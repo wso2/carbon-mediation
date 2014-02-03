@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getApplicationList" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Optional filter. See http://www.twilio.com/docs/api/rest/applications#list-get-filters -->
+    <parameter name="friendlyName"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.application.getApplicationList"/>
+    </sequence>
+</template>

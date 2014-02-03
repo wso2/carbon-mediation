@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twitter_timeline" type="synapse/template">
+
+	<subComponents>
+		<component name="getHomeTimeline">
+			<file>get_home_timeline.xml</file>
+			<description>Returns a collection of the most recent Tweets posted by
+				the user indicated by the screen_name or user_id parameters. User
+				timelines belonging to protected users may only be requested when
+				the authenticated user either "owns" the timeline or is an approved
+				follower of the owner</description>
+		</component>
+		<component name="getMentionsTimeline">
+			<file>get_mentions_timeline.xml</file>
+			<description>Returns the 20 most recent mentions (tweets containing a
+				users's @screen_name) for the authenticating user. The timeline
+				returned is the equivalent of the one seen when you view your
+				mentions on twitter.com. This method can only return up to 800
+				tweets</description>
+		</component>
+		<component name="getRetweetsOfMine">
+			<file>get_retweets_of_mine.xml</file>
+			<description>Returns the most recent tweets authored by the
+				authenticating user that have been retweeted by others. This
+				timeline is a subset of the user's GET statuses/user_timeline. See
+				Working with Timelines for instructions on traversing timelines.
+			</description>
+		</component>
+
+
+
+	</subComponents>
+</component>

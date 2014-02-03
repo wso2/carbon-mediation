@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twitter_tweets" type="synapse/template">
+
+	<subComponents>
+		<component name="showStatus">
+			<file>show_status.xml</file>
+			<description>Returns a single Tweet, specified by the id parameter.
+				The Tweet's author will also be embedded within the tweet.
+			</description>
+		</component>
+		<component name="updateStatus">
+			<file>update_status.xml</file>
+			<description>Updates the authenticating user's current status, also
+				known as tweeting. To upload an image to accompany the tweet, use
+				POST statuses/update_with_media.
+			</description>
+		</component>
+		<component name="retweet">
+			<file>retweet_status.xml</file>
+			<description>Retweets a tweet. Returns the original tweet with
+				retweet details embedded.</description>
+		</component>
+		<component name="destroyStatus">
+			<file>destroy_status.xml</file>
+			<description>Destroys the status specified by the required ID
+				parameter. The authenticating user must be the author of the
+				specified status. Returns the destroyed status if successful.
+			</description>
+		</component>
+	</subComponents>
+</component>

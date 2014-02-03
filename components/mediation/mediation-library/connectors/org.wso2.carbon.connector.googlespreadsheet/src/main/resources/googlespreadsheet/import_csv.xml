@@ -1,0 +1,19 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="importCSV">
+	<parameter name="spreadsheetName"/>	
+	<parameter name="worksheetName"/>
+	<parameter name="filePath" />
+	<parameter name="batchEnable" />	
+	<parameter name="batchSize" />	
+	<sequence>
+		<log level="custom">
+			<property name="FLW" value="GoogleSpreadsheet : Import CSV"/>
+			<property name="worksheetName" expression="$func:worksheetName"/>
+			<property name="spreadsheetName" expression="$func:spreadsheetName"/>	
+			<property name="filePath" expression="$func:filePath"/>
+			<property name="batchEnable" expression="$func:batchEnable"/>	
+			<property name="batchSize" expression="$func:batchSize"/>			
+		</log>		
+		<class
+			name="org.wso2.carbon.connector.googlespreadsheet.GoogleSpreadsheetImportCSV" />
+	</sequence>
+</template>	

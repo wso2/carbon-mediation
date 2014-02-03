@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="dequeueMember" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="queueSid"/>
+    <parameter name="callSid"/>
+    <parameter name="url"/>
+    <!--
+     All parameters are compulsory. The string 'Front' may be used as the
+     CallSid value in order to dequeue the first member on the queue.
+    -->
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.queue.DequeueMember"/>
+    </sequence>
+</template>

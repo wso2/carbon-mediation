@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://ws.apache.org/ns/synapse">
+	<proxy  name="HL7ServerProxy" transports="https http hl7" startOnLoad="true" trace="disable">
+	    <target>
+		<endpoint name="endpoint_urn_uuid_9CB8D06C91A1E996796270828144799-1418795938">
+		    <address uri="hl7://localhost:9988"/>
+		</endpoint>
+		<inSequence>
+		    <log level="full"/>
+		</inSequence>
+		<outSequence>
+		    <log level="full"/> 
+		    <drop/>
+		</outSequence>
+	    </target>
+	    <parameter name="transport.hl7.Port">9293</parameter>
+	</proxy>
+</definitions>

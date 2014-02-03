@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twitter_trends" type="synapse/template">
+
+	<subComponents>
+		<component name="getClosestTrends">
+			<file>get_closest_trends.xml</file>
+			<description>Returns the locations that Twitter has trending topic
+				information for, closest to a specified location.</description>
+		</component>
+		<component name="getTopTrendPlaces">
+			<file>get_top_trends.xml</file>
+			<description>Returns the top 10 trending topics for a specific WOEID,
+				if trending information is available for it. The response is an
+				array of "trend" objects that encode the name of the trending topic,
+				the query parameter that can be used to search for the topic on
+				Twitter Search.</description>
+		</component>
+
+	</subComponents>
+</component>

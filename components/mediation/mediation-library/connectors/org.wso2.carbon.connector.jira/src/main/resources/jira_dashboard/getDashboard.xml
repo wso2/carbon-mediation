@@ -1,0 +1,23 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="getDashboard">
+
+	<sequence>
+
+		<property name="Accept-Encoding" action="remove" scope="transport" />
+		<payloadFactory media-type="xml">
+			<format>
+				<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+					<soapenv:Header />
+					<soapenv:Body />
+				</soapenv:Envelope>
+			</format>
+			<args />
+		</payloadFactory>
+		<property name="messageType" value="application/json" scope="axis2" />
+
+		<call>
+			<endpoint>
+				<http method="GET" uri-template="{uri.var.jira.url}/rest/api/2/dashboard" />
+			</endpoint>
+		</call>
+	</sequence>
+</template>

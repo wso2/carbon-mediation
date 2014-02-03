@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="updateIncomingPhoneNumber" xmlns="http://ws.apache.org/ns/synapse">
+    <!--mandatory-->
+    <parameter name="incomingCallerId"/>
+    <!-- optional parameters to be updated-->
+    <parameter name="friendlyName"/>
+    <parameter name="apiVersion"/>
+    <parameter name="voiceUrl"/>
+    <parameter name="voiceMethod"/>
+    <parameter name="voiceFallbackUrl"/>
+    <parameter name="voiceFallbackMethod"/>
+    <parameter name="statusCallback"/>
+    <parameter name="statusCallbackMethod"/>
+    <parameter name="voiceCallerIdLookup"/>
+    <parameter name="voiceApplicationSid"/>
+    <parameter name="smsUrl"/>
+    <parameter name="smsMethod"/>
+    <parameter name="smsFallbackUrl"/>
+    <parameter name="smsFallbackMethod"/>
+    <parameter name="smsApplicationSid"/>
+    <parameter name="accountSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.phonenumbers.UpdateIncomingPhoneNumber"/>
+    </sequence>
+</template>

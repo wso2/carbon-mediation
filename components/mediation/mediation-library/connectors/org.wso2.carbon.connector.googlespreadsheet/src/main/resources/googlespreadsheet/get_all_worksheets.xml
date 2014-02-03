@@ -1,0 +1,11 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="getAllWorksheets">	
+	<parameter name="spreadsheetName"/>	
+	<sequence>
+		<log level="custom">
+			<property name="FLW" value="GoogleSpreadsheet : Get All Worksheets"/>			
+			<property name="spreadsheetName" expression="$func:spreadsheetName"/>			
+		</log>
+		<class
+			name="org.wso2.carbon.connector.googlespreadsheet.GoogleSpreadsheetGetAllWorksheets" />
+	</sequence>
+</template>	

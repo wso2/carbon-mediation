@@ -1,0 +1,11 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="retweet">
+	<parameter name="consumerKey" />
+	<parameter name="consumerSecret" />
+	<parameter name="accessToken" />
+	<parameter name="accessTokenSecret" />
+	<parameter name="id" />
+	<sequence>
+		<class
+			name="org.wso2.carbon.connector.twitter.TwitterRetweetStatus" />
+	</sequence>
+</template>	

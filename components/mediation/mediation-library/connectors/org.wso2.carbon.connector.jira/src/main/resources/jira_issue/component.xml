@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="jira_issue" type="synapse/template">
+
+	<subComponents>
+		<component name="createIssue">
+			<file>createIssue.xml</file>
+			<description>creates jira issue</description>
+		</component>
+		<component name="getIssue">
+			<file>getIssue.xml</file>
+			<description>get jira issue</description>
+		</component>
+		<component name="updateIssue">
+			<file>updateIssue.xml</file>
+			<description>update jira issue</description>
+		</component>
+		<component name="updateIssueAssignee">
+			<file>updateIssueAssignee.xml</file>
+			<description>update jira issue assinee</description>
+		</component>
+		<component name="getIssuesForUser">
+			<file>getIssuesForUser.xml</file>
+			<description>get jira for the requested user</description>
+		</component>
+		<component name="getTransitions">
+			<file>getTransitions.xml</file>
+			<description>get transitions for the requested jira</description>
+		</component>
+		<component name="doTransition">
+			<file>doTransition.xml</file>
+			<description>change transitions for the requested jira</description>
+		</component>
+		<component name="deleteComment">
+			<file>deleteComment.xml</file>
+			<description>delete comment of the given jira issue</description>
+		</component>
+		<component name="getComments">
+			<file>getComments.xml</file>
+			<description>get jira issue commnents</description>
+		</component>
+		<component name="postComment">
+			<file>postComment.xml</file>
+			<description>Posting jira issue comment</description>
+		</component>
+		<component name="updateComment">
+			<file>updateComment.xml</file>
+			<description>updating jira issue comment</description>
+		</component>
+		<component name="getVotesForIssue">
+			<file>getVotesForIssue.xml</file>
+			<description>get vote for the requested jira</description>
+		</component>
+		<component name="addAttachmentToIssueId">
+			<file>addAttachmentToIssueId.xml</file>
+			<description>Add one or more attachments to an issue. </description>
+		</component>
+		<component name="getIssuePriorities">
+			<file>getIssuePriorities.xml</file>
+			<description>Get a list of issue priorities. </description>
+		</component>
+		<component name="getIssuePriorityById">
+			<file>getIssuePriorityById.xml</file>
+			<description>Get information about issue priority by ID. </description>
+		</component>
+		<component name="getIssueTypes">
+			<file>getIssueTypes.xml</file>
+			<description>Get issue types defined in the system. </description>
+		</component>
+		<component name="getIssueTypeById">
+			<file>getIssueTypeById.xml</file>
+			<description>Get information about issue type by ID. </description>
+		</component>
+	</subComponents>
+</component>

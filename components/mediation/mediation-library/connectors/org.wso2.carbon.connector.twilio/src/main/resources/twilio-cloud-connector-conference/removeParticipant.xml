@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="removeParticipant" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Compulsory-->
+    <parameter name="conferenceSid"/>
+    <parameter name="callSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.conference.RemoveParticipant"/>
+    </sequence>
+</template>

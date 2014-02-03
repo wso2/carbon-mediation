@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twitter_direct_messages" type="synapse/template">
+
+	<subComponents>
+		<component name="sendDirectMessage">
+			<file>send_direct_message.xml</file>
+			<description>Sends a new direct message to the specified user from
+				the authenticating user. Requires both the user and text parameters
+				and must be a POST. Returns the sent message in the requested format
+				if successful.</description>
+		</component>
+		<component name="getDirectMessages">
+			<file>get_direct_messages.xml</file>
+			<description>Returns the 20 most recent direct messages sent to the
+				authenticating user. Includes detailed information about the sender
+				and recipient user. You can request up to 200 direct messages per
+				call, up to a maximum of 800 incoming DMs.</description>
+		</component>
+		<component name="getSentDirectMessages">
+			<file>get_send_direct_messages.xml</file>
+			<description>Returns the 20 most recent direct messages sent by the
+				authenticating user. Includes detailed information about the sender
+				and recipient user. You can request up to 200 direct messages per
+				call, up to a maximum of 800 outgoing DMs</description>
+		</component>
+
+	</subComponents>
+</component>

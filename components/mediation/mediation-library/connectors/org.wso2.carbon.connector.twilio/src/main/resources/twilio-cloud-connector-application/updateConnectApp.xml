@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="updateConnectApp" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Mandatory parameter-->
+    <parameter name="connectAppSid"/>
+    <!-- optional parameters. For more information, refer http://www.twilio.com/docs/api/rest/connect-apps#instance-post-optional-parameters -->
+    <parameter name="friendlyName"/>
+    <parameter name="authorizeRedirectUrl"/>
+    <parameter name="deauthorizeCallbackUrl"/>
+    <parameter name="deauthorizeCallbackMethod"/>
+    <parameter name="permissions"/>
+    <parameter name="description"/>
+    <parameter name="companyName"/>
+    <parameter name="homepageUrl"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.application.updateConnectApp"/>
+    </sequence>
+</template>

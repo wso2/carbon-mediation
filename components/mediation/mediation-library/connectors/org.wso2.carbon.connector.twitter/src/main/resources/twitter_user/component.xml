@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twitter_user" type="synapse/template">
+
+	<subComponents>
+		<component name="getUserTimeLine">
+			<file>get_user_time_line.xml</file>
+			<description>Returns a collection of the most recent Tweets posted by
+				the user indicated by the screen_name or user_id parameters.
+			</description>
+		</component>
+
+
+	</subComponents>
+</component>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="googlespreadsheet" type="synapse/template" >
+    <subComponents> 
+        <component name="createSpreadsheet" >
+            <file>create_spreadsheet.xml</file>
+            <description>Create a Spreadsheet with a given name</description>
+        </component>
+        <component name="createWorksheet" >
+            <file>create_worksheet.xml</file>
+            <description>Create a worksheet with a given name</description>
+        </component>
+        <component name="importCSV" >
+            <file>import_csv.xml</file>
+            <description>Import CSV data into a worksheet</description>
+        </component>
+        <component name="usernameLogin" >
+            <file>username_login.xml</file>
+            <description>Log in to the google account with username and password</description>
+        </component>
+        <component name="searchCell" >
+            <file>search_cell.xml</file>
+            <description>Search a cell with a given string</description>
+        </component>
+        <component name="purgeWorksheet" >
+            <file>purge_worksheet.xml</file>
+            <description>Purge (delete) data in a worksheet</description>
+        </component>
+        <component name="deleteWorksheet" >
+            <file>delete_worksheet.xml</file>
+            <description>Delete an entire worksheet with its data</description>
+        </component>
+        <component name="getAllSpreadsheets" >
+            <file>get_all_spreadsheets.xml</file>
+            <description>Retrieve all spreadsheets for a particular google account</description>
+        </component>
+        <component name="getAllWorksheets" >
+            <file>get_all_worksheets.xml</file>
+            <description>Retrieve all worksheets for a given spreadsheet</description>
+        </component>
+        <component name="updateWorksheetMetadata" >
+            <file>update_worksheet_metadata.xml</file>
+            <description>Update metadata of a given worksheet</description>
+        </component>
+        <component name="getAllCells" >
+            <file>get_all_cells.xml</file>
+            <description>Retrieve all cells with data for a given worksheet</description>
+        </component>
+        <component name="getAllCellsCSV" >
+            <file>get_all_cells_csv.xml</file>
+            <description>Retrieve all cells with data for a given worksheet in csv format</description>
+        </component>
+        <component name="getAuthors" >
+            <file>get_authors.xml</file>
+            <description>Retrieve authors of a given spreadsheet or worksheet</description>
+        </component>
+        <component name="getCellRange" >
+            <file>get_cell_range.xml</file>
+            <description>Retrieve cells containing data for a given cell range</description>
+        </component>
+        <component name="getCellRangeCSV" >
+            <file>get_cell_range_csv.xml</file>
+            <description>Retrieve cells containing data for a given cell range in csv format</description>
+        </component>
+        <component name="getColumnHeaders" >
+            <file>get_column_headers.xml</file>
+            <description>Retrieve column headers for a given worksheet</description>
+        </component>
+        <component name="setRow" >
+            <file>set_row.xml</file>
+            <description>Set a specific row with the given data</description>
+        </component>
+            <component name="init">
+            <file>init.xml</file>
+            <description>configure googlespreadsheet related setup</description>
+        </component>
+        <component name="getSpreadsheetsByTitle">
+            <file>get_spreadsheets_by_title.xml</file>
+            <description>Retrieve spreadsheets with the given title</description>
+        </component>
+        <component name="getWorksheetsByTitle">
+            <file>get_worksheets_by_title.xml</file>
+            <description>Retrieve worksheets with the given title</description>
+        </component>
+    </subComponents>
+</component>

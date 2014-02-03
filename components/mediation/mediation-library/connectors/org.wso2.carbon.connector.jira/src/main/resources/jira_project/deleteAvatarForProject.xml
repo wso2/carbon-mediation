@@ -1,0 +1,17 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="deleteAvatarForProject">
+	<parameter name="projectKey"
+		description="a String containing of the unique key for a project" />
+	<parameter name="avatarId"
+		description="id of the avator" />	
+
+	<sequence>
+		 <property name="uri.var.projectKey" expression="$func:projectKey" />
+		 <property name="uri.var.avatarId" expression="$func:avatarId" />
+		 <property name="messageType" value="application/json" scope="axis2" />
+		<call>
+			<endpoint>
+				<http method="DELETE" uri-template="{uri.var.jira.url}/rest/api/2/project/{uri.var.projectKey}/avatar/{uri.var.avatarId}" />
+			</endpoint>
+		</call>
+	</sequence>
+</template>

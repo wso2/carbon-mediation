@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getAccountsList" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="friendlyName"/>
+    <parameter name="status"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.account.GetAccountsList"/>
+    </sequence>
+</template>

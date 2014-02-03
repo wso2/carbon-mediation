@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getRecordingList" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Optional.-->
+    <parameter name="callSid"/>
+    <parameter name="dateCreated"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.call.GetRecordingList"/>
+    </sequence>
+</template>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="modifyLiveCall" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required-->
+    <parameter name="callSid"/>
+    <!--Available parameters to be modified (Optional).
+        See http://www.twilio.com/docs/api/rest/change-call-state#post-parameters for full specification and allowed values.
+    -->
+    <parameter name="url"/>
+    <parameter name="method"/>
+    <parameter name="status"/>
+    <parameter name="fallbackUrl"/>
+    <parameter name="fallbackMethod"/>
+    <parameter name="statusCallback"/>
+    <parameter name="statusCallbackMethod"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.call.ModifyLiveCall"/>
+    </sequence>
+</template>

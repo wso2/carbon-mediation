@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="makeCall" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required Parameters.
+        See http://www.twilio.com/docs/api/rest/making-calls#post-parameters-required for full specification and allowed values.
+    -->
+    <parameter name="to"/>
+    <parameter name="from"/>
+    <!--One of the below must be provided.
+        See http://www.twilio.com/docs/api/rest/making-calls#post-parameters-required for full specification and allowed values.
+    -->
+    <parameter name="url"/>
+    <parameter name="applicationSid"/>
+    <!--Optional parameters.
+        See http://www.twilio.com/docs/api/rest/making-calls#post-parameters-optional for full specification and allowed values.
+     -->
+    <parameter name="method"/>
+    <parameter name="fallbackUrl"/>
+    <parameter name="fallbackMethod"/>
+    <parameter name="statusCallback"/>
+    <parameter name="statusCallbackMethod"/>
+    <parameter name="sendDigits"/>
+    <parameter name="ifMachine"/>
+    <parameter name="timeout"/>
+    <parameter name="record"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.call.MakeCall"/>
+    </sequence>
+</template>

@@ -1,0 +1,10 @@
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+<?xml version="1.0" encoding="UTF-8"?>
+<connector>
+    <component name="${connector_name}" package="${package}" >
+        <dependency component="helloWorld"/>
+        <description>wso2 sample connector library</description>
+    </component>
+</connector>

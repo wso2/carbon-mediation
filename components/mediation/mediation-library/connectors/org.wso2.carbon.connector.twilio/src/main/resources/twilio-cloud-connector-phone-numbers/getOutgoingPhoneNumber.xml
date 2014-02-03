@@ -1,0 +1,6 @@
+<template name="getOutgoingPhoneNumber" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="outgoingCallerId"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.phonenumbers.GetOutgoingPhoneNumber"/>
+    </sequence>
+</template>

@@ -1,0 +1,15 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="deleteFilter">
+    
+    <parameter name="filterId" description="a String containing the filter id." />
+	<sequence>
+		<property name="uri.var.filterId" expression="$func:filterId" />
+		<property name="Accept-Encoding" action="remove" scope="transport" />
+                <property name="messageType" value="application/json" scope="axis2" />
+		<call>
+			<endpoint>
+				<http method="DELETE"
+					uri-template="{uri.var.jira.url}/rest/api/2/filter/{uri.var.filterId}" />
+			</endpoint>
+		</call>
+	</sequence>
+</template>

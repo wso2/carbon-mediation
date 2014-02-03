@@ -1,0 +1,7 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="usernameLogin">
+	<parameter name="username"/>
+	<parameter name="password"/>	
+	<sequence>
+		<class name="org.wso2.carbon.connector.googlespreadsheet.GoogleSpreadsheetLoginUser" />
+	</sequence>
+</template>	

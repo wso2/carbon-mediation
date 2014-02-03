@@ -1,0 +1,14 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="updateIssue">
+     <parameter name="issueIdOrKey" description="a String containing the issue id." />
+	<sequence>
+		<property name="messageType" value="application/json" scope="axis2" />
+		<property name="Accept-Encoding" action="remove" scope="transport" />
+		<property name="uri.var.issueId" expression="$func:issueIdOrKey" />
+		<call>
+			<endpoint>
+				<http method="PUT"
+					uri-template="{uri.var.jira.url}/rest/api/2/issue/{uri.var.issueId}" />
+			</endpoint>
+		</call>
+	</sequence>
+</template>

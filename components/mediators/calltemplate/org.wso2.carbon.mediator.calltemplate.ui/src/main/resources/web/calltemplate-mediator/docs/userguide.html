@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<!--
+ ~ Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~ http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ -->
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>Call Template Mediator - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>Call Template Mediator</h1>
+<p>
+The call template mediator is used to invoke a target Sequence Template. It will define/populate corresponding
+    parameters of a template before actually executing the template.
+</p>
+<img src="images/call-template.png"/>
+<p><strong>Call Template Mediator</strong></p>
+
+<ul>
+<li>
+Target Template : target sequence template this call template mediator refering to.
+</li>
+<li>
+Available Templates : Lists all available sequence templates in ESB configuration/registry . When user
+    selects one of the available templates it  will autonatically list down the relevant parameters of
+    the selected sequence template
+</li>
+</ul>
+
+<h2>Parameters of Call-Template mediator</h2>
+<p>
+Manage the parameters which would be referred from target Sequence Template.
+</p>
+<img src="images/call-template-parameters.png"/>
+<p><strong>Call-Template Mediator - Add Parameter</strong></p>
+
+<ul>
+<li>
+Parameter Name: Name of the parameter.
+</li>
+<li>
+Parameter Type: Whether it is a static value or an xpath expression.
+</li>
+<li>
+Value/ Expression: The static value or the xpath expression.
+</li>
+<li>
+Dynamic Xpath: when  this option is selected AND if type is an xpath expression , it will be rendered
+    as an double quoted expression ,meaning xpath will be evaluated dynamically. Hence xpath expression will
+    not be passed as an evaluated value to a sequence template ,rather it will be evaluated just before
+    the expression is used within the template
+</li>
+<li>
+NSEditor: Specify the namespaces that are used in the xpath expression.
+</li>
+<li>
+Action: Delete the paramater.
+</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twilio-cloud-connector-usage" type="synapse/template">
+
+    <subComponents>
+    
+        <component name="getUsageRecordList">
+            <file>getUsageRecordList.xml</file>
+            <description>Get usage record list</description>
+        </component>
+        
+        <component name="getUsageTriggerList">
+            <file>getUsageTriggerList.xml</file>
+            <description>Get usage trigger list</description>
+        </component>
+
+        <component name="getUsageTrigger">
+            <file>getUsageTrigger.xml</file>
+            <description>Get usage trigger</description>
+        </component>
+
+        <component name="updateUsageTrigger">
+            <file>updateUsageTrigger.xml</file>
+            <description>Update usage trigger</description>
+        </component>
+
+        <component name="removeUsageTrigger">
+            <file>removeUsageTrigger.xml</file>
+            <description>Remove usage trigger</description>
+        </component>
+
+        <component name="addUsageTrigger">
+            <file>addUsageTrigger.xml</file>
+            <description>Add usage trigger</description>
+        </component>
+        
+    </subComponents>
+
+</component>

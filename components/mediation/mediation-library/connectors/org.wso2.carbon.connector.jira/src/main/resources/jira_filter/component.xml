@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="jira_filter" type="synapse/template">
+
+	<subComponents>
+		<component name="createFilter">
+			<file>createFilter.xml</file>
+			<description>Creates a new filter, and returns newly created filter. Currently sets permissions just using the users default sharing permissions</description>
+		</component>
+		<component name="deleteFilter">
+			<file>deleteFilter.xml</file>
+			<description>Delete a filter.</description>
+		</component>
+		<component name="getFavouriteFilters">
+			<file>getFavouriteFilters.xml</file>
+			<description>Returns the favourite filters of the logged-in user.</description>
+		</component>
+		<component name="getFilterById">
+			<file>getFilterById.xml</file>
+			<description>Returns a filter given an id</description>
+		</component>
+		<component name="updateFilterById">
+			<file>updateFilterById.xml</file>
+			<description>Updates an existing filter, and returns its new value.</description>
+		</component>
+	</subComponents>
+</component>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="createQueue" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="friendlyName"/>
+    <parameter name="maxSize"/>
+    <!--
+     The QueueSid parameter is compulsory. FriendlyName and MaxSize may be specified if needed.
+    -->
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.queue.CreateQueue"/>
+    </sequence>
+</template>

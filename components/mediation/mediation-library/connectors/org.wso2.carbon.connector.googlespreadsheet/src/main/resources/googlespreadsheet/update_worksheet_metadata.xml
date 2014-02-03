@@ -1,0 +1,19 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="updateWorksheetMetadata">
+    <parameter name="spreadsheetName" />
+	<parameter name="worksheetOldName"/>	
+	<parameter name="worksheetNewName"/>	
+	<parameter name="worksheetRows"/>
+	<parameter name="worksheetColumns"/>
+	<sequence>
+		<log level="custom">
+			<property name="FLW" value="GoogleSpreadsheet : Update Worksheet Metdata"/>
+			<property name="spreadsheetName" expression="$func:spreadsheetName"/>
+			<property name="worksheetOldName" expression="$func:worksheetOldName"/>
+			<property name="worksheetNewName" expression="$func:worksheetNewName"/>
+			<property name="worksheetRows" expression="$func:worksheetRows"/>
+			<property name="worksheetColumns" expression="$func:worksheetColumns"/>
+		</log>
+		<class
+			name="org.wso2.carbon.connector.googlespreadsheet.GoogleSpreadsheetUpdateWorksheetMetadata" />
+	</sequence>
+</template>	

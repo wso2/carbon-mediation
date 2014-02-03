@@ -1,0 +1,25 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="getStatusesOfProject">
+	<parameter name="projectKey"
+		description="a String containing of the unique key for a project" />
+
+	<sequence>
+		<property name="uri.var.projectKey" expression="$func:projectKey" />
+
+		<payloadFactory media-type="xml">
+			<format>
+				<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+					<soapenv:Header />
+					<soapenv:Body />
+				</soapenv:Envelope>
+			</format>
+			<args />
+		</payloadFactory>
+		<property name="messageType" value="application/json" scope="axis2" />
+		<call>
+			<endpoint>
+				<http method="get"
+					uri-template="{uri.var.jira.url}/rest/api/2/project/{uri.var.projectKey}/statuses" />
+			</endpoint>
+		</call>
+	</sequence>
+</template>

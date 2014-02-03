@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<!--
+ ~ Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~ http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ -->
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>DB Report Mediator - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+
+<body>
+<div id="middle">
+<h1>DB Report Mediator</h1>
+<p>
+The dbreport mediator is very similar to the dblookup mediator, but
+writes information to a Database, using the specified insert SQL
+statement. </p>
+
+<h3>DBReport mediator options</h3>
+<div class="image">
+<img src="images/dbreport_mediator_screenshot.png" alt=""/>
+<p>Figure 1: DBReport options
+</p>
+</div>
+DBReport mediator options field descriptions,
+<ul>
+<li>Connection Information - Specify whether the connection is
+taken from a connection pool or from a data source</li>
+<li>Driver - Database driver</li>
+<li>Url - JDBC URL of the database that data will be looked up.</li>
+<li>User - Username that's used to connect to the database.</li>
+<li>Password - Password used to connect to the
+database. </li>
+</ul>
+<h3>Data sources</h3>
+<h4>Carbon Datasource</h4>
+<p>If existing Carbon data source is chosen, clicking "Load Data Sources" will give the available datasource. Then a data source can be selected.</p>
+<img src="images/ds.png" alt="Data Source"/>
+<p>Figure 2 : Existing Datasources</p>
+    
+<h4>External</h4>
+<p>Like in Pool connection data source configuration properties should be specified.</p>
+<img src="images/ds-external.png" alt="Data Source"/>
+<p>Figure 3: External Datasources</p>
+<h4>Adding properties</h4>
+<p>
+Properties can be add to the DBReport Mediator by clicking Add Property, then the configuration UI appears. 
+</p>
+<div class="image">
+<img src="images/dbreport_property.png" alt=""/>
+<p>Figure 4: Adding a property </p>
+</div>
+<p>Property field descriptions,</p>
+<ul>
+<li> autocommit = true | false </li>
+<li> isolation = Connection.TRANSACTION_NONE |
+Connection.TRANSACTION_READ_COMMITTED |
+Connection.TRANSACTION_READ_UNCOMMITTED |
+Connection.TRANSACTION_REPEATABLE_READ |
+Connection.TRANSACTION_SERIALIZABLE</li>
+<li>initialsize = int </li>
+<li> maxactive = int </li>
+<li> maxidle = int </li>
+<li> maxopenstatements = int </li>
+<li> maxwait = long </li>
+<li> minidle = int </li>
+<li> poolstatements = true | false </li>
+<li> testonborrow = true | false </li>
+<li> testwhileidle = true | false </li>
+<li> validationquery = String </li>
+</ul>
+<h4>Adding SQL statements</h4>
+<ol>
+<li>SQL Statements can be added by clicking Add Statement link.
+</li>
+<li>More than one statement may be specified.</li>
+</ol>
+<ul>
+<ul>
+<li>The SQL statement may
+specify parameters which could be specified as values or XPath
+expressions. </li>
+<li>The types of parameters could be any valid SQL types.
+Only
+the first row of a result set will be considered and any others are
+ignored. </li>
+</ul>
+</ul>
+<div class="image">
+<img src="images/dbreport_sql.png" alt=""/>
+<p>
+Figure 5: Adding SQL statements
+</p>
+</div>
+</div>
+</body></html>

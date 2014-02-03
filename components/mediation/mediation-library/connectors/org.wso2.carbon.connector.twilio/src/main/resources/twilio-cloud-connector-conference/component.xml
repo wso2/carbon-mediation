@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twilio-cloud-connector-conference" type="synapse/template">
+
+    <subComponents>
+        <!-- Accounts -->
+        <component name="getConference">
+            <file>getConference.xml</file>
+            <description>Get a conference by its Sid</description>
+        </component>
+        <component name="getConferenceList">
+            <file>getConferenceList.xml</file>
+            <description>Get a conference list by parameters</description>
+        </component>
+        <component name="getParticipant">
+            <file>getParticipant.xml</file>
+            <description>Get a participant of a given conference by call sid of the participant</description>
+        </component>
+        <component name="getParticipantList">
+            <file>getParticipantList.xml</file>
+            <description>Get a participant list of a conference</description>
+        </component>
+        <component name="updateParticipant">
+            <file>updateParticipant.xml</file>
+            <description>Updates a participant</description>
+        </component>
+        <component name="removeParticipant">
+            <file>removeParticipant.xml</file>
+            <description>Removes a participant</description>
+        </component>
+    </subComponents>
+
+</component>

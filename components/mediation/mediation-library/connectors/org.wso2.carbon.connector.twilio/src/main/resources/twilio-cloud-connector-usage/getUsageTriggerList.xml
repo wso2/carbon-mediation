@@ -1,0 +1,8 @@
+<template name="getUsageTriggerList" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="recurring"/>
+    <parameter name="usageCategory"/>
+    <parameter name="triggerBy"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.usage.GetUsageTriggerList"/>
+    </sequence>
+</template>

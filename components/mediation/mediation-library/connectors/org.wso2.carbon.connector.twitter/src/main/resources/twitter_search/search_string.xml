@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template xmlns="http://ws.apache.org/ns/synapse" name="search">
+	<parameter name="search" />
+	<parameter name="lang" />
+	<parameter name="locale" />
+	<parameter name="maxId" />
+	<parameter name="since" />
+	<parameter name="sinceId" />
+	<parameter name="geocode" />
+	<parameter name="radius" />
+	<parameter name="unit" />
+	<parameter name="until" />
+	<parameter name="count" />
+	<sequence>
+
+		<property name="uri.var.twitter.search" expression="$func:search" />
+		<property name="uri.var.twitter.geocode" expression="$func:geocode" />
+		<property name="uri.var.twitter.lang" expression="$func:lang" />
+		<property name="uri.var.twitter.locale" expression="$func:locale" />
+		<property name="uri.var.twitter.maxId" expression="$func:maxId" />
+		<property name="uri.var.twitter.sinceId" expression="$func:sinceId" />
+		<property name="uri.var.twitter.since" expression="$func:since" />
+		<property name="uri.var.twitter.radius" expression="$func:radius" />
+		<property name="uri.var.twitter.unit" expression="$func:unit" />
+		<property name="uri.var.twitter.until" expression="$func:until" />
+		<property name="uri.var.twitter.count" expression="$func:count" />
+
+
+		<filter
+			xpath="get-property('uri.var.twitter.geocode') = '' or  (not(string(get-property('uri.var.twitter.geocode'))))">
+			<then>
+				<property name="uri.var.twitter.geocode" value="" />
+			</then>
+		</filter>
+
+		<filter
+			xpath="get-property('uri.var.twitter.lang') = '' or  (not(string(get-property('uri.var.twitter.lang'))))">
+			<then>
+				<property name="uri.var.twitter.lang" value="" />
+			</then>
+		</filter>
+
+		<filter
+			xpath="get-property('uri.var.twitter.locale') = '' or  (not(string(get-property('uri.var.twitter.locale'))))">
+			<then>
+				<property name="uri.var.twitter.locale" value="" />
+			</then>
+		</filter>
+
+		<filter
+			xpath="get-property('uri.var.twitter.maxId') = '' or  (not(string(get-property('uri.var.twitter.maxId'))))">
+			<then>
+				<property name="uri.var.twitter.maxId" value="" />
+			</then>
+		</filter>
+
+
+		<filter
+			xpath="get-property('uri.var.twitter.sinceId') = '' or  (not(string(get-property('uri.var.twitter.maxId'))))">
+			<then>
+				<property name="uri.var.twitter.maxId" value="" />
+			</then>
+		</filter>
+
+		<filter
+			xpath="get-property('uri.var.twitter.since') = '' or  (not(string(get-property('uri.var.twitter.since'))))">
+			<then>
+				<property name="uri.var.twitter.since" value="" />
+			</then>
+		</filter>
+
+
+
+		<filter
+			xpath="get-property('uri.var.twitter.radius') = '' or  (not(string(get-property('uri.var.twitter.radius'))))">
+			<then>
+				<property name="uri.var.twitter.radius" value="" />
+			</then>
+		</filter>
+
+		<filter
+			xpath="get-property('uri.var.twitter.radius') = '' or  (not(string(get-property('uri.var.twitter.radius'))))">
+			<then>
+				<property name="uri.var.twitter.radius" value="" />
+			</then>
+		</filter>
+
+		<filter
+			xpath="get-property('uri.var.twitter.unit') = '' or  (not(string(get-property('uri.var.twitter.unit'))))">
+			<then>
+				<property name="uri.var.twitter.unit" value="" />
+			</then>
+		</filter>
+
+		<property name="Authorization"
+			expression="fn:concat('bearer ', get-property('operation','twitter.accessToken'))"
+			scope="transport" />
+
+
+		<property name="messageType" value="application/x-www-form-urlencoded"
+			scope="axis2" />
+
+		<payloadFactory media-type="xml">
+			<format>
+				<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+					<soapenv:Header />
+					<soapenv:Body />
+				</soapenv:Envelope>
+			</format>
+			<args />
+		</payloadFactory>
+
+		<call>
+			<endpoint>
+				<http method="GET"
+					uri-template="https://api.twitter.com/1.1/search/tweets.json?q={uri.var.twitter.search}&amp;since_id={uri.var.twitter.sinceId}&amp;max_id={uri.var.twitter.maxId}&amp;result_type=mixed&amp;count={uri.var.twitter.count}&amp;lang={uri.var.twitter.lang}&amp;geocode={uri.var.twitter.geocode}&amp;locale={uri.var.twitter.locale}" />
+			</endpoint>
+		</call>
+
+
+
+	</sequence>
+</template>

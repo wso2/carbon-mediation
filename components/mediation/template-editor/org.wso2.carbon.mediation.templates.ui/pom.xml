@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>template-editor</artifactId>
+        <version>4.3.0-SNAPSHOT</version>
+	<relativePath>../pom.xml</relativePath>
+    </parent>    
+    <version>4.3.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.wso2.carbon</groupId>
+    <artifactId>org.wso2.carbon.mediation.templates.ui</artifactId>
+    <packaging>bundle</packaging>
+    <name>WSO2 Carbon - Template Editor UI</name>
+    <url>http://wso2.org</url>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Carbon-Component>UIBundle</Carbon-Component>
+                        <Private-Package>
+                            <!--org.wso2.carbon.sequences.ui.*,-->
+                            <!--org.wso2.carbon.mediation.templates.stub.*,-->
+                            org.wso2.carbon.mediation.templates.ui,
+                            org.wso2.carbon.mediation.templates.ui.factory,
+<!--                            org.wso2.carbon.mediation.templates.ui.types.*,-->
+                        </Private-Package>
+                        <Export-Package>
+                            org.wso2.carbon.mediation.templates.ui.*,
+                        </Export-Package>
+                        <Import-Package>
+                            org.wso2.carbon.mediation.templates.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.mediation.templates.endpoint.stub.*;version="${carbon.platform.package.import.version.range}",
+                            !javax.xml.namespace,
+                            org.wso2.carbon.mediator.service.*,
+                            org.wso2.carbon.sequences.common.*,
+                            org.wso2.carbon.mediation.templates.common.*,
+                            org.wso2.carbon.sequences.ui.client,
+                            org.wso2.carbon.mediation.service.templates,
+                            org.apache.axis2.*; version="${axis2.osgi.version.range.template-editor}",
+			                org.apache.axiom.*; version="${axiom.osgi.version.range.template-editor}",
+                            javax.servlet;version="${imp.pkg.version.javax.servlet}",
+                            javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
+                            javax.servlet.jsp;version="${imp.pkg.version.javax.servlet.jsp}",
+                            javax.servlet.jsp.el;version="${imp.pkg.version.javax.servlet.jsp}",
+                            javax.servlet.jsp.jstl.core;version="${imp.pkg.version.javax.servlet.jsp.jstl}",
+                            javax.servlet.jsp.jstl.fmt;version="${imp.pkg.version.javax.servlet.jsp.jstl}",
+                            javax.servlet.jsp.jstl.sql;version="${imp.pkg.version.javax.servlet.jsp.jstl}",
+                            javax.servlet.jsp.jstl.tlv;version="${imp.pkg.version.javax.servlet.jsp.jstl}",
+                            javax.servlet.jsp.resources;version="${imp.pkg.version.javax.servlet.jsp}",
+                            javax.servlet.jsp.tagext;version="${imp.pkg.version.javax.servlet.jsp}",
+                            javax.servlet.resources;version="${imp.pkg.version.javax.servlet}",
+                            org.apache.taglibs.standard,
+                            org.apache.taglibs.standard.extra.spath,
+                            org.apache.taglibs.standard.functions,
+                            org.apache.taglibs.standard.lang.jstl,
+                            org.apache.taglibs.standard.lang.jstl.parser,
+                            org.apache.taglibs.standard.lang.jstl.test,
+                            org.apache.taglibs.standard.lang.jstl.test.beans,
+                            org.apache.taglibs.standard.lang.support,
+                            org.apache.taglibs.standard.resources,
+                            org.apache.taglibs.standard.tag.common.core,
+                            org.apache.taglibs.standard.tag.common.fmt,
+                            org.apache.taglibs.standard.tag.common.sql,
+                            org.apache.taglibs.standard.tag.common.xml,
+                            org.apache.taglibs.standard.tag.el.core,
+                            org.apache.taglibs.standard.tag.el.fmt,
+                            org.apache.taglibs.standard.tag.el.sql,
+                            org.apache.taglibs.standard.tag.el.xml,
+                            org.apache.taglibs.standard.tag.rt.core,
+                            org.apache.taglibs.standard.tag.rt.fmt,
+                            org.apache.taglibs.standard.tag.rt.sql,
+                            org.apache.taglibs.standard.tag.rt.xml,
+                            org.apache.taglibs.standard.tei,
+                            org.apache.taglibs.standard.tlv,
+                            org.eclipse.equinox.http.helper,
+                            org.eclipse.equinox.jsp.jasper,
+                            *;resolution:=optional
+                        </Import-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.woden.wso2</groupId>-->
+            <!--<artifactId>woden</artifactId>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediator.service</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.service</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.sequences.common</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.sequences.ui</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2-codegen</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.common</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+</project>

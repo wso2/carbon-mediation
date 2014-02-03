@@ -1,0 +1,21 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="deleteComment">
+
+	<parameter name="issueIdOrKey" description="a String containing the issue id." />
+	<parameter name="commentId" description="a String containing the issue id." />
+
+	<sequence>
+		<property name="uri.var.issueId" expression="$func:issueIdOrKey" />
+		<property name="uri.var.commentId" expression="$func:commentId" />
+		<property name="messageType" value="application/json" scope="axis2" />
+		<property name="Accept-Encoding" action="remove" scope="transport" />
+
+		<call>
+			<endpoint>
+				<http method="DELETE"
+					uri-template="{uri.var.jira.url}/rest/api/2/issue/{uri.var.issueId}/comment/{uri.var.commentId}" />
+			</endpoint>
+		</call>
+
+	</sequence>
+
+</template>

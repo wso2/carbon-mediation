@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twilio-cloud-connector-application" type="synapse/template">
+
+    <subComponents>
+        <!--APPLICATIONS-->
+        <component name="createApplication">
+            <file>createApplication.xml</file>
+            <description>Create a new application given a FriendlyName</description>
+        </component>
+        <component name="getApplication">
+            <file>getApplication.xml</file>
+            <description>Get an application</description>
+        </component>
+        <component name="getApplicationList">
+            <file>getApplicationList.xml</file>
+            <description>Get a list of applications bound to the account</description>
+        </component>
+        <component name="updateApplication">
+            <file>updateApplication.xml</file>
+            <description>Update the parameters of an existing application</description>
+        </component>
+        <component name="removeApplication">
+            <file>removeApplication.xml</file>
+            <description>Remove an application from the account</description>
+        </component>
+
+        <!-- CONNECT APPS -->
+        <component name="getConnectApp">
+            <file>getConnectApp.xml</file>
+            <description>Get a connect app from the Sid reference</description>
+        </component>
+        <component name="updateConnectApp">
+            <file>updateConnectApp.xml</file>
+            <description>Update a connect app from the Sid reference</description>
+        </component>
+        <component name="getConnectAppList">
+            <file>getConnectAppList.xml</file>
+            <description>Get a list of all connect app for the account</description>
+        </component>
+
+        <!-- AUTHORIZED CONNECT APPS -->
+        <component name="getAuthorizedConnectApp">
+            <file>getAuthorizedConnectApp.xml</file>
+            <description>Get an authorized connect app from the Sid reference</description>
+        </component>
+        <component name="getAuthorizedConnectAppList">
+            <file>getAuthorizedConnectAppList.xml</file>
+            <description>Get a list of authorized connect apps for the account</description>
+        </component>
+    </subComponents>
+
+</component>

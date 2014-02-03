@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="createSubAccount" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Optional Parameter.
+        See https://www.twilio.com/docs/api/rest/subaccounts#creating-subaccounts-post-parameters-optional for full specification and allowed values.
+    -->
+    <parameter name="friendlyName"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.account.CreateSubAccount"/>
+    </sequence>
+</template>

@@ -1,0 +1,26 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="getIssuePriorities">
+
+	<sequence>
+		<property name="Accept-Encoding" action="remove" scope="transport" />
+		<payloadFactory media-type="xml">
+			<format>
+				<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+					<soapenv:Header />
+					<soapenv:Body />
+				</soapenv:Envelope>
+			</format>
+			<args />
+		</payloadFactory>
+
+		<property name="messageType" value="application/json" scope="axis2" />
+
+
+		<call>
+			<endpoint>
+				<http method="get" uri-template="{uri.var.jira.url}/rest/api/2/priority" />
+			</endpoint>
+		</call>
+
+	</sequence>
+
+</template>

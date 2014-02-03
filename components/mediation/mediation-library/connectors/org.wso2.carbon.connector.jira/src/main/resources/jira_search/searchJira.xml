@@ -1,0 +1,49 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="searchJira">
+	<parameter name="query" description="the search query to be executed as a String" />
+	<parameter name="maxResult" description="maxium results to be shown" />
+	<parameter name="startFrom" description="starts from" />
+
+	<sequence>
+		<property name="Accept" value="application/json" scope="transport" />
+
+		<property name="uri.var.jira.jqlQuery" expression="$func:query" />
+		<property name="uri.var.jira.max.result" expression="$func:maxResult" />
+		<property name="uri.var.jira.start.from" expression="$func:startFrom" />
+
+		<filter
+			xpath="get-property('uri.var.jira.max.result') = '' or  (not(string(get-property('uri.var.jira.max.result'))))">
+			<then>
+				<property name="uri.var.jira.max.result" value="50" />
+			</then>
+		</filter>
+
+		<filter
+			xpath="get-property('uri.var.jira.start.from') = '' or  (not(string(get-property('uri.var.jira.start.from'))))">
+			<then>
+				<property name="uri.var.jira.start.from" value="0" />
+			</then>
+		</filter>
+
+		<payloadFactory media-type="xml">
+			<format>
+				<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+					<soapenv:Header />
+					<soapenv:Body />
+				</soapenv:Envelope>
+			</format>
+			<args />
+		</payloadFactory>
+
+		<property name="messageType" value="application/json" scope="axis2" />
+
+		<call>
+			<endpoint>
+				<http method="get"
+					uri-template="{uri.var.jira.url}/rest/api/2/search?jql={uri.var.jira.jqlQuery}&amp;maxResults={uri.var.jira.max.result}&amp;startAt={uri.var.jira.start.from}" />
+			</endpoint>
+		</call>
+
+	</sequence>
+</template>
+
+

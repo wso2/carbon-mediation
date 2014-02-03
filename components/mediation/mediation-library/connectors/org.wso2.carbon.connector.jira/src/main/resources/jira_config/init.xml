@@ -1,0 +1,21 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="init">
+
+	<parameter name="username" description="URI of the JIRA instance." />
+	<parameter name="password"
+		description="username of the user used to log in to JIRA." />
+	<parameter name="uri"
+		description="password of the user used to log in to JIRA." />
+
+
+	<sequence>
+		<property name="jira.username" expression="$func:username" />
+		<property name="jira.password" expression="$func:password" />
+		<property name="jira.for.auth"
+			expression="fn:concat($ctx:jira.username,':',$ctx:jira.password)" />
+		<property name="uri.var.jira.url" expression="$func:uri" />
+		<property name="Authorization"
+			expression="fn:concat('Basic ', base64Encode($ctx:jira.for.auth))"
+			scope="transport" />
+	
+	</sequence>
+</template>

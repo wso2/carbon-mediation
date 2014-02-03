@@ -1,0 +1,233 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>business-messaging</artifactId>
+        <version>4.3.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.wso2.carbon</groupId>
+    <artifactId>org.wso2.carbon.transports.sap</artifactId>
+    <version>1.0</version>
+    <packaging>${packaging.type}</packaging>
+    <name>SAP transport</name>
+    <description>WSO2 Carbon - SAP Adapter</description>
+
+    <profiles>
+        <profile>
+            <id>jco-lib-absent</id>
+            <activation>
+                <file>
+                    <missing>${basedir}/lib/sapjco-3.jar</missing>
+                </file>
+            </activation>
+            <properties>
+                <packaging.type>jar</packaging.type>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*.*</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>comp</id>
+                                <phase>compile</phase>
+                            </execution>
+                            <execution>
+                                <id>test-comp</id>
+                                <phase>test-compile</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>idoc-lib-absent</id>
+            <activation>
+                <file>
+                    <missing>${basedir}/lib/sapidoc-3.jar</missing>
+                </file>
+            </activation>
+            <properties>
+                <packaging.type>jar</packaging.type>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*.*</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>comp</id>
+                                <phase>compile</phase>
+                            </execution>
+                            <execution>
+                                <id>test-comp</id>
+                                <phase>test-compile</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>jco-idoc-libs-present</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <packaging.type>bundle</packaging.type>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*.*</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>comp</id>
+                                <phase>compile</phase>
+                            </execution>
+                            <execution>
+                                <id>test-comp</id>
+                                <phase>test-compile</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <tasks>
+                                        <taskdef resource="net/sf/antcontrib/antcontrib.properties"
+                                                 classpathref="maven.plugin.classpath"/>
+                                        <echo message="SAPJCo available"/>
+                                        <echo message="Building SAP Adapter"/>
+
+                                        <mkdir dir="${basedir}/target"/>
+                                        <mkdir dir="${basedir}/target/classes"/>
+
+                                        <property name="runtime-classpath"
+                                                  refid="maven.runtime.classpath"/>
+
+                                        <path id="lib.path.ref">
+                                            <fileset dir="${basedir}/lib"
+                                                     includes="*.jar"/>
+                                        </path>
+
+                                        <echo message="Maven CLASS PATH : ${runtime-classpath}"/>
+
+                                        <javac fork="true"
+                                               executable="${env.JAVA_HOME}/bin/javac"
+                                               srcdir="${basedir}/src/main/java"
+                                               destdir="${basedir}/target/classes"
+                                               classpathref="lib.path.ref"
+                                               classpath="${runtime-classpath}"
+                                               debug="true" debuglevel="lines,vars,source">
+                                            <include
+                                                    name="org/wso2/carbon/transports/sap/**"/>
+                                        </javac>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>ant-contrib</groupId>
+                                <artifactId>ant-contrib</artifactId>
+                                <version>20020829</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>maven-bundle-plugin</artifactId>
+                        <version>1.4.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <instructions>
+                                <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                                <Bundle-Name>${project.artifactId}</Bundle-Name>
+                                <DynamicImport-Package>*</DynamicImport-Package>
+                                <Export-Package>
+                                    org.wso2.carbon.transports.sap.*,
+                                </Export-Package>
+                                <Import-Package>
+                                    org.apache.axis2.*; version="${axis2.osgi.version.range}",
+                                    org.apache.axiom.*; version="${axiom.osgi.version.range}",
+                                    *;resolution:=optional
+                                </Import-Package>
+                            </instructions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>1.6.1-wso2v5</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-transport-base</artifactId>
+            <version>${axis2-transports.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom</groupId>
+            <artifactId>axiom-api</artifactId>
+            <version>1.2.11-wso2v2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+</project>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twilio-cloud-connector-account" type="synapse/template">
+
+    <subComponents>
+        <!-- Accounts -->
+        <component name="init">
+            <file>init.xml</file>
+            <description>Configure Twilio Account with AccountSid and AuthToken</description>
+        </component>
+        <component name="getAccount">
+            <file>getAccount.xml</file>
+            <description>Get the details associated with the account</description>
+        </component>
+        <component name="getAccountsList">
+            <file>getAccountsList.xml</file>
+            <description>Get the details of all accounts associated with the configured account with the given list
+                filters
+            </description>
+        </component>
+        <component name="updateAccount">
+            <file>updateAccount.xml</file>
+            <description>Updates the account (Status can be only changed in sub accounts) </description>
+        </component>
+        <component name="createSubAccount">
+            <file>createSubAccount.xml</file>
+            <description>Creates a sub account under the pre configured main account </description>
+        </component>
+    </subComponents>
+
+</component>

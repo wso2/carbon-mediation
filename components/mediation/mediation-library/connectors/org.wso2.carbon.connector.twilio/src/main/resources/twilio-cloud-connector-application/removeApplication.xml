@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="removeApplication" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Mandatory parameter - Application SID -->
+    <parameter name="applicationSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.application.RemoveApplication"/>
+    </sequence>
+</template>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connector>
+	<component name="jira" package="org.wso2.carbon.connectors">
+		<dependency component="jira_config" />
+		<dependency component="jira_dashboard"/>
+		<dependency component="jira_filter"/>
+		<dependency component="jira_group"/>
+		<dependency component="jira_issue" />
+		<dependency component="jira_project" />
+		<dependency component="jira_search" />
+		<dependency component="jira_user" />
+		<description>Jira 6.0 cloud connector</description>
+	</component>
+</connector>

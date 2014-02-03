@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connector>
+	<component name="twitter" package="org.wso2.carbon.connectors">
+		<dependency component="twitter_config" />
+		<dependency component="twitter_search" />
+		<dependency component="twitter_tweets" />
+		<dependency component="twitter_trends" />
+		<dependency component="twitter_user" />
+		<dependency component="twitter_timeline" />
+		<dependency component="twitter_direct_messages" />
+		<dependency component="twitter_friends_followers" />
+		<description>synapse library for twitter connector</description>
+	</component>
+	<icon>icon/icon-twitter-small.png</icon>
+</connector>

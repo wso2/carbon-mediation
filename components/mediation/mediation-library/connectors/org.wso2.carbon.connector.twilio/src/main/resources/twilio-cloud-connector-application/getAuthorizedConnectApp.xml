@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getAuthorizedConnectApp" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Mandatory parameter - Authorized Connect App SID -->
+    <parameter name="authorizedConnectAppSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.application.getAuthorizedConnectApp"/>
+    </sequence>
+</template>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="removeUsageTrigger" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="usageTriggerSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.usage.RemoveUsageTrigger"/>
+    </sequence>
+</template>

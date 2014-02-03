@@ -1,0 +1,8 @@
+<template name="getUsageRecordList" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="usageCategory"/>
+    <parameter name="startDate"/>
+    <parameter name="endDate"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.usage.GetUsageRecordList"/>
+    </sequence>
+</template>

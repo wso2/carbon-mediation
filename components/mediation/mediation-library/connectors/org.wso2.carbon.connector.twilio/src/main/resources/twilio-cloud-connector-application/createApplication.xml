@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="createApplication" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Mandatory parameter-->
+    <parameter name="friendlyName"/>
+    <!-- optional parameters. For more information, see http://www.twilio.com/docs/api/rest/applications#list-post-optional-parameters. -->
+    <parameter name="apiVersion"/>
+    <parameter name="voiceUrl"/>
+    <parameter name="voiceMethod"/>
+    <parameter name="voiceFallbackUrl"/>
+    <parameter name="voiceFallbackMethod"/>
+    <parameter name="statusCallback"/>
+    <parameter name="statusCallbackMethod"/>
+    <parameter name="voiceCallerIdLookup"/>
+    <parameter name="smsUrl"/>
+    <parameter name="smsMethod"/>
+    <parameter name="smsFallbackUrl"/>
+    <parameter name="smsFallbackMethod"/>
+    <parameter name="smsStatusCallback"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.application.createApplication"/>
+    </sequence>
+</template>

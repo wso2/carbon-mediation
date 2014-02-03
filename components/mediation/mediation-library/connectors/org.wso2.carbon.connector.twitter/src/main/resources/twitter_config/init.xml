@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<template xmlns="http://ws.apache.org/ns/synapse" name="init">
+	<parameter name="consumerKey" />
+	<parameter name="consumerSecret" />
+	<parameter name="accessToken" />
+	<parameter name="accessTokenSecret" />
+	<sequence>
+			
+		<property expression="$func:consumerKey" name="twitter.consumerKey"
+			type="STRING" />
+		<property expression="$func:consumerSecret" name="twilio.consumerSecret"
+			type="STRING" />
+
+		<property name="twilio.basekey"
+			expression="fn:concat(get-property('twitter.consumerKey'),':',get-property('twilio.consumerSecret'))" />
+
+		<property name="Authorization"
+			expression="fn:concat('Basic ', base64Encode(get-property('twilio.basekey')))"
+			scope="transport" />
+		
+		<property name="DISABLE_CHUNKING" value="true" scope="axis2" />
+
+		<payloadFactory>
+			<format>
+				<POST>
+					<grant_type>client_credentials</grant_type>
+				</POST>
+			</format>
+			<args />
+		</payloadFactory>
+		
+		<property name="messageType" value="application/x-www-form-urlencoded"
+			scope="axis2" />
+			
+		<call>
+			<endpoint>
+				<http method="POST" uri-template="https://api.twitter.com/oauth2/token" />
+			</endpoint>
+		</call>
+
+ 	
+		<property name="twitter.accessToken" expression="//access_token"
+			type="STRING" scope="operation" />
+
+
+		<class name="org.wso2.carbon.connector.twitter.TwitterConfig" />
+
+	</sequence>
+</template>

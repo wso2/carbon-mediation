@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="jira_search" type="synapse/template">
+
+	<subComponents>
+		<component name="searchJira">
+			<file>searchJira.xml</file>
+			<description>Search jira using JQL</description>
+		</component>
+	</subComponents>
+</component>

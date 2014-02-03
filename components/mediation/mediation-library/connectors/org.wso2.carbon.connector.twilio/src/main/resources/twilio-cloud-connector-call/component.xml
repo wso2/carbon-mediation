@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twilio-cloud-connector-call" type="synapse/template">
+
+    <subComponents>
+        <!--Calls-->
+        <component name="makeCall">
+            <file>makeCall.xml</file>
+            <description>Make A Call</description>
+        </component>
+        <component name="getCall">
+            <file>getCall.xml</file>
+            <description>Get details of a single Incoming or Outgoing Call</description>
+        </component>
+        <component name="getCallList">
+            <file>getCallList.xml</file>
+            <description>Get a list of incoming and outgoing calls</description>
+        </component>
+        <component name="modifyLiveCall">
+            <file>modifyLiveCall.xml</file>
+            <description>Modify a live call</description>
+        </component>
+        <component name="getTranscription">
+            <file>getTranscription.xml</file>
+            <description>Get recorded transcriptions by Transcription SID</description>
+        </component>
+        <component name="getTranscriptionList">
+            <file>getTranscriptionList.xml</file>
+            <description>Get a list of recorded transcriptions</description>
+        </component>
+        <component name="getRecording">
+            <file>getRecording.xml</file>
+            <description>Get a recording</description>
+        </component>
+        <component name="getRecordingList">
+            <file>getRecordingList.xml</file>
+            <description>Get a list of recordings</description>
+        </component>
+        <component name="deleteRecording">
+            <file>deleteRecording.xml</file>
+            <description>Delete a recording</description>
+        </component>
+    </subComponents>
+
+</component>

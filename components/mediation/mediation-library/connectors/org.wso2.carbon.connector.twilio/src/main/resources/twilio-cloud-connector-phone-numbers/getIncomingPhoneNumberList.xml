@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getIncomingPhoneNumberList" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="phoneNumber"/>
+    <parameter name="friendlyName"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.phonenumbers.GetIncomingPhoneNumberList"/>
+    </sequence>
+</template>

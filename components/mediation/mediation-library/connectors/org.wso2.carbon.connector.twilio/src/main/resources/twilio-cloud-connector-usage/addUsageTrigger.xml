@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="addUsageTrigger" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="usageCategory"/>
+    <parameter name="triggerValue"/>
+    <parameter name="callbackUrl"/>
+    <parameter name="friendlyName"/>
+    <parameter name="triggerBy"/>
+    <parameter name="recurring"/>
+    <parameter name="callbackMethod"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.usage.AddUsageTrigger"/>
+    </sequence>
+</template>

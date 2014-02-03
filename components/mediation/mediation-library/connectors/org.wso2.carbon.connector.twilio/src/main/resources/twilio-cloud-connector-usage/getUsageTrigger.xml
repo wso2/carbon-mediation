@@ -1,0 +1,6 @@
+<template name="getUsageTrigger" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="usageTriggerSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.usage.GetUsageTrigger"/>
+    </sequence>
+</template>

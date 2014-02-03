@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getMember" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="queueSid"/>
+    <parameter name="callSid"/>
+    <!--  Both parameters are compulsory.
+    -->
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.queue.GetMember"/>
+    </sequence>
+</template>

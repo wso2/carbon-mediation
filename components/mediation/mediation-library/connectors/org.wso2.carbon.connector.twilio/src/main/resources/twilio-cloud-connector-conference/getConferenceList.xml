@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getConferenceList" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Optional Parameters.
+        See http://www.twilio.com/docs/api/rest/conference#list-get-filters for full specification and allowed values.
+    -->
+    <parameter name="status"/>
+    <parameter name="friendlyName"/>
+    <parameter name="dateCreated"/>
+    <parameter name="dateUpdated"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.conference.GetConferenceList"/>
+    </sequence>
+</template>

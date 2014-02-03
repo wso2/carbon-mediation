@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="salesforce" type="synapse/template" >
+    <subComponents> 
+		<component name="init" >
+	    		<file>init.xml</file>
+	    		<description>Login synapse library</description>
+		</component>
+		<component name="logout" >
+	    		<file>logout.xml</file>
+	    		<description>Logout synapse library</description>
+		</component>		
+		<component name="query" >
+	    		<file>query.xml</file>
+	    		<description>Query (SQL) synapse library</description>
+		</component>	
+		<component name="queryAll" >
+	    		<file>queryAll.xml</file>
+	    		<description>Query all (SQL) synapse library</description>
+		</component>	
+		<component name="queryMore" >
+	    		<file>queryMore.xml</file>
+	    		<description>Query more synapse library</description>
+		</component>	
+		<component name="create" >
+	    		<file>create.xml</file>
+	    		<description>Insert sObject(s) synapse library</description>
+		</component>	
+		<component name="update" >
+	    		<file>update.xml</file>
+	    		<description>Update or update sObject(s) synapse library</description>
+		</component>		
+		<component name="upsert" >
+	    		<file>upsert.xml</file>
+	    		<description>Insert or update sObject(s) synapse library</description>
+		</component>		
+		<component name="delete" >
+	    		<file>delete.xml</file>
+	    		<description>Delete sObject(s) synapse library</description>
+		</component>		
+		<component name="search" >
+	    		<file>search.xml</file>
+	    		<description>Search using SOSL synapse library</description>
+		</component>	
+		<component name="emptyRecycleBin" >
+	    		<file>emptyRecycleBin.xml</file>
+	    		<description>Empty RecycleBin synapse library</description>
+		</component>
+		<component name="undelete" >
+	    		<file>undelete.xml</file>
+	    		<description>Restore sObject(s) synapse library</description>
+		</component>	
+		<component name="describeSobject" >
+	    		<file>describeSObject.xml</file>
+	    		<description>Describe SObject synapse library</description>
+		</component>		
+		<component name="describeSobjects" >
+	    		<file>describeSObjects.xml</file>
+	    		<description>Describe SObjects synapse library</description>
+		</component>
+		<component name="describeGlobal" >
+	    		<file>describeGlobal.xml</file>
+	    		<description>Describe global synapse library</description>
+		</component>
+		<component name="setPassword" >
+	    		<file>setPassword.xml</file>
+	    		<description>Set password synapse library</description>
+		</component>
+		<component name="sendEmailMessage" >
+	    		<file>sendEmailMessage.xml</file>
+	    		<description>Send email message synapse library</description>
+		</component>	
+		<component name="sendEmail" >
+	    		<file>sendEmail.xml</file>
+	    		<description>Send email synapse library</description>
+		</component>		
+		<component name="retrieve" >
+	    		<file>retrieve.xml</file>
+	    		<description>Retrieve synapse library</description>
+		</component>
+		<component name="resetPassword" >
+	    		<file>resetPassword.xml</file>
+	    		<description>Reset Password synapse library</description>
+		</component>		
+		<component name="getUserInformation" >
+	    		<file>getUserInformation.xml</file>
+	    		<description>Get User Information synapse library</description>
+		</component>				
+    </subComponents>    
+</component>

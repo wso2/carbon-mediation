@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getAvailableTollFreeNumbers" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Compulsory-->
+    <parameter name="country"/>
+    <parameter name="areaCode"/>
+    <parameter name="contains"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.phonenumbers.GetAvailableTollFreeNumbers"/>
+    </sequence>
+</template>

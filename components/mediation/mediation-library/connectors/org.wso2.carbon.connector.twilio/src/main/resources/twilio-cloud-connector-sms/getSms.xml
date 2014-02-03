@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getSms" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required parameter-->
+    <parameter name="messageSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.sms.GetSms"/>
+    </sequence>
+</template>

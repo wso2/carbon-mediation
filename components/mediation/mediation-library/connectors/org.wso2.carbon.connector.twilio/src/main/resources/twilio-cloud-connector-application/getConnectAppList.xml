@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getConnectAppList" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Mandatory parameter(s) - none. -->
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.application.getConnectAppList"/>
+    </sequence>
+</template>

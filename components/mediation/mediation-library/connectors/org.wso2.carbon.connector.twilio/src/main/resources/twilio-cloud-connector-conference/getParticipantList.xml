@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getParticipantList" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Compulsory-->
+    <parameter name="conferenceSid"/>
+    <parameter name="muted"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.conference.GetParticipantList"/>
+    </sequence>
+</template>

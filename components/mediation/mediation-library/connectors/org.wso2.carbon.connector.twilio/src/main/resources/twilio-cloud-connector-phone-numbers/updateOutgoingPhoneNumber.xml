@@ -1,0 +1,9 @@
+<template name="updateOutgoingPhoneNumber" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- required -->
+    <parameter name="outgoingCallerId"/>
+    <!-- Optional -->
+    <parameter name="friendlyName"/>      
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.phonenumbers.UpdateOutgoingPhoneNumber"/>
+    </sequence>
+</template>

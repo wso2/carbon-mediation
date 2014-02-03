@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twitter_friends_followers" type="synapse/template">
+
+	<subComponents>
+		<component name="getFriendsIds">
+			<file>get_friendsIds.xml</file>
+			<description>Returns a cursored collection of user IDs for every user
+				the specified user is following (otherwise known as their
+				"friends").</description>
+		</component>
+		<component name="getFollowersIds">
+			<file>get_followers_ids.xml</file>
+			<description>Returns a cursored collection of user IDs for every user
+				following the specified user. At this time, results are ordered with
+				the most recent following first — however, this ordering is subject
+				to unannounced change and eventual consistency issues</description>
+		</component>
+		<component name="getFollowers">
+			<file>get_followers.xml</file>
+			<description>Returns a cursored collection of user objects for users
+				following the specified user.
+
+				At this time, results are ordered with the most recent following first
+				— however, this ordering is subject to unannounced change and
+				eventual consistency issues.</description>
+		</component>
+		
+		<component name="getFriends">
+			<file>get_friends.xml</file>
+			<description>Returns a cursored collection of user objects for users
+				Friends the specified user.</description>
+		</component>
+
+	</subComponents>
+</component>

@@ -1,0 +1,1179 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:axis2="http://service.proxyadmin.carbon.wso2.org" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax281="http://proxyadmin.carbon.wso2.org/xsd" xmlns:ns="http://org.apache.synapse/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://service.proxyadmin.carbon.wso2.org">
+    <wsdl:documentation>ProxyServiceAdmin</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax282="http://org.apache.synapse/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://proxyadmin.carbon.wso2.org/xsd">
+            <xs:import namespace="http://org.apache.synapse/xsd"/>
+            <xs:complexType name="ProxyAdminException">
+                <xs:complexContent>
+                    <xs:extension base="ax282:Exception">
+
+                        <xs:sequence/>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:complexType name="ProxyData">
+                <xs:all>
+                    <xs:element minOccurs="0" name="enableStatistics" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="enableTracing" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="endpointKey" nillable="true" type="xs:string"/>
+
+                    <xs:element minOccurs="0" name="endpointXML" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="faultSeqKey" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="faultSeqXML" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="inSeqKey" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="inSeqXML" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="outSeqKey" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="outSeqXML" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="pinnedServers" nillable="true" type="xs:string"/>
+
+                    <xs:element minOccurs="0" name="running" type="xs:boolean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="serviceParams" nillable="true" type="ax281:Entry"/>
+                    <xs:element minOccurs="0" name="startOnLoad" type="xs:boolean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="transports" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="wsdlAvailable" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="wsdlDef" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="wsdlKey" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="wsdlResources" nillable="true" type="ax281:Entry"/>
+                    <xs:element minOccurs="0" name="wsdlURI" nillable="true" type="xs:string"/>
+
+                </xs:all>
+            </xs:complexType>
+            <xs:complexType name="Entry">
+                <xs:all>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
+                </xs:all>
+            </xs:complexType>
+            <xs:complexType name="MetaData">
+
+                <xs:all>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="endpoints" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="endpointsAvailable" type="xs:boolean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="sequences" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="sequencesAvailable" type="xs:boolean"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="transports" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="transportsAvailable" type="xs:boolean"/>
+                </xs:all>
+            </xs:complexType>
+
+        </xs:schema>
+        <xs:schema xmlns:ax283="http://proxyadmin.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.synapse/xsd">
+            <xs:import namespace="http://proxyadmin.carbon.wso2.org/xsd"/>
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Exception" nillable="true" type="xs:anyType"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ProxyAdminException">
+
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="ProxyAdminException" nillable="true" type="ax281:ProxyAdminException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="stopProxyService">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="stopProxyServiceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="startProxyService">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="startProxyServiceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="redeployProxyService">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="redeployProxyServiceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="modifyProxy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="pd" nillable="true" type="ax281:ProxyData"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="modifyProxyResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSourceView">
+
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="pd" nillable="true" type="ax281:ProxyData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSourceViewResponse">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getProxy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getProxyResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax281:ProxyData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="getMetaDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax281:MetaData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndpoint">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndpointResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAvailableTransportsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="getAvailableSequencesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAvailableEndpointsResponse">
+
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="enableTracing">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="enableTracingResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="enableStatistics">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="enableStatisticsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="disableTracing">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="disableTracingResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="disableStatistics">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="disableStatisticsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteProxyService">
+
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteProxyServiceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addProxy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="pd" nillable="true" type="ax281:ProxyData"/>
+                    </xs:sequence>
+
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addProxyResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="deleteProxyServiceRequest">
+        <wsdl:part name="parameters" element="ns:deleteProxyService"/>
+    </wsdl:message>
+    <wsdl:message name="deleteProxyServiceResponse">
+        <wsdl:part name="parameters" element="ns:deleteProxyServiceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="ProxyAdminException">
+
+        <wsdl:part name="parameters" element="ns:ProxyAdminException"/>
+    </wsdl:message>
+    <wsdl:message name="disableStatisticsRequest">
+        <wsdl:part name="parameters" element="ns:disableStatistics"/>
+    </wsdl:message>
+    <wsdl:message name="disableStatisticsResponse">
+        <wsdl:part name="parameters" element="ns:disableStatisticsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="enableStatisticsRequest">
+
+        <wsdl:part name="parameters" element="ns:enableStatistics"/>
+    </wsdl:message>
+    <wsdl:message name="enableStatisticsResponse">
+        <wsdl:part name="parameters" element="ns:enableStatisticsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addProxyRequest">
+        <wsdl:part name="parameters" element="ns:addProxy"/>
+    </wsdl:message>
+    <wsdl:message name="addProxyResponse">
+
+        <wsdl:part name="parameters" element="ns:addProxyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getEndpointRequest">
+        <wsdl:part name="parameters" element="ns:getEndpoint"/>
+    </wsdl:message>
+    <wsdl:message name="getEndpointResponse">
+        <wsdl:part name="parameters" element="ns:getEndpointResponse"/>
+    </wsdl:message>
+    <wsdl:message name="enableTracingRequest">
+
+        <wsdl:part name="parameters" element="ns:enableTracing"/>
+    </wsdl:message>
+    <wsdl:message name="enableTracingResponse">
+        <wsdl:part name="parameters" element="ns:enableTracingResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getAvailableEndpointsRequest"/>
+    <wsdl:message name="getAvailableEndpointsResponse">
+        <wsdl:part name="parameters" element="ns:getAvailableEndpointsResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="stopProxyServiceRequest">
+        <wsdl:part name="parameters" element="ns:stopProxyService"/>
+    </wsdl:message>
+    <wsdl:message name="stopProxyServiceResponse">
+        <wsdl:part name="parameters" element="ns:stopProxyServiceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getMetaDataRequest"/>
+    <wsdl:message name="getMetaDataResponse">
+        <wsdl:part name="parameters" element="ns:getMetaDataResponse"/>
+
+    </wsdl:message>
+    <wsdl:message name="getAvailableTransportsRequest"/>
+    <wsdl:message name="getAvailableTransportsResponse">
+        <wsdl:part name="parameters" element="ns:getAvailableTransportsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="disableTracingRequest">
+        <wsdl:part name="parameters" element="ns:disableTracing"/>
+    </wsdl:message>
+    <wsdl:message name="disableTracingResponse">
+
+        <wsdl:part name="parameters" element="ns:disableTracingResponse"/>
+    </wsdl:message>
+    <wsdl:message name="redeployProxyServiceRequest">
+        <wsdl:part name="parameters" element="ns:redeployProxyService"/>
+    </wsdl:message>
+    <wsdl:message name="redeployProxyServiceResponse">
+        <wsdl:part name="parameters" element="ns:redeployProxyServiceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="startProxyServiceRequest">
+
+        <wsdl:part name="parameters" element="ns:startProxyService"/>
+    </wsdl:message>
+    <wsdl:message name="startProxyServiceResponse">
+        <wsdl:part name="parameters" element="ns:startProxyServiceResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getAvailableSequencesRequest"/>
+    <wsdl:message name="getAvailableSequencesResponse">
+        <wsdl:part name="parameters" element="ns:getAvailableSequencesResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="modifyProxyRequest">
+        <wsdl:part name="parameters" element="ns:modifyProxy"/>
+    </wsdl:message>
+    <wsdl:message name="modifyProxyResponse">
+        <wsdl:part name="parameters" element="ns:modifyProxyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getProxyRequest">
+        <wsdl:part name="parameters" element="ns:getProxy"/>
+    </wsdl:message>
+
+    <wsdl:message name="getProxyResponse">
+        <wsdl:part name="parameters" element="ns:getProxyResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getSourceViewRequest">
+        <wsdl:part name="parameters" element="ns:getSourceView"/>
+    </wsdl:message>
+    <wsdl:message name="getSourceViewResponse">
+        <wsdl:part name="parameters" element="ns:getSourceViewResponse"/>
+    </wsdl:message>
+
+    <wsdl:portType name="ProxyServiceAdminPortType">
+        <wsdl:operation name="deleteProxyService">
+            <wsdl:input message="axis2:deleteProxyServiceRequest" wsaw:Action="urn:deleteProxyService"/>
+            <wsdl:output message="axis2:deleteProxyServiceResponse" wsaw:Action="urn:deleteProxyServiceResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:deleteProxyServiceProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="disableStatistics">
+            <wsdl:input message="axis2:disableStatisticsRequest" wsaw:Action="urn:disableStatistics"/>
+            <wsdl:output message="axis2:disableStatisticsResponse" wsaw:Action="urn:disableStatisticsResponse"/>
+
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:disableStatisticsProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="enableStatistics">
+            <wsdl:input message="axis2:enableStatisticsRequest" wsaw:Action="urn:enableStatistics"/>
+            <wsdl:output message="axis2:enableStatisticsResponse" wsaw:Action="urn:enableStatisticsResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:enableStatisticsProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addProxy">
+            <wsdl:input message="axis2:addProxyRequest" wsaw:Action="urn:addProxy"/>
+
+            <wsdl:output message="axis2:addProxyResponse" wsaw:Action="urn:addProxyResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:addProxyProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getEndpoint">
+            <wsdl:input message="axis2:getEndpointRequest" wsaw:Action="urn:getEndpoint"/>
+            <wsdl:output message="axis2:getEndpointResponse" wsaw:Action="urn:getEndpointResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:getEndpointProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="enableTracing">
+
+            <wsdl:input message="axis2:enableTracingRequest" wsaw:Action="urn:enableTracing"/>
+            <wsdl:output message="axis2:enableTracingResponse" wsaw:Action="urn:enableTracingResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:enableTracingProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableEndpoints">
+            <wsdl:input message="axis2:getAvailableEndpointsRequest" wsaw:Action="urn:getAvailableEndpoints"/>
+            <wsdl:output message="axis2:getAvailableEndpointsResponse" wsaw:Action="urn:getAvailableEndpointsResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:getAvailableEndpointsProxyAdminException"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="stopProxyService">
+            <wsdl:input message="axis2:stopProxyServiceRequest" wsaw:Action="urn:stopProxyService"/>
+            <wsdl:output message="axis2:stopProxyServiceResponse" wsaw:Action="urn:stopProxyServiceResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:stopProxyServiceProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getMetaData">
+            <wsdl:input message="axis2:getMetaDataRequest" wsaw:Action="urn:getMetaData"/>
+            <wsdl:output message="axis2:getMetaDataResponse" wsaw:Action="urn:getMetaDataResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:getMetaDataProxyAdminException"/>
+
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableTransports">
+            <wsdl:input message="axis2:getAvailableTransportsRequest" wsaw:Action="urn:getAvailableTransports"/>
+            <wsdl:output message="axis2:getAvailableTransportsResponse" wsaw:Action="urn:getAvailableTransportsResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:getAvailableTransportsProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="disableTracing">
+            <wsdl:input message="axis2:disableTracingRequest" wsaw:Action="urn:disableTracing"/>
+            <wsdl:output message="axis2:disableTracingResponse" wsaw:Action="urn:disableTracingResponse"/>
+
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:disableTracingProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="redeployProxyService">
+            <wsdl:input message="axis2:redeployProxyServiceRequest" wsaw:Action="urn:redeployProxyService"/>
+            <wsdl:output message="axis2:redeployProxyServiceResponse" wsaw:Action="urn:redeployProxyServiceResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:redeployProxyServiceProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="startProxyService">
+            <wsdl:input message="axis2:startProxyServiceRequest" wsaw:Action="urn:startProxyService"/>
+
+            <wsdl:output message="axis2:startProxyServiceResponse" wsaw:Action="urn:startProxyServiceResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:startProxyServiceProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableSequences">
+            <wsdl:input message="axis2:getAvailableSequencesRequest" wsaw:Action="urn:getAvailableSequences"/>
+            <wsdl:output message="axis2:getAvailableSequencesResponse" wsaw:Action="urn:getAvailableSequencesResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:getAvailableSequencesProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="modifyProxy">
+
+            <wsdl:input message="axis2:modifyProxyRequest" wsaw:Action="urn:modifyProxy"/>
+            <wsdl:output message="axis2:modifyProxyResponse" wsaw:Action="urn:modifyProxyResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:modifyProxyProxyAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getProxy">
+            <wsdl:input message="axis2:getProxyRequest" wsaw:Action="urn:getProxy"/>
+            <wsdl:output message="axis2:getProxyResponse" wsaw:Action="urn:getProxyResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:getProxyProxyAdminException"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="getSourceView">
+            <wsdl:input message="axis2:getSourceViewRequest" wsaw:Action="urn:getSourceView"/>
+            <wsdl:output message="axis2:getSourceViewResponse" wsaw:Action="urn:getSourceViewResponse"/>
+            <wsdl:fault message="axis2:ProxyAdminException" name="ProxyAdminException" wsaw:Action="urn:getSourceViewProxyAdminException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="ProxyServiceAdminSoap11Binding" type="axis2:ProxyServiceAdminPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="disableStatistics">
+
+            <soap:operation soapAction="urn:disableStatistics" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteProxyService">
+            <soap:operation soapAction="urn:deleteProxyService" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="enableStatistics">
+            <soap:operation soapAction="urn:enableStatistics" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addProxy">
+
+            <soap:operation soapAction="urn:addProxy" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="enableTracing">
+            <soap:operation soapAction="urn:enableTracing" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getEndpoint">
+            <soap:operation soapAction="urn:getEndpoint" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableEndpoints">
+
+            <soap:operation soapAction="urn:getAvailableEndpoints" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="stopProxyService">
+            <soap:operation soapAction="urn:stopProxyService" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMetaData">
+            <soap:operation soapAction="urn:getMetaData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableTransports">
+
+            <soap:operation soapAction="urn:getAvailableTransports" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="redeployProxyService">
+            <soap:operation soapAction="urn:redeployProxyService" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="disableTracing">
+            <soap:operation soapAction="urn:disableTracing" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="startProxyService">
+
+            <soap:operation soapAction="urn:startProxyService" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableSequences">
+            <soap:operation soapAction="urn:getAvailableSequences" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="modifyProxy">
+            <soap:operation soapAction="urn:modifyProxy" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSourceView">
+
+            <soap:operation soapAction="urn:getSourceView" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getProxy">
+            <soap:operation soapAction="urn:getProxy" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ProxyServiceAdminSoap12Binding" type="axis2:ProxyServiceAdminPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="disableStatistics">
+
+            <soap12:operation soapAction="urn:disableStatistics" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteProxyService">
+            <soap12:operation soapAction="urn:deleteProxyService" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="enableStatistics">
+            <soap12:operation soapAction="urn:enableStatistics" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addProxy">
+
+            <soap12:operation soapAction="urn:addProxy" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="enableTracing">
+            <soap12:operation soapAction="urn:enableTracing" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getEndpoint">
+            <soap12:operation soapAction="urn:getEndpoint" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableEndpoints">
+
+            <soap12:operation soapAction="urn:getAvailableEndpoints" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="stopProxyService">
+            <soap12:operation soapAction="urn:stopProxyService" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMetaData">
+            <soap12:operation soapAction="urn:getMetaData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableTransports">
+
+            <soap12:operation soapAction="urn:getAvailableTransports" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="redeployProxyService">
+            <soap12:operation soapAction="urn:redeployProxyService" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="disableTracing">
+            <soap12:operation soapAction="urn:disableTracing" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="startProxyService">
+
+            <soap12:operation soapAction="urn:startProxyService" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableSequences">
+            <soap12:operation soapAction="urn:getAvailableSequences" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="modifyProxy">
+            <soap12:operation soapAction="urn:modifyProxy" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getSourceView">
+
+            <soap12:operation soapAction="urn:getSourceView" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getProxy">
+            <soap12:operation soapAction="urn:getProxy" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+
+            </wsdl:output>
+            <wsdl:fault name="ProxyAdminException">
+                <soap12:fault use="literal" name="ProxyAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ProxyServiceAdminHttpBinding" type="axis2:ProxyServiceAdminPortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="disableStatistics">
+
+            <http:operation location="disableStatistics"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="disableStatistics"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="disableStatistics"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteProxyService">
+
+            <http:operation location="deleteProxyService"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="deleteProxyService"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="deleteProxyService"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="enableStatistics">
+
+            <http:operation location="enableStatistics"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="enableStatistics"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="enableStatistics"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addProxy">
+
+            <http:operation location="addProxy"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="addProxy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="addProxy"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="enableTracing">
+
+            <http:operation location="enableTracing"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="enableTracing"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="enableTracing"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEndpoint">
+
+            <http:operation location="getEndpoint"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getEndpoint"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getEndpoint"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableEndpoints">
+
+            <http:operation location="getAvailableEndpoints"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getAvailableEndpoints"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getAvailableEndpoints"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="stopProxyService">
+
+            <http:operation location="stopProxyService"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="stopProxyService"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="stopProxyService"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMetaData">
+
+            <http:operation location="getMetaData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getMetaData"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getMetaData"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableTransports">
+
+            <http:operation location="getAvailableTransports"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getAvailableTransports"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getAvailableTransports"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="redeployProxyService">
+
+            <http:operation location="redeployProxyService"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="redeployProxyService"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="redeployProxyService"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="disableTracing">
+
+            <http:operation location="disableTracing"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="disableTracing"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="disableTracing"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="startProxyService">
+
+            <http:operation location="startProxyService"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="startProxyService"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="startProxyService"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableSequences">
+
+            <http:operation location="getAvailableSequences"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getAvailableSequences"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getAvailableSequences"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyProxy">
+
+            <http:operation location="modifyProxy"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="modifyProxy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="modifyProxy"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSourceView">
+
+            <http:operation location="getSourceView"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getSourceView"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getSourceView"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getProxy">
+
+            <http:operation location="getProxy"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="getProxy"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getProxy"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service name="ProxyServiceAdmin">
+        <wsdl:port name="ProxyServiceAdminHttpsSoap11Endpoint" binding="axis2:ProxyServiceAdminSoap11Binding">
+            <soap:address location="https://localhost:8243/services/ProxyServiceAdmin.ProxyServiceAdminHttpsSoap11Endpoint"/>
+        </wsdl:port>
+        <wsdl:port name="ProxyServiceAdminHttpsSoap12Endpoint" binding="axis2:ProxyServiceAdminSoap12Binding">
+            <soap12:address location="https://localhost:8243/services/ProxyServiceAdmin.ProxyServiceAdminHttpsSoap12Endpoint"/>
+        </wsdl:port>
+        <wsdl:port name="ProxyServiceAdminHttpsEndpoint" binding="axis2:ProxyServiceAdminHttpBinding">
+            <http:address location="https://localhost:8243/services/ProxyServiceAdmin.ProxyServiceAdminHttpsEndpoint"/>
+
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

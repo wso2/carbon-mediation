@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getSmsList" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Optional parameters.
+        See http://www.twilio.com/docs/api/rest/sms#list-get-filters for full specification and allowed values.
+    -->
+    <parameter name="to"/>
+    <parameter name="from"/>
+    <parameter name="dateSent"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.sms.GetSmsList"/>
+    </sequence>
+</template>

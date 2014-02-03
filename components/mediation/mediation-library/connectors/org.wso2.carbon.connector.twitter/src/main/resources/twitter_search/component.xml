@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twitter_search" type="synapse/template">
+
+	<subComponents>
+		<component name="search">
+			<file>search_string.xml</file>
+			<description>Returns a collection of relevant Tweets matching a
+				specified query. Please note that Twitter's search service and, by
+				extension, the Search API is not meant to be an exhaustive source of
+				Tweets. Not all Tweets will be indexed or made available via the
+				search interface</description>
+		</component>
+		<component name="searchPlaces">
+			<file>search_places.xml</file>
+			<description>Search for places that can be attached to a
+				statuses/update. Given a latitude and a longitude pair, an IP
+				address, or a name, this request will return a list of all the valid
+				places that can be used as the place_id when updating a status
+			</description>
+		</component>
+	</subComponents>
+</component>

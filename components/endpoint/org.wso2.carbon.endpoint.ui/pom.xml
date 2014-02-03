@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>endpoint</artifactId>
+        <version>4.3.0-SNAPSHOT</version>
+	<relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    <version>4.3.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.carbon.endpoint.ui</artifactId>
+    <packaging>bundle</packaging>
+    <name>WSO2 Carbon - Endpoint Editor UI</name>
+    <url>http://wso2.org</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.endpoint.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.registry.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.ui</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Carbon-Component>UIBundle</Carbon-Component>
+                        <Export-Package>
+                            org.wso2.carbon.endpoint.ui.*,
+                        </Export-Package>
+                        <Import-Package>
+                            org.wso2.carbon.endpoint.stub.*;
+                            version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.mediation.templates.ui.*,
+                            org.apache.axis2.*; version="${axis2.osgi.version.range.endpoint}",
+			                org.apache.axiom.*; version="${axiom.osgi.version.range.endpoint}",
+                            javax.xml.namespace;version="0.0.0",
+                            javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
+                            *;resolution:=optional
+                        </Import-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

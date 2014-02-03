@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twilio-cloud-connector-sms" type="synapse/template">
+
+    <subComponents>
+        <!--SMS-->
+        <component name="sendSms">
+            <file>sendSms.xml</file>
+            <description>Send SMS</description>
+        </component>
+        <component name="getSms">
+            <file>getSms.xml</file>
+            <description>Returns Incoming and Outgoing SMS by Message Sid</description>
+        </component>
+        <component name="getSmsList">
+            <file>getSmsList.xml</file>
+            <description>Returns a list of Incoming and Outgoing SMS Records</description>
+        </component>
+        <component name="getShortCode">
+            <file>getShortCode.xml</file>
+            <description>Returns the details of a Short Code associated with your account</description>
+        </component>
+        <component name="updateShortCodeProperties">
+            <file>updateShortCodeProperties.xml</file>
+            <description>Updates the short code's properties</description>
+        </component>
+        <component name="getShortCodeList">
+            <file>getShortCodeList.xml</file>
+            <description>Returns the short codes list associated to an account</description>
+        </component>
+    </subComponents>
+
+</component>

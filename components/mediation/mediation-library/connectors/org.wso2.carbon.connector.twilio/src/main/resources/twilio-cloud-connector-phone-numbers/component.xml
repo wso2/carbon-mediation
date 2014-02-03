@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twilio-cloud-connector-phone-numbers" type="synapse/template">
+    <subComponents>
+        <component name="getAvailableLocalNumbers">
+            <file>getAvailableLocalNumbers.xml</file>
+            <description>Get available local numbers</description>
+        </component>
+
+        <component name="getAvailableTollFreeNumbers">
+            <file>getAvailableTollFreeNumbers.xml</file>
+            <description>Get available toll-free numbers</description>
+        </component>
+
+        <component name="getIncomingPhoneNumber">
+            <file>getIncomingPhoneNumber.xml</file>
+            <description>Get Incoming Phone number allocated to the Account by its Sid</description>
+        </component>
+
+        <component name="getIncomingPhoneNumberList">
+            <file>getIncomingPhoneNumberList.xml</file>
+            <description>Get Incoming Phone numbers list allocated to the Account</description>
+        </component>
+
+        <component name="removeIncomingPhoneNumber">
+            <file>removeIncomingPhoneNumber.xml</file>
+            <description>Remove an Incoming Phone number allocated to the Account</description>
+        </component>
+
+        <component name="updateIncomingPhoneNumber">
+            <file>updateIncomingPhoneNumber.xml</file>
+            <description>Updates the Incoming Phone number</description>
+        </component>
+
+        <component name="purchasePhoneNumber">
+            <file>purchasePhoneNumber.xml</file>
+            <description>Purchases a Phone number</description>
+        </component>
+
+        <component name="getOutgoingPhoneNumber">
+            <file>getOutgoingPhoneNumber.xml</file>
+            <description>get outgoing phone number</description>
+        </component>
+
+        <component name="getOutgoingPhoneNumberList">
+            <file>getOutgoingPhoneNumberList.xml</file>
+            <description>get outgoing phone number list</description>
+        </component>
+
+        <component name="addOutgoingPhoneNumber">
+            <file>addOutgoingPhoneNumber.xml</file>
+            <description>add outgoing phone number</description>
+        </component>
+
+        <component name="updateOutgoingPhoneNumber">
+            <file>updateOutgoingPhoneNumber.xml</file>
+            <description>update outgoing phone number</description>
+        </component>
+
+        <component name="removeOutgoingPhoneNumber">
+            <file>removeOutgoingPhoneNumber.xml</file>
+            <description>remove outgoing phone number</description>
+        </component>
+               
+    </subComponents>
+</component>

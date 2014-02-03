@@ -1,0 +1,37 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="postComment">
+
+	<parameter name="issueIdOrKey" description="a String containing the issue id." />
+    <parameter name="comment" description="a String containing the comment to be posted" />
+    <parameter name="visibleRole" description="a String containing the visible role" />
+
+	<sequence>
+
+        <payloadFactory media-type="json">
+            <format> {
+                "body": "$1",
+                "visibility": {
+                "type": "role",
+                "value": "$2"
+                }
+                }
+            </format>
+            <args>
+                <arg evaluator="xml" expression="$func:comment"/>
+                <arg evaluator="xml" expression="$func:visibleRole"/>
+            </args>
+        </payloadFactory>
+
+		<property name="uri.var.issueId" expression="$func:issueIdOrKey" />
+		<property name="messageType" value="application/json" scope="axis2" />
+		<property name="Accept-Encoding" action="remove" scope="transport" />
+
+		<call>
+			<endpoint>
+				<http method="POST"
+					uri-template="{uri.var.jira.url}/rest/api/2/issue/{uri.var.issueId}/comment" />
+			</endpoint>
+		</call>
+
+	</sequence>
+
+</template>

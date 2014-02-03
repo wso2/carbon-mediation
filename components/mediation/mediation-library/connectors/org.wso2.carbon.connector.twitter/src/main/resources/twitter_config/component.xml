@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="twitter_config" type="synapse/template">
+
+	<subComponents>
+		<component name="init">
+			<file>init.xml</file>
+			<description></description>
+		</component>
+	</subComponents>
+</component>

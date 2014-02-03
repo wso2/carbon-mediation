@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getMemberList" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="queueSid"/>
+    <!-- Use the QueueSid parameter as the key for retrieving the members in the queue.-->
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.queue.GetMemberList"/>
+    </sequence>
+</template>

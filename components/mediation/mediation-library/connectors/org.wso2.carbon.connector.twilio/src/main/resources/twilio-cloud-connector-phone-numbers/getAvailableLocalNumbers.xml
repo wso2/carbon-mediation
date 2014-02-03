@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getAvailableLocalNumbers" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Compulsory-->
+    <parameter name="country"/>
+    <!--Basic Filters
+    Refer: https://www.twilio.com/docs/api/rest/available-phone-numbers#local-get-basic-filters
+    -->
+    <parameter name="areaCode"/>
+    <parameter name="contains"/>
+    <parameter name="inRegion"/>
+    <parameter name="inPostalCode"/>
+    <!--Advance Filters
+    Refer: https://www.twilio.com/docs/api/rest/available-phone-numbers#local-get-advanced-filters
+    -->
+    <parameter name="nearLatLong"/>
+    <parameter name="nearNumber"/>
+    <parameter name="inLata"/>
+    <parameter name="inRateCenter"/>
+    <parameter name="distance"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.phonenumbers.GetAvailableLocalNumbers"/>
+    </sequence>
+</template>

@@ -1,0 +1,13 @@
+<template name="addOutgoingPhoneNumber" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- required -->
+    <parameter name="phoneNumber"/>
+    <!-- Optional -->
+    <parameter name="friendlyName"/>
+    <parameter name="callDelay"/>
+    <parameter name="extension"/>
+    <parameter name="statusCallback"/>
+    <parameter name="statusCallbackMethod"/>       
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.phonenumbers.AddOutgoingPhoneNumber"/>
+    </sequence>
+</template>

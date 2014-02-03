@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="purchasePhoneNumber" xmlns="http://ws.apache.org/ns/synapse">
+    <!--
+    Exactly One of the below parameters must be provided
+    For more information see https://www.twilio.com/docs/api/rest/incoming-phone-numbers#list-post-required-parameters
+    -->
+    <parameter name="phoneNumber"/>
+    <parameter name="areaCode"/>
+    <!--Optional Parameters -->
+    <parameter name="friendlyName"/>
+    <parameter name="voiceUrl"/>
+    <parameter name="voiceMethod"/>
+    <parameter name="voiceFallbackUrl"/>
+    <parameter name="voiceFallbackMethod"/>
+    <parameter name="statusCallback"/>
+    <parameter name="statusCallbackMethod"/>
+    <parameter name="voiceCallerIdLookup"/>
+    <parameter name="voiceApplicationSid"/>
+    <parameter name="smsUrl"/>
+    <parameter name="smsMethod"/>
+    <parameter name="smsFallbackUrl"/>
+    <parameter name="smsFallbackMethod"/>
+    <parameter name="smsApplicationSid"/>
+    <parameter name="apiVersion"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.phonenumbers.PurchasePhoneNumber"/>
+    </sequence>
+</template>

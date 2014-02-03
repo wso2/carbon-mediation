@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getConnectApp" xmlns="http://ws.apache.org/ns/synapse">
+    <!-- Mandatory parameter - Connect App SID -->
+    <parameter name="connectAppSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.application.getConnectApp"/>
+    </sequence>
+</template>

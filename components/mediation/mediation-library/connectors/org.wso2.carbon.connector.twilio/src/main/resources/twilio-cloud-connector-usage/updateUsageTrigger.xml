@@ -1,0 +1,9 @@
+<template name="updateUsageTrigger" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="usageTriggerSid"/>
+    <parameter name="friendlyName"/>
+    <parameter name="callbackUrl"/>
+    <parameter name="callbackMethod"/>	
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.usage.UpdateUsageTrigger"/>
+    </sequence>
+</template>

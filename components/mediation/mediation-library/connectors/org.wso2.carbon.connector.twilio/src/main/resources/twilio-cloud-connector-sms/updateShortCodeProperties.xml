@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="updateShortCodeProperties" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required-->
+    <parameter name="shortCodeSid"/>
+    <!--Optional parameters.
+        See http://www.com/docs/api/rest/short-codes#instance-post-optional-parameters for full specification and allowed values.
+    -->
+    <parameter name="friendlyName"/>
+    <parameter name="apiVersion"/>
+    <parameter name="smsUrl"/>
+    <parameter name="smsMethod"/>
+    <parameter name="smsFallbackUrl"/>
+    <parameter name="smsFallbackMethod"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.sms.UpdateShortCodeProperties"/>
+    </sequence>
+</template>

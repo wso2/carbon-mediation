@@ -1,0 +1,42 @@
+.editLink {
+    background: url("../images/envelop.gif") left no-repeat;
+    padding-left: 20px;
+}
+
+.resendLink {
+    background: url("../images/envelop.gif") left no-repeat;
+    padding-left: 20px;
+}
+
+#purgeMessages {
+    background: url("../images/delete.gif") left no-repeat;
+    padding-left: 20px;
+}
+
+.er7TextArea {
+    width: 833px;
+    height: 115px;
+}
+
+.xmlTextArea {
+    width: 832px;
+    height: 340px;
+}
+
+.shortRow {
+
+}
+
+.pageLink {
+    text-decoration: underline;
+    color: blue;
+    cursor: pointer;
+}
+
+.rightAlign {
+    text-align: right;
+}
+
+.centerAlign {
+    text-align: center;
+}

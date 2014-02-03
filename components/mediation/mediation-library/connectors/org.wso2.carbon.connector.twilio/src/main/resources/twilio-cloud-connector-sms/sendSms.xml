@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="sendSms" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required  parameters.
+        See http://www.twilio.com/docs/api/rest/sending-sms#post-parameters-required for full specification and allowed values.
+    -->
+    <parameter name="body"/>
+    <parameter name="to"/>
+    <parameter name="from"/>
+    <!--Optional parameters.
+        See http://www.twilio.com/docs/api/rest/sending-sms#post-parameters-optional for full specification and allowed values.
+    -->
+    <parameter name="statusCallBackUrl"/>
+    <parameter name="applicationSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.sms.SendSms"/>
+    </sequence>
+</template>

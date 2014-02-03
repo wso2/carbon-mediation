@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+-->
+        
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>hl7</artifactId>
+        <version>4.3.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.wso2.carbon</groupId>
+    <artifactId>org.wso2.carbon.business.messaging.hl7.store</artifactId>
+    <packaging>bundle</packaging>
+    <name>WSO2 Carbon - HL7 Business Messaging - Store</name>
+    <url>http://wso2.org</url>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.openjpa</groupId>
+                <artifactId>openjpa-maven-plugin</artifactId>
+                <version>2.2.2</version>
+                <!--<configuration>-->
+                    <!--&lt;!&ndash;<includes>**/entities/*.class</includes>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<excludes>**/entities/XML*.class</excludes>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<addDefaultConstructor>true</addDefaultConstructor>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<enforcePropertyRestrictions>true</enforcePropertyRestrictions>&ndash;&gt;-->
+                <!--</configuration>-->
+                <configuration>
+                <persistenceXmlFile>${basedir}/src/main/resources/META-INF/persistence.xml</persistenceXmlFile>
+                <classes>${project.build.outputDirectory}</classes>
+                <includes>${project.build.outputDirectory}/*/.class</includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>enhancer</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>enhance</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.openjpa.wso2</groupId>
+                        <artifactId>openjpa-all</artifactId>
+                        <!-- set the version to be the same as the level in your runtime -->
+                        <version>${openjpa.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>                        
+                        <DynamicImport-Package>*</DynamicImport-Package>
+                        <Export-Package>
+                            org.wso2.carbon.business.messaging.hl7.store.*,
+                            org.wso2.carbon.business.messaging.hl7.store.entity.*,
+                        </Export-Package>
+                        <Import-Package>                                     
+                            org.apache.axis2.*; version="${axis2.osgi.version.range.hl7}",
+                            org.apache.axiom.*; version="${axiom.osgi.version.range.hl7}",
+                            org.wso2.carbon.utils.*,
+                            *;resolution:=optional
+                        </Import-Package>  
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.core</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.service.mgt</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.logging</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+            <version>2.1.2-wso2v2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.axis2</groupId>
+                    <artifactId>axis2-codegen</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.business.messaging.hl7.common</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.business.messaging.hl7.message</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.business.messaging.hl7.transport</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.core</artifactId>
+            <version>${wso2carbon.version.hl7}</version>
+        </dependency>
+        <dependency>
+            <groupId>ca.uhn.hapi.wso2</groupId>
+            <artifactId>hapi</artifactId>
+            <version>${hapi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.openjpa.wso2</groupId>
+            <artifactId>openjpa-all</artifactId>
+            <version>${openjpa.version}</version>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <openjpa.version>2.2.2.wso2v1</openjpa.version>
+    </properties>
+
+
+</project>
+

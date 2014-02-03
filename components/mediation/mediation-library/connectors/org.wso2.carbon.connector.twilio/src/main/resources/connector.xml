@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<connector>
+	<component name="twilio" package="org.wso2.carbon.connectors">
+		<dependency component="twilio-cloud-connector-conference" />
+		<dependency component="twilio-cloud-connector-account" />
+		<dependency component="twilio-cloud-connector-application" />
+		<dependency component="twilio-cloud-connector-sms" />
+		<dependency component="twilio-cloud-connector-call" />
+		<dependency component="twilio-cloud-connector-sms" />
+		<dependency component="twilio-cloud-connector-queue" />
+		<dependency component="twilio-cloud-connector-phone-numbers" />
+		<dependency component="twilio-cloud-connector-usage" />
+		<description>Twilio Cloud Connector</description>
+	</component>
+	<icon>icon/icon.png</icon>
+</connector>

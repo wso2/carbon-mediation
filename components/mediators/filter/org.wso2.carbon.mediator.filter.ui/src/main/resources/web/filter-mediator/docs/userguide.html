@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<!--
+ ~ Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~ http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ -->
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>Filter Mediator - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>Filter Mediator</h1>
+<p>
+The filter mediator either test the given xpath expression as a boolean expression, or match the evaluation 
+result of a source xpath expression as a String against the given regular expression. If the test succeeds,
+the filter mediator will execute the enclosed mediators in sequence. 
+</p>
+<img src="images/filter_mediator_screenshot.jpg"/>
+
+<p>
+Here are the configuration options related to Filter Mediator.
+</p>
+
+<ul>
+<li>
+Specify As: Specify whether you give the condition as an XPath or a Regular expression.
+</li>
+<li>
+XPath: XPath expression if you selected the "Specify As" option to "XPath". Note that you can define the
+namespaces used in the xpath by clicking the "Namespaces" link
+</li>
+<li>
+Source: XPath expression to locate the value which is going match with the reguilar expression that you can define below. 
+</li>
+<li>
+Regex: Regular expression to match with the source value.
+</li>
+</ul>
+</body>
+</html>

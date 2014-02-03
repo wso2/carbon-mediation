@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="updateParticipant" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Compulsory-->
+    <parameter name="conferenceSid"/>
+    <parameter name="callSid"/>
+    <parameter name="muted"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.conference.UpdateParticipant"/>
+    </sequence>
+</template>

@@ -1,0 +1,11 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="getSpreadsheetsByTitle">
+    <parameter name="title"/>
+    <sequence>
+        <log level="custom">
+            <property name="FLW" value="GoogleSpreadsheet : Get Worksheets by Title"/>
+            <property name="title" expression="$func:title"/>
+        </log>
+        <class
+                name="org.wso2.carbon.connector.googlespreadsheet.GoogleSpreadsheetGetSpreadsheetsByTitle" />
+    </sequence>
+</template>

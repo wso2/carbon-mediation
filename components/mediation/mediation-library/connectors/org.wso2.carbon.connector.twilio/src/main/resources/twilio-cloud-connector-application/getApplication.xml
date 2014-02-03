@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getApplication" xmlns="http://ws.apache.org/ns/synapse">
+    <parameter name="applicationSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.application.getApplication"/>
+    </sequence>
+</template>

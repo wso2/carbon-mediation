@@ -1,0 +1,16 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="addAttachmentToIssueId">
+    <parameter name="issueIdOrKey" description="a String containing the issue id." />
+
+	<sequence>
+	    <property name="uri.var.issueId" expression="$func:issueIdOrKey" />
+		<property name="messageType" value="multipart/form-data" scope="axis2" />
+		<property name="Accept-Encoding" action="remove" scope="transport" />
+
+		<call>
+			<endpoint>
+				<http method="POST"
+					uri-template="{uri.var.jira.url}/rest/api/2/issue/{uri.var.issueId}/attachments" />
+			</endpoint>
+		</call>
+	</sequence>
+</template>

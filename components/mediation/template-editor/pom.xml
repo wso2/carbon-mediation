@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>mediation</artifactId>
+        <version>4.3.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.wso2.carbon</groupId>
+    <artifactId>template-editor</artifactId>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - Template Editor Aggregator Module</name>
+    <url>http://wso2.org</url>
+
+    		<modules>
+       			<module>org.wso2.carbon.mediation.templates.service</module>
+                	<module>org.wso2.carbon.mediation.templates.common</module>
+                	<module>org.wso2.carbon.mediation.templates</module>
+                	<module>org.wso2.carbon.mediation.templates.ui</module>
+    		</modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.axis2.wso2</groupId>
+                <artifactId>axis2</artifactId>
+                <version>${axis2.wso2.version.template-editor}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.core</artifactId>
+                <version>${wso2carbon.version.template-editor}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.registry.core</artifactId>
+                <version>${wso2carbon.version.template-editor}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.ui</artifactId>
+                <version>${wso2carbon.version.template-editor}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.utils</artifactId>
+                <version>${wso2carbon.version.template-editor}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.synapse</groupId>
+                <artifactId>synapse-core</artifactId>
+                <version>${synapse.version.template-editor}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
+                <version>${wso2carbon.version.template-editor}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.logging</artifactId>
+                <version>${wso2carbon.version.template-editor}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.mediation.templates.stub</artifactId>
+                <version>${wso2carbon.version.template-editor}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <properties>
+        <wso2carbon.version.template-editor>${wso2carbon.version}</wso2carbon.version.template-editor>
+        <synapse.version.template-editor>${synapse.version}</synapse.version.template-editor>
+        <axis2.wso2.version.template-editor>${axis2.wso2.version}</axis2.wso2.version.template-editor>
+        <axis2.osgi.version.range.template-editor>${axis2.osgi.version.range}</axis2.osgi.version.range.template-editor>
+        <axiom.osgi.version.range.template-editor>${axiom.osgi.version.range}</axiom.osgi.version.range.template-editor>
+    </properties>
+
+</project>

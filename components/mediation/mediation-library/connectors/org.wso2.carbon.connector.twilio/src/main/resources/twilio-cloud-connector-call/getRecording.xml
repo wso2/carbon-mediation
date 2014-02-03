@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template name="getRecording" xmlns="http://ws.apache.org/ns/synapse">
+    <!--Required.-->
+    <parameter name="recordingSid"/>
+    <sequence>
+        <class name="org.wso2.carbon.connector.twilio.call.GetRecording"/>
+    </sequence>
+</template>

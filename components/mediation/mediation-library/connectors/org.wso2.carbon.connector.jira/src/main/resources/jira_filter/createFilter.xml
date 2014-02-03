@@ -1,0 +1,33 @@
+<template xmlns="http://ws.apache.org/ns/synapse" name="createFilter">
+
+    <parameter name="filterName" description="a String containing the name of the filter" />
+    <parameter name="jqlType" description="a String containing the jql type" />
+    <parameter name="description" description="a String containing the description of the filter" />
+    <parameter name="favourite" description="a Boolean which set the filter in favourite filters" />
+	<sequence>
+        <payloadFactory media-type="json">
+            <format> {
+                "name": "$1",
+                "description": "$2",
+                "jql": "type = $3",
+                "favourite": "$4"
+                }
+            </format>
+            <args>
+                <arg evaluator="xml" expression="$func:filterName"/>
+                <arg evaluator="xml" expression="$func:description"/>
+                <arg evaluator="xml" expression="$func:jqlType"/>
+                <arg evaluator="xml" expression="$func:favourite"/>
+            </args>
+        </payloadFactory>
+        <property name="messageType" value="application/json" scope="axis2" />
+		<property name="Accept-Encoding" action="remove" scope="transport" />
+
+		<call>
+			<endpoint>
+				<http method="POST"
+					uri-template="{uri.var.jira.url}/rest/api/2/filter" />
+			</endpoint>
+		</call>
+	</sequence>
+</template>

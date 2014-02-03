@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<!--
+ ~ Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~ http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ -->
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>Smooks Mediator - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+	<h1>Smooks Mediator</h1>
+
+	<p>
+		Smooks mediator can be used to apply lightweight transformations on messages in an efficient manner.
+		Smooks is a powerful framework for processing, manipulating and transforming XML. More information
+		about Smooks can be obtained from the official <a href="http://www.smooks.org">Smooks website</a>.
+	</p>
+
+
+	<img src="images/smooks.png"/>
+	<p><strong>Smooks Mediator Configuartion</strong></p>
+
+	<p>
+		The Smooks mediator requires the transformation definition to be passed in as an external resource.
+		This transformation can be specified as a local entry or be stored in the registry. The mediator UI
+		enables you to point the mediator to an existing local entry or a registry resource.
+	</p>
+	
+	<h2>Input</h2>
+	
+	<p>
+		User can define an 'input' as a 'Text' or 'XML' and need to provide a 'xpath' expression to pick exact <br/>
+		message block, else by default whole 'message body' will be selected by default.
+	</p>
+
+	<h2>Output</h2>
+	<p>
+		Same like in  input, user can define how his output should be. When user defines an 'output' expression there are<br/>
+		additional operations can be performed.
+	</p>
+
+		<ul>
+			<li>
+				Add     : Selected node will be added as a child to the message.
+			</li>
+			<li>
+				Replace : Selected node will be replaced in the message.
+			</li>
+			<li>
+				Sibling : Selected node will be added as a sibling.
+			</li>
+		</ul>
+		
+	<p>
+	When user defines an 'output' as a 'Property', property will be saved in the messagecontext for the future uses. 
+	</p>
+</body>
+</html>
