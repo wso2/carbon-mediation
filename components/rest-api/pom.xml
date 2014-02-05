@@ -20,8 +20,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>carbon-components</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <artifactId>carbon-mediation-components</artifactId>
+        <version>${wso2carbon.version}</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -100,7 +100,7 @@
     </dependencyManagement>
 
     <properties>
-        <wso2carbon.version.rest.api>4.3.0-SNAPSHOT</wso2carbon.version.rest.api>
+        <wso2carbon.version.rest.api>${wso2carbon.version}</wso2carbon.version.rest.api>
         <synapse.version.rest.api>${synapse.version}</synapse.version.rest.api>
         <axis2.osgi.version.range.rest.api>${axis2.osgi.version.range}</axis2.osgi.version.range.rest.api>
         <axis2.wso2.version.rest.api>${axis2.wso2.version}</axis2.wso2.version.rest.api>

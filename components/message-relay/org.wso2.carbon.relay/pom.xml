@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>message-relay-parent</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>${wso2carbon.version}</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>${wso2carbon.version}</version>
     <groupId>org.wso2.carbon</groupId>
     <artifactId>org.wso2.carbon.relay</artifactId>    
     <packaging>bundle</packaging>

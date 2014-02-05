@@ -19,10 +19,10 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>event-mediator</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>${wso2carbon.version}</version>
 	<relativePath>../pom.xml</relativePath>
     </parent>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>${wso2carbon.version}</version>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
     <artifactId>org.wso2.carbon.mediator.event.ui</artifactId>
