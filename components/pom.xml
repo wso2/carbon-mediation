@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <parent>
+      <groupId>org.wso2.carbon</groupId>
+      <artifactId>carbon-mediation</artifactId>
+      <version>${wso2carbon.version}</version>       
+   </parent>
+   <groupId>org.wso2.carbon</groupId>
+   <artifactId>carbon-mediation-components</artifactId>
+   <packaging>pom</packaging>
+   <name>WSO2 Carbon Mediation Components - Aggregator Module</name>
+   <url>http://wso2.org</url>
+   <modelVersion>4.0.0</modelVersion>
+   <version>${wso2carbon.version}</version>
+   <name>WSO2 Carbon - Platform Aggregator Pom</name>
+   <url>http://wso2.org</url>
+
+   <profiles>
+      <profile>
+         <id>default</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+         <modules>
+            <module>business-messaging</module>
+            <module>endpoint</module>
+            <module>localentry</module>
+            <module>mediation-initializer</module>
+            <module>mediation-statistics</module>
+            <module>mediation-tracer</module>
+            <module>mediation</module>
+            <module>mediators</module>
+            <module>message-relay</module>
+            <module>proxy-admin</module>
+            <module>scheduled-tasks</module>
+            <module>sequence-editor</module>
+            <module>synapse-config-admin</module>
+            <module>synapse-artifact-uploader</module>
+            <module>synapse-registries</module>
+            <module>priority-mediation</module>
+            <module>rest-api</module>
+         </modules>
+      </profile>
+   </profiles>  
+</project>
