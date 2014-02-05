@@ -9,7 +9,6 @@
    <artifactId>carbon-mediation-components</artifactId>
    <packaging>pom</packaging>
    <name>WSO2 Carbon Mediation Components - Aggregator Module</name>
-   <url>http://wso2.org</url>
    <modelVersion>4.0.0</modelVersion>
    <version>${wso2carbon.version}</version>
    <url>http://wso2.org</url>
