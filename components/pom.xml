@@ -12,7 +12,6 @@
    <url>http://wso2.org</url>
    <modelVersion>4.0.0</modelVersion>
    <version>${wso2carbon.version}</version>
-   <name>WSO2 Carbon - Platform Aggregator Pom</name>
    <url>http://wso2.org</url>
 
    <profiles>
