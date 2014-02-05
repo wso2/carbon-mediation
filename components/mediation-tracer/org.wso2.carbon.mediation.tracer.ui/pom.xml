@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
  ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
@@ -15,64 +15,58 @@
  ~ limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <parent>
-        <groupId>org.wso2.carbon</groupId>
-        <artifactId>mediation-tracer</artifactId>
-        <version>${wso2carbon.version}</version>
-	<relativePath>../pom.xml</relativePath>
-    </parent>    
-
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
-    <artifactId>org.wso2.carbon.mediation.tracer.ui</artifactId>
-    <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Mediation Tracer UI</name>
-    <url>http://wso2.org</url>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Carbon-Component>UIBundle</Carbon-Component>
-                        <Export-Package>
-                            org.wso2.carbon.mediation.tracer.ui.*
-                        </Export-Package>
-                        <Import-Package>
-                            org.wso2.carbon.mediation.tracer.stub.*; version="${carbon.platform.package.export.version}",
-                            org.wso2.carbon.mediation.tracer.stub.client.*; version="${carbon.platform.package.export.version}"
-                        </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
-	<dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.mediation.tracer.stub</artifactId>
-        </dependency>
-    </dependencies>
-
+   <parent>
+      <groupId>org.wso2.carbon</groupId>
+      <artifactId>mediation-tracer</artifactId>
+      <version>${wso2carbon.version}</version>
+   </parent>
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.wso2.carbon</groupId>
+   <artifactId>org.wso2.carbon.mediation.tracer.ui</artifactId>
+   <packaging>bundle</packaging>
+   <name>WSO2 Carbon - Mediation Tracer UI</name>
+   <version>${wso2carbon.version}</version>
+   <url>http://wso2.org</url>
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+               <instructions>
+                  <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                  <Bundle-Name>${project.artifactId}</Bundle-Name>
+                  <Carbon-Component>UIBundle</Carbon-Component>
+                  <Export-Package>org.wso2.carbon.mediation.tracer.ui.*</Export-Package>
+                  <Import-Package>org.wso2.carbon.mediation.tracer.stub.*; version="${carbon.platform.package.export.version}",
+                            org.wso2.carbon.mediation.tracer.stub.client.*; version="${carbon.platform.package.export.version}"</Import-Package>
+                  <DynamicImport-Package>*</DynamicImport-Package>
+               </instructions>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+   <dependencies>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.ui</artifactId>
+         <version>${wso2carbon.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.logging</artifactId>
+         <version>${wso2carbon.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.utils</artifactId>
+         <version>${wso2carbon.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediation.tracer.stub</artifactId>
+         <version>${wso2carbon.version}</version>
+      </dependency>
+   </dependencies>
 </project>
