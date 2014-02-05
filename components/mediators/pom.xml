@@ -128,7 +128,7 @@
 
     <properties>
         <wso2carbon.version.mediators>${wso2carbon.version}</wso2carbon.version.mediators>
-        <synapse.version.mediators>2.1.2-wso2v2</synapse.version.mediators>
+        <synapse.version.mediators>2.1.3-wso2v1-SNAPSHOT</synapse.version.mediators>
     </properties>
 
 </project>

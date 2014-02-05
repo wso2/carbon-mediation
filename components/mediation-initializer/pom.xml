@@ -44,47 +44,47 @@
             <dependency>
                 <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-core</artifactId>
-                <version>${synapse.version.mediation-initializer}</version>
+                <version>${synapse.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-extensions</artifactId>
-                <version>${synapse.version.mediation-initializer}</version>
+                <version>${synapse.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.core</artifactId>
-                <version>${wso2carbon.version.mediation-initializer}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.ui</artifactId>
-                <version>${wso2carbon.version.mediation-initializer}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.mediation.registry</artifactId>
-                <version>${wso2carbon.version.mediation-initializer}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.datasource</artifactId>
-                <version>${wso2carbon.version.mediation-initializer}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.task.services</artifactId>
-                <version>${wso2carbon.version.mediation-initializer}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.securevault</artifactId>
-                <version>${wso2carbon.version.mediation-initializer}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.application.deployer</artifactId>
-                <version>${wso2carbon.version.mediation-initializer}</version>
+                <version>${wso2carbon.version}</version>
 		<exclusions>
 			<exclusion>
 			  <groupId>org.wso2.carbon</groupId>
@@ -104,12 +104,12 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.application.deployer.synapse</artifactId>
-                <version>${wso2carbon.version.mediation-initializer}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.event.core</artifactId>
-                <version>${wso2carbon.version.mediation-initializer}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

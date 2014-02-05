@@ -42,7 +42,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.apache.axis2.wso2</groupId>
+                <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2</artifactId>
                 <version>${axis2.wso2.version.sequence-editor}</version>
             </dependency>
@@ -87,7 +87,7 @@
     <properties>
         <wso2carbon.version.sequence-editor>${wso2carbon.version}</wso2carbon.version.sequence-editor>
         <synapse.version.sequence-editor>${synapse.version}</synapse.version.sequence-editor>
-        <axis2.wso2.version.sequence-editor>${axis2.wso2.version}</axis2.wso2.version.sequence-editor>
+        <axis2.wso2.version.sequence-editor>${axis2.version}</axis2.wso2.version.sequence-editor>
         <axis2.osgi.version.range.sequence-editor>${axis2.osgi.version.range}</axis2.osgi.version.range.sequence-editor>
         <axiom.osgi.version.range.sequence-editor>${axiom.osgi.version.range}</axiom.osgi.version.range.sequence-editor>
     </properties>

@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediator.router.impl</artifactId>
-            <version>${wso2carbon.version.mediation-initializer}</version>
+            <version>${wso2carbon.version}</version>
         </dependency>
     </dependencies>
 

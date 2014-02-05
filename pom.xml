@@ -20,7 +20,7 @@
             <checksumPolicy>ignore</checksumPolicy>
          </releases>
       </repository>
-      <!-- WSO2 Snapshot artifact repository -->
+      <!-- WSO2 Snapshot artifact repository-->
       <repository>
          <id>wso2.snapshots</id>
          <name>WSO2 Snapshot Repository</name>
@@ -138,5 +138,6 @@
    <properties>
       <wso2carbon.version>4.3.0-SNAPSHOT</wso2carbon.version>
       <synapse.version>2.1.3-wso2v1-SNAPSHOT</synapse.version>
+      <axis2.version>1.6.1-wso2v11-SNAPSHOT</axis2.version>
    </properties>
 </project>
