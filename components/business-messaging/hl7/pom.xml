@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>business-messaging</artifactId>
-        <version>${wso2carbon.version}</version>
+        <version>4.3.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -43,7 +43,7 @@
     <properties>
         <axis2.transport.base.hl7>${axis2-transports.version}</axis2.transport.base.hl7>
         <synapse.version.hl7>${synapse.version}</synapse.version.hl7>
-        <wso2carbon.version.hl7>${wso2carbon.version}</wso2carbon.version.hl7>
+        <wso2carbon.version.hl7>4.3.0-SNAPSHOT</wso2carbon.version.hl7>
         <xmlschema.version.hl7>${xmlschema.version}</xmlschema.version.hl7>
         <hapi.version>1.2.0.wso2v1</hapi.version>
         <addressing.version.hl7>${addressing.version}</addressing.version.hl7>

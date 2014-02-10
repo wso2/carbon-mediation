@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>mediators</artifactId>
-        <version>${wso2carbon.version}</version>
+        <version>4.3.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -53,7 +53,7 @@
     </dependencyManagement>
 
     <properties>
-        <wso2carbon.version.smooks>${wso2carbon.version}</wso2carbon.version.smooks>
+        <wso2carbon.version.smooks>4.3.0-SNAPSHOT</wso2carbon.version.smooks>
         <synapse.version.smooks>${synapse.version}</synapse.version.smooks>
         <axis2.wso2.version.smooks>${axis2.wso2.version}</axis2.wso2.version.smooks>    
     </properties>

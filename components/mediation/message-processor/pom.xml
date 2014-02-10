@@ -22,7 +22,7 @@
 <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>mediation</artifactId>
-        <version>${wso2carbon.version}</version>
+        <version>4.3.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -86,7 +86,7 @@
     </dependencyManagement>
 
     <properties>
-        <wso2carbon.version.messageProcessor>${wso2carbon.version}</wso2carbon.version.messageProcessor>
+        <wso2carbon.version.messageProcessor>4.3.0-SNAPSHOT</wso2carbon.version.messageProcessor>
         <axis2.wso2.version.messageProcessor>${axis2.wso2.version}</axis2.wso2.version.messageProcessor>
         <axis2.osgi.version.range.messageProcessor>${axis2.osgi.version.range}</axis2.osgi.version.range.messageProcessor>
         <axiom.osgi.version.range.messageProcessor>${axiom.osgi.version.range}</axiom.osgi.version.range.messageProcessor>

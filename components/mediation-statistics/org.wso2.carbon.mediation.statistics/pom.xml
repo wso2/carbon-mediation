@@ -19,13 +19,13 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <artifactId>mediation-statistics</artifactId>
-        <version>${wso2carbon.version}</version>	
+        <version>4.3.0-SNAPSHOT</version>	
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
     <artifactId>org.wso2.carbon.mediation.statistics</artifactId>
-    <version>${wso2carbon.version}</version>
+    <version>4.3.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Mediation statistics BE</name>
     <url>http://wso2.org</url>
@@ -40,22 +40,22 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
-            <version>${wso2carbon.version}</version>
+            <version>4.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
-            <version>${wso2carbon.version}</version>
+            <version>4.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-            <version>${wso2carbon.version}</version>
+            <version>4.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.core</artifactId>
-            <version>${wso2carbon.version}</version>
+            <version>4.3.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
