@@ -37,9 +37,9 @@
          </activation>
          <modules>
             <module>org.wso2.carbon.proxyadmin.stub</module>
-            <!--module>org.wso2.carbon.business.messaging.salesforce.stub</module>
+            <!--module>org.wso2.carbon.business.messaging.salesforce.stub</module-->
             <module>org.wso2.carbon.endpoint.stub</module>
-            <module>org.wso2.carbon.localentry.stub</module>
+            <!--module>org.wso2.carbon.localentry.stub</module>
             <module>org.wso2.carbon.mediation.artifactuploader.stub</module>
             <module>org.wso2.carbon.mediation.configadmin.stub</module>
             <module>org.wso2.carbon.mediation.statistics.stub</module>
