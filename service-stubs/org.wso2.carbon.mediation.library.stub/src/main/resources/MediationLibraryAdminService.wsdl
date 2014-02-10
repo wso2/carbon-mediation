@@ -1,0 +1,507 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://org.apache.synapse/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://service.library.mediation.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ax2225="http://service.library.mediation.carbon.wso2.org/xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.library.mediation.carbon.wso2.org">
+   <wsdl:documentation>MediationLibraryAdminService</wsdl:documentation>
+   <wsdl:types>
+      <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.library.mediation.carbon.wso2.org/xsd">
+         <xs:complexType name="LibraryInfo">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="QName" nillable="true" type="xs:string"></xs:element>
+               <xs:element maxOccurs="unbounded" minOccurs="0" name="artifacts" nillable="true" type="ax2225:LibraryArtifiactInfo"></xs:element>
+               <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"></xs:element>
+               <xs:element minOccurs="0" name="libName" nillable="true" type="xs:string"></xs:element>
+               <xs:element minOccurs="0" name="packageName" nillable="true" type="xs:string"></xs:element>
+               <xs:element minOccurs="0" name="qName" nillable="true" type="xs:string"></xs:element>
+               <xs:element minOccurs="0" name="status" type="xs:boolean"></xs:element>
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="LibraryArtifiactInfo">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"></xs:element>
+               <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+            </xs:sequence>
+         </xs:complexType>
+      </xs:schema>
+      <xs:schema xmlns:ax2226="http://service.library.mediation.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.synapse/xsd">
+         <xs:import namespace="http://service.library.mediation.carbon.wso2.org/xsd"></xs:import>
+         <xs:element name="updateStatus">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="libQName" nillable="true" type="xs:string"></xs:element>
+                  <xs:element minOccurs="0" name="libName" nillable="true" type="xs:string"></xs:element>
+                  <xs:element minOccurs="0" name="packageName" nillable="true" type="xs:string"></xs:element>
+                  <xs:element minOccurs="0" name="status" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getLibraryInfo">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="libName" nillable="true" type="xs:string"></xs:element>
+                  <xs:element minOccurs="0" name="packageName" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getLibraryInfoResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2226:LibraryInfo"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getImport">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="qualifiedName" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getImportResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllLibraryInfo">
+            <xs:complexType>
+               <xs:sequence></xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllLibraryInfoResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2226:LibraryInfo"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllLibraries">
+            <xs:complexType>
+               <xs:sequence></xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllLibrariesResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllImports">
+            <xs:complexType>
+               <xs:sequence></xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllImportsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="MediationLibraryAdminServiceException">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="MediationLibraryAdminServiceException" nillable="true" type="ns:Exception"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:complexType name="Exception">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string"></xs:element>
+            </xs:sequence>
+         </xs:complexType>
+         <xs:element name="downloadLibraryArchive">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="downloadLibraryArchiveResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:base64Binary"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="deleteLibrary">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="libQualifiedName" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="deleteImport">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="importQualifiedName" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="addImport">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="libName" nillable="true" type="xs:string"></xs:element>
+                  <xs:element minOccurs="0" name="packageName" nillable="true" type="xs:string"></xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+      </xs:schema>
+   </wsdl:types>
+   <wsdl:message name="getLibraryInfoRequest">
+      <wsdl:part name="parameters" element="ns:getLibraryInfo"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="getLibraryInfoResponse">
+      <wsdl:part name="parameters" element="ns:getLibraryInfoResponse"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="addImportRequest">
+      <wsdl:part name="parameters" element="ns:addImport"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="updateStatusRequest">
+      <wsdl:part name="parameters" element="ns:updateStatus"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="getAllLibrariesRequest">
+      <wsdl:part name="parameters" element="ns:getAllLibraries"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="getAllLibrariesResponse">
+      <wsdl:part name="parameters" element="ns:getAllLibrariesResponse"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="deleteImportRequest">
+      <wsdl:part name="parameters" element="ns:deleteImport"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="deleteLibraryRequest">
+      <wsdl:part name="parameters" element="ns:deleteLibrary"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="MediationLibraryAdminServiceException">
+      <wsdl:part name="parameters" element="ns:MediationLibraryAdminServiceException"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="getAllImportsRequest">
+      <wsdl:part name="parameters" element="ns:getAllImports"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="getAllImportsResponse">
+      <wsdl:part name="parameters" element="ns:getAllImportsResponse"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="downloadLibraryArchiveRequest">
+      <wsdl:part name="parameters" element="ns:downloadLibraryArchive"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="downloadLibraryArchiveResponse">
+      <wsdl:part name="parameters" element="ns:downloadLibraryArchiveResponse"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="getAllLibraryInfoRequest">
+      <wsdl:part name="parameters" element="ns:getAllLibraryInfo"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="getAllLibraryInfoResponse">
+      <wsdl:part name="parameters" element="ns:getAllLibraryInfoResponse"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="getImportRequest">
+      <wsdl:part name="parameters" element="ns:getImport"></wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="getImportResponse">
+      <wsdl:part name="parameters" element="ns:getImportResponse"></wsdl:part>
+   </wsdl:message>
+   <wsdl:portType name="MediationLibraryAdminServicePortType">
+      <wsdl:operation name="getLibraryInfo">
+         <wsdl:input message="tns:getLibraryInfoRequest" wsaw:Action="urn:getLibraryInfo"></wsdl:input>
+         <wsdl:output message="tns:getLibraryInfoResponse" wsaw:Action="urn:getLibraryInfoResponse"></wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="addImport">
+         <wsdl:input message="tns:addImportRequest" wsaw:Action="urn:addImport"></wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="updateStatus">
+         <wsdl:input message="tns:updateStatusRequest" wsaw:Action="urn:updateStatus"></wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllLibraries">
+         <wsdl:input message="tns:getAllLibrariesRequest" wsaw:Action="urn:getAllLibraries"></wsdl:input>
+         <wsdl:output message="tns:getAllLibrariesResponse" wsaw:Action="urn:getAllLibrariesResponse"></wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="deleteImport">
+         <wsdl:input message="tns:deleteImportRequest" wsaw:Action="urn:deleteImport"></wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="deleteLibrary">
+         <wsdl:input message="tns:deleteLibraryRequest" wsaw:Action="urn:deleteLibrary"></wsdl:input>
+         <wsdl:fault message="tns:MediationLibraryAdminServiceException" name="MediationLibraryAdminServiceException" wsaw:Action="urn:deleteLibraryMediationLibraryAdminServiceException"></wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="getAllImports">
+         <wsdl:input message="tns:getAllImportsRequest" wsaw:Action="urn:getAllImports"></wsdl:input>
+         <wsdl:output message="tns:getAllImportsResponse" wsaw:Action="urn:getAllImportsResponse"></wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="downloadLibraryArchive">
+         <wsdl:input message="tns:downloadLibraryArchiveRequest" wsaw:Action="urn:downloadLibraryArchive"></wsdl:input>
+         <wsdl:output message="tns:downloadLibraryArchiveResponse" wsaw:Action="urn:downloadLibraryArchiveResponse"></wsdl:output>
+         <wsdl:fault message="tns:MediationLibraryAdminServiceException" name="MediationLibraryAdminServiceException" wsaw:Action="urn:downloadLibraryArchiveMediationLibraryAdminServiceException"></wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="getAllLibraryInfo">
+         <wsdl:input message="tns:getAllLibraryInfoRequest" wsaw:Action="urn:getAllLibraryInfo"></wsdl:input>
+         <wsdl:output message="tns:getAllLibraryInfoResponse" wsaw:Action="urn:getAllLibraryInfoResponse"></wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getImport">
+         <wsdl:input message="tns:getImportRequest" wsaw:Action="urn:getImport"></wsdl:input>
+         <wsdl:output message="tns:getImportResponse" wsaw:Action="urn:getImportResponse"></wsdl:output>
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="MediationLibraryAdminServiceSoap11Binding" type="tns:MediationLibraryAdminServicePortType">
+      <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+      <wsdl:operation name="getLibraryInfo">
+         <soap:operation soapAction="urn:getLibraryInfo" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"></soap:body>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="addImport">
+         <soap:operation soapAction="urn:addImport" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="updateStatus">
+         <soap:operation soapAction="urn:updateStatus" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllLibraries">
+         <soap:operation soapAction="urn:getAllLibraries" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"></soap:body>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="deleteImport">
+         <soap:operation soapAction="urn:deleteImport" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllImports">
+         <soap:operation soapAction="urn:getAllImports" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"></soap:body>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="deleteLibrary">
+         <soap:operation soapAction="urn:deleteLibrary" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+         <wsdl:fault name="MediationLibraryAdminServiceException">
+            <soap:fault use="literal" name="MediationLibraryAdminServiceException"></soap:fault>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="downloadLibraryArchive">
+         <soap:operation soapAction="urn:downloadLibraryArchive" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"></soap:body>
+         </wsdl:output>
+         <wsdl:fault name="MediationLibraryAdminServiceException">
+            <soap:fault use="literal" name="MediationLibraryAdminServiceException"></soap:fault>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="getImport">
+         <soap:operation soapAction="urn:getImport" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"></soap:body>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllLibraryInfo">
+         <soap:operation soapAction="urn:getAllLibraryInfo" style="document"></soap:operation>
+         <wsdl:input>
+            <soap:body use="literal"></soap:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"></soap:body>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="MediationLibraryAdminServiceSoap12Binding" type="tns:MediationLibraryAdminServicePortType">
+      <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap12:binding>
+      <wsdl:operation name="getLibraryInfo">
+         <soap12:operation soapAction="urn:getLibraryInfo" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="addImport">
+         <soap12:operation soapAction="urn:addImport" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="updateStatus">
+         <soap12:operation soapAction="urn:updateStatus" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllLibraries">
+         <soap12:operation soapAction="urn:getAllLibraries" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="deleteImport">
+         <soap12:operation soapAction="urn:deleteImport" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllImports">
+         <soap12:operation soapAction="urn:getAllImports" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="deleteLibrary">
+         <soap12:operation soapAction="urn:deleteLibrary" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+         <wsdl:fault name="MediationLibraryAdminServiceException">
+            <soap12:fault use="literal" name="MediationLibraryAdminServiceException"></soap12:fault>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="downloadLibraryArchive">
+         <soap12:operation soapAction="urn:downloadLibraryArchive" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:output>
+         <wsdl:fault name="MediationLibraryAdminServiceException">
+            <soap12:fault use="literal" name="MediationLibraryAdminServiceException"></soap12:fault>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="getImport">
+         <soap12:operation soapAction="urn:getImport" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllLibraryInfo">
+         <soap12:operation soapAction="urn:getAllLibraryInfo" style="document"></soap12:operation>
+         <wsdl:input>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"></soap12:body>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="MediationLibraryAdminServiceHttpBinding" type="tns:MediationLibraryAdminServicePortType">
+      <http:binding verb="POST"></http:binding>
+      <wsdl:operation name="getLibraryInfo">
+         <http:operation location="getLibraryInfo"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="addImport">
+         <http:operation location="addImport"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="updateStatus">
+         <http:operation location="updateStatus"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllLibraries">
+         <http:operation location="getAllLibraries"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="deleteImport">
+         <http:operation location="deleteImport"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllImports">
+         <http:operation location="getAllImports"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="deleteLibrary">
+         <http:operation location="deleteLibrary"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="downloadLibraryArchive">
+         <http:operation location="downloadLibraryArchive"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getImport">
+         <http:operation location="getImport"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllLibraryInfo">
+         <http:operation location="getAllLibraryInfo"></http:operation>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"></mime:content>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="MediationLibraryAdminService">
+      <wsdl:port name="MediationLibraryAdminServiceHttpsSoap11Endpoint" binding="tns:MediationLibraryAdminServiceSoap11Binding">
+         <soap:address location="https://dushan-ThinkPad-T520:8243/services/MediationLibraryAdminService.MediationLibraryAdminServiceHttpsSoap11Endpoint"></soap:address>
+      </wsdl:port>
+      <wsdl:port name="MediationLibraryAdminServiceHttpsSoap12Endpoint" binding="tns:MediationLibraryAdminServiceSoap12Binding">
+         <soap12:address location="https://dushan-ThinkPad-T520:8243/services/MediationLibraryAdminService.MediationLibraryAdminServiceHttpsSoap12Endpoint"></soap12:address>
+      </wsdl:port>
+      <wsdl:port name="MediationLibraryAdminServiceHttpsEndpoint" binding="tns:MediationLibraryAdminServiceHttpBinding">
+         <http:address location="https://dushan-ThinkPad-T520:8243/services/MediationLibraryAdminService.MediationLibraryAdminServiceHttpsEndpoint"></http:address>
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>
