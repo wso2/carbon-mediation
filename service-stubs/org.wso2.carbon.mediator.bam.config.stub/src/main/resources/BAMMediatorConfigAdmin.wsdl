@@ -1,0 +1,603 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://services.config.bam.mediator.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax2235="http://config.bam.mediator.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://services.config.bam.mediator.carbon.wso2.org">
+    <wsdl:documentation>BAMMediatorConfigAdmin</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://config.bam.mediator.carbon.wso2.org/xsd">
+            <xs:complexType name="BamServerConfig">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="ip" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="password" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="port" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="streamConfigurations" nillable="true" type="xs:anyType" />
+                    <xs:element minOccurs="0" name="username" nillable="true" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax2236="http://config.bam.mediator.carbon.wso2.org/xsd" xmlns:ns="http://org.apache.axis2/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
+            <xs:import namespace="http://config.bam.mediator.carbon.wso2.org/xsd" />
+            <xs:element name="saveResourceString">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="resourceString" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="bamServerProfileLocation" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveResourceStringResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveBamServerConfig">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="bamServerConfig" nillable="true" type="ax2236:BamServerConfig" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveBamServerConfigResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resourceAlreadyExists">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="bamServerProfileLocation" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resourceAlreadyExistsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeResource">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="path" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeResourceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getServerProfileNameList">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="bamServerProfileCollectionLocation" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getServerProfileNameListResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getResourceString">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="bamServerProfileLocation" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getResourceStringResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getBamServerConfig">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="bamServerConfigLocation" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getBamServerConfigResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2236:BamServerConfig" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="encryptAndBase64Encode">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="plainText" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="encryptAndBase64EncodeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="base64DecodeAndDecrypt">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="cipherText" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="base64DecodeAndDecryptResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="bamServerConfigExists">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="bamServerConfigLocation" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="bamServerConfigExistsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addCollection">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="bamServerProfileCollectionLocation" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addCollectionResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getBamServerConfigRequest">
+        <wsdl:part name="parameters" element="ns1:getBamServerConfig" />
+    </wsdl:message>
+    <wsdl:message name="getBamServerConfigResponse">
+        <wsdl:part name="parameters" element="ns1:getBamServerConfigResponse" />
+    </wsdl:message>
+    <wsdl:message name="removeResourceRequest">
+        <wsdl:part name="parameters" element="ns1:removeResource" />
+    </wsdl:message>
+    <wsdl:message name="removeResourceResponse">
+        <wsdl:part name="parameters" element="ns1:removeResourceResponse" />
+    </wsdl:message>
+    <wsdl:message name="saveResourceStringRequest">
+        <wsdl:part name="parameters" element="ns1:saveResourceString" />
+    </wsdl:message>
+    <wsdl:message name="saveResourceStringResponse">
+        <wsdl:part name="parameters" element="ns1:saveResourceStringResponse" />
+    </wsdl:message>
+    <wsdl:message name="saveBamServerConfigRequest">
+        <wsdl:part name="parameters" element="ns1:saveBamServerConfig" />
+    </wsdl:message>
+    <wsdl:message name="saveBamServerConfigResponse">
+        <wsdl:part name="parameters" element="ns1:saveBamServerConfigResponse" />
+    </wsdl:message>
+    <wsdl:message name="bamServerConfigExistsRequest">
+        <wsdl:part name="parameters" element="ns1:bamServerConfigExists" />
+    </wsdl:message>
+    <wsdl:message name="bamServerConfigExistsResponse">
+        <wsdl:part name="parameters" element="ns1:bamServerConfigExistsResponse" />
+    </wsdl:message>
+    <wsdl:message name="addCollectionRequest">
+        <wsdl:part name="parameters" element="ns1:addCollection" />
+    </wsdl:message>
+    <wsdl:message name="addCollectionResponse">
+        <wsdl:part name="parameters" element="ns1:addCollectionResponse" />
+    </wsdl:message>
+    <wsdl:message name="resourceAlreadyExistsRequest">
+        <wsdl:part name="parameters" element="ns1:resourceAlreadyExists" />
+    </wsdl:message>
+    <wsdl:message name="resourceAlreadyExistsResponse">
+        <wsdl:part name="parameters" element="ns1:resourceAlreadyExistsResponse" />
+    </wsdl:message>
+    <wsdl:message name="base64DecodeAndDecryptRequest">
+        <wsdl:part name="parameters" element="ns1:base64DecodeAndDecrypt" />
+    </wsdl:message>
+    <wsdl:message name="base64DecodeAndDecryptResponse">
+        <wsdl:part name="parameters" element="ns1:base64DecodeAndDecryptResponse" />
+    </wsdl:message>
+    <wsdl:message name="getResourceStringRequest">
+        <wsdl:part name="parameters" element="ns1:getResourceString" />
+    </wsdl:message>
+    <wsdl:message name="getResourceStringResponse">
+        <wsdl:part name="parameters" element="ns1:getResourceStringResponse" />
+    </wsdl:message>
+    <wsdl:message name="getServerProfileNameListRequest">
+        <wsdl:part name="parameters" element="ns1:getServerProfileNameList" />
+    </wsdl:message>
+    <wsdl:message name="getServerProfileNameListResponse">
+        <wsdl:part name="parameters" element="ns1:getServerProfileNameListResponse" />
+    </wsdl:message>
+    <wsdl:message name="encryptAndBase64EncodeRequest">
+        <wsdl:part name="parameters" element="ns1:encryptAndBase64Encode" />
+    </wsdl:message>
+    <wsdl:message name="encryptAndBase64EncodeResponse">
+        <wsdl:part name="parameters" element="ns1:encryptAndBase64EncodeResponse" />
+    </wsdl:message>
+    <wsdl:portType name="BAMMediatorConfigAdminPortType">
+        <wsdl:operation name="getBamServerConfig">
+            <wsdl:input message="tns:getBamServerConfigRequest" wsaw:Action="urn:getBamServerConfig" />
+            <wsdl:output message="tns:getBamServerConfigResponse" wsaw:Action="urn:getBamServerConfigResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="removeResource">
+            <wsdl:input message="tns:removeResourceRequest" wsaw:Action="urn:removeResource" />
+            <wsdl:output message="tns:removeResourceResponse" wsaw:Action="urn:removeResourceResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="saveResourceString">
+            <wsdl:input message="tns:saveResourceStringRequest" wsaw:Action="urn:saveResourceString" />
+            <wsdl:output message="tns:saveResourceStringResponse" wsaw:Action="urn:saveResourceStringResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="saveBamServerConfig">
+            <wsdl:input message="tns:saveBamServerConfigRequest" wsaw:Action="urn:saveBamServerConfig" />
+            <wsdl:output message="tns:saveBamServerConfigResponse" wsaw:Action="urn:saveBamServerConfigResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="bamServerConfigExists">
+            <wsdl:input message="tns:bamServerConfigExistsRequest" wsaw:Action="urn:bamServerConfigExists" />
+            <wsdl:output message="tns:bamServerConfigExistsResponse" wsaw:Action="urn:bamServerConfigExistsResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="addCollection">
+            <wsdl:input message="tns:addCollectionRequest" wsaw:Action="urn:addCollection" />
+            <wsdl:output message="tns:addCollectionResponse" wsaw:Action="urn:addCollectionResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="resourceAlreadyExists">
+            <wsdl:input message="tns:resourceAlreadyExistsRequest" wsaw:Action="urn:resourceAlreadyExists" />
+            <wsdl:output message="tns:resourceAlreadyExistsResponse" wsaw:Action="urn:resourceAlreadyExistsResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="base64DecodeAndDecrypt">
+            <wsdl:input message="tns:base64DecodeAndDecryptRequest" wsaw:Action="urn:base64DecodeAndDecrypt" />
+            <wsdl:output message="tns:base64DecodeAndDecryptResponse" wsaw:Action="urn:base64DecodeAndDecryptResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getResourceString">
+            <wsdl:input message="tns:getResourceStringRequest" wsaw:Action="urn:getResourceString" />
+            <wsdl:output message="tns:getResourceStringResponse" wsaw:Action="urn:getResourceStringResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getServerProfileNameList">
+            <wsdl:input message="tns:getServerProfileNameListRequest" wsaw:Action="urn:getServerProfileNameList" />
+            <wsdl:output message="tns:getServerProfileNameListResponse" wsaw:Action="urn:getServerProfileNameListResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="encryptAndBase64Encode">
+            <wsdl:input message="tns:encryptAndBase64EncodeRequest" wsaw:Action="urn:encryptAndBase64Encode" />
+            <wsdl:output message="tns:encryptAndBase64EncodeResponse" wsaw:Action="urn:encryptAndBase64EncodeResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="BAMMediatorConfigAdminSoap11Binding" type="tns:BAMMediatorConfigAdminPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="removeResource">
+            <soap:operation soapAction="urn:removeResource" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getBamServerConfig">
+            <soap:operation soapAction="urn:getBamServerConfig" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="saveResourceString">
+            <soap:operation soapAction="urn:saveResourceString" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="saveBamServerConfig">
+            <soap:operation soapAction="urn:saveBamServerConfig" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="bamServerConfigExists">
+            <soap:operation soapAction="urn:bamServerConfigExists" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="resourceAlreadyExists">
+            <soap:operation soapAction="urn:resourceAlreadyExists" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addCollection">
+            <soap:operation soapAction="urn:addCollection" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="base64DecodeAndDecrypt">
+            <soap:operation soapAction="urn:base64DecodeAndDecrypt" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getServerProfileNameList">
+            <soap:operation soapAction="urn:getServerProfileNameList" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceString">
+            <soap:operation soapAction="urn:getResourceString" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="encryptAndBase64Encode">
+            <soap:operation soapAction="urn:encryptAndBase64Encode" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="BAMMediatorConfigAdminSoap12Binding" type="tns:BAMMediatorConfigAdminPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="removeResource">
+            <soap12:operation soapAction="urn:removeResource" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getBamServerConfig">
+            <soap12:operation soapAction="urn:getBamServerConfig" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="saveResourceString">
+            <soap12:operation soapAction="urn:saveResourceString" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="saveBamServerConfig">
+            <soap12:operation soapAction="urn:saveBamServerConfig" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="bamServerConfigExists">
+            <soap12:operation soapAction="urn:bamServerConfigExists" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="resourceAlreadyExists">
+            <soap12:operation soapAction="urn:resourceAlreadyExists" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addCollection">
+            <soap12:operation soapAction="urn:addCollection" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="base64DecodeAndDecrypt">
+            <soap12:operation soapAction="urn:base64DecodeAndDecrypt" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getServerProfileNameList">
+            <soap12:operation soapAction="urn:getServerProfileNameList" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceString">
+            <soap12:operation soapAction="urn:getResourceString" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="encryptAndBase64Encode">
+            <soap12:operation soapAction="urn:encryptAndBase64Encode" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="BAMMediatorConfigAdminHttpBinding" type="tns:BAMMediatorConfigAdminPortType">
+        <http:binding verb="POST" />
+        <wsdl:operation name="removeResource">
+            <http:operation location="removeResource" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getBamServerConfig">
+            <http:operation location="getBamServerConfig" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="saveResourceString">
+            <http:operation location="saveResourceString" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="saveBamServerConfig">
+            <http:operation location="saveBamServerConfig" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="bamServerConfigExists">
+            <http:operation location="bamServerConfigExists" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="resourceAlreadyExists">
+            <http:operation location="resourceAlreadyExists" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addCollection">
+            <http:operation location="addCollection" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="base64DecodeAndDecrypt">
+            <http:operation location="base64DecodeAndDecrypt" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getServerProfileNameList">
+            <http:operation location="getServerProfileNameList" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getResourceString">
+            <http:operation location="getResourceString" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="encryptAndBase64Encode">
+            <http:operation location="encryptAndBase64Encode" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="BAMMediatorConfigAdmin">
+        <wsdl:port name="BAMMediatorConfigAdminHttpsSoap11Endpoint" binding="tns:BAMMediatorConfigAdminSoap11Binding">
+            <soap:address location="https://my:8244/services/BAMMediatorConfigAdmin.BAMMediatorConfigAdminHttpsSoap11Endpoint" />
+        </wsdl:port>
+        <wsdl:port name="BAMMediatorConfigAdminHttpsSoap12Endpoint" binding="tns:BAMMediatorConfigAdminSoap12Binding">
+            <soap12:address location="https://my:8244/services/BAMMediatorConfigAdmin.BAMMediatorConfigAdminHttpsSoap12Endpoint" />
+        </wsdl:port>
+        <wsdl:port name="BAMMediatorConfigAdminHttpsEndpoint" binding="tns:BAMMediatorConfigAdminHttpBinding">
+            <http:address location="https://my:8244/services/BAMMediatorConfigAdmin.BAMMediatorConfigAdminHttpsEndpoint" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

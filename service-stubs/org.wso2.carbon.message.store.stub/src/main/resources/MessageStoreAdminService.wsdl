@@ -1,0 +1,605 @@
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://org.apache.synapse/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://service.store.message.carbon.wso2.org" xmlns:ax2231="http://service.store.message.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.store.message.carbon.wso2.org">
+    <wsdl:documentation>MessageStoreAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.store.message.carbon.wso2.org/xsd">
+            <xs:complexType name="MessageInfo">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="soapXml" nillable="true" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax2232="http://service.store.message.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.synapse/xsd">
+            <xs:import namespace="http://service.store.message.carbon.wso2.org/xsd" />
+            <xs:element name="modifyMessageStore">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSize">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSizeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPaginatedMessages">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="pageNumber" type="xs:int" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPaginatedMessagesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2232:MessageInfo" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageStoreNames">
+                <xs:complexType>
+                    <xs:sequence />
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageStoreNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageStore">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageStoreResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEnvelope">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEnvelopeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>                       
+            <xs:element name="getClassName">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getClassNameResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllMessages">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllMessagesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2232:MessageInfo" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteMessageStore">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteMessage">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteFirstMessages">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteAllMessages">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addMessageStore">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="xml" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Exception" nillable="true" type="xs:anyType" />
+                </xs:sequence>
+            </xs:complexType>            
+            <xs:element name="Exception">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="Exception" nillable="true" type="ns:Exception" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>            
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getSizeRequest">
+        <wsdl:part name="parameters" element="ns:getSize" />
+    </wsdl:message>
+    <wsdl:message name="getSizeResponse">
+        <wsdl:part name="parameters" element="ns:getSizeResponse" />
+    </wsdl:message>
+    <wsdl:message name="deleteAllMessagesRequest">
+        <wsdl:part name="parameters" element="ns:deleteAllMessages" />
+    </wsdl:message>
+    <wsdl:message name="getMessageStoreRequest">
+        <wsdl:part name="parameters" element="ns:getMessageStore" />
+    </wsdl:message>
+    <wsdl:message name="getMessageStoreResponse">
+        <wsdl:part name="parameters" element="ns:getMessageStoreResponse" />
+    </wsdl:message>
+    <wsdl:message name="deleteMessageStoreRequest">
+        <wsdl:part name="parameters" element="ns:deleteMessageStore" />
+    </wsdl:message>
+    <wsdl:message name="getEnvelopeRequest">
+        <wsdl:part name="parameters" element="ns:getEnvelope" />
+    </wsdl:message>
+    <wsdl:message name="getEnvelopeResponse">
+        <wsdl:part name="parameters" element="ns:getEnvelopeResponse" />
+    </wsdl:message>
+    <wsdl:message name="addMessageStoreRequest">
+        <wsdl:part name="parameters" element="ns:addMessageStore" />
+    </wsdl:message>   
+    <wsdl:message name="Exception">
+        <wsdl:part name="parameters" element="ns:Exception" />
+    </wsdl:message>    
+    <wsdl:message name="modifyMessageStoreRequest">
+        <wsdl:part name="parameters" element="ns:modifyMessageStore" />
+    </wsdl:message>
+    <wsdl:message name="getClassNameRequest">
+        <wsdl:part name="parameters" element="ns:getClassName" />
+    </wsdl:message>
+    <wsdl:message name="getClassNameResponse">
+        <wsdl:part name="parameters" element="ns:getClassNameResponse" />
+    </wsdl:message>
+    <wsdl:message name="getAllMessagesRequest">
+        <wsdl:part name="parameters" element="ns:getAllMessages" />
+    </wsdl:message>
+    <wsdl:message name="getAllMessagesResponse">
+        <wsdl:part name="parameters" element="ns:getAllMessagesResponse" />
+    </wsdl:message>
+    <wsdl:message name="deleteFirstMessagesRequest">
+        <wsdl:part name="parameters" element="ns:deleteFirstMessages" />
+    </wsdl:message>
+    <wsdl:message name="deleteMessageRequest">
+        <wsdl:part name="parameters" element="ns:deleteMessage" />
+    </wsdl:message>
+    <wsdl:message name="getPaginatedMessagesRequest">
+        <wsdl:part name="parameters" element="ns:getPaginatedMessages" />
+    </wsdl:message>
+    <wsdl:message name="getPaginatedMessagesResponse">
+        <wsdl:part name="parameters" element="ns:getPaginatedMessagesResponse" />
+    </wsdl:message>
+    <wsdl:message name="getMessageStoreNamesRequest">
+        <wsdl:part name="parameters" element="ns:getMessageStoreNames" />
+    </wsdl:message>
+    <wsdl:message name="getMessageStoreNamesResponse">
+        <wsdl:part name="parameters" element="ns:getMessageStoreNamesResponse" />
+    </wsdl:message>
+    <wsdl:portType name="MessageStoreAdminServicePortType">
+        <wsdl:operation name="getSize">
+            <wsdl:input message="tns:getSizeRequest" wsaw:Action="urn:getSize" />
+            <wsdl:output message="tns:getSizeResponse" wsaw:Action="urn:getSizeResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="deleteAllMessages">
+            <wsdl:input message="tns:deleteAllMessagesRequest" wsaw:Action="urn:deleteAllMessages" />
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStore">
+            <wsdl:input message="tns:getMessageStoreRequest" wsaw:Action="urn:getMessageStore" />
+            <wsdl:output message="tns:getMessageStoreResponse" wsaw:Action="urn:getMessageStoreResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="deleteMessageStore">
+            <wsdl:input message="tns:deleteMessageStoreRequest" wsaw:Action="urn:deleteMessageStore" />
+        </wsdl:operation>
+        <wsdl:operation name="getEnvelope">
+            <wsdl:input message="tns:getEnvelopeRequest" wsaw:Action="urn:getEnvelope" />
+            <wsdl:output message="tns:getEnvelopeResponse" wsaw:Action="urn:getEnvelopeResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="addMessageStore">
+            <wsdl:input message="tns:addMessageStoreRequest" wsaw:Action="urn:addMessageStore" />
+            <wsdl:fault message="tns:Exception" name="Exception" wsaw:Action="urn:addMessageStoreException" />            
+        </wsdl:operation>
+        <wsdl:operation name="modifyMessageStore">
+            <wsdl:input message="tns:modifyMessageStoreRequest" wsaw:Action="urn:modifyMessageStore" />
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <wsdl:input message="tns:getClassNameRequest" wsaw:Action="urn:getClassName" />
+            <wsdl:output message="tns:getClassNameResponse" wsaw:Action="urn:getClassNameResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getAllMessages">
+            <wsdl:input message="tns:getAllMessagesRequest" wsaw:Action="urn:getAllMessages" />
+            <wsdl:output message="tns:getAllMessagesResponse" wsaw:Action="urn:getAllMessagesResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="deleteFirstMessages">
+            <wsdl:input message="tns:deleteFirstMessagesRequest" wsaw:Action="urn:deleteFirstMessages" />
+        </wsdl:operation>
+        <wsdl:operation name="deleteMessage">
+            <wsdl:input message="tns:deleteMessageRequest" wsaw:Action="urn:deleteMessage" />
+        </wsdl:operation>
+        <wsdl:operation name="getPaginatedMessages">
+            <wsdl:input message="tns:getPaginatedMessagesRequest" wsaw:Action="urn:getPaginatedMessages" />
+            <wsdl:output message="tns:getPaginatedMessagesResponse" wsaw:Action="urn:getPaginatedMessagesResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStoreNames">
+            <wsdl:input message="tns:getMessageStoreNamesRequest" wsaw:Action="urn:getMessageStoreNames" />
+            <wsdl:output message="tns:getMessageStoreNamesResponse" wsaw:Action="urn:getMessageStoreNamesResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="MessageStoreAdminServiceSoap11Binding" type="tns:MessageStoreAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="getSize">
+            <soap:operation soapAction="urn:getSize" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStore">
+            <soap:operation soapAction="urn:getMessageStore" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteAllMessages">
+            <soap:operation soapAction="urn:deleteAllMessages" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteMessageStore">
+            <soap:operation soapAction="urn:deleteMessageStore" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getEnvelope">
+            <soap:operation soapAction="urn:getEnvelope" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyMessageStore">
+            <soap:operation soapAction="urn:modifyMessageStore" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addMessageStore">
+            <soap:operation soapAction="urn:addMessageStore" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>           
+            <wsdl:fault name="Exception">
+                <soap12:fault use="literal" name="Exception" />
+            </wsdl:fault>            
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <soap:operation soapAction="urn:getClassName" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllMessages">
+            <soap:operation soapAction="urn:getAllMessages" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteMessage">
+            <soap:operation soapAction="urn:deleteMessage" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteFirstMessages">
+            <soap:operation soapAction="urn:deleteFirstMessages" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getPaginatedMessages">
+            <soap:operation soapAction="urn:getPaginatedMessages" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStoreNames">
+            <soap:operation soapAction="urn:getMessageStoreNames" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="MessageStoreAdminServiceSoap12Binding" type="tns:MessageStoreAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="getSize">
+            <soap12:operation soapAction="urn:getSize" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStore">
+            <soap12:operation soapAction="urn:getMessageStore" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteAllMessages">
+            <soap12:operation soapAction="urn:deleteAllMessages" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteMessageStore">
+            <soap12:operation soapAction="urn:deleteMessageStore" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getEnvelope">
+            <soap12:operation soapAction="urn:getEnvelope" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyMessageStore">
+            <soap12:operation soapAction="urn:modifyMessageStore" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addMessageStore">
+            <soap12:operation soapAction="urn:addMessageStore" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>           
+            <wsdl:fault name="Exception">
+                <soap12:fault use="literal" name="Exception" />
+            </wsdl:fault>            
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <soap12:operation soapAction="urn:getClassName" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllMessages">
+            <soap12:operation soapAction="urn:getAllMessages" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteMessage">
+            <soap12:operation soapAction="urn:deleteMessage" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteFirstMessages">
+            <soap12:operation soapAction="urn:deleteFirstMessages" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getPaginatedMessages">
+            <soap12:operation soapAction="urn:getPaginatedMessages" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStoreNames">
+            <soap12:operation soapAction="urn:getMessageStoreNames" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="MessageStoreAdminServiceHttpBinding" type="tns:MessageStoreAdminServicePortType">
+        <http:binding verb="POST" />
+        <wsdl:operation name="getSize">
+            <http:operation location="getSize" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStore">
+            <http:operation location="getMessageStore" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteAllMessages">
+            <http:operation location="deleteAllMessages" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteMessageStore">
+            <http:operation location="deleteMessageStore" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getEnvelope">
+            <http:operation location="getEnvelope" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyMessageStore">
+            <http:operation location="modifyMessageStore" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addMessageStore">
+            <http:operation location="addMessageStore" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <http:operation location="getClassName" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getAllMessages">
+            <http:operation location="getAllMessages" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteMessage">
+            <http:operation location="deleteMessage" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteFirstMessages">
+            <http:operation location="deleteFirstMessages" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getPaginatedMessages">
+            <http:operation location="getPaginatedMessages" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStoreNames">
+            <http:operation location="getMessageStoreNames" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="MessageStoreAdminService">
+        <wsdl:port name="MessageStoreAdminServiceHttpsSoap11Endpoint" binding="tns:MessageStoreAdminServiceSoap11Binding">
+            <soap:address location="https://localhost:8243/services/MessageStoreAdminService.MessageStoreAdminServiceHttpsSoap11Endpoint" />
+        </wsdl:port>
+        <wsdl:port name="MessageStoreAdminServiceHttpsSoap12Endpoint" binding="tns:MessageStoreAdminServiceSoap12Binding">
+            <soap12:address location="https://localhost:8243/services/MessageStoreAdminService.MessageStoreAdminServiceHttpsSoap12Endpoint" />
+        </wsdl:port>
+        <wsdl:port name="MessageStoreAdminServiceHttpsEndpoint" binding="tns:MessageStoreAdminServiceHttpBinding">
+            <http:address location="https://localhost:8243/services/MessageStoreAdminService.MessageStoreAdminServiceHttpsEndpoint" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
