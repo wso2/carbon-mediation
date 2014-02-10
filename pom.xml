@@ -1,50 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.wso2.carbon</groupId>
    <artifactId>carbon-mediation</artifactId>
    <packaging>pom</packaging>
    <version>4.3.0-SNAPSHOT</version>
-   <name>WSO2 Carbon Mediation -  Aggregator Pom</name>
+   <name>WSO2 Carbon - Platform Aggregator Pom</name>
    <url>http://wso2.org</url>
-   <description>WSO2 Carbon Mediation with all its components, features and products</description>
-   <repositories>
-      <!-- WSO2 released artifact repository -->
-      <repository>
-         <id>wso2.releases</id>
-         <name>WSO2 Releases Repository</name>
-         <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
-         <releases>
-            <enabled>true</enabled>
-            <updatePolicy>daily</updatePolicy>
-            <checksumPolicy>ignore</checksumPolicy>
-         </releases>
-      </repository>
-      <!-- WSO2 Snapshot artifact repository-->
-      <repository>
-         <id>wso2.snapshots</id>
-         <name>WSO2 Snapshot Repository</name>
-         <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>daily</updatePolicy>
-         </snapshots>
-         <releases>
-            <enabled>false</enabled>
-         </releases>
-      </repository>
-      <repository>
-         <id>wso2-nexus</id>
-         <name>WSO2 internal Repository</name>
-         <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
-         <releases>
-            <enabled>true</enabled>
-            <updatePolicy>daily</updatePolicy>
-            <checksumPolicy>ignore</checksumPolicy>
-         </releases>
-      </repository>
-   </repositories>
-
+   <profiles>
+      <profile>
+         <id>default</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+         <modules>
+            <module>service-stubs</module>
+            <module>components</module>
+            <module>features</module>
+         </modules>
+      </profile>
+   </profiles>
+   <build>
+      <extensions>
+         <extension>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-ssh</artifactId>
+            <version>2.1</version>
+         </extension>
+      </extensions>
+   </build>
+   <properties>
+      <wso2carbon.version>4.3.0-SNAPSHOT</wso2carbon.version>
+      <synapse.version>2.1.3-wso2v1-SNAPSHOT</synapse.version>
+      <axis2.version>1.6.1-wso2v11-SNAPSHOT</axis2.version>
+      <commons-lang.wso2.version>2.6.0.wso2v1</commons-lang.wso2.version>
+      <orbit.version.axis2>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2>
+      <orbit.version.axis2.client>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2.client>
+   </properties>
    <pluginRepositories>
       <pluginRepository>
          <id>wso2.releases</id>
@@ -79,66 +88,50 @@
          </releases>
       </pluginRepository>
    </pluginRepositories>
-   <distributionManagement>
+   <repositories>
+      <repository>
+         <id>wso2-nexus</id>
+         <name>WSO2 internal Repository</name>
+         <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+         <releases>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>ignore</checksumPolicy>
+         </releases>
+      </repository>
       <repository>
          <id>wso2.releases</id>
          <name>WSO2 internal Repository</name>
          <url>http://maven.wso2.org/nexus/content/repositories/releases/</url>
+         <releases>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+            <checksumPolicy>ignore</checksumPolicy>
+         </releases>
       </repository>
-      <snapshotRepository>
+      <repository>
          <id>wso2.snapshots</id>
          <name>Apache Snapshot Repository</name>
          <url>http://maven.wso2.org/nexus/content/repositories/snapshots/</url>
+         <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>daily</updatePolicy>
+         </snapshots>
+         <releases>
+            <enabled>false</enabled>
+         </releases>
+      </repository>
+   </repositories>
+   <distributionManagement>
+      <repository>
+         <id>wso2-maven2-repository</id>
+         <name>WSO2 Maven2 Repository</name>
+         <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/maven2/</url>
+      </repository>
+      <snapshotRepository>
+         <id>wso2-maven2-snapshot-repository</id>
+         <name>WSO2 Maven2 Snapshot Repository</name>
+         <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/snapshots/maven2/</url>
       </snapshotRepository>
    </distributionManagement>
-   <build>
-      <extensions>
-         <extension>
-            <groupId>org.apache.maven.wagon</groupId>
-            <artifactId>wagon-ssh</artifactId>
-            <version>2.1</version>
-         </extension>
-      </extensions>
-   </build>
-   <profiles>
-      <profile>
-         <id>default</id>
-         <activation>
-            <activeByDefault>true</activeByDefault>
-         </activation>
-         <modules>
-            <module>components</module>
-         </modules>
-      </profile>
-      <profile>
-         <id>builder</id>
-         <activation>
-            <property>
-               <name>builder</name>
-               <value>true</value>
-            </property>
-         </activation>
-         <modules>
-            <module>components</module>
-         </modules>
-      </profile>
-      <profile>
-         <id>sonar-profile</id>
-         <activation>
-            <property>
-               <name>bamboo</name>
-               <value>sonar</value>
-            </property>
-         </activation>
-         <modules>
-            <module>components</module>
-         </modules>
-      </profile>
-   </profiles>
-   <properties>
-      <wso2carbon.version>4.3.0-SNAPSHOT</wso2carbon.version>
-      <synapse.version>2.1.3-wso2v1-SNAPSHOT</synapse.version>
-      <axis2.version>1.6.1-wso2v11-SNAPSHOT</axis2.version>
-      <commons-lang.wso2.version>2.6.0.wso2v1</commons-lang.wso2.version>
-   </properties>
 </project>
