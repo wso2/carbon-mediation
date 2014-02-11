@@ -28,6 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
     <artifactId>synapse-registries</artifactId>
+    <version>4.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Synapse Registries Aggregator Module</name>
     <url>http://wso2.org</url>
@@ -58,7 +59,7 @@
 
     <properties>
         <synapse.version.synapse-registries>${synapse.version}</synapse.version.synapse-registries>
-        <wso2carbon.version.synapse-registries>4.3.0-SNAPSHOT</wso2carbon.version.synapse-registries>
+        <wso2carbon.version.synapse-registries>${wso2carbon.version}</wso2carbon.version.synapse-registries>
         <axis2.osgi.version.range.synapse-registries>${axis2.osgi.version.range}</axis2.osgi.version.range.synapse-registries>
         <axiom.osgi.version.range.synapse-registries>${axiom.osgi.version.range}</axiom.osgi.version.range.synapse-registries>
     </properties>

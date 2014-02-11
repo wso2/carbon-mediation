@@ -20,12 +20,12 @@
         <groupId>org.wso2.carbon</groupId>
         <artifactId>mediation-initializer</artifactId>
         <version>4.3.0-SNAPSHOT</version>
-	<relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
     <artifactId>org.wso2.carbon.mediator.bridge</artifactId>
+    <version>4.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>WSO2 Carbon - Mediator Bridge</name>
     <url>http://wso2.org</url>
@@ -37,14 +37,7 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.server</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
+            <version>${wso2carbon.version}</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            
-        </plugins>
-    </build>
-
 </project>
