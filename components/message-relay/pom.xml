@@ -26,6 +26,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
+    <version>4.3.0-SNAPSHOT</version>
     <groupId>org.wso2.carbon</groupId>
     <artifactId>message-relay-parent</artifactId>   
     <packaging>pom</packaging>
@@ -54,9 +55,9 @@
     </dependencyManagement>
 
     <properties>
-        <wso2carbon.version.message-relay>4.3.0-SNAPSHOT</wso2carbon.version.message-relay>
+        <wso2carbon.version.message-relay>${wso2carbon.version}</wso2carbon.version.message-relay>
         <synapse.version.message-relay>${synapse.version}</synapse.version.message-relay>
-        <axis2.wso2.version.message-relay>${axis2.wso2.version}</axis2.wso2.version.message-relay>    
+        <axis2.wso2.version.message-relay>${orbit.version.axis2}</axis2.wso2.version.message-relay>    
     </properties>
 
 </project>
