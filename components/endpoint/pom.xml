@@ -44,37 +44,37 @@
          <dependency>
             <groupId>org.apache.axis2.wso2</groupId>
             <artifactId>axis2</artifactId>
-            <version>${axis2.wso2.version.endpoint}</version>
+            <version>${orbit.version.axis2}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-            <version>${wso2carbon.version.endpoint}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.core</artifactId>
-            <version>${wso2carbon.version.endpoint}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
-            <version>${wso2carbon.version.endpoint}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
-            <version>${wso2carbon.version.endpoint}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
-            <version>${wso2carbon.version.endpoint}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>
-            <version>${synapse.version.endpoint}</version>
+            <version>${synapse.version}</version>
             <exclusions>
                <exclusion>
                   <groupId>org.apache.axis2</groupId>
@@ -85,20 +85,17 @@
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
-            <version>${wso2carbon.version.endpoint}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.templates.ui</artifactId>
-            <version>${wso2carbon.version.endpoint}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
       </dependencies>
    </dependencyManagement>
    <properties>
-      <wso2carbon.version.endpoint>${wso2carbon.version}</wso2carbon.version.endpoint>
-      <synapse.version.endpoint>${synapse.version}</synapse.version.endpoint>
       <axis2.osgi.version.range.endpoint>${axis2.osgi.version.range}</axis2.osgi.version.range.endpoint>
-      <axis2.wso2.version.endpoint>${axis2.version}</axis2.wso2.version.endpoint>
       <axiom.osgi.version.range.endpoint>${axiom.osgi.version.range}</axiom.osgi.version.range.endpoint>
    </properties>
 </project>

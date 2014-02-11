@@ -54,11 +54,11 @@
             <module>org.wso2.carbon.message.store.stub</module>            
 	    <module>org.wso2.carbon.proxyadmin.stub</module>  
             <module>org.wso2.carbon.sequences.stub</module>
-
+            <module>org.wso2.carbon.task.stub</module>
+            
 
                      <!--module>org.wso2.carbon.business.messaging.salesforce.stub</module-->
             <!--module>org.wso2.carbon.priority.executors.stub</module>
-            <module>org.wso2.carbon.task.stub</module>
             <module>org.wso2.carbon.rest.api.stub</module-->
          </modules>
       </profile>

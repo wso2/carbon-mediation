@@ -42,9 +42,9 @@
             <module>endpoint</module>
             <module>localentry</module-->
             <module>mediation-initializer</module>
-            <!--module>mediation-statistics</module>
+            <module>mediation-statistics</module>
             <module>mediation-tracer</module>
-            <module>mediation</module>
+            <!--module>mediation</module>
             <module>mediators</module>
             <module>message-relay</module>
             <module>proxy-admin</module-->

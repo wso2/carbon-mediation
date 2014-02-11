@@ -85,7 +85,7 @@
                   <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                   <Bundle-Name>${project.artifactId}</Bundle-Name>
                   <Export-Package>org.wso2.carbon.mediation.statistics.stub.*;
-                            version="${carbon.platform.package.export.version}",
+                            version="${carbon.platform.package.export.version}",  
                             org.wso2.carbon.mediation.statistics.stub.aspect.*;
                             version="${carbon.platform.package.export.version}"</Export-Package>
                   <Import-Package>!org.wso2.carbon.mediation.statistics.stub.*</Import-Package>
