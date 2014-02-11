@@ -38,11 +38,11 @@
             <activeByDefault>true</activeByDefault>
          </activation>
          <modules>
-            <module>business-messaging</module>
+            <!--module>business-messaging</module>
             <module>endpoint</module>
-            <module>localentry</module>
+            <module>localentry</module-->
             <module>mediation-initializer</module>
-            <module>mediation-statistics</module>
+            <!--module>mediation-statistics</module>
             <module>mediation-tracer</module>
             <module>mediation</module>
             <module>mediators</module>
@@ -54,7 +54,7 @@
             <module>synapse-artifact-uploader</module>
             <module>synapse-registries</module>
             <module>priority-mediation</module>
-            <module>rest-api</module>
+            <module>rest-api</module-->
          </modules>
       </profile>
    </profiles>  

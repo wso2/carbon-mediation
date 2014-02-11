@@ -33,7 +33,7 @@
          <modules>
             <module>service-stubs</module>
             <module>components</module>
-            <module>features</module>
+            <!--module>features</module-->
          </modules>
       </profile>
    </profiles>

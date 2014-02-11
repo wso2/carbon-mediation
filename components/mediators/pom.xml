@@ -27,16 +27,17 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
+    <version>4.3.0-SNAPSHOT</version>
     <artifactId>mediators</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediators Aggregator Module</name>
     <url>http://wso2.org</url>
 
 			<modules>
-				<module>target-mediator</module>
+				<!--module>target-mediator</module-->
 				<!--module>log</module>
 				<module>send</module-->
-				<module>class</module>
+				<!--module>class</module-->
 				<!--module>calltemplate</module>
 				<module>aggregate</module>
 				<module>clone</module>
@@ -49,7 +50,7 @@
 				<module>validate</module>
 				<module>xslt</module>
 				<module>callout</module-->
-				<module>command</module>
+				<!--module>command</module-->
 				<!--module>dbreport</module>
 				<module>filter</module>
 				<module>iterate</module>
@@ -64,7 +65,7 @@
 				<module>out</module>
 				<module>drop</module-->
 				<module>router</module>
-				<module>event</module>
+				<!--module>event</module-->
 				<!--module>entitlement</module>
 				<module>oauth</module>
 				<module>transaction</module>
@@ -80,7 +81,7 @@
 			  	<module>payloadFactory</module>
                                 <module>ejb</module>
 				<module>bean-mediator</module-->
-				<module>fastXSLT</module>
+				<!--module>fastXSLT</module-->
 				<!--module>loopback</module>
 				<module>respond</module>
                                 <module>call</module-->
@@ -127,8 +128,8 @@
     </dependencyManagement>
 
     <properties>
-        <wso2carbon.version.mediators>4.3.0-SNAPSHOT</wso2carbon.version.mediators>
-        <synapse.version.mediators>2.1.3-wso2v1-SNAPSHOT</synapse.version.mediators>
+        <wso2carbon.version.mediators>${wso2carbon.version}</wso2carbon.version.mediators>
+        <synapse.version.mediators>${synapse.version}</synapse.version.mediators>
     </properties>
 
 </project>
