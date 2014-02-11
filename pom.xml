@@ -61,6 +61,8 @@
    <properties>
       <wso2carbon.old.version>4.2.0</wso2carbon.old.version>
       <wso2carbon.version>4.3.0-SNAPSHOT</wso2carbon.version>
+      <carbon.platform.package.export.version>4.3.0-SNAPSHOT</carbon.platform.package.export.version>
+      <carbon.platform.package.import.version>4.3.0-SNAPSHOT</carbon.platform.package.export.version>
       <synapse.version>2.1.3-wso2v1-SNAPSHOT</synapse.version>
       <axis2.version>1.6.1-wso2v11-SNAPSHOT</axis2.version>
       <commons-lang.wso2.version>2.6.0.wso2v1</commons-lang.wso2.version>
