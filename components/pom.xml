@@ -46,8 +46,8 @@
             <module>mediation-tracer</module>
             <!--module>mediation</module>
             <module>mediators</module>
-            <module>message-relay</module>
-            <module>proxy-admin</module-->
+            <module>message-relay</module-->
+            <module>proxy-admin</module>
             <module>scheduled-tasks</module>
             <!--module>sequence-editor</module>
             <module>synapse-config-admin</module>
