@@ -38,9 +38,9 @@
             <activeByDefault>true</activeByDefault>
          </activation>
          <modules>
-            <!--module>business-messaging</module>
+            <!--module>business-messaging</module-->
             <module>endpoint</module>
-            <module>localentry</module-->
+            <!--module>localentry</module-->
             <module>mediation-initializer</module>
             <module>mediation-statistics</module>
             <module>mediation-tracer</module>
