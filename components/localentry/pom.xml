@@ -33,7 +33,7 @@
 
     <modules>
         <module>org.wso2.carbon.localentry</module>
-        <!--module>org.wso2.carbon.localentry.ui</module-->
+        <module>org.wso2.carbon.localentry.ui</module>
     </modules>
 
     <dependencyManagement>

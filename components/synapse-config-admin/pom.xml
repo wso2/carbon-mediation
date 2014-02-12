@@ -25,6 +25,8 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
+    <version>4.3.0-SNAPSHOT</version>
+    <groupId>org.wso2.carbon</groupId>
     <artifactId>synapse-config-admin</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Synapse Configuration Administrator Aggregator Module</name>
@@ -32,7 +34,7 @@
 
     <modules>
         <module>org.wso2.carbon.mediation.configadmin</module>
-        <module>org.wso2.carbon.mediation.configadmin.ui</module>
+        <!--module>org.wso2.carbon.mediation.configadmin.ui</module-->
     </modules>
 
     <dependencyManagement>
@@ -40,55 +42,52 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.core</artifactId>
-                <version>${wso2carbon.version.synapse-config-admin}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.logging</artifactId>
-                <version>${wso2carbon.version.synapse-config-admin}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
-                <version>${wso2carbon.version.synapse-config-admin}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
-                <version>${wso2carbon.version.synapse-config-admin}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.synapse</groupId>
                 <artifactId>synapse-core</artifactId>
-                <version>${synapse.version.synapse-config-admin}</version>
+                <version>${synapse.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.ui</artifactId>
-                <version>${wso2carbon.version.synapse-config-admin}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.utils</artifactId>
-                <version>${wso2carbon.version.synapse-config-admin}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.registry.core</artifactId>
-                <version>${wso2carbon.version.synapse-config-admin}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.axis2.wso2</groupId>
                 <artifactId>axis2</artifactId>
-                <version>${axis2.wso2.version.synapse-config-admin}</version>
+                <version>${orbit.version.axis2}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <axis2.wso2.version.synapse-config-admin>${axis2.wso2.version}</axis2.wso2.version.synapse-config-admin>
-        <wso2carbon.version.synapse-config-admin>4.3.0-SNAPSHOT</wso2carbon.version.synapse-config-admin>
-        <synapse.version.synapse-config-admin>${synapse.version}</synapse.version.synapse-config-admin>
         <axis2.osgi.version.range.synapse-config-admin>${axis2.osgi.version.range}</axis2.osgi.version.range.synapse-config-admin>
         <axiom.osgi.version.range.synapse-config-admin>${axiom.osgi.version.range}</axiom.osgi.version.range.synapse-config-admin>
     </properties>

@@ -36,7 +36,7 @@
     <modules>
         <module>org.wso2.carbon.task.services</module>
         <module>org.wso2.carbon.task</module>
-        <!--module>org.wso2.carbon.task.ui</module-->
+        <module>org.wso2.carbon.task.ui</module>
     </modules>
 
     <dependencyManagement>

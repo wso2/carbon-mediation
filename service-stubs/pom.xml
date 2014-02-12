@@ -84,6 +84,11 @@
                 <groupId>org.apache.ws.commons.schema</groupId>
                 <artifactId>XmlSchema</artifactId>
             </dependency>
+         <dependency>
+                <groupId>org.apache.neethi.wso2</groupId>
+                <artifactId>neethi</artifactId>
+         </dependency>
+
    </dependencies>
 
 </project>
