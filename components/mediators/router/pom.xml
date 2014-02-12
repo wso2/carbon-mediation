@@ -35,7 +35,7 @@
 
 			<modules>
 				<module>org.wso2.carbon.mediator.router.impl</module>
-				<!--module>org.wso2.carbon.mediator.router.ui</module-->
+				<module>org.wso2.carbon.mediator.router.ui</module>
 			</modules>
 
 </project>

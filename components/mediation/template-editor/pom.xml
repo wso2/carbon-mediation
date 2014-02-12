@@ -27,6 +27,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
+    <version>4.3.0-SNAPSHOT</version>
     <artifactId>template-editor</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Template Editor Aggregator Module</name>

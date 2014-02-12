@@ -34,7 +34,7 @@
     <url>http://wso2.org</url>
 
 			<modules>
-				<!--module>target-mediator</module-->
+				<module>target-mediator</module>
 				<!--module>log</module>
 				<module>send</module-->
 				<!--module>class</module-->

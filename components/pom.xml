@@ -39,18 +39,20 @@
          </activation>
          <modules>
             <!--module>business-messaging</module-->
+            <module>mediation-initializer</module>
+            <module>mediation</module>
             <module>endpoint</module>
             <!--module>localentry</module-->
-            <module>mediation-initializer</module>
+
             <module>mediation-statistics</module>
             <module>mediation-tracer</module>
-            <!--module>mediation</module>
+
             <module>mediators</module>
-            <module>message-relay</module-->
+            <!--module>message-relay</module-->
             <module>proxy-admin</module>
             <module>scheduled-tasks</module>
-            <!--module>sequence-editor</module>
-            <module>synapse-config-admin</module>
+            <module>sequence-editor</module>
+            <!--module>synapse-config-admin</module>
             <module>synapse-artifact-uploader</module-->
             <module>synapse-registries</module>
             <!--module>priority-mediation</module>

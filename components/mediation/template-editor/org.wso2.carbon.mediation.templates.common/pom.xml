@@ -20,11 +20,11 @@
         <groupId>org.wso2.carbon</groupId>
         <artifactId>template-editor</artifactId>
         <version>4.3.0-SNAPSHOT</version>
-	<relativePath>../pom.xml</relativePath>
     </parent>    
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
+        <version>4.3.0-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.templates.common</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Template Editor Common</name>
