@@ -40,8 +40,8 @@
                   <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                   <Bundle-Name>${project.artifactId}</Bundle-Name>
                   <Private-Package />
-                  <Export-Package>org.wso2.carbon.mediation.templates.stub.*;version="${carbon.platform.package.export.version}",
-                            org.wso2.carbon.mediation.templates.endpoint.stub.*;version="${carbon.platform.package.export.version}",</Export-Package>
+                  <Export-Package>org.wso2.carbon.mediation.templates.stub.*;version="${wso2carbon.version}",
+                            org.wso2.carbon.mediation.templates.endpoint.stub.*;version="${wso2carbon.version}",</Export-Package>
                   <DynamicImport-Package>*</DynamicImport-Package>
                </instructions>
             </configuration>
@@ -102,5 +102,10 @@
          <artifactId>axis2</artifactId>
          <version>${orbit.version.axis2}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.neethi.wso2</groupId>
+        <artifactId>neethi</artifactId>
+     </dependency>
    </dependencies>
+
 </project>

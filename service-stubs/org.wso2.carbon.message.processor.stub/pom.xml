@@ -102,5 +102,9 @@
          <artifactId>axis2</artifactId>
          <version>${orbit.version.axis2}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.neethi.wso2</groupId>
+        <artifactId>neethi</artifactId>
+     </dependency>
    </dependencies>
 </project>

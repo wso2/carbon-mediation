@@ -74,17 +74,17 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.sequences.common</artifactId>
-            <version>${wso2version.version}</version>
+            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
-            <version>${wso2version.version}</version>
+            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.core</artifactId>
-            <version>${wso2version.version}</version>
+            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
@@ -100,12 +100,12 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
-            <version>${wso2version.version}</version>
+            <version>${wso2carbon.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-            <version>${wso2version.version}</version>
+            <version>${wso2carbon.version}</version>
         </dependency>
     </dependencies>
 

@@ -34,9 +34,9 @@
 
     <modules>
           <module>template-editor</module>
-          <!--module>message-store</module>    
+          <module>message-store</module>    
           <module>message-processor</module>
-          <module>mediation-library</module>
+          <!--module>mediation-library</module>
 	  <module>mediation-security</module-->
    </modules>
 

@@ -62,11 +62,11 @@
                 <artifactId>org.wso2.carbon.service.mgt</artifactId>
                 <version>${wso2carbon.version.messageStore}</version>
             </dependency>
-            <dependency>
+            <!--dependency>
                 <groupId>org.apache.axis2.wso2</groupId>
                 <artifactId>axis2</artifactId>
                 <version>${axis2.wso2.version.messageStore}</version>
-            </dependency>
+            </dependency-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.ui</artifactId>

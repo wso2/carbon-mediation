@@ -107,12 +107,16 @@
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2</artifactId>
-	    <version>${axis2.version}</version>
-        </dependency>
-    </dependencies>
+<dependencies>
+      <dependency>
+         <groupId>org.apache.axis2.wso2</groupId>
+         <artifactId>axis2</artifactId>
+         <version>${orbit.version.axis2}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.neethi.wso2</groupId>
+        <artifactId>neethi</artifactId>
+     </dependency>
+   </dependencies>
 
 </project>

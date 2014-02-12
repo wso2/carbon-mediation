@@ -80,7 +80,10 @@
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
             </dependency>
-
+         <dependency>
+                <groupId>org.apache.ws.commons.schema</groupId>
+                <artifactId>XmlSchema</artifactId>
+            </dependency>
    </dependencies>
 
 </project>

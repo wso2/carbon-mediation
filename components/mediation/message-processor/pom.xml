@@ -87,7 +87,7 @@
 
     <properties>
         <wso2carbon.version.messageProcessor>4.3.0-SNAPSHOT</wso2carbon.version.messageProcessor>
-        <axis2.wso2.version.messageProcessor>${axis2.wso2.version}</axis2.wso2.version.messageProcessor>
+        <axis2.wso2.version.messageProcessor>${orbit.version.axis2}</axis2.wso2.version.messageProcessor>
         <axis2.osgi.version.range.messageProcessor>${axis2.osgi.version.range}</axis2.osgi.version.range.messageProcessor>
         <axiom.osgi.version.range.messageProcessor>${axiom.osgi.version.range}</axiom.osgi.version.range.messageProcessor>
         <synapse.version.messageProcessor>${synapse.version}</synapse.version.messageProcessor>
