@@ -1,0 +1,31 @@
+<serviceGroup>
+
+    <parameter name="adminService" locked="true">true</parameter>
+    <parameter name="hiddenService" locked="true">true</parameter>
+
+    <service name="EndpointAdmin">
+           <schema schemaNamespace="http://org.apache.axis2/xsd"
+                elementFormDefaultQualified="true"/>
+        <transports>
+            <transport>https</transport>
+        </transports>
+        <parameter name="ServiceClass" locked="false">
+                org.wso2.carbon.endpoint.service.EndpointAdmin
+        </parameter>
+        <description>
+            This service will give info / management functionality on endpoints
+        </description>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/robust-in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+
+        <parameter name="AuthorizationAction" locked="true">/permission/admin/manage/mediation</parameter>
+
+    </service>
+</serviceGroup>
+

@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<!--
+ ~ Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~ http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ -->
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>RM Sequence Mediator - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>RM Sequence Mediator</h1>
+<p>
+The RMSequence mediator can be used to create a sequence of messages to communicate via WS-Reliable Messaging 
+with an WS-RM enabled endpoint. The simple use case of this mediator is to specify Message sequence to "Single Message", 
+because this means that only one message is involved in the same sequence. However if multiple messages should be sent 
+in the same sequence, the correlation property should be used with a XPath expression that selects an unique element 
+value from the incoming message. With the result of the XPath expression, Synapse can group messages together that 
+belong to the same sequence. To close the sequence neatly, for the last message of the sequence also an XPath expression 
+should be specified. With the version attribute the WS-RM specification version to be used can be specified, 1.0 or 1.1. 
+</p>
+
+<img src="images/rmsequence_screenshot.jpg"/>
+<p><strong>RMSequnce Mediator</strong></p>
+
+<ul>
+<li>
+WS-RM Spec Version: Reliable Messaging Specification version: possible values 1.0 /1.1
+</li>
+<li>
+Message Sequence: Whether to use a single message or a multiple correlated messages
+<ul>
+<li>
+Single Message - Making single message reliable.
+</li>
+<li>
+Correlated Sequence - Make multiple correlated message reliable. When you select this option
+you have to provide the following two fields appears in the panel.
+<ul>
+<li>
+Sequence XPath: The xpath expression that selects an unique element value from the incoming message
+</li>
+<li>
+Last Message XPath: The xpath expression that identify the last message
+</li>
+</ul>
+<em>NOTE: You can define prefixes for the namespaces used in these expression from the right hand side link named "Namespaces".</em>
+</li>
+</ul>
+
+<img src="images/correlated_sequence.jpg"/>
+<p><strong>Specifying Correlated Sequences</strong></p>
+
+
+
+</li>
+</ul>
+</body>
+</html>

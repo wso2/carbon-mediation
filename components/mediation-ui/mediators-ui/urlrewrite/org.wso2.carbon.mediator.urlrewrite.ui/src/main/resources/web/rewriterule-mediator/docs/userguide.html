@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <!--
+    ~ Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+    ~
+    ~ Licensed under the Apache License, Version 2.0 (the "License");
+    ~ you may not use this file except in compliance with the License.
+    ~ You may obtain a copy of the License at
+    ~
+    ~ http://www.apache.org/licenses/LICENSE-2.0
+    ~
+    ~ Unless required by applicable law or agreed to in writing, software
+    ~ distributed under the License is distributed on an "AS IS" BASIS,
+    ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    ~ See the License for the specific language governing permissions and
+    ~ limitations under the License.
+    -->
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>URL Rewrite Mediator - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>URL Rewrite Mediator</h1>
+
+<p>
+   The URL rewrite mediator is used to modify and transform the URL values available in the message.
+</p>
+
+<img alt="Rewrite Mediator" src="images/rewrite_mediator_screenshot.jpg"/>
+
+<p>
+    <strong>Figure1: Rewrite Mediator</strong>
+</p>
+
+<h2>Properties</h2>
+
+<ul>
+    <li>In Property :</li>
+	
+	<p>
+	By default 'rewrite' mediator will take the 'To' header of the message and will apply the provided rewrite rules on it.   
+    If user specify a 'inPorperty'  attribute, the mediator will take the value of the specified property as the input URL. 
+	</p>
+   
+    <li>Out Property :</li>   
+	<p>
+	 Similarly the mediator by default sets the transformed URL as the 'To' header of the message. 
+      Alternatively user can use the 'outProperty' attribute to instruct the mediator to set the resulting URL as a property. 
+    </p>
+   
+</ul>
+
+
+<h2>Rules</h2>
+
+<p>
+   The rewrite mediator applies URL transformations by evaluating a set of rules on the message
+</p>
+
+<img alt="Rewriterule Mediator" src="images/rewriterule_mediator_screenshot.jpg"/>
+
+<p>
+    <strong>Figure2: Rules </strong>
+</p>
+
+<ul>
+    <li>Condition:- A rule can consist of an optional condition. If the condition is provided it will be evaluated first</li>
+    <li>Action:- It states which type of action should be executed on the URL. This defaults to 'set' value</li>
+    <li>Fragment:- This  attribute can be used to specify the URL fragment on which the action should be executed. For port and full-uri options those actions are not applicable. User should provide the correct port number/full-uri, which will be set.</li>
+    <li>Value/Expression:- The value to 'set', 'append' or 'prepend' must be specified using either the 'value' attribute or the 'xpath' attribute.
+		One of these two attributes are always needed unless the value of the 'type' attribute is set to 'remove'</li>
+	<li>Regex:- When user  set  action to 'replace' an additional 'regex' 
+		attribute must be specified which indicates the portion that should be replaced with the given value. </li>
+</ul>
+
+</body>
+</html>

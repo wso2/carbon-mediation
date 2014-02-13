@@ -1,0 +1,414 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+  <title>Endpoint Management - User Guide</title>
+  <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all" />
+</head>
+
+<body>
+
+<div id="middle">
+<h1>Endpoint Management</h1>
+
+<p>Use the Endpoint Management feature to add, remove and modify endpoints.
+</p>
+<ol>
+  <li>In the navigator, under Manage > Service Bus, click
+    <strong>Endpoints</strong>. The <em><strong>Manage
+    Endpoints</strong></em> page appears.</li>
+  <li>In the <strong>Add Endpoint</strong> tab, select the endpoint type you want
+    to add.
+    The available options are: 
+    <ul>
+      <li>Address Endpoint - Defines the direct URL of the service</li>
+       <li>Default Endpoint - Defines additional configuration for the default target</li>
+      <li>WSDL Endpoint - Defines the WSDL, Service and Port</li>
+      <li>Fail-over Endpoint - Defines a list of endpoints that the service will
+        try to connect to in case of a failure. This will take place in a
+        round robin manner.</li>
+      <li>Load-Balance Group - Defines groups of endpoints for replicated
+        services.The incoming requests will be directed to these endpoints in
+        a round robin manner. These endpoints automatically handle the
+        fail-over cases as well.</li>
+	<li>Recipient List Group - Defines the list of endpoints a message will be routed to</li>
+	<li>Template Endpoint -	Defines a template endpoint that can parameterfy endpoints</li> 
+    </ul>
+  </li>
+</ol>
+
+<div class="image">
+<img alt="Selections for Endpoints" src="images/endpoint_types.png" />
+
+<p>Figure 1: Selections for Endpoints </p>
+</div>
+<ol>
+</ol>
+
+<h3>Adding an Address Endpoint</h3>
+<ol>
+    <li>In the <strong>Add Endpoint</strong> tab, click <strong>Address
+        Endpoint</strong>. The <em><strong>Address Endpoint</strong></em> page
+        appears with its default view.
+    </li><br/>
+    <div class="image">
+        <img alt="" src="images/address_endpoint_default.png" />
+        <p>Figure 2: Configuring Address Endpoint</p>
+    </div>
+
+  <li>In case, you want to configure Advanced Options, then click on <i>Show Advanced Options</i> drop down pane.
+    Then the page with all the available Address Endpoint Options appears.</li><br/>
+    <div class="image">
+    <img alt="" src="images/address_endpoint.png" />
+    <p>Figure 3: Configuring Address Endpoint - Advanced Options</p>
+    </div>
+  <li>Enter the required details in the fields. 
+    The following fields are specific to the Address Endpoint.
+    <ul>
+      <li>Name: The unique name for the endpoint </li>
+      <li>Address: The URL of the endpoint. You can test the availability of the given URL on the fly by just
+          clicking the <i>Test Address</i>.</li>
+      <li>Format: The message format for the endpoint. The available values
+        are: 
+        <ul>
+          <li>Leave As-Is: No transformation is done to the outgoing message.
+          </li>
+          <li>SOAP 1.1: Transforming
+            message to SOAP 1.1 </li>
+          <li>SOAP 1.2: Transforming
+            message to SOAP 1.2 </li>
+          <li>Plain Old XML (POX) - Transforming to plain old XML format </li>
+          <li>Representational State Transfer (REST/GET) - Transforming to
+            HTTP Get Request </li>
+        </ul>
+      </li>
+      <li>Optimize: Optimization for the message which transfers binary
+        data. The available values are: 
+        <ul>
+          <li>Leave As-Is: No special Optimization. Keep the original message</li>
+          <li>SwA: Optimized as a SwA (SOAP with Attachment) message. </li>
+          <li>MTOM: Optimized as a MTOM (message transmission optimization
+            mechanism)
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  </ol>
+  <p>Note : The rest of the fields are general to Address, Default and WSDL endpoints. Common
+    <a href="#Description">Field  Descriptions</a>.</p>
+
+<h3>Adding a Default Endpoint</h3>
+<ol>
+  <li>In the <strong>Add Endpoint</strong> tab, click <strong>Default
+    Endpoint</strong>. The <em><strong>Default Endpoint</strong></em> page
+    appears. You can switch to the advanced option by clicking on <i>Show Advanced Options</i> drop down pane.<br/>
+    <br/>
+    <div class="image">
+    <img alt="" src="images/default_endpoint.png" />
+    <p>Figure 4: Configuring Default Endpoint </p>
+    </div>
+  </li>
+    <li>Enter the required details in the fields.
+        The Default Endpoint differ from the Addressing Endpoint only by the URL attribute. 
+    <p>Note : The rest of the fields are general to Address, Default and WSDL endpoints. Common
+    <a href="#Description">Field  Descriptions</a>.</p>
+    </li>   
+</ol>
+
+<h3>Adding a WSDL Endpoint </h3>
+<ol>
+  <li>In the <strong>Add Endpoint</strong> list, click <strong>WSDL
+    Endpoint</strong>. The <em><strong>WSDL Endpoint</strong></em> page
+    appears.
+    <br/><br/>    
+    <div class="image">
+    <img alt="" src="images/wsdl_endpoint.png" />
+    <p>Figure 5: Configuring WSDL Endpoint </p>
+    </div>
+  </li>
+  <li>Enter the required details in the fields.
+    The following fields are specific to the WSDL Endpoint. 
+
+    <ul>
+      <li>Name: A unique name for the endpoint. </li>
+      <li>WSDL URI: The URI of the WSDL. </li>
+      <li>Service: The service selected from the available services for the
+        WSDL. </li>
+      <li>Port: The port selected for the service specified in the above
+        field. In a WSDL, an endpoint is bound to each port inside each
+        service. </li>
+    </ul>
+  </li>
+</ol>
+
+<p>Note : The rest of the fields are general to Address, Default and WSDL endpoints. Common
+    <a href="#Description">Field  Descriptions</a>.</p>
+<ol>
+</ol>
+
+<h3>Adding a Fail-Over Endpoint</h3>
+<ol>
+  <li>In the <strong>Add Endpoint</strong> list, click <strong>Fail-Over
+    Endpoint</strong>. The <em><strong>Fail-over Endpoint</strong></em> page
+    appears.</li>
+  <li>In the <strong>Endpoint Name</strong> field, enter a name for the
+    endpoint. </li>
+  <li>Click on Add Child of <strong>root</strong>. A menu with the available
+    endpoints appears.
+    <br/><br/>
+    <div class="image">
+    <img alt="Configuring Fail-over Endpoint" src="images/adding_failover_endpoint.png" />
+    <p>Figure 6: Adding Fail-over Endpoint </p>
+    </div>
+    <p>
+    </p>
+  </li>
+  <li>Click on the endpoint you want to add as a fail-over endpoint.A tab with
+    the fields relevant to the selected endpoint appears.</li>
+  <li>Enter the details and click <strong>Save &amp; Close</strong>.
+    The following screen-shot displays adding a Address endpoint to the fail-over
+    endpoint list.
+
+    <br/><br/>
+    <div class="image">
+    <img alt="Configuring Fail-over Endpoint"
+    src="images/failover_endpoint.png" />
+    <p>Figure 7: Configuring Fail-over Endpoint </p>
+    
+    You can add fail-over and load-balance endpoints interchangeably to as
+    many levels as you want. 
+    
+    </div>
+  </li>
+</ol>
+
+<h3>Adding a Load-Balance Group Endpoint</h3>
+<ol>
+  <li>In the <strong>Add Endpoint</strong> list, click <strong>Load Balance
+    Group Endpoint</strong>. The <em><strong>Load Balance Group
+    Endpoint</strong></em> page appears. </li>
+  <li>Enter the required details in the fields.
+    The following fields are specific to the Load-balance Group Endpoint.  
+    <ul>
+      <li>Endpoint Name: A unique name for the endpoint. </li>
+      <li>Session Management: A session management method from the load
+        balancing group. The possible values are. 
+        <ul>
+          <li>None: Session management is not used. </li>
+          <li>Transport: Session management is done on the transport level
+            using HTTP cookies. </li>
+          <li>SOAP: Session management is
+            done using SOAP sessions. </li>
+          <li>Client ID: Session management is done using an ID sent by the
+            client. </li>
+        </ul>
+      </li>
+      <li>Session Timeout(ms): Session timeout in milliseconds. </li>
+    </ul>
+    <br/>
+    <div class="image">
+    <img alt="Configuring Load balance Endpoint"
+    src="images/loadbalance_endpoint.png" />
+    <p>Figure 8: Configuring Load balance Group Endpoint </p>
+    </div>
+  </li>
+  <li>Click on Add Child of <strong>root</strong>. A menu with the available
+    endpoints appears.
+  </li>
+  <li>Click on the endpoint you want to add as a load-balance group
+    endpoint.A tab with the fields relevant to the selected endpoint
+  appears.</li>
+  <li>Enter the details and click <strong>Save &amp; Close</strong>.
+    You can add as many endpoints as you need to the load balancing group.
+  </li>
+</ol>
+
+<h3>Adding Template Endpoints</h3>
+<ol>
+    <li>In the <strong>Add Endpoint</strong> tab, click <strong>Template
+        Endpoint</strong>. The <em><strong>Template Endpoint</strong></em> page
+        appears with its default view.
+    </li><br/>
+    <div class="image">
+        <img alt="" src="images/template_endpoint.png" />
+        <p>Figure 9: Configuring Template Endpoint</p>
+    </div>
+
+  <li>Enter the required details in the fields.
+    The following fields are specific to the Template Endpoint.
+
+    <ul>
+      <li>Name: The unique name for the template endpoint </li>
+      <li>Address: The URL of the template endpoint. If an endpoint part of a target template has an
+          address element with $uri declared in it, then it will be populated with the value specified in this
+          address field. As always you can test the availability of the given URL on the fly by just
+          clicking the <i>Test Address</i>.</li>
+      <li>Target Template: Target template for this endpoint.
+      </li>
+
+    </ul>
+  </li>
+
+   <li>In case, you want to add parameters to template Endpoints, then click on <i>Add Parameters</i> button.
+    Then the page will be appear with the parameter table. You can add and delete parameter name/value pairs.</li><br/>
+    <div class="image">
+    <img alt="" src="images/template_endpoint_with_params.png" />
+    <p>Figure 9.1: Adding template Endpoint Parameters</p>
+    </div>
+  </ol>
+
+<h3>Adding a Recipient List Endpoint</h3>
+<ol>
+  <li>In the <strong>Add Endpoint</strong> list, click <strong>Recipient List
+    Endpoint</strong>. The <em><strong>Recipient List Endpoint</strong></em> page
+    appears.</li>
+  <li>In the <strong>Endpoint Name</strong> field, enter a name for the
+    endpoint. </li>
+  <li>Click on Add Child of <strong>root</strong>. A menu with the available
+    endpoints appears.
+  </li>
+  <li>Click on the endpoint you want to add as a Recipient List endpoint.A tab with
+    the fields relevant to the selected endpoint appears.</li>
+  <li>Enter the details and click <strong>Save &amp; Close</strong>.
+    The following screen-shot displays adding a Address endpoint to the Recipient List
+    endpoint list.
+
+    <br/><br/>
+    <div class="image">
+    <img alt="Configuring Recipient List Endpoint" src="images/recipientlist_endpoint.png" />
+    <p>Figure 10: Configuring Recipient List Endpoint </p>
+    </div>
+  </li>
+</ol>
+
+<h3>Adding Dynamic Endpoints</h3>
+<ol>
+    <li>
+        To save an endpoint as a dynamic endpoint, click on <span style="font-weight: bold;">Save In Registry</span> which will
+        display the dynamic endpoint Save As UI.
+    </li>
+    <li>
+        Select either <span style="font-weight: bold;">Governance Registry</span> or <span
+            style="font-weight: bold;">Configuration Registry</span>.
+    </li>
+    <li>Provide the key for the dynamic endpoint. This key will use as the path for the resource
+    that will be added into Registry.</li>
+</ol>
+
+<div>
+    <img src="images/dynamic-endpoints.png" alt=""/>
+    <p>Figure 11: Adding a dynamic endpoint</p>
+</div>
+<p>Saved dynamic endpoint will be displayed as follows</p>
+<div>
+    <img src="images/saved-dynamic-endpoints.png" alt=""/>
+    <p>Figure 11.1: Saved dynamic endpoint</p>
+</div>
+
+<h2><a name="Description" id="Description">Description of Fields Common to Address, Default and WSDL
+Endpoints</a></h2>
+
+<table style="border: 1px solid ;" border="1">
+  <tbody>
+    <tr
+    style="background: rgb(221, 221, 221) none repeat scroll 0 50%;">
+      <td>Field Name </td>
+      <td>Description </td>
+    </tr>
+    <tr>
+      <td>Suspend Error Codes </td>
+      <td>A list of error codes. If these error codes are received from the
+        endpoint, the endpoint will be suspended </td>
+    </tr>
+    <tr>
+      <td>Initial Duration (Millis) </td>
+      <td>The duration that the endpoint is suspended for the first time
+        after the receiving the suspend error codes. </td>
+    </tr>
+    <tr>
+      <td>Max Duration (Millis) </td>
+      <td>The maximum duration that the endpoint is suspended after the
+        receiving the suspend error codes. </td>
+    </tr>
+    <tr>
+      <td>Factor </td>
+      <td>The duration to suspend can vary from the first time suspension to
+        the subsequent time. The factor value decides the suspense duration
+        variance between subsequent suspensions. </td>
+    </tr>
+    <tr>
+      <td>On Timeout Error codes </td>
+      <td>A list of error codes. If these error codes are received from the
+        endpoint, the request will be subjected to a timeout. </td>
+    </tr>
+    <tr>
+      <td>Retry </td>
+      <td>The number of re-tries in case of a timeout, caused by the above
+        listed error codes. </td>
+    </tr>
+    <tr>
+      <td>Retry Delay(Millis) </td>
+      <td>The delay between re-tries, in milli seconds. </td>
+    </tr>
+    <tr>
+      <td>Timeout Action </td>
+      <td>The action to be done at a timeout situation. You can select from, 
+        <ul>
+          <li>Never Timeout </li>
+          <li>Discard Message </li>
+          <li>Execute Fault Sequence </li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td>Timeout Duration (Mills) </td>
+      <td>The duration in milli seconds before considering a request as
+        timeout </td>
+    </tr>
+    <tr>
+      <td>WS-Addressing </td>
+      <td>Adds WS-Addressing headers to the endpoint. </td>
+    </tr>
+    <tr>
+      <td>Separate Listener </td>
+      <td>The listener to the response will be a separate transport stream
+        from the caller </td>
+    </tr>
+    <tr>
+      <td>WS-Security </td>
+      <td>Adds WS-Security features as described in a policy key (referring
+        to a registry location). </td>
+    </tr>
+    <tr>
+      <td>WS-Reliable Messaging </td>
+      <td>Adds WS-Reliable Messaging features as described in a policy key
+        (referring to a registry location). </td>
+    </tr>
+    <tr>
+      <td>Non Retry Error Codes</td>
+      <td>When a child endpoint of failover/loadbalance endpoint failed for a given error code, the request will not be send to the other child endpoints of failover/loadbalance endpoint. That means retry will not be happen with the rest of the child endpoints. This option is available only when endpoint is added as a child endpoint of failover/loadbalance endpoint</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>For <a href="http://wso2.org/library/esb">more information</a> please refer to the WSO2 library</p>
+</body>
+</html>

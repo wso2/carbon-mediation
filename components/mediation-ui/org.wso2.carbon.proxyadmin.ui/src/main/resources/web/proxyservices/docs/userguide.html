@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>Proxy Services - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>Proxy Services</h1>
+
+<p>A proxy service acts as a service hosted in WSO2 ESB, and typically
+    fronts an existing service endpoint. A proxy service can be created and
+    exposed on a different transport, schema, WSDL, or QoS (such as WS-Security,
+    WS-Reliable Messaging) other than the real service. It can mediate the
+    messages before they are delivered to the actual endpoint and the responses
+    before they reach the client.</p>
+
+<p>Clients can send requests for proxy services directly to the ESB, as the
+    client sees it as a service hosted on WSO2 ESB.For example it can perform the
+    <code>?wsdl</code> function and view the WSDL of the virtual proxy service.
+    In the ESB configuration, such requests can be handled anyway you like. You
+    can process the message and send it to the actual service, probably running
+    on a different computer, but it is not necessary to always send the message
+    to the actual service. You can list a combination of tasks to be performed on
+    the messages received for the proxy service and terminate the flow or send a
+    message back to the client even without sending it to the actual service. </p>
+
+
+<h2>Adding a Proxy Service</h2>
+<p>
+    From the left navigation menu, select <strong>Proxy Service</strong> under
+    Manage > Services > Add. This will take you to the <strong>Create Proxy
+    Service from Template</strong> page.
+</p>
+<div class="image">
+    <img  alt="add proxy image" src="images/templates.png"/>
+
+    <p>Figure 1: Select Proxy Service Template</p>
+</div>
+<p>
+    Select a template that suits your mediation requirements. If you are looking
+    to create an advanced proxy service or if none of the available templates
+    matches your requirements, select the <strong><a href="custom-proxy.html">Custom Proxy</a>
+    </strong> option at the end of the templates list. This will launch the proxy
+    service creation wizard which enables you to customize all aspects of the proxy
+    service including the sequences, endpoints, transport settings, WSDL options and
+    other QoS settings.
+</p>
+<p>
+    The <strong>Create Proxy Service from Template</strong> page provides you the
+    following set of built-in templates for creating and setting up proxy services
+    easily and quickly.
+</p>
+<ul>
+    <li><a href="#passthroughproxy">Pass Through Proxy</a></li>
+    <li><a href="#secureproxy">Secure Proxy</a></li>
+    <li><a href="#wsdlbasedproxy">WSDL Based Proxy</a></li>
+    <li><a href="#logproxy">Log and Forward Proxy</a></li>
+    <li><a href="#transformerproxy">Transformer Proxy</a></li>
+	<li><a href="custom-proxy.html">Custom Proxy</a></li>
+</ul>
+
+<h3><a name="passthroughproxy">Pass Through Proxy</a></h3>
+<p>
+This template can be used to create a simple proxy service on a specified endpoint.
+Here is no any option  availble to define sequences.</p>
+<p> This proxy service does not perform any processing on the messages that pass through the proxy.</p>
+
+<div class="image">
+    <img  alt="passthrough proxy" src="images/pass-through-proxy.jpeg"/>
+
+    <p>Figure 2: Pass Through Proxy Template</p>
+</div>
+
+<h4> Parameters </h4>
+<ul>
+    <li>Proxy service settings	: User should porvide proxy name and the endpoint URL. Selecting an endpoint can be chossed as direct endpoint or a 
+	registry entry.</li>
+    <li>WSDL options			: If user likes to publish the actual back end service WSDL/ customized WSDL, he can provide the WSDL entry as 
+	a registry entry or as a URL or an inline wsdl option.  If user doesn't provide the WSDL option, the default WSDL will be published when user request for ?WSDL. </li>
+    <li>Transport settings		: Proxy service transport options can be specified here.</li>    
+</ul>
+
+<p> <strong>Note: </strong>If the user configures WSO2 ESB with WSO2 Governance Registry and if he uploads all the required files as *.gar file (described in WSO2 GREG documentation),
+ he can  provide only the base WSDL under 'WSDl options'.
+There is no need to provide all required imported schemas as WSDL resources since ESB is able to resolve the imported resources using only the base WSDL.
+Please note that for the above function user needs to uncomment the following lines @ synapse.properties file which is avilable in ESB_HOME/lib/core/WEB_INF/classes folder.
+</p>
+<p><strong>
+synapse.wsdl.resolver=org.wso2.carbon.mediation.initializer.RegistryWSDLLocator <br/>
+synapse.schema.resolver=org.wso2.carbon.mediation.initializer.RegistryXmlSchemaURIResolver
+</strong>
+</p>
+
+<h3><a name="secureproxy">Secure Proxy</a></h3>
+
+<p>
+This template can be used to create a proxy with WS-Security engaged. If you wish to expose an existing service with WS-Security you can
+choose this option. 
+</p>
+
+<div class="image">
+    <img  alt="secure proxy" src="images/secure-proxy.jpeg"/>
+
+    <p>Figure 3: SecureProxy Template</p>
+</div>
+
+<h4> Parameters </h4>
+
+<p>
+In addition to  "Pass through proxy" configurations, user should provide the security policy.
+</p>
+<ul>
+    <li>Proxy service settings	: User should porvide proxy name and the endpoint URL. Selecting an endpoint can be chossed as direct endpoint or a 
+	registry entry.</li>
+    <li>WSDL options			: If user likes to publish the actual back end service WSDL/ customized WSDL, he can provide the WSDL entry as 
+	a registry entry or as a URL or an inline wsdl option.  If user doesn't provide the WSDL option, the default WSDL will be published when user request for ?WSDL. </li>
+    <li>Transport settings		: Proxy service transport options can be soecified here.</li>    
+</ul>
+
+<p> <strong>Note: </strong>If the user configures WSO2 ESB with WSO2 Governance Registry and if he uploads all the required files as *.gar file (described in WSO2 GREG documentation),
+ he can  provide only the base WSDL under 'WSDl options'.
+There is no need to provide all required imported schemas as WSDL resources since ESB is able to resolve the imported resources using only the base WSDL.
+Please note that for the above function user needs to uncomment the following lines @ synapse.properties file which is avilable in ESB_HOME/lib/core/WEB_INF/classes folder.
+</p>
+<p><strong>
+synapse.wsdl.resolver=org.wso2.carbon.mediation.initializer.RegistryWSDLLocator <br/>
+synapse.schema.resolver=org.wso2.carbon.mediation.initializer.RegistryXmlSchemaURIResolver
+</strong>
+</p>
+
+<h3><a name="wsdlbasedproxy">WSDL Based Proxy</a></h3>
+
+<p>
+This template can be used to create a proxy service out of a WSDL of an existing Web Service.  Endpoint information is extracted 
+from a remotely hosted WSDL of an actual service.
+</p>
+
+<div class="image">
+    <img  alt="secure proxy" src="images/wsdlbased-proxy.jpeg"/>
+    <p>Figure 4: WSDL Based Proxy Template</p>
+</div>
+
+<h4> Parameters </h4>
+
+<ul>
+    <li>Proxy service settings	: User should porvide proxy name and the WSDL URL,Service and port number.</li>
+    <li>WSDL options			: If user likes to publish the actual back end service WSDL/ customized WSDL, he can provide the WSDL entry as 
+	a registry entry or as a URL or an inline wsdl option.  If user doesn't provide the WSDL option, the default WSDL will be published when user request for ?WSDL. </li>
+    <li>Transport settings		: Proxy service transport options can be soecified here.</li>    
+</ul>
+
+<p> <strong>Note: </strong>If the user configures WSO2 ESB with WSO2 Governance Registry and if he uploads all the required files as *.gar file (described in WSO2 GREG documentation),
+ he can  provide only the base WSDL under 'WSDl options'.
+There is no need to provide all required imported schemas as WSDL resources since ESB is able to resolve the imported resources using only the base WSDL.
+Please note that for the above function user needs to uncomment the following lines @ synapse.properties file which is avilable in ESB_HOME/lib/core/WEB_INF/classes folder.
+</p>
+<p><strong>
+synapse.wsdl.resolver=org.wso2.carbon.mediation.initializer.RegistryWSDLLocator <br/>
+synapse.schema.resolver=org.wso2.carbon.mediation.initializer.RegistryXmlSchemaURIResolver
+</strong>
+</p>
+
+<h3><a name="logproxy">Logging Proxy</a></h3>
+
+<p>
+This template can be used to create a proxy service  which logs all
+ the incoming requests and forwards them to a given endpoint. 
+ If necessary responses coming back from the backend service can be logged before routing them to the client. 
+</p>
+
+<div class="image">
+    <img  alt="secure proxy" src="images/logging-proxy.jpeg"/>
+    <p>Figure 5:Logging  Proxy Template</p>
+</div>
+
+<h4> Parameters </h4>
+
+<ul>
+    <li>Proxy service settings	: User should porvide proxy name and the endpoint URL. Selecting an endpoint can be chossed as direct endpoint or a 
+	registry entry. Request and Response log level also should be provided if user wants to log the messages.</li>
+    <li>WSDL options			: If user likes to publish the actual back end service WSDL/ customized WSDL, he can provide the WSDL entry as 
+	a registry entry or as a URL or an inline wsdl option.  If user doesn't provide the WSDL option, the default WSDL will be published when user request for ?WSDL. </li>
+    <li>Transport settings		: Proxy service transport options can be soecified here.</li>    
+</ul>
+
+<p> <strong>Note: </strong>If the user configures WSO2 ESB with WSO2 Governance Registry and if he uploads all the required files as *.gar file (described in WSO2 GREG documentation),
+ he can  provide only the base WSDL under 'WSDl options'.
+There is no need to provide all required imported schemas as WSDL resources since ESB is able to resolve the imported resources using only the base WSDL.
+Please note that for the above function user needs to uncomment the following lines @ synapse.properties file which is avilable in ESB_HOME/lib/core/WEB_INF/classes folder.
+</p>
+<p><strong>
+synapse.wsdl.resolver=org.wso2.carbon.mediation.initializer.RegistryWSDLLocator <br/>
+synapse.schema.resolver=org.wso2.carbon.mediation.initializer.RegistryXmlSchemaURIResolver
+</strong>
+</p>
+
+<h3><a name="transformerproxy">Transformer Proxy</a></h3>
+
+<p>
+This template can be used to create a proxy service , where user is trying to implement a
+    scenario where an existing service is exposed over a different schema (message format)
+    you can make use of the <strong>Transformer Proxy</strong> option to easily setup
+    a proxy service which can transform requests and responses based on specified XSLT
+    configurations.
+</p>
+
+<div class="image">
+    <img  alt="secure proxy" src="images/transformer-proxy.jpeg"/>
+    <p>Figure 6:Transformer Proxy Template</p>
+</div>
+
+<h4> Parameters </h4>
+
+<ul>
+    <li>Proxy service settings	: User should porvide proxy name and the endpoint URL. Selecting an endpoint can be chossed as direct endpoint or a 
+	registry entry. XSLT tranformation script should be provided as a registry entry.</li>
+    <li>WSDL options			: If user likes to publish the actual back end service WSDL/ customized WSDL, he can provide the WSDL entry as 
+	a registry entry or as a URL or an inline wsdl option.  If user doesn't provide the WSDL option, the default WSDL will be published when user request for ?WSDL. </li>
+    <li>Transport settings		: Proxy service transport options can be soecified here.</li>    
+</ul>
+<p> <strong>Note: </strong>If the user configures WSO2 ESB with WSO2 Governance Registry and if he uploads all the required files as *.gar file (described in WSO2 GREG documentation),
+ he can  provide only the base WSDL under 'WSDl options'.
+There is no need to provide all required imported schemas as WSDL resources since ESB is able to resolve the imported resources using only the base WSDL.
+Please note that for the above function user needs to uncomment the following lines @ synapse.properties file which is avilable in ESB_HOME/lib/core/WEB_INF/classes folder.
+</p>
+<p><strong>
+synapse.wsdl.resolver=org.wso2.carbon.mediation.initializer.RegistryWSDLLocator <br/>
+synapse.schema.resolver=org.wso2.carbon.mediation.initializer.RegistryXmlSchemaURIResolver
+</strong>
+</p>
+
+</body>
+</html>

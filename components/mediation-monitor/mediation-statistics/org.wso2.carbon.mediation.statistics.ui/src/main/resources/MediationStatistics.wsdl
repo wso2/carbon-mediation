@@ -1,0 +1,632 @@
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://statistics.mediation.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax273="http://aspects.synapse.apache.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax272="http://statistics.mediation.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://statistics.mediation.carbon.wso2.org">
+    <wsdl:documentation>MediationStatisticsAdmin</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax276="http://statistics.mediation.carbon.wso2.org" xmlns:ax274="http://aspects.synapse.apache.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://statistics.mediation.carbon.wso2.org/xsd">
+            <xs:import namespace="http://aspects.synapse.apache.org/xsd" />
+            <xs:import namespace="http://statistics.mediation.carbon.wso2.org" />
+            <xs:complexType name="InOutStatisticsRecord">
+                <xs:all>
+                    <xs:element minOccurs="0" name="inRecord" nillable="true" type="ax272:StatisticsRecord" />
+
+                    <xs:element minOccurs="0" name="outRecord" nillable="true" type="ax272:StatisticsRecord" />
+                </xs:all>
+            </xs:complexType>
+            <xs:complexType name="StatisticsRecord">
+                <xs:all>
+                    <xs:element minOccurs="0" name="avgTime" type="xs:double" />
+                    <xs:element minOccurs="0" name="faultCount" type="xs:int" />
+                    <xs:element minOccurs="0" name="inStatistic" type="xs:boolean" />
+                    <xs:element minOccurs="0" name="maxTime" type="xs:long" />
+
+                    <xs:element minOccurs="0" name="minTime" type="xs:long" />
+                    <xs:element minOccurs="0" name="resourceId" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="totalCount" type="xs:int" />
+                    <xs:element minOccurs="0" name="type" nillable="true" type="ax274:ComponentType" />
+                </xs:all>
+            </xs:complexType>
+            <xs:complexType name="MediationStatisticsException">
+                <xs:complexContent>
+                    <xs:extension base="ax276:Exception">
+
+                        <xs:sequence />
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:complexType name="GraphData">
+                <xs:all>
+                    <xs:element minOccurs="0" name="endPointData" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="proxyServiceData" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="sequenceData" nillable="true" type="xs:string" />
+
+                    <xs:element minOccurs="0" name="serverData" nillable="true" type="xs:string" />
+                </xs:all>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax275="http://statistics.mediation.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://statistics.mediation.carbon.wso2.org">
+            <xs:import namespace="http://statistics.mediation.carbon.wso2.org/xsd" />
+            <xs:element name="listServersResponse">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listSequenceResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="listProxyServicesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="listEndPointResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getServerStatisticsResponse">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax275:InOutStatisticsRecord" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSequenceStatistics">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="sequenceName" nillable="true" type="xs:string" />
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSequenceStatisticsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax275:InOutStatisticsRecord" />
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="getProxyServiceStatistics">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getProxyServiceStatisticsResponse">
+
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax275:InOutStatisticsRecord" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndPointStatistics">
+                <xs:complexType>
+                    <xs:sequence>
+
+                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndPointStatisticsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax275:InOutStatisticsRecord" />
+                    </xs:sequence>
+
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Exception" nillable="true" type="xs:anyType" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="MediationStatisticsException">
+                <xs:complexType>
+
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="MediationStatisticsException" nillable="true" type="ax275:MediationStatisticsException" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDataForGraphResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax275:GraphData" />
+
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCategoryStatistics">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="category" type="xs:int" />
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:element>
+            <xs:element name="getCategoryStatisticsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax275:InOutStatisticsRecord" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://aspects.synapse.apache.org/xsd">
+            <xs:complexType name="ComponentType">
+                <xs:complexContent>
+                    <xs:extension base="xs:Enum">
+                        <xs:sequence />
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+        </xs:schema>
+
+    </wsdl:types>
+    <wsdl:message name="getDataForGraphRequest" />
+    <wsdl:message name="getDataForGraphResponse">
+        <wsdl:part name="parameters" element="ns:getDataForGraphResponse" />
+    </wsdl:message>
+    <wsdl:message name="MediationStatisticsException">
+        <wsdl:part name="parameters" element="ns:MediationStatisticsException" />
+    </wsdl:message>
+    <wsdl:message name="getProxyServiceStatisticsRequest">
+
+        <wsdl:part name="parameters" element="ns:getProxyServiceStatistics" />
+    </wsdl:message>
+    <wsdl:message name="getProxyServiceStatisticsResponse">
+        <wsdl:part name="parameters" element="ns:getProxyServiceStatisticsResponse" />
+    </wsdl:message>
+    <wsdl:message name="listSequenceRequest" />
+    <wsdl:message name="listSequenceResponse">
+        <wsdl:part name="parameters" element="ns:listSequenceResponse" />
+    </wsdl:message>
+
+    <wsdl:message name="listServersRequest" />
+    <wsdl:message name="listServersResponse">
+        <wsdl:part name="parameters" element="ns:listServersResponse" />
+    </wsdl:message>
+    <wsdl:message name="getSequenceStatisticsRequest">
+        <wsdl:part name="parameters" element="ns:getSequenceStatistics" />
+    </wsdl:message>
+    <wsdl:message name="getSequenceStatisticsResponse">
+        <wsdl:part name="parameters" element="ns:getSequenceStatisticsResponse" />
+
+    </wsdl:message>
+    <wsdl:message name="listEndPointRequest" />
+    <wsdl:message name="listEndPointResponse">
+        <wsdl:part name="parameters" element="ns:listEndPointResponse" />
+    </wsdl:message>
+    <wsdl:message name="getEndPointStatisticsRequest">
+        <wsdl:part name="parameters" element="ns:getEndPointStatistics" />
+    </wsdl:message>
+    <wsdl:message name="getEndPointStatisticsResponse">
+
+        <wsdl:part name="parameters" element="ns:getEndPointStatisticsResponse" />
+    </wsdl:message>
+    <wsdl:message name="getServerStatisticsRequest" />
+    <wsdl:message name="getServerStatisticsResponse">
+        <wsdl:part name="parameters" element="ns:getServerStatisticsResponse" />
+    </wsdl:message>
+    <wsdl:message name="getCategoryStatisticsRequest">
+        <wsdl:part name="parameters" element="ns:getCategoryStatistics" />
+    </wsdl:message>
+
+    <wsdl:message name="getCategoryStatisticsResponse">
+        <wsdl:part name="parameters" element="ns:getCategoryStatisticsResponse" />
+    </wsdl:message>
+    <wsdl:message name="listProxyServicesRequest" />
+    <wsdl:message name="listProxyServicesResponse">
+        <wsdl:part name="parameters" element="ns:listProxyServicesResponse" />
+    </wsdl:message>
+    <wsdl:portType name="MediationStatisticsAdminPortType">
+        <wsdl:operation name="getDataForGraph">
+
+            <wsdl:input message="ns:getDataForGraphRequest" wsaw:Action="urn:getDataForGraph" />
+            <wsdl:output message="ns:getDataForGraphResponse" wsaw:Action="urn:getDataForGraphResponse" />
+            <wsdl:fault message="ns:MediationStatisticsException" name="MediationStatisticsException" wsaw:Action="urn:getDataForGraphMediationStatisticsException" />
+        </wsdl:operation>
+        <wsdl:operation name="getProxyServiceStatistics">
+            <wsdl:input message="ns:getProxyServiceStatisticsRequest" wsaw:Action="urn:getProxyServiceStatistics" />
+            <wsdl:output message="ns:getProxyServiceStatisticsResponse" wsaw:Action="urn:getProxyServiceStatisticsResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="listSequence">
+
+            <wsdl:input message="ns:listSequenceRequest" wsaw:Action="urn:listSequence" />
+            <wsdl:output message="ns:listSequenceResponse" wsaw:Action="urn:listSequenceResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="listServers">
+            <wsdl:input message="ns:listServersRequest" wsaw:Action="urn:listServers" />
+            <wsdl:output message="ns:listServersResponse" wsaw:Action="urn:listServersResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceStatistics">
+            <wsdl:input message="ns:getSequenceStatisticsRequest" wsaw:Action="urn:getSequenceStatistics" />
+
+            <wsdl:output message="ns:getSequenceStatisticsResponse" wsaw:Action="urn:getSequenceStatisticsResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="listEndPoint">
+            <wsdl:input message="ns:listEndPointRequest" wsaw:Action="urn:listEndPoint" />
+            <wsdl:output message="ns:listEndPointResponse" wsaw:Action="urn:listEndPointResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointStatistics">
+            <wsdl:input message="ns:getEndPointStatisticsRequest" wsaw:Action="urn:getEndPointStatistics" />
+            <wsdl:output message="ns:getEndPointStatisticsResponse" wsaw:Action="urn:getEndPointStatisticsResponse" />
+
+        </wsdl:operation>
+        <wsdl:operation name="getServerStatistics">
+            <wsdl:input message="ns:getServerStatisticsRequest" wsaw:Action="urn:getServerStatistics" />
+            <wsdl:output message="ns:getServerStatisticsResponse" wsaw:Action="urn:getServerStatisticsResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="getCategoryStatistics">
+            <wsdl:input message="ns:getCategoryStatisticsRequest" wsaw:Action="urn:getCategoryStatistics" />
+            <wsdl:output message="ns:getCategoryStatisticsResponse" wsaw:Action="urn:getCategoryStatisticsResponse" />
+        </wsdl:operation>
+
+        <wsdl:operation name="listProxyServices">
+            <wsdl:input message="ns:listProxyServicesRequest" wsaw:Action="urn:listProxyServices" />
+            <wsdl:output message="ns:listProxyServicesResponse" wsaw:Action="urn:listProxyServicesResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="MediationStatisticsAdminSoap11Binding" type="ns:MediationStatisticsAdminPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="getDataForGraph">
+            <soap:operation soapAction="urn:getDataForGraph" style="document" />
+
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="MediationStatisticsException">
+                <soap:fault use="literal" name="MediationStatisticsException" />
+            </wsdl:fault>
+
+        </wsdl:operation>
+        <wsdl:operation name="getProxyServiceStatistics">
+            <soap:operation soapAction="urn:getProxyServiceStatistics" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="listSequence">
+            <soap:operation soapAction="urn:listSequence" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="listServers">
+            <soap:operation soapAction="urn:listServers" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceStatistics">
+            <soap:operation soapAction="urn:getSequenceStatistics" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="listEndPoint">
+            <soap:operation soapAction="urn:listEndPoint" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="getServerStatistics">
+            <soap:operation soapAction="urn:getServerStatistics" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointStatistics">
+            <soap:operation soapAction="urn:getEndPointStatistics" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="getCategoryStatistics">
+            <soap:operation soapAction="urn:getCategoryStatistics" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="listProxyServices">
+            <soap:operation soapAction="urn:listProxyServices" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="MediationStatisticsAdminSoap12Binding" type="ns:MediationStatisticsAdminPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="getDataForGraph">
+            <soap12:operation soapAction="urn:getDataForGraph" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="MediationStatisticsException">
+                <soap12:fault use="literal" name="MediationStatisticsException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getProxyServiceStatistics">
+            <soap12:operation soapAction="urn:getProxyServiceStatistics" style="document" />
+
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listSequence">
+            <soap12:operation soapAction="urn:listSequence" style="document" />
+
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listServers">
+            <soap12:operation soapAction="urn:listServers" style="document" />
+
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceStatistics">
+            <soap12:operation soapAction="urn:getSequenceStatistics" style="document" />
+
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listEndPoint">
+            <soap12:operation soapAction="urn:listEndPoint" style="document" />
+
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getServerStatistics">
+            <soap12:operation soapAction="urn:getServerStatistics" style="document" />
+
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointStatistics">
+            <soap12:operation soapAction="urn:getEndPointStatistics" style="document" />
+
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getCategoryStatistics">
+            <soap12:operation soapAction="urn:getCategoryStatistics" style="document" />
+
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="listProxyServices">
+            <soap12:operation soapAction="urn:listProxyServices" style="document" />
+
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="MediationStatisticsAdminHttpBinding" type="ns:MediationStatisticsAdminPortType">
+
+        <http:binding verb="POST" />
+        <wsdl:operation name="getDataForGraph">
+            <http:operation location="getDataForGraph" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="getDataForGraph" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getDataForGraph" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="getProxyServiceStatistics">
+            <http:operation location="getProxyServiceStatistics" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="getProxyServiceStatistics" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getProxyServiceStatistics" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="listSequence">
+            <http:operation location="listSequence" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="listSequence" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="listSequence" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="listServers">
+            <http:operation location="listServers" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="listServers" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="listServers" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceStatistics">
+            <http:operation location="getSequenceStatistics" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="getSequenceStatistics" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getSequenceStatistics" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="listEndPoint">
+            <http:operation location="listEndPoint" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="listEndPoint" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="listEndPoint" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="getServerStatistics">
+            <http:operation location="getServerStatistics" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="getServerStatistics" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getServerStatistics" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointStatistics">
+            <http:operation location="getEndPointStatistics" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="getEndPointStatistics" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getEndPointStatistics" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="getCategoryStatistics">
+            <http:operation location="getCategoryStatistics" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="getCategoryStatistics" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="getCategoryStatistics" />
+            </wsdl:output>
+
+        </wsdl:operation>
+        <wsdl:operation name="listProxyServices">
+            <http:operation location="listProxyServices" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="listProxyServices" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="listProxyServices" />
+            </wsdl:output>
+
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="MediationStatisticsAdmin">
+        <wsdl:port name="MediationStatisticsAdminHttpsSoap11Endpoint" binding="ns:MediationStatisticsAdminSoap11Binding">
+            <soap:address location="https://localhost:8243/services/MediationStatisticsAdmin.MediationStatisticsAdminHttpsSoap11Endpoint" />
+        </wsdl:port>
+        <wsdl:port name="MediationStatisticsAdminHttpsSoap12Endpoint" binding="ns:MediationStatisticsAdminSoap12Binding">
+            <soap12:address location="https://localhost:8243/services/MediationStatisticsAdmin.MediationStatisticsAdminHttpsSoap12Endpoint" />
+        </wsdl:port>
+
+        <wsdl:port name="MediationStatisticsAdminHttpsEndpoint" binding="ns:MediationStatisticsAdminHttpBinding">
+            <http:address location="https://localhost:8243/services/MediationStatisticsAdmin.MediationStatisticsAdminHttpsEndpoint" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

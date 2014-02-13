@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>Priority Executors - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>Priority Executors</h1>
+<p>
+Use the <span style="font-style: italic; font-weight: bold;">Priority Executors</span> page to add
+or edit Priority Executors.</p>
+
+<p>
+As shown in Figure,1 the sequence management section displays a list of
+existing Priority Executors.</p>
+
+<div class="image">
+<img src="images/executor-list.png" alt=""/>
+
+<p>Figure 1: Priority Executor Management</p>
+</div>
+
+<ul>
+  <li>Edit
+    <ul>
+      <li>Click <span style="font-weight: bold;">Edit</span> to
+        edit an existing executor.</li>
+    </ul>
+  </li>
+  <li>Remove
+    <ul>
+      <li>Click <span style="font-weight: bold;">Remove</span> to remove an executor</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>Adding a Priority Executor</h3>
+<ol>
+  <li style="color: black;">On the <span
+    style="font-weight: bold; font-style: italic;">Priotity Executors</span>
+    page, click <span style="font-weight: bold;">Add</span>. The
+    <span style="font-style: italic; font-weight: bold;">Design
+    Priority Executor</span> page appears.</li>
+  <li style="color: black;">Enter a Priority Executor name and other options and then save.</li>
+</ol>
+
+<h3>Editing a Priority Executor</h3>
+<ol>
+  <li>On the <span style="font-weight: bold; font-style: italic;">Priority Executors</span> page, click <span
+    style="font-weight: bold;">Edit.</span> The <span
+    style="font-style: italic; font-weight: bold;">Priority Executors Design</span>
+    page appears, displaying the selected executor.</li>
+
+  <div class="image">
+  <img src="images/executor-design.png" alt=""/>
+
+  <p>Figure 3: Editing an Executor</p>
+  </div>
+</ol>
+
+<h3>Priority Executor Add/Edit options</h3>
+
+<p>When adding or editing a Priority Executor user can configure various options</p>
+<p></p>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2"
+cellspacing="2">
+    <thead>
+    <tr>
+        <th>Field</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Name</td>
+        <td>Name of the Executor</td>
+    </tr>
+
+    <tr>
+        <td>FixedQueus</td>
+        <td>Weather fixed size queues are used or not</td>
+    </tr>
+
+    <tr>
+        <td>Queues</td>
+        <td>Individual Queue Configurations</td>
+    </tr>
+
+    <tr>
+        <td>Max</td>
+        <td>Maximum Number of Threads in th Executor</td>
+    </tr>
+
+    <tr>
+        <td>Core</td>
+        <td>Core Number of Threads in th Executor</td>
+    </tr>
+
+    <tr>
+        <td>Keep-Alive</td>
+        <td>Keep Alive time for Threads</td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Queue Configurations</h3>
+<p>Each and every priority has a queue associated with it. A message is put in to one of the queues
+    corresponding to its priority.</p>
+
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2"
+cellspacing="2">
+    <thead><tr>
+        <th>Field</th>
+        <th>Description</th>
+    </tr></thead>
+    <tbody>
+    <tr>
+        <td>Size</td>
+        <td>Size of the Queue, this option is visible only if fixed size queues are selected</td>
+    </tr>
+    <tr>
+        <td>Priority</td>
+        <td>Priority of the Queue</td>
+    </tr>
+    </tbody>
+</table>
+
+<p>For <a href="http://wso2.org/library/esb">more information</a> please refer to the WSO2 library</p>
+</body>
+</html>

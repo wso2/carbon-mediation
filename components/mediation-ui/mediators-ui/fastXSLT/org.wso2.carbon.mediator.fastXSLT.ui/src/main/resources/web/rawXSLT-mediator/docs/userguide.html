@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <!--
+    ~ Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+    ~
+    ~ Licensed under the Apache License, Version 2.0 (the "License");
+    ~ you may not use this file except in compliance with the License.
+    ~ You may obtain a copy of the License at
+    ~
+    ~ http://www.apache.org/licenses/LICENSE-2.0
+    ~
+    ~ Unless required by applicable law or agreed to in writing, software
+    ~ distributed under the License is distributed on an "AS IS" BASIS,
+    ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    ~ See the License for the specific language governing permissions and
+    ~ limitations under the License.
+    -->
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>FastXSLT Mediator - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>XSLT Mediator</h1>
+
+<p>
+    The fastXSLT mediator applies the specified XSLT transformation to the selected element of the current
+    message payload. If the source element is not specified, it defaults to the first child of the soap
+    body. Optionally parameters (XSLT) could be passed into the transformations through the 'property'
+    field. The 'feature' field defines any features which should be explicitly set to the TransformerFactory.
+    The feature 'http://ws.apache.org/ns/synapse/transform/feature/dom' turns on DOM based transformations instead
+    of serializing elements into Byte streams and/or temporary files. Though this would be better in
+    performance than using byte streams, sometimes it may not work for all transformations.
+</p>
+<img src="images/xslt_mediator_screenshot.jpg"/>
+
+<p><strong>FastXSLT Mediator</strong></p>
+
+<ul>
+    <li>
+        Key : The registry key to refer the xslt.
+    </li>
+    <li>
+        Source: Specify in which part of message (specified in xpath) the xslt should be applied. Default is the SOAP
+        body of
+        the message.
+    </li>
+</ul>
+
+<h2>Properties of the FastXSLT mediator</h2>
+
+<p>
+    Manage the properties which would be referred from the xslt in transformation (using get-property(prop-name) xpath
+    extension function).
+</p>
+<img src="images/add_properties_screenshot.jpg"/>
+
+<p><strong>FastXSLT Mediator - Add Properties</strong></p>
+
+<ul>
+    <li>
+        Property Name: Name of the property.
+    </li>
+    <li>
+        Property Type: Whether it is a static value or an xpath expression.
+    </li>
+    <li>
+        Value/ Expression: The static value or the xpath expression.
+    </li>
+    <li>
+        NSEditor: Specify the namespaces that are used in the xpath expression.
+    </li>
+    <li>
+        Action: Delete the property.
+    </li>
+</ul>
+
+
+<h2>Features of the FastXSLT mediator</h2>
+
+<p>
+    Specify the features to be enabled in the XSLT transformation. Read the introduction paragraph of this guide for an
+    example feature.
+</p>
+<img src="images/add_features_screenshot.jpg"/>
+
+<p><strong>FastXSLT Mediator - Add Features</strong></p>
+
+<ul>
+    <li>
+        Feature Name: Name of the feature.
+    </li>
+    <li>
+        Feature Value: Specify whether the feature is turn on (True) or Not (False).
+    </li>
+    <li>
+        Action: Delete the feature.
+    </li>
+</ul>
+
+</body>
+</html>

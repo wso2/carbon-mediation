@@ -1,0 +1,4 @@
+<smooks xmlns="http://ws.apache.org/ns/synapse" config-key="conf:/permission">
+   <input xmlns:ns="http://org.apache.synapse/xsd" xmlns:ns3="http://org.apache.synapse/xsd" type="text" expression="AAAAA" />
+   <output type="text" property="AAAAAAA" />
+</smooks>

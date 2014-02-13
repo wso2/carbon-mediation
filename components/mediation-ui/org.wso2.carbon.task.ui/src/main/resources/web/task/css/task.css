@@ -1,0 +1,22 @@
+.form-subtitle {
+    font-weight: bold;
+}
+
+.form-help {
+    font-style: italic;
+    color: #595959;
+}
+
+.table.styled {
+    border: solid 1px #595959;
+}
+
+table.styled thead th {
+    text-align: left;
+}
+
+table.styled tbody td {
+    padding-left: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}

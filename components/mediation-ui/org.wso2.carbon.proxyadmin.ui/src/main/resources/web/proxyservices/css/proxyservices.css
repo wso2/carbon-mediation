@@ -1,0 +1,242 @@
+h4{
+    display:inline;
+}
+.button-pane {
+    margin-top: 10px;
+    background-color: #5b5b5b;
+    height: 30px;
+    padding-top: 10px;
+}
+
+.button-pane ul {
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+.button-pane li {
+    float: right;
+    margin-right: 20px;
+}
+
+.button-pane-simple {
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+    height: 20px;
+}
+
+.button-pane-simple li {
+    float: right;
+    margin-left: 20px;
+}
+
+.button-space{
+    margin-left:10px;
+}
+.tabPanePositioner{
+*position:relative;*z-index:1000;
+}
+.tabPane {
+	
+    list-style: none;
+    padding: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: -1px;
+    *margin-bottom: -22px;
+    height: 23px;
+}
+
+.tabPane li {
+    float: left;
+    background-image: url( ../images/tab-unselected.gif );
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    width: 98px;
+    height: 20px;
+    text-align: center;
+    color: #ffffff;
+    cursor: pointer;
+    padding-top: 3px;
+}
+
+.tabPane li.selected {
+    color: #000000;
+    background-image: url( ../images/tab-selected.gif );
+    float: left;
+}
+
+.tabPaneContent,.tabPaneContentMain {
+    background-color: #ffffff;
+    border: solid 1px #828282;
+    padding: 10px;
+}
+
+.forProxy {
+    height: 390px;
+    *height:450px;
+    padding-left:100px;
+}
+
+.tabPaneContentMain div {
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    color:#005387;
+    text-decoration:underline;
+    font-size:0.7em;
+    font-weight:bold;
+}
+
+.ps-selected {
+    background-image: url( ../images/ps-node-selected-back.gif );
+    background-repeat: no-repeat;
+    width: 109px;
+    height: 55px;
+    color:#000000 !important;
+    text-decoration:none !important;
+}
+.ps-notselected {
+    background-image: url( ../images/ps-node-notselected-back.gif );
+    background-repeat: no-repeat;
+    width: 109px;
+    height: 55px;
+    color:#000000 !important;
+    text-decoration:none !important;
+}
+
+.ps-1 {
+    margin-left: 0px;
+    margin-top: 110px;
+    padding-top: 10px;
+}
+
+.ps-2 {
+    margin-left: 60px;
+    margin-top: 30px;
+}
+
+.ps-3 {
+    margin-left: 160px;
+    margin-top: 0px;
+}
+
+.ps-4 {
+    margin-left: 300px;
+    margin-top: 30px;
+}
+
+.ps-5 {
+    margin-left: 320px;
+    margin-top: 110px;
+    padding-top: 3px;
+}
+
+.ps-6 {
+    margin-left: 290px;
+    margin-top: 180px;
+}
+
+.ps-7 {
+    margin-left: 160px;
+    margin-top: 220px;
+    padding-top: 3px;
+}
+
+.ps-8 {
+    margin-left: 60px;
+    margin-top: 170px;
+}
+
+.ps-9 {
+    margin-left: 200px;
+    margin-top: 280px;
+}
+
+.ps-10 {
+    margin-left: 160px;
+    margin-top: 340px;
+    padding-top: 7px;
+}
+
+.ps-11 {
+    margin-left: 210px;
+    margin-top: 80px;
+}
+
+.clear {
+    clear: both;
+}
+
+.form-table {
+
+}
+
+.form-table td {
+    text-align: left;
+    vertical-align: top;
+    padding-left:5px;
+    line-height:20px;
+}
+
+.form-table th {
+    padding-right: 20px;
+    padding-left:5px;
+    font-weight: normal;
+    text-align: left;
+}
+.subTabPane{
+   padding:0px;
+    margin:0px;
+    margin-left:10px;
+    height:24px;
+}
+.subTabPane li{
+    list-style-type:none;
+    float:left;
+    background-color:#b7b7b7;
+    padding:5px;
+    margin-right:4px;
+    cursor:pointer;
+}
+.subTabPane li.selected{
+    border-top:solid 1px #cccccc;
+    border-left:solid 1px #cccccc;
+    border-right:solid 1px #cccccc;
+    background-color:#ffffff;
+    font-weight:bold;
+}
+.subTabPaneContent{
+    background-color:#ffffff;
+    border:solid 1px #cccccc;
+    padding:10px;
+}
+
+.cell-inside{
+    padding-left:5px;
+}
+.cell-inside a{
+    cursor:pointer;
+}
+.name-value-add{
+    margin-top:10px;
+    margin-bottom:10px;
+}
+.name-value-add input{
+    margin-left:15px;
+}
+.ProxyArrows{
+    cursor:default !important;
+}
+.buttonRowAlone {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-image: url(../admin/images/buttonRow-bg.gif);
+    background-position: left top;
+    background-repeat: repeat-x;
+    border-bottom: solid 1px #cccccc;
+    border-top: solid 1px #cccccc;
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<!--
+ ~ Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~ http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ -->
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>Script Mediator - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>Script Mediator</h1>
+<p>
+Synapse supports Mediators implemented in a variety of scripting languages such as JavaScript, 
+Python or Ruby. There are two ways of defining script mediators, either with the script program 
+statements stored in a separate file which is referenced via the local or remote registry entry, 
+or with the script program statements embedded in-line within the Synapse configuration.
+</p>
+<h3>Script Type</h3>
+<ul>
+<li>Inline: Specify the script inline</li>
+<li>Registry: Store the script in registry and refer it using the key</li>
+</ul>
+<h3>If Inline Selected</h3>
+<img alt="Script Mediator with Inlinded Source" src="images/script.png"/>
+<h4>Language</h4>
+<p>Choose from variety of scripting languages supported</p>
+<h4>Source</h4>
+<p>If inline selected as the Script type, specify the source</p>
+<h3>If Registry Selected</h3>
+<img alt="Script Mediator with Registry Source" src="images/script_registry.png"/>
+<h4>Function</h4>
+<p>Function of the script language to execute</p>
+<h4>Key</h4>
+<p>Registry location of the source</p>
+<h4>Include Keys</h4>
+<p>Scripts sources to be included</p>
+</body>
+</html>

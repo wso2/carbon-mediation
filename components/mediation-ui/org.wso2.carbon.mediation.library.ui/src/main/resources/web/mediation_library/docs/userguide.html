@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"></meta>
+    <title>Connectors - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all" />
+</head>
+
+<body>
+
+<h1>Connectors</h1>
+
+<p>A <strong>connector</strong> allows you to interact with a third-party product's functionality and data
+from your message flow. For example, the predefined ESB connectors allow you to
+connect to and interact with the APIs of services such as Twilio, Salesforce, and JIRA.
+For example, if you have enabled the Twitter and Google Spreadsheet connectors in your
+ESB instance, your message flow could receive requests containing a user's Twitter name
+and password, log into the user's Twitter account, get a list of the user's followers, and
+write that information to a Google spreadsheet. 
+Each connector provides a set of operations, which you call from your proxy services,
+sequences, and REST APIs to interact with that product. For example, the Twitter
+connector provides operations that call the Twitter APIs to get and send direct messages,
+retrieve IDs of friends and followers, update status, retweet other users' status, and more.
+</p>
+
+<h2>Adding Connectors</h2>
+<p>
+    To add a connector to this ESB instance, click <strong>Manage > Connectors > Add</strong>.
+</p>
+
+<p><img alt="Mediation Library List" src="images/connector_main.jpg"/></p>
+<p style="font-style: italic;"><strong>Figure 1:</strong>Connector main</p>
+
+<p>You can then upload the connector's ZIP file.</p>
+
+<p><img alt="Uploading Mediation Libraries" src="images/add_connector.jpg"/></p>
+<p style="font-style: italic;"><strong>Figure 2:</strong> Uploading Connectors</p>
+
+<p>To view the list of deployed connectors, click <strong>Manage > Connectors > List</strong>.</p>
+
+<p><img alt="Mediation Library List" src="images/connectors_list_disable.jpg"/></p>
+<p style="font-style: italic;"><strong>Figure 3:</strong>Connector List</p>
+
+
+<h2>Enabling and Disabling Connectors</h2>
+
+<p>Before you can use a connector, you must enable it by clicking the <strong>Enable</strong> link for that
+connector in the list. To make a connector temporarily unavailable in the ESB instance,
+click <strong>Disable</strong>.</p> 
+
+<p><img alt="Mediation Library List" src="images/connectors_list_enable.jpg"/></p>
+<p style="font-style: italic;"><strong>Figure 4:</strong>Connector List</p>
+
+<h2>Deleting a Connector</h2>
+
+<p>To remove a connector from this ESB instance, click the <strong>Delete</strong> link for that connector in
+the list.</p>
+
+</body>
+</html>
+
