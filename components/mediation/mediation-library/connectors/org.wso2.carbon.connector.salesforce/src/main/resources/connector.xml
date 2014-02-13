@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<connector>
-    <component name="salesforce" package="org.wso2.carbon.connectors" >
-        <dependency component="salesforce" />
-        <description>synapse library for Salesforce connector</description>
-    </component>
-    <icon>icon/icon.png</icon>
-</connector>

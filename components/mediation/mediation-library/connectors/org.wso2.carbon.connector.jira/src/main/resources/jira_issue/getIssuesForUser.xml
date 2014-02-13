@@ -1,6 +1,0 @@
-<template xmlns="http://ws.apache.org/ns/synapse" name="getIssuesForUser">
-
-	<sequence>
-
-	</sequence>
-</template>

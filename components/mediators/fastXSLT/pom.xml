@@ -36,15 +36,4 @@
         <module>org.wso2.carbon.mediator.fastXSLT</module>
         <module>org.wso2.carbon.mediator.fastXSLT.ui</module>
     </modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-core</artifactId>
-                <version>2.1.1-wso2v8</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
 </project>
