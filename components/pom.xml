@@ -38,8 +38,8 @@
             <activeByDefault>true</activeByDefault>
          </activation>
          <modules>
-            <!--module>business-messaging</module-->
             <module>mediation-initializer</module>
+            <module>business-adaptors</module>
             <module>mediation</module>
             <module>endpoint</module>
             <!--module>localentry</module-->

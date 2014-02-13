@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" ?>
 <!--
  ~ Copyright (c) 2009-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
@@ -15,60 +15,20 @@
  ~ limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>mediation-initializer</artifactId>
+        <artifactId>hl7</artifactId>
         <version>4.3.0-SNAPSHOT</version>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
-    <version>4.3.0-SNAPSHOT</version>
     <groupId>org.wso2.carbon</groupId>
-    <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
+    <artifactId>org.wso2.carbon.business.messaging.hl7.transport</artifactId>
+    <version>4.3.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
-    <name>WSO2 Carbon - Mediation Dependency Management</name>
+    <name>WSO2 Carbon - HL7 Business Messaging - Transport</name>
     <url>http://wso2.org</url>
-    <description>Dependency management of Synapse and the required mediation fragments of the ESB</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.eclipse.osgi</groupId>
-            <artifactId>org.eclipse.osgi</artifactId>
-            <version>3.7.0.v20110613</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2-codegen</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-extensions</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.mediator.router.impl</artifactId>
-            <version>${wso2carbon.version}</version>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
-            
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
@@ -76,23 +36,49 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <DynamicImport-Package>*</DynamicImport-Package>
                         <Export-Package>
-                            org.wso2.carbon.mediation.dependency.mgt.*,
+                            org.wso2.carbon.business.messaging.hl7.transport.*,
                         </Export-Package>
-                        <Import-Package>
+                        <Import-Package>                                     
+                            org.apache.axis2.*; version=&quot;${axis2.osgi.version.range.hl7}&quot;,
+                            org.apache.axiom.*; version=&quot;${axiom.osgi.version.range.hl7}&quot;,
+                            org.wso2.carbon.core.*,
+                            org.wso2.carbon.utils.*,
+                            org.osgi.framework,
                             *;resolution:=optional
                         </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-transport-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.business.messaging.hl7.common</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.schema</groupId>
+            <artifactId>XmlSchema</artifactId>
+        </dependency>
+    </dependencies>
 </project>
