@@ -20,7 +20,7 @@
 
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>sequence-editor</artifactId>
+        <artifactId>mediation-ui</artifactId>
         <version>4.3.0-SNAPSHOT</version>
     </parent>
 
@@ -114,21 +114,14 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediator.service</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.templates.service</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2</artifactId>
-        </dependency-->
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.sequences.common</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -155,7 +148,7 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.sequences.stub</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
+            <version>${wso2carbon.version}</version>
         </dependency>
     </dependencies>
 

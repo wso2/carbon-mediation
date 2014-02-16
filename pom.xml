@@ -39,11 +39,8 @@
 	    <module>components/mediation-monitor</module>
             <module>components/business-adaptors</module>
             <module>components/mediation-admin</module>
-            <!--module>components/mediation-connector</module>
-            
-            <module>components/mediation-monitor</module>
-            <module>components/mediation-registry</module>
-            <module>components/mediation-ui</module-->
+            <module>components/mediation-connector</module>
+            <!--module>components/mediation-ui</module-->
             <module>components/mediators</module>            
          </modules>
       </profile>
@@ -165,11 +162,24 @@
             <version>${commons.lang.wso2.version}</version>
            </dependency>
 
+
+<dependency>
+            <groupId>org.apache.rampart.wso2</groupId>
+            <artifactId>rampart-core</artifactId>
+            <version>${rampart.wso2.version}</version>
+        </dependency>
+
+
+
+
   <dependency>
                <groupId>org.wso2.carbon</groupId>
                <artifactId>org.wso2.carbon.logging</artifactId>
                 <version>${wso2carbon.version}</version>
             </dependency>
+
+
+
 
            <!-- Apache End here-->
 
@@ -241,6 +251,17 @@
         </dependency>
 
 
+	 <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.user.core</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+	 <dependency>
+               <groupId>org.wso2.carbon</groupId>
+               <artifactId>org.wso2.carbon.service.mgt</artifactId>
+               <version>${wso2carbon.version}</version>
+            </dependency>
+
  	<!-- Carbon Old version -->
         
 
@@ -252,7 +273,83 @@
         </dependency>
 
          
+<!--Mediation Dependencies Start here-->
+ <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+ <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.registry.core</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
 
+
+ <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.proxyadmin</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+
+
+ <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediator.service</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+
+
+ <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
+ <version>${wso2carbon.version}</version>
+        </dependency>
+
+
+<dependency>
+                        <groupId>org.wso2.securevault</groupId>
+                        <artifactId>org.wso2.securevault</artifactId>
+			<version>${org.wso2.securevault.version}</version>
+                </dependency>
+
+
+
+
+      
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.service</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+     
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.sequences.common</artifactId>
+           <version>${wso2carbon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.sequences.ui</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+
+
+
+ <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.stub</artifactId>
+             <version>${wso2carbon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.common</artifactId>
+             <version>${wso2carbon.version}</version>
+        </dependency>
+    
+       
+
+<!--Mediation Dependencies Ends here-->
     
 <!--Misc-->
     <dependency>
@@ -265,26 +362,7 @@
 
 
 
-
-          
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
            
-
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.registry.core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.user.core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.user.mgt</artifactId>
@@ -293,11 +371,7 @@
            
           
 
-            <dependency>
-               <groupId>org.wso2.carbon</groupId>
-               <artifactId>org.wso2.carbon.service.mgt</artifactId>
-               <version>${project.version}</version>
-            </dependency>
+            
 
            
             <dependency>
@@ -899,25 +973,30 @@
 	<orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         
+      <rampart.wso2.version>1.6.1.wso2v9</rampart.wso2.version>
       <!--Apache End-->
 
      <!--Misc-->
 	 <wsdl4j.wso2.version>1.6.2.wso2v4</wsdl4j.wso2.version>
          <ca.uhn.hapi.wso2.version>2.1.0.wso2v1</ca.uhn.hapi.wso2.version>
+<org.wso2.securevault.version>1.0.0-wso2v2</org.wso2.securevault.version>
      <!--Misc End-->
 
        <!-- Servlet API -->
         <exp.pkg.version.javax.servlet>2.6.0</exp.pkg.version.javax.servlet>
         <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
          <!--&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&-->
+
+
+
+
       <wso2carbon.old.version>4.2.0</wso2carbon.old.version>
        <previous.version>4.2.0</previous.version>
       <wso2carbon.version>4.3.0-SNAPSHOT</wso2carbon.version>
-      <rampart.wso2.version>1.6.1-wso2v9</rampart.wso2.version>
        
       
       
-      <rampart.version>1.6.1-wso2v9</rampart.version>
+      <rampart.version>1.6.1.wso2v9</rampart.version>
 
 
 

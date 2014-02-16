@@ -37,8 +37,9 @@
             <activeByDefault>true</activeByDefault>
          </activation>
          <modules>
-            <module>org.wso2.carbon.endpoint</module>
-           
+            <module>org.wso2.carbon.localentry.ui</module>
+            <module>org.wso2.carbon.sequences.ui</module>
+            <module>org.wso2.carbon.mediation.templates.ui</module>
          </modules>
       </profile>
    </profiles>

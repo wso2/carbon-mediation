@@ -40,26 +40,25 @@
   
             <module>org.wso2.carbon.task.services</module>
             <module>org.wso2.carbon.task</module>
-            
-            <!--module>org.wso2.carbon.endpoint</module>
             <module>org.wso2.carbon.connector.core</module>
+            <module>org.wso2.carbon.endpoint</module>
             <module>org.wso2.carbon.localentry</module>
             <module>org.wso2.carbon.mediation.artifactuploader</module>
-            <module>org.wso2.carbon.mediation.configadmin</module>
-            <module>org.wso2.carbon.mediation.library</module>
-            <module>org.wso2.carbon.mediation.security</module>
-            <module>org.wso2.carbon.mediation.templates</module>
-            <module>org.wso2.carbon.mediation.templates.common</module>
-            <module>org.wso2.carbon.mediation.templates.service</module>
-            <module>org.wso2.carbon.mediator.service</module>
-            <module>org.wso2.carbon.message.processor</module>
-            <module>org.wso2.carbon.message.store</module>
-            <module>org.wso2.carbon.priority.executors</module>
             <module>org.wso2.carbon.proxyadmin</module>
             <module>org.wso2.carbon.proxyadmin.common</module>
-            <module>org.wso2.carbon.rest.api</module>
-            <module>org.wso2.carbon.sequences</module>
-            <module>org.wso2.carbon.sequences.common</module-->
+	    <module>org.wso2.carbon.mediator.service</module>
+	    <module>org.wso2.carbon.mediation.configadmin</module>
+            <module>org.wso2.carbon.mediation.library</module>
+            <module>org.wso2.carbon.mediation.security</module>
+            <module>org.wso2.carbon.mediation.templates.common</module>
+            <module>org.wso2.carbon.mediation.templates</module>
+            <module>org.wso2.carbon.mediation.templates.service</module>
+            <module>org.wso2.carbon.message.processor</module>
+	    <module>org.wso2.carbon.message.store</module>
+            <module>org.wso2.carbon.priority.executors</module>
+	    <module>org.wso2.carbon.rest.api</module>
+            <module>org.wso2.carbon.sequences.common</module>
+            <module>org.wso2.carbon.sequences</module>            
          </modules>
       </profile>
    </profiles>
