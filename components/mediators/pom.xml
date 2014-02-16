@@ -35,6 +35,7 @@
     <url>http://wso2.org</url>
 
 			<modules>
+				<module>router</module>
 				<module>bam</module>
 				<module>entitlement</module>
 				<module>fastXSLT</module>
