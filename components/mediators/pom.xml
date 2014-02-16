@@ -36,10 +36,10 @@
 
 			<modules>
 				<module>router</module>
-				<module>bam</module>
+				<!--module>bam</module>
 				<module>entitlement</module>
 				<module>fastXSLT</module>
-				<module>oauth</module>
+				<module>oauth</module-->
 			</modules>
 
 </project>

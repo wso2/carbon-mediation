@@ -21,20 +21,20 @@
 
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>mediation-monitor</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <artifactId>mediators</artifactId>
+         <version>4.3.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
-    <artifactId>mediation-tracer</artifactId>
-    <packaging>pom</packaging>
-    <name>WSO2 Carbon - Mediation Tracer Aggregator Module</name>
     <version>4.3.0-SNAPSHOT</version>
+    <artifactId>router-mediator</artifactId>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - Router Mediator Aggregator Module</name>
     <url>http://wso2.org</url>
 
-    <modules>
-        <module>org.wso2.carbon.mediation.tracer</module>
-        <module>org.wso2.carbon.mediation.tracer.ui</module>         
-    </modules>
+			<modules>
+				<module>org.wso2.carbon.mediator.router.impl</module>
+			</modules>
+
 </project>

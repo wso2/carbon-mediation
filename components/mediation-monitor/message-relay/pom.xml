@@ -32,32 +32,9 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Message Relay Parent</name>
     <url>http://wso2.org</url>
-
     		<modules>
        		    <module>org.wso2.carbon.relay</module>
                     <module>org.wso2.carbon.relay.mediators.builder</module>
                     <module>org.wso2.carbon.relay.module</module>
     		</modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.axis2.wso2</groupId>
-                <artifactId>axis2</artifactId>
-                <version>${axis2.wso2.version.message-relay}</version>
-            </dependency>            
-            <dependency>
-                <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-core</artifactId>
-                <version>${synapse.version.message-relay}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <properties>
-        <wso2carbon.version.message-relay>${wso2carbon.version}</wso2carbon.version.message-relay>
-        <synapse.version.message-relay>${synapse.version}</synapse.version.message-relay>
-        <axis2.wso2.version.message-relay>${orbit.version.axis2}</axis2.wso2.version.message-relay>    
-    </properties>
-
 </project>

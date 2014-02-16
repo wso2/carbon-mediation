@@ -37,32 +37,4 @@
     <modules>
         <module>org.wso2.carbon.mediation.registry</module>       
     </modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.core</artifactId>
-                <version>${wso2carbon.version.synapse-registries}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-commons</artifactId>
-                <version>${synapse.version.synapse-registries}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-core</artifactId>
-                <version>${synapse.version.synapse-registries}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <properties>
-        <synapse.version.synapse-registries>${synapse.version}</synapse.version.synapse-registries>
-        <wso2carbon.version.synapse-registries>${wso2carbon.version}</wso2carbon.version.synapse-registries>
-        <axis2.osgi.version.range.synapse-registries>${axis2.osgi.version.range}</axis2.osgi.version.range.synapse-registries>
-        <axiom.osgi.version.range.synapse-registries>${axiom.osgi.version.range}</axiom.osgi.version.range.synapse-registries>
-    </properties>
-
 </project>

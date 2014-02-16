@@ -41,8 +41,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-json</artifactId>
-            <version>1.6.1-wso2v5</version>
+            <artifactId>axis2-json</artifactId>            
         </dependency>
     </dependencies>    
 
@@ -72,10 +71,5 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
-
-    <properties>
-        <wso2carbon.version.message-relay>${wso2carbon.version}</wso2carbon.version.message-relay>       
-    </properties>
-    
+    </build>    
 </project>
