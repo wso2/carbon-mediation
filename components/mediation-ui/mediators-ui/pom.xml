@@ -34,10 +34,10 @@
     <url>http://wso2.org</url>
 
 			<modules>
+				<module>org.wso2.carbon.mediator.aggregate.ui</module>
+                                <module>org.wso2.carbon.mediator.bam.ui</module>
                                 <module>org.wso2.carbon.mediator.bean.ui</module>
-				<module>org.wso2.carbon.mediator.drop.ui</module>
-                                <module>org.wso2.carbon.mediator.aggregate.ui</module>
-                                <module>org.wso2.carbon.mediator.cache.ui</module>
+ 				<module>org.wso2.carbon.mediator.cache.ui</module>
                                 <module>org.wso2.carbon.mediator.callout.ui</module>
                                 <module>org.wso2.carbon.mediator.calltemplate.ui</module>
                                 <module>org.wso2.carbon.mediator.call.ui</module>
@@ -45,13 +45,15 @@
                                 <module>org.wso2.carbon.mediator.clone.ui</module>
                                 <module>org.wso2.carbon.mediator.command.ui</module>
                                 <module>org.wso2.carbon.mediator.conditionalrouter.ui</module>
-                                <module>org.wso2.carbon.mediator.dblookup.ui</module>
+				<module>org.wso2.carbon.mediator.dblookup.ui</module>
                                 <module>org.wso2.carbon.mediator.dbreport.ui</module>
+				<module>org.wso2.carbon.mediator.drop.ui</module>
                                 <module>org.wso2.carbon.mediator.ejb.ui</module>
                                 <module>org.wso2.carbon.mediator.enqueue.ui</module>
                                 <module>org.wso2.carbon.mediator.enrich.ui</module>
                                 <module>org.wso2.carbon.mediator.entitlement.ui</module>
                                 <module>org.wso2.carbon.mediator.event.ui</module>
+                                <module>org.wso2.carbon.mediator.fastXSLT.ui</module>
 				<module>org.wso2.carbon.mediator.fault.ui</module>
 				<module>org.wso2.carbon.mediator.filter.ui</module>
 				<module>org.wso2.carbon.mediator.header.ui</module>
@@ -62,10 +64,12 @@
 			        <module>org.wso2.carbon.mediator.payloadfactory.ui</module>
 			        <module>org.wso2.carbon.mediator.property.ui</module> 	         					<module>org.wso2.carbon.mediator.respond.ui</module>
 				<module>org.wso2.carbon.mediator.rmsequence.ui</module>
+				<module>org.wso2.carbon.mediator.rule.ui</module>
 				<module>org.wso2.carbon.mediator.script.ui</module>
 				<module>org.wso2.carbon.mediator.send.ui</module>
 				<module>org.wso2.carbon.mediator.sequence.ui</module>
 				<module>org.wso2.carbon.mediator.spring.ui</module>
+			        <module>org.wso2.carbon.mediator.smooks.ui</module>
 				<module>org.wso2.carbon.mediator.store.ui</module>
 				<module>org.wso2.carbon.mediator.switch.ui</module>
 				<module>org.wso2.carbon.mediator.target.ui</module>

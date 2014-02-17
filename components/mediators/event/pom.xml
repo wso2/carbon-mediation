@@ -33,34 +33,6 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>org.wso2.carbon.mediator.event.ui</module>
         <module>org.wso2.carbon.mediator.event</module>
     </modules>
-
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-core</artifactId>
-                <version>${synapse.version.event}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.event.core</artifactId>
-                <version>${wso2carbon.version.event}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.event.ws</artifactId>
-                <version>${wso2carbon.version.event}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <properties>
-        <wso2carbon.version.event>4.3.0-SNAPSHOT</wso2carbon.version.event>
-        <synapse.version.event>${synapse.version}</synapse.version.event>
-        <axis2.wso2.version.smooks>${axis2.wso2.version}</axis2.wso2.version.smooks>
-    </properties>
 </project>

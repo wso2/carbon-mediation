@@ -33,7 +33,6 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>org.wso2.carbon.mediator.command.ui</module>
         <module>org.wso2.carbon.mediator.command.services</module>
     </modules>
     

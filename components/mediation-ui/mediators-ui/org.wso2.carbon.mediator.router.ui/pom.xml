@@ -91,11 +91,13 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.mediator.target</artifactId>
-            <version>${wso2carbon.version}</version>
-        </dependency>
+            <artifactId>org.wso2.carbon.mediator.router.impl</artifactId>
+ 
+<version>${wso2carbon.version}</version>
+       </dependency>
+
     </dependencies>
 
 </project>

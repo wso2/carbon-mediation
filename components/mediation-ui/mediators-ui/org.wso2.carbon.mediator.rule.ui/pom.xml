@@ -93,12 +93,10 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.rule.common</artifactId>
-            <version>${wso2carbon.version.mediators}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.rule.mediation</artifactId>
-            <version>${wso2carbon.version.mediators}</version>
         </dependency>
     </dependencies>
 
