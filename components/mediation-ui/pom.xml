@@ -50,6 +50,7 @@
             <module>org.wso2.carbon.rest.api.ui</module>
             <module>org.wso2.carbon.task.ui</module>
             <module>org.wso2.carbon.endpoint.ui</module>
+            <module>mediators-ui</module>
          </modules>
       </profile>
    </profiles>

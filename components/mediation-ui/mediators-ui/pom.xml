@@ -21,115 +21,60 @@
 
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>carbon-mediation-components</artifactId>
+        <artifactId>mediation-ui</artifactId>
         <version>4.3.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
     <version>4.3.0-SNAPSHOT</version>
-    <artifactId>mediators</artifactId>
+    <artifactId>mediators-ui</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediators Aggregator Module</name>
     <url>http://wso2.org</url>
 
 			<modules>
-				<module>target-mediator</module>
-				<!--module>log</module>
-				<module>send</module-->
-				<!--module>class</module-->
-				<!--module>calltemplate</module>
-				<module>aggregate</module>
-				<module>clone</module>
-				<module>dblookup</module>
-				<module>fault</module>
-				<module>header</module>
-				<module>property</module>
-				<module>switch</module>
-                		<module>store</module>
-				<module>validate</module>
-				<module>xslt</module>
-				<module>callout</module-->
-				<!--module>command</module-->
-				<!--module>dbreport</module>
-				<module>filter</module>
-				<module>iterate</module>
-				<module>rmsequence</module>
-				<module>script</module>
-				<module>sequence</module>
-				<module>spring</module>
-				<module>throttle</module>
-				<module>xquery</module>
-				<module>cache</module>
-				<module>in</module>
-				<module>out</module>
-				<module>drop</module-->
-				<module>router</module>
-				<!--module>event</module-->
-				<!--module>entitlement</module>
-				<module>oauth</module>
-				<module>transaction</module>
-				<module>rule</module-->
-				<!--module>autoscale</module-->
-				<!--module>uiless</module>
-				<module>enqueue</module>
-			  	<module>smooks</module>
-                                <module>bam</module>
-			  	<module>enrich</module>
-			  	<module>urlrewrite</module>
-			  	<module>conditionalrouter</module>
-			  	<module>payloadFactory</module>
-                                <module>ejb</module>
-				<module>bean-mediator</module-->
-				<!--module>fastXSLT</module-->
-				<!--module>loopback</module>
-				<module>respond</module>
-                                <module>call</module-->
-			</modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.core</artifactId>
-                <version>${wso2carbon.version.mediators}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.mediator.service</artifactId>
-                <version>${wso2carbon.version.mediators}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-core</artifactId>
-                <version>${synapse.version.mediators}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.synapse</groupId>
-                <artifactId>synapse-extensions</artifactId>
-                <version>${synapse.version.mediators}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.registry.core</artifactId>
-                <version>${wso2carbon.version.mediators}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.sequences.ui</artifactId>
-                <version>${wso2carbon.version.mediators}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.logging</artifactId>
-                <version>${wso2carbon.version.mediators}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <properties>
-        <wso2carbon.version.mediators>${wso2carbon.version}</wso2carbon.version.mediators>
-        <synapse.version.mediators>${synapse.version}</synapse.version.mediators>
-    </properties>
+                                <module>org.wso2.carbon.mediator.bean.ui</module>
+				<module>org.wso2.carbon.mediator.drop.ui</module>
+                                <module>org.wso2.carbon.mediator.aggregate.ui</module>
+                                <module>org.wso2.carbon.mediator.cache.ui</module>
+                                <module>org.wso2.carbon.mediator.callout.ui</module>
+                                <module>org.wso2.carbon.mediator.calltemplate.ui</module>
+                                <module>org.wso2.carbon.mediator.call.ui</module>
+                                <module>org.wso2.carbon.mediator.clazz.ui</module>
+                                <module>org.wso2.carbon.mediator.clone.ui</module>
+                                <module>org.wso2.carbon.mediator.command.ui</module>
+                                <module>org.wso2.carbon.mediator.conditionalrouter.ui</module>
+                                <module>org.wso2.carbon.mediator.dblookup.ui</module>
+                                <module>org.wso2.carbon.mediator.dbreport.ui</module>
+                                <module>org.wso2.carbon.mediator.ejb.ui</module>
+                                <module>org.wso2.carbon.mediator.enqueue.ui</module>
+                                <module>org.wso2.carbon.mediator.enrich.ui</module>
+                                <module>org.wso2.carbon.mediator.entitlement.ui</module>
+                                <module>org.wso2.carbon.mediator.event.ui</module>
+				<module>org.wso2.carbon.mediator.fault.ui</module>
+				<module>org.wso2.carbon.mediator.filter.ui</module>
+				<module>org.wso2.carbon.mediator.header.ui</module>
+				<module>org.wso2.carbon.mediator.in.ui</module>
+				<module>org.wso2.carbon.mediator.log.ui</module>
+				<module>org.wso2.carbon.mediator.loopback.ui</module>
+			        <module>org.wso2.carbon.mediator.out.ui</module>
+			        <module>org.wso2.carbon.mediator.payloadfactory.ui</module>
+			        <module>org.wso2.carbon.mediator.property.ui</module> 	         					<module>org.wso2.carbon.mediator.respond.ui</module>
+				<module>org.wso2.carbon.mediator.rmsequence.ui</module>
+				<module>org.wso2.carbon.mediator.script.ui</module>
+				<module>org.wso2.carbon.mediator.send.ui</module>
+				<module>org.wso2.carbon.mediator.sequence.ui</module>
+				<module>org.wso2.carbon.mediator.spring.ui</module>
+				<module>org.wso2.carbon.mediator.store.ui</module>
+				<module>org.wso2.carbon.mediator.switch.ui</module>
+				<module>org.wso2.carbon.mediator.target.ui</module>
+				<module>org.wso2.carbon.mediator.throttle.ui</module>
+				<module>org.wso2.carbon.mediator.uiless.ui</module>
+				<module>org.wso2.carbon.mediator.urlrewrite.ui</module>
+				<module>org.wso2.carbon.mediator.validate.ui</module>
+				<module>org.wso2.carbon.mediator.xquery.ui</module>
+				<module>org.wso2.carbon.mediator.xslt.ui</module>
+			</modules>    
 
 </project>

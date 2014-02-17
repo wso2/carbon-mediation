@@ -1,0 +1,754 @@
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns="http://org.apache.synapse/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax215="http://io.java/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ax213="http://hl7v2.uhn.ca/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax211="http://entity.store.hl7.messaging.business.carbon.wso2.org/xsd" xmlns:tns="http://admin.store.hl7.messaging.business.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://admin.store.hl7.messaging.business.carbon.wso2.org">
+    <wsdl:documentation>HL7StoreAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://hl7v2.uhn.ca/xsd">
+            <xs:complexType name="HL7Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="errorCode" type="xs:int"></xs:element>
+                    <xs:element minOccurs="0" name="fieldPosition" type="xs:int"></xs:element>
+                    <xs:element minOccurs="0" name="message" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="segmentName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="segmentRepetition" type="xs:int"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://entity.store.hl7.messaging.business.carbon.wso2.org/xsd">
+            <xs:complexType name="TransferableHL7Message">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="controlId" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="date" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="envelope" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="id" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="rawMessage" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                    <xs:element minOccurs="0" name="timestamp" type="xs:long"></xs:element>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://io.java/xsd">
+            <xs:complexType name="IOException">
+                <xs:sequence></xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax214="http://hl7v2.uhn.ca/xsd" xmlns:ax216="http://io.java/xsd" xmlns:ax212="http://entity.store.hl7.messaging.business.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.synapse/xsd">
+            <xs:import namespace="http://entity.store.hl7.messaging.business.carbon.wso2.org/xsd"></xs:import>
+            <xs:import namespace="http://hl7v2.uhn.ca/xsd"></xs:import>
+            <xs:import namespace="http://io.java/xsd"></xs:import>
+            <xs:element name="updateMessage">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="er7Payload" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="xmlPayload" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateMessageResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sendMessage">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="msg" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="proxyName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sendMessageResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="search">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="searchResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax212:TransferableHL7Message"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSize">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSizeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSearchSize">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="query" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getSearchSizeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="HL7StoreAdminServiceHL7Exception">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="HL7Exception" nillable="true" type="ax214:HL7Exception"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="HL7StoreAdminServiceIOException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="IOException" nillable="true" type="ax215:IOException"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="HL7StoreAdminServiceClassNotFoundException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="ClassNotFoundException" nillable="true" type="xs:anyType"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessagesPaginated">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="pageNumber" type="xs:int"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessagesPaginatedResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax212:TransferableHL7Message"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessages">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessagesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax212:TransferableHL7Message"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessage">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax212:TransferableHL7Message"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getHL7StoreNames">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getHL7StoreNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getHL7Proxies">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getHL7ProxiesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getClassName">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getClassNameResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="flushMessages">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="storeName" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="flushMessagesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getSizeRequest">
+        <wsdl:part name="parameters" element="ns:getSize"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getSizeResponse">
+        <wsdl:part name="parameters" element="ns:getSizeResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMessageRequest">
+        <wsdl:part name="parameters" element="ns:getMessage"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMessageResponse">
+        <wsdl:part name="parameters" element="ns:getMessageResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="HL7StoreAdminServiceHL7Exception">
+        <wsdl:part name="parameters" element="ns:HL7StoreAdminServiceHL7Exception"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="HL7StoreAdminServiceIOException">
+        <wsdl:part name="parameters" element="ns:HL7StoreAdminServiceIOException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="HL7StoreAdminServiceClassNotFoundException">
+        <wsdl:part name="parameters" element="ns:HL7StoreAdminServiceClassNotFoundException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="sendMessageRequest">
+        <wsdl:part name="parameters" element="ns:sendMessage"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="sendMessageResponse">
+        <wsdl:part name="parameters" element="ns:sendMessageResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="updateMessageRequest">
+        <wsdl:part name="parameters" element="ns:updateMessage"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="updateMessageResponse">
+        <wsdl:part name="parameters" element="ns:updateMessageResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getHL7StoreNamesRequest">
+        <wsdl:part name="parameters" element="ns:getHL7StoreNames"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getHL7StoreNamesResponse">
+        <wsdl:part name="parameters" element="ns:getHL7StoreNamesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getHL7ProxiesRequest">
+        <wsdl:part name="parameters" element="ns:getHL7Proxies"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getHL7ProxiesResponse">
+        <wsdl:part name="parameters" element="ns:getHL7ProxiesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="searchRequest">
+        <wsdl:part name="parameters" element="ns:search"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="searchResponse">
+        <wsdl:part name="parameters" element="ns:searchResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getClassNameRequest">
+        <wsdl:part name="parameters" element="ns:getClassName"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getClassNameResponse">
+        <wsdl:part name="parameters" element="ns:getClassNameResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getSearchSizeRequest">
+        <wsdl:part name="parameters" element="ns:getSearchSize"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getSearchSizeResponse">
+        <wsdl:part name="parameters" element="ns:getSearchSizeResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="flushMessagesRequest">
+        <wsdl:part name="parameters" element="ns:flushMessages"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="flushMessagesResponse">
+        <wsdl:part name="parameters" element="ns:flushMessagesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMessagesRequest">
+        <wsdl:part name="parameters" element="ns:getMessages"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMessagesResponse">
+        <wsdl:part name="parameters" element="ns:getMessagesResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMessagesPaginatedRequest">
+        <wsdl:part name="parameters" element="ns:getMessagesPaginated"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMessagesPaginatedResponse">
+        <wsdl:part name="parameters" element="ns:getMessagesPaginatedResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="HL7StoreAdminServicePortType">
+        <wsdl:operation name="getSize">
+            <wsdl:input message="tns:getSizeRequest" wsaw:Action="urn:getSize"></wsdl:input>
+            <wsdl:output message="tns:getSizeResponse" wsaw:Action="urn:getSizeResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessage">
+            <wsdl:input message="tns:getMessageRequest" wsaw:Action="urn:getMessage"></wsdl:input>
+            <wsdl:output message="tns:getMessageResponse" wsaw:Action="urn:getMessageResponse"></wsdl:output>
+            <wsdl:fault message="tns:HL7StoreAdminServiceHL7Exception" name="HL7StoreAdminServiceHL7Exception" wsaw:Action="urn:getMessageHL7StoreAdminServiceHL7Exception"></wsdl:fault>
+            <wsdl:fault message="tns:HL7StoreAdminServiceIOException" name="HL7StoreAdminServiceIOException" wsaw:Action="urn:getMessageHL7StoreAdminServiceIOException"></wsdl:fault>
+            <wsdl:fault message="tns:HL7StoreAdminServiceClassNotFoundException" name="HL7StoreAdminServiceClassNotFoundException" wsaw:Action="urn:getMessageHL7StoreAdminServiceClassNotFoundException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="sendMessage">
+            <wsdl:input message="tns:sendMessageRequest" wsaw:Action="urn:sendMessage"></wsdl:input>
+            <wsdl:output message="tns:sendMessageResponse" wsaw:Action="urn:sendMessageResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateMessage">
+            <wsdl:input message="tns:updateMessageRequest" wsaw:Action="urn:updateMessage"></wsdl:input>
+            <wsdl:output message="tns:updateMessageResponse" wsaw:Action="urn:updateMessageResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getHL7StoreNames">
+            <wsdl:input message="tns:getHL7StoreNamesRequest" wsaw:Action="urn:getHL7StoreNames"></wsdl:input>
+            <wsdl:output message="tns:getHL7StoreNamesResponse" wsaw:Action="urn:getHL7StoreNamesResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getHL7Proxies">
+            <wsdl:input message="tns:getHL7ProxiesRequest" wsaw:Action="urn:getHL7Proxies"></wsdl:input>
+            <wsdl:output message="tns:getHL7ProxiesResponse" wsaw:Action="urn:getHL7ProxiesResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <wsdl:input message="tns:searchRequest" wsaw:Action="urn:search"></wsdl:input>
+            <wsdl:output message="tns:searchResponse" wsaw:Action="urn:searchResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <wsdl:input message="tns:getClassNameRequest" wsaw:Action="urn:getClassName"></wsdl:input>
+            <wsdl:output message="tns:getClassNameResponse" wsaw:Action="urn:getClassNameResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSearchSize">
+            <wsdl:input message="tns:getSearchSizeRequest" wsaw:Action="urn:getSearchSize"></wsdl:input>
+            <wsdl:output message="tns:getSearchSizeResponse" wsaw:Action="urn:getSearchSizeResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="flushMessages">
+            <wsdl:input message="tns:flushMessagesRequest" wsaw:Action="urn:flushMessages"></wsdl:input>
+            <wsdl:output message="tns:flushMessagesResponse" wsaw:Action="urn:flushMessagesResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessages">
+            <wsdl:input message="tns:getMessagesRequest" wsaw:Action="urn:getMessages"></wsdl:input>
+            <wsdl:output message="tns:getMessagesResponse" wsaw:Action="urn:getMessagesResponse"></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessagesPaginated">
+            <wsdl:input message="tns:getMessagesPaginatedRequest" wsaw:Action="urn:getMessagesPaginated"></wsdl:input>
+            <wsdl:output message="tns:getMessagesPaginatedResponse" wsaw:Action="urn:getMessagesPaginatedResponse"></wsdl:output>
+            <wsdl:fault message="tns:HL7StoreAdminServiceHL7Exception" name="HL7StoreAdminServiceHL7Exception" wsaw:Action="urn:getMessagesPaginatedHL7StoreAdminServiceHL7Exception"></wsdl:fault>
+            <wsdl:fault message="tns:HL7StoreAdminServiceIOException" name="HL7StoreAdminServiceIOException" wsaw:Action="urn:getMessagesPaginatedHL7StoreAdminServiceIOException"></wsdl:fault>
+            <wsdl:fault message="tns:HL7StoreAdminServiceClassNotFoundException" name="HL7StoreAdminServiceClassNotFoundException" wsaw:Action="urn:getMessagesPaginatedHL7StoreAdminServiceClassNotFoundException"></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="HL7StoreAdminServiceSoap11Binding" type="tns:HL7StoreAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap:binding>
+        <wsdl:operation name="getSize">
+            <soap:operation soapAction="urn:getSize" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessage">
+            <soap:operation soapAction="urn:getMessage" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="HL7StoreAdminServiceIOException">
+                <soap:fault use="literal" name="HL7StoreAdminServiceIOException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="HL7StoreAdminServiceClassNotFoundException">
+                <soap:fault use="literal" name="HL7StoreAdminServiceClassNotFoundException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="HL7StoreAdminServiceHL7Exception">
+                <soap:fault use="literal" name="HL7StoreAdminServiceHL7Exception"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="sendMessage">
+            <soap:operation soapAction="urn:sendMessage" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateMessage">
+            <soap:operation soapAction="urn:updateMessage" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getHL7StoreNames">
+            <soap:operation soapAction="urn:getHL7StoreNames" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getHL7Proxies">
+            <soap:operation soapAction="urn:getHL7Proxies" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <soap:operation soapAction="urn:search" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSearchSize">
+            <soap:operation soapAction="urn:getSearchSize" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <soap:operation soapAction="urn:getClassName" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="flushMessages">
+            <soap:operation soapAction="urn:flushMessages" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessagesPaginated">
+            <soap:operation soapAction="urn:getMessagesPaginated" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+            <wsdl:fault name="HL7StoreAdminServiceIOException">
+                <soap:fault use="literal" name="HL7StoreAdminServiceIOException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="HL7StoreAdminServiceClassNotFoundException">
+                <soap:fault use="literal" name="HL7StoreAdminServiceClassNotFoundException"></soap:fault>
+            </wsdl:fault>
+            <wsdl:fault name="HL7StoreAdminServiceHL7Exception">
+                <soap:fault use="literal" name="HL7StoreAdminServiceHL7Exception"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMessages">
+            <soap:operation soapAction="urn:getMessages" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"></soap:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="HL7StoreAdminServiceSoap12Binding" type="tns:HL7StoreAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"></soap12:binding>
+        <wsdl:operation name="getSize">
+            <soap12:operation soapAction="urn:getSize" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessage">
+            <soap12:operation soapAction="urn:getMessage" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="HL7StoreAdminServiceIOException">
+                <soap12:fault use="literal" name="HL7StoreAdminServiceIOException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="HL7StoreAdminServiceClassNotFoundException">
+                <soap12:fault use="literal" name="HL7StoreAdminServiceClassNotFoundException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="HL7StoreAdminServiceHL7Exception">
+                <soap12:fault use="literal" name="HL7StoreAdminServiceHL7Exception"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="sendMessage">
+            <soap12:operation soapAction="urn:sendMessage" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateMessage">
+            <soap12:operation soapAction="urn:updateMessage" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getHL7StoreNames">
+            <soap12:operation soapAction="urn:getHL7StoreNames" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getHL7Proxies">
+            <soap12:operation soapAction="urn:getHL7Proxies" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <soap12:operation soapAction="urn:search" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSearchSize">
+            <soap12:operation soapAction="urn:getSearchSize" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <soap12:operation soapAction="urn:getClassName" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="flushMessages">
+            <soap12:operation soapAction="urn:flushMessages" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessagesPaginated">
+            <soap12:operation soapAction="urn:getMessagesPaginated" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+            <wsdl:fault name="HL7StoreAdminServiceIOException">
+                <soap12:fault use="literal" name="HL7StoreAdminServiceIOException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="HL7StoreAdminServiceClassNotFoundException">
+                <soap12:fault use="literal" name="HL7StoreAdminServiceClassNotFoundException"></soap12:fault>
+            </wsdl:fault>
+            <wsdl:fault name="HL7StoreAdminServiceHL7Exception">
+                <soap12:fault use="literal" name="HL7StoreAdminServiceHL7Exception"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMessages">
+            <soap12:operation soapAction="urn:getMessages" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="HL7StoreAdminServiceHttpBinding" type="tns:HL7StoreAdminServicePortType">
+        <http:binding verb="POST"></http:binding>
+        <wsdl:operation name="getSize">
+            <http:operation location="getSize"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessage">
+            <http:operation location="getMessage"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sendMessage">
+            <http:operation location="sendMessage"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateMessage">
+            <http:operation location="updateMessage"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getHL7StoreNames">
+            <http:operation location="getHL7StoreNames"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getHL7Proxies">
+            <http:operation location="getHL7Proxies"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="search">
+            <http:operation location="search"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getSearchSize">
+            <http:operation location="getSearchSize"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getClassName">
+            <http:operation location="getClassName"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="flushMessages">
+            <http:operation location="flushMessages"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessagesPaginated">
+            <http:operation location="getMessagesPaginated"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getMessages">
+            <http:operation location="getMessages"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="HL7StoreAdminService">
+        <wsdl:port name="HL7StoreAdminServiceHttpsSoap11Endpoint" binding="tns:HL7StoreAdminServiceSoap11Binding">
+            <soap:address location="https://localhost:8243/services/HL7StoreAdminService.HL7StoreAdminServiceHttpsSoap11Endpoint"></soap:address>
+        </wsdl:port>
+        <wsdl:port name="HL7StoreAdminServiceHttpsSoap12Endpoint" binding="tns:HL7StoreAdminServiceSoap12Binding">
+            <soap12:address location="https://localhost:8243/services/HL7StoreAdminService.HL7StoreAdminServiceHttpsSoap12Endpoint"></soap12:address>
+        </wsdl:port>
+        <wsdl:port name="HL7StoreAdminServiceHttpsEndpoint" binding="tns:HL7StoreAdminServiceHttpBinding">
+            <http:address location="https://localhost:8243/services/HL7StoreAdminService.HL7StoreAdminServiceHttpsEndpoint"></http:address>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
