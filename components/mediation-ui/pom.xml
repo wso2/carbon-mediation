@@ -40,6 +40,16 @@
             <module>org.wso2.carbon.localentry.ui</module>
             <module>org.wso2.carbon.sequences.ui</module>
             <module>org.wso2.carbon.mediation.templates.ui</module>
+            <module>org.wso2.carbon.mediation.artifactuploader.ui</module>
+	    <module>org.wso2.carbon.mediation.configadmin.ui</module>
+	    <module>org.wso2.carbon.mediation.library.ui</module>
+            <module>org.wso2.carbon.message.processor.ui</module>
+            <module>org.wso2.carbon.message.store.ui</module>
+            <module>org.wso2.carbon.priority.executors.ui</module>
+            <module>org.wso2.carbon.proxyadmin.ui</module>
+            <module>org.wso2.carbon.rest.api.ui</module>
+            <module>org.wso2.carbon.task.ui</module>
+            <module>org.wso2.carbon.endpoint.ui</module>
          </modules>
       </profile>
    </profiles>

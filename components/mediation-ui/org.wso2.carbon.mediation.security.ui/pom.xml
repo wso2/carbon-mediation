@@ -13,22 +13,19 @@
 
 	<parent>
 		<groupId>org.wso2.carbon</groupId>
-		<artifactId>mediation-security</artifactId>
+		<artifactId>mediation-ui</artifactId>
 		<version>4.3.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.wso2.carbon.mediation.security.ui</artifactId>
+        <groupId>org.wso2.carbon</groupId>
+	<version>4.3.0-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>WSO2 Carbon - Synapse Security-UI</name>
 	<description>This is a core module of the project.</description>
 
 	<dependencies>
-		<!--<dependency> -->
-		<!--<groupId>org.apache.woden.wso2</groupId> -->
-		<!--<artifactId>woden</artifactId> -->
-		<!--</dependency> -->
 
 		<dependency>
 			<groupId>org.apache.axis2.wso2</groupId>
@@ -37,7 +34,7 @@
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.sequences.common</artifactId>
-			<version>${carbon.platform.version}</version>
+			<version>${wso2carbon.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
@@ -46,7 +43,6 @@
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.utils</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.synapse</groupId>
@@ -65,12 +61,13 @@
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.mediation.library.stub</artifactId>
-			<version>${project.version}</version>
+			<version>${wso2carbon.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.registry.common.ui</artifactId>
+			<version>${wso2carbon.old.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
@@ -79,11 +76,12 @@
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.registry.extensions</artifactId>
+			<version>${wso2carbon.old.version}</version>                  
 		</dependency>
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.mediation.security</artifactId>
-			<version>${project.version}</version>
+			<version>${wso2carbon.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
@@ -100,12 +98,13 @@
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.registry.properties.stub</artifactId>
+			<version>${wso2carbon.old.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.wso2.carbon</groupId>
 			<artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
-			<version>${project.version}</version>
+			<version>${wso2carbon.version}</version>
 		</dependency>
 	</dependencies>
 

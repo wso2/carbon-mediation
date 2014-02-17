@@ -18,7 +18,7 @@
 
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>scheduled-tasks</artifactId>
+        <artifactId>mediation-ui</artifactId>
         <version>4.3.0-SNAPSHOT</version>
     </parent>
 
@@ -66,22 +66,18 @@
         <dependency>
             <groupId>org.apache.axis2.wso2</groupId>
             <artifactId>axis2</artifactId>
-            <version>${orbit.version.axis2}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-tasks</artifactId>
-            <version>${synapse.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-commons</artifactId>
-            <version>${synapse.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ui</artifactId>
-            <version>${wso2carbon.version}</version>
         </dependency>
 	<dependency>
             <groupId>org.wso2.carbon</groupId>

@@ -394,6 +394,11 @@
             <artifactId>openjpa-all</artifactId>
             <version>${openjpa.version}</version>
         </dependency>
+              <dependency>
+            <groupId>org.apache.openjpa.wso2</groupId>
+            <artifactId>openjpa</artifactId>
+            <version>${openjpa.version}</version>
+        </dependency>
         
            <dependency>
                 <groupId>com.h2database.wso2</groupId>

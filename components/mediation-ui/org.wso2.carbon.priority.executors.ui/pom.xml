@@ -18,9 +18,8 @@
 
     <parent>
         <groupId>org.wso2.carbon</groupId>
-        <artifactId>priority-mediation</artifactId>
+        <artifactId>mediation-ui</artifactId>
         <version>4.3.0-SNAPSHOT</version>
-	<relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -42,7 +41,6 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <!--<Fragment-Host>org.wso2.carbon.ui</Fragment-Host>-->
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
                             org.wso2.carbon.priority.executors.ui.*,
@@ -120,6 +118,7 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.priority.executors.stub</artifactId>
+            <version>${wso2carbon.version}</version> 
         </dependency>
     </dependencies>
 
