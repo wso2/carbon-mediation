@@ -30,7 +30,7 @@
     <artifactId>bam-mediator</artifactId>
     <version>4.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon BAM Mediator Module</name>
+    <name>WSO2 Carbon - BAM Mediator Module</name>
     <url>http://wso2.org</url>
 
     <modules>

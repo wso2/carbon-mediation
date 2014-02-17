@@ -30,7 +30,7 @@
     <groupId>org.wso2.carbon</groupId>
     <artifactId>fastXSLT-mediator</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon FastXSLT Mediator Module</name>
+    <name>WSO2 Carbon - FastXSLT Mediator Module</name>
     <url>http://wso2.org</url>
 
     <modules>
