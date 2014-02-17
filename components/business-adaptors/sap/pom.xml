@@ -207,7 +207,7 @@
             <artifactId>axis2-transport-base</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.ws.commons.axiom.wso2</groupId>
+            <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
             <exclusions>
                 <exclusion>

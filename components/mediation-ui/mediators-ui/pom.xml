@@ -60,9 +60,11 @@
 				<module>org.wso2.carbon.mediator.in.ui</module>
 				<module>org.wso2.carbon.mediator.log.ui</module>
 				<module>org.wso2.carbon.mediator.loopback.ui</module>
+                                <module>org.wso2.carbon.mediator.oauth.ui</module>
 			        <module>org.wso2.carbon.mediator.out.ui</module>
 			        <module>org.wso2.carbon.mediator.payloadfactory.ui</module>
-			        <module>org.wso2.carbon.mediator.property.ui</module> 	         					<module>org.wso2.carbon.mediator.respond.ui</module>
+			        <module>org.wso2.carbon.mediator.property.ui</module>
+   			        <module>org.wso2.carbon.mediator.respond.ui</module>
 				<module>org.wso2.carbon.mediator.rmsequence.ui</module>
 				<module>org.wso2.carbon.mediator.rule.ui</module>
 				<module>org.wso2.carbon.mediator.script.ui</module>
@@ -79,6 +81,8 @@
 				<module>org.wso2.carbon.mediator.validate.ui</module>
 				<module>org.wso2.carbon.mediator.xquery.ui</module>
 				<module>org.wso2.carbon.mediator.xslt.ui</module>
+                                <module>org.wso2.carbon.mediator.router.ui</module>
+				<module>org.wso2.carbon.mediator.iterate.ui</module>
 			</modules>    
 
 </project>

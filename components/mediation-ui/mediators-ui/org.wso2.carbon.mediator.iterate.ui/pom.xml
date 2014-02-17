@@ -92,6 +92,5 @@
             <artifactId>org.wso2.carbon.logging</artifactId>
         </dependency>
     </dependencies>
-
 </project>
 

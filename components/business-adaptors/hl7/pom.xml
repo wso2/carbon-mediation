@@ -38,7 +38,7 @@
         <module>org.wso2.carbon.business.messaging.hl7.message</module>
         <module>org.wso2.carbon.business.messaging.hl7.transport</module>
         <module>org.wso2.carbon.business.messaging.hl7.store</module>
-        <!--module>org.wso2.carbon.business.messaging.hl7.samples</module-->
+        <module>org.wso2.carbon.business.messaging.hl7.samples</module>
     </modules>   
     
 </project>
