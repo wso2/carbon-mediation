@@ -42,6 +42,8 @@
             <module>components/mediation-connector</module>
             <module>components/mediators</module>
             <module>components/mediation-ui</module>
+	    <module>features/business-adaptors</module>
+	    <module>features/mediation-config-admin-features</module>
          </modules>
       </profile>
    </profiles>
@@ -391,6 +393,16 @@
          </dependency>
          <!--Service Stub Ends here-->
          <!--Mediation Dependencies Start here-->
+         <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.mediation.configadmin</artifactId>
+                <version>${wso2carbon.version}</version>
+         </dependency>
+         <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.mediation.configadmin.ui</artifactId>
+                <version>${wso2carbon.version}</version>
+         </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.business.messaging.hl7.message</artifactId>
