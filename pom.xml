@@ -481,7 +481,26 @@
             <artifactId>org.wso2.carbon.mediator.router.impl</artifactId>
 	    <version>${wso2carbon.version}</version>
          </dependency>
+	<dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.ui</artifactId>
+	    <version>${wso2carbon.version}</version>
+        </dependency>
+
+ 
          <!--Mediation Dependencies Ends here-->
+
+         <!--Feature dependencies Start here-->
+         
+     
+       
+
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.business.messaging.hl7.store.ui</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
+         <!--Feature dependencies End here -->
          <!--Misc-->
          <dependency>
             <groupId>ca.uhn.hapi.wso2</groupId>
