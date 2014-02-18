@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ ~ Copyright (c) 2009-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~      http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+      <groupId>org.wso2.carbon</groupId>
+      <artifactId>mediation-admin-features</artifactId>
+      <version>4.3.0-SNAPSHOT</version>
+   </parent>
+   <groupId>org.wso2.carbon</groupId>
+   <version>4.3.0-SNAPSHOT</version>
+   <modelVersion>4.0.0</modelVersion>
+   <artifactId>org.wso2.carbon.mediation.admin.feature</artifactId>
+   <packaging>pom</packaging>
+   <name>WSO2 Carbon - Mediation Admin Features</name>
+   <url>http://wso2.org</url>
+   <description>This feature contains admin features of mediation</description>
+
+    <dependencies>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.endpoint</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.connector.core</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.localentry</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediation.artifactuploader</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediation.library</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediation.security</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediation.templates</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediation.templates.common</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediation.templates.service</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediator.clazz.services</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediator.service</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.message.processor</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.message.store</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.proxyadmin</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.proxyadmin.common</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.priority.executors</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.rest.api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.sequences</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.sequences.common</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.task</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.task.services</artifactId>
+      </dependency>
+   </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.wso2.maven</groupId>
+                <artifactId>carbon-p2-plugin</artifactId>
+                <version>${carbon.p2.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>4-p2-feature-generation</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-feature-gen</goal>
+                        </goals>
+                        <configuration>
+                            <id>org.wso2.carbon.mediation.admin.feature</id>
+                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                            <adviceFile>
+                                <properties>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
+                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
+                                </properties>
+                            </adviceFile>
+                            <bundles>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.connector.core</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.endpoint</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.localentry</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.artifactuploader</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.library</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.templates.common</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.templates.service</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.templates</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.clazz.services</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.service</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.message.processor</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.message.store</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.priority.executors</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.proxyadmin.common</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.proxyadmin</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.rest.api</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences.common</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.task</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.task.services</bundleDef>
+
+                            </bundles>
+                            <importFeatures>
+                                <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${wso2carbon.version}</importFeatureDef>
+                            </importFeatures>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
