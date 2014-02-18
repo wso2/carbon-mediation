@@ -36,6 +36,7 @@
             <module>components/mediation-registry</module>
             <module>components/mediation-initializer</module>
             <module>components/mediation-monitor</module>
+            <module>components/mediation-config-admin</module>
             <module>components/business-adaptors</module>
             <module>components/mediation-admin</module>
             <module>components/mediation-connector</module>
@@ -273,6 +274,11 @@
          </dependency>
          <!-- Carbon Old version Ends Here -->
          <!--Service Stub Starts here -->
+	<dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.configadmin.stub</artifactId>
+            <version>${wso2carbon.version}</version>
+        </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ndatasource.stub</artifactId>
