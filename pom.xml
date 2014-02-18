@@ -274,6 +274,12 @@
             <artifactId>org.wso2.carbon.registry.common.ui</artifactId>
             <version>${wso2carbon.old.version}</version>
          </dependency>
+	 <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.event.server.feature</artifactId>
+            <version>${wso2carbon.old.version}</version>
+		<type>zip</type>
+            </dependency>
          <!-- Carbon Old version Ends Here -->
          <!--Service Stub Starts here -->
 	<dependency>
@@ -504,7 +510,26 @@
 
          <!--Feature dependencies Start here-->
          
-     
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.mediation.initializer.ui</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.mediation.registry</artifactId>
+                <version>${wso2carbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.startup</artifactId>
+                <version>${wso2carbon.old.version}</version>
+            </dependency>
        
 
         <dependency>
