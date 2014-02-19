@@ -41,6 +41,8 @@
 				<module>event</module>
 				<module>fastXSLT</module>
 				<module>smooks</module>
+				<module>entitlement</module>
+				<module>oauth</module>
 			</modules>
 
 </project>
