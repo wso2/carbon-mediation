@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
  ~ Copyright (c) 2009-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
@@ -14,12 +14,8 @@
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <parent>
       <groupId>org.wso2.carbon</groupId>
       <artifactId>mediation-admin-features</artifactId>
       <version>4.3.0-SNAPSHOT</version>
@@ -32,8 +28,7 @@
    <name>WSO2 Carbon - Mediation Admin Features</name>
    <url>http://wso2.org</url>
    <description>This feature contains admin features of mediation</description>
-
-    <dependencies>
+   <dependencies>
       <dependency>
          <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.endpoint</artifactId>
@@ -119,30 +114,29 @@
          <artifactId>org.wso2.carbon.task.services</artifactId>
       </dependency>
    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.wso2.maven</groupId>
-                <artifactId>carbon-p2-plugin</artifactId>
-                <version>${carbon.p2.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>4-p2-feature-generation</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>p2-feature-gen</goal>
-                        </goals>
-                        <configuration>
-                            <id>org.wso2.carbon.mediation.admin.feature</id>
-                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
-                            <adviceFile>
-                                <properties>
-                                    <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
-                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
-                                </properties>
-                            </adviceFile>
-                            <bundles>
+   <build>
+      <plugins>
+         <plugin>
+            <groupId>org.wso2.maven</groupId>
+            <artifactId>carbon-p2-plugin</artifactId>
+            <version>${carbon.p2.plugin.version}</version>
+            <executions>
+               <execution>
+                  <id>4-p2-feature-generation</id>
+                  <phase>package</phase>
+                  <goals>
+                     <goal>p2-feature-gen</goal>
+                  </goals>
+                  <configuration>
+                     <id>org.wso2.carbon.mediation.admin.feature</id>
+                     <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                     <adviceFile>
+                        <properties>
+                           <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
+                           <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
+                        </properties>
+                     </adviceFile>
+                     <bundles>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.connector.core</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.endpoint</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.localentry</bundleDef>
@@ -164,18 +158,16 @@
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.task</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.task.services</bundleDef>
-
-                            </bundles>
-                            <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>
-                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${wso2carbon.version}</importFeatureDef>
-                            </importFeatures>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
+                     </bundles>
+                     <importFeatures>
+                        <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>
+                        <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
+                        <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${wso2carbon.version}</importFeatureDef>
+                     </importFeatures>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+      </plugins>
+   </build>
 </project>
