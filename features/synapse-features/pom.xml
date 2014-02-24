@@ -39,9 +39,9 @@
         <module>org.apache.synapse.wso2.feature</module>
         <module>org.apache.synapse.samples.feature</module>
 	<module>org.apache.synapse.transport.fix.feature</module>
-        <!--module>org.apache.synapse.transport.nhttp.feature</module>
+        <module>org.apache.synapse.transport.nhttp.feature</module>
         <module>org.apache.synapse.transport.vfs.feature</module>        
-        <module>org.apache.synapse.transport.vfs.smb.feature</module-->
-    </modules>
+        <module>org.apache.synapse.transport.vfs.smb.feature</module>
+   </modules>
 </project>
 

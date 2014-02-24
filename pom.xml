@@ -88,15 +88,20 @@
          </dependency>
          <dependency>
             <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-vfs-transport</artifactId>
+            <version>${synapse.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-tasks</artifactId>
             <version>${synapse.version}</version>
          </dependency>
-	 <dependency>
+         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-samples</artifactId>
             <version>${synapse.version}</version>
          </dependency>
-	 <dependency>
+         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-nhttp-transport</artifactId>
             <version>${synapse.version}</version>
@@ -106,11 +111,11 @@
             <artifactId>synapse-commons</artifactId>
             <version>${synapse.version}</version>
          </dependency>
-<dependency>
+         <dependency>
             <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-fix-transport</artifactId>    
-            <version>${synapse.version}</version>        
-        </dependency>
+            <artifactId>synapse-fix-transport</artifactId>
+            <version>${synapse.version}</version>
+         </dependency>
          <!--Synapse Versions End-->
          <!--axis2 Version Start-->
          <dependency>
@@ -156,6 +161,21 @@
             <groupId>org.apache.rampart.wso2</groupId>
             <artifactId>rampart-core</artifactId>
             <version>${rampart.wso2.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.httpcomponents.wso2</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.3.0.wso2v1</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.httpcomponents.wso2</groupId>
+            <artifactId>httpcore-nio</artifactId>
+            <version>4.2.3.wso2v3</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.httpcomponents.wso2</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.5.wso2v1</version>
          </dependency>
          <!-- Apache End here-->
          <!--Carbon common-->
@@ -666,25 +686,25 @@
             <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
-           <groupId>org.wso2.carbon</groupId>
-           <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
-           <version>${wso2carbon.old.version}</version>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
+            <version>${wso2carbon.old.version}</version>
          </dependency>
-	<dependency>
+         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.authenticator.stub</artifactId>
             <version>${wso2carbon.old.version}</version>
-        </dependency>
- 	<dependency>
+         </dependency>
+         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
             <version>${wso2carbon.old.version}</version>
-        </dependency>
-	<dependency>
+         </dependency>
+         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
             <version>4.2.2</version>
-        </dependency>
+         </dependency>
          <!--Mediation Dependencies Ends here-->
          <!--Feature dependencies Start here-->
          <dependency>
@@ -1017,8 +1037,6 @@
             <artifactId>org.wso2.carbon.relay.mediators.builder</artifactId>
             <version>${wso2carbon.version}</version>
          </dependency>
-
-
          <!--Feature dependencies End here -->
          <!--Misc-->
          <dependency>
@@ -1244,6 +1262,11 @@
             <version>${javax.ws.rs.version}</version>
          </dependency>
          <dependency>
+            <groupId>jsch.wso2</groupId>
+            <artifactId>jsch</artifactId>
+            <version>${jsch.wso2.version}</version>
+         </dependency>
+         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
             <version>${jaxb.impl.version}</version>
@@ -1429,62 +1452,77 @@
             <artifactId>gson</artifactId>
             <version>${com.google.code.gson.version}</version>
          </dependency>
-        <dependency>
+         <dependency>
             <groupId>libthrift.wso2</groupId>
             <artifactId>libthrift</artifactId>
             <version>${libthrift.wso2.version}</version>
-        </dependency>
-	<dependency>
+         </dependency>
+         <dependency>
             <groupId>slf4j.wso2</groupId>
             <artifactId>slf4j</artifactId>
             <version>${slf4j.wso2.version}</version>
-        </dependency>
-        <dependency>
-           <groupId>net.sf.saxon.wso2</groupId>
-           <artifactId>saxon</artifactId>
-           <version>${saxon.wso2.version}</version>
-        </dependency>
-	<dependency>
-           <groupId>org.quartz-scheduler.wso2</groupId>
-           <artifactId>quartz</artifactId>
-           <version>${quartz.wso2.version}</version>
-        </dependency>
- 	<dependency>
-	   <groupId>org.wso2.uri.template</groupId>
-	   <artifactId>wso2-uri-templates</artifactId>
-           <version>${org.wso2.uri.template.version}</version>
-	</dependency>
-      <dependency>
-         <groupId>org.wso2.caching</groupId>
-         <artifactId>wso2caching-core</artifactId>
-         <version>${org.wso2.caching.version}</version>
-      </dependency>
-        <dependency>
-           <groupId>org.wso2.throttle</groupId>
-           <artifactId>wso2throttle-core</artifactId>
-           <version>${org.wso2.throttle.version}</version>
-       </dependency>
-    <dependency>
+         </dependency>
+         <dependency>
+            <groupId>net.sf.saxon.wso2</groupId>
+            <artifactId>saxon</artifactId>
+            <version>${saxon.wso2.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.quartz-scheduler.wso2</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz.wso2.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.wso2.uri.template</groupId>
+            <artifactId>wso2-uri-templates</artifactId>
+            <version>${org.wso2.uri.template.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.wso2.caching</groupId>
+            <artifactId>wso2caching-core</artifactId>
+            <version>${org.wso2.caching.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.wso2.throttle</groupId>
+            <artifactId>wso2throttle-core</artifactId>
+            <version>${org.wso2.throttle.version}</version>
+         </dependency>
+         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>com.jayway.jsonpath</artifactId>
             <version>${jsonpath.version}</version>
-        </dependency>
-	<dependency>
-		    <groupId>com.damnhandy.wso2</groupId>
-		    <artifactId>handy-uri-templates</artifactId>
-		    <version>${damnhandy.version}</version>
-	    </dependency>
- <dependency>
-		    <groupId>org.wso2.staxon</groupId>
-		    <artifactId>staxon-core</artifactId>
-		    <version>${staxon.version}</version>
-	    </dependency>
- <dependency>
+         </dependency>
+         <dependency>
+            <groupId>com.damnhandy.wso2</groupId>
+            <artifactId>handy-uri-templates</artifactId>
+            <version>${damnhandy.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.wso2.staxon</groupId>
+            <artifactId>staxon-core</artifactId>
+            <version>${staxon.version}</version>
+         </dependency>
+         <dependency>
             <groupId>quickfixj.wso2</groupId>
             <artifactId>quickfixj</artifactId>
             <version>${quickfixj.wso2.version}</version>
-        </dependency> 
-   </dependencies>
+         </dependency>
+         <dependency>
+            <groupId>commons-net.wso2</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commons.net.wso2.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.commons.wso2</groupId>
+            <artifactId>commons-vfs2</artifactId>
+            <version>${org.apache.commons.wso2.version}</version>
+         </dependency>
+         <dependency>
+            <groupId>jcifs.wso2</groupId>
+            <artifactId>jcifs</artifactId>
+            <version>${jcifs.wso2.version}</version>
+         </dependency>
+      </dependencies>
    </dependencyManagement>
    <properties>
       <!-- Carbon platform version Start here-->
@@ -1527,6 +1565,10 @@
       <wsdl4j.wso2.version>1.6.2.wso2v4</wsdl4j.wso2.version>
       <ca.uhn.hapi.wso2.version>2.1.0.wso2v1</ca.uhn.hapi.wso2.version>
       <org.wso2.securevault.version>1.0.0-wso2v2</org.wso2.securevault.version>
+      <jsch.wso2.version>0.1.41-wso2v1</jsch.wso2.version>
+      <org.apache.commons.wso2.version>2.0.wso2v8</org.apache.commons.wso2.version>
+      <commons.net.wso2.version>2.0.wso2v1</commons.net.wso2.version>
+      <jcifs.wso2.version>0.8.3-wso2v1</jcifs.wso2.version>
       <!--Misc End-->
       <!-- Servlet API -->
       <exp.pkg.version.javax.servlet>2.6.0</exp.pkg.version.javax.servlet>
