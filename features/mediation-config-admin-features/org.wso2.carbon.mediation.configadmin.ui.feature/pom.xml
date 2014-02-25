@@ -73,7 +73,7 @@
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.configadmin.stub</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer.ui:${wso2cabon.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.initializer.ui:${wso2carbon.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
