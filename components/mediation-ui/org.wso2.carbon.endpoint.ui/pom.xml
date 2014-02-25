@@ -75,7 +75,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.endpoint.stub.*;
-                            version="${carbon.platform.package.import.version.range}",
+                            version="${wso2carbon.version}",
                             org.wso2.carbon.mediation.templates.ui.*,
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
 			                org.apache.axiom.*; version="${axiom.osgi.version.range}",

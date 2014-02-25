@@ -323,6 +323,11 @@
          </dependency>
          <!-- Carbon Old version Ends Here -->
          <!--Service Stub Starts here -->
+	 <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.artifactuploader.stub</artifactId>
+            <version>${wso2carbon.version}</version>
+      	 </dependency>	
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.configadmin.stub</artifactId>
@@ -1149,7 +1154,7 @@
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.server.admin</artifactId>
-            <version>${carbon.platform.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.json.wso2</groupId>
@@ -1528,7 +1533,7 @@
       <!-- Carbon platform version Start here-->
       <carbon.platform.version>4.3.0-SNAPSHOT</carbon.platform.version>
       <carbon.platform.package.export.version>4.3.0-SNAPSHOT</carbon.platform.package.export.version>
-      <carbon.platform.package.import.version.range>[4.3.0.SNAPSHOT, 4.4.0)</carbon.platform.package.import.version.range>
+      <carbon.platform.package.import.version.range>4.3.0.SNAPSHOT</carbon.platform.package.import.version.range>
       <wso2carbon.old.version>4.2.0</wso2carbon.old.version>
       <previous.version>4.2.0</previous.version>
       <wso2carbon.version>4.3.0-SNAPSHOT</wso2carbon.version>

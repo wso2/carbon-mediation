@@ -42,16 +42,16 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Carbon-Component>UIBundle</Carbon-Component>
-                        <Private-Package>
+                        <!--Private-Package>
                             org.wso2.carbon.localentry.ui.types.*,
                             org.wso2.carbon.localentry.ui.types.axis2.*,
                             org.wso2.carbon.localentry.ui.types.xsd.*,
-                        </Private-Package>
+                        </Private-Package-->
                         <Export-Package>
                             org.wso2.carbon.localentry.ui.*,
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.localentry.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.localentry.stub.*;version="${wso2carbon.version}",
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
 			                org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             javax.servlet;version="${imp.pkg.version.javax.servlet}",

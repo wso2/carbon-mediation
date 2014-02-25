@@ -80,8 +80,8 @@
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.carbon.transports.hl7</id>
-                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                            <id>org.wso2.carbon.hl7</id>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
                                     <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
@@ -92,7 +92,7 @@
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.business.messaging.hl7.transport</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.business.messaging.hl7.message</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.business.messaging.hl7.store</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.business.messaging.hl7.store.ui</bundleDef>f>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.business.messaging.hl7.store.ui</bundleDef>
                                 <bundleDef>ca.uhn.hapi.wso2:hapi</bundleDef>
                                 <bundleDef>org.apache.openjpa.wso2:openjpa-all</bundleDef>
                             </bundles>

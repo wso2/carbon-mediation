@@ -61,7 +61,7 @@
                             	<bundleDef>org.wso2.carbon:org.wso2.carbon.transports.sap</bundleDef>
                             </bundles>	
                             <id>org.wso2.carbon.transports.sap</id>
-                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
 		        </configuration>
                     </execution>
                 </executions>
