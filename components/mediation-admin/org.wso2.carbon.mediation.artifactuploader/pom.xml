@@ -78,8 +78,8 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Import-Package>
-                            org.apache.axis2.*; version="${axis2.osgi.version.range.synapse-config-admin}",
-                            org.apache.axiom.*; version="${axiom.osgi.version.range.synapse-config-admin}",
+                            org.apache.axis2.*; version="${axis2.osgi.version.range}",
+                            org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             javax.servlet;version="${imp.pkg.version.javax.servlet}",
                             javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
                             !javax.xml.namespace,

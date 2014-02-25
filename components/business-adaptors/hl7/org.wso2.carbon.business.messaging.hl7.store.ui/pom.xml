@@ -61,7 +61,6 @@
                         <Import-Package>
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
-                            <!--org.apache.axis2; version="${axis2.osgi.version.range.messageStore}",-->
                             org.wso2.carbon.message.store.stub.*; version="${carbon.platform.package.import.version.range}",
                             !javax.xml.namespace,
                             javax.xml.namespace;version="0.0.0",

@@ -64,7 +64,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.apache.synapse.*,
-                            org.apache.axiom.*; version="${axiom.osgi.version.range.synapse-registries}",
+                            org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.commons.logging,
                             *;resolution:=optional
                         </Import-Package>

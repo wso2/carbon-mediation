@@ -48,7 +48,7 @@
                         <Import-Package>
                             org.wso2.carbon.proxyadmin.stub.*;version="${carbon.platform.package.import.version.range}",
                             org.apache.axis2.*,
-                            org.apache.axiom.*; version="${axiom.osgi.version.range.proxy-admin}",                            
+                            org.apache.axiom.*; version="${axiom.osgi.version.range}",                            
                             !javax.xml.namespace,
                             javax.xml.namespace;version="0.0.0",                                                       
                             *;resolution:=optional

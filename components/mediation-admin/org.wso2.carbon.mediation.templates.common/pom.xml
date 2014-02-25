@@ -47,8 +47,8 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.mediator.service.*,
-                            org.apache.axis2.*; version="${axis2.osgi.version.range.template-editor}",
-			                org.apache.axiom.*; version="${axiom.osgi.version.range.template-editor}",
+                            org.apache.axis2.*; version="${axis2.osgi.version.range}",
+			                org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

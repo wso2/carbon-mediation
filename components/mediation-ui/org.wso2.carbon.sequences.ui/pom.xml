@@ -62,9 +62,9 @@
                             org.wso2.carbon.mediator.service.*,
                             org.wso2.carbon.sequences.common.*,
                             org.apache.axis2.*;
-                            version="${axis2.osgi.version.range.sequence-editor}",
+                            version="${axis2.osgi.version.range}",
                             org.apache.axiom.*;
-                            version="${axiom.osgi.version.range.sequence-editor}",
+                            version="${axiom.osgi.version.range}",
                             javax.servlet;version="${imp.pkg.version.javax.servlet}",
                             javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
                             javax.servlet.jsp;version="${imp.pkg.version.javax.servlet.jsp}",

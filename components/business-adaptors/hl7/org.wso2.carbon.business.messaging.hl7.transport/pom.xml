@@ -46,8 +46,8 @@
                             org.wso2.carbon.business.messaging.hl7.transport.*,
                         </Export-Package>
                         <Import-Package>                                     
-                            org.apache.axis2.*; version=&quot;${axis2.osgi.version.range.hl7}&quot;,
-                            org.apache.axiom.*; version=&quot;${axiom.osgi.version.range.hl7}&quot;,
+                            org.apache.axis2.*; version=&quot;${axis2.osgi.version.range}&quot;,
+                            org.apache.axiom.*; version=&quot;${axiom.osgi.version.range}&quot;,
                             org.wso2.carbon.core.*,
                             org.wso2.carbon.utils.*,
                             org.osgi.framework,
