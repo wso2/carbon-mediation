@@ -1548,7 +1548,7 @@
       <orbit.version.axis2>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2>
       <orbit.version.axis2.client>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2.client>
       <axis2-transports.version>1.6.1-wso2v11-SNAPSHOT</axis2-transports.version>
-      <axis2.osgi.version.range>[1.6.1.wso2v11, 1.7.0)</axis2.osgi.version.range>
+      <axis2.osgi.version.range>[1.6.1.wso2v11-SNAPSHOT, 1.7.0)</axis2.osgi.version.range>
       <axis2.json.version>1.6.1-wso2v5</axis2.json.version>
       <!--End-->
       <!-- Axiom Version Start here -->
