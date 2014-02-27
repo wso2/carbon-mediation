@@ -708,10 +708,17 @@
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
-            <version>4.2.2</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
+
+
          <!--Mediation Dependencies Ends here-->
          <!--Feature dependencies Start here-->
+	 <dependency>
+	    <groupId>org.wso2.carbon</groupId>
+	    <artifactId>org.wso2.carbon.identity.oauth.mediator</artifactId>
+            <version>${wso2carbon.version}</version>
+	 </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer.ui</artifactId>
@@ -1564,7 +1571,7 @@
       <!-- Apache start -->
       <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
       <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
-      <rampart.wso2.version>1.6.1.wso2v9</rampart.wso2.version>
+      <rampart.wso2.version>1.6.1.wso2v12</rampart.wso2.version>
       <!--Apache End-->
       <!--Misc-->
       <wsdl4j.wso2.version>1.6.2.wso2v4</wsdl4j.wso2.version>

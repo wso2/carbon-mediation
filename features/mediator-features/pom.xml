@@ -37,6 +37,7 @@
         <module>org.wso2.carbon.mediators.ui.feature</module>
         <module>smooks-mediator-feature</module>
         <module>bam-mediator</module>
+	<module>oauth-mediator-feature</module>
 	<module>org.wso2.carbon.mediators.server.feature</module>
         <module>org.wso2.carbon.mediators.feature</module>
     </modules>
