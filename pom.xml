@@ -258,12 +258,12 @@
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ndatasource.common</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.extensions</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -273,12 +273,12 @@
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.caching.core</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.application.deployer</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -288,7 +288,7 @@
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.properties.stub</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -308,17 +308,17 @@
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.common</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.common.ui</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.event.server.feature</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
             <type>zip</type>
          </dependency>
          <!-- Carbon Old version Ends Here -->
@@ -336,12 +336,12 @@
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ndatasource.stub</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.priority.executors.stub</artifactId>
-            <version>${wso2carbon.old.version}</version>
+            <version>${wso2carbon.version}</version>
          </dependency>
          <dependency>
             <groupId>org.wso2.carbon</groupId>
