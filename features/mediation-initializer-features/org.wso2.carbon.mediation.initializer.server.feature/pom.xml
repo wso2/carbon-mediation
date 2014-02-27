@@ -84,8 +84,8 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.datasource.server</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.task.server</importFeatureDef>
+                                <!--importFeatureDef>org.wso2.carbon.datasource.server</importFeatureDef-->
+                                <!--importFeatureDef>org.wso2.carbon.task.server</importFeatureDef-->
 				<importFeatureDef>org.wso2.carbon.event.server</importFeatureDef>
                             </importFeatures>
                         </configuration>
