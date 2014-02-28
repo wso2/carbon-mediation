@@ -92,7 +92,7 @@
                                 <importBundleDef>org.apache.bsf.wso2:bsf-all</importBundleDef>
                             </importBundles>
                             <importFeatures>
-                                <!--importFeatureDef>org.wso2.carbon.sequences.server</importFeatureDef-->
+                                <importFeatureDef>org.wso2.carbon.mediation.admin</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

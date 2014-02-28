@@ -60,7 +60,8 @@
                             <id>org.wso2.carbon.mediators</id>
                             <propertiesFile>../../../etc/feature.properties</propertiesFile>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.sequences</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.admin</importFeatureDef>
+				<importFeatureDef>org.wso2.carbon.mediation.ui</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.mediators.server.feature</includedFeatureDef>

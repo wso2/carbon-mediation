@@ -72,7 +72,6 @@
       <dependency>
          <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.mediator.dbreport.ui</artifactId>
-         <version>4.2.0</version>
       </dependency>
       <dependency>
          <groupId>org.wso2.carbon</groupId>
@@ -109,7 +108,6 @@
       <dependency>
          <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.mediator.oauth.ui</artifactId>
-         <version>4.2.0</version>
       </dependency>
       <dependency>
          <groupId>org.wso2.carbon</groupId>
@@ -317,7 +315,7 @@
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.call.ui</bundleDef>
                      </bundles>
                      <importFeatures>
-                        <!--importFeatureDef>org.wso2.carbon.sequences.ui:${wso2carbon.version}</importFeatureDef-->
+                        <importFeatureDef>org.wso2.carbon.mediation.ui:${wso2carbon.version}</importFeatureDef>
                      </importFeatures>
                   </configuration>
                </execution>
