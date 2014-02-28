@@ -195,8 +195,6 @@
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.localentry.ui</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.localentry.stub</bundleDef>
-
-
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>
