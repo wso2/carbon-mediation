@@ -315,7 +315,7 @@
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.call.ui</bundleDef>
                      </bundles>
                      <importFeatures>
-                        <importFeatureDef>org.wso2.carbon.mediation.ui:${wso2carbon.version}</importFeatureDef>
+                        <importFeatureDef>org.wso2.carbon.mediation.ui</importFeatureDef>
                      </importFeatures>
                   </configuration>
                </execution>

@@ -34,12 +34,13 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>org.wso2.carbon.mediators.ui.feature</module>
+
         <module>smooks-mediator-feature</module>
         <module>bam-mediator</module>
-	<module>oauth-mediator-feature</module>
-	<module>org.wso2.carbon.mediators.server.feature</module>
+	    <module>oauth-mediator-feature</module>
         <module>org.wso2.carbon.mediators.feature</module>
+        <module>org.wso2.carbon.mediators.ui.feature</module>
+        <module>org.wso2.carbon.mediators.server.feature</module>
     </modules>
 </project>
 
