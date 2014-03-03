@@ -314,9 +314,9 @@
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.respond.ui</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.call.ui</bundleDef>
                      </bundles>
-                     <importFeatures>
+                     <!--importFeatures>
                         <importFeatureDef>org.wso2.carbon.mediation.ui</importFeatureDef>
-                     </importFeatures>
+                     </importFeatures-->
                   </configuration>
                </execution>
             </executions>

@@ -19,9 +19,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-      <groupId>org.wso2.carbon</groupId>
-      <artifactId>mediation-initializer-features</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>mediation-initializer-features</artifactId>
+        <version>4.3.0-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -31,8 +31,9 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Initializer Server Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the core bundles required for Back-end Mediation Initializer functionality</description>
-    
+    <description>This feature contains the core bundles required for Back-end Mediation Initializer functionality
+    </description>
+
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -46,14 +47,14 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.startup</artifactId>
         </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.event.server.feature</artifactId>
-		<version>${wso2carbon.version}</version>
-  		<type>zip</type>
-            </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.event.server.feature</artifactId>
+            <version>${wso2carbon.version}</version>
+            <type>zip</type>
+        </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -69,11 +70,11 @@
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.mediation.initializer.server</id>
-                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
                                     <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
-                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef> 
+                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
                                 </properties>
                             </adviceFile>
                             <bundles>
@@ -84,9 +85,9 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
-                                <!--importFeatureDef>org.wso2.carbon.datasource.server</importFeatureDef-->
-                                <!--importFeatureDef>org.wso2.carbon.task.server</importFeatureDef-->
-				                <importFeatureDef>org.wso2.carbon.event.server</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.datasource.server:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.task.server</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.server</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
@@ -120,7 +121,7 @@
                     </execution>
                 </executions>
             </plugin>
-           
+
         </plugins>
     </build>
 </project>

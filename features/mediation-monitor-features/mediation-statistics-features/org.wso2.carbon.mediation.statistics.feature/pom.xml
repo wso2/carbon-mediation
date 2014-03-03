@@ -67,7 +67,7 @@
                             <propertiesFile>../../../etc/feature.properties</propertiesFile>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core:${wso2carbon.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer</importFeatureDef>                                
+                                <importFeatureDef>org.wso2.carbon.mediation.initializer:${wso2carbon.version}</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.mediation.statistics.server.feature</includedFeatureDef>

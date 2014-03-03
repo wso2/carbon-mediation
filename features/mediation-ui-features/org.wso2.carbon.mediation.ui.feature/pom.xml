@@ -202,6 +202,7 @@
                                 <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${wso2carbon.version}
                                 </importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.admin:${wso2carbon.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

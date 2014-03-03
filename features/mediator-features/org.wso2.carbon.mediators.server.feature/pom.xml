@@ -91,9 +91,9 @@
                                 <importBundleDef>org.wso2.carbon:org.wso2.carbon.ec2-client</importBundleDef>
                                 <importBundleDef>org.apache.bsf.wso2:bsf-all</importBundleDef>
                             </importBundles>
-                            <importFeatures>
+                            <!--importFeatures>
                                 <importFeatureDef>org.wso2.carbon.mediation.admin</importFeatureDef>
-                            </importFeatures>
+                            </importFeatures-->
                         </configuration>
                     </execution>
                 </executions>

@@ -14,7 +14,7 @@
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
 -->
-        
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -22,7 +22,7 @@
     <parent>
         <groupId>org.wso2.carbon</groupId>
         <version>4.3.0-SNAPSHOT</version>
-    	<artifactId>mediation-monitor-features</artifactId>
+        <artifactId>mediation-monitor-features</artifactId>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -35,7 +35,7 @@
 
     <modules>
         <module>org.wso2.carbon.mediation.tracer.server.feature</module>
-	<module>org.wso2.carbon.mediation.tracer.ui.feature</module>
+        <module>org.wso2.carbon.mediation.tracer.ui.feature</module>
         <module>org.wso2.carbon.mediation.tracer.feature</module>
     </modules>
 </project>
