@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
  ~ Copyright (c) 2005-2011, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
@@ -17,98 +17,98 @@
  ~ under the License.
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-   <parent>
-      <groupId>org.wso2.carbon</groupId>
-      <artifactId>mediation-admin-stub</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
-   </parent>
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>org.wso2.carbon</groupId>
-   <artifactId>org.wso2.carbon.mediation.templates.stub</artifactId>
-   <packaging>bundle</packaging>
-   <version>4.3.0-SNAPSHOT</version>
-   <name>WSO2 Carbon - Template Editor Service Administrator Stub</name>
-   <url>http://wso2.org</url>
-   <build>
-      <plugins>
-         <plugin>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>maven-bundle-plugin</artifactId>
-            <extensions>true</extensions>
-            <configuration>
-               <instructions>
-                  <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                  <Bundle-Name>${project.artifactId}</Bundle-Name>
-                  <Private-Package />
-                  <Export-Package>org.wso2.carbon.mediation.templates.stub.*;version="${wso2carbon.version}",
-                            org.wso2.carbon.mediation.templates.endpoint.stub.*;version="${wso2carbon.version}",</Export-Package>
-                  <DynamicImport-Package>*</DynamicImport-Package>
-               </instructions>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.1</version>
-            <executions>
-               <execution>
-                  <id>source-code-generation</id>
-                  <phase>process-resources</phase>
-                  <goals>
-                     <goal>run</goal>
-                  </goals>
-                  <configuration>
-                     <tasks>
-                        <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                           <arg line="-uri src/main/resources/TemplateAdminService.wsdl -u -uw -o target/generated-code                -p org.wso2.carbon.mediation.templates.stub.types                   -ns2p http://exception.common.templates.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.stub.types.common,http://common.templates.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.stub.types.common,http://mgt.dependency.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.stub.types.common,http://org.apache.synapse/xsd=org.wso2.carbon.mediation.templates.stub.types.axis2" />
-                           <classpath refid="maven.dependency.classpath" />
-                           <classpath refid="maven.compile.classpath" />
-                           <classpath refid="maven.runtime.classpath" />
-                        </java>
-                        <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                           <arg line="-uri src/main/resources/EndpointTemplateAdminService.wsdl -u -uw -o target/generated-code                -p org.wso2.carbon.mediation.templates.endpoint.stub.types                   -ns2p http://exception.common.templates.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.endpoint.stub.types.common,http://common.templates.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.endpoint.stub.types.common,http://mgt.dependency.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.endpoint.stub.types.common,http://org.apache.synapse/xsd=org.wso2.carbon.mediation.templates.endpoint.stub.types.axis2" />
-                           <classpath refid="maven.dependency.classpath" />
-                           <classpath refid="maven.compile.classpath" />
-                           <classpath refid="maven.runtime.classpath" />
-                        </java>
-                     </tasks>
-                  </configuration>
-               </execution>
-            </executions>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-               <execution>
-                  <id>add-source</id>
-                  <phase>generate-sources</phase>
-                  <goals>
-                     <goal>add-source</goal>
-                  </goals>
-                  <configuration>
-                     <sources>
-                        <source>target/generated-code/src</source>
-                     </sources>
-                  </configuration>
-               </execution>
-            </executions>
-         </plugin>
-      </plugins>
-   </build>
-   <dependencies>
-      <dependency>
-         <groupId>org.apache.axis2.wso2</groupId>
-         <artifactId>axis2</artifactId>         
-      </dependency>
-      <dependency>
-         <groupId>org.apache.axis2.wso2</groupId>
-         <artifactId>axis2-client</artifactId>         
-      </dependency>
-      <dependency>
-        <groupId>org.apache.neethi.wso2</groupId>
-        <artifactId>neethi</artifactId>
-     </dependency>
-   </dependencies>
+
+    <parent>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>mediation-admin-stub</artifactId>
+        <version>4.3.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.carbon.mediation.templates.stub</artifactId>
+    <packaging>bundle</packaging>
+    <name>WSO2 Carbon - Template Editor Service Administrator Stub</name>
+    <url>http://wso2.org</url>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Private-Package>
+                        </Private-Package>
+                        <Export-Package>
+                            org.wso2.carbon.mediation.templates.stub.*;version="${carbon.platform.package.export.version}",
+                            org.wso2.carbon.mediation.templates.endpoint.stub.*;version="${carbon.platform.package.export.version}",
+                        </Export-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <id>source-code-generation</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
+                                    <arg line="-uri src/main/resources/TemplateAdminService.wsdl -u -uw -o target/generated-code                -p org.wso2.carbon.mediation.templates.stub.types                   -ns2p http://exception.common.templates.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.stub.types.common,http://common.templates.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.stub.types.common,http://mgt.dependency.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.stub.types.common,http://org.apache.synapse/xsd=org.wso2.carbon.mediation.templates.stub.types.axis2"/>
+                                    <classpath refid="maven.dependency.classpath"/>
+                                    <classpath refid="maven.compile.classpath"/>
+                                    <classpath refid="maven.runtime.classpath"/>
+                                </java>
+                                <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
+                                    <arg line="-uri src/main/resources/EndpointTemplateAdminService.wsdl -u -uw -o target/generated-code                -p org.wso2.carbon.mediation.templates.endpoint.stub.types                   -ns2p http://exception.common.templates.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.endpoint.stub.types.common,http://common.templates.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.endpoint.stub.types.common,http://mgt.dependency.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.templates.endpoint.stub.types.common,http://org.apache.synapse/xsd=org.wso2.carbon.mediation.templates.endpoint.stub.types.axis2"/>
+                                    <classpath refid="maven.dependency.classpath"/>
+                                    <classpath refid="maven.compile.classpath"/>
+                                    <classpath refid="maven.runtime.classpath"/>
+                                </java>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>
+                                    target/generated-code/src
+                                </source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

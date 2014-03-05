@@ -48,6 +48,14 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediation.templates.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.message.processor.ui</artifactId>
         </dependency>
         <dependency>
@@ -172,6 +180,12 @@
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.artifactuploader.ui</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.artifactuploader.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.templates.ui</bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon:org.wso2.carbon.mediation.templates.service
+                                </bundleDef>
+                                <bundleDef>
+                                    org.wso2.carbon:org.wso2.carbon.mediation.templates.stub
+                                </bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.message.processor.ui</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.message.processor.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.message.store.ui</bundleDef>
@@ -202,7 +216,8 @@
                                 <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${wso2carbon.version}
                                 </importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.admin:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.admin:${wso2carbon.version}
+                                </importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

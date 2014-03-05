@@ -61,8 +61,6 @@
                                     <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
                                 </properties>
                             </adviceFile>
-
-                                <!--<bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.configadmin</bundleDef>-->
                                 <bundles>
                                     <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.configadmin</bundleDef>
                                 </bundles>
