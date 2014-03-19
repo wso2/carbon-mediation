@@ -86,6 +86,7 @@
     boolean hasPut = false;
     boolean hasDelete = false;
     boolean hasOptions = false;
+    boolean hasHead = false;
     boolean hasUrlStyle = false;
     boolean hasUriTemplate = false;
 
@@ -103,6 +104,8 @@
                 hasDelete = true;
             } else if ("OPTIONS".equals(method)) {
                 hasOptions = true;
+            } else if ("HEAD".equals(method)) {
+                hasHead = true;
             }
         }
     }
@@ -413,6 +416,14 @@
         </div>
         <input type="checkbox" name="methods" value="OPTIONS"
                style="display:inline; vertical-align: middle" <%if (hasOptions) {%>
+               checked="checked"
+                <%}%>/>
+
+        <div id="divHead" style="display:inline;">
+            <fmt:message key="methods.head.label"/>
+        </div>
+        <input type="checkbox" name="methods" value="HEAD"
+               style="display:inline; vertical-align: middle" <%if (hasHead) {%>
                checked="checked"
                 <%}%>/>
     </td>
