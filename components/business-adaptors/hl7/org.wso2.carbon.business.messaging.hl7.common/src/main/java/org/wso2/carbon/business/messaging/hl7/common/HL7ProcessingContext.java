@@ -427,15 +427,21 @@ public class HL7ProcessingContext {
 			throws HL7Exception {
 		String errMsg = "User has not set any property to indicate the system, whether it has to "
 				+ "generate ACK message or not.";
-		if (("true").equalsIgnoreCase(applicationAck)) {
-			try {
-				Message response = applicationResponses.poll(timeOutVal,TimeUnit.MILLISECONDS);
-				return response;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return this.createNack(hl7Msg, errMsg);
+        if (("true").equalsIgnoreCase(applicationAck)) {
+            try {
+                Message response = applicationResponses.poll(timeOutVal, TimeUnit.MILLISECONDS);
+                return response;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                applicationResponses.poll(timeOutVal,TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                log.error("Error During handle Application Ack - Removing from Queue", e);
+            }
+        }
+        return this.createNack(hl7Msg, errMsg);
 	}
 	
 	/**
@@ -491,7 +497,7 @@ public class HL7ProcessingContext {
     }
 
 	/**
-	 * @param timeOutVal Transport Timeout value
+	 * @param timeOut Transport Timeout value
 	 */
 	public void setTimeOutVal(int timeOut) {
 	    this.timeOutVal = timeOut;
