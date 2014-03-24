@@ -55,26 +55,6 @@
             </modules>
         </profile>
     </profiles>
-    <!--<build>-->
-    <!--<extensions>-->
-    <!--<extension>-->
-    <!--<groupId>org.apache.maven.wagon</groupId>-->
-    <!--<artifactId>wagon-ssh</artifactId>-->
-    <!--<version>2.1</version>-->
-    <!--</extension>-->
-    <!--</extensions>-->
-    <!--<plugins>-->
-    <!--<plugin>-->
-    <!--<groupId>org.apache.maven.plugins</groupId>-->
-    <!--<artifactId>maven-compiler-plugin</artifactId>-->
-    <!--<version>3.1</version>-->
-    <!--<configuration>-->
-    <!--<source>1.6</source>-->
-    <!--<target>1.6</target>-->
-    <!--</configuration>-->
-    <!--</plugin>-->
-    <!--</plugins>-->
-    <!--</build>-->
     <build>
         <extensions>
             <extension>
@@ -381,12 +361,12 @@
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.rule.common</artifactId>
-                <version>${wso2carbon.old.version}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.rule.mediation</artifactId>
-                <version>${wso2carbon.old.version}</version>
+                <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>

@@ -284,7 +284,7 @@
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.out.ui</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.property.ui</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.rmsequence.ui</bundleDef>
-                        <!--bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.rule.ui</bundleDef-->
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.rule.ui</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.script.ui</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.send.ui</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.store.ui</bundleDef>
