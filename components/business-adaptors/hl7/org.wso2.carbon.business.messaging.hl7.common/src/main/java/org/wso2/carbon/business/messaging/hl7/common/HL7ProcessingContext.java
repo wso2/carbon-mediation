@@ -30,6 +30,7 @@ import ca.uhn.hl7v2.parser.EncodingNotSupportedException;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import ca.uhn.hl7v2.util.idgenerator.InMemoryIDGenerator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
@@ -135,6 +136,8 @@ public class HL7ProcessingContext {
         // PipeParser is always set with NoValidation context, other wise invalid messages will result in halting
         // execution.
 		this.getPipeParser().setValidationContext(new NoValidation());
+        //Improve the performance for generating ID.
+        this.getPipeParser().getParserConfiguration().setIdGenerator(new InMemoryIDGenerator());
 	}
 	
 	public HL7ProcessingContext(ParameterInclude params) throws HL7Exception, AxisFault {
@@ -377,44 +380,58 @@ public class HL7ProcessingContext {
 	 * @throws HL7Exception
 	 * @throws AxisFault
 	 */
-	private Message handleAutoAckNack(String resultMode, MessageContext ctx,
-			Message hl7Msg) throws HL7Exception, AxisFault {
-		Message msg;
-		if (HL7Constants.HL7_RESULT_MODE_ACK.equals(resultMode)) {
+    private Message handleAutoAckNack(String resultMode, MessageContext ctx,
+                                      Message hl7Msg) throws HL7Exception, AxisFault {
+        Message msg;
+        String applicationAck = (String) ctx.getProperty(HL7Constants.HL7_APPLICATION_ACK);
+        if (HL7Constants.HL7_RESULT_MODE_ACK.equals(resultMode)) {
+            if (ctx.getFLOW() == 1) { // it is inflow
 
-			if (ctx.getFLOW() == 1) { // it is inflow
-				msg = this.createAck(hl7Msg);
-				return msg;
-			} else {
-				MessageContext requestMessageCtx = ctx.getOperationContext()
-						.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+                if (!(("true").equalsIgnoreCase(applicationAck))) {
+                    //Since Result Mode is ACK and ACK Sends to Client. Response from back end is removed
+                    //And HL7_APPLICATION_ACK is not enabled, Content will be removed from the Queue
+                    //if it is failed to remove, System get memory Leak
 
-				Message requesthl7message = xmlPayloadToHL7Message(requestMessageCtx);
-				msg = this.createAck(requesthl7message);
-				applicationResponses.offer(msg);
-			}
-		} else if (HL7Constants.HL7_RESULT_MODE_NACK.equals(resultMode)) {
-			String nackMessage = (String) ctx.getProperty(HL7Constants.HL7_NACK_MESSAGE);
-			if (nackMessage == null) {
-				nackMessage = "";
-			}			
-			if (ctx.getFLOW() == 1) {
-				msg = this.createNack(hl7Msg, nackMessage);
-				return msg;
-			} else {
-				MessageContext requestMessageCtx = ctx.getOperationContext()
-						.getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+                    applicationResponses.clear();
+                }
+                msg = this.createAck(hl7Msg);
+                return msg;
+            } else {
+                MessageContext requestMessageCtx = ctx.getOperationContext()
+                        .getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
-				Message requesthl7message = xmlPayloadToHL7Message(requestMessageCtx);
-				msg = this.createNack(requesthl7message, nackMessage);
-				applicationResponses.offer(msg);
-			}
-		} else{
-                return this.createNack(hl7Msg,
-                       "Application Error: ACK/NACK was not explicitely returned");
+                Message requesthl7message = xmlPayloadToHL7Message(requestMessageCtx);
+                msg = this.createAck(requesthl7message);
+                applicationResponses.offer(msg);
+            }
+        } else if (HL7Constants.HL7_RESULT_MODE_NACK.equals(resultMode)) {
+            String nackMessage = (String) ctx.getProperty(HL7Constants.HL7_NACK_MESSAGE);
+            if (nackMessage == null) {
+                nackMessage = "";
+            }
+            if (ctx.getFLOW() == 1) {
+                msg = this.createNack(hl7Msg, nackMessage);
+                if (!(("true").equalsIgnoreCase(applicationAck))) {
+                    //Since Result Mode is ACK and ACK Sends to Client. Response from back end is removed
+                    //And HL7_APPLICATION_ACK is not enabled, Content will be removed from the Queue
+                    //if it is failed to remove, System get memory Leak
+                    applicationResponses.clear();
+                }
+                return msg;
+            } else {
+                MessageContext requestMessageCtx = ctx.getOperationContext()
+                        .getMessageContext(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
+
+                Message requesthl7message = xmlPayloadToHL7Message(requestMessageCtx);
+                msg = this.createNack(requesthl7message, nackMessage);
+                applicationResponses.offer(msg);
+            }
+        } else {
+            return this.createNack(hl7Msg,
+                    "Application Error: ACK/NACK was not explicitly returned");
         }
         return null;
-	}
+    }
 
 	/**
 	 * ACK or NACK property is not set, want to create an application ACK
