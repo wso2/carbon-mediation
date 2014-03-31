@@ -536,7 +536,7 @@
                       page="list_sequences.jsp" pageNumberParameterName="pageNumber"
                       resourceBundle="org.wso2.carbon.sequences.ui.i18n.Resources"
                       prevKey="prev" nextKey="next"
-                      parameters="<%=""%>"/>
+                      parameters="<%=\"\"%>"/>
     <br>
     <carbon:itemGroupSelector selectAllInPageFunction="selectAllInThisPage(true)"
                               selectAllFunction="selectAllInAllPages()"
@@ -696,7 +696,7 @@
                       page="list_sequences.jsp" pageNumberParameterName="pageNumber"
                       resourceBundle="org.wso2.carbon.sequences.ui.i18n.Resources"
                       prevKey="prev" nextKey="next"
-                      parameters="<%=""%>"/>
+                      parameters="<%=\"\"%>"/>
 </div>
 <div id="tabs-2">
     <% if ((dynamicSequences != null) && (dynamicSequences.length > 0)) { %>
@@ -708,7 +708,7 @@
                       pageNumberParameterName="dynamicPageNumber"
                       resourceBundle="org.wso2.carbon.sequences.ui.i18n.Resources"
                       prevKey="prev" nextKey="next"
-                      parameters="<%=""%>"/>
+                      parameters="<%=\"\"%>"/>
     <br/>
     <table class="styledLeft" cellspacing="1" id="dynamicSequencesTable">
         <thead>
@@ -756,7 +756,7 @@
                       pageNumberParameterName="dynamicPageNumber"
                       resourceBundle="org.wso2.carbon.sequences.ui.i18n.Resources"
                       prevKey="prev" nextKey="next"
-                      parameters="<%=""%>"/>
+                      parameters="<%=\"\"%>"/>
     <script type="text/javascript">
         alternateTableRows('dynamicSequencesTable', 'tableEvenRow', 'tableOddRow');
     </script>
