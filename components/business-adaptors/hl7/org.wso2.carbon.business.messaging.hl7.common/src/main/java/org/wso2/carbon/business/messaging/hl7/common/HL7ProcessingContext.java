@@ -412,7 +412,7 @@ public class HL7ProcessingContext {
             if (ctx.getFLOW() == 1) {
                 msg = this.createNack(hl7Msg, nackMessage);
                 if (!(("true").equalsIgnoreCase(applicationAck))) {
-                    //Since Result Mode is ACK and ACK Sends to Client. Response from back end is removed
+                    //Since Result Mode is NACK and NACK Sends to Client. Response from back end is removed
                     //And HL7_APPLICATION_ACK is not enabled, Content will be removed from the Queue
                     //if it is failed to remove, System get memory Leak
                     applicationResponses.clear();
