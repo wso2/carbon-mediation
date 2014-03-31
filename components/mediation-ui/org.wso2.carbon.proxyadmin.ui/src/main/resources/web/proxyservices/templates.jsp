@@ -70,7 +70,7 @@
                                     <td width="20%">
                                         <a href="<%=url%>"><fmt:message key="<%=template%>"/></a>
                                     </td>
-                                    <td><fmt:message key="<%=template+".desc"%>"/></td>
+                                    <td><fmt:message key="<%=template+\".desc\"%>"/></td>
                                 </tr>
                     <%
                             }
