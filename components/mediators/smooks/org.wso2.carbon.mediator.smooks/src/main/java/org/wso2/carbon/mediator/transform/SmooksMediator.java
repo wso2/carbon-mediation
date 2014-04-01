@@ -73,10 +73,15 @@ public class SmooksMediator extends AbstractMediator {
 	private boolean transactionStarted = false;
 
 	private EntityManagerFactory emf;
-
+	
+	/* To disable huge messages load into the payload , ex: scenarios like JMS routing*/
+	public static String DISABLE_SMOOKS_RESULT_PAYLOAD = "DISABLE_SMOOKS_RESULT_PAYLOAD";
+	
 	public boolean mediate(MessageContext synCtx) {
 		SynapseLog synLog = getLog(synCtx);
-
+		
+		String disableResultPayload = (String)synCtx.getProperty(SmooksMediator.DISABLE_SMOOKS_RESULT_PAYLOAD);
+		
 		if (synLog.isTraceOrDebugEnabled()) {
 			synLog.traceOrDebug("Start : Smooks mediator");
 
@@ -114,7 +119,10 @@ public class SmooksMediator extends AbstractMediator {
 				// filter the message through smooks
 				smooks.filterSource(executionContext, streamSource, result);
 				// add result
-				output.process(null, synCtx, synLog, result);
+				if(disableResultPayload ==null || (disableResultPayload !=null && !disableResultPayload.equalsIgnoreCase("true")) ){
+					output.process(null, synCtx, synLog, result);
+				}
+				
 			} else {
 				// create an output stream for store the result
 				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -122,7 +130,9 @@ public class SmooksMediator extends AbstractMediator {
 				// filter the message through smooks
 				smooks.filterSource(executionContext, streamSource, streamResult);
 				// add result
-				output.process(outputStream, synCtx, synLog, null);
+				if(disableResultPayload ==null || (disableResultPayload !=null && !disableResultPayload.equalsIgnoreCase("true")) ){
+					output.process(outputStream, synCtx, synLog, null);
+				}
 			}
 			if (transactionStarted) {
 				commitTransaction();
