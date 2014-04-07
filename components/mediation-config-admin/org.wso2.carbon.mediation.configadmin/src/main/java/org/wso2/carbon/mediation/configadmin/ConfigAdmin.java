@@ -47,6 +47,7 @@ import java.util.concurrent.locks.Lock;
 @SuppressWarnings({"UnusedDeclaration"})
 public class ConfigAdmin extends AbstractServiceBusAdmin {
 
+    final static String PROP_REPORT_CDATA = "http://java.sun.com/xml/stream/properties/report-cdata-event";
     private static final Log log = LogFactory.getLog(ConfigAdmin.class);
 
     /**
@@ -67,8 +68,9 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             XMLConfigurationSerializer.serializeConfiguration(getSynapseConfiguration(), stream);
             XMLInputFactory factory = XMLInputFactory.newInstance();
-            factory.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event",
-                    Boolean.TRUE);
+            if (factory.isPropertySupported(PROP_REPORT_CDATA)) {
+                factory.setProperty(PROP_REPORT_CDATA, Boolean.TRUE);
+            }
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
                     stream.toByteArray());
             StAXOMBuilder builder = new StAXOMBuilder(OMAbstractFactory.getOMFactory(),
@@ -187,7 +189,7 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
     /**
      * Create a new synapse configuration in the specified path. Save the current
      * configuration and destroy it.
-     *     
+     *
      * @param name name of the configuration to be removed
      * @param description description for the configuration
      * @return true if the new configuration creation is successful
@@ -206,7 +208,7 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
     /**
      * Add an existing configuration to the ESB configuration management system
      * @param name name of the configuration
-     * 
+     *
      * @return true if the configuration is added successfully
      * @throws org.apache.axis2.AxisFault if an error occurs
      */
@@ -223,7 +225,7 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
     /**
      * Load the configuration from the given file
      *
-     * @param name name of configuration 
+     * @param name name of configuration
      * @throws org.apache.axis2.AxisFault if an error occurs
      * @return true if the new configuration is successful created
      */
