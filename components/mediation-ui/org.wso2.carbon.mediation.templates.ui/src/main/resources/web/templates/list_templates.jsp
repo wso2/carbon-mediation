@@ -543,7 +543,7 @@
                   page="list_templates.jsp" pageNumberParameterName="pageNumber"
                   resourceBundle="org.wso2.carbon.mediation.templates.ui.i18n.Resources"
                   prevKey="prev" nextKey="next"
-                  parameters="<%=""%>"/>
+                  parameters="<%=\"\"%>"/>
         <% } else { %>
             <p><fmt:message key="no.templates.static.text"/></p>
         <% } %>
@@ -660,7 +660,7 @@
                           page="list_templates.jsp" pageNumberParameterName="endpointPageNumber"
                           resourceBundle="org.wso2.carbon.mediation.templates.ui.i18n.Resources"
                           prevKey="prev" nextKey="next"
-                          parameters="<%=""%>"/>
+                          parameters="<%=\"\"%>"/>
         <br>
         <table class="styledLeft" cellspacing="1" id="endpointsTable">
             <thead>
@@ -715,7 +715,7 @@
                           page="list_templates.jsp" pageNumberParameterName="endpointPageNumber"
                           resourceBundle="org.wso2.carbon.mediation.templates.ui.i18n.Resources"
                           prevKey="prev" nextKey="next"
-                          parameters="<%=""%>"/>
+                          parameters="<%=\"\"%>"/>
     <% } else { %>
             <p><fmt:message key="no.templates.static.text"/></p>
         <% } %>
@@ -729,7 +729,7 @@
                           page="list_templates.jsp" pageNumberParameterName="dynamicEndpointPageNumber"
                           resourceBundle="org.wso2.carbon.mediation.templates.ui.i18n.Resources"
                           prevKey="prev" nextKey="next"
-                          parameters="<%=""%>"/>
+                          parameters="<%=\"\"%>"/>
         <br>
         <table class="styledLeft" cellspacing="1" id="dynamicEndpointsTable">
             <thead>
@@ -784,7 +784,7 @@
                           page="list_templates.jsp" pageNumberParameterName="dynamicEndpointPageNumber"
                           resourceBundle="org.wso2.carbon.mediation.templates.ui.i18n.Resources"
                           prevKey="prev" nextKey="next"
-                          parameters="<%=""%>"/>
+                          parameters="<%=\"\"%>"/>
     <% } else { %>
             <p><fmt:message key="no.templates.dynamic.text"/></p>
         <% } %>

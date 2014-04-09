@@ -240,7 +240,7 @@ public class SAPTransportSender extends AbstractTransportSender {
         try {
             function = destination.getRepository().getFunction(rfcName);
         } catch (JCoException e) {
-            throw new AxisFault("RFC function " + function + " cloud not found in SAP system", e);
+            throw new AxisFault("RFC function " + rfcName + " could not found in SAP system", e);
         }
         return function;
     }

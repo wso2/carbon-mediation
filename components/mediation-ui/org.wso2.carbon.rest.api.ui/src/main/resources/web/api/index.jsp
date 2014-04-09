@@ -385,7 +385,7 @@
                       pageNumberParameterName="pageNumber"
                       resourceBundle="org.wso2.carbon.rest.api.ui.i18n.Resources"
                       prevKey="prev" nextKey="next"
-                      parameters="<%=""%>"/>
+                      parameters="<%=\"\"%>"/>
     <br/>
     <carbon:itemGroupSelector selectAllInPageFunction="selectAllInThisPage(true)"
                               selectAllFunction="selectAllInAllPages()"
@@ -475,7 +475,7 @@
                       pageNumberParameterName="pageNumber"
                       resourceBundle="org.wso2.carbon.rest.api.ui.i18n.Resources"
                       prevKey="prev" nextKey="next"
-                      parameters="<%=""%>"/>
+                      parameters="<%=\"\"%>"/>
 </form>
 <p>&nbsp;</p>
 <%
