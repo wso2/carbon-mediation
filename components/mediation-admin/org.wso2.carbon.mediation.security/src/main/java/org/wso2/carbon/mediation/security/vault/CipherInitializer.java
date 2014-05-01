@@ -60,7 +60,7 @@ public class CipherInitializer {
 	private static final String ALGORITHM = "algorithm";
 	private static final String DEFAULT_ALGORITHM = "RSA";
 	private static final String TRUSTED = "trusted";
-	private static CipherInitializer cipherInitializer = null;
+	private static CipherInitializer cipherInitializer  = new CipherInitializer();;
 
 	// global password provider implementation class if defined in secret
 	// manager conf file
@@ -73,25 +73,28 @@ public class CipherInitializer {
 	private DecryptionProvider decryptionProvider = null;
 
 	private Cipher encryptionProvider = null;
+	
+	Object cipherLockObj = new Object();
 
 	private CipherInitializer() {
 		super();
-		boolean initPro = init();
-		if (initPro) {
-			initCipherDecryptProvider();
-			initEncrypt();
-		} else {
-			log.error("Either Configuration properties can not be loaded or No secret"
-			          + " repositories have been configured please check PRODUCT_HOME/repository/conf/security "
-			          + " refer links related to configure WSO2 Secure vault");
+		synchronized (cipherLockObj) {
+
+			boolean initPro = init();
+			if (initPro) {
+				initCipherDecryptProvider();
+				initEncrypt();
+			} else {
+				log.error("Either Configuration properties can not be loaded or No secret"
+				          + " repositories have been configured please check PRODUCT_HOME/repository/conf/security "
+				          + " refer links related to configure WSO2 Secure vault");
+			}
 		}
+
 	}
 
 	public static CipherInitializer getInstance() {
-		if (cipherInitializer == null) {
-			cipherInitializer = new CipherInitializer();
-		}
-		return cipherInitializer;
+	   	return cipherInitializer;
 	}
 
 	private boolean init() {
@@ -228,6 +231,7 @@ public class CipherInitializer {
 	}
 
 	protected void initCipherDecryptProvider() {
+		if(decryptionProvider !=null) return;
 		Properties properties = SecureVaultUtil.loadProperties();
 		StringBuffer sb = new StringBuffer();
 		// sb.append(id);
@@ -275,6 +279,8 @@ public class CipherInitializer {
 	 */
 	public void initEncrypt() {
 	
+		if(encryptionProvider != null) return;
+		
 		Properties properties = SecureVaultUtil.loadProperties();
 			
 		String keyStoreFile = null;
