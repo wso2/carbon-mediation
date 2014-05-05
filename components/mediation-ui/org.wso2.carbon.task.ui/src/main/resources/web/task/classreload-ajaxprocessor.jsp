@@ -54,7 +54,7 @@
         TaskDescription taskDescription = TaskManagementHelper.getTaskDescription(request, client, taskName, group);
         Set<OMElement> propertyValues = null;
         if (taskDescription != null) {
-            propertyValues = taskDescription.getProperties();
+            propertyValues = taskDescription.getXmlProperties();
         }
         ResponseInformation responseInformation = client.loadTaskProperties(className, group);
         if (responseInformation.isFault()) {

@@ -73,7 +73,7 @@
                     for (TaskDescription taskDescription : descriptions) {
                         if (taskDescription != null) {
                             String name = taskDescription.getName();
-                            String group = taskDescription.getGroup();
+                            String group = taskDescription.getTaskGroup();
                 %>
                 <tr id="tr_<%=name%>">
 
