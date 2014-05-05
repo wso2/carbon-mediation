@@ -41,6 +41,8 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 	private RegistryService registryService;
 
 	UserRegistry registry = null;
+	
+	Object decryptlockObj = new Object();
 
 	private SecureVaultLookupHandlerImpl(ServerConfigurationService serverConfigurationService,
 	                                     RegistryService registryService) throws RegistryException {
@@ -156,15 +158,26 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 
 	private String vaultLookup(String aliasPasword, MessageContext synCtx,
 	                           Map<String, Object> decryptedCacheMap) {
-		SecretCipherHander secretManager = new SecretCipherHander(synCtx);
-		String decryptedValue = secretManager.getSecret(aliasPasword);
-		if (decryptedCacheMap == null) {
-			return null;
+		synchronized (decryptlockObj) {
+			SecretCipherHander secretManager = new SecretCipherHander(synCtx);
+			String decryptedValue = secretManager.getSecret(aliasPasword);
+			if (decryptedCacheMap == null) {
+				return null;
+			}
+
+			if (decryptedValue.isEmpty()) {
+				SecureVaultCacheContext cacheContext =
+				                                       (SecureVaultCacheContext) decryptedCacheMap.get(aliasPasword);
+				if (cacheContext != null) {
+					return cacheContext.getDecryptedValue();
+				}
+			}
+
+			decryptedCacheMap.put(aliasPasword, new SecureVaultCacheContext(Calendar.getInstance()
+			                                                                        .getTime(),
+			                                                                decryptedValue));
+			return decryptedValue;
 		}
-		decryptedCacheMap.put(aliasPasword, new SecureVaultCacheContext(Calendar.getInstance()
-		                                                                        .getTime(),
-		                                                                decryptedValue));
-		return decryptedValue;
 	}
 
 }
