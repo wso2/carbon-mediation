@@ -206,7 +206,12 @@ public class TaskManagementClient {
             log.debug("Retrieved Task : " + taskDescription);
         }
         validateTaskDescription(taskDescription);
-        taskDescription.setInterval(taskDescription.getInterval()/1000);
+        long interval = taskDescription.getInterval();
+        if (taskDescription.getIntervalInMs()) {
+            interval = interval / 1000;
+        }
+        taskDescription.setInterval(interval);
+        taskDescription.setIntervalInMs(false);
         return taskDescription;
     }
 

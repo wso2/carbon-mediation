@@ -1,7 +1,7 @@
 package org.wso2.carbon.ntaskint.core;
 
 
-public class Task3 implements org.apache.synapse.task.Task {
+final class Task3 implements org.apache.synapse.task.Task {
     private String recipeName;
     private String parameter;
 

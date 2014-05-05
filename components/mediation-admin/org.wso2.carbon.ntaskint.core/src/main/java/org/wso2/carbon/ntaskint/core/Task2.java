@@ -3,7 +3,7 @@ package org.wso2.carbon.ntaskint.core;
 import org.wso2.carbon.ntask.core.AbstractTask;
 
 
-public class Task2 extends AbstractTask {
+final class Task2 extends AbstractTask {
     private String recipeName;
     private String parameter;
 

@@ -1,4 +1,4 @@
-package org.wso2.carbon.ntaskint.core;
+package org.wso2.carbon.mediation.ntask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

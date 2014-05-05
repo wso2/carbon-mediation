@@ -7,7 +7,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ntask.core.AbstractTask;
 
-public class Task extends AbstractTask implements org.apache.synapse.task.Task, ManagedLifecycle {
+final class Task extends AbstractTask implements org.apache.synapse.task.Task, ManagedLifecycle {
     private static final Log logger = LogFactory.getLog(Task.class.getName());
     private static final int DEFAULT_CONNECTION_TIMEOUT = 20000;
 

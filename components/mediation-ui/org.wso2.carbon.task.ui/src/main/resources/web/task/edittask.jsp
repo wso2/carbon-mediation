@@ -113,9 +113,9 @@
     <td style="width:150px"><fmt:message key="task.group"/><span class="required">*</span></td>
     <td align="left">
         <input id="taskGroup" name="taskGroup" class="longInput" type="text"
-               value="<%=taskDescription.getGroup()%>" disabled="true"/>
+               value="<%=taskDescription.getTaskGroup()%>" disabled="true"/>
         <input type="hidden" name="taskGroup_hidden" id="taskGroup_hidden"
-               value="<%=taskDescription.getGroup()%>"/>
+               value="<%=taskDescription.getTaskGroup()%>"/>
     </td>
 </tr>
 <%
@@ -129,7 +129,7 @@
                onkeyup="onclassnamefieldchange('loadClassButton');"
                onchange="onclassnamefieldchange('loadClassButton');" id="taskClass" name="taskClass"
                class="longInput" type="text"
-               value="<%=taskDescription.getTaskClass()%>"/>
+               value="<%=taskDescription.getTaskImplClassName()%>"/>
         <input id="loadClassButton" name="loadClassButton" class="button" type="button"
                href="#"
                value="<fmt:message key="task.class.reload.button.text"/>"/>
@@ -138,7 +138,7 @@
 <%
 } else { %>
 <input id="taskClass" name="taskClass" type="hidden"
-       value="<%=taskDescription.getTaskClass()%>"/>
+       value="<%=taskDescription.getTaskImplClassName()%>"/>
 <% } %>
 <%
     if (!disableTaskProperties) {
@@ -147,7 +147,7 @@
     <td colspan="2">
 
         <div id="modelDescription">
-            <% Set<OMElement> properties = taskDescription.getProperties();
+            <% Set<OMElement> properties = taskDescription.getXmlProperties();
                 if (properties != null && !properties.isEmpty()) {
             %>
             <table border="0" cellpadding="0" cellspacing="0" class="styledLeft noBorders"
@@ -244,7 +244,7 @@
 </tr>
 <%
 } else {
-    Set<OMElement> properties = taskDescription.getProperties();
+    Set<OMElement> properties = taskDescription.getXmlProperties();
     if (properties != null && !properties.isEmpty()) {
         int i = 0;
         for (OMElement property : properties) {
@@ -290,9 +290,12 @@
 </tr>
 
 <%
-    String cron = taskDescription.getCron();
+    String cron = taskDescription.getCronExpression();
     int count = taskDescription.getCount();
     long interval = taskDescription.getInterval();
+    if (taskDescription.getIntervalInMs()) {
+        interval = interval / 1000;
+    }
     boolean simpleTrigger = cron == null || "".equals(cron);
 
 %>
