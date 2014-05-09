@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.SynapseTaskException;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskManager;
+import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -27,6 +28,8 @@ public class NTaskTaskManager implements TaskManager {
 
     private Map<String, Object> properties = new HashMap<String, Object>(5);
 
+    private TaskStartupObserver startupObserver;
+    
     public boolean schedule(TaskDescription taskDescription) {
         TaskInfo taskInfo;
         try {
@@ -34,7 +37,7 @@ public class NTaskTaskManager implements TaskManager {
         } catch (Exception e) {
             return false;
         }
-
+        startupObserver = taskDescription.getTaskStartupObserver();
         if (!isInitialized()) {
             return false;
         }
@@ -69,7 +72,7 @@ public class NTaskTaskManager implements TaskManager {
         if (!isInitialized()) {
             return false;
         }
-        try {
+        try {	
             TaskInfo taskInfo = taskManager.getTask(taskName);
             TaskDescription description = TaskBuilder.buildTaskDescription(taskInfo);
             taskInfo = TaskBuilder.buildTaskInfo(description, properties);
@@ -341,8 +344,8 @@ public class NTaskTaskManager implements TaskManager {
     }
 
     private org.wso2.carbon.ntask.core.TaskManager getTaskManager(boolean system) throws Exception {
-        TaskService taskService = NtaskService.getTaskService();
-        if (taskService == null) {
+        TaskService taskService = NtaskService.getTaskService(startupObserver);
+        if (taskService == null) {        	
             return null;
         }
         return taskService.getTaskManager(
