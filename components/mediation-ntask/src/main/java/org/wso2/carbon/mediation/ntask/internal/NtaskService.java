@@ -68,6 +68,12 @@ public class NtaskService implements TaskStartupSubject{
     	}
         return NtaskService.taskService;
     }
+    
+	public static void attachObserver(TaskStartupObserver startupObserver) {
+		synchronized (startupObservers) {
+			startupObservers.add(startupObserver);
+		}
+	}
 
 	@Override
 	public void attach(TaskStartupObserver startupObserver) {

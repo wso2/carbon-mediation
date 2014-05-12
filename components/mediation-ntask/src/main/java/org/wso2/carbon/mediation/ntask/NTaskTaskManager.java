@@ -32,12 +32,13 @@ public class NTaskTaskManager implements TaskManager {
     
     public boolean schedule(TaskDescription taskDescription) {
         TaskInfo taskInfo;
+        startupObserver = taskDescription.getTaskStartupObserver();
         try {
             taskInfo = TaskBuilder.buildTaskInfo(taskDescription, properties);
         } catch (Exception e) {
+        	NtaskService.attachObserver(startupObserver);
             return false;
-        }
-        startupObserver = taskDescription.getTaskStartupObserver();
+        }        
         if (!isInitialized()) {
             return false;
         }
@@ -58,12 +59,12 @@ public class NTaskTaskManager implements TaskManager {
             if (logger.isDebugEnabled()) {
                 logger.debug("#schedule() Scheduled task [" + taskInfo.getName() + "] SUCCESSFUL.");
             }
-        } catch (Exception e) {
+        } catch (Exception e) {e.printStackTrace();
             if (logger.isDebugEnabled()) {
                 logger.debug("#schedule() Scheduled task [" + taskDescription.getName() + "] FAILED. Error:" + e.getLocalizedMessage());
                 logger.error(e);
             }
-            return false;
+            return false;	
         }
         return true;
     }
