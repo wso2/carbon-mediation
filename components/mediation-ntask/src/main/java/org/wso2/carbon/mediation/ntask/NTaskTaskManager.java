@@ -94,17 +94,17 @@ public class NTaskTaskManager implements TaskManager {
         }
         String list[] = taskName.split("::");
         String name = list[0];
-        String group = list[1];
+        //String group = list[1];
         if (name == null || "".equals(name)) {
             throw new SynapseTaskException("Task Name can not be null", logger);
         }
-        if (group == null || "".equals(group)) {
+        /*if (group == null || "".equals(group)) {
             group = TaskDescription.DEFAULT_GROUP;
             if (logger.isDebugEnabled()) {
                 logger.debug("Task group is null or empty , using default group :"
                         + TaskDescription.DEFAULT_GROUP);
             }
-        }
+        }*/
         try {
             boolean deleted = taskManager.deleteTask(name);
             if (deleted) {
@@ -215,6 +215,28 @@ public class NTaskTaskManager implements TaskManager {
         return new String[0];
     }
 
+    private boolean deleteInboundEndpointTasks() {
+        if (!isInitialized()) {
+            return false;
+        }
+        try {
+            List<TaskInfo> taskList = taskManager.getAllTasks();
+            List<String> result = new ArrayList<String>();
+            for (TaskInfo taskInfo : taskList) {
+            	String strTaskName = taskInfo.getName();
+            	if(strTaskName.endsWith("-EP")){
+            		delete(strTaskName);
+            	}
+                result.add(taskInfo.getName());
+            }
+        } catch (Exception e) {
+            logger.error("#getTaskNames() Cannot return task list. Error:" + e.getLocalizedMessage());
+            logger.error(e);
+            return false;
+        }
+        return true;
+    }    
+    
     public boolean init(Properties properties) {
         try {
             if (this.tmproperties == null && properties != null) {
@@ -226,6 +248,7 @@ public class NTaskTaskManager implements TaskManager {
             }
             taskManager.initStartupTasks();
             initialized = true;
+            deleteInboundEndpointTasks();
             return true;
         } catch (Exception e) {
             logger.error("#init() Cannot initialize task manager. Error:" + e.getLocalizedMessage());
