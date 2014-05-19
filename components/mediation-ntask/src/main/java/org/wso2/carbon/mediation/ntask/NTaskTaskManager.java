@@ -215,7 +215,7 @@ public class NTaskTaskManager implements TaskManager {
         return new String[0];
     }
 
-    private boolean deleteInboundEndpointTasks() {
+    public boolean deleteInboundEndpointAllTasks() {
         if (!isInitialized()) {
             return false;
         }
@@ -247,8 +247,7 @@ public class NTaskTaskManager implements TaskManager {
                 return false;
             }
             taskManager.initStartupTasks();
-            initialized = true;
-            deleteInboundEndpointTasks();
+            initialized = true;            
             return true;
         } catch (Exception e) {
             logger.error("#init() Cannot initialize task manager. Error:" + e.getLocalizedMessage());

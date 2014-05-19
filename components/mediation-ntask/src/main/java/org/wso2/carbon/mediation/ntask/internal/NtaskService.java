@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.ntask.core.service.TaskService;
+import org.wso2.carbon.mediation.ntask.NTaskTaskManager;
 import org.wso2.carbon.mediation.ntask.TaskBuilder;
 import org.apache.synapse.task.TaskStartupSubject;
 import org.apache.synapse.task.TaskStartupObserver;
@@ -46,6 +47,7 @@ public class NtaskService implements TaskStartupSubject{
             logger.debug("Setting the Task Service [" + taskService + "].");
         }
         NtaskService.taskService = taskService;
+        (new NTaskTaskManager()).deleteInboundEndpointAllTasks();
         notifySubjects();
     }
 
