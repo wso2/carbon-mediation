@@ -24,7 +24,7 @@
         <description>
             This service will help to create/modify remote tasks.
         </description>
-        <parameter name="ServiceClass">org.wso2.carbon.ntaskint.core.admin.ESBTaskAdmin</parameter>
+        <parameter name="ServiceClass">org.wso2.carbon.mediation.ntask.admin.ESBTaskAdmin</parameter>
         <parameter name="enableMTOM" locked="false">false</parameter>        
     </service>
     
