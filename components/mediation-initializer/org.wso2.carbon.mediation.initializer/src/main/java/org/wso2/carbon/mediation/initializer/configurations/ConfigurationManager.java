@@ -542,8 +542,9 @@ public class ConfigurationManager {
                 }
             }
         }
-        
-        synEnv.getTaskManager().init(repository, taskScheduler);
+
+		synEnv.getTaskManager().init(repository, taskScheduler,
+				newSynapseConfiguration.getTaskManager());
         // init the synapse configuration
         newSynapseConfiguration.init(synEnv);
         synEnv.setInitialized(true);
