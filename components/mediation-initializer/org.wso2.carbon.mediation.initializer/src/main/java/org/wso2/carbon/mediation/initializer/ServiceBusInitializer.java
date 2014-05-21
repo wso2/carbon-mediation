@@ -18,6 +18,7 @@ package org.wso2.carbon.mediation.initializer;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.deployment.DeploymentEngine;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
@@ -27,6 +28,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
 import org.apache.synapse.commons.datasource.DataSourceConstants;
 import org.apache.synapse.commons.datasource.DataSourceInformationRepository;
+import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.deployers.InboundEndpointDeployer;
+import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.registry.RegistryEntry;
 import org.apache.synapse.task.TaskConstants;
@@ -67,7 +73,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -247,8 +252,10 @@ public class ServiceBusInitializer {
 
             configCtxSvc.getServerConfigContext().setProperty(
                     ConfigurationManager.CONFIGURATION_MANAGER, configurationManager);
-            
-                        
+
+			registerInboundDeployer(configCtxSvc.getServerConfigContext()
+					.getAxisConfiguration(),
+					contextInfo.getSynapseEnvironment());
         } catch (Exception e) {
             handleFatal("Couldn't initialize the ESB...", e);
         } catch (Throwable t) {
@@ -734,4 +741,31 @@ public class ServiceBusInitializer {
 			}
 	    }
     }
+	/**
+	 * Register for inbound hot depoyment
+	 * */
+	private void registerInboundDeployer(AxisConfiguration axisConfig,
+			SynapseEnvironment synEnv) {
+		DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig
+				.getConfigurator();
+		SynapseArtifactDeploymentStore deploymentStore = synEnv
+				.getSynapseConfiguration().getArtifactDeploymentStore();
+
+		String synapseConfigPath = ServiceBusUtils
+				.getSynapseConfigAbsPath(synEnv.getServerContextInformation());
+
+		String inboundDirPath = synapseConfigPath + File.separator
+				+ MultiXMLConfigurationBuilder.INBOUND_ENDPOINT_DIR;
+
+		for (InboundEndpoint inboundEndpoint : synEnv.getSynapseConfiguration()
+				.getInboundEndpoints()) {
+			if (inboundEndpoint.getFileName() != null) {
+				deploymentStore.addRestoredArtifact(inboundDirPath
+						+ File.separator + inboundEndpoint.getFileName());
+			}
+		}
+		deploymentEngine.addDeployer(new InboundEndpointDeployer(),
+				inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+	}
+
 }
