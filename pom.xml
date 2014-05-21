@@ -53,6 +53,7 @@
                 <module>features/mediator-features</module>
                 <module>features/mediation-ui-features</module>
                 <module>features/synapse-features</module>
+                <module>features/mediation-ntask-features</module>
             </modules>
         </profile>
     </profiles>
