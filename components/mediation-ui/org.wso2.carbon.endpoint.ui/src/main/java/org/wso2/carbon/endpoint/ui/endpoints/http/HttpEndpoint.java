@@ -19,12 +19,8 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.endpoints.DefinitionFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.endpoints.Template;
-import org.apache.synapse.util.streaming_xpath.compiler.XPath1Parser.orExpr_return;
 import org.wso2.carbon.endpoint.ui.endpoints.Endpoint;
 import org.wso2.carbon.endpoint.ui.util.EndpointConfigurationHelper;
-
-import com.damnhandy.uri.template.UriTemplate;
-
 
 import java.util.Properties;
 
@@ -146,17 +142,17 @@ public class HttpEndpoint extends Endpoint {
     public void setMethod(String method) {
         this.method = method;
         
-        if ("get".equals(method)) {
+        if ("get".equalsIgnoreCase(method)) {
         	setHttpGet(true);
-        } else if ("post".equals(method)) {
+        } else if ("post".equalsIgnoreCase(method)) {
         	setHttpPost(true);
-        } else if ("push".equals(method)) {
+        } else if ("push".equalsIgnoreCase(method)) {
         	setHttpPush(true);
-        } else if ("put".equals(method)) {
+        } else if ("put".equalsIgnoreCase(method)) {
         	setHttpPut(true);
-        } else if ("delete".equals(method)) {
+        } else if ("delete".equalsIgnoreCase(method)) {
         	setHttpDelete(true);
-        } else if ("head".equals(method)) {
+        } else if ("head".equalsIgnoreCase(method)) {
         	setHttpHead(true);
         } else {
         	setHttpGet(false);
