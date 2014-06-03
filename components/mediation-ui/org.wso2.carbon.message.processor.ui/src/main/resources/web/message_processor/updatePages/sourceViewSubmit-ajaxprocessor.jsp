@@ -28,3 +28,4 @@
 <input id="Name" name="Name" type="hidden" value="<%=mpName%>"/>
 <input name="Provider" id="Provider" type="hidden" value="<%=mpProvider%>"/>
 <input name="MessageStore" id="MessageStore" type="hidden" value="<%=mpStore%>"/>
+<input name="TargetEndpoint" id="TargetEndpoint" type="hidden" value="<%=processorData.getTargetEndpoint()%>"/>
