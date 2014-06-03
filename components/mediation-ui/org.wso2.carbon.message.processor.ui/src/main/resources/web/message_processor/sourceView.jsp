@@ -49,8 +49,8 @@
                 return false;
             }
             var messageProcessorValue = trim(document.getElementById('messageProcessorSource').value);
-            var messageProcessorStr = {Name : document.getElementById("Name").value, tableParams : document.getElementById("tableParams").value, Provider : document.getElementById("Provider").value, MessageStore : document.getElementById("MessageStore").value, TargetEndpoint : document.getElementById("TargetEndpoint").value};
-            
+            var messageProcessorStr = {messageProcessorString : messageProcessorValue, mpName : document.getElementById("mpName").value, mpProvider : document.getElementById("mpProvider").value, mpStore : document.getElementById("mpStore").value};
+
             jQuery.ajax({
                 type: 'POST',
                 url: 'updatePages/sourceViewUpdate.jsp',
@@ -83,7 +83,7 @@
         }
 
         function postToServiceCaller() {
-            var messageProcessorStr = {Name : document.getElementById("Name").value, tableParams : document.getElementById("tableParams").value, Provider : document.getElementById("Provider").value, MessageStore : document.getElementById("MessageStore").value};
+            var messageProcessorStr = {Name : document.getElementById("Name").value, tableParams : document.getElementById("tableParams").value, Provider : document.getElementById("Provider").value, MessageStore : document.getElementById("MessageStore").value, TargetEndpoint : document.getElementById("TargetEndpoint").value};
             jQuery.ajax({
                 type: 'POST',
                 url: 'ServiceCaller.jsp',
