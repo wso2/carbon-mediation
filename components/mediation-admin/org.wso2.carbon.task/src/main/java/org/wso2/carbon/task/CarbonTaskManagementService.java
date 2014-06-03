@@ -52,7 +52,7 @@ public class CarbonTaskManagementService extends AbstractAdmin {
             log.debug("Add TaskDescription - Get a Task configuration  :" + taskElement);
         }
         TaskDescription taskDescription = validateAndCreate(taskElement);
-        if (isContains(taskDescription.getName(), taskDescription.getGroup())) {
+        if (isContains(taskDescription.getName(), taskDescription.getTaskGroup())) {
             throw new TaskManagementException("Task with name " + taskDescription.getName() +
                     " is already there.");
         }
@@ -61,7 +61,7 @@ public class CarbonTaskManagementService extends AbstractAdmin {
         } catch (Exception e) {
             try {
                 getTaskManager().deleteTaskDescription(taskDescription.getName(),
-                        taskDescription.getGroup());
+                        taskDescription.getTaskGroup());
             } catch (Exception ignored) {
             }
             handleException("Error creating a task : " + e.getMessage(), e);            

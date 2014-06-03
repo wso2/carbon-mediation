@@ -75,24 +75,25 @@ public class CarbonSynapseController extends Axis2SynapseController {
         Object context = serverContextInformation.getServerContext();
         if (context instanceof ConfigurationContext) {
             AxisConfiguration axisCfg = ((ConfigurationContext) context).getAxisConfiguration();
-            DeploymentEngine deploymentEngine = (DeploymentEngine) axisCfg.getConfigurator();
-            // File carbonHome = new File(System.getProperty(ServerConstants.CARBON_HOME));
-            // subjected to change
-            String carbonRepoPath = axisCfg.getRepository().getPath();
-            String mediatorsPath = carbonRepoPath + File.separator + "mediators";
-            String extensionsPath = carbonRepoPath + File.separator + "extensions";
-            ExtensionDeployer deployer = new ExtensionDeployer();
-            deploymentEngine.addDeployer(deployer, mediatorsPath, "xar");
-            deploymentEngine.addDeployer(deployer, extensionsPath, "xar");
-            deploymentEngine.addDeployer(deployer, mediatorsPath, "jar");
-            deploymentEngine.addDeployer(deployer, extensionsPath, "jar");
+            synchronized (axisCfg) {
+                DeploymentEngine deploymentEngine = (DeploymentEngine) axisCfg.getConfigurator();
+                // File carbonHome = new File(System.getProperty(ServerConstants.CARBON_HOME));
+                // subjected to change
+                String carbonRepoPath = axisCfg.getRepository().getPath();
+                String mediatorsPath = carbonRepoPath + File.separator + "mediators";
+                String extensionsPath = carbonRepoPath + File.separator + "extensions";
+                ExtensionDeployer deployer = new ExtensionDeployer();
+                deploymentEngine.addDeployer(deployer, mediatorsPath, "xar");
+                deploymentEngine.addDeployer(deployer, extensionsPath, "xar");
+                deploymentEngine.addDeployer(deployer, mediatorsPath, "jar");
+                deploymentEngine.addDeployer(deployer, extensionsPath, "jar");
 
-            // Register deployer for class mediators
-            String classMediatorsPath = carbonRepoPath + File.separator + "class-mediators";
-            deploymentEngine.addDeployer(new ClassMediatorDeployer(),
-                                         classMediatorsPath,
-                                         ServiceBusConstants.CLASS_MEDIATOR_EXTENSION);
-
+                // Register deployer for class mediators
+                String classMediatorsPath = carbonRepoPath + File.separator + "class-mediators";
+                deploymentEngine.addDeployer(new ClassMediatorDeployer(),
+                                             classMediatorsPath,
+                                             ServiceBusConstants.CLASS_MEDIATOR_EXTENSION);
+            }
             this.currentConfigurationName = ((ConfigurationContext) context).
                     getAxisConfiguration().getParameterValue(
                     ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION).toString();

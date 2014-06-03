@@ -80,8 +80,8 @@ public class TaskManagementHelper {
 
         TaskDescription taskDescription = new TaskDescription();
         taskDescription.setName(name.trim());
-        taskDescription.setGroup(group.trim());
-        taskDescription.setTaskClass(taskClass.trim());
+        taskDescription.setTaskGroup(group.trim());
+        taskDescription.setTaskImplClassName(taskClass.trim());
 
         String trigger = request.getParameter("taskTrigger");
 
@@ -93,6 +93,7 @@ public class TaskManagementHelper {
                 if (interval != null && !"".equals(interval)) {
                     try {
                         taskDescription.setInterval(Long.parseLong(interval.trim()) * 1000);
+                        taskDescription.setIntervalInMs(true);
                     } catch (NumberFormatException e) {
                         handleException("Invalid value for interval (Expected type is long) : " +
                                 interval);
@@ -114,7 +115,7 @@ public class TaskManagementHelper {
 
                 String cron = request.getParameter("triggerCron");
                 if (cron != null && !"".equals(cron)) {
-                    taskDescription.setCron(cron.trim());
+                    taskDescription.setCronExpression(cron.trim());
                 } else {
                     handleException("Cron expression cannot be empty for cron trigger");
                 }
@@ -172,7 +173,7 @@ public class TaskManagementHelper {
                                 OMNamespace nullNS = FACTORY.createOMNamespace("", "");
                                 propElem.addAttribute("name", propName.trim(), nullNS);
                                 propElem.addAttribute("value", value.trim(), nullNS);
-                                taskDescription.addProperty(propElem);
+                                taskDescription.setXmlProperty(propElem);
                             }
 
                         } else if ("xml".equals(propertyType)) {
@@ -196,7 +197,7 @@ public class TaskManagementHelper {
                                     handleException("Invalid XML has been provided " +
                                             "for property : " + propName);
                                 }
-                                taskDescription.addProperty(propElem);
+                                taskDescription.setXmlProperty(propElem);
                             }
                         }
                     }

@@ -86,7 +86,7 @@ public class TaskManager {
         assetInitialized();
         String className =
                 jobMetaDataProviderServiceHandler.getTaskManagementServiceImplementer(
-                        taskDescription.getGroup());
+                        taskDescription.getTaskGroup());
         if (className != null && !"".equals(className)) {
             taskManagementServiceHandler.addTaskDescription(taskDescription, className);
         }
@@ -119,7 +119,7 @@ public class TaskManager {
         assetInitialized();
         String className =
                 jobMetaDataProviderServiceHandler.getTaskManagementServiceImplementer(
-                        taskDescription.getGroup());
+                        taskDescription.getTaskGroup());
         if (className != null && !"".equals(className)) {
             taskManagementServiceHandler.editTaskDescription(taskDescription, className);
         }

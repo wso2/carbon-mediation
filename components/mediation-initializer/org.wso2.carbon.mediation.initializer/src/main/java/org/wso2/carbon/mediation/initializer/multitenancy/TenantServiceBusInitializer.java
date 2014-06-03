@@ -432,17 +432,19 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
 
     private void addDeployers(ConfigurationContext configurationContext,ServerContextInformation contextInfo) {
         AxisConfiguration axisConfig = configurationContext.getAxisConfiguration();
-        DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
-        String carbonRepoPath = configurationContext.getAxisConfiguration().getRepository().getFile();
-       
-        String mediatorsPath = carbonRepoPath + File.separator + "mediators";
-        String extensionsPath = carbonRepoPath + File.separator + "extensions";
-        ExtensionDeployer deployer = new ExtensionDeployer();
-        deploymentEngine.addDeployer(deployer, mediatorsPath, "xar");
-        deploymentEngine.addDeployer(deployer, extensionsPath, "xar");
-        deploymentEngine.addDeployer(deployer, mediatorsPath, "jar");
-        deploymentEngine.addDeployer(deployer, extensionsPath, "jar");
-     }
+        synchronized (axisConfig) {
+            DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
+            String carbonRepoPath = configurationContext.getAxisConfiguration().getRepository().getFile();
+
+            String mediatorsPath = carbonRepoPath + File.separator + "mediators";
+            String extensionsPath = carbonRepoPath + File.separator + "extensions";
+            ExtensionDeployer deployer = new ExtensionDeployer();
+            deploymentEngine.addDeployer(deployer, mediatorsPath, "xar");
+            deploymentEngine.addDeployer(deployer, extensionsPath, "xar");
+            deploymentEngine.addDeployer(deployer, mediatorsPath, "jar");
+            deploymentEngine.addDeployer(deployer, extensionsPath, "jar");
+        }
+    }
     
     
     /**
