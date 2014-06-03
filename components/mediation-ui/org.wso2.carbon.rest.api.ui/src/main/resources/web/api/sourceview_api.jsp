@@ -80,6 +80,9 @@
         source = client.getApiSource(apiData);
         sourceXml = ApiEditorHelper.parseStringToPrettyfiedString(source);
     }
+    if (sourceXml != null) {
+        sourceXml = sourceXml.trim().replace("&", "&amp;");
+    }
 %>
 
 <script type="text/javascript">
