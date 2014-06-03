@@ -75,7 +75,7 @@ public class CarbonSynapseController extends Axis2SynapseController {
         Object context = serverContextInformation.getServerContext();
         if (context instanceof ConfigurationContext) {
             AxisConfiguration axisCfg = ((ConfigurationContext) context).getAxisConfiguration();
-            synchronized (axisConfig) {
+            synchronized (axisCfg) {
                 DeploymentEngine deploymentEngine = (DeploymentEngine) axisCfg.getConfigurator();
                 // File carbonHome = new File(System.getProperty(ServerConstants.CARBON_HOME));
                 // subjected to change
