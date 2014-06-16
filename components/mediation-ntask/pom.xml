@@ -79,9 +79,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Private-Package>
+                        <!--Private-Package>
                             org.wso2.carbon.mediation.ntask.internal,
-                        </Private-Package>
+                        </Private-Package-->
                         <Export-Package>
                             !javax.servlet,
                             !javax.servlet.http,
