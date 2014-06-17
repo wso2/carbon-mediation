@@ -9,13 +9,18 @@ import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.service.TaskService;
-import org.wso2.carbon.mediation.ntask.internal.NtaskService;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
-public class NTaskTaskManager implements TaskManager {
+public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
+    private static final Object lock = new Object();
+
+    private static final Log logger = LogFactory.getLog(NTaskTaskManager.class.getName());
+
     private String name;
 
     private boolean initialized = false;
@@ -24,13 +29,19 @@ public class NTaskTaskManager implements TaskManager {
 
     private Properties tmproperties;
 
-    private static final Log logger = LogFactory.getLog(NTaskTaskManager.class.getName());
-
     private Map<String, Object> properties = new HashMap<String, Object>(5);
 
     private TaskStartupObserver startupObserver;
     
     public boolean schedule(TaskDescription taskDescription) {
+        if (CarbonUtils.isWorkerNode()) {
+            logger.info("[Manager-node] Skipping scheduling task:" + taskDescription.getName());
+            return true;
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Scheduling task:" + taskDescription.getName());
+            }
+        }
         TaskInfo taskInfo;
         startupObserver = taskDescription.getTaskStartupObserver();
         try {
@@ -54,8 +65,10 @@ public class NTaskTaskManager implements TaskManager {
                     //apiData.setContext(TENANT_DELIMITER + tenantDomain + tenantApiContext);
                 }
             }
-            taskManager.registerTask(taskInfo);
-            taskManager.scheduleTask(taskInfo.getName());
+            synchronized (lock) {
+                taskManager.registerTask(taskInfo);
+                taskManager.scheduleTask(taskInfo.getName());
+            }
             if (logger.isDebugEnabled()) {
                 logger.debug("#schedule() Scheduled task [" + taskInfo.getName() + "] SUCCESSFUL.");
             }
@@ -73,12 +86,14 @@ public class NTaskTaskManager implements TaskManager {
         if (!isInitialized()) {
             return false;
         }
-        try {	
-            TaskInfo taskInfo = taskManager.getTask(taskName);
-            TaskDescription description = TaskBuilder.buildTaskDescription(taskInfo);
-            taskInfo = TaskBuilder.buildTaskInfo(description, properties);
-            taskManager.registerTask(taskInfo);
-            taskManager.rescheduleTask(taskInfo.getName());
+        try {
+            synchronized (lock) {
+                TaskInfo taskInfo = taskManager.getTask(taskName);
+                TaskDescription description = TaskBuilder.buildTaskDescription(taskInfo);
+                taskInfo = TaskBuilder.buildTaskInfo(description, properties);
+                taskManager.registerTask(taskInfo);
+                taskManager.rescheduleTask(taskInfo.getName());
+            }
         } catch (Exception e) {
             return false;
         }
@@ -94,19 +109,22 @@ public class NTaskTaskManager implements TaskManager {
         }
         String list[] = taskName.split("::");
         String name = list[0];
-        //String group = list[1];
         if (name == null || "".equals(name)) {
             throw new SynapseTaskException("Task Name can not be null", logger);
         }
-        /*if (group == null || "".equals(group)) {
-            group = TaskDescription.DEFAULT_GROUP;
-            if (logger.isDebugEnabled()) {
-                logger.debug("Task group is null or empty , using default group :"
-                        + TaskDescription.DEFAULT_GROUP);
-            }
-        }*/
+        //String group = list[1];
+        //if (group == null || "".equals(group)) {
+        //    group = TaskDescription.DEFAULT_GROUP;
+        //    if (logger.isDebugEnabled()) {
+        //        logger.debug("Task group is null or empty , using default group :"
+        //                + TaskDescription.DEFAULT_GROUP);
+        //    }
+        //}
         try {
-            boolean deleted = taskManager.deleteTask(name);
+            boolean deleted;
+            synchronized (lock) {
+                deleted = taskManager.deleteTask(name);
+            }
             if (deleted) {
                 NTaskAdapter.removeProperty(taskName);
             }
@@ -123,7 +141,9 @@ public class NTaskTaskManager implements TaskManager {
             return false;
         }
         try {
-            taskManager.pauseTask(taskName);
+            synchronized (lock) {
+                taskManager.pauseTask(taskName);
+            }
             return true;
         } catch (Exception e) {
             logger.error("#pause() Cannot pause task [" + taskName + "]. Error:" + e.getLocalizedMessage());
@@ -137,9 +157,11 @@ public class NTaskTaskManager implements TaskManager {
             return false;
         }
         try {
-            List<TaskInfo> taskList = taskManager.getAllTasks();
-            for (TaskInfo taskInfo : taskList) {
-                taskManager.pauseTask(taskInfo.getName());
+            synchronized (lock) {
+                List<TaskInfo> taskList = taskManager.getAllTasks();
+                for (TaskInfo taskInfo : taskList) {
+                    taskManager.pauseTask(taskInfo.getName());
+                }
             }
             return true;
         } catch (Exception e) {
@@ -157,7 +179,9 @@ public class NTaskTaskManager implements TaskManager {
             return false;
         }
         try {
-            taskManager.resumeTask(taskName);
+            synchronized (lock) {
+                taskManager.resumeTask(taskName);
+            }
         } catch (Exception e) {
             logger.error("#resume() Cannot resume task [" + taskName + "]. Error:" + e.getLocalizedMessage());
             logger.error(e);
@@ -171,9 +195,11 @@ public class NTaskTaskManager implements TaskManager {
             return false;
         }
         try {
-            List<TaskInfo> taskList = taskManager.getAllTasks();
-            for (TaskInfo taskInfo : taskList) {
-                taskManager.resumeTask(taskInfo.getName());
+            synchronized (lock) {
+                List<TaskInfo> taskList = taskManager.getAllTasks();
+                for (TaskInfo taskInfo : taskList) {
+                    taskManager.resumeTask(taskInfo.getName());
+                }
             }
             return true;
         } catch (Exception e) {
@@ -188,7 +214,10 @@ public class NTaskTaskManager implements TaskManager {
             return null;
         }
         try {
-            TaskInfo taskInfo = taskManager.getTask(taskName);
+            TaskInfo taskInfo;
+            synchronized (lock) {
+                taskInfo = taskManager.getTask(taskName);
+            }
             return TaskBuilder.buildTaskDescription(taskInfo);
         } catch (Exception e) {
             logger.error("#getTask() Cannot return task [" + taskName + "]. Error:" + e.getLocalizedMessage());
@@ -201,8 +230,10 @@ public class NTaskTaskManager implements TaskManager {
         if (!isInitialized()) {
             return new String[0];
         }
-        try {
-            List<TaskInfo> taskList = taskManager.getAllTasks();
+        try {List<TaskInfo> taskList;
+            synchronized (lock) {
+                taskList = taskManager.getAllTasks();
+            }
             List<String> result = new ArrayList<String>();
             for (TaskInfo taskInfo : taskList) {
                 result.add(taskInfo.getName());
@@ -215,65 +246,66 @@ public class NTaskTaskManager implements TaskManager {
         return new String[0];
     }
 
-    public boolean deleteInboundEndpointAllTasks() {
-        if (!isInitialized()) {
-            return false;
-        }
-        try {
-            List<TaskInfo> taskList = taskManager.getAllTasks();
-            List<String> result = new ArrayList<String>();
-            for (TaskInfo taskInfo : taskList) {
-            	String strTaskName = taskInfo.getName();
-            	if(strTaskName.endsWith("-EP")){
-            		delete(strTaskName);
-            	}
-                result.add(taskInfo.getName());
-            }
-        } catch (Exception e) {
-            logger.error("#getTaskNames() Cannot return task list. Error:" + e.getLocalizedMessage());
-            logger.error(e);
-            return false;
-        }
-        return true;
-    }    
-    
     public boolean init(Properties properties) {
-        try {
-            if (this.tmproperties == null && properties != null) {
-                this.tmproperties = properties;
+        synchronized (lock) {
+            try {
+                if (this.tmproperties == null && properties != null) {
+                    this.tmproperties = properties;
+                }
+                TaskService taskService = NtaskService.getTaskService();
+                if (taskService == null) {
+                    // Cannot proceed with the initialization because the TaskService is not yet
+                    // available. Register this as an observer so that this can be reinitialized
+                    // from within the NtaskService when the TaskService is available.
+                    NtaskService.addObserver(this);
+                    return false;
+                }
+                if (CarbonUtils.isWorkerNode() || CarbonUtils.isRunningInStandaloneMode()) {
+                    taskService.registerTaskType(TaskBuilder.TASK_TYPE_USER);
+                    taskService.registerTaskType(TaskBuilder.TASK_TYPE_SYSTEM);
+                } else { // Skip running tasks on the management node
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Omitting task registration");
+                    }
+                    initialized = true;
+                    return true;
+                }
+                taskManager = getTaskManager(false);
+                if (taskManager == null) {
+                    return false;
+                }
+                // TODO: removing this as this re initializes all tasks when updating a single task
+                //taskManager.initStartupTasks();
+                initialized = true;
+                return true;
+            } catch (Exception e) {
+                logger.error("#init() Cannot initialize task manager. Error:" + e.getLocalizedMessage());
+                logger.error(e);
+                initialized = false;
             }
-            taskManager = this.getTaskManager(false);
-            if (taskManager == null) {
-                return false;
-            }
-            taskManager.initStartupTasks();
-            initialized = true;            
-            return true;
-        } catch (Exception e) {
-            logger.error("#init() Cannot initialize task manager. Error:" + e.getLocalizedMessage());
-            logger.error(e);
-            initialized = false;
         }
         return false;
+    }
+
+    public boolean update(Map<String, Object> parameters) {
+        return init(parameters == null || !parameters.containsKey("init.properties") ? null
+                : (Properties) parameters.get("init.properties"));
     }
 
     public boolean isInitialized() {
-        long duration = 100;
-        return initialized || init(null);
+        synchronized (lock) {
+            long duration = 100;
+            return initialized;
+        }
     }
 
     public boolean start() {
-        if (!isInitialized()) {
-            return false;
-        }
-        return true;
+        return isInitialized();
     }
 
     public boolean stop() {
-        if (!isInitialized()) {
-            return false;
-        }
-        return false;
+        // Nothing to do here.
+        return true;
     }
 
     public int getRunningTaskCount() {
@@ -284,8 +316,11 @@ public class NTaskTaskManager implements TaskManager {
         int count = 0;
         try {
             for (String name : names) {
-                if (taskManager.getTaskState(name).equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL)) {
-                    ++count;
+                synchronized (lock) {
+                    if (taskManager.getTaskState(name)
+                            .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL)) {
+                        ++count;
+                    }
                 }
             }
         } catch (Exception e) {
@@ -305,11 +340,15 @@ public class NTaskTaskManager implements TaskManager {
         } else {
             return false;
         }
-        try {
-            return taskManager.getTaskState(taskName).equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL);
-        } catch (Exception e) {
-            logger.error("#isTaskRunning() Cannot return task status [" + taskName + "]. Error:" + e.getLocalizedMessage());
-            logger.error(e);
+        synchronized (lock) {
+            try {
+                return taskManager.getTaskState(taskName)
+                        .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL);
+            } catch (Exception e) {
+                logger.error("#isTaskRunning() Cannot return task status [" + taskName
+                        + "]. Error:" + e.getLocalizedMessage());
+                logger.error(e);
+            }
         }
         return false;
     }
@@ -322,7 +361,9 @@ public class NTaskTaskManager implements TaskManager {
         while (i.hasNext()) {
             String k = (String) i.next();
             Object v = properties.get(k);
-            this.properties.put(k, v);
+            synchronized (lock) {
+                this.properties.put(k, v);
+            }
         }
         return true;
     }
@@ -331,7 +372,9 @@ public class NTaskTaskManager implements TaskManager {
         if (name == null) {
             return false;
         }
-        properties.put(name, property);
+        synchronized (lock) {
+            properties.put(name, property);
+        }
         return true;
     }
 

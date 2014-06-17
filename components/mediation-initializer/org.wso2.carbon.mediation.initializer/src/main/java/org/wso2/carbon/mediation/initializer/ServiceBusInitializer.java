@@ -52,6 +52,7 @@ import org.wso2.carbon.mediation.initializer.multitenancy.TenantServiceBusInitia
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.*;
 import org.wso2.carbon.mediation.initializer.utils.ConfigurationHolder;
+import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.mediation.registry.ESBRegistryConstants;
 import org.wso2.carbon.mediation.registry.services.SynapseRegistryService;
 import org.wso2.carbon.registry.core.CollectionImpl;
@@ -118,10 +119,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * @scr.reference name="eventbroker.service"
  * interface="org.wso2.carbon.event.core.EventBroker" cardinality="1..1"
  * policy="dynamic" bind="setEventBroker" unbind="unSetEventBroker"
+ * @scr.reference name="esbntask.taskservice"
+ * interface="org.wso2.carbon.mediation.ntask.internal.NtaskService" cardinality="0..1"
+ * policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  */
 @SuppressWarnings({"JavaDoc", "UnusedDeclaration"})
 public class ServiceBusInitializer {
-
     private static final Log log = LogFactory.getLog(ServiceBusInitializer.class);
 
     private static RegistryService registryService;
@@ -164,7 +167,6 @@ public class ServiceBusInitializer {
             TenantServiceBusInitializer listener = new TenantServiceBusInitializer();
             bndCtx.registerService(
                     Axis2ConfigurationContextObserver.class.getName(), listener, null);
-
             // initialize the lock
             Lock lock = new ReentrantLock();
             configCtxSvc.getServerConfigContext().getAxisConfiguration().addParameter(
@@ -663,6 +665,12 @@ public class ServiceBusInitializer {
 
     protected void unSetEventBroker(EventBroker eventBroker) {
         ServiceBusInitializer.eventBroker = null;
+    }
+
+    protected void setTaskService(NtaskService taskService) {
+    }
+
+    protected void unsetTaskService(NtaskService ntaskService) {
     }
 
     public static EventBroker getEventBroker() {

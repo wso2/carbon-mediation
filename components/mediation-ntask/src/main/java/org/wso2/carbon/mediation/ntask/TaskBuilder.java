@@ -5,7 +5,7 @@ import org.wso2.carbon.ntask.core.TaskInfo;
 
 import java.util.*;
 
-public final class TaskBuilder {
+final class TaskBuilder {
     public static final String TASK_TYPE_USER = "CARBON_USER_REMOTE_TASKS";
     public static final String TASK_TYPE_SYSTEM = "CARBON_SYSTEM_REMOTE_TASKS";
     public static final String REMOTE_SYSTEM_TASK_HEADER_ID = "REMOTE_SYSTEM_TASK_ID";
