@@ -2,6 +2,7 @@ package org.wso2.carbon.mediation.ntask;
 
 import org.apache.synapse.task.*;
 import org.wso2.carbon.ntask.core.TaskInfo;
+import org.wso2.carbon.ntask.core.impl.RoundRobinTaskLocationResolver;
 
 import java.util.*;
 
@@ -80,7 +81,10 @@ final class TaskBuilder {
         if (taskInstance instanceof org.apache.synapse.task.Task) {
             NTaskAdapter.addProperty(nameGroup, taskInstance);
         }
-        return new TaskInfo(description.getName(), NTaskAdapter.class.getName(), props, triggerInfo);
+        TaskInfo taskInfo = new TaskInfo(description.getName(), NTaskAdapter.class.getName(), props, triggerInfo);
+        //"org.wso2.carbon.ntask.core.impl.RandomTaskLocationResolver"
+        taskInfo.setLocationResolverClass(RoundRobinTaskLocationResolver.class.getName());
+        return taskInfo;
     }
 
     public static TaskDescription buildTaskDescription(TaskInfo taskInfo) {
