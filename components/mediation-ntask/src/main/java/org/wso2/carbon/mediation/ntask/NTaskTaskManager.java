@@ -6,6 +6,7 @@ import org.apache.synapse.task.SynapseTaskException;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskManager;
 import org.apache.synapse.task.TaskStartupObserver;
+import org.wso2.carbon.base.CarbonBaseUtils;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -35,8 +36,8 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
     
     public boolean schedule(TaskDescription taskDescription) {
         if (CarbonUtils.isWorkerNode()) {
-            logger.info("[Manager-node] Skipping scheduling task:" + taskDescription.getName());
-            return true;
+            //logger.info("[Manager-node] Skipping scheduling task:" + taskDescription.getName());
+            //return true;
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("Scheduling task:" + taskDescription.getName());
@@ -260,7 +261,9 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                     NtaskService.addObserver(this);
                     return false;
                 }
-                if (CarbonUtils.isWorkerNode() || CarbonUtils.isRunningInStandaloneMode()) {
+                logger.info("WORKERNODE: " + CarbonUtils.isWorkerNode() + " STANDALONE: " + CarbonUtils.isRunningInStandaloneMode());
+                if (CarbonUtils.isWorkerNode()) { // || !mgt()
+
                     taskService.registerTaskType(TaskBuilder.TASK_TYPE_USER);
                     taskService.registerTaskType(TaskBuilder.TASK_TYPE_SYSTEM);
                 } else { // Skip running tasks on the management node
@@ -270,8 +273,8 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                     initialized = true;
                     return true;
                 }
-                taskManager = getTaskManager(false);
-                if (taskManager == null) {
+
+                if ((taskManager = getTaskManager(false)) == null) {
                     return false;
                 }
                 // TODO: removing this as this re initializes all tasks when updating a single task
