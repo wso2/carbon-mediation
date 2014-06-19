@@ -265,14 +265,16 @@ public class MediationLibraryServiceComponent extends AbstractAxis2Configuration
             }
         }
         //register imports
-        deploymentEngine.addDeployer(new ImportDeployer(),
-                synapseImportDir, ServiceBusConstants.ARTIFACT_EXTENSION);
-
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(new ImportDeployer(),
+                    synapseImportDir, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
         //register library deployer
         String carbonRepoPath = axisConfig.getRepository().getPath();
         String libsPath = carbonRepoPath + File.separator + "synapse-libs";
-        deploymentEngine.addDeployer(new LibraryArtifactDeployer(), libsPath, "zip");
-
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(new LibraryArtifactDeployer(), libsPath, "zip");
+        }
     }
 
 

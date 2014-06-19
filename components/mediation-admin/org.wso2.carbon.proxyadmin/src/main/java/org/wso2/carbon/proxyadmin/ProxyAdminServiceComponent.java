@@ -157,8 +157,10 @@ public class ProxyAdminServiceComponent extends AbstractAxis2ConfigurationContex
                         proxyDirPath + File.separator + proxyService.getFileName());
             }
         }
-        deploymentEngine.addDeployer(
-                new ProxyServiceDeployer(), proxyDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(
+                    new ProxyServiceDeployer(), proxyDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
      }
 
     protected void deactivate(ComponentContext context) {
