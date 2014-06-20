@@ -7,14 +7,19 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.mediation.ntask.TaskServiceObserver;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.apache.synapse.task.TaskStartupObserver;
+import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * @scr.component name="esbntask.taskservice" immediate="true"
  * @scr.reference name="tasks.component" interface="org.wso2.carbon.ntask.core.service.TaskService"
  * cardinality="1..1" policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
+ * @scr.reference name="config.context.service"
+ * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
+ * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
  **/
 public class NtaskService implements TaskStartupSubject {
     private static final Log logger = LogFactory.getLog(NtaskService.class);
@@ -24,14 +29,16 @@ public class NtaskService implements TaskStartupSubject {
     private static TaskService taskService;
 
     private static final List<TaskStartupObserver>startupObservers = new ArrayList<TaskStartupObserver>();
-    
+
+    private static ConfigurationContextService ccServiceInstance;
+
+    private static final Object lock = new Object();
+
     protected void activate(ComponentContext context) {
         try {
             context.getBundleContext()
                     .registerService(this.getClass().getName(), new NtaskService(), null);
-            if (logger.isDebugEnabled()) {
-                logger.debug("ntask-integration bundle is activated ");
-            }
+            logger.debug("ntask-integration bundle is activated ");
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
         }
@@ -46,35 +53,52 @@ public class NtaskService implements TaskStartupSubject {
             logger.debug("Setting the Task Service [" + taskService + "].");
         }
         NtaskService.taskService = taskService;
-        if (taskService != null) {
-            synchronized (observers) {
-                for (TaskServiceObserver o : observers) {
-                    if (o.update(null)) {
-                        observers.remove(o);
-                    }
-                }
-            }
-        } else {
-            logger.error("Could not notify observers. TaskService is null.");
-        }
+        updateAndCleanupObservers();
         deleteInboundEndpointAllTasks();
         notifySubjects();
     }
 
     protected void unsetTaskService(TaskService taskService) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Unsetting the Task Service [" + taskService + "].");
+            logger.debug("Unsetting the Task Service [" + taskService + "]");
         }
         NtaskService.taskService = null;
     }
 
-    public static void addObserver(TaskServiceObserver o) {
-        synchronized (observers) {
-            if (observers.contains(o)) {
-                return;
-            }
-            observers.add(o);
+    protected void setConfigurationContextService(ConfigurationContextService contextService) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Setting Configuration Context Service [" + contextService + "]");
         }
+        NtaskService.ccServiceInstance = contextService;
+        updateAndCleanupObservers();
+    }
+
+    private void updateAndCleanupObservers() {
+        Iterator<TaskServiceObserver> i = observers.iterator();
+        while (i.hasNext()) {
+            TaskServiceObserver observer = i.next();
+            if (observer.update(null)) {
+                i.remove();
+            }
+        }
+    }
+
+    protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Unsetting Configuration Context Service [" + contextService + "]");
+        }
+        NtaskService.ccServiceInstance = null;
+    }
+
+    public static ConfigurationContextService getCcServiceInstance() {
+        return NtaskService.ccServiceInstance;
+    }
+
+    public static void addObserver(TaskServiceObserver o) {
+        if (observers.contains(o)) {
+            return;
+        }
+        observers.add(o);
     }
 
     public static TaskService getTaskService() {
@@ -82,11 +106,11 @@ public class NtaskService implements TaskStartupSubject {
     }
 
     public static TaskService getTaskService(TaskStartupObserver startupObserver) {
-    	if(NtaskService.taskService == null && startupObserver != null){
-    		synchronized (startupObservers) {
-    			startupObservers.add(startupObserver);
-    		}
-    	}
+        if (NtaskService.taskService == null && startupObserver != null){
+            synchronized (startupObservers) {
+                startupObservers.add(startupObserver);
+            }
+        }
         return NtaskService.taskService;
     }
     
@@ -107,7 +131,9 @@ public class NtaskService implements TaskStartupSubject {
 	public void notifySubjects() {
 		synchronized (startupObservers) {
 			for(TaskStartupObserver inboundObserver:startupObservers){
-				inboundObserver.update();
+                if (inboundObserver != null) {
+				    inboundObserver.update();
+                }
 			}
 			startupObservers.clear();
 		}
