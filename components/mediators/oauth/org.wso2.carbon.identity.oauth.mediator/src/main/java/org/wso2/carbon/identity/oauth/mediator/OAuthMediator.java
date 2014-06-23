@@ -18,6 +18,8 @@
 package org.wso2.carbon.identity.oauth.mediator;
 
 import java.lang.String;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.axis2.AxisFault;
@@ -33,6 +35,7 @@ import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.wso2.carbon.identity.oauth.stub.dto.OAuthConsumerDTO;
 import org.wso2.carbon.identity.oauth.stub.types.Parameters;
+import org.wso2.carbon.identity.oauth2.stub.dto.OAuth2TokenValidationRequestDTO_TokenValidationContextParam;
 import org.wso2.carbon.identity.oauth2.stub.dto.OAuth2TokenValidationResponseDTO;
 
 public class OAuthMediator extends AbstractMediator {
@@ -141,7 +144,28 @@ public class OAuthMediator extends AbstractMediator {
                     (Map) msgContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
             String authHeader = (String) headersMap.get("Authorization");
             String accessToken = authHeader.substring(7).trim();
-			respDTO = oauth2Client.validateAuthenticationRequest(accessToken);
+            List<OAuth2TokenValidationRequestDTO_TokenValidationContextParam> contextParams =
+                    new ArrayList<OAuth2TokenValidationRequestDTO_TokenValidationContextParam>();
+            for(int i = 0; ;i++){
+                if(synCtx.getProperty("oauth_context_param_key_" + i) != null &&
+                        synCtx.getProperty("oauth_context_param_key_" + i) instanceof String &&
+                        !synCtx.getProperty("oauth_context_param_key_" + i).equals("") &&
+                        synCtx.getProperty("oauth_context_param_value_" + i) != null &&
+                        synCtx.getProperty("oauth_context_param_value_" + i) instanceof String &&
+                        !synCtx.getProperty("oauth_context_param_value_" + i).equals("")){
+                    String paramKey = (String)synCtx.getProperty("oauth_context_param_key_" + i);
+                    String paramValue = (String)synCtx.getProperty("oauth_context_param_value_" + i);
+                    OAuth2TokenValidationRequestDTO_TokenValidationContextParam param =
+                            new OAuth2TokenValidationRequestDTO_TokenValidationContextParam();
+                    param.setKey(paramKey);
+                    param.setValue(paramValue);
+                    contextParams.add(param);
+                } else {
+                    break;
+                }
+            }
+
+			respDTO = oauth2Client.validateAuthenticationRequest(accessToken ,contextParams);
 		} catch (Exception e) {
 			log.error("Error occured while validating oauth access token", e);
 			throw new SynapseException("Error occured while validating oauth 2.0 access token");
