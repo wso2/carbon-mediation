@@ -81,9 +81,9 @@ final class TaskBuilder {
         if (taskInstance instanceof org.apache.synapse.task.Task) {
             NTaskAdapter.addProperty(nameGroup, taskInstance);
         }
-        TaskInfo taskInfo = new TaskInfo(description.getName(), NTaskAdapter.class.getName(), props, triggerInfo);
+        TaskInfo taskInfo = new TaskInfo(description.getName(),
+                NTaskAdapter.class.getName(), props, RoundRobinTaskLocationResolver.class.getName(), triggerInfo);
         //"org.wso2.carbon.ntask.core.impl.RandomTaskLocationResolver"
-        taskInfo.setLocationResolverClass(RoundRobinTaskLocationResolver.class.getName());
         return taskInfo;
     }
 

@@ -10,6 +10,7 @@ import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
+import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -32,6 +33,8 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
     private Map<String, Object> properties = new HashMap<String, Object>(5);
 
     private TaskStartupObserver startupObserver;
+
+    private List<TaskInfo> pendingTasks = new ArrayList<TaskInfo>();
     
     public boolean schedule(TaskDescription taskDescription) {
         logger.debug("#schedule Scheduling task:" + taskDescription.getName());
@@ -40,10 +43,14 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         try {
             taskInfo = TaskBuilder.buildTaskInfo(taskDescription, properties);
         } catch (Exception e) {
-        	NtaskService.attachObserver(startupObserver);
+        	//NtaskService.attachObserver(startupObserver);
             return false;
         }        
         if (!isInitialized()) {
+            // if cannot schedule, put in the pending tasks list.
+            synchronized (lock) {
+                pendingTasks.add(taskInfo);
+            }
             return false;
         }
         try {
@@ -53,7 +60,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             }
             logger.debug("#schedule Scheduled task [" + taskInfo.getName() + "] SUCCESSFUL.");
         } catch (Exception e) {
-            logger.error("Scheduling task[" + taskDescription.getName() + "] FAILED. Error" + e.getLocalizedMessage());
+            logger.error("Scheduling task [" + taskDescription.getName() + "] FAILED. Error:" + e.getLocalizedMessage());
             logger.error(e);
             return false;	
         }
@@ -243,10 +250,8 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                 boolean isWorkerNode = !isSingleNode && CarbonUtils.isWorkerNode();
                 logger.debug("#init Single-Node: " + isSingleNode
                         + " Worker-Node: " + isWorkerNode);
-                if (isSingleNode || isWorkerNode) {
-                    taskService.registerTaskType(TaskBuilder.TASK_TYPE_USER);
-                    taskService.registerTaskType(TaskBuilder.TASK_TYPE_SYSTEM);
-                } else { // Skip running tasks on the management node
+                if (!(isSingleNode || isWorkerNode)) {
+                    // Skip running tasks on the management node
                     logger.debug("#init Skipping task registration");
                     initialized = true;
                     return true;
@@ -254,8 +259,30 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                 if ((taskManager = getTaskManager(false)) == null) {
                     return false;
                 }
-                // TODO: removing this as this re initializes all tasks when updating a single task
-                //taskManager.initStartupTasks();
+                // Register pending tasks..
+                synchronized (lock) {
+                    Iterator tasks = pendingTasks.iterator();
+                    while (tasks.hasNext()) {
+                        TaskInfo taskInfo = (TaskInfo) tasks.next();
+                        try {
+                            if (taskManager.getTask(taskInfo.getName()) != null) {
+                                logger.debug("Pending task [" + taskInfo.getName() + "] is already available in the registry.");
+                                continue;
+                            }
+                            taskManager.registerTask(taskInfo);
+                            taskManager.scheduleTask(taskInfo.getName());
+                            tasks.remove();
+                            logger.debug("#schedule Scheduled pending task [" + taskInfo.getName() + "] SUCCESSFUL.");
+
+                        } catch (TaskException e) {
+                            logger.error(e.getLocalizedMessage());
+                        }
+
+                    }
+                }
+                // Run already deployed tasks..
+                taskService.registerTaskType(TaskBuilder.TASK_TYPE_USER);
+                taskService.registerTaskType(TaskBuilder.TASK_TYPE_SYSTEM);
                 initialized = true;
                 return true;
             } catch (Exception e) {
