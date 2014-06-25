@@ -67,7 +67,7 @@ public class NTaskAdapter extends AbstractTask {
             return;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("Executing NTaskAdapter: " + getProperties()
+            logger.debug("#execute Executing NTaskAdapter: " + getProperties()
                 + " Worker-node[" + CarbonUtils.isWorkerNode() + "]" );
         }
         // kernel/core/org.wso2.carbon.core
