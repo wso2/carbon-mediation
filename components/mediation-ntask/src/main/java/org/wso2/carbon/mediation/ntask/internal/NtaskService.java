@@ -2,7 +2,6 @@ package org.wso2.carbon.mediation.ntask.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.task.TaskStartupSubject;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.mediation.ntask.TaskServiceObserver;
 import org.wso2.carbon.ntask.core.service.TaskService;
@@ -21,7 +20,7 @@ import java.util.List;
  * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
  * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
  **/
-public class NtaskService implements TaskStartupSubject {
+public class NtaskService {
     private static final Log logger = LogFactory.getLog(NtaskService.class);
 
     private static final List<TaskServiceObserver> observers = new ArrayList<TaskServiceObserver>();
@@ -38,14 +37,14 @@ public class NtaskService implements TaskStartupSubject {
         try {
             context.getBundleContext()
                     .registerService(this.getClass().getName(), new NtaskService(), null);
-            logger.debug("ntask-integration bundle is activated ");
+            logger.debug("ntask-integration bundle is activated.");
         } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
+            logger.error("Could not activate NTaskService. Error: " + e.getMessage(), e);
         }
     }    
     
     protected void deactivate(ComponentContext context) {
-        logger.debug("ntask-integration bundle is deactivated ");
+        logger.debug("ntask-integration bundle is deactivated.");
     }
 
     protected void setTaskService(TaskService taskService) {
@@ -55,7 +54,7 @@ public class NtaskService implements TaskStartupSubject {
         NtaskService.taskService = taskService;
         updateAndCleanupObservers();
         deleteInboundEndpointAllTasks();
-        notifySubjects();
+        //notifySubjects();
     }
 
     protected void unsetTaskService(TaskService taskService) {
@@ -104,40 +103,6 @@ public class NtaskService implements TaskStartupSubject {
     public static TaskService getTaskService() {
         return NtaskService.taskService;
     }
-
-    public static TaskService getTaskService(TaskStartupObserver startupObserver) {
-        if (NtaskService.taskService == null && startupObserver != null){
-            synchronized (startupObservers) {
-                startupObservers.add(startupObserver);
-            }
-        }
-        return NtaskService.taskService;
-    }
-    
-	public static void attachObserver(TaskStartupObserver startupObserver) {
-		synchronized (startupObservers) {
-			startupObservers.add(startupObserver);
-		}
-	}
-
-	@Override
-	public void attach(TaskStartupObserver startupObserver) {
-		synchronized (startupObservers) {
-			startupObservers.add(startupObserver);
-		}
-	}
-
-	@Override
-	public void notifySubjects() {
-		synchronized (startupObservers) {
-			for(TaskStartupObserver inboundObserver:startupObservers){
-                if (inboundObserver != null) {
-				    inboundObserver.update();
-                }
-			}
-			startupObservers.clear();
-		}
-	}
 
     // TODO
     public boolean deleteInboundEndpointAllTasks() {
