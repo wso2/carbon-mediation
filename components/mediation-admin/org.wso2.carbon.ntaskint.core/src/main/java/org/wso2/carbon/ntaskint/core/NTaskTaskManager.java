@@ -39,17 +39,6 @@ public class NTaskTaskManager implements TaskManager {
             return false;
         }
         try {
-            if (taskDescription.getReceiverType() == TaskDescription.NOT_SET) {
-                //logger.error("#schedule() Cannot schedule task [" + taskDescription.getName() + "]. Error: Receiver of the task not set.");
-                //return false;
-            } else if (taskDescription.getReceiverType() == TaskDescription.RECIPE) {
-                String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-                if (tenantDomain != null && !tenantDomain.equals("")
-                        && !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                    //String tenantApiContext = apiData.getContext();
-                    //apiData.setContext(TENANT_DELIMITER + tenantDomain + tenantApiContext);
-                }
-            }
             taskManager.registerTask(taskInfo);
             taskManager.scheduleTask(taskInfo.getName());
             if (logger.isDebugEnabled()) {
