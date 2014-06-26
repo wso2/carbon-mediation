@@ -42,7 +42,7 @@ final class TaskBuilder {
         triggerInfo.setDisallowConcurrentExecution(true);
         Map<String, String> props = new HashMap<String, String>();
         props.put(REMOTE_TASK_NAME, description.getName());
-        String targetUrl = null;// = description.getTargetURI();
+        String targetUrl = null;
         if (system && targetUrl != null) {
             int i1 = targetUrl.lastIndexOf("/");
             String systemTaskId = targetUrl.substring(i1 + 1);
@@ -81,17 +81,15 @@ final class TaskBuilder {
         if (taskInstance instanceof org.apache.synapse.task.Task) {
             NTaskAdapter.addProperty(nameGroup, taskInstance);
         }
-        TaskInfo taskInfo = new TaskInfo(description.getName(),
+        return new TaskInfo(description.getName(),
                 NTaskAdapter.class.getName(), props, RoundRobinTaskLocationResolver.class.getName(), triggerInfo);
         //"org.wso2.carbon.ntask.core.impl.RandomTaskLocationResolver"
-        return taskInfo;
     }
 
     public static TaskDescription buildTaskDescription(TaskInfo taskInfo) {
         TaskDescription taskDescription = new TaskDescription();
         taskDescription.setName(taskInfo.getName());
         Map<String, String> taskProps = taskInfo.getProperties();
-        //taskDescription.setTargetURI(taskProps.get(REMOTE_TASK_URI));
         TaskInfo.TriggerInfo triggerInfo = taskInfo.getTriggerInfo();
         taskDescription.setCronExpression(triggerInfo.getCronExpression());
         taskDescription.setStartTime(dateToCal(triggerInfo.getStartTime()));
@@ -99,7 +97,6 @@ final class TaskBuilder {
         taskDescription.setCount(triggerInfo.getRepeatCount()+1);
         taskDescription.setInterval(triggerInfo.getIntervalMillis());
         taskDescription.setIntervalInMs(true);
-        //taskDescription.setAllowConcurrentExecutions(!triggerInfo.isDisallowConcurrentExecution());
 
         return taskDescription;
     }
