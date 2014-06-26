@@ -278,6 +278,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                 taskService.registerTaskType(TaskBuilder.TASK_TYPE_USER);
                 taskService.registerTaskType(TaskBuilder.TASK_TYPE_SYSTEM);
                 initialized = true;
+                logger.info("initialized");
                 return true;
             } catch (Exception e) {
                 logger.error("Cannot initialize task manager. Error: " + e.getLocalizedMessage(), e);
@@ -354,12 +355,9 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         if (properties == null) {
             return false;
         }
-        Iterator i = properties.keySet().iterator();
-        while (i.hasNext()) {
-            String k = (String) i.next();
-            Object v = properties.get(k);
+        for (String key : properties.keySet()) {
             synchronized (lock) {
-                this.properties.put(k, v);
+                this.properties.put(key, properties.get(key));
             }
         }
         return true;
@@ -379,7 +377,9 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         if (name == null) {
             return null;
         }
-        return properties.get(name);
+        synchronized (lock) {
+            return properties.get(name);
+        }
     }
 
     public void setName(String name) {
@@ -395,14 +395,18 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
     }
 
     public Properties getConfigurationProperties() {
-        return configProperties;
+        synchronized (lock) {
+            return configProperties;
+        }
     }
 
     public void setConfigurationProperties(Properties properties) {
         if (properties == null) {
             return;
         }
-        configProperties.putAll(properties);
+        synchronized (lock) {
+            configProperties.putAll(properties);
+        }
     }
 
     private org.wso2.carbon.ntask.core.TaskManager getTaskManager(boolean system) throws Exception {
