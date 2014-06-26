@@ -56,9 +56,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                 taskManager.registerTask(taskInfo);
                 taskManager.scheduleTask(taskInfo.getName());
             }
-            logger.debug("#schedule Scheduled task [" + taskInfo.getName() + "] SUCCESSFUL.");
+            logger.info("Scheduled task [" + taskDescription.getName() + "::" + taskDescription.getTaskGroup() + "]");
         } catch (Exception e) {
-            logger.error("Scheduling task [" + taskDescription.getName() + "] FAILED. Error: " + e.getLocalizedMessage(), e);
+            logger.error("Scheduling task [" + taskDescription.getName()
+                    + "::" + taskDescription.getTaskGroup() + "] FAILED. Error: " + e.getLocalizedMessage(), e);
             return false;
         }
         return true;
@@ -94,14 +95,14 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         if (name == null || "".equals(name)) {
             throw new SynapseTaskException("Task name is null. ", logger);
         }
-        //String group = list[1];
-        //if (group == null || "".equals(group)) {
-        //    group = TaskDescription.DEFAULT_GROUP;
-        //    if (logger.isDebugEnabled()) {
-        //        logger.debug("Task group is null or empty , using default group :"
-        //                + TaskDescription.DEFAULT_GROUP);
-        //    }
-        //}
+        String group = list[1];
+        if (group == null || "".equals(group)) {
+            group = TaskDescription.DEFAULT_GROUP;
+            if (logger.isDebugEnabled()) {
+                logger.debug("Task group is null or empty , using default group :"
+                        + TaskDescription.DEFAULT_GROUP);
+            }
+        }
         try {
             boolean deleted;
             synchronized (lock) {
@@ -110,9 +111,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             if (deleted) {
                 NTaskAdapter.removeProperty(taskName);
             }
+            logger.debug("Deleted task [" + name + "] [" + deleted +"]");
             return deleted;
         } catch (Exception e) {
-            logger.error("Cannot delete task [" + taskName + "]. Error: " + e.getLocalizedMessage(), e);
+            logger.error("Cannot delete task [" + taskName + "::" + group + "]. Error: " + e.getLocalizedMessage(), e);
             return false;
         }
     }
