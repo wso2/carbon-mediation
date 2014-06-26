@@ -53,8 +53,6 @@ public class NtaskService {
         }
         NtaskService.taskService = taskService;
         updateAndCleanupObservers();
-        deleteInboundEndpointAllTasks();
-        //notifySubjects();
     }
 
     protected void unsetTaskService(TaskService taskService) {
@@ -102,31 +100,5 @@ public class NtaskService {
 
     public static TaskService getTaskService() {
         return NtaskService.taskService;
-    }
-
-    // TODO
-    public boolean deleteInboundEndpointAllTasks() {
-//        if (!isInitialized()) {
-//            return false;
-//        }
-//        try {
-//            List<TaskInfo> taskList;
-//            synchronized (lock) {
-//                taskList = taskManager.getAllTasks();
-//            }
-//            List<String> result = new ArrayList<String>();
-//            for (TaskInfo taskInfo : taskList) {
-//                String strTaskName = taskInfo.getName();
-//                if(strTaskName.endsWith("-EP")){
-//                    delete(strTaskName);
-//                }
-//                result.add(taskInfo.getName());
-//            }
-//        } catch (Exception e) {
-//            logger.error("#getTaskNames() Cannot return task list. Error:" + e.getLocalizedMessage());
-//            logger.error(e);
-//            return false;
-//        }
-        return true;
     }
 }
