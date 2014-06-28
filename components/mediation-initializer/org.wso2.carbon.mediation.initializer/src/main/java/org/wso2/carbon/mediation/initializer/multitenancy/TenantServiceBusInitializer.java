@@ -416,6 +416,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         mainSequence.setFileName(SynapseConstants.MAIN_SEQUENCE_KEY + ".xml");
         faultSequence.setFileName(SynapseConstants.FAULT_SEQUENCE_KEY + ".xml");
         Registry registry = new WSO2Registry();
+        registry.getConfigurationProperties().setProperty("cachableDuration", "1500");
         initialSynCfg.setRegistry(registry);
 
         MultiXMLConfigurationSerializer serializer
