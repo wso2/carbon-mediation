@@ -278,9 +278,10 @@ public class MessageStoreAdminServiceComponent extends AbstractAxis2Configuratio
             }
         }
 
-        deploymentEngine.addDeployer(new MessageStoreDeployer(),
-                messageStoreDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
-
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(new MessageStoreDeployer(),
+                    messageStoreDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
     }
 
 

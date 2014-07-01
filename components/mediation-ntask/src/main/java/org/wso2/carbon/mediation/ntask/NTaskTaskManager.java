@@ -5,11 +5,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.SynapseTaskException;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskManager;
-import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
+import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -27,57 +26,41 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
 
     private org.wso2.carbon.ntask.core.TaskManager taskManager;
 
-    private Properties tmproperties;
-
     private Map<String, Object> properties = new HashMap<String, Object>(5);
 
-    private TaskStartupObserver startupObserver;
-    
+    private List<TaskInfo> pendingTasks = new ArrayList<TaskInfo>();
+
+    protected final Properties configProperties = new Properties();
+
     public boolean schedule(TaskDescription taskDescription) {
-        if (CarbonUtils.isWorkerNode()) {
-            logger.info("[Manager-node] Skipping scheduling task:" + taskDescription.getName());
-            return true;
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Scheduling task:" + taskDescription.getName());
-            }
-        }
+        logger.debug("#schedule Scheduling task:" + taskDescription.getName());
         TaskInfo taskInfo;
-        startupObserver = taskDescription.getTaskStartupObserver();
         try {
             taskInfo = TaskBuilder.buildTaskInfo(taskDescription, properties);
         } catch (Exception e) {
-        	NtaskService.attachObserver(startupObserver);
+            if (logger.isDebugEnabled()) {
+                logger.debug("#schedule Could not build task info object. Error:" + e.getLocalizedMessage(), e);
+            }
             return false;
         }        
         if (!isInitialized()) {
+            // if cannot schedule yet, put in the pending tasks list.
+            synchronized (lock) {
+                logger.debug("#schedule Added pending task [" + taskInfo.getName() + "]");
+                pendingTasks.add(taskInfo);
+            }
             return false;
         }
         try {
-            if (taskDescription.getReceiverType() == TaskDescription.NOT_SET) {
-                //logger.error("#schedule() Cannot schedule task [" + taskDescription.getName() + "]. Error: Receiver of the task not set.");
-                //return false;
-            } else if (taskDescription.getReceiverType() == TaskDescription.RECIPE) {
-                String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-                if (tenantDomain != null && !tenantDomain.equals("")
-                        && !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-                    //String tenantApiContext = apiData.getContext();
-                    //apiData.setContext(TENANT_DELIMITER + tenantDomain + tenantApiContext);
-                }
-            }
             synchronized (lock) {
                 taskManager.registerTask(taskInfo);
                 taskManager.scheduleTask(taskInfo.getName());
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("#schedule() Scheduled task [" + taskInfo.getName() + "] SUCCESSFUL.");
-            }
-        } catch (Exception e) {e.printStackTrace();
-            if (logger.isDebugEnabled()) {
-                logger.debug("#schedule() Scheduled task [" + taskDescription.getName() + "] FAILED. Error:" + e.getLocalizedMessage());
-                logger.error(e);
-            }
-            return false;	
+            logger.info("Scheduled task [" + taskDescription.getName() + "::" + taskDescription.getTaskGroup() + "]");
+        } catch (Exception e) {
+            logger.error("Scheduling task [" + taskDescription.getName()
+                    + "::" + taskDescription.getTaskGroup() + "] FAILED. Error: " + e.getLocalizedMessage(), e);
+            return false;
         }
         return true;
     }
@@ -110,16 +93,16 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         String list[] = taskName.split("::");
         String name = list[0];
         if (name == null || "".equals(name)) {
-            throw new SynapseTaskException("Task Name can not be null", logger);
+            throw new SynapseTaskException("Task name is null. ", logger);
         }
-        //String group = list[1];
-        //if (group == null || "".equals(group)) {
-        //    group = TaskDescription.DEFAULT_GROUP;
-        //    if (logger.isDebugEnabled()) {
-        //        logger.debug("Task group is null or empty , using default group :"
-        //                + TaskDescription.DEFAULT_GROUP);
-        //    }
-        //}
+        String group = list[1];
+        if (group == null || "".equals(group)) {
+            group = TaskDescription.DEFAULT_GROUP;
+            if (logger.isDebugEnabled()) {
+                logger.debug("Task group is null or empty , using default group :"
+                        + TaskDescription.DEFAULT_GROUP);
+            }
+        }
         try {
             boolean deleted;
             synchronized (lock) {
@@ -128,10 +111,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             if (deleted) {
                 NTaskAdapter.removeProperty(taskName);
             }
+            logger.debug("Deleted task [" + name + "] [" + deleted +"]");
             return deleted;
         } catch (Exception e) {
-            logger.error("#delete() Cannot delete task [" + taskName + "]. Error:" + e.getLocalizedMessage());
-            logger.error(e);
+            logger.error("Cannot delete task [" + taskName + "::" + group + "]. Error: " + e.getLocalizedMessage(), e);
             return false;
         }
     }
@@ -146,8 +129,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             }
             return true;
         } catch (Exception e) {
-            logger.error("#pause() Cannot pause task [" + taskName + "]. Error:" + e.getLocalizedMessage());
-            logger.error(e);
+            logger.error("Cannot pause task [" + taskName + "]. Error: " + e.getLocalizedMessage(), e);
         }
         return false;
     }
@@ -165,8 +147,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             }
             return true;
         } catch (Exception e) {
-            logger.error("#pauseAll() Cannot pause all tasks. Error:" + e.getLocalizedMessage());
-            logger.error(e);
+            logger.error("Cannot pause all tasks. Error: " + e.getLocalizedMessage(), e);
         }
         return false;
     }
@@ -183,8 +164,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                 taskManager.resumeTask(taskName);
             }
         } catch (Exception e) {
-            logger.error("#resume() Cannot resume task [" + taskName + "]. Error:" + e.getLocalizedMessage());
-            logger.error(e);
+            logger.error("Cannot resume task [" + taskName + "]. Error: " + e.getLocalizedMessage(), e);
             return false;
         }
         return true;
@@ -203,8 +183,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             }
             return true;
         } catch (Exception e) {
-            logger.error("#resumeAll() Cannot resume all tasks. Error:" + e.getLocalizedMessage());
-            logger.error(e);
+            logger.error("Cannot resume all tasks. Error: " + e.getLocalizedMessage(), e);
         }
         return false;
     }
@@ -220,8 +199,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             }
             return TaskBuilder.buildTaskDescription(taskInfo);
         } catch (Exception e) {
-            logger.error("#getTask() Cannot return task [" + taskName + "]. Error:" + e.getLocalizedMessage());
-            logger.error(e);
+            logger.error("Cannot return task [" + taskName + "]. Error: " + e.getLocalizedMessage(), e);
             return null;
         }
     }
@@ -240,8 +218,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             }
             return result.toArray(new String[result.size()]);
         } catch (Exception e) {
-            logger.error("#getTaskNames() Cannot return task list. Error:" + e.getLocalizedMessage());
-            logger.error(e);
+            logger.error("Cannot return task list. Error: " + e.getLocalizedMessage(), e);
         }
         return new String[0];
     }
@@ -249,38 +226,62 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
     public boolean init(Properties properties) {
         synchronized (lock) {
             try {
-                if (this.tmproperties == null && properties != null) {
-                    this.tmproperties = properties;
-                }
                 TaskService taskService = NtaskService.getTaskService();
-                if (taskService == null) {
+                if (taskService == null || NtaskService.getCcServiceInstance() == null) {
                     // Cannot proceed with the initialization because the TaskService is not yet
                     // available. Register this as an observer so that this can be reinitialized
-                    // from within the NtaskService when the TaskService is available.
+                    // within the NtaskService when the TaskService is available.
                     NtaskService.addObserver(this);
                     return false;
                 }
-                if (CarbonUtils.isWorkerNode() || CarbonUtils.isRunningInStandaloneMode()) {
-                    taskService.registerTaskType(TaskBuilder.TASK_TYPE_USER);
-                    taskService.registerTaskType(TaskBuilder.TASK_TYPE_SYSTEM);
-                } else { // Skip running tasks on the management node
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Omitting task registration");
-                    }
+                boolean isSingleNode = NtaskService.getCcServiceInstance().getServerConfigContext()
+                        .getAxisConfiguration().getClusteringAgent() == null;
+                boolean isWorkerNode = !isSingleNode && CarbonUtils.isWorkerNode();
+                logger.debug("#init Single-Node: " + isSingleNode
+                        + " Worker-Node: " + isWorkerNode);
+                if (!isSingleNode && !isWorkerNode) {
+                    // Skip running tasks on the management node
+                    logger.debug("#init Skipping task registration");
                     initialized = true;
                     return true;
                 }
-                taskManager = getTaskManager(false);
-                if (taskManager == null) {
+                if ((taskManager = getTaskManager(false)) == null) {
                     return false;
                 }
-                // TODO: removing this as this re initializes all tasks when updating a single task
-                //taskManager.initStartupTasks();
+                // Register pending tasks..
+                Iterator tasks = pendingTasks.iterator();
+                while (tasks.hasNext()) {
+                    TaskInfo taskInfo = (TaskInfo) tasks.next();
+                    try {
+                        List<TaskInfo> taskInfos = taskManager.getAllTasks();
+                        boolean hasTask = false;
+                        for (TaskInfo task : taskInfos) {
+                            if (task.getName().equals(taskInfo.getName())) {
+                                hasTask = true;
+                                break;
+                            }
+                        }
+                        if (hasTask) {
+                            logger.debug("#init Pending task [" + taskInfo.getName()
+                                    + "] is already available in the registry.");
+                            continue;
+                        }
+                        taskManager.registerTask(taskInfo);
+                        taskManager.scheduleTask(taskInfo.getName());
+                        tasks.remove();
+                        logger.debug("#init Scheduled pending task [" + taskInfo.getName() + "] SUCCESSFUL.");
+                    } catch (TaskException e) {
+                        logger.error("Could not schedule task [" + taskInfo.getName() + "]. Error: " + e.getLocalizedMessage(), e);
+                    }
+                }
+                // Run already deployed tasks..
+                taskService.registerTaskType(TaskBuilder.TASK_TYPE_USER);
+                taskService.registerTaskType(TaskBuilder.TASK_TYPE_SYSTEM);
                 initialized = true;
+                logger.info("initialized");
                 return true;
             } catch (Exception e) {
-                logger.error("#init() Cannot initialize task manager. Error:" + e.getLocalizedMessage());
-                logger.error(e);
+                logger.error("Cannot initialize task manager. Error: " + e.getLocalizedMessage(), e);
                 initialized = false;
             }
         }
@@ -294,7 +295,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
 
     public boolean isInitialized() {
         synchronized (lock) {
-            long duration = 100;
             return initialized;
         }
     }
@@ -324,8 +324,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                 }
             }
         } catch (Exception e) {
-            logger.error("#getRunningTaskCount() Cannot return running task count. Error:" + e.getLocalizedMessage());
-            logger.error(e);
+            logger.error("Cannot return running task count. Error: " + e.getLocalizedMessage(), e);
         }
         return count;
     }
@@ -345,9 +344,8 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                 return taskManager.getTaskState(taskName)
                         .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL);
             } catch (Exception e) {
-                logger.error("#isTaskRunning() Cannot return task status [" + taskName
-                        + "]. Error:" + e.getLocalizedMessage());
-                logger.error(e);
+                logger.error("Cannot return task status [" + taskName
+                        + "]. Error: " + e.getLocalizedMessage(), e);
             }
         }
         return false;
@@ -357,12 +355,9 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         if (properties == null) {
             return false;
         }
-        Iterator i = properties.keySet().iterator();
-        while (i.hasNext()) {
-            String k = (String) i.next();
-            Object v = properties.get(k);
+        for (String key : properties.keySet()) {
             synchronized (lock) {
-                this.properties.put(k, v);
+                this.properties.put(key, properties.get(key));
             }
         }
         return true;
@@ -382,7 +377,9 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         if (name == null) {
             return null;
         }
-        return properties.get(name);
+        synchronized (lock) {
+            return properties.get(name);
+        }
     }
 
     public void setName(String name) {
@@ -396,22 +393,25 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
     public String getProviderClass() {
         return this.getClass().getName();
     }
-    protected final Properties configProperties = new Properties();
 
     public Properties getConfigurationProperties() {
-        return configProperties;
+        synchronized (lock) {
+            return configProperties;
+        }
     }
 
     public void setConfigurationProperties(Properties properties) {
         if (properties == null) {
             return;
         }
-        configProperties.putAll(properties);
+        synchronized (lock) {
+            configProperties.putAll(properties);
+        }
     }
 
     private org.wso2.carbon.ntask.core.TaskManager getTaskManager(boolean system) throws Exception {
-        TaskService taskService = NtaskService.getTaskService(startupObserver);
-        if (taskService == null) {        	
+        TaskService taskService = NtaskService.getTaskService();
+        if (taskService == null) {
             return null;
         }
         return taskService.getTaskManager(
