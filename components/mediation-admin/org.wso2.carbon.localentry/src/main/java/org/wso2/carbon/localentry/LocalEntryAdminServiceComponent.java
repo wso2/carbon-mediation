@@ -154,8 +154,10 @@ public class LocalEntryAdminServiceComponent extends AbstractAxis2ConfigurationC
                         entriesDirPath + File.separator + entry.getFileName());
             }
         }
-        deploymentEngine.addDeployer(new LocalEntryDeployer(),
-                entriesDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(new LocalEntryDeployer(),
+                    entriesDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
     }
 
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {

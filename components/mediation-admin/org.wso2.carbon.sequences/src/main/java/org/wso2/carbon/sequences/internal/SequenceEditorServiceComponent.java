@@ -153,8 +153,10 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
                         sequenceDirPath + File.separator + seq.getFileName());
             }
         }
-        deploymentEngine.addDeployer(new SequenceDeploymentInterceptor(),
-                sequenceDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(new SequenceDeploymentInterceptor(),
+                    sequenceDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
     }
 
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
