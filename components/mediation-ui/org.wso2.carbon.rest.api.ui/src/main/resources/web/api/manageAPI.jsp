@@ -95,23 +95,41 @@
     session.setAttribute("mode", mode);
     if ("edit".equals(mode)) {
         //To apply changes that might have been made in the source view
-        if (fromSourceView || fromResourceSourceView) {
-            apiData = (APIData) session.getAttribute("apiData");
-            apiName = apiData.getName();
-            //session.removeAttribute("fromSourceView");
-        } else {
-            apiName = request.getParameter("apiName");
+        apiData = session.getAttribute("apiData") != null ? (APIData) session
+					.getAttribute("apiData") : null;
 
-            try {
-                apiData = client.getApiByNane(apiName);
-            } catch (Exception e) {
-                String msg = "Unable to get API data: "
-                             + e.getMessage();
-                CarbonUIMessage.sendCarbonUIMessage(msg,
-                                                    CarbonUIMessage.ERROR, request);
-            }
-        }
+			if (apiData == null) {
+				apiName = request.getParameter("apiName");
+				try {
+					apiData = client.getApiByNane(apiName);
+				} catch (Exception e) {
+					String msg = "Unable to get API data: "
+							+ e.getMessage();
+					CarbonUIMessage.sendCarbonUIMessage(msg,
+							CarbonUIMessage.ERROR, request);
+				}
+			// restrict previous API data load for new API request 	
+			} else if (!apiData.getName().equals(
+					request.getParameter("apiName"))) {
 
+				apiName = request.getParameter("apiName");
+				// remove previous session API data with the end-point data
+				session.removeAttribute("anonEpXML");
+				session.removeAttribute("apiData");
+
+				try {
+					apiData = client.getApiByNane(apiName);
+				} catch (Exception e) {
+					String msg = "Unable to get API data: "
+							+ e.getMessage();
+					CarbonUIMessage.sendCarbonUIMessage(msg,
+							CarbonUIMessage.ERROR, request);
+				}
+
+			} else {
+				apiName = apiData.getName();
+
+			}
         apiContext = apiData.getContext();
         //If api context contains a preceeding '/'
         if (apiContext.startsWith("/")) {
