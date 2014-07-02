@@ -142,6 +142,8 @@
         addServiceParameter("pinnedServers", document.getElementById('pinnedServers').value);
         addServiceParameter("is.active", document.getElementById('mp_state').value);
         addServiceParameter("non.retry.status.codes", document.getElementById('non_retry_status_codes').value);
+        addServiceParameter("max.delivery.drop",document.getElementById('max_delivery_drop').value);
+
     }
 
     function addServiceParameter(parameter, value) {
@@ -426,6 +428,26 @@
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
                                         && !processorData.getParams().isEmpty()&&(processorData.getParams().get("max.delivery.attempts")!=null))?processorData.getParams().get("max.delivery.attempts"):""%>"
                                 />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><fmt:message key="max.delivery.drop"/></td>
+                        <td>
+                            <select id="max_delivery_drop" name="max_delivery_drop">
+                                <% if (null != processorData && processorData.getParams() != null) {
+                                      if (!processorData.getParams().isEmpty() && (processorData.getParams().get("max.delivery.drop") != null)
+                                            && (processorData.getParams().get("max.delivery.drop")).toString().equals("Enabled")) { %>
+                                         <option value="Disabled">Disabled</option>
+                                         <option value="Enabled" selected>Enabled</option>
+                                   <% } else { %>
+                                        <option value="Disabled" selected>Disabled</option>
+                                        <option value="Enabled">Enabled</option>
+                                   <% } %>
+                                <% } else { %>
+                                        <option value="Disabled" selected>Disabled</option>
+                                        <option value="Enabled">Enabled</option>
+                                <% } %>
+                            </select>
                         </td>
                     </tr>
                     <tr>
