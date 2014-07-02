@@ -370,7 +370,7 @@
     <%
     	if (client!=null) {
     %>
-	    <%=" :- " + client.getAPICount()%>
+	    <%=": " + client.getAPICount()%>
     <%
 	}
     %>
