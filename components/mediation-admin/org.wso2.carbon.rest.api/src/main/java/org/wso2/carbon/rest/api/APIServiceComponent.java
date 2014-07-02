@@ -155,8 +155,10 @@ public class APIServiceComponent extends AbstractAxis2ConfigurationContextObserv
                         apiDirPath + File.separator + api.getFileName());
             }
         }
-        deploymentEngine.addDeployer(
-                new APIDeployer(), apiDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(
+                    new APIDeployer(), apiDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
     }
 
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {

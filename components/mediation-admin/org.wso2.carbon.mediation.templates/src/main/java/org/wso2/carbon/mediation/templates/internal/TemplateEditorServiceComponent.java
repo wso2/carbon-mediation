@@ -179,8 +179,10 @@ public class TemplateEditorServiceComponent extends AbstractAxis2ConfigurationCo
                         templateDirPath + File.separator + epTempl.getFileName());
             }
         }
-        deploymentEngine.addDeployer(new TemplateDeployer(),
-                templateDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(new TemplateDeployer(),
+                    templateDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
     }
 
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
