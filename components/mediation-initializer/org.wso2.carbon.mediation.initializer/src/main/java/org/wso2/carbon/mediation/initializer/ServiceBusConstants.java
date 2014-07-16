@@ -66,7 +66,8 @@ public final class ServiceBusConstants {
     public static final int ITEM_TYPE_MESSAGE_PROCESSOR =11;
     public static final int ITEM_TYPE_TEMPLATE_ENDPOINTS = 12;
     public static final int ITEM_TYPE_REST_API      = 13;
-    public static final int ITEM_TYPE_IMPORT      = 14;
+    public static final int ITEM_TYPE_IMPORT        = 14;
+    public static final int ITEM_TYPE_INBOUND       = 15;
 
     public static final String ARTIFACT_EXTENSION = "xml";
     public static final String CLASS_MEDIATOR_EXTENSION = "jar";
