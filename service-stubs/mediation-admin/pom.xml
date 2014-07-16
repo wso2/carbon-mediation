@@ -54,7 +54,7 @@
         <module>org.wso2.carbon.task.stub</module>
         <module>org.wso2.carbon.priority.executors.stub</module>
         <module>org.wso2.carbon.rest.api.stub</module>
-
+	<module>org.wso2.carbon.inbound.stub</module>
     </modules>
   <dependencies>
     <dependency>

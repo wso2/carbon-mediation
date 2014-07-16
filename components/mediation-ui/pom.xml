@@ -51,6 +51,7 @@
 	    <module>org.wso2.carbon.mediation.security.ui</module>
             <module>org.wso2.carbon.localentry.ui</module>
             <module>mediators-ui</module>
+            <module>org.wso2.carbon.inbound.ui</module>
          </modules>
       </profile>
    </profiles>
