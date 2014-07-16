@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+  <title>Scheduled Tasks - User Guide</title>
+  <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>Scheduled Tasks</h1>
+<p>
+    A task is a custom developed Java class which implements the org.apache.synapse.startup.Task
+    interface. This interface defines a single method named 'execute'. Tasks can be scheduled on
+    the ESB to execute periodically. If required a task can be configured to run only a limited
+    number of times.
+</p>
+<p>
+    Before a task can be scheduled on the ESB it has to be compiled and packaged into a jar file.
+    This jar file should then be placed in the repository/components/lib directory of the ESB. It
+    is then required to restart the ESB for the jar containing the task implementation to be picked
+    up by the server runtime. An OSGi bundle containing the task implementation will be created
+    automatically and it will be deployed in the server.
+</p>
+<p>
+    Having deployed a task implementation into the ESB runtime, one can use the ESB management console
+    to schedule various instances of the task. It is possible to schedule a task by specifying the
+    number of times it needs to run along with the frequency or you can use the cron syntax.
+</p>
+
+<h2>Scheduling a Task</h2>
+<ol>
+  <li>
+      In the navigator, under Manage > Service Bus, click <span
+        style="font-weight: bold;">Scheduled Tasks</span>. The <span
+        style="font-weight: bold; font-style: italic;">Scheduled Tasks</span> page
+        appears.
+  </li>
+  <img src="images/tasks1.png" alt="Add New Scheduled Task"/>
+  <p>Figure 1. Scheduled Tasks Panel</p>  
+  <li>
+      Click <span style="font-weight: bold;">Add Task</span>.
+  </li>
+  <li>
+      Enter the required details and click <span
+        style="font-weight: bold;">Schedule</span>. <span style="color: red;"><span
+        style="color: black"><a href="#PageWindow_name1">Field Descriptions</a>
+        </span> </span>
+  </li>
+</ol>
+
+<p><img src="images/tasks2.png"
+alt="Scheduled Task configuration panel"/></p>
+
+<p>Figure 2. New Scheduled Task Configuration Panel</p>
+
+<h2>Field Descriptions</h2>
+<p></p>
+<table style="text-align: left; width: 712px; height: 155px;" border="1"
+cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td colspan="2" rowspan="1"><a name="PageWindow_name1"><strong>Scheduled
+        Tasks</strong></a></td>
+    </tr>
+    <tr>
+      <td><strong>Field Name</strong></td>
+      <td><strong>Description</strong></td>
+    </tr>
+    <tr>
+      <td>Task Name</td>
+      <td>Name of the scheduled task</td>
+    </tr>
+    <tr>
+      <td>Task Group</td>
+      <td>The Group name to grouping tasks. The group name
+        <b>synapse.simple.quartz</b> groups the tasks belongs to ESB -
+        Synapse. All available groups are displayed as a drop down menu.If
+        there are tasks belong to some other domains - for example WSO2 Mashups
+        tasks, then those will be shown here as a separate group names. </td>
+    </tr>
+    <tr>
+      <td>Task Implementation</td>
+      <td>The implementation class of the task.There is a default task
+        implementation which is shipped with ESB. It is
+        org.apache.synapse.startup.tasks.MessageInjector which just injects a
+        message specified into Synapse environment. ESB sample 300 demonstrates
+        this. </td>
+    </tr>
+    <tr>
+      <td>Trigger Type</td>
+      <td>Trigger type for the task. This can be either Simple or Cron. A
+        simple trigger is defined by specifying a 'count' and an 'interval',
+        implying that the task will run a 'count' number of times at specified
+        intervals. A cron trigger is defined using a cron expression. </td>
+    </tr>
+    <tr>
+      <td>Count</td>
+      <td>The number of times the task will be executed.</td>
+    </tr>
+    <tr>
+      <td>Interval</td>
+      <td>The interval between consecutive executions of a task</td>
+    </tr>
+    <tr>
+      <td>Pinned servers</td>
+      <td>Provide a list of ESB server names where this task should be started
+        for the Pinned server value.</td>
+    </tr>
+  </tbody>
+</table>
+<p></p>
+
+<h2>An Example</h2>
+
+<p>This example only shows how to specify the task implementation class and specify
+properties required by that task implementaion. </p>
+
+<p>Task implementation class used in this example is named
+<strong>org.apache.synapse.startup.tasks.MessageInjector</strong>. This class
+is available in the standard WSO2 ESB distribution and hence can be used out of
+the box without deploying any other third party libraries or custom jars. Figure 3
+shows the page in the management console after the Load Class button is clicked. It
+shows the instance properties of <strong>MessageInjector</strong> task implementation.
+(Refer ESB sample 300 for more information)</p>
+
+<p><img alt="Task Example" src="images/tasks3.png"/></p>
+
+<p>Figure 3 . A Task Example</p>
+</body>
+</html>
