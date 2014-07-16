@@ -143,8 +143,10 @@ public class PriorityServiceComponent extends AbstractAxis2ConfigurationContextO
                         endpointDirPath + File.separator + ep.getFileName());
             }
         }
-        deploymentEngine.addDeployer(
-                new ExecutorDeployer(), endpointDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(
+                    new ExecutorDeployer(), endpointDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
     }
 
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {

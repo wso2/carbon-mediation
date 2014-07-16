@@ -276,8 +276,10 @@ public class MessageProcessorServiceComponent extends AbstractAxis2Configuration
                         messageProcessorDirPath + File.separator + processor.getFileName());
             }
         }
-        deploymentEngine.addDeployer(new MessageProcessorDeployer(),
-                messageProcessorDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        synchronized (axisConfig) {
+            deploymentEngine.addDeployer(new MessageProcessorDeployer(),
+                    messageProcessorDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        }
     }
 
 

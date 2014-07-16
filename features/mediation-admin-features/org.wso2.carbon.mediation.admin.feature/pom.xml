@@ -113,6 +113,11 @@
          <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.task.services</artifactId>
       </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon</groupId>
+         <artifactId>org.wso2.carbon.mediation.ntask</artifactId>
+         <version>${wso2carbon.version}</version>
+      </dependency>
    </dependencies>
    <build>
       <plugins>
@@ -158,6 +163,7 @@
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.task</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.task.services</bundleDef>
+                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.ntask</bundleDef>
                      </bundles>
                      <importFeatures>
                         <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>

@@ -753,7 +753,7 @@ function resetVars() {
                       page="index.jsp" pageNumberParameterName="dynamicPageNumber"
                       resourceBundle="org.wso2.carbon.endpoint.ui.i18n.Resources"
                       prevKey="prev" nextKey="next"
-                      parameters="<%=""%>"/>
+                      parameters="<%=\"\"%>"/>
     <br/>
     <table class="styledLeft" cellspacing="1" id="dynamicEndpointsTable">
         <thead>
@@ -809,7 +809,7 @@ function resetVars() {
                           page="index.jsp" pageNumberParameterName="dynamicPageNumber"
                           resourceBundle="org.wso2.carbon.endpoint.ui.i18n.Resources"
                           prevKey="prev" nextKey="next"
-                          parameters="<%=""%>"/>
+                          parameters="<%=\"\"%>"/>
     <%
         }
     %>

@@ -74,7 +74,7 @@ public class ProxyObserver implements AxisObserver {
     private static final Log log = LogFactory.getLog(ProxyObserver.class);
 
     private static final String[] DEFAULT_MODULES = new String[] {
-        "addressing", "ServerAdminModule", "wso2statistics", "POXSecurityModule"
+        "addressing", "ServerAdminModule", "wso2statistics", "POXSecurityModule", "pagination"
     };
 
     /**

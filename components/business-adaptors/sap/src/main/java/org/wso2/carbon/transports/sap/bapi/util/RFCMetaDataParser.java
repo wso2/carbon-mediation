@@ -106,7 +106,7 @@ public class RFCMetaDataParser {
             if(qname.equals("structure")){
                 processStructure(childElement, function, name);
             }else if(qname.equals("field")){
-                processField(childElement, function, name);  
+                processField(childElement, function, name);
             }else{
                 log.warn("Unknown meta data type tag :" + qname + " detected. " +
                         "This meta data element will be discarded!");
@@ -201,20 +201,33 @@ public class RFCMetaDataParser {
 
     private static void processRow(OMElement element, JCoTable table, String id)
             throws AxisFault {
-        for (int i = 0; i < table.getNumRows(); i++) {
-            if (Integer.parseInt(id) == i) {
-                table.setRow(i);
-                Iterator itr = element.getChildElements();
-                while (itr.hasNext()) {
-                    OMElement childElement = (OMElement) itr.next();
-                    String qname = childElement.getQName().toString();
-                    if (qname != null && qname.equals("field")) {
-                        processField(childElement,table);
-                    } else {
-                        log.warn("Invalid meta data type element found : " + qname + " .This meta data " +
-                                "type will be ignored");
-                    }
-                }
+
+        int rowId;
+        try {
+            rowId = Integer.parseInt(id);
+        } catch (NumberFormatException ex) {
+            log.warn("Row ID should be a integer, found " + id + ". Skipping row", ex);
+            return;
+        }
+
+        if (table.getNumRows() <= rowId) {
+            //which mean this is a new row
+            table.appendRow();
+
+        } else {
+            //handle existing row
+            table.setRow(rowId);
+        }
+
+        Iterator itr = element.getChildElements();
+        while (itr.hasNext()) {
+            OMElement childElement = (OMElement) itr.next();
+            String qname = childElement.getQName().toString();
+            if (qname != null && qname.equals("field")) {
+                processField(childElement, table);
+            } else {
+                log.warn("Invalid meta data type element found : " + qname + " .This meta data " +
+                        "type will be ignored");
             }
         }
     }

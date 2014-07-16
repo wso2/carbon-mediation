@@ -267,7 +267,7 @@ public class ConfigurationUpdater {
                     "to the AxisConfiguration", axisFault);
         }
 
-        synEnv.getTaskManager().init(taskRepository, taskScheduler);
+        synEnv.getTaskManager().init(taskRepository, taskScheduler, newConfig.getTaskManager());
         Parameter suspendPersistence = new Parameter(ServiceBusConstants.SUSPEND_PERSISTENCE, "true");
         try {
             axisCfg.addParameter(suspendPersistence);
@@ -545,6 +545,12 @@ public class ConfigurationUpdater {
                 MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION))) {
             newConfig.getProperties().setProperty(
                     MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION, "true");
+        }
+
+        if (Boolean.valueOf(currentConfig.getProperty(
+                MultiXMLConfigurationBuilder.SEPARATE_TASK_MANAGER_DEFINITION))) {
+            newConfig.getProperties().setProperty(
+                    MultiXMLConfigurationBuilder.SEPARATE_TASK_MANAGER_DEFINITION, "true");
         }
     }
 

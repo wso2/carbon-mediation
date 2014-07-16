@@ -92,15 +92,6 @@ public class HL7TransportListener extends AbstractTransportListenerEx<HL7Endpoin
         if (server != null) {
             server.stop();
         }
-
-        //Adding a delay to the server stop. This is to give some time for the socket to properly close.
-        //See https://wso2.org/jira/browse/ESBJAVA-955
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            log.info("InterruptedException: SimpleServer stop delay interrupted");
-        }
-
         log.info("Stopped HL7 endpoint on port: " + endpoint.getPort());
     }
 }

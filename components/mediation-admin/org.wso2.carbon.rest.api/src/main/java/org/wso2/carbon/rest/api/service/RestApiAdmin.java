@@ -1,6 +1,8 @@
 package org.wso2.carbon.rest.api.service;
 
+import java.net.MalformedURLException;
 import java.net.SocketException;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 
@@ -18,6 +20,7 @@ import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.description.TransportInDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,7 +43,6 @@ import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceMan
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.CarbonConfigurationContextFactory;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-
 import org.wso2.carbon.rest.api.*;
 import org.wso2.carbon.utils.NetworkUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -376,7 +378,21 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             handleException(log, "Could not retrieve server context", e);
         }
 
-        String httpPort = (String)configuration.getTransportIn("http").getParameter("port").getValue();
+        String portValue = "";
+        String protocol = "";
+
+        TransportInDescription transportInDescription = configuration.getTransportIn("http");
+        if (transportInDescription == null) {
+            transportInDescription = configuration.getTransportIn("https");
+        }
+
+        if (transportInDescription != null) {
+            protocol = transportInDescription.getName();
+            portValue = (String) transportInDescription.getParameter("port").getValue();
+        } else {
+            throw new APIException("http/https transport required");
+        }
+		
         String host = null;
 
         Parameter hostParam =  configuration.getParameter("hostname");
@@ -393,7 +409,22 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             }
         }
 
-        String serverContext = "http://" + host + ":" + httpPort;
+        String serverContext = "";
+
+        try {
+            int port = Integer.parseInt(portValue);
+            if ("http".equals(protocol) && port == 80) {
+                port = -1;
+            } else if ("https".equals(protocol) && port == 443) {
+                port = -1;
+            }
+            URL serverURL = new URL(protocol, host, port, "");
+            serverContext = serverURL.toExternalForm();
+        } catch (MalformedURLException e) {
+            handleException(log, "Error when generating server context URL", e);
+        } catch (NumberFormatException e) {
+            handleException(log, "Error when getting the port for server context URL", e);
+        }
 
         return serverContext;
     }

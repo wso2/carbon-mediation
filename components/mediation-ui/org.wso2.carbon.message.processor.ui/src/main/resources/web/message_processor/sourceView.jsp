@@ -83,7 +83,7 @@
         }
 
         function postToServiceCaller() {
-            var messageProcessorStr = {Name : document.getElementById("Name").value, tableParams : document.getElementById("tableParams").value, Provider : document.getElementById("Provider").value, MessageStore : document.getElementById("MessageStore").value};
+            var messageProcessorStr = {Name : document.getElementById("Name").value, tableParams : document.getElementById("tableParams").value, Provider : document.getElementById("Provider").value, MessageStore : document.getElementById("MessageStore").value, TargetEndpoint : document.getElementById("TargetEndpoint").value};
             jQuery.ajax({
                 type: 'POST',
                 url: 'ServiceCaller.jsp',
