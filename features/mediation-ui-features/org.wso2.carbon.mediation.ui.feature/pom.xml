@@ -151,6 +151,14 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.artifactuploader.stub</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.inbound.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.inbound.ui</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -209,6 +217,8 @@
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.localentry.ui</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.localentry.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound.ui</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>
