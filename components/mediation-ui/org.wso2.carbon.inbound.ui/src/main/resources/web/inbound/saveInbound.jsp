@@ -46,7 +46,7 @@
 			List<String>sParams = new ArrayList<String>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
-				if(strKey.startsWith("transport.")){
+				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.")){
 					sParams.add(strKey + "~:~" + request.getParameter(strKey));
 				}else if(strKey.startsWith("paramkey")){
 					String paramKey = request.getParameter("paramkey" + strKey.replaceAll("paramkey",""));
