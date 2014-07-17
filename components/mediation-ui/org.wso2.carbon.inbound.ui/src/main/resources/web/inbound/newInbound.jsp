@@ -16,6 +16,7 @@
  ~ under the License.
  -->
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient"%>
+<%@page import="org.wso2.carbon.inbound.ui.internal.InboundClientConstants"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -60,9 +61,9 @@
                                 class="required">*</span></td>
                         <td align="left">
                             <select id="inboundType" name="inboundType" class="longInput" on>
-                                <option value="FILE">File</option>
-                                <option value="JMS">JMS</option>
-                                <option value="CLASS">Custom</option>
+                                <option value="<%=InboundClientConstants.TYPE_FILE%>">File</option>
+                                <option value="<%=InboundClientConstants.TYPE_JMS%>">JMS</option>
+                                <option value="<%=InboundClientConstants.TYPE_CLASS%>">Custom</option>
                             </select>
                         </td>
                     </tr>

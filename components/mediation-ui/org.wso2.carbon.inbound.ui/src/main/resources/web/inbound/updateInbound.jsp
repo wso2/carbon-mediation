@@ -18,6 +18,7 @@
 <%@page import="java.util.Map"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
+<%@page import="java.lang.Long"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
@@ -48,7 +49,8 @@
 					sParams.add(strKey.replaceAll("param.","") + "~:~" + request.getParameter(strKey));
 				}	
 			}		
-			client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),request.getParameter("inboundInterval"),protocol, classImpl, sParams);
+			Long intervalms = 1000 * Long.valueOf(request.getParameter("inboundInterval"));
+			client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),intervalms.toString(),protocol, classImpl, sParams);
 	%>
 	<script type="text/javascript">
     forward("index.jsp");
