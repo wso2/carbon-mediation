@@ -1,5 +1,6 @@
 package org.wso2.carbon.inbound;
 
+import java.io.StringReader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -8,14 +9,21 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
 import org.apache.synapse.inbound.InboundEndpoint;
+import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 
@@ -47,7 +55,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 	}
 
 	public void addInboundEndpoint(String name, String sequence,
-			String onError, String interval, String protocol, String classImpl,
+			String onError, String interval, String protocol,String outsequence, String classImpl,
 			String[] sParams) throws InboundManagementException {
 		SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
 		OMFactory fac = OMAbstractFactory.getOMFactory();
@@ -58,6 +66,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 		elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
 		elem.addAttribute(fac.createOMAttribute("onError", null, onError));
 		elem.addAttribute(fac.createOMAttribute("interval", null, interval));
+        elem.addAttribute(fac.createOMAttribute("outsequence", null, outsequence));
 		if (protocol != null) {
 			elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
 		} else {
@@ -82,8 +91,32 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 		inboundEndpoint.init(getSynapseEnvironment());
 	}
 
+    public void addInboundEndpointFromXMLString(String inboundElement){
+        XMLStreamReader reader = null;
+        try {
+            reader = XMLInputFactory.newInstance().createXMLStreamReader(
+                    new StringReader(inboundElement));
+        } catch (XMLStreamException e) {
+            log.error(e.getMessage());
+        }
+        StAXOMBuilder builder = new StAXOMBuilder(reader);
+        OMElement omElement = builder.getDocumentElement();
+        SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+        SynapseXMLConfigurationFactory.defineInboundEndpoint(
+                synapseConfiguration, omElement,
+                synapseConfiguration.getProperties());
+        String name = omElement.getAttributeValue(new QName("name"));
+        InboundEndpoint inboundEndpoint = null;
+        try {
+            inboundEndpoint = getInboundEndpoint(name);
+        } catch (InboundManagementException e) {
+            log.error(e.getMessage());
+        }
+        persistInboundEndpoint(inboundEndpoint);
+        inboundEndpoint.init(getSynapseEnvironment());
+    }
 	public void updateInboundEndpoint(String name, String sequence,
-			String onError, String interval, String protocol, String classImpl,
+			String onError, String interval, String protocol,String outsequence, String classImpl,
 			String[] sParams) throws InboundManagementException {
 		SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
 		OMFactory fac = OMAbstractFactory.getOMFactory();
@@ -94,6 +127,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 		elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
 		elem.addAttribute(fac.createOMAttribute("onError", null, onError));
 		elem.addAttribute(fac.createOMAttribute("interval", null, interval));
+        elem.addAttribute(fac.createOMAttribute("outsequence", null, outsequence));
 		if (protocol != null) {
 			elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
 		} else {
