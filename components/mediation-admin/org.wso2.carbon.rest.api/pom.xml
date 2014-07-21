@@ -78,6 +78,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <SYNAPSE_DEPLOYER-RequiredServices>
+                            org.wso2.carbon.rest.api.service.RestAPIDeployerService
+                        </SYNAPSE_DEPLOYER-RequiredServices>
                         <Export-Package>
                             org.wso2.carbon.rest.api.*
                         </Export-Package>

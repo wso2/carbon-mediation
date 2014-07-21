@@ -23,6 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.service.TaskManagementService;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.task.JobMetaDataProviderServiceHandler;
+import org.wso2.carbon.task.service.TaskDeployerService;
+import org.wso2.carbon.task.service.TaskDeployerServiceImpl;
 import org.wso2.carbon.task.TaskManagementServiceHandler;
 import org.wso2.carbon.task.TaskManager;
 import org.wso2.carbon.task.multitenancy.TenantCreationListener;
@@ -75,6 +77,8 @@ public class TaskManagementServiceComponent {
             TenantCreationListener listener = new TenantCreationListener();
             ctxt.getBundleContext().registerService(
                     Axis2ConfigurationContextObserver.class.getName(), listener, null);
+            ctxt.getBundleContext().registerService(
+                    TaskDeployerService.class.getName(), new TaskDeployerServiceImpl(), null);
 
             // initialize the task manager
             TaskManager taskManager = new TaskManager();
