@@ -46,6 +46,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <SYNAPSE_DEPLOYER-RequiredServices>
+                            org.wso2.carbon.sequences.services.SequenceDeployerService
+                        </SYNAPSE_DEPLOYER-RequiredServices>
                         <Private-Package>
                             org.wso2.carbon.sequences.internal
                         </Private-Package>

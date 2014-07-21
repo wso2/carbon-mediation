@@ -35,6 +35,8 @@ import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.proxyadmin.observer.ProxyObserver;
 import org.wso2.carbon.proxyadmin.observer.ProxyServiceParameterObserver;
+import org.wso2.carbon.proxyadmin.service.ProxyDeployerService;
+import org.wso2.carbon.proxyadmin.service.ProxyDeployerServiceImpl;
 import org.wso2.carbon.proxyadmin.util.ConfigHolder;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -86,6 +88,9 @@ public class ProxyAdminServiceComponent extends AbstractAxis2ConfigurationContex
             
             bndCtx.registerService(
                                    Axis2ConfigurationContextObserver.class.getName(), this, null);
+
+            bndCtx.registerService(ProxyDeployerService.class.getName(),
+                                   new ProxyDeployerServiceImpl(), null);
             
             SynapseEnvironmentService synEnvService =
                     ConfigHolder.getInstance().getSynapseEnvironmentService(

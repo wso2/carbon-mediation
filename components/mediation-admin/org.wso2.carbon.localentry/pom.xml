@@ -75,6 +75,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <SYNAPSE_DEPLOYER-RequiredServices>
+                            org.wso2.carbon.localentry.service.LocalEntryDeployerService
+                        </SYNAPSE_DEPLOYER-RequiredServices>
                         <Private-Package>
                             org.wso2.carbon.localentry.util; version=1.0.0,
                         </Private-Package>

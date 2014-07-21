@@ -36,6 +36,8 @@ import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
+import org.wso2.carbon.mediation.library.service.LibraryDeployerService;
+import org.wso2.carbon.mediation.library.service.LibraryDeployerServiceImpl;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.mediation.library.util.*;
@@ -89,6 +91,8 @@ public class MediationLibraryServiceComponent extends AbstractAxis2Configuration
         try {
             BundleContext bndCtx = ctxt.getBundleContext();
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
+            bndCtx.registerService(LibraryDeployerService.class.getName(),
+                                   new LibraryDeployerServiceImpl(), null);
             SynapseEnvironmentService synEnvService =
                     ConfigHolder.getInstance().getSynapseEnvironmentService(
                             MultitenantConstants.SUPER_TENANT_ID);
