@@ -26,7 +26,7 @@ public class InboundDescription {
 			this.type = InboundClientConstants.TYPE_CLASS;
 			this.classImpl = inboundEndpoint.getClassImpl();	
 		}		
-		this.interval = inboundEndpoint.getInterval();
+		this.interval = inboundEndpoint.getInterval()/1000;
 		this.suspend = inboundEndpoint.isSuspendSpecified();
 		this.injectingSeq = inboundEndpoint.getInjectingSeq();
 		this.onErrorSeq = inboundEndpoint.getOnErrorSeq();

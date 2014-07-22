@@ -16,34 +16,33 @@
 
 package org.wso2.carbon.priority.executors;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.DeploymentEngine;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
-import org.apache.synapse.endpoints.Endpoint;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
-import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
-import org.wso2.carbon.utils.ConfigurationContextService;
-import org.wso2.carbon.registry.core.service.RegistryService;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.priority.executors.util.ConfigHolder;
-import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-
-
-import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.osgi.framework.BundleContext;
+import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
+import org.wso2.carbon.priority.executors.services.PriorityExeDeployerService;
+import org.wso2.carbon.priority.executors.services.PriorityExeDeployerServiceImpl;
+import org.wso2.carbon.priority.executors.util.ConfigHolder;
+import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
+import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.File;
 import java.util.HashMap;
@@ -84,6 +83,8 @@ public class PriorityServiceComponent extends AbstractAxis2ConfigurationContextO
         try {
             BundleContext bndCtx = ctxt.getBundleContext();
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
+            bndCtx.registerService(PriorityExeDeployerService.class.getName(),
+                                               new PriorityExeDeployerServiceImpl(), null);
             SynapseEnvironmentService synEnvService =
                     synapseEnvironmentServices.get(
                             MultitenantConstants.SUPER_TENANT_ID);

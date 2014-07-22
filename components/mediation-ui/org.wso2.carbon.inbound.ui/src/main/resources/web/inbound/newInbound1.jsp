@@ -42,7 +42,11 @@
 <script type="text/javascript">
 var iParamCount = 0;
 var classRequired = false;
+var requiredParams = null;
 </script>
+    <carbon:jsi18n
+        resourceBundle="org.wso2.carbon.inbound.ui.i18n.Resources"
+        request="<%=request%>" i18nObjectName="taskjsi18n"/>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
     <carbon:breadcrumb label="inbound.header.new"
                        resourceBundle="org.wso2.carbon.inbound.ui.i18n.Resources"
@@ -51,7 +55,8 @@ var classRequired = false;
     <% InboundManagementClient client;
         try {
             client = InboundManagementClient.getInstance(config, session);
-            List<String>defaultParams = client.getDefaultParameters(request.getParameter("inboundType"));
+            List<String>defaultParams = client.getDefaultParameters(request.getParameter("inboundType"));            
+            List<String>advParams = client.getAdvParameters(request.getParameter("inboundType"));
     %>
     <form method="post" name="inboundcreationform" id="inboundcreationform"
           action="saveInbound.jsp">
@@ -124,35 +129,96 @@ var classRequired = false;
                         </td>
                         <td></td>
                     </tr>
-                    <% } %>
-					<% for(String defaultParam : defaultParams) {%>                        
+                    <% } %>             
+                    <%if(!defaultParams.isEmpty()){                     
+                    %>
+                    <script type="text/javascript">var requiredParams = new Array(<%=defaultParams.size()%>);</script>
+                    <%} %>       
+					<%  int ctr = -1;
+					    for(String defaultParamOri : defaultParams) {
+						String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
+						String defaultParam = arrParamOri[0].trim();	
+						ctr++;
+					%> 	
+					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
 	                    <tr>
-	                        <td style="width:150px"><%=defaultParam %></td>
-	                        <td align="left">	                            	                      
-                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"/>                       
+	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
+	                        <td align="left">
+	                        <%if(arrParamOri.length > 1){%>
+	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+	                            <%for(int i = 1;i<arrParamOri.length;i++){%>
+	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
+	                            <%}%>                                
+                                </select>
+							<%} else{%>	                            	                      
+                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"/>
+                            <%} %>                       
 	                        </td>
 	                        <td></td>
 	                    </tr>                        
                      <% } %>
+                     <% if(InboundClientConstants.TYPE_CLASS.equals(request.getParameter("inboundType"))){ %>
+                    <tr>
+                        <td class="buttonRow" colspan="3">       
+	                            <input class="button" type="button"
+	                                   value='<fmt:message key="inbound.add.param"/>'
+	                                   onclick="addRow('tblInput');"/>   
+	                            <input class="button" type="button"
+	                                   value='<fmt:message key="inbound.remove.param"/>'
+	                                   onclick="deleteRow('tblInput');"/>                                                                 
+                        </td>
+                    </tr>                     
+                     <%}else{ %>
+				    <tr>
+				        <td><span id="_adv" style="float: left; position: relative;">
+				            <a class="icon-link" onclick="javascript:showAdvancedOptions('');"
+				               style="background-image: url(images/down.gif);"><fmt:message
+				                    key="show.advanced.options"/></a>
+				        </span>
+				        </td>
+				    </tr> 
+				    <%} %>
+				    <tr>
+					    <td colspan="3">
+						    <div id="_advancedForm" style="display:none">
+						    <table id="tblAdvInput" name="tblAdvInput" class="normal-nopadding" cellspacing="0" cellpadding="0" border="0">
+								<% for(String defaultParamOri : advParams) {
+									String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
+									String defaultParam = arrParamOri[0].trim();						
+								%> 					                       
+				                    <tr>
+				                        <td style="width:150px"><%=defaultParam %></td>
+				                        <td align="left">
+				                        <%if(arrParamOri.length > 1){%>
+				                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+				                            <%for(int i = 1;i<arrParamOri.length;i++){%>
+				                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
+				                            <%}%>                                
+			                                </select>
+										<%} else{%>	                            	                      
+			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"/>
+			                            <%} %>                       
+				                        </td>
+				                        <td></td>
+				                    </tr>                        
+			                     <% } %>						    
+						    	</table>
+						    </div> 			
+					    </td>
+				    </tr>
                     <tr>
                         <td class="buttonRow" colspan="3">
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.save.button.text"/>"
-                                   onclick="inboundsave2('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>',document.inboundcreationform); return false;"/>
+                                   onclick="inboundsave2('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>',document.inboundcreationform); return false;"/>
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.cancel.button.text"/>"
-                                   onclick="document.location.href='index.jsp?ordinal=0';"/>
-                            <input class="button" type="button"
-                                   value='<fmt:message key="inbound.add.param"/>'
-                                   onclick="addRow('tblInput');"/>   
-                            <input class="button" type="button"
-                                   value='<fmt:message key="inbound.remove.param"/>'
-                                   onclick="deleteRow('tblInput');"/>                                                                    
+                                   onclick="document.location.href='index.jsp?ordinal=0';"/>                                                                 
                         </td>
                     </tr>
-                    </tbody>
-                </table>
-                                               
+				         </tbody> 
+				    </table>
+                                              
                 <script type="text/javascript">
                     autoredioselect();
                 </script>

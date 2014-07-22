@@ -18,6 +18,7 @@
 <%@page import="java.util.Map"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
+<%@page import="java.lang.Long"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
@@ -45,13 +46,20 @@
 			List<String>sParams = new ArrayList<String>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
-				if(strKey.startsWith("transport.")){
-					sParams.add(strKey + "~:~" + request.getParameter(strKey));
+				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.")){
+					String strVal = request.getParameter(strKey);
+					if(strVal != null && !strVal.equals("")){
+						sParams.add(strKey + "~:~" + request.getParameter(strKey));
+					}
 				}else if(strKey.startsWith("paramkey")){
-					sParams.add(request.getParameter("paramkey" + strKey.replaceAll("paramkey","")) + "~:~" + request.getParameter("paramval" + strKey.replaceAll("paramkey","")));
+					String paramKey = request.getParameter("paramkey" + strKey.replaceAll("paramkey",""));
+					if(paramKey != null && !paramKey.trim().equals("")){
+						sParams.add(paramKey + "~:~" + request.getParameter("paramval" + strKey.replaceAll("paramkey","")));	
+					}					
 				}	
 			}		
-			client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),request.getParameter("inboundInterval"),protocol, classImpl, sParams);
+			Long intervalms = 1000 * Long.valueOf(request.getParameter("inboundInterval"));
+			client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),intervalms.toString(),protocol, classImpl, sParams);
 	%>
 	<script type="text/javascript">
     forward("index.jsp");

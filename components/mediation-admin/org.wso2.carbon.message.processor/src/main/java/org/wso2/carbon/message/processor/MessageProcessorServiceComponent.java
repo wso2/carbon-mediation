@@ -35,6 +35,8 @@ import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
+import org.wso2.carbon.message.processor.service.MessageProcessorDeployerService;
+import org.wso2.carbon.message.processor.service.MessageProcessorDeployerServiceImpl;
 import org.wso2.carbon.message.processor.util.ConfigHolder;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -91,6 +93,8 @@ public class MessageProcessorServiceComponent extends AbstractAxis2Configuration
     protected void activate(ComponentContext ctxt) {
         BundleContext bndCtx = ctxt.getBundleContext();
         bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
+        bndCtx.registerService(MessageProcessorDeployerService.class.getName(),
+                               new MessageProcessorDeployerServiceImpl(), null);
         try {
             SynapseEnvironmentService synEnvService =
                     ConfigHolder.getInstance().getSynapseEnvironmentService(
