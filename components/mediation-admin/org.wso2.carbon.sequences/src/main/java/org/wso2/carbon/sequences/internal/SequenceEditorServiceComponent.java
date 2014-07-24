@@ -16,17 +16,19 @@
 
 package org.wso2.carbon.sequences.internal;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.DeploymentEngine;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
@@ -36,13 +38,12 @@ import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServic
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.sequences.SequenceDeploymentInterceptor;
 import org.wso2.carbon.sequences.common.SequenceEditorException;
-import org.wso2.carbon.utils.ConfigurationContextService;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.osgi.framework.BundleContext;
+import org.wso2.carbon.sequences.services.SequenceDeployerService;
+import org.wso2.carbon.sequences.services.SequenceDeployerServiceImpl;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
+import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.File;
 import java.util.Map;
@@ -87,6 +88,8 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
         try {
             BundleContext bndCtx = context.getBundleContext();
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
+            bndCtx.registerService(SequenceDeployerService.class.getName(),
+                                   new SequenceDeployerServiceImpl(), null);
             SynapseEnvironmentService synEnvService =
                     ConfigHolder.getInstance().getSynapseEnvironmentService(
                             MultitenantConstants.SUPER_TENANT_ID);

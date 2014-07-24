@@ -26,6 +26,8 @@ import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.localentry.service.LocalEntryDeployerService;
+import org.wso2.carbon.localentry.service.LocalEntryDeployerServiceImpl;
 import org.wso2.carbon.localentry.util.ConfigHolder;
 import org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
@@ -85,6 +87,8 @@ public class LocalEntryAdminServiceComponent extends AbstractAxis2ConfigurationC
         try {
             BundleContext bndCtx = ctxt.getBundleContext();
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
+            bndCtx.registerService(LocalEntryDeployerService.class.getName(),
+                                               new LocalEntryDeployerServiceImpl(), null);
             SynapseEnvironmentService synEnvService =
                     ConfigHolder.getInstance().getSynapseEnvironmentService(
                             MultitenantConstants.SUPER_TENANT_ID);

@@ -89,8 +89,12 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <SYNAPSE_DEPLOYER-RequiredServices>
+                            org.wso2.carbon.message.store.service.MessageStoreDeployerService
+                        </SYNAPSE_DEPLOYER-RequiredServices>
                         <Export-Package>
                             org.wso2.carbon.message.store.persistence.*,
+                            org.wso2.carbon.message.store.*,
                             !javax.servlet,
                             !javax.servlet.http,
                         </Export-Package>

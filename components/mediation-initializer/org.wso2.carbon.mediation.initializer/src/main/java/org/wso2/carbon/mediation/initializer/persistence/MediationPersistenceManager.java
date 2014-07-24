@@ -153,6 +153,8 @@ public class MediationPersistenceManager {
                 new APIStore(configPath, registry, configName));
         dataStores.put(ServiceBusConstants.ITEM_TYPE_IMPORT,
                 new ImportStore(configPath, registry, configName));
+        dataStores.put(ServiceBusConstants.ITEM_TYPE_INBOUND,
+                new InboundStore(configPath, registry, configName));  
     }
 
     public void destroy() {

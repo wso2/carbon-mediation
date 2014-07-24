@@ -19,25 +19,41 @@ package org.wso2.carbon.mediation.library.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.locks.Lock;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.engine.AxisConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.SynapsePropertiesLoader;
+import org.apache.synapse.config.xml.EntryFactory;
 import org.apache.synapse.config.xml.SynapseImportFactory;
 import org.apache.synapse.config.xml.SynapseImportSerializer;
+import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.libraries.imports.SynapseImport;
 import org.apache.synapse.libraries.model.Library;
 import org.apache.synapse.libraries.util.LibDeployerUtils;
@@ -46,6 +62,7 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.library.util.LocalEntryUtil;
 
 @SuppressWarnings({ "UnusedDeclaration" })
 public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
@@ -224,6 +241,7 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 				// this is a important step -> we need to unload what ever the
 				// components loaded thru this import
 				synLib.unLoadLibrary();
+				undeployingLocalEntries(synLib, configuration);
 			}
 
 			MediationPersistenceManager pm = getMediationPersistenceManager();
@@ -418,15 +436,17 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 					synapseImport.setStatus(true);
 					synLib.setLibStatus(true);
 					synLib.loadLibrary();
+					deployingLocalEntries(synLib, configuration);
 				} else {
 					synapseImport.setStatus(false);
 					synLib.setLibStatus(false);
 					synLib.unLoadLibrary();
+					undeployingLocalEntries(synLib, configuration);
 				}
 
 				// update synapse configuration.
 				MediationPersistenceManager mp = getMediationPersistenceManager();
-				mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
+				mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);				
 			}
 
 		} catch (Exception e) {
@@ -434,5 +454,149 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 			handleException(log, message, e);
 		}
 	}
+    
+	/**
+	 * Deploy the local entries from lib
+	 * 
+	 * */
+	private void deployingLocalEntries(Library library, SynapseConfiguration config) {
+		if (log.isDebugEnabled()) {
+			log.debug("Start : Adding Local registry entries to the configuration");
+		}
+		for (Map.Entry<String, Object> libararyEntryMap : library.getLocalEntryArtifacts()
+		                                                         .entrySet()) {
+			File localEntryFileObj = (File) libararyEntryMap.getValue();
+			OMElement document = LocalEntryUtil.getOMElement(localEntryFileObj);
+			addEntry(document.toString());
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("End : Adding Local registry entries to the configuration");
+		}
+	}
 
+	/**
+	 * 
+	 * Undeploy the local entries deployed from the lib
+	 * 
+	 * */
+	private void undeployingLocalEntries(Library library, SynapseConfiguration config) {
+		if (log.isDebugEnabled()) {
+			log.debug("Start : Removing Local registry entries from the configuration");
+		}
+		for (Map.Entry<String, Object> libararyEntryMap : library.getLocalEntryArtifacts()
+		                                                         .entrySet()) {
+			File localEntryFileObj = (File) libararyEntryMap.getValue();
+			OMElement document = LocalEntryUtil.getOMElement(localEntryFileObj);
+			deleteEntry(document.toString());
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("End : Removing Local registry entries from the configuration");
+		}
+	}
+
+	/**
+	 * Add the local entry
+	 * 
+	 * */
+	private boolean addEntry(String ele) {
+		final Lock lock = getLock();
+		try {
+			lock.lock();
+			OMElement elem;
+			try {
+				elem = LocalEntryUtil.nonCoalescingStringToOm(ele);
+			} catch (XMLStreamException e) {
+				log.error("Error while converting the file content : " + e.getMessage());
+				return false;
+			}
+
+			if (elem.getQName().getLocalPart().equals(XMLConfigConstants.ENTRY_ELT.getLocalPart())) {
+
+				String entryKey = elem.getAttributeValue(new QName("key"));
+				entryKey = entryKey.trim();
+				if (log.isDebugEnabled()) {								
+					log.debug("Adding local entry with key : " + entryKey);
+				}
+				if (getSynapseConfiguration().getLocalRegistry().containsKey(entryKey)) {
+					log.error("An Entry with key " + entryKey +
+					          " is already used within the configuration");
+				} else {
+					Entry entry =
+					              EntryFactory.createEntry(elem,
+					                                       getSynapseConfiguration().getProperties());
+					entry.setFileName(ServiceBusUtils.generateFileName(entry.getKey()));
+					getSynapseConfiguration().addEntry(entryKey, entry);
+					MediationPersistenceManager pm =
+					                                 ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+					pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+				}
+				if (log.isDebugEnabled()) {
+					log.debug("Local registry entry : " + entryKey + " added to the configuration");
+				}
+				return true;
+			} else {
+				log.warn("Error adding local entry. Invalid definition");
+			}
+		} catch (SynapseException syne) {
+			log.error("Unable to add local entry ", syne);
+		} catch (OMException e) {
+			log.error("Unable to add local entry. Invalid XML ", e);
+		} catch (Exception e) {
+			log.error("Unable to add local entry. Invalid XML ", e);			
+		} finally {
+			lock.unlock();
+		}
+		return false;
+	}
+
+	/**
+	 * emove the local entry
+	 * */
+	public boolean deleteEntry(String ele) {
+
+		final Lock lock = getLock();
+		String entryKey = null;
+		try {
+			lock.lock();
+			OMElement elem;
+			try {
+				elem = LocalEntryUtil.nonCoalescingStringToOm(ele);
+			} catch (XMLStreamException e) {
+				log.error("Error while converting the file content : " + e.getMessage());
+				return false;
+			}
+
+			if (elem.getQName().getLocalPart().equals(XMLConfigConstants.ENTRY_ELT.getLocalPart())) {
+
+				entryKey = elem.getAttributeValue(new QName("key"));
+				entryKey = entryKey.trim();
+				log.debug("Adding local entry with key : " + entryKey);
+
+				SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+				Entry entry = synapseConfiguration.getDefinedEntries().get(entryKey);
+				if (entry != null) {
+					synapseConfiguration.removeEntry(entryKey);
+					MediationPersistenceManager pm =
+					                                 ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+					pm.deleteItem(entryKey, entry.getFileName(),
+					              ServiceBusConstants.ITEM_TYPE_ENTRY);
+					if (log.isDebugEnabled()) {
+						log.debug("Deleted local entry with key : " + entryKey);
+					}
+					return true;
+				} else {
+					log.warn("No entry exists by the key : " + entryKey);
+					return false;
+				}
+			}
+		} catch (SynapseException syne) {
+			log.error("Unable to delete the local entry : " + entryKey, syne);
+		} catch (Exception e) {
+			log.error("Unable to delete the local entry : " + entryKey, e);			
+		} finally {
+			lock.unlock();
+		}
+		return false;
+	}
+    
 }

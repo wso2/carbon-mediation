@@ -90,6 +90,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <SYNAPSE_DEPLOYER-RequiredServices>
+                            org.wso2.carbon.message.processor.service.MessageProcessorDeployerService
+                        </SYNAPSE_DEPLOYER-RequiredServices>
                         <Export-Package>
                             !javax.servlet,
                             !javax.servlet.http,

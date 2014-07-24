@@ -26,6 +26,8 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.endpoints.Endpoint;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.endpoint.service.EndpointDeployerService;
+import org.wso2.carbon.endpoint.service.EndpointDeployerServiceImpl;
 import org.wso2.carbon.endpoint.util.ConfigHolder;
 import org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
@@ -84,6 +86,9 @@ public class EndpointServiceComponent extends AbstractAxis2ConfigurationContextO
         try {
             BundleContext bndCtx = ctxt.getBundleContext();
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
+            bndCtx.registerService(EndpointDeployerService.class.getName(),
+                                               new EndpointDeployerServiceImpl(), null);
+
             SynapseEnvironmentService synEnvService =
                     ConfigHolder.getInstance().getSynapseEnvironmentService(
                             MultitenantConstants.SUPER_TENANT_ID);
