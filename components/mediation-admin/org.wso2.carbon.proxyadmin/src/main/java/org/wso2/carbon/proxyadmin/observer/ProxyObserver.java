@@ -39,7 +39,6 @@ import org.apache.synapse.util.PolicyInfo;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.RegistryResources;
-import org.wso2.carbon.core.persistence.ServicePersistenceManager;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
@@ -141,7 +140,7 @@ public class ProxyObserver implements AxisObserver {
         }
 
         if (AxisEvent.SERVICE_DEPLOY == event.getEventType()) {
-            ProxyService proxySvc = getSynapseConfiguration().getProxyService(axisService.getName());
+            /*ProxyService proxySvc = getSynapseConfiguration().getProxyService(axisService.getName());
             if (proxySvc != null) {
                 try {
                     ServicePersistenceManager spm = new ServicePersistenceManager(
@@ -152,7 +151,7 @@ public class ProxyObserver implements AxisObserver {
                 } catch (Exception e) {
 
                 }
-            }
+            }*/
         }
 
         if (AxisEvent.SERVICE_REMOVE == event.getEventType()) {
@@ -179,7 +178,7 @@ public class ProxyObserver implements AxisObserver {
                         log.debug("Proxy Service representing the service " + axisService.getName()
                                 + " of type proxy is not found in the SynapseConfiguration");
                     }
-                } else {
+                } /*else {
                     try {
                         ServicePersistenceManager spm = new ServicePersistenceManager(
                                 getSynapseConfiguration().getAxisConfiguration());
@@ -189,7 +188,7 @@ public class ProxyObserver implements AxisObserver {
                     } catch (Exception e) {
                         log.warn("Error while removing service parameter information from registry", e);
                     }
-                }
+                }*/
             }
         }
     }
