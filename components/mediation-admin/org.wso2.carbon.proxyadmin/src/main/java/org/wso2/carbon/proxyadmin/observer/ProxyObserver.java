@@ -139,21 +139,6 @@ public class ProxyObserver implements AxisObserver {
             }
         }
 
-        if (AxisEvent.SERVICE_DEPLOY == event.getEventType()) {
-            /*ProxyService proxySvc = getSynapseConfiguration().getProxyService(axisService.getName());
-            if (proxySvc != null) {
-                try {
-                    ServicePersistenceManager spm = new ServicePersistenceManager(
-                            getSynapseConfiguration().getAxisConfiguration());
-                    for (Parameter p : axisService.getParameters()) {
-                        spm.updateServiceParameter(axisService, p);
-                    }
-                } catch (Exception e) {
-
-                }
-            }*/
-        }
-
         if (AxisEvent.SERVICE_REMOVE == event.getEventType()) {
 
             Parameter keepServiceHistoryParam = axisService.getParameter(
@@ -178,17 +163,7 @@ public class ProxyObserver implements AxisObserver {
                         log.debug("Proxy Service representing the service " + axisService.getName()
                                 + " of type proxy is not found in the SynapseConfiguration");
                     }
-                } /*else {
-                    try {
-                        ServicePersistenceManager spm = new ServicePersistenceManager(
-                                getSynapseConfiguration().getAxisConfiguration());
-                        for (Parameter p : axisService.getParameters()) {
-                            spm.removeServiceParameter(axisService, p);
-                        }
-                    } catch (Exception e) {
-                        log.warn("Error while removing service parameter information from registry", e);
-                    }
-                }*/
+                }
             }
         }
     }
