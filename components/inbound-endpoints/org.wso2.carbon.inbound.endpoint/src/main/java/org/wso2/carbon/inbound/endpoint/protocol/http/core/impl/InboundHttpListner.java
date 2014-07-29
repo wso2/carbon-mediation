@@ -43,11 +43,9 @@ import java.util.Map;
 public class InboundHttpListner implements InboundListner {
     protected Log log = LogFactory.getLog(this.getClass());
 
-
     private String injectingSequence;
     private String onErrorSequence;
     private String outSequence;
-
     private SynapseEnvironment synapseEnvironment;
     private String port;
     private static Map<Integer, InboundHttpSourceHandler> inboundHttpSourceHandlerMap;
@@ -90,7 +88,13 @@ public class InboundHttpListner implements InboundListner {
      */
     private void startEndpoint() {
         InetSocketAddress inetSocketAddress = new InetSocketAddress(Integer.parseInt(port));
-        ListenerEndpoint endpoint = ioReactor.listen(inetSocketAddress);
+        ListenerEndpoint endpoint = null;
+        if (ioReactor != null) {
+            endpoint = ioReactor.listen(inetSocketAddress);
+        } else {
+            log.error("io Reactor cannot be null");
+            return;
+        }
         try {
             endpoint.waitFor();
             if (log.isInfoEnabled()) {
@@ -106,8 +110,7 @@ public class InboundHttpListner implements InboundListner {
                 }
             }
         } catch (InterruptedException e) {
-            log.error("Listener startup was interrupted");
-            System.out.println(e.getMessage());
+            log.error("Listener startup was interrupted", e);
         }
     }
 
@@ -170,9 +173,9 @@ public class InboundHttpListner implements InboundListner {
             Thread thread = new Thread(inboundHttpSourceResponseWorker);
             thread.start();
             isResponseWorkerStarted = true;
-            log.info("start Response worker");
+            log.info("start http inbound response worker");
         } else {
-            log.error("cannot start response worker");
+            log.error("cannot start inbound http response worker");
         }
     }
 }

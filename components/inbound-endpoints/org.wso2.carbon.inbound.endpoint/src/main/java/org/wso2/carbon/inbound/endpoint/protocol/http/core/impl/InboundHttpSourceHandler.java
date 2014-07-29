@@ -69,7 +69,7 @@ public class InboundHttpSourceHandler implements NHttpServerEventHandler {
         this.faultSeq = faultSeq;
         this.outSequence = outSequence;
         this.inboundConfiguration = inboundConfiguration;
-        this.executorService = Executors.newFixedThreadPool(InboundHttpConstants.WORKER_POOL_SIZE, new InboundThreadFactory("request"));
+        this.executorService = Executors.newFixedThreadPool(InboundHttpConstants.WORKER_POOL_SIZE, new InboundThreadFactory("inbound_request"));
     }
 
 
@@ -83,7 +83,7 @@ public class InboundHttpSourceHandler implements NHttpServerEventHandler {
             HttpContext _context = nHttpServerConnection.getContext();
             _context.setAttribute(PassThroughConstants.REQ_ARRIVAL_TIME, System.currentTimeMillis());
 
-            if (!InboundSourceContext.assertState(nHttpServerConnection, ProtocolState.REQUEST_READY) && !InboundSourceContext.assertState(nHttpServerConnection, ProtocolState.WSDL_RESPONSE_DONE)) {
+            if (!InboundSourceContext.assertState(nHttpServerConnection, ProtocolState.REQUEST_READY) && !InboundSourceContext.assertState(nHttpServerConnection, ProtocolState.WSDL_RESPONSE_DONE)){
                 handleInvalidState(nHttpServerConnection, "Request received");
                 return;
             }
@@ -108,7 +108,7 @@ public class InboundHttpSourceHandler implements NHttpServerEventHandler {
             String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
             if ("GET".equals(method) || "HEAD".equals(method)) {
                 HttpContext context = request.getConnection().getContext();
-                ContentOutputBuffer outputBuffer = new SimpleOutputBuffer(8192, new HeapByteBufferAllocator());
+                ContentOutputBuffer outputBuffer = new SimpleOutputBuffer(InboundHttpConstants.SYNAPSE_RESPONSE_BUFFER_SIZE, new HeapByteBufferAllocator());
                 context.setAttribute("synapse.response-source-buffer", outputBuffer);
             }
             executorService.execute(
