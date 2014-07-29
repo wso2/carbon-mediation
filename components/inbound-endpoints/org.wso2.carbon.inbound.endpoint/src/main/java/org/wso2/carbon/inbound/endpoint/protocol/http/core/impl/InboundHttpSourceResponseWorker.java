@@ -24,6 +24,9 @@ import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundHttpConstants
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * Get meditited message context from Source Response Worker and created InboundHttpSourceResponse extract the pipe and set to the reader
+ */
 public class InboundHttpSourceResponseWorker implements Runnable {
     private Logger logger = Logger.getLogger(InboundHttpSourceResponseWorker.class);
 

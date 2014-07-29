@@ -16,6 +16,9 @@ import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConfiguration
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * wrapping class of InboundHttpSourceHandler
+ */
 public class MultiListnerIODispatch extends
         AbstractIODispatch<DefaultNHttpServerConnection> {
 
@@ -25,16 +28,15 @@ public class MultiListnerIODispatch extends
     private final Map<Integer, InboundHttpSourceHandler> handlers;
 
 
+    public MultiListnerIODispatch(final Map<Integer, InboundHttpSourceHandler> handlers) {
+        this.handlers = handlers;
 
-   public MultiListnerIODispatch(final Map<Integer, InboundHttpSourceHandler> handlers){
-       this.handlers=handlers;
-
-   }
+    }
 
 
     @Override
     protected DefaultNHttpServerConnection createConnection(IOSession ioSession) {
-       return getConnection(ioSession);
+        return getConnection(ioSession);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class MultiListnerIODispatch extends
         int localPort = defaultNHttpServerConnection.getLocalPort();
         InboundHttpSourceHandler handler = handlers.get(localPort);
         try {
-            handler.exception(defaultNHttpServerConnection,e);
+            handler.exception(defaultNHttpServerConnection, e);
         } catch (final Exception ex) {
             handler.exception(defaultNHttpServerConnection, ex);
         }
@@ -97,22 +99,21 @@ public class MultiListnerIODispatch extends
         int localPort = defaultNHttpServerConnection.getLocalPort();
         InboundHttpSourceHandler handler = handlers.get(localPort);
         try {
-           handler.timeout(defaultNHttpServerConnection);
+            handler.timeout(defaultNHttpServerConnection);
         } catch (final Exception ex) {
             handler.exception(defaultNHttpServerConnection, ex);
         }
     }
 
-    private DefaultNHttpServerConnection getConnection(IOSession ioSession){
+    private DefaultNHttpServerConnection getConnection(IOSession ioSession) {
         InboundConfiguration inboundConfiguration = new InboundConfiguration();
-        HttpParams httpParams =  inboundConfiguration.buildHttpParams();
-        DefaultNHttpServerConnection conn =  LoggingUtils.createServerConnection(
+        HttpParams httpParams = inboundConfiguration.buildHttpParams();
+        DefaultNHttpServerConnection conn = LoggingUtils.createServerConnection(
                 ioSession, new SynapseHTTPRequestFactory(), new HeapByteBufferAllocator(), httpParams);
         int timeout = HttpConnectionParams.getSoTimeout(httpParams);
         conn.setSocketTimeout(timeout);
         return conn;
     }
-
 
 
 }

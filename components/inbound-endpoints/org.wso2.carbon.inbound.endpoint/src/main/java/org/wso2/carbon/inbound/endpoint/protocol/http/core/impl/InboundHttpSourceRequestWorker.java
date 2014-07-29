@@ -16,6 +16,7 @@ import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpInetConnection;
@@ -38,7 +39,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-
+/**
+ * create Synapse Message Context from HTTP Request and inject it to the sequence.
+ */
 public class InboundHttpSourceRequestWorker implements Runnable {
 
     private static final Log log = LogFactory.getLog(InboundHttpSourceRequestWorker.class);
@@ -111,7 +114,7 @@ public class InboundHttpSourceRequestWorker implements Runnable {
         axis2MsgCtx.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, false);
         axis2MsgCtx.setProperty(PassThroughConstants.SERVICE_PREFIX, servicePrefix);
 
-        // msgContext.setTo(new EndpointReference(restUrlPostfix));
+
         axis2MsgCtx.setProperty(PassThroughConstants.REST_URL_POSTFIX, restUrlPostfix);
 
 
@@ -255,25 +258,23 @@ public class InboundHttpSourceRequestWorker implements Runnable {
         boolean nioAck = msgContext.isPropertyTrue("NIO-ACK-Requested", false);
         if (respWillFollow || ack || forced || nioAck) {
             NHttpServerConnection conn = request.getConnection();
-            //SourceResponse sourceResponse;
+            InboundHttpSourceResponse inboundHttpSourceResponse;
             if (!nioAck) {
                 msgContext.removeProperty(MessageContext.TRANSPORT_HEADERS);
-//                sourceResponse = SourceResponseFactory.create(msgContext,
-//                        request, sourceConfiguration);
-//                sourceResponse.setStatus(HttpStatus.SC_ACCEPTED);
+                inboundHttpSourceResponse = InboundSourceResponseFactory.create(msgContext,
+                        request, sourceConfiguration);
+                inboundHttpSourceResponse.setStatus(HttpStatus.SC_ACCEPTED);
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("Sending ACK response with status "
                             + msgContext.getProperty(NhttpConstants.HTTP_SC)
                             + ", for MessageID : " + msgContext.getMessageID());
                 }
-//                sourceResponse = SourceResponseFactory.create(msgContext,
-//                        request, sourceConfiguration);
-//                sourceResponse.setStatus(Integer.parseInt(
-//                        msgContext.getProperty(NhttpConstants.HTTP_SC).toString()));
+                inboundHttpSourceResponse = InboundSourceResponseFactory.create(msgContext,
+                        request, sourceConfiguration);
+                inboundHttpSourceResponse.setStatus(Integer.parseInt(
+                        msgContext.getProperty(NhttpConstants.HTTP_SC).toString()));
             }
-
-            //    SourceContext.setResponse(conn, sourceResponse);
             ProtocolState state = InboundSourceContext.getState(conn);
             if (state != null && state.compareTo(ProtocolState.REQUEST_DONE) <= 0) {
                 conn.requestOutput();

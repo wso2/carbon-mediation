@@ -132,7 +132,7 @@ public class InboundManagementClient {
 				i++;
 			}
 			stub.addInboundEndpoint(name, sequence, onError, interval,
-					protocol, classImpl, sParams);
+					protocol, null,classImpl, sParams);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -172,7 +172,7 @@ public class InboundManagementClient {
 				i++;
 			}
 			stub.updateInboundEndpoint(name, sequence, onError, interval,
-					protocol, classImpl, sParams);
+					protocol,null, classImpl, sParams);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();

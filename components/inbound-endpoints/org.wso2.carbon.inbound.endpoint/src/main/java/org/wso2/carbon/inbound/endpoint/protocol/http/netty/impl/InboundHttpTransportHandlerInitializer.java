@@ -54,7 +54,9 @@ public class InboundHttpTransportHandlerInitializer extends ChannelInitializer<S
      */
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
-        logger.info("initializing channel pipeline");
+        if(logger.isDebugEnabled()) {
+            logger.info("initializing channel pipeline");
+        }
         ChannelPipeline p = ch.pipeline();
         p.addLast(new HttpServerCodec());
         p.addLast(new HttpObjectAggregator(InboundHttpConstants.MAXIMUM_CHUNK_SIZE_AGGREGATOR));

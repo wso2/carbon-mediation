@@ -21,8 +21,8 @@ import java.util.Map;
 public class InboundSourceResponseFactory {
 
     public static InboundHttpSourceResponse create(MessageContext msgContext,
-                                        InboundHttpSourceRequest sourceRequest,
-                                        InboundConfiguration sourceConfiguration) {
+                                                   InboundHttpSourceRequest sourceRequest,
+                                                   InboundConfiguration sourceConfiguration) {
         // determine the status code to be sent
         int statusCode = PassThroughTransportUtils.determineHttpStatusCode(msgContext);
 
@@ -36,7 +36,7 @@ public class InboundSourceResponseFactory {
         boolean forceContentLengthCopy = msgContext.isPropertyTrue(PassThroughConstants.COPY_CONTENT_LENGTH_FROM_INCOMING);
 
         if (forceContentLength && forceContentLengthCopy && msgContext.getProperty(PassThroughConstants.ORGINAL_CONTEN_LENGTH) != null) {
-            sourceResponse.addHeader(HTTP.CONTENT_LEN, (String)msgContext.getProperty(PassThroughConstants.ORGINAL_CONTEN_LENGTH));
+            sourceResponse.addHeader(HTTP.CONTENT_LEN, (String) msgContext.getProperty(PassThroughConstants.ORGINAL_CONTEN_LENGTH));
         }
 
         if (transportHeaders != null && msgContext.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE) != null) {
@@ -51,30 +51,27 @@ public class InboundSourceResponseFactory {
             }
         }
 
-//        if (transportHeaders != null) {
-//            addResponseHeader(sourceResponse, transportHeaders);
-//        }else{
-            Boolean noEntityBody = (Boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY);
-            if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
-                OMOutputFormat format = NhttpUtil.getOMOutputFormat(msgContext);
-                transportHeaders = new HashMap();
-                MessageFormatter messageFormatter =
-                        MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
-                if(msgContext.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE) == null){
-                    transportHeaders.put(HTTP.CONTENT_TYPE, messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
-                }
-                addResponseHeader(sourceResponse, transportHeaders);
-          //  }
+
+        Boolean noEntityBody = (Boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY);
+        if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
+            OMOutputFormat format = NhttpUtil.getOMOutputFormat(msgContext);
+            transportHeaders = new HashMap();
+            MessageFormatter messageFormatter =
+                    MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
+            if (msgContext.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE) == null) {
+                transportHeaders.put(HTTP.CONTENT_TYPE, messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
+            }
+            addResponseHeader(sourceResponse, transportHeaders);
+
 
         }
-
 
 
         // Add excess response header.
         String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
         Map excessHeaders = (Map) msgContext.getProperty(excessProp);
         if (excessHeaders != null) {
-            for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext(); ) {
                 String key = (String) iterator.next();
                 for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
                     sourceResponse.addHeader(key, (String) excessVal);

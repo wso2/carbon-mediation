@@ -18,7 +18,9 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Listener class for Inbound Http Inbounds
+ */
 public class InboundHttpListner implements InboundListner {
     protected Log log = LogFactory.getLog(this.getClass());
 
@@ -34,7 +36,7 @@ public class InboundHttpListner implements InboundListner {
     private InboundConfiguration inboundConfiguration;
     private static DefaultListeningIOReactor ioReactor;
     private static boolean isIOReactorStarted = false;
-    private  InboundHttpSourceResponseWorker inboundHttpSourceResponseWorker;
+    private InboundHttpSourceResponseWorker inboundHttpSourceResponseWorker;
     private static boolean isResponseWorkerStarted;
 
 
@@ -45,8 +47,8 @@ public class InboundHttpListner implements InboundListner {
         this.outSequence = outSeq;
         this.inboundHttpSourceHandlerMap = new HashMap<Integer, InboundHttpSourceHandler>();
         this.inboundConfiguration = new InboundConfiguration();
-        this.synapseEnvironment=synapseEnvironment;
-        if(!isResponseWorkerStarted){
+        this.synapseEnvironment = synapseEnvironment;
+        if (!isResponseWorkerStarted) {
             inboundHttpSourceResponseWorker = new InboundHttpSourceResponseWorker();
         }
     }
@@ -64,6 +66,9 @@ public class InboundHttpListner implements InboundListner {
 
     }
 
+    /**
+     * start endpoints for ports specified
+     */
     private void startEndpoint() {
         InetSocketAddress inetSocketAddress = new InetSocketAddress(Integer.parseInt(port));
         ListenerEndpoint endpoint = ioReactor.listen(inetSocketAddress);
@@ -82,12 +87,10 @@ public class InboundHttpListner implements InboundListner {
                 }
             }
         } catch (InterruptedException e) {
-            log.warn("Listener startup was interrupted");
+            log.error("Listener startup was interrupted");
             System.out.println(e.getMessage());
         }
     }
-
-
 
 
     private DefaultListeningIOReactor startIOReactor() {
@@ -143,13 +146,13 @@ public class InboundHttpListner implements InboundListner {
     }
 
 
-    private void startResponseWorker(){
-        if(inboundHttpSourceResponseWorker != null && !isResponseWorkerStarted){
+    private void startResponseWorker() {
+        if (inboundHttpSourceResponseWorker != null && !isResponseWorkerStarted) {
             Thread thread = new Thread(inboundHttpSourceResponseWorker);
             thread.start();
-            isResponseWorkerStarted=true;
+            isResponseWorkerStarted = true;
             log.info("start Response worker");
-        }else{
+        } else {
             log.error("cannot start response worker");
         }
     }

@@ -16,18 +16,21 @@ import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;
 import org.apache.synapse.transport.passthru.connections.SourceConnections;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
 
+/**
+ * configurations related to Inbound Http
+ */
 public class InboundConfiguration extends BaseConfiguration {
 private static PassThroughConfiguration conf = PassThroughConfiguration.getInstance();
 private static int iOBufferSize = conf.getIOBufferSize();
 private static BufferFactory bufferFactory = new BufferFactory(iOBufferSize, new HeapByteBufferAllocator(), 512);
-private SourceConnections sourceConnections = null;
+private InboundSourceConnections sourceConnections = null;
 private HttpResponseFactory httpResponseFactory;
     private HttpProcessor httpProcessor = null;
 
 
     public InboundConfiguration() {
         super(null, null, null, null);
-        this.sourceConnections= new SourceConnections();
+        this.sourceConnections= new InboundSourceConnections();
         this.httpResponseFactory = new DefaultHttpResponseFactory();
         httpProcessor = new ImmutableHttpProcessor(
                 new HttpResponseInterceptor[]{
@@ -74,7 +77,7 @@ private HttpResponseFactory httpResponseFactory;
         return bufferFactory;
     }
 
-    public SourceConnections getSourceConnections(){
+    public InboundSourceConnections getSourceConnections(){
         return sourceConnections;
     }
 

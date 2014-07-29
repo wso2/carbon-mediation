@@ -20,36 +20,54 @@ import java.util.*;
 
 public class InboundHttpSourceResponse {
     private Pipe pipe = null;
-    /** Transport headers */
+    /**
+     * Transport headers
+     */
     private Map<String, TreeSet<String>> headers = new HashMap<String, TreeSet<String>>();
-    /** Status of the response */
+    /**
+     * Status of the response
+     */
     private int status = HttpStatus.SC_OK;
-    /** Status line */
+    /**
+     * Status line
+     */
     private String statusLine = null;
-    /** Actual response submitted */
+    /**
+     * Actual response submitted
+     */
     private HttpResponse response = null;
-    /** Configuration of the receiver */
+    /**
+     * Configuration of the receiver
+     */
     private InboundConfiguration sourceConfiguration;
-    /** Version of the response */
+    /**
+     * Version of the response
+     */
     private ProtocolVersion version = HttpVersion.HTTP_1_1;
-    /** Connection strategy */
+    /**
+     * Connection strategy
+     */
     private ConnectionReuseStrategy connStrategy = new DefaultConnectionReuseStrategy();
     /** Chunk response or not */
     // private boolean chunk = true;
-    /** response has an entity or not**/
+    /**
+     * response has an entity or not*
+     */
     private boolean hasEntity = true;
 
     private InboundHttpSourceRequest request = null;
 
-    /** If version change required default HTTP 1.1 will be overridden*/
-    private boolean versionChangeRequired =false;
+    /**
+     * If version change required default HTTP 1.1 will be overridden
+     */
+    private boolean versionChangeRequired = false;
 
     public InboundHttpSourceResponse(InboundConfiguration config, int status, InboundHttpSourceRequest request) {
         this(config, status, null, request);
     }
 
     public InboundHttpSourceResponse(InboundConfiguration config, int status, String statusLine,
-                          InboundHttpSourceRequest request) {
+                                     InboundHttpSourceRequest request) {
         this.status = status;
         this.statusLine = statusLine;
         this.sourceConfiguration = config;
@@ -66,8 +84,9 @@ public class InboundHttpSourceResponse {
 
     /**
      * Starts the response by writing the headers
+     *
      * @param conn connection
-     * @throws java.io.IOException if an error occurs
+     * @throws java.io.IOException           if an error occurs
      * @throws org.apache.http.HttpException if an error occurs
      */
     public void start(NHttpServerConnection conn) throws IOException, HttpException {
@@ -78,7 +97,8 @@ public class InboundHttpSourceResponse {
 
         if (statusLine != null) {
             response.setStatusLine(version, status, statusLine);
-        } if(versionChangeRequired){
+        }
+        if (versionChangeRequired) {
             response.setStatusLine(version, status);
         } else {
             response.setStatusCode(status);
@@ -117,7 +137,7 @@ public class InboundHttpSourceResponse {
         for (Map.Entry<String, TreeSet<String>> entry : entries) {
             if (entry.getKey() != null) {
                 Iterator<String> i = entry.getValue().iterator();
-                while(i.hasNext()) {
+                while (i.hasNext()) {
                     response.addHeader(entry.getKey(), i.next());
                 }
             }
@@ -186,10 +206,11 @@ public class InboundHttpSourceResponse {
 
     /**
      * Consume the content through the Pipe and write them to the wire
-     * @param conn connection
+     *
+     * @param conn    connection
      * @param encoder encoder
-     * @throws java.io.IOException if an error occurs
      * @return number of bytes written
+     * @throws java.io.IOException if an error occurs
      */
     public int write(NHttpServerConnection conn, ContentEncoder encoder) throws IOException {
         int bytes = 0;
@@ -201,10 +222,6 @@ public class InboundHttpSourceResponse {
         // Update connection state
         if (encoder.isCompleted()) {
             InboundSourceContext.updateState(conn, ProtocolState.RESPONSE_DONE);
-
-            sourceConfiguration.getMetrics().
-                    notifySentMessageSize(conn.getMetrics().getSentBytesCount());
-
             if (response != null && !this.connStrategy.keepAlive(response, conn.getContext())) {
                 InboundSourceContext.updateState(conn, ProtocolState.CLOSING);
 
@@ -225,7 +242,7 @@ public class InboundHttpSourceResponse {
     }
 
     public void addHeader(String name, String value) {
-        if(headers.get(name) == null) {
+        if (headers.get(name) == null) {
             TreeSet<String> values = new TreeSet<String>();
             values.add(value);
             headers.put(name, values);
@@ -238,6 +255,7 @@ public class InboundHttpSourceResponse {
     public void setStatus(int status) {
         this.status = status;
     }
+
     public void removeHeader(String name) {
         if (headers.get(name) != null) {
             headers.remove(name);

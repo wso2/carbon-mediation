@@ -4,6 +4,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
 import org.apache.http.nio.NHttpConnection;
 import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.ProtocolState;
+import org.apache.synapse.transport.passthru.SourceContext;
 import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConfiguration;
 
 import java.nio.ByteBuffer;
@@ -22,7 +23,9 @@ public class InboundSourceContext {
 
     private InboundHttpSourceResponse response;
 
-    /** Mark the connection to be shut down after the current request-response is completed. */
+    /**
+     * Mark the connection to be shut down after the current request-response is completed.
+     */
     private boolean shutDown = false;
 
     private Pipe reader;
@@ -135,7 +138,7 @@ public class InboundSourceContext {
 
         if (info != null) {
             info.setState(state);
-        }  else {
+        } else {
             throw new IllegalStateException("Connection information should be present");
         }
     }

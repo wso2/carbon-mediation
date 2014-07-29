@@ -19,28 +19,46 @@ import java.util.TreeMap;
 public class InboundHttpSourceRequest {
 
     private Pipe pipe = null;
-    /** HTTP Headers */
-    private Map<String, String> headers =  new TreeMap<String, String>(new Comparator<String>() {
+    /**
+     * HTTP Headers
+     */
+    private Map<String, String> headers = new TreeMap<String, String>(new Comparator<String>() {
         public int compare(String o1, String o2) {
             return o1.compareToIgnoreCase(o2);
         }
     });
-    /** HTTP URL */
+    /**
+     * HTTP URL
+     */
     private String url;
-    /** HTTP Method */
+    /**
+     * HTTP Method
+     */
     private String method;
-    /** Weather reqyest has a body */
+    /**
+     * Weather reqyest has a body
+     */
     private boolean entityEnclosing;
-    /** The http request */
+    /**
+     * The http request
+     */
     private HttpRequest request = null;
-    /** Configuration of the receiver */
+    /**
+     * Configuration of the receiver
+     */
     private InboundConfiguration sourceConfiguration;
-    /** HTTP Version */
+    /**
+     * HTTP Version
+     */
     private ProtocolVersion version = null;
-    /** The connection from the client */
+    /**
+     * The connection from the client
+     */
     private NHttpServerConnection connection = null;
 
-    /** Excess headers of the request */
+    /**
+     * Excess headers of the request
+     */
     private Map excessHeaders = new MultiValueMap();
 
     private SynapseEnvironment synapseEnvironment;
@@ -51,10 +69,9 @@ public class InboundHttpSourceRequest {
     private String outSeq;
 
 
-
     public InboundHttpSourceRequest(InboundConfiguration sourceConfiguration,
-                         HttpRequest request,
-                         NHttpServerConnection conn) {
+                                    HttpRequest request,
+                                    NHttpServerConnection conn) {
         this.sourceConfiguration = sourceConfiguration;
         this.request = request;
         this.connection = conn;
@@ -73,7 +90,7 @@ public class InboundHttpSourceRequest {
         Header[] headers = request.getAllHeaders();
         if (headers != null) {
             for (Header header : headers) {
-                if(this.headers.containsKey(header.getName())) {
+                if (this.headers.containsKey(header.getName())) {
                     addExcessHeader(header);
                 } else {
                     this.headers.put(header.getName(), header.getValue());
@@ -84,15 +101,16 @@ public class InboundHttpSourceRequest {
 
     /**
      * Start processing the request by connecting the pipe if this request has an entity body.
+     *
      * @param conn connection
-     * @throws java.io.IOException if an error occurs
+     * @throws java.io.IOException           if an error occurs
      * @throws org.apache.http.HttpException if an error occurs
      */
     public void start(NHttpServerConnection conn) throws IOException, HttpException {
         if (entityEnclosing) {
             pipe = new Pipe(conn, sourceConfiguration.getBufferFactory().getBuffer(), "source", sourceConfiguration);
 
-           InboundSourceContext.get(conn).setReader(pipe);
+            InboundSourceContext.get(conn).setReader(pipe);
 
             // See if the client expects a 100-Continue
             if (((HttpEntityEnclosingRequest) request).expectContinue()) {
@@ -109,11 +127,11 @@ public class InboundHttpSourceRequest {
 
     /**
      * Produce the content in to the pipe.
-     * @param conn the connection
-     * @param decoder content decoder
      *
-     * @throws java.io.IOException if an error occurs
+     * @param conn    the connection
+     * @param decoder content decoder
      * @return number of bytes read
+     * @throws java.io.IOException if an error occurs
      */
     public int read(NHttpServerConnection conn, ContentDecoder decoder) throws IOException {
         if (pipe == null) {
