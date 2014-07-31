@@ -179,18 +179,17 @@
         endpoint = (HttpEndpoint) ListEndpointDesignerHelper.getEditingEndpoint(request, session);
     }
 
-    String[] methodOptions = {"get", "post", "put", "delete", "head"};
-    //String[] formatOptions = {"soap11", "soap12", "POX", "REST", "GET", "leave-as-is"};
-    
+    String[] methodOptions = {"get", "post", "put", "delete", "head", "options", "patch", "leave-as-is"};
+
     String[] actionOptions = {"neverTimeout", "discardMessage", "executeFaultSequence"};
     String httpEpName = "";
     String endpointUriTemplate = "";
     String validAddressURL = "";
     
-    boolean isGet = false, isPost = false, isPush = false, isPut = false, isDelete = false, isHead = false;
-    //boolean isPox = false, isRest = false, isSoap11 = false, isSoap12 = false, isGet = false;
-    
-    boolean ismethodDefault = true;
+    boolean isGet = false, isPost = false, isPatch = false, isPut = false, isDelete = false,
+            isHead = false, isOptions = false;
+
+    boolean isLeaveAsIs = true;
     String errorCode = "";
     long suspendDurationOnFailure = 0;
     long maxDuration = 0;
@@ -224,19 +223,21 @@
             isGet = true;
         } else if (endpoint.isHttpPost()) {
             isPost = true;
-        } else if (endpoint.isHttpPush()) {
-            isPush = true;
+        } else if (endpoint.isHttpPatch()) {
+            isPatch = true;
         } else if (endpoint.isHttpPut()) {
             isPut = true;
         } else if (endpoint.isHttpDelete()) {
             isDelete = true;
         } else if (endpoint.isHttpHead()) {
-        	isHead = true; 
+        	isHead = true;
+        } else if (endpoint.isHttpOptions()) {
+            isOptions = true;
         } else {
-            ismethodDefault = true;
+            isLeaveAsIs = true;
         }
-        if (isGet || isPost || isPush || isPut || isDelete || isHead) {
-            ismethodDefault = false;
+        if (isGet || isPost || isPatch || isPut || isDelete || isHead || isOptions) {
+            isLeaveAsIs = false;
         }
 
         // Error codes
@@ -417,6 +418,15 @@
             <option value="<%=methodOptions[4]%>" <%=isHead ? "selected=\"selected\"" : ""%>>
                 <fmt:message
                         key="http.head"/></option>
+            <option value="<%=methodOptions[5]%>" <%=isOptions ? "selected=\"selected\"" : ""%>>
+                            <fmt:message
+                                    key="http.options"/></option>
+            <option value="<%=methodOptions[6]%>" <%=isPatch ? "selected=\"selected\"" : ""%>>
+                                        <fmt:message
+                                                key="http.patch"/></option>
+            <option value="<%=methodOptions[7]%>" <%=isLeaveAsIs ? "selected=\"selected\"" : ""%>>
+                                        <fmt:message
+                                                key="http.leave.as.is"/></option>
         </select>
         </td>
     </tr>
