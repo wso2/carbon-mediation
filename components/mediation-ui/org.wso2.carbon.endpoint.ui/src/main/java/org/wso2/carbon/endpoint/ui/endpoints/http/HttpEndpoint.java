@@ -31,11 +31,12 @@ public class HttpEndpoint extends Endpoint {
     
 	private boolean httpGet = false;
 	private boolean httpPost = false;
-	private boolean httpPush = false; 
+	private boolean httpPatch = false;
 	private boolean httpPut = false; 
 	private boolean httpDelete = false;
 	private boolean httpHead = false; 
-	
+	private boolean httpOptions = false;
+
 	/*
 	 * private boolean httpTrace = false; 
 	 * private boolean httpConnect = false; 
@@ -74,8 +75,8 @@ public class HttpEndpoint extends Endpoint {
     	this.httpPost = post;
     }    
     
-    public void setHttpPush(boolean push) {
-    	this.httpPush = push;
+    public void setHttpPatch(boolean patch) {
+    	this.httpPatch = patch;
     }
     
     public void setHttpPut(boolean put) {
@@ -88,6 +89,10 @@ public class HttpEndpoint extends Endpoint {
     
     public void setHttpHead(boolean head) {
     	this.httpHead = head;
+    }
+
+    public void setHttpOptions(boolean options) {
+    	this.httpOptions = options;
     }
     
     public String getTagLocalName() {
@@ -102,8 +107,8 @@ public class HttpEndpoint extends Endpoint {
     	return httpPost; 
     }
     
-    public boolean isHttpPush() {
-    	return httpPush;
+    public boolean isHttpPatch() {
+    	return httpPatch;
     }
     
     public boolean isHttpPut() {
@@ -117,7 +122,10 @@ public class HttpEndpoint extends Endpoint {
     public boolean isHttpHead() {
     	return httpHead; 
     }
-    
+
+    public boolean isHttpOptions() {
+        return httpOptions;
+    }
 
     public String getEndpointName() {
         return endpointName;
@@ -146,21 +154,24 @@ public class HttpEndpoint extends Endpoint {
         	setHttpGet(true);
         } else if ("post".equalsIgnoreCase(method)) {
         	setHttpPost(true);
-        } else if ("push".equalsIgnoreCase(method)) {
-        	setHttpPush(true);
+        } else if ("patch".equalsIgnoreCase(method)) {
+        	setHttpPatch(true);
         } else if ("put".equalsIgnoreCase(method)) {
         	setHttpPut(true);
         } else if ("delete".equalsIgnoreCase(method)) {
         	setHttpDelete(true);
         } else if ("head".equalsIgnoreCase(method)) {
         	setHttpHead(true);
+        } else if ("options".equalsIgnoreCase(method)) {
+            setHttpOptions(true);
         } else {
-        	setHttpGet(false);
+            setHttpGet(false);
         	setHttpPost(false);
-        	setHttpPush(false);
+        	setHttpPatch(false);
         	setHttpPut(false);
         	setHttpDelete(false);
         	setHttpHead(false);
+            setHttpOptions(false);
         }
     }
 
@@ -280,14 +291,16 @@ public class HttpEndpoint extends Endpoint {
         	httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "get"));
         } else if (isHttpPost()) {
         	httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "post"));
-        } else if (isHttpPush()) {
-        	httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "push"));
+        } else if (isHttpPatch()) {
+        	httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "patch"));
         } else if (isHttpPut()) {
         	httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "put"));
         } else if (isHttpDelete()) {
         	httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "delete"));
         } else if (isHttpHead()) {
         	httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "head"));
+        } else if (isHttpOptions()) {
+            httpElement.addAttribute(fac.createOMAttribute("method", nullNS, "options"));
         }
 
         // Suspend configuration

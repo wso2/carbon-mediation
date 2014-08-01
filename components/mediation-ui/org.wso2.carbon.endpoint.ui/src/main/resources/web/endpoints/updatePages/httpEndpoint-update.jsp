@@ -60,20 +60,24 @@
     	httpEndpoint.setHttpGet(true);
     } else if ("post".equals(methodOption)) {
     	httpEndpoint.setHttpPost(true);
-    } else if ("push".equals(methodOption)) {
-    	httpEndpoint.setHttpPush(true);
+    } else if ("patch".equals(methodOption)) {
+    	httpEndpoint.setHttpPatch(true);
     } else if ("put".equals(methodOption)) {
     	httpEndpoint.setHttpPut(true);
     } else if ("delete".equals(methodOption)) {
         httpEndpoint.setHttpDelete(true);
     } else if ("head".equals(methodOption)) {
     	httpEndpoint.setHttpHead(true);
+    } else if ("options".equals(methodOption)) {
+        httpEndpoint.setHttpOptions(true);
     } else {
     	httpEndpoint.setHttpGet(false);
     	httpEndpoint.setHttpPost(false);
-    	httpEndpoint.setHttpPush(false);
+    	httpEndpoint.setHttpPatch(false);
     	httpEndpoint.setHttpPut(false);
     	httpEndpoint.setHttpDelete(false);
+    	httpEndpoint.setHttpHead(false);
+    	httpEndpoint.setHttpOptions(false);
     }
 
     if (description != null && !"".equals(description)) {
