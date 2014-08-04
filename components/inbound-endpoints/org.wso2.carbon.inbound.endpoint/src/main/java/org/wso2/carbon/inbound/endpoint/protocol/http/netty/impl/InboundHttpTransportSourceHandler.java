@@ -36,13 +36,13 @@ public class InboundHttpTransportSourceHandler extends ChannelInboundHandlerAdap
     private SynapseEnvironment synapseEnvironment;
     private String injectSeq;
     private String faultSeq;
-    private String outSequence;
 
-    public InboundHttpTransportSourceHandler(SynapseEnvironment synapseEnvironment, String injectSeq, String faultSeq,String outSequence) {
+
+    public InboundHttpTransportSourceHandler(SynapseEnvironment synapseEnvironment, String injectSeq, String faultSeq) {
         this.synapseEnvironment = synapseEnvironment;
         this.injectSeq = injectSeq;
         this.faultSeq = faultSeq;
-        this.outSequence=outSequence;
+
     }
 
 
@@ -87,7 +87,6 @@ public class InboundHttpTransportSourceHandler extends ChannelInboundHandlerAdap
         inboundSourceRequest.setSynapseEnvironment(this.synapseEnvironment);
         inboundSourceRequest.setInjectSeq(this.injectSeq);
         inboundSourceRequest.setFaultSeq(this.faultSeq);
-        inboundSourceRequest.setOutSeq(outSequence);
         inboundRequestQueue.publish(inboundSourceRequest);
     }
 

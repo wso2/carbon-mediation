@@ -55,7 +55,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 	}
 
 	public void addInboundEndpoint(String name, String sequence,
-			String onError, String interval, String protocol,String outsequence, String classImpl,
+			String onError,  String protocol, String classImpl,
 			String[] sParams) throws InboundManagementException {
 		SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
 		OMFactory fac = OMAbstractFactory.getOMFactory();
@@ -65,8 +65,6 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 		elem.addAttribute(fac.createOMAttribute("name", null, name));
 		elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
 		elem.addAttribute(fac.createOMAttribute("onError", null, onError));
-		elem.addAttribute(fac.createOMAttribute("interval", null, interval));
-        elem.addAttribute(fac.createOMAttribute("outsequence", null, outsequence));
 		if (protocol != null) {
 			elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
 		} else {
@@ -116,7 +114,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         inboundEndpoint.init(getSynapseEnvironment());
     }
 	public void updateInboundEndpoint(String name, String sequence,
-			String onError, String interval, String protocol,String outsequence, String classImpl,
+			String onError,  String protocol, String classImpl,
 			String[] sParams) throws InboundManagementException {
 		SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
 		OMFactory fac = OMAbstractFactory.getOMFactory();
@@ -126,8 +124,6 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 		elem.addAttribute(fac.createOMAttribute("name", null, name));
 		elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
 		elem.addAttribute(fac.createOMAttribute("onError", null, onError));
-		elem.addAttribute(fac.createOMAttribute("interval", null, interval));
-        elem.addAttribute(fac.createOMAttribute("outsequence", null, outsequence));
 		if (protocol != null) {
 			elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
 		} else {

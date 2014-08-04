@@ -29,7 +29,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.inbound.InboundMessageContextQueue;
+import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 
 import org.apache.synapse.transport.passthru.PassThroughConstants;
@@ -37,7 +37,7 @@ import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConfiguration;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundHttpConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,23 +45,24 @@ import java.io.OutputStream;
 /**
  * Get meditited message context from Source Response Worker and created InboundHttpSourceResponse extract the pipe and set to the reader
  */
-public class InboundHttpSourceResponseWorker implements Runnable {
+public class InboundHttpSourceResponseWorker implements InboundResponseSender {
     private Logger logger = Logger.getLogger(InboundHttpSourceResponseWorker.class);
+    private String type;
+
+
 
     @Override
-    public void run() {
-        while (true) {
-            try {
-                MessageContext messageContext = InboundMessageContextQueue.getInstance().getMessageContextQueue().take();
+    public void sendBack(MessageContext messageContext) {
+           try{
                 if (messageContext != null) {
 
                     org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
 
                     InboundConfiguration sourceConfiguration = (InboundConfiguration) msgContext.getProperty(
-                            InboundHttpConstants.HTTP_INBOUND_SOURCE_CONFIGURATION);
+                            InboundConstants.HTTP_INBOUND_SOURCE_CONFIGURATION);
 
                     NHttpServerConnection conn = (NHttpServerConnection) msgContext.getProperty(
-                            InboundHttpConstants.HTTP_INBOUND_SOURCE_CONNECTION);
+                            InboundConstants.HTTP_INBOUND_SOURCE_CONNECTION);
                     if (conn == null) {
                         logger.error("Unable to correlate the response to a request");
                         throw new IllegalStateException("Unable to correlate the response to a request");
@@ -184,9 +185,15 @@ public class InboundHttpSourceResponseWorker implements Runnable {
                 logger.error(axisFault.getMessage(), axisFault);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
             }
-        }
+
+    }
+
+    @Override
+    public String getType() {
+        return this.type;
+    }
+    public void setType(String type) {
+        this.type = type;
     }
 }

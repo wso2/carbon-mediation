@@ -33,11 +33,10 @@ import org.apache.axiom.soap.impl.llom.soap12.SOAP12Factory;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.inbound.InboundMessageContextQueue;
+import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.passthru.Pipe;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundHttpConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -53,39 +52,12 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * Sends responses to requests that are sent to the InboundEndpoint
  */
 
-public class InboundSourceResponseSender implements Runnable{
+public class InboundSourceResponseSender implements InboundResponseSender{
 
 
     private Logger logger = Logger.getLogger(InboundSourceResponseSender.class);
 
-    public void run() {
 
-        while (true) {
-            try {
-                MessageContext smc = InboundMessageContextQueue.getInstance().getMessageContextQueue().take();
-
-                    ChannelHandlerContext ctx = (ChannelHandlerContext) smc.getProperty(SynapseConstants.CHANNEL_HANDLER_CONTEXT);
-                    //Retrieve the SOAP envelope from the MessageContext
-                    SOAPEnvelope envelope = smc.getEnvelope();
-                    String contentType = (String) ((Axis2MessageContext) smc).getAxis2MessageContext().getProperty(InboundHttpConstants.CONTENT_TYPE);
-                    if (envelope.getBody().getFirstElement() == null) {
-                        Pipe pipe = (Pipe) ((Axis2MessageContext) smc).getAxis2MessageContext().getProperty(InboundHttpConstants.PASS_THROUGH_TARGET_BUFFER);
-                        FullHttpResponse fullHttpResponse = getHttpResponseFrombyte(pipe.getInputStream(), contentType);
-                        //Send the envelope using the ChannelHandlerContext
-                        ctx.writeAndFlush(fullHttpResponse);
-                    }
-                    else {
-                        FullHttpResponse fullHttpResponse = getHttpResponse(envelope, contentType);
-                        //Send the envelope using the ChannelHandlerContext
-                        ctx.writeAndFlush(fullHttpResponse);
-                    }
-
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage());
-
-        }
-    }
-    }
 
     private FullHttpResponse getHttpResponse(SOAPEnvelope soapEnvelope, String ContentType) {
         byte[] bytes = soapEnvelope.toString().getBytes();
@@ -125,9 +97,9 @@ public class InboundSourceResponseSender implements Runnable{
             XMLStreamReader reader =
                     XMLInputFactory.newInstance().createXMLStreamReader(inputStream);
             SOAPFactory f = null;
-            if (version == InboundHttpConstants.SOAP_11) {
+            if (version == InboundConstants.SOAP_11) {
                 f = new SOAP11Factory();
-            } else if (version == InboundHttpConstants.SOAP_12) {
+            } else if (version == InboundConstants.SOAP_12) {
                 f = new SOAP12Factory();
             }
             StAXSOAPModelBuilder builder =
@@ -145,5 +117,30 @@ public class InboundSourceResponseSender implements Runnable{
     }
 
 
+    @Override
+    public void sendBack(MessageContext smc) {
 
+        ChannelHandlerContext ctx = (ChannelHandlerContext) smc.getProperty(InboundConstants.CHANNEL_HANDLER_CONTEXT);
+        //Retrieve the SOAP envelope from the MessageContext
+        SOAPEnvelope envelope = smc.getEnvelope();
+        String contentType = (String) ((Axis2MessageContext) smc).getAxis2MessageContext().getProperty(InboundConstants.CONTENT_TYPE);
+        if (envelope.getBody().getFirstElement() == null) {
+            Pipe pipe = (Pipe) ((Axis2MessageContext) smc).getAxis2MessageContext().getProperty(InboundConstants.PASS_THROUGH_TARGET_BUFFER);
+            FullHttpResponse fullHttpResponse = getHttpResponseFrombyte(pipe.getInputStream(), contentType);
+            //Send the envelope using the ChannelHandlerContext
+            ctx.writeAndFlush(fullHttpResponse);
+        }
+        else {
+            FullHttpResponse fullHttpResponse = getHttpResponse(envelope, contentType);
+            //Send the envelope using the ChannelHandlerContext
+            ctx.writeAndFlush(fullHttpResponse);
+        }
+
+
+    }
+
+    @Override
+    public String getType() {
+        return null;
+    }
 }

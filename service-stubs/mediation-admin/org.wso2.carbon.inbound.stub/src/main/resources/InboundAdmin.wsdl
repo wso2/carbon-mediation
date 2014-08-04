@@ -10,6 +10,25 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="updateInboundEndpoint">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="sequence" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="onError" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="classImpl" nillable="true" type="xs:string"></xs:element>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="sParams" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeInboundEndpoint">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="getInboundEndpointbyName">
                 <xs:complexType>
                     <xs:sequence>
@@ -24,17 +43,15 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="addInboundEndpoint">
+            <xs:element name="getAllInboundEndpointNames">
+                <xs:complexType>
+                    <xs:sequence></xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllInboundEndpointNamesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="sequence" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="onError" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="interval" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="outsequence" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="classImpl" nillable="true" type="xs:string"></xs:element>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="sParams" nillable="true" type="xs:string"></xs:element>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -45,36 +62,15 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="updateInboundEndpoint">
+            <xs:element name="addInboundEndpoint">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
                         <xs:element minOccurs="0" name="sequence" nillable="true" type="xs:string"></xs:element>
                         <xs:element minOccurs="0" name="onError" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="interval" nillable="true" type="xs:string"></xs:element>
                         <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"></xs:element>
-                        <xs:element minOccurs="0" name="outsequence" nillable="true" type="xs:string"></xs:element>
                         <xs:element minOccurs="0" name="classImpl" nillable="true" type="xs:string"></xs:element>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="sParams" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="removeInboundEndpoint">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllInboundEndpointNames">
-                <xs:complexType>
-                    <xs:sequence></xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllInboundEndpointNamesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"></xs:element>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -91,7 +87,6 @@
                     <xs:element minOccurs="0" name="interval" type="xs:long"></xs:element>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"></xs:element>
                     <xs:element minOccurs="0" name="onErrorSeq" nillable="true" type="xs:string"></xs:element>
-                    <xs:element minOccurs="0" name="outSequence" nillable="true" type="xs:string"></xs:element>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="parameters" nillable="true" type="xs:string"></xs:element>
                     <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"></xs:element>
                     <xs:element minOccurs="0" name="suspend" type="xs:boolean"></xs:element>
@@ -117,14 +112,14 @@
     <wsdl:message name="getAllInboundEndpointNamesResponse">
         <wsdl:part name="parameters" element="ns1:getAllInboundEndpointNamesResponse"></wsdl:part>
     </wsdl:message>
-    <wsdl:message name="updateInboundEndpointRequest">
-        <wsdl:part name="parameters" element="ns1:updateInboundEndpoint"></wsdl:part>
-    </wsdl:message>
     <wsdl:message name="getInboundEndpointbyNameRequest">
         <wsdl:part name="parameters" element="ns1:getInboundEndpointbyName"></wsdl:part>
     </wsdl:message>
     <wsdl:message name="getInboundEndpointbyNameResponse">
         <wsdl:part name="parameters" element="ns1:getInboundEndpointbyNameResponse"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="updateInboundEndpointRequest">
+        <wsdl:part name="parameters" element="ns1:updateInboundEndpoint"></wsdl:part>
     </wsdl:message>
     <wsdl:portType name="InboundAdminPortType">
         <wsdl:operation name="addInboundEndpointFromXMLString">
@@ -143,14 +138,14 @@
             <wsdl:output message="tns:getAllInboundEndpointNamesResponse" wsaw:Action="urn:getAllInboundEndpointNamesResponse"></wsdl:output>
             <wsdl:fault message="tns:InboundAdminInboundManagementException" name="InboundAdminInboundManagementException" wsaw:Action="urn:getAllInboundEndpointNamesInboundAdminInboundManagementException"></wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="updateInboundEndpoint">
-            <wsdl:input message="tns:updateInboundEndpointRequest" wsaw:Action="urn:updateInboundEndpoint"></wsdl:input>
-            <wsdl:fault message="tns:InboundAdminInboundManagementException" name="InboundAdminInboundManagementException" wsaw:Action="urn:updateInboundEndpointInboundAdminInboundManagementException"></wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="getInboundEndpointbyName">
             <wsdl:input message="tns:getInboundEndpointbyNameRequest" wsaw:Action="urn:getInboundEndpointbyName"></wsdl:input>
             <wsdl:output message="tns:getInboundEndpointbyNameResponse" wsaw:Action="urn:getInboundEndpointbyNameResponse"></wsdl:output>
             <wsdl:fault message="tns:InboundAdminInboundManagementException" name="InboundAdminInboundManagementException" wsaw:Action="urn:getInboundEndpointbyNameInboundAdminInboundManagementException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateInboundEndpoint">
+            <wsdl:input message="tns:updateInboundEndpointRequest" wsaw:Action="urn:updateInboundEndpoint"></wsdl:input>
+            <wsdl:fault message="tns:InboundAdminInboundManagementException" name="InboundAdminInboundManagementException" wsaw:Action="urn:updateInboundEndpointInboundAdminInboundManagementException"></wsdl:fault>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="InboundAdminSoap11Binding" type="tns:InboundAdminPortType">
@@ -191,6 +186,15 @@
                 <soap:fault use="literal" name="InboundAdminInboundManagementException"></soap:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="updateInboundEndpoint">
+            <soap:operation soapAction="urn:updateInboundEndpoint" style="document"></soap:operation>
+            <wsdl:input>
+                <soap:body use="literal"></soap:body>
+            </wsdl:input>
+            <wsdl:fault name="InboundAdminInboundManagementException">
+                <soap:fault use="literal" name="InboundAdminInboundManagementException"></soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="getInboundEndpointbyName">
             <soap:operation soapAction="urn:getInboundEndpointbyName" style="document"></soap:operation>
             <wsdl:input>
@@ -199,15 +203,6 @@
             <wsdl:output>
                 <soap:body use="literal"></soap:body>
             </wsdl:output>
-            <wsdl:fault name="InboundAdminInboundManagementException">
-                <soap:fault use="literal" name="InboundAdminInboundManagementException"></soap:fault>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="updateInboundEndpoint">
-            <soap:operation soapAction="urn:updateInboundEndpoint" style="document"></soap:operation>
-            <wsdl:input>
-                <soap:body use="literal"></soap:body>
-            </wsdl:input>
             <wsdl:fault name="InboundAdminInboundManagementException">
                 <soap:fault use="literal" name="InboundAdminInboundManagementException"></soap:fault>
             </wsdl:fault>
@@ -251,6 +246,15 @@
                 <soap12:fault use="literal" name="InboundAdminInboundManagementException"></soap12:fault>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="updateInboundEndpoint">
+            <soap12:operation soapAction="urn:updateInboundEndpoint" style="document"></soap12:operation>
+            <wsdl:input>
+                <soap12:body use="literal"></soap12:body>
+            </wsdl:input>
+            <wsdl:fault name="InboundAdminInboundManagementException">
+                <soap12:fault use="literal" name="InboundAdminInboundManagementException"></soap12:fault>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="getInboundEndpointbyName">
             <soap12:operation soapAction="urn:getInboundEndpointbyName" style="document"></soap12:operation>
             <wsdl:input>
@@ -259,15 +263,6 @@
             <wsdl:output>
                 <soap12:body use="literal"></soap12:body>
             </wsdl:output>
-            <wsdl:fault name="InboundAdminInboundManagementException">
-                <soap12:fault use="literal" name="InboundAdminInboundManagementException"></soap12:fault>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="updateInboundEndpoint">
-            <soap12:operation soapAction="urn:updateInboundEndpoint" style="document"></soap12:operation>
-            <wsdl:input>
-                <soap12:body use="literal"></soap12:body>
-            </wsdl:input>
             <wsdl:fault name="InboundAdminInboundManagementException">
                 <soap12:fault use="literal" name="InboundAdminInboundManagementException"></soap12:fault>
             </wsdl:fault>
@@ -302,6 +297,12 @@
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="updateInboundEndpoint">
+            <http:operation location="updateInboundEndpoint"></http:operation>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"></mime:content>
+            </wsdl:input>
+        </wsdl:operation>
         <wsdl:operation name="getInboundEndpointbyName">
             <http:operation location="getInboundEndpointbyName"></http:operation>
             <wsdl:input>
@@ -310,12 +311,6 @@
             <wsdl:output>
                 <mime:content type="text/xml" part="parameters"></mime:content>
             </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="updateInboundEndpoint">
-            <http:operation location="updateInboundEndpoint"></http:operation>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"></mime:content>
-            </wsdl:input>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="InboundAdmin">

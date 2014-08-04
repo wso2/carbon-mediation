@@ -28,7 +28,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundListner;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundHttpConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 /**
  * Start ServerBootStrap in a given port for http inbound connections
@@ -40,23 +40,25 @@ public class InboundHttpListner implements InboundListner {
     private SynapseEnvironment synapseEnvironment;
     private String injectSeq;
     private String faultSeq;
-    private String outSequence;
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
     private Thread listnerThread;
-    private Thread responseSender;
 
-    public InboundHttpListner(int port, SynapseEnvironment synapseEnvironment, String injectSeq, String faultSeq,String outSequence) {
+
+    public InboundHttpListner(int port, SynapseEnvironment synapseEnvironment, String injectSeq, String faultSeq) {
         this.port = port;
         this.synapseEnvironment = synapseEnvironment;
         this.injectSeq = injectSeq;
         this.faultSeq = faultSeq;
-        this.outSequence=outSequence;
-        responseSender = new Thread(new InboundSourceResponseSender());
 
     }
 
     public InboundHttpListner() {
+    }
+
+    @Override
+    public void init() {
+        start();
     }
 
     public void start() {
@@ -67,10 +69,10 @@ public class InboundHttpListner implements InboundListner {
                 workerGroup = new NioEventLoopGroup();
                 try {
                     ServerBootstrap b = new ServerBootstrap();
-                    b.option(ChannelOption.SO_BACKLOG, InboundHttpConstants.MAXIMUM_CONNECTIONS_QUEUED);
+                    b.option(ChannelOption.SO_BACKLOG, InboundConstants.MAXIMUM_CONNECTIONS_QUEUED);
                     b.group(bossGroup, workerGroup)
                             .channel(NioServerSocketChannel.class)
-                            .childHandler(new InboundHttpTransportHandlerInitializer(synapseEnvironment, injectSeq, faultSeq,outSequence));
+                            .childHandler(new InboundHttpTransportHandlerInitializer(synapseEnvironment, injectSeq, faultSeq));
 
                     Channel ch = null;
                     try {
@@ -88,25 +90,18 @@ public class InboundHttpListner implements InboundListner {
             "Inbound Listner");
             listnerThread.start();
 
-        if(responseSender != null){
-            logger.info("Starting Inbound response sender");
+            }
 
-           responseSender.start();
-
-        }
-    }
-
-    public void shutDown() {
+    @Override
+    public void destroy() {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
         if(listnerThread != null){
             listnerThread.stop();
         }
-        if(responseSender != null){
-            responseSender.stop();
-        }
-
     }
+
+
 
 
     public int getPort() {

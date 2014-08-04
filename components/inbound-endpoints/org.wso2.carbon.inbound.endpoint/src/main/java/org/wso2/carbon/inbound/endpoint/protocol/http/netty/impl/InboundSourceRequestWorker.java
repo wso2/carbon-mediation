@@ -37,7 +37,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundHttpConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -68,20 +68,19 @@ public class InboundSourceRequestWorker implements Runnable {
                 byte[] bytes = inboundSourceRequest.getContentBytes();
                 String contentType = inboundSourceRequest.getHttpheaders().get(HTTP.CONTENT_TYPE);
                 int soapVersion;
-                if (contentType.indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) > -InboundHttpConstants.SOAP_11) {
-                    soapVersion = InboundHttpConstants.SOAP_12;
+                if (contentType.indexOf(SOAP12Constants.SOAP_12_CONTENT_TYPE) > -InboundConstants.SOAP_11) {
+                    soapVersion = InboundConstants.SOAP_12;
                 } else if (contentType
-                        .indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) > -InboundHttpConstants.SOAP_11) {
-                    soapVersion = InboundHttpConstants.SOAP_11;
+                        .indexOf(SOAP11Constants.SOAP_11_CONTENT_TYPE) > -InboundConstants.SOAP_11) {
+                    soapVersion = InboundConstants.SOAP_11;
                 } else {
-                    soapVersion = InboundHttpConstants.SOAP_11;
+                    soapVersion = InboundConstants.SOAP_11;
                 }
                 SOAPEnvelope soapEnvelope = toSOAPENV(new ByteArrayInputStream(bytes), soapVersion);// building message need to check whether msg should build or not
                 msgCtx.setEnvelope(soapEnvelope);
                 msgCtx.setProperty(SynapseConstants.IS_INBOUND, "true");
-                msgCtx.setProperty(SynapseConstants.CHANNEL_HANDLER_CONTEXT, inboundSourceRequest.getChannelHandlerContext());
-                msgCtx.setProperty(SynapseConstants.OUT_SEQUENCE, inboundSourceRequest.getOutSeq());
-                msgCtx.setWSAAction(inboundSourceRequest.getHttpheaders().get(InboundHttpConstants.SOAP_ACTION));
+                msgCtx.setProperty(InboundConstants.CHANNEL_HANDLER_CONTEXT, inboundSourceRequest.getChannelHandlerContext());
+                msgCtx.setWSAAction(inboundSourceRequest.getHttpheaders().get(InboundConstants.SOAP_ACTION));
                 if (inboundSourceRequest.getInjectSeq() == null || inboundSourceRequest.getInjectSeq().equals("")) {
                     log.error("Sequence name not specified. Sequence : " + inboundSourceRequest.getInjectSeq());
                 }
@@ -133,9 +132,9 @@ public class InboundSourceRequestWorker implements Runnable {
                     XMLInputFactory.newInstance().createXMLStreamReader(inputStream);
 
             SOAPFactory f = null;
-            if (version == InboundHttpConstants.SOAP_11) {
+            if (version == InboundConstants.SOAP_11) {
                 f = new SOAP11Factory();
-            } else if (version == InboundHttpConstants.SOAP_12) {
+            } else if (version == InboundConstants.SOAP_12) {
                 f = new SOAP12Factory();
             }
 

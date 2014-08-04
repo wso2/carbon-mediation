@@ -38,50 +38,54 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Listener class for Inbound Http Inbounds
+ * Listener class for Http Inbound Endpoints
  */
 public class InboundHttpListner implements InboundListner {
     protected Log log = LogFactory.getLog(this.getClass());
 
     private String injectingSequence;
     private String onErrorSequence;
-    private String outSequence;
     private SynapseEnvironment synapseEnvironment;
     private String port;
     private static Map<Integer, InboundHttpSourceHandler> inboundHttpSourceHandlerMap;
     private static MultiListnerIODispatch multiListnerIODispatch;
     private InboundConfiguration inboundConfiguration;
     private static DefaultListeningIOReactor ioReactor;
-    private static boolean isIOReactorStarted = false;
-    private InboundHttpSourceResponseWorker inboundHttpSourceResponseWorker;
-    private static boolean isResponseWorkerStarted;
+    private static boolean isIOReactorStarted;
 
 
-    public InboundHttpListner(String port, SynapseEnvironment synapseEnvironment, String injectSeq, String onErrorSeq, String outSeq) {
+    public InboundHttpListner(String port, SynapseEnvironment synapseEnvironment, String injectSeq, String onErrorSeq) {
         this.port = port;
         this.injectingSequence = injectSeq;
         this.onErrorSequence = onErrorSeq;
-        this.outSequence = outSeq;
         this.inboundHttpSourceHandlerMap = new HashMap<Integer, InboundHttpSourceHandler>();
         this.inboundConfiguration = new InboundConfiguration();
         this.synapseEnvironment = synapseEnvironment;
-        if (!isResponseWorkerStarted) {
-            inboundHttpSourceResponseWorker = new InboundHttpSourceResponseWorker();
-        }
+    }
+
+    @Override
+    public void init() {
+        InboundHttpSourceHandler inboundHttpSourceHandler = new InboundHttpSourceHandler(this.inboundConfiguration, synapseEnvironment, injectingSequence, onErrorSequence);
+        this.inboundHttpSourceHandlerMap.put(Integer.parseInt(port), inboundHttpSourceHandler);
+        start();
     }
 
     public void start() {
-        InboundHttpSourceHandler inboundHttpSourceHandler = new InboundHttpSourceHandler(this.inboundConfiguration, synapseEnvironment, injectingSequence, onErrorSequence, outSequence);
-        this.inboundHttpSourceHandlerMap.put(Integer.parseInt(port), inboundHttpSourceHandler);
         startIOReactor();
         startEndpoint();
-        startResponseWorker();
+    }
+
+    @Override
+    public void destroy() {
+        try {
+            ioReactor.shutdown();
+        } catch (IOException e) {
+           log.error("cannot shutdown io reactor in Inbound");
+        }
     }
 
 
-    public void shutDown() {
 
-    }
 
     /**
      * start endpoints for ports specified
@@ -102,11 +106,8 @@ public class InboundHttpListner implements InboundListner {
                 if (!address.isUnresolved()) {
                     log.info("Inbound http Listner started on " +
                             address.getHostName() + ":" + address.getPort());
-                    System.out.println(("Inbound http Listner started on " +
-                            address.getHostName() + ":" + address.getPort()));
                 } else {
                     log.info("Inbound http Listner started on" + address);
-                    System.out.println("Inbound http Listner started on" + address);
                 }
             }
         } catch (InterruptedException e) {
@@ -122,7 +123,6 @@ public class InboundHttpListner implements InboundListner {
                         inboundConfiguration.buildIOReactorConfig(),
                         new NativeThreadFactory(new ThreadGroup("Inbound http thread group"), "Inbound http core impl"));
                 multiListnerIODispatch = new MultiListnerIODispatch(inboundHttpSourceHandlerMap);
-
                 ioReactor.setExceptionHandler(new IOReactorExceptionHandler() {
 
                     public boolean handle(IOException ioException) {
@@ -167,15 +167,4 @@ public class InboundHttpListner implements InboundListner {
         return null;
     }
 
-
-    private void startResponseWorker() {
-        if (inboundHttpSourceResponseWorker != null && !isResponseWorkerStarted) {
-            Thread thread = new Thread(inboundHttpSourceResponseWorker);
-            thread.start();
-            isResponseWorkerStarted = true;
-            log.info("start http inbound response worker");
-        } else {
-            log.error("cannot start inbound http response worker");
-        }
-    }
 }

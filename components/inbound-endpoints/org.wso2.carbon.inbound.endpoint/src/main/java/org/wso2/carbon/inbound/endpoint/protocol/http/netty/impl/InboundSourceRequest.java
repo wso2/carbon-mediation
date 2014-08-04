@@ -37,15 +37,9 @@ public class InboundSourceRequest {
     private String faultSeq;
     private String to;
     private String replyTo;
-    private String outSeq;
 
-    public String getOutSeq() {
-        return outSeq;
-    }
 
-    public void setOutSeq(String outSeq) {
-        this.outSeq = outSeq;
-    }
+
 
     public String getTo() {
         return to;

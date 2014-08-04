@@ -42,7 +42,7 @@ import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConfiguration;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundHttpConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundThreadFactory;
 
 import java.io.IOException;
@@ -59,17 +59,15 @@ public class InboundHttpSourceHandler implements NHttpServerEventHandler {
     private SynapseEnvironment synapseEnvironment;
     private String injectSeq;
     private String faultSeq;
-    private String outSequence;
     private InboundConfiguration inboundConfiguration;
     private ExecutorService executorService;
 
-    public InboundHttpSourceHandler(InboundConfiguration inboundConfiguration, SynapseEnvironment synapseEnvironment, String injectSeq, String faultSeq, String outSequence) {
+    public InboundHttpSourceHandler(InboundConfiguration inboundConfiguration, SynapseEnvironment synapseEnvironment, String injectSeq, String faultSeq) {
         this.synapseEnvironment = synapseEnvironment;
         this.injectSeq = injectSeq;
         this.faultSeq = faultSeq;
-        this.outSequence = outSequence;
         this.inboundConfiguration = inboundConfiguration;
-        this.executorService = Executors.newFixedThreadPool(InboundHttpConstants.WORKER_POOL_SIZE, new InboundThreadFactory("inbound_request"));
+        this.executorService = Executors.newFixedThreadPool(InboundConstants.WORKER_POOL_SIZE, new InboundThreadFactory("inbound_request"));
     }
 
 
@@ -92,32 +90,28 @@ public class InboundHttpSourceHandler implements NHttpServerEventHandler {
 
             // at this point we have read the HTTP Headers
             InboundSourceContext.updateState(nHttpServerConnection, ProtocolState.REQUEST_HEAD);
-
             InboundHttpSourceRequest request = new InboundHttpSourceRequest(
                     inboundConfiguration, nHttpServerConnection.getHttpRequest(), nHttpServerConnection);
-
             InboundSourceContext.setRequest(nHttpServerConnection, request);
             request.setInjectSeq(injectSeq);
-            request.setOutSeq(outSequence);
             request.setFaultSeq(faultSeq);
-
             request.start(nHttpServerConnection);
 
 
             /******/
             String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
-            if ("GET".equals(method) || "HEAD".equals(method)) {
+            if ("GET".equals(method) || "HEAD".equals(method)){
                 HttpContext context = request.getConnection().getContext();
-                ContentOutputBuffer outputBuffer = new SimpleOutputBuffer(InboundHttpConstants.SYNAPSE_RESPONSE_BUFFER_SIZE, new HeapByteBufferAllocator());
+                ContentOutputBuffer outputBuffer = new SimpleOutputBuffer(InboundConstants.SYNAPSE_RESPONSE_BUFFER_SIZE, new HeapByteBufferAllocator());
                 context.setAttribute("synapse.response-source-buffer", outputBuffer);
             }
             executorService.execute(
                     new InboundHttpSourceRequestWorker(request, inboundConfiguration, synapseEnvironment));
-        } catch (HttpException e) {
+        } catch (HttpException e){
             log.error(e.getMessage(), e);
             InboundSourceContext.updateState(nHttpServerConnection, ProtocolState.CLOSED);
             inboundConfiguration.getSourceConnections().shutDownConnection(nHttpServerConnection, true);
-        } catch (IOException e) {
+        } catch (IOException e){
             log.error(e.getMessage(), e);
             InboundSourceContext.updateState(nHttpServerConnection, ProtocolState.CLOSED);
             inboundConfiguration.getSourceConnections().shutDownConnection(nHttpServerConnection, true);
@@ -128,20 +122,15 @@ public class InboundHttpSourceHandler implements NHttpServerEventHandler {
     public void inputReady(NHttpServerConnection nHttpServerConnection, ContentDecoder contentDecoder) throws IOException, HttpException {
         try {
             ProtocolState protocolState = InboundSourceContext.getState(nHttpServerConnection);
-
             if (protocolState != ProtocolState.REQUEST_HEAD
                     && protocolState != ProtocolState.REQUEST_BODY) {
                 handleInvalidState(nHttpServerConnection, "Request message body data received");
-                log.error("Error In Input Ready");
+                log.error("Error when reading request content in to pipe");
                 return;
             }
-
             InboundSourceContext.updateState(nHttpServerConnection, ProtocolState.REQUEST_BODY);
-
             InboundHttpSourceRequest request = InboundSourceContext.getRequest(nHttpServerConnection);
-
             int readBytes = request.read(nHttpServerConnection, contentDecoder);
-
         } catch (IOException e) {
             informReaderError(nHttpServerConnection);
             log.error(e.getMessage(), e);
@@ -157,11 +146,9 @@ public class InboundHttpSourceHandler implements NHttpServerEventHandler {
             if (protocolState.compareTo(ProtocolState.REQUEST_DONE) < 0) {
                 return;
             }
-
             if (protocolState.compareTo(ProtocolState.CLOSING) >= 0) {
                 return;
             }
-
             if (protocolState != ProtocolState.REQUEST_DONE) {
                 handleInvalidState(nHttpServerConnection, "Writing a response");
                 log.error("Invalid Sate");

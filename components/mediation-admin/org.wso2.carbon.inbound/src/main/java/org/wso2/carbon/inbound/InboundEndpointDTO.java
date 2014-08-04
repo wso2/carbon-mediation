@@ -16,7 +16,7 @@ public class InboundEndpointDTO {
     private String onErrorSeq;
     private String [] parameters;
     private String fileName;
-    private String outSequence;
+
 
 
 
@@ -24,12 +24,10 @@ public class InboundEndpointDTO {
 		this.name = inboundEndpoint.getName();
 		this.protocol = inboundEndpoint.getProtocol();
 		this.classImpl = inboundEndpoint.getClassImpl();
-		this.interval = inboundEndpoint.getInterval();
 		this.isSuspend = inboundEndpoint.isSuspend();
 		this.injectingSeq = inboundEndpoint.getInjectingSeq();
 		this.onErrorSeq = inboundEndpoint.getOnErrorSeq();
 		this.fileName = inboundEndpoint.getFileName();
-        this.outSequence = inboundEndpoint.getOutSequence();
 		Map<String, String>mParams = inboundEndpoint.getParametersMap();
 		if(mParams != null && !mParams.isEmpty()){
 			this.parameters = new String[mParams.size()];
@@ -115,12 +113,5 @@ public class InboundEndpointDTO {
 		this.fileName = fileName;
 	}
 
-    public String getOutSequence() {
-        return outSequence;
-    }
 
-    public void setOutSequence(String outSequence) {
-        this.outSequence = outSequence;
-    }
-	
 }

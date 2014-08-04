@@ -26,7 +26,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import org.apache.log4j.Logger;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundHttpConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 
 /**
@@ -37,14 +37,11 @@ public class InboundHttpTransportHandlerInitializer extends ChannelInitializer<S
     private SynapseEnvironment synapseEnvironment;
     private String injectSeq;
     private String faultSeq;
-    private  String outSeq;
 
-    public InboundHttpTransportHandlerInitializer(SynapseEnvironment synapseEnvironment, String injectSeq, String faultSeq,String outSequence) {
+    public InboundHttpTransportHandlerInitializer(SynapseEnvironment synapseEnvironment, String injectSeq, String faultSeq) {
         this.synapseEnvironment = synapseEnvironment;
         this.injectSeq = injectSeq;
         this.faultSeq = faultSeq;
-        this.outSeq=outSequence;
-
     }
 
     /**
@@ -59,7 +56,7 @@ public class InboundHttpTransportHandlerInitializer extends ChannelInitializer<S
         }
         ChannelPipeline p = ch.pipeline();
         p.addLast(new HttpServerCodec());
-        p.addLast(new HttpObjectAggregator(InboundHttpConstants.MAXIMUM_CHUNK_SIZE_AGGREGATOR));
-        p.addLast("handler", new InboundHttpTransportSourceHandler(synapseEnvironment, injectSeq, faultSeq,outSeq));
+        p.addLast(new HttpObjectAggregator(InboundConstants.MAXIMUM_CHUNK_SIZE_AGGREGATOR));
+        p.addLast("handler", new InboundHttpTransportSourceHandler(synapseEnvironment, injectSeq, faultSeq));
     }
 }

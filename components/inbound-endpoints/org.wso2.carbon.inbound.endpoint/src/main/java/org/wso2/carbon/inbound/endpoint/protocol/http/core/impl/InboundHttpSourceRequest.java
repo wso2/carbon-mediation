@@ -84,7 +84,7 @@ public class InboundHttpSourceRequest {
     private String faultSeq;
     private String to;
     private String replyTo;
-    private String outSeq;
+
 
 
     public InboundHttpSourceRequest(InboundConfiguration sourceConfiguration,
@@ -252,12 +252,5 @@ public class InboundHttpSourceRequest {
         this.replyTo = replyTo;
     }
 
-    public String getOutSeq() {
-        return outSeq;
-    }
-
-    public void setOutSeq(String outSeq) {
-        this.outSeq = outSeq;
-    }
 
 }

@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.util.UUIDGenerator;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -30,6 +31,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
@@ -49,7 +51,7 @@ import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConfiguration;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundHttpConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 import java.net.InetAddress;
 import java.util.Comparator;
@@ -89,36 +91,59 @@ public class InboundHttpSourceRequestWorker implements Runnable {
             org.apache.synapse.MessageContext msgCtx = createMessageContext(request);
             MessageContext messageContext = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx).getAxis2MessageContext();
             messageContext.setProperty(
-                    InboundHttpConstants.HTTP_INBOUND_SOURCE_REQUEST, request);
+                    InboundConstants.HTTP_INBOUND_SOURCE_REQUEST, request);
             messageContext.setProperty(
-                    InboundHttpConstants.HTTP_INBOUND_SOURCE_CONFIGURATION, sourceConfiguration);
-            messageContext.setProperty(InboundHttpConstants.HTTP_INBOUND_SOURCE_CONNECTION,
+                    InboundConstants.HTTP_INBOUND_SOURCE_CONFIGURATION, sourceConfiguration);
+            messageContext.setProperty(InboundConstants.HTTP_INBOUND_SOURCE_CONNECTION,
                     request.getConnection());
-
-            if (request.isEntityEnclosing()) {
-                processEntityEnclosingRequest(messageContext);
-                msgCtx.setProperty(SynapseConstants.IS_INBOUND, "true");
-                msgCtx.setProperty(SynapseConstants.OUT_SEQUENCE, request.getOutSeq());
-                msgCtx.setWSAAction(request.getHeaders().get(InboundHttpConstants.SOAP_ACTION));
-                SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(request.getInjectSeq());
-                seq.setErrorHandler(request.getFaultSeq());
-                if (seq != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("injecting message to sequence : " + request.getInjectSeq());
-                    }
-                    synapseEnvironment.injectAsync(msgCtx, seq);
-                } else {
-                    log.error("Sequence: " + request.getInjectSeq() + " not found");
+            msgCtx.setProperty(SynapseConstants.IS_INBOUND,true);
+            msgCtx.setWSAAction(request.getHeaders().get(InboundConstants.SOAP_ACTION));
+            SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(request.getInjectSeq());
+            seq.setErrorHandler(request.getFaultSeq());
+            if (seq != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("injecting message to sequence : " + request.getInjectSeq());
                 }
             } else {
-                log.error("cannot handle Non Entity Enclosing Request");
+                log.error("Sequence: " + request.getInjectSeq() + " not found");
             }
+            if (request.isEntityEnclosing()) {
+                processEntityEnclosingRequest(messageContext);
+
+            } else {
+                processNonEntityEnclosing(null,messageContext);
+            }
+            synapseEnvironment.injectAsync(msgCtx, seq);
+            sendAck(messageContext);
         } else {
             log.error("InboundSourceRequest cannot be null");
         }
     }
 
+    private void processNonEntityEnclosing(SOAPEnvelope soapEnvelope,MessageContext msgContext) {
+        String soapAction = request.getHeaders().get(SOAP_ACTION_HEADER);
+        if ((soapAction != null) && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
+            soapAction = soapAction.substring(1, soapAction.length() - 1);
+        }
+        msgContext.setSoapAction(soapAction);
+        msgContext.setTo(new EndpointReference(request.getUri()));
+        msgContext.setServerSide(true);
+        msgContext.setDoingREST(true);
+        if(!request.isEntityEnclosing()){
+            msgContext.setProperty(PassThroughConstants.NO_ENTITY_BODY, Boolean.TRUE);
+        }
+        try {
+            if(soapEnvelope == null){
+                msgContext.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+            }else{
+                msgContext.setEnvelope(soapEnvelope);
+            }
 
+        } catch (AxisFault axisFault) {
+            log.error("Error processing " + request.getMethod() +
+                    " request for : " + request.getUri(), axisFault);
+        }
+    }
     private org.apache.synapse.MessageContext createMessageContext(InboundHttpSourceRequest inboundSourceRequest) {
         org.apache.synapse.MessageContext msgCtx = synapseEnvironment.createMessageContext();
         MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx).getAxis2MessageContext();
@@ -160,11 +185,8 @@ public class InboundHttpSourceRequestWorker implements Runnable {
             msgContext.setProperty(HTTPConstants.HTTP_METHOD, method);
             msgContext.setProperty(Constants.Configuration.CHARACTER_SET_ENCODING, charSetEncoding);
             msgContext.setServerSide(true);
-
             msgContext.setProperty(Constants.Configuration.CONTENT_TYPE, contentTypeHeader);
             msgContext.setProperty(Constants.Configuration.MESSAGE_TYPE, contentType);
-
-
             String soapAction = request.getHeaders().get(SOAP_ACTION_HEADER);
 
             int soapVersion = HTTPTransportUtils.

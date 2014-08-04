@@ -21,7 +21,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.http.netty.impl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundHttpConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundThreadFactory;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -40,8 +40,8 @@ public class InboundRequestQueue {
     private ExecutorService executorService;
 
     public InboundRequestQueue() {
-        executorService = Executors.newFixedThreadPool(InboundHttpConstants.WORKER_POOL_SIZE, new InboundThreadFactory("request"));
-        eventQueue = new ArrayBlockingQueue<InboundSourceRequest>(InboundHttpConstants.REQUEST_BUFFER_CAPACITY);
+        executorService = Executors.newFixedThreadPool(InboundConstants.WORKER_POOL_SIZE, new InboundThreadFactory("request"));
+        eventQueue = new ArrayBlockingQueue<InboundSourceRequest>(InboundConstants.REQUEST_BUFFER_CAPACITY);
     }
 
     public void publish(InboundSourceRequest inboundSourceRequest) {
