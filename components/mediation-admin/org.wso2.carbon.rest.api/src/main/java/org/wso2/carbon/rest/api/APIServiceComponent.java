@@ -161,7 +161,7 @@ public class APIServiceComponent extends AbstractAxis2ConfigurationContextObserv
         }
         synchronized (axisConfig) {
             deploymentEngine.addDeployer(
-                    new APIDeployer(), apiDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+                    new ApiDeployer(), apiDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
         }
     }
 
