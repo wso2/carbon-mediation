@@ -9,7 +9,6 @@ import org.apache.synapse.deployers.APIDeployer;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
-import javax.sound.midi.SysexMessage;
 import javax.xml.namespace.QName;
 
 public class ApiDeployer extends APIDeployer {
