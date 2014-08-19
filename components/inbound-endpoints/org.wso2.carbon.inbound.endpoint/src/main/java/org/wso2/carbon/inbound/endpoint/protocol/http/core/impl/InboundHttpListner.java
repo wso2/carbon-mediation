@@ -58,7 +58,7 @@ public class InboundHttpListner implements InboundListner {
         this.port = port;
         this.injectingSequence = injectSeq;
         this.onErrorSequence = onErrorSeq;
-        this.inboundHttpSourceHandlerMap = new HashMap<Integer, InboundHttpSourceHandler>();
+        this.inboundHttpSourceHandlerMap = getHandlerMap();
         this.inboundConfiguration = new InboundConfiguration();
         this.synapseEnvironment = synapseEnvironment;
     }
@@ -166,5 +166,14 @@ public class InboundHttpListner implements InboundListner {
         }
         return null;
     }
+
+    private Map<Integer, InboundHttpSourceHandler> getHandlerMap(){
+        if(inboundHttpSourceHandlerMap==null){
+            inboundHttpSourceHandlerMap=new HashMap<Integer, InboundHttpSourceHandler>();
+            return inboundHttpSourceHandlerMap;
+        }
+        return inboundHttpSourceHandlerMap;
+    }
+
 
 }
