@@ -40,11 +40,16 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
+import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.deployers.ExtensionDeployer;
+import org.apache.synapse.deployers.InboundEndpointDeployer;
+import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.task.TaskConstants;
 import org.apache.synapse.task.TaskDescriptionRepository;
+import org.apache.synapse.task.TaskManager;
 import org.apache.synapse.task.TaskScheduler;
 import org.osgi.framework.ServiceRegistration;
 import org.wso2.carbon.base.ServerConfiguration;
@@ -55,6 +60,7 @@ import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingSe
 import org.wso2.carbon.mediation.initializer.CarbonSynapseController;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusInitializer;
+import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
@@ -64,6 +70,7 @@ import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentServiceI
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServiceImpl;
 import org.wso2.carbon.mediation.initializer.utils.ConfigurationHolder;
+import org.wso2.carbon.mediation.ntask.NTaskTaskManager;
 import org.wso2.carbon.mediation.registry.WSO2Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
@@ -203,7 +210,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             }
 
             ConfigurationHolder.getInstance().addSynapseRegistration(tenantId, synapseRegistration);
-            
+            registerInboundDeployer(axisConfig, contextInfo.getSynapseEnvironment());            
         } catch (Exception e) {
             handleFatal("Couldn't initialize the ESB for tenant:" + tenantDomain, e);
         } catch (Throwable t) {
@@ -212,6 +219,33 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         }
     }
 
+    /**
+     * Register for inbound hot depoyment
+     * */
+    private void registerInboundDeployer(AxisConfiguration axisConfig,
+            SynapseEnvironment synEnv) {
+        DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig
+                .getConfigurator();
+        SynapseArtifactDeploymentStore deploymentStore = synEnv
+                .getSynapseConfiguration().getArtifactDeploymentStore();
+
+        String synapseConfigPath = ServiceBusUtils
+                .getSynapseConfigAbsPath(synEnv.getServerContextInformation());
+
+        String inboundDirPath = synapseConfigPath + File.separator
+                + MultiXMLConfigurationBuilder.INBOUND_ENDPOINT_DIR;
+
+        for (InboundEndpoint inboundEndpoint : synEnv.getSynapseConfiguration()
+                .getInboundEndpoints()) {
+            if (inboundEndpoint.getFileName() != null) {
+                deploymentStore.addRestoredArtifact(inboundDirPath
+                        + File.separator + inboundEndpoint.getFileName());
+            }
+        }
+        deploymentEngine.addDeployer(new InboundEndpointDeployer(),
+                inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+    }    
+    
     public void terminatingConfigurationContext(ConfigurationContext configurationContext) {
         String tenantDomain =
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
@@ -332,8 +366,8 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             configurationContext.setProperty(
                     ServiceBusConstants.CARBON_TASK_REPOSITORY, repository);
         } else {
-            repository = (TaskDescriptionRepository)
-                    configurationContext.getProperty(ServiceBusConstants.CARBON_TASK_REPOSITORY);
+            repository = (TaskDescriptionRepository) configurationContext
+                    .getProperty(ServiceBusConstants.CARBON_TASK_REPOSITORY);
         }
         contextInfo.addProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY, repository);
 
@@ -418,13 +452,17 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         Registry registry = new WSO2Registry();
         registry.getConfigurationProperties().setProperty("cachableDuration", "1500");
         initialSynCfg.setRegistry(registry);
-
+        //Add the default NTask Manager to config
+        TaskManager taskManager = new NTaskTaskManager();      
+        initialSynCfg.setTaskManager(taskManager);
+        
         MultiXMLConfigurationSerializer serializer
                 = new MultiXMLConfigurationSerializer(synapseConfigDir.getAbsolutePath());
         try {
             serializer.serializeSequence(mainSequence, initialSynCfg, null);
             serializer.serializeSequence(faultSequence, initialSynCfg, null);
             serializer.serializeSynapseRegistry(registry, initialSynCfg, null);
+            serializer.serializeSynapseXML(initialSynCfg);
         } catch (Exception e) {
             handleException("Couldn't serialise the initial synapse configuration " +
                     "for the domain : " + tenantDomain, e);
