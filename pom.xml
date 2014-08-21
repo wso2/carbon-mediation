@@ -44,6 +44,7 @@
                 <module>components/mediators</module>
                 <module>components/mediation-ui</module>
                 <module>components/mediation-ntask</module>
+                <module>components/inbound-endpoints</module>
                 <module>features/scheduled-tasks</module>
                 <module>features/business-adaptors</module>
                 <module>features/mediation-config-admin-features</module>
@@ -1644,6 +1645,11 @@
                 <artifactId>jcifs</artifactId>
                 <version>${jcifs.wso2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
@@ -1808,6 +1814,7 @@
         <damnhandy.version>1.1.7.wso2v1</damnhandy.version>
         <staxon.version>1.2.0.wso2v2</staxon.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
+        <netty.version>4.0.0.Final</netty.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
