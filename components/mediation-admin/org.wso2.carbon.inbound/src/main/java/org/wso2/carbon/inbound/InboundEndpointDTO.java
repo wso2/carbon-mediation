@@ -15,13 +15,15 @@ public class InboundEndpointDTO {
     private String injectingSeq;
     private String onErrorSeq;
     private String [] parameters;
-    private String fileName;	
-	
-	public InboundEndpointDTO(InboundEndpoint inboundEndpoint){
+    private String fileName;
+
+
+
+
+    public InboundEndpointDTO(InboundEndpoint inboundEndpoint){
 		this.name = inboundEndpoint.getName();
 		this.protocol = inboundEndpoint.getProtocol();
 		this.classImpl = inboundEndpoint.getClassImpl();
-		this.interval = inboundEndpoint.getInterval();
 		this.isSuspend = inboundEndpoint.isSuspend();
 		this.injectingSeq = inboundEndpoint.getInjectingSeq();
 		this.onErrorSeq = inboundEndpoint.getOnErrorSeq();
@@ -110,7 +112,6 @@ public class InboundEndpointDTO {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	
-	
-	
+
+
 }

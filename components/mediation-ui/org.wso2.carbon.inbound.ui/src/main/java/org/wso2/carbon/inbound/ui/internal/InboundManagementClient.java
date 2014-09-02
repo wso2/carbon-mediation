@@ -122,7 +122,7 @@ public class InboundManagementClient {
 	}		
 
 	public boolean addInboundEndpoint(String name, String sequence,
-			String onError, String interval, String protocol, String classImpl,
+			String onError,  String protocol, String classImpl,
 			List<String> lParameters) {
 		try {
 			String[] sParams = new String[lParameters.size()];
@@ -131,7 +131,7 @@ public class InboundManagementClient {
 				sParams[i] = parameter;
 				i++;
 			}
-			stub.addInboundEndpoint(name, sequence, onError, interval,
+			stub.addInboundEndpoint(name, sequence, onError,
 					protocol, classImpl, sParams);
 			return true;
 		} catch (Exception e) {
@@ -162,7 +162,7 @@ public class InboundManagementClient {
 	}
 	
 	public boolean updteInboundEndpoint(String name, String sequence,
-			String onError, String interval, String protocol, String classImpl,
+			String onError,  String protocol, String classImpl,
 			List<String> lParameters) {
 		try {
 			String[] sParams = new String[lParameters.size()];
@@ -171,7 +171,7 @@ public class InboundManagementClient {
 				sParams[i] = parameter;
 				i++;
 			}
-			stub.updateInboundEndpoint(name, sequence, onError, interval,
+			stub.updateInboundEndpoint(name, sequence, onError,
 					protocol, classImpl, sParams);
 			return true;
 		} catch (Exception e) {

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>carbon-mediation</artifactId>
+        <groupId>org.wso2.carbon</groupId>
+        <version>4.3.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>inbound-endpoints</artifactId>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - Inbound Endpoint Module</name>
+    <url>http://wso2.org</url>
+
+    <modules>
+
+        <module>org.wso2.carbon.inbound.endpoint</module>
+    </modules>
+
+<dependencies>
+    <dependency>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>org.wso2.carbon.core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.synapse</groupId>
+        <artifactId>synapse-commons</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.synapse</groupId>
+        <artifactId>synapse-core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.synapse</groupId>
+        <artifactId>synapse-nhttp-transport</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.axis2.wso2</groupId>
+        <artifactId>axis2</artifactId>
+    </dependency>
+</dependencies>
+</project>
