@@ -79,6 +79,7 @@ public class InboundManagementClient {
 
 	public List<String> getDefaultParameters(String strType) {
 		List<String> rtnList = new ArrayList<String>();
+		rtnList.add("interval" + InboundClientConstants.STRING_SPLITTER);                
 		if (strType.equals(InboundClientConstants.TYPE_FILE)) {
 			rtnList.add("transport.vfs.FileURI" + InboundClientConstants.STRING_SPLITTER);					
 		} else if (strType.equals(InboundClientConstants.TYPE_JMS)) {
@@ -95,6 +96,7 @@ public class InboundManagementClient {
 	}
 	public List<String> getAdvParameters(String strType) {
 		List<String> rtnList = new ArrayList<String>();
+		rtnList.add("interval");
 		if (strType.equals(InboundClientConstants.TYPE_FILE)) {
 			rtnList.add("transport.vfs.ContentType");
 			rtnList.add("transport.vfs.FileNamePattern" + InboundClientConstants.STRING_SPLITTER);

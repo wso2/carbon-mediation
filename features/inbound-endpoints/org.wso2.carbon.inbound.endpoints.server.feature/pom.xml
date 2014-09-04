@@ -27,18 +27,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon</groupId>
     <version>4.3.0-SNAPSHOT</version>
-    <artifactId>org.wso2.carbon.inbound.endpoints.feature</artifactId>
+    <artifactId>org.wso2.carbon.inbound.endpoints.server.feature</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Mediation Initializer Feature</name>
+    <name>WSO2 Carbon - Inbound Endpoint Server Feature</name>
     <url>http://wso2.org</url>
-    <description>This feature contains the bundles required for Mediation Initializer functionality</description>
 
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.inbound.endpoints.server.feature</artifactId>
-            <version>${wso2carbon.version}</version>
-            <type>zip</type>
+            <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -56,24 +54,50 @@
                             <goal>p2-feature-gen</goal>
                         </goals>
                         <configuration>
-                            <id>org.wso2.carbon.inbound.endpoints.feature</id>
+                            <id>org.wso2.carbon.inbound.endpoints.server</id>
                             <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
-                                    <propertyDef>org.eclipse.equinox.p2.type.group:true</propertyDef>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
+                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
                                 </properties>
                             </adviceFile>
-                            <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core:${wso2carbon.version}</importFeatureDef>
-                            </importFeatures>
-                            <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.inbound.endpoints.feature</includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.inbound.endpoints.server.feature</includedFeatureDef>
-                            </includedFeatures>
+                            <bundles>
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound.endpoint</bundleDef>
+                            </bundles>    
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>prefilter-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>src/main/resources</outputDirectory>
+                            <includeEmptyDirs>true</includeEmptyDirs>
+                            <resources>
+                                <resource>
+                                    <directory>resources</directory>
+                                    <includes>
+                                        <include>**/*.xml</include>
+                                        <include>p2.inf</include>
+                                        <include>build.properties</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>
