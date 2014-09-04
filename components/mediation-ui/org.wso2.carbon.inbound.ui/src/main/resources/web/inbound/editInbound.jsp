@@ -107,14 +107,6 @@ var classRequired = false;
 	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
                         </td>
                     </tr>
-                    <tr>
-                        <td style="width:150px"><fmt:message key="inbound.interval"/><span
-                                class="required">*</span></td>
-                        <td align="left">
-                            <input id="inboundInterval" name="inboundInterval" class="longInput" type="text" value="<%=inboundDescription.getInterval()%>"/>
-                        </td>
-                        <td></td>
-                    </tr>                                         
                     
                     <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
                     <script type="text/javascript">classRequired = true;</script>       
