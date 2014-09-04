@@ -23,6 +23,9 @@
     <artifactId>carbon-mediation</artifactId>
     <packaging>pom</packaging>
     <version>4.3.0-SNAPSHOT</version>
+    <modules>
+        <module>features/inbound-endpoints</module>
+    </modules>
     <name>WSO2 Carbon - Platform Aggregator Pom</name>
     <url>http://wso2.org</url>
     <profiles>
@@ -55,6 +58,7 @@
                 <module>features/mediation-ui-features</module>
                 <module>features/synapse-features</module>
                 <module>features/mediation-ntask-features</module>
+                <module>features/inbound-endpoints</module>
             </modules>
         </profile>
     </profiles>
