@@ -57,9 +57,8 @@
 						sParams.add(paramKey + "~:~" + request.getParameter("paramval" + strKey.replaceAll("paramkey","")));	
 					}					
 				}	
-			}		
-			Long intervalms = 1000 * Long.valueOf(request.getParameter("inboundInterval"));
-			client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),intervalms.toString(),protocol, classImpl, sParams);
+			}
+			client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
 	%>
 	<script type="text/javascript">
     forward("index.jsp");
