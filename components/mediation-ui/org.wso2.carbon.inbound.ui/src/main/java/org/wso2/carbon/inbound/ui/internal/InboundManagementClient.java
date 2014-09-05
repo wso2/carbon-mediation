@@ -96,7 +96,6 @@ public class InboundManagementClient {
 	}
 	public List<String> getAdvParameters(String strType) {
 		List<String> rtnList = new ArrayList<String>();
-		rtnList.add("interval");
 		if (strType.equals(InboundClientConstants.TYPE_FILE)) {
 			rtnList.add("transport.vfs.ContentType");
 			rtnList.add("transport.vfs.FileNamePattern" + InboundClientConstants.STRING_SPLITTER);

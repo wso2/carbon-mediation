@@ -55,7 +55,9 @@
 					String paramKey = request.getParameter("paramkey" + strKey.replaceAll("paramkey",""));
 					if(paramKey != null && !paramKey.trim().equals("")){
 						sParams.add(paramKey + "~:~" + request.getParameter("paramval" + strKey.replaceAll("paramkey","")));	
-					}					
+					}	
+				}else if(strKey.startsWith("interval")){
+				    sParams.add("interval~:~" + request.getParameter("interval"));						
 				}	
 			}
 			client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);

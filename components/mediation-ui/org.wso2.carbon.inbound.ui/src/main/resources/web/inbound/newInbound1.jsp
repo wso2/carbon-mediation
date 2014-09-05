@@ -110,16 +110,7 @@ var requiredParams = null;
 	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
 	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
                         </td>                        
-                    </tr>
-                  <!--  <tr>
-                        <td style="width:150px"><fmt:message key="inbound.interval"/><span
-                                class="required">*</span></td>
-                        <td align="left">
-                            <input id="inboundInterval" name="inboundInterval" class="longInput" type="text"/>
-                        </td>
-                        <td></td>
-                    </tr> -->
-                    
+                    </tr>                   
                     <% if(InboundClientConstants.TYPE_CLASS.equals(request.getParameter("inboundType"))){ %>
 					<script type="text/javascript">classRequired = true;</script>                    
                     <tr>
