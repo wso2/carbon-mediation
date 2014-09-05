@@ -71,11 +71,7 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     if (document.getElementById('inboundErrorSequence').value == '') {
         CARBON.showWarningDialog(msg2);
         return false;
-    }    
-    if (document.getElementById('inboundInterval').value == '' || !isNumber(document.getElementById('inboundInterval').value)) {
-        CARBON.showWarningDialog(msg3);
-        return false;
-    }     
+    }        
     if (classRequired && document.getElementById('inboundClass').value == '') {
         CARBON.showWarningDialog(msg4);
         return false;
@@ -102,11 +98,7 @@ function inboundUpdate(msg1,msg2,msg3,msg4,form){
     if (document.getElementById('inboundErrorSequence').value == '') {
         CARBON.showWarningDialog(msg2);
         return false;
-    }    
-    if (document.getElementById('inboundInterval').value == '' || !isNumber(document.getElementById('inboundInterval').value)) {
-        CARBON.showWarningDialog(msg3);
-        return false;
-    }     
+    }         
     if (classRequired && document.getElementById('inboundClass').value == '') {
         CARBON.showWarningDialog(msg4);
         return false;

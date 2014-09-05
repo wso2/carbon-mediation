@@ -2,15 +2,9 @@ package org.wso2.carbon.inbound.endpoint.inboundfactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.inbound.InboundResponseSenderFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
-import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
-import org.wso2.carbon.inbound.endpoint.protocol.http.core.impl.InboundHttpListner;
 import org.wso2.carbon.inbound.endpoint.protocol.http.core.impl.InboundHttpSourceResponseWorker;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
-import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 
 /**
  * Created by isurur on 7/30/14.
@@ -29,7 +23,7 @@ public class InboundResponseSenderFactoryImpl implements InboundResponseSenderFa
                 ( (InboundHttpSourceResponseWorker)inboundResponseSender).setType(Protocols.http.toString());
             } else if (protocol != null && Protocols.http_cxf_ws_rm.toString().equals(protocol)) {
             } else {
-                log.error("response worker type should be specified.");
+                //log.error("response worker type should be specified.");
             }
             return inboundResponseSender;
         }
