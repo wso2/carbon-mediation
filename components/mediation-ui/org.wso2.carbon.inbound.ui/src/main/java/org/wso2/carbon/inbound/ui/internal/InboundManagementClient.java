@@ -104,7 +104,6 @@ public class InboundManagementClient {
 			rtnList.add("transport.vfs.Locking" + InboundClientConstants.STRING_SPLITTER + "enable" + InboundClientConstants.STRING_SPLITTER + "disable");
 			rtnList.add("transport.vfs.MaxRetryCount");
 			rtnList.add("transport.vfs.ReconnectTimeout");
-			rtnList.add("transport.vfs.MoveAfterProcess");
 			rtnList.add("transport.vfs.ActionAfterProcess" + InboundClientConstants.STRING_SPLITTER + "NONE" + InboundClientConstants.STRING_SPLITTER + "MOVE");
 			rtnList.add("transport.vfs.MoveAfterProcess");
 		    rtnList.add("transport.vfs.ActionAfterErrors" + InboundClientConstants.STRING_SPLITTER + "NONE" + InboundClientConstants.STRING_SPLITTER + "MOVE");
