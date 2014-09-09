@@ -63,7 +63,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         try {
             ctx = new InitialContext(properties);
         } catch (NamingException e) {
-            logger.error("NamingException while obtaining initial context.");
+            logger.error("NamingException while obtaining initial context. " + e.getMessage());
         }
 
         String connectionFactoryType = properties.getProperty(JMSConstants.CONNECTION_FACTORY_TYPE);
@@ -134,6 +134,10 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         if (this.connectionFactory != null) {
             return this.connectionFactory;
         }
+        
+        if(ctx == null){
+            return null;
+        }
 
         try {
             if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
@@ -153,6 +157,10 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     }
 
     public Connection createConnection() {
+        if(connectionFactory == null){
+            logger.error("Connection cannot bb establish to the broke. Plese check the broker libs provided.");
+            return null;
+        }
         try {
         	if (jmsSpec11) {        		
 	             if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE )) {
