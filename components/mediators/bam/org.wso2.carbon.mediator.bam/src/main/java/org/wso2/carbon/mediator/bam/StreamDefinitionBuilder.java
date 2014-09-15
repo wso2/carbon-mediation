@@ -116,7 +116,6 @@ public class StreamDefinitionBuilder {
     private void addConstantPayloadToPayloadDataList(List<Attribute> attributes) throws BamMediatorException {
         try{
             attributes.add(new Attribute(BamMediatorConstants.MSG_DIRECTION, AttributeType.STRING));
-            attributes.add(new Attribute(BamMediatorConstants.SERVICE_NAME, AttributeType.STRING));
             attributes.add(new Attribute(BamMediatorConstants.OPERATION_NAME, AttributeType.STRING));
             attributes.add(new Attribute(BamMediatorConstants.MSG_ID, AttributeType.STRING));
             attributes.add(new Attribute(BamMediatorConstants.REQUEST_RECEIVED_TIME, AttributeType.LONG));
