@@ -49,7 +49,14 @@ public class InboundHttpSourceResponseWorker implements InboundResponseSender {
     private Logger logger = Logger.getLogger(InboundHttpSourceResponseWorker.class);
     private String type;
 
+    private static InboundHttpSourceResponseWorker instance;
 
+    public static InboundHttpSourceResponseWorker getInstance() {
+        if (instance == null) {
+            instance = new InboundHttpSourceResponseWorker();
+        }
+        return instance;
+    }
 
     @Override
     public void sendBack(MessageContext messageContext) {
@@ -189,11 +196,4 @@ public class InboundHttpSourceResponseWorker implements InboundResponseSender {
 
     }
 
-    @Override
-    public String getType() {
-        return this.type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
 }

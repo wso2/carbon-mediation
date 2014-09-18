@@ -3,18 +3,19 @@ package org.wso2.carbon.inbound.endpoint.protocol.generic;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.GenericPollingConsumer;
-import org.apache.synapse.inbound.PollingProcessor;
+import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.startup.quartz.StartUpController;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskStartupObserver;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
-public class GenericProcessor implements PollingProcessor, TaskStartupObserver {
+public class GenericProcessor implements InboundRequestProcessor, TaskStartupObserver {
 
 
 	private GenericPollingConsumer pollingConsumer;
@@ -36,6 +37,17 @@ public class GenericProcessor implements PollingProcessor, TaskStartupObserver {
         this.onErrorSeq = onErrorSeq;
         this.synapseEnvironment = synapseEnvironment;
         this.classImpl = classImpl;
+    }
+
+    public GenericProcessor(InboundProcessorParams params) {
+        this.name = params.getName();
+        this.properties = params.getProperties();
+        this.interval =
+                Long.parseLong(properties.getProperty(InboundConstants.INBOUND_ENDPOINT_INTERVAL));
+        this.injectingSeq = params.getInjectingSeq();
+        this.onErrorSeq = params.getOnErrorSeq();
+        this.synapseEnvironment = params.getSynapseEnvironment();
+        this.classImpl = params.getClassImpl();
     }
 
     public void init() {

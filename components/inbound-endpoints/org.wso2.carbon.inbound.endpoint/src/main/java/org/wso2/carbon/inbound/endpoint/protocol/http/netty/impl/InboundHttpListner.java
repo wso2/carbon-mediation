@@ -27,14 +27,14 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.InboundListner;
+import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 /**
  * Start ServerBootStrap in a given port for http inbound connections
  */
 
-public class InboundHttpListner implements InboundListner {
+public class InboundHttpListner implements InboundRequestProcessor {
     private static Logger logger = Logger.getLogger(InboundHttpListner.class);
     private int port;
     private SynapseEnvironment synapseEnvironment;

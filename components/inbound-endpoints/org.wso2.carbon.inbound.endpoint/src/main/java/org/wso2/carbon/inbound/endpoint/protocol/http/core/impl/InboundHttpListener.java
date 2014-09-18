@@ -20,14 +20,13 @@
 package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
 
 
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.InboundListner;
+import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConfiguration;
-
-
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 import java.net.InetSocketAddress;
 
@@ -35,7 +34,7 @@ import java.net.InetSocketAddress;
 /**
  * Listener class for Http Inbound Endpoints
  */
-public class InboundHttpListner implements InboundListner {
+public class InboundHttpListener implements InboundRequestProcessor {
     protected Log log = LogFactory.getLog(this.getClass());
 
     private String injectingSequence;
@@ -44,14 +43,15 @@ public class InboundHttpListner implements InboundListner {
     private String port;
     private InboundConfiguration inboundConfiguration;
 
+    public InboundHttpListener(InboundProcessorParams params) {
 
-
-    public InboundHttpListner(String port, SynapseEnvironment synapseEnvironment, String injectSeq, String onErrorSeq) {
-        this.port = port;
-        this.injectingSequence = injectSeq;
-        this.onErrorSequence = onErrorSeq;
+        this.port = params.getProperties().
+                getProperty(InboundConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
+        this.injectingSequence = params.getInjectingSeq();
+        this.onErrorSequence = params.getOnErrorSeq();
+        this.synapseEnvironment = params.getSynapseEnvironment();
         this.inboundConfiguration = new InboundConfiguration();
-        this.synapseEnvironment = synapseEnvironment;
+
     }
 
     @Override
