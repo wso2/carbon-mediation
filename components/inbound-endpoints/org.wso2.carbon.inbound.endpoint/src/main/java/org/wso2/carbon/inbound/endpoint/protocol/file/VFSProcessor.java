@@ -20,15 +20,17 @@ package org.wso2.carbon.inbound.endpoint.protocol.file;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.PollingProcessor;
+import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.startup.quartz.StartUpController;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskStartupObserver;
+import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 import java.util.Properties;
 
-public class VFSProcessor implements PollingProcessor, TaskStartupObserver {
+public class VFSProcessor implements InboundRequestProcessor, TaskStartupObserver {
 
 	private FilePollingConsumer fileScanner;
     private String name;
@@ -39,14 +41,15 @@ public class VFSProcessor implements PollingProcessor, TaskStartupObserver {
     private SynapseEnvironment synapseEnvironment;
     private static final Log log = LogFactory.getLog(VFSProcessor.class);
     private StartUpController startUpController;
-    
-    public VFSProcessor(String name, Properties vfsProperties, long scanInterval, String injectingSeq, String onErrorSeq, SynapseEnvironment synapseEnvironment) {
-        this.name = name;
-        this.vfsProperties = vfsProperties;
-        this.interval = scanInterval;
-        this.injectingSeq = injectingSeq;
-        this.onErrorSeq = onErrorSeq;
-        this.synapseEnvironment = synapseEnvironment;
+
+    public VFSProcessor(InboundProcessorParams params) {
+        this.name = params.getName();
+        this.vfsProperties = params.getProperties();
+        this.interval =
+                Long.parseLong(vfsProperties.getProperty(InboundConstants.INBOUND_ENDPOINT_INTERVAL));
+        this.injectingSeq = params.getInjectingSeq();
+        this.onErrorSeq = params.getOnErrorSeq();
+        this.synapseEnvironment = params.getSynapseEnvironment();
     }
 
     public void init() {

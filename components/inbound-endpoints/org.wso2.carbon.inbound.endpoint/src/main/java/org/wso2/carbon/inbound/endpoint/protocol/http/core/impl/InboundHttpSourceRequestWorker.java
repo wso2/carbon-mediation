@@ -31,7 +31,6 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.Parameter;
-import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.RequestResponseTransport;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.HTTPConstants;
@@ -44,6 +43,7 @@ import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.transport.nhttp.HttpCoreRequestResponseTransport;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
@@ -96,6 +96,8 @@ public class InboundHttpSourceRequestWorker implements Runnable {
                     InboundConstants.HTTP_INBOUND_SOURCE_CONFIGURATION, sourceConfiguration);
             messageContext.setProperty(InboundConstants.HTTP_INBOUND_SOURCE_CONNECTION,
                     request.getConnection());
+            messageContext.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
+                                                   InboundHttpSourceResponseWorker.getInstance());
             msgCtx.setProperty(SynapseConstants.IS_INBOUND,true);
             msgCtx.setWSAAction(request.getHeaders().get(InboundConstants.SOAP_ACTION));
             SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(request.getInjectSeq());

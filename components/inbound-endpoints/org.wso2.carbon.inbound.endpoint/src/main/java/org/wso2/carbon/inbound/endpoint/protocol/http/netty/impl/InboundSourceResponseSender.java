@@ -139,8 +139,4 @@ public class InboundSourceResponseSender implements InboundResponseSender{
 
     }
 
-    @Override
-    public String getType() {
-        return null;
-    }
 }

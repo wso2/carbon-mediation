@@ -36,7 +36,6 @@ import org.apache.commons.vfs2.FileObject;
 import org.apache.synapse.commons.vfs.FileObjectDataSource;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.InjectHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 import javax.mail.internet.ContentType;
@@ -44,7 +43,7 @@ import javax.mail.internet.ParseException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class FileInjectHandler implements InjectHandler {
+public class FileInjectHandler {
 
 	private static final Log log = LogFactory.getLog(FileInjectHandler.class);
 	
