@@ -24,6 +24,14 @@
         <description>
             This service will help to create/modify remote tasks.
         </description>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/robust-in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
         <parameter name="ServiceClass">org.wso2.carbon.mediation.ntask.admin.ESBTaskAdmin</parameter>
         <parameter name="enableMTOM" locked="false">false</parameter>        
     </service>
@@ -32,3 +40,4 @@
     <parameter name="adminService" locked="true">true</parameter>
     <parameter name="hiddenService" locked="true">true</parameter>
 </serviceGroup>
+
