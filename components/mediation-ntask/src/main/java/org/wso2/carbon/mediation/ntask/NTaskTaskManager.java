@@ -275,8 +275,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                     }
                 }
                 // Run already deployed tasks..
-                taskService.registerTaskType(TaskBuilder.TASK_TYPE_USER);
-                taskService.registerTaskType(TaskBuilder.TASK_TYPE_SYSTEM);
+                taskService.registerTaskType(TaskBuilder.TASK_TYPE_ESB);
                 initialized = true;
                 logger.info("initialized");
                 return true;
@@ -436,9 +435,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         if (taskService == null) {
             return null;
         }
-        return taskService.getTaskManager(
-                system ? TaskBuilder.TASK_TYPE_SYSTEM :
-                        TaskBuilder.TASK_TYPE_USER);
+        return taskService.getTaskManager(TaskBuilder.TASK_TYPE_ESB);
     }
 
     private int getCurrentTenantId() {
