@@ -53,8 +53,13 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         }
         try {
             synchronized (lock) {
+                if (taskManager == null) {
+                    logger.warn("#schedule Could not schedule task [" + taskInfo.getName() + "]. Task manager is not available.");
+                    return false;
+                }
                 taskManager.registerTask(taskInfo);
                 taskManager.scheduleTask(taskInfo.getName());
+
             }
             logger.info("Scheduled task [" + taskDescription.getName() + "::" + taskDescription.getTaskGroup() + "]");
         } catch (Exception e) {
@@ -71,6 +76,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         }
         try {
             synchronized (lock) {
+                if (taskManager == null) {
+                    logger.warn("#reschedule Could not reschedule task [" + taskName + "]. Task manager is not available.");
+                    return false;
+                }
                 TaskInfo taskInfo = taskManager.getTask(taskName);
                 TaskDescription description = TaskBuilder.buildTaskDescription(taskInfo);
                 taskInfo = TaskBuilder.buildTaskInfo(description, properties);
@@ -106,6 +115,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         try {
             boolean deleted;
             synchronized (lock) {
+                if (taskManager == null) {
+                    logger.warn("#delete Could not delete task [" + taskName + "]. Task manager is not available.");
+                    return false;
+                }
                 deleted = taskManager.deleteTask(name);
             }
             if (deleted) {
@@ -125,6 +138,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         }
         try {
             synchronized (lock) {
+                if (taskManager == null) {
+                    logger.warn("#pause Could not pause task [" + taskName + "]. Task manager is not available.");
+                    return false;
+                }
                 taskManager.pauseTask(taskName);
             }
             return true;
@@ -140,6 +157,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         }
         try {
             synchronized (lock) {
+                if (taskManager == null) {
+                    logger.warn("#pauseAll Could not pause any task. Task manager is not available.");
+                    return false;
+                }
                 List<TaskInfo> taskList = taskManager.getAllTasks();
                 for (TaskInfo taskInfo : taskList) {
                     taskManager.pauseTask(taskInfo.getName());
@@ -161,6 +182,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         }
         try {
             synchronized (lock) {
+                if (taskManager == null) {
+                    logger.warn("#resume Could not resume task [" + taskName + "]. Task manager is not available.");
+                    return false;
+                }
                 taskManager.resumeTask(taskName);
             }
         } catch (Exception e) {
@@ -176,6 +201,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         }
         try {
             synchronized (lock) {
+                if (taskManager == null) {
+                    logger.warn("#resumeAll Could not resume any task. Task manager is not available.");
+                    return false;
+                }
                 List<TaskInfo> taskList = taskManager.getAllTasks();
                 for (TaskInfo taskInfo : taskList) {
                     taskManager.resumeTask(taskInfo.getName());
@@ -195,6 +224,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         try {
             TaskInfo taskInfo;
             synchronized (lock) {
+                if (taskManager == null) {
+                    logger.warn("#getTask Could not retrieve task [" + taskName + "]. Task manager is not available.");
+                    return null;
+                }
                 taskInfo = taskManager.getTask(taskName);
             }
             return TaskBuilder.buildTaskDescription(taskInfo);
@@ -210,6 +243,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         }
         try {List<TaskInfo> taskList;
             synchronized (lock) {
+                if (taskManager == null) {
+                    logger.warn("#getTaskNames Could not query task names. Task manager is not available.");
+                    return new String[0];
+                }
                 taskList = taskManager.getAllTasks();
             }
             List<String> result = new ArrayList<String>();
@@ -246,7 +283,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                     return true;
                 }
                 if ((taskManager = getTaskManager(false)) == null) {
+                    logger.debug("Could not initialize task manager");
                     return false;
+                } else {
+                    logger.warn("Initialized task manager");
                 }
                 // Register pending tasks..
                 Iterator tasks = pendingTasks.iterator();
@@ -316,6 +356,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         try {
             for (String name : names) {
                 synchronized (lock) {
+                    if (taskManager == null) {
+                        logger.warn("#getRunningTaskCount Could not determine the number of running tasks. Task manager is not available.");
+                        return -1;
+                    }
                     if (taskManager.getTaskState(name)
                             .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL)) {
                         ++count;
@@ -339,6 +383,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             return false;
         }
         synchronized (lock) {
+            if (taskManager == null) {
+                logger.warn("#isTaskRunning Could not determine the state of the task [" + taskName + "]. Task manager is not available.");
+                return false;
+            }
             try {
                 return taskManager.getTaskState(taskName)
                         .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL);
