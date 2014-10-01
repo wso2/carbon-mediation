@@ -328,28 +328,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         return count;
     }
 
-    public List<String> getRunningTaskList() {
-        if (!isInitialized()) {
-            return null;
-        }
-        String[] names = getTaskNames();
-        List<String> runningTaskList = new ArrayList<String>();
-        try {
-            for (String name : names) {
-                synchronized (lock) {
-                    if (taskManager.getTaskState(name)
-                            .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL)) {
-                        runningTaskList.add(name);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("Cannot return running task list. Error: " + e.getLocalizedMessage(), e);
-        }
-        return runningTaskList;
-    }
-
-
     public boolean isTaskRunning(Object o) {
         if (!isInitialized()) {
             return false;
