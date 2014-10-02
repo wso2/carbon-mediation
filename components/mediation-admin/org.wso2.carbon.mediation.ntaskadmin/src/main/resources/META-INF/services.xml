@@ -16,13 +16,13 @@
 	~  limitations under the License.
 -->
 <serviceGroup>
-    <service name="RemoteTaskAdmin">
+    <service name="ESBNTaskAdmin">
         <schema schemaNamespace="http://admin.core.ntaskint.carbon.wso2.org" elementFormDefaultQualified="true"/>
         <transports>
             <transport>https</transport>
         </transports>
         <description>
-            This service will help to create/modify remote tasks.
+            This service will help to create/modify ESB tasks.
         </description>
         <messageReceivers>
             <messageReceiver mep="http://www.w3.org/ns/wsdl/robust-in-only"
@@ -32,11 +32,11 @@
             <messageReceiver mep="http://www.w3.org/ns/wsdl/in-out"
                              class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
         </messageReceivers>
-        <parameter name="ServiceClass">org.wso2.carbon.mediation.ntask.admin.ESBTaskAdmin</parameter>
+        <parameter name="ServiceClass">org.wso2.carbon.mediation.ntaskadmin.ESBNTaskAdmin</parameter>
         <parameter name="enableMTOM" locked="false">false</parameter>        
     </service>
-    
-    <parameter name="AuthorizationAction" locked="true">/permission/admin/configure/ntaskint</parameter>
+
+    <parameter name="AuthorizationAction" locked="true">/permission/admin/configure/ntaskadmin</parameter>
     <parameter name="adminService" locked="true">true</parameter>
     <parameter name="hiddenService" locked="true">true</parameter>
 </serviceGroup>
