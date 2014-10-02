@@ -118,6 +118,11 @@
          <artifactId>org.wso2.carbon.mediation.ntask</artifactId>
          <version>${wso2carbon.version}</version>
       </dependency>
+       <dependency>
+           <groupId>org.wso2.carbon</groupId>
+           <artifactId>org.wso2.carbon.mediation.ntaskadmin</artifactId>
+           <version>${wso2carbon.version}</version>
+       </dependency>
       <dependency>
          <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.inbound</artifactId>
@@ -169,6 +174,7 @@
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.task</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.task.services</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.ntask</bundleDef>
+                         <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.ntaskadmin</bundleDef>
                         <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound</bundleDef>
                      </bundles>
                      <importFeatures>
