@@ -57,9 +57,10 @@
             <module>org.wso2.carbon.sequences.common</module>
             <module>org.wso2.carbon.sequences</module>
             <module>org.wso2.carbon.task</module>
-	    <module>org.wso2.carbon.task.services</module>
+	        <module>org.wso2.carbon.task.services</module>
             <module>org.wso2.carbon.ntaskint.core</module>
-	    <module>org.wso2.carbon.inbound</module>
+	        <module>org.wso2.carbon.inbound</module>
+            <module>org.wso2.carbon.mediation.ntaskadmin</module>
          </modules>
       </profile>
    </profiles>
