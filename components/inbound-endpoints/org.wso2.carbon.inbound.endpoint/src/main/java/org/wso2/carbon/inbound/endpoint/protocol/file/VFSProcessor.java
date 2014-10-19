@@ -26,7 +26,8 @@ import org.apache.synapse.startup.quartz.StartUpController;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskStartupObserver;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
+
 
 import java.util.Properties;
 
@@ -46,7 +47,7 @@ public class VFSProcessor implements InboundRequestProcessor, TaskStartupObserve
         this.name = params.getName();
         this.vfsProperties = params.getProperties();
         this.interval =
-                Long.parseLong(vfsProperties.getProperty(InboundConstants.INBOUND_ENDPOINT_INTERVAL));
+                Long.parseLong(vfsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL));
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
