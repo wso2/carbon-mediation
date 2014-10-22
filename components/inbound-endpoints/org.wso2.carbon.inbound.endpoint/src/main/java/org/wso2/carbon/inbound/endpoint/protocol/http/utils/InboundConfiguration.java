@@ -46,7 +46,7 @@ public class InboundConfiguration extends BaseConfiguration {
     private InboundSourceConnections sourceConnections = null;
     private HttpResponseFactory httpResponseFactory;
     private HttpProcessor httpProcessor = null;
-    private static ExecutorService executorService;
+    private static volatile  ExecutorService executorService;
     private static final String INBOUND_THREAD_FACTORY = "inbound_request";
 
 
@@ -128,7 +128,7 @@ public class InboundConfiguration extends BaseConfiguration {
      *
      * @return
      */
-    public ExecutorService getInboundExecutorService() {
+    public static ExecutorService getInboundExecutorService() {
         if (executorService == null) {
             executorService = Executors.newFixedThreadPool(InboundConstants.WORKER_POOL_SIZE,
                     new InboundThreadFactory(INBOUND_THREAD_FACTORY));
