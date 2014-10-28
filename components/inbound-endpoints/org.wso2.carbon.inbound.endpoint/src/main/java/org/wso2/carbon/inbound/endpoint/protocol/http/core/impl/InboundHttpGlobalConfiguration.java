@@ -189,7 +189,7 @@ public class InboundHttpGlobalConfiguration {
                     ioReactor.shutdown();
                     isIOReactorStarted = false;
                 } catch (IOException e) {
-                    log.error(e.getMessage());
+                    log.error(e.getMessage(),e);
                 }
             }
         } else {
