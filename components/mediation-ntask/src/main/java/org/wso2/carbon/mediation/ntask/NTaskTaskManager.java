@@ -32,6 +32,8 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
 
     protected final Properties configProperties = new Properties();
 
+    private Queue<TaskDescription> taskDescriptionQueue = new LinkedList<TaskDescription>();
+
     public boolean schedule(TaskDescription taskDescription) {
         logger.debug("#schedule Scheduling task:" + taskDescription.getName());
         TaskInfo taskInfo;
@@ -41,6 +43,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             if (logger.isDebugEnabled()) {
                 logger.debug("#schedule Could not build task info object. Error:" + e.getLocalizedMessage(), e);
             }
+            taskDescriptionQueue.add(taskDescription);
             return false;
         }        
         if (!isInitialized()) {
@@ -95,7 +98,12 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         if (name == null || "".equals(name)) {
             throw new SynapseTaskException("Task name is null. ", logger);
         }
-        String group = list[1];
+
+        String group = null;
+        if(list.length>1)
+        {
+            group = list[1];
+        }
         if (group == null || "".equals(group)) {
             group = TaskDescription.DEFAULT_GROUP;
             if (logger.isDebugEnabled()) {
@@ -107,6 +115,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             boolean deleted;
             synchronized (lock) {
                 deleted = taskManager.deleteTask(name);
+
             }
             if (deleted) {
                 NTaskAdapter.removeProperty(taskName);
@@ -248,6 +257,13 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                 if ((taskManager = getTaskManager(false)) == null) {
                     return false;
                 }
+
+                //Re-scheduling the tasks missed during the server startup
+                Iterator taskDescriptions = taskDescriptionQueue.iterator();
+                while(taskDescriptions.hasNext()) {
+                    schedule((TaskDescription)taskDescriptions.next());
+                }
+
                 // Register pending tasks..
                 Iterator tasks = pendingTasks.iterator();
                 while (tasks.hasNext()) {
