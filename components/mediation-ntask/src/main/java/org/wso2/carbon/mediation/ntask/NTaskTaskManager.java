@@ -7,6 +7,7 @@ import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskManager;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
@@ -15,7 +16,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.*;
 
-public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
+public class NTaskTaskManager implements TaskManager, TaskServiceObserver, ServerStartupHandler {
     private static final Object lock = new Object();
 
     private static final Log logger = LogFactory.getLog(NTaskTaskManager.class.getName());
@@ -32,6 +33,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
 
     protected final Properties configProperties = new Properties();
 
+    private static Queue<TaskDescription> taskDescriptionQueue = new LinkedList<TaskDescription>();
+
+    private boolean isServerStarted = false;
+
     public boolean schedule(TaskDescription taskDescription) {
         logger.debug("#schedule Scheduling task:" + taskDescription.getName());
         TaskInfo taskInfo;
@@ -41,8 +46,9 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
             if (logger.isDebugEnabled()) {
                 logger.debug("#schedule Could not build task info object. Error:" + e.getLocalizedMessage(), e);
             }
+            taskDescriptionQueue.add(taskDescription);
             return false;
-        }        
+        }
         if (!isInitialized()) {
             // if cannot schedule yet, put in the pending tasks list.
             synchronized (lock) {
@@ -104,7 +110,11 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         if (name == null || "".equals(name)) {
             throw new SynapseTaskException("Task name is null. ", logger);
         }
-        String group = list[1];
+
+        String group = null;
+        if (list.length > 1) {
+            group = list[1];
+        }
         if (group == null || "".equals(group)) {
             group = TaskDescription.DEFAULT_GROUP;
             if (logger.isDebugEnabled()) {
@@ -120,11 +130,12 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                     return false;
                 }
                 deleted = taskManager.deleteTask(name);
+
             }
             if (deleted) {
                 NTaskAdapter.removeProperty(taskName);
             }
-            logger.debug("Deleted task [" + name + "] [" + deleted +"]");
+            logger.debug("Deleted task [" + name + "] [" + deleted + "]");
             return deleted;
         } catch (Exception e) {
             logger.error("Cannot delete task [" + taskName + "::" + group + "]. Error: " + e.getLocalizedMessage(), e);
@@ -241,7 +252,8 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
         if (!isInitialized()) {
             return new String[0];
         }
-        try {List<TaskInfo> taskList;
+        try {
+            List<TaskInfo> taskList;
             synchronized (lock) {
                 if (taskManager == null) {
                     logger.warn("#getTaskNames Could not query task names. Task manager is not available.");
@@ -288,6 +300,15 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
                 } else {
                     logger.warn("Initialized task manager");
                 }
+
+                //Re-scheduling the tasks missed during the server startup
+                if (isServerStarted) {
+                    Iterator taskDescriptions = taskDescriptionQueue.iterator();
+                    while (taskDescriptions.hasNext()) {
+                        schedule((TaskDescription) taskDescriptions.next());
+                    }
+                }
+
                 // Register pending tasks..
                 Iterator tasks = pendingTasks.iterator();
                 while (tasks.hasNext()) {
@@ -330,6 +351,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
     public boolean update(Map<String, Object> parameters) {
         return init(parameters == null || !parameters.containsKey("init.properties") ? null
                 : (Properties) parameters.get("init.properties"));
+
     }
 
     public boolean isInitialized() {
@@ -493,8 +515,15 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver {
     private void checkSystemRequest() throws Exception {
         if (this.getCurrentTenantId() != MultitenantConstants.SUPER_TENANT_ID) {
             throw new Exception("System request verification failed, " +
-                            "only Super-Tenant can make this type of requests");
+                    "only Super-Tenant can make this type of requests");
         }
+    }
+
+    @Override
+    public void invoke() {
+        //Initialize the Task Manager after server is started
+        isServerStarted = true;
+        init(null);
     }
 }
 

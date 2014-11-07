@@ -2,8 +2,12 @@ package org.wso2.carbon.mediation.ntask.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.core.ServerStartupHandler;
+import org.wso2.carbon.mediation.ntask.NTaskTaskManager;
 import org.wso2.carbon.mediation.ntask.TaskServiceObserver;
+import org.wso2.carbon.ntask.core.TaskStartupHandler;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -19,7 +23,7 @@ import java.util.List;
  * @scr.reference name="config.context.service"
  * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
  * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
- **/
+ */
 public class NtaskService {
     private static final Log logger = LogFactory.getLog(NtaskService.class);
 
@@ -27,7 +31,7 @@ public class NtaskService {
 
     private static TaskService taskService;
 
-    private static final List<TaskStartupObserver>startupObservers = new ArrayList<TaskStartupObserver>();
+    private static final List<TaskStartupObserver> startupObservers = new ArrayList<TaskStartupObserver>();
 
     private static ConfigurationContextService ccServiceInstance;
 
@@ -35,14 +39,19 @@ public class NtaskService {
 
     protected void activate(ComponentContext context) {
         try {
-            context.getBundleContext()
+
+            BundleContext bundleContext = context.getBundleContext();
+            bundleContext
                     .registerService(this.getClass().getName(), new NtaskService(), null);
+            bundleContext.registerService(ServerStartupHandler.class.getName(),
+                    new NTaskTaskManager(), null);
+
             logger.debug("ntask-integration bundle is activated.");
         } catch (Throwable e) {
             logger.error("Could not activate NTaskService. Error: " + e.getMessage(), e);
         }
-    }    
-    
+    }
+
     protected void deactivate(ComponentContext context) {
         logger.debug("ntask-integration bundle is deactivated.");
     }
