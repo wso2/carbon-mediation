@@ -20,7 +20,7 @@
     <ManagementPermissions>
         <ManagementPermission>
             <DisplayName>Configure ntask integration</DisplayName>
-            <ResourceId>/permission/admin/configure/ntaskint</ResourceId>
+            <ResourceId>/permission/admin/configure/medntask</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>
 

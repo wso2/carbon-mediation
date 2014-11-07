@@ -27,7 +27,7 @@ import org.apache.synapse.startup.quartz.StartUpController;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskStartupObserver;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 
 import java.util.Properties;
@@ -50,9 +50,9 @@ public class JMSProcessor implements InboundRequestProcessor, TaskStartupObserve
         this.name = params.getName();
         this.jmsProperties = params.getProperties();
 
-        if (jmsProperties.getProperty(InboundConstants.INBOUND_ENDPOINT_INTERVAL) != null) {
+        if (jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL) != null) {
             this.interval = Long.parseLong(
-                    jmsProperties.getProperty(InboundConstants.INBOUND_ENDPOINT_INTERVAL));
+                    jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL));
         }
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq  = params.getOnErrorSeq();

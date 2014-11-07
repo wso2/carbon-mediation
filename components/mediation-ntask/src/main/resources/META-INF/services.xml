@@ -17,7 +17,7 @@
 -->
 <serviceGroup>
     <service name="RemoteTaskAdmin">
-        <schema schemaNamespace="http://admin.core.ntaskint.carbon.wso2.org" elementFormDefaultQualified="true"/>
+        <schema schemaNamespace="http://admin.core.medntask.carbon.wso2.org" elementFormDefaultQualified="true"/>
         <transports>
             <transport>https</transport>
         </transports>
@@ -36,7 +36,7 @@
         <parameter name="enableMTOM" locked="false">false</parameter>        
     </service>
     
-    <parameter name="AuthorizationAction" locked="true">/permission/admin/configure/ntaskint</parameter>
+    <parameter name="AuthorizationAction" locked="true">/permission/admin/configure/medntask</parameter>
     <parameter name="adminService" locked="true">true</parameter>
     <parameter name="hiddenService" locked="true">true</parameter>
 </serviceGroup>
