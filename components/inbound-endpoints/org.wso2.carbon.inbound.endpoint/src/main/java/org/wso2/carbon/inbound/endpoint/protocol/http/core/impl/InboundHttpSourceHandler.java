@@ -48,6 +48,7 @@ public class InboundHttpSourceHandler extends SourceHandler {
             //Create Source Request related to HTTP Request
             SourceRequest request = getSourceRequest(conn);
             if (request == null) {
+                log.warn("No SourceRequest created for HTTP Request");
                 return;
             }
             String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase() : "";

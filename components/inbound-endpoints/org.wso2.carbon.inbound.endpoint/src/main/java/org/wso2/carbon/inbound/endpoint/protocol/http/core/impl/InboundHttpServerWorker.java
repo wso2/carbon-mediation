@@ -18,7 +18,6 @@
 package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
 
 
-import org.apache.axis2.Constants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,13 +44,12 @@ public class InboundHttpServerWorker extends ServerWorker {
     private InboundHttpConfiguration inboundHttpConfiguration;
 
 
-    public InboundHttpServerWorker(SourceRequest sourceRequest,
-                                   SourceConfiguration sourceConfiguration, InboundHttpConfiguration inboundHttpConfiguration, OutputStream outputStream) {
+    public InboundHttpServerWorker(SourceRequest sourceRequest,SourceConfiguration sourceConfiguration,
+                                        InboundHttpConfiguration inboundHttpConfiguration, OutputStream outputStream) {
         super(sourceRequest, sourceConfiguration, outputStream);
         this.inboundHttpConfiguration = inboundHttpConfiguration;
         this.request = sourceRequest;
     }
-
 
     public void run() {
         if (request != null) {

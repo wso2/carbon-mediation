@@ -34,7 +34,6 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
 
     public static enum Protocols {jms, file, http}
 
-
     /**
      * return underlying Request Processor Implementation according to protocol
      *

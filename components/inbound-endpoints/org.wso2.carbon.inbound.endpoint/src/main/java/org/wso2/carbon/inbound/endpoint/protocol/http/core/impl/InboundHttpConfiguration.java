@@ -21,10 +21,9 @@ package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
 import org.apache.synapse.core.SynapseEnvironment;
 
 /**
- * Class Represent Http Inbound Request Related Properties
+ * Class Represent Http Inbound  Related Properties
  */
 public class InboundHttpConfiguration {
-
 
     private SynapseEnvironment synapseEnvironment;
     private String injectSeq;
@@ -37,14 +36,23 @@ public class InboundHttpConfiguration {
         this.synapseEnvironment = synapseEnvironment;
     }
 
+    /**
+     * @return synapse environment
+     */
     public SynapseEnvironment getSynapseEnvironment() {
         return synapseEnvironment;
     }
 
+    /**
+     * @return injecting sequence
+     */
     public String getInjectSeq() {
         return injectSeq;
     }
 
+    /**
+     * @return fault sequence
+     */
     public String getFaultSeq() {
         return faultSeq;
     }

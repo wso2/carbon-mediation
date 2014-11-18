@@ -76,7 +76,6 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
 
     }
-
     @Override
     public void destroy() {
         PassThroughInboundEndpointHandler.closeEndpoint(Integer.parseInt(port));
