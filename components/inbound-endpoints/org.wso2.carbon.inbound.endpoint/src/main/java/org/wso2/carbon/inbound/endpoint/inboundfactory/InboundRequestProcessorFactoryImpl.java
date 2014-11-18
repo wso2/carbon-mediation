@@ -1,12 +1,12 @@
-/*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+/**
+* Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
+* WSO2 Inc. licenses this file to you under the Apache License,
+* Version 2.0 (the "License"); you may not use this file except
+* in compliance with the License.
+* You may obtain a copy of the License at
 *
-*    http://www.apache.org/licenses/LICENSE-2.0
+* http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing,
 * software distributed under the License is distributed on an
@@ -20,6 +20,7 @@ package org.wso2.carbon.inbound.endpoint.inboundfactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
@@ -56,7 +57,8 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
         } else if (params.getClassImpl() != null) {
             inboundRequestProcessor = new GenericProcessor(params);
         } else {
-            log.error("Protocol or Class should be specified.");
+            log.error("Protocol or Class should be specified for Inbound Endpoint " + params.getName());
+            throw new SynapseException("Protocol or Class should be specified for Inbound Endpoint " + params.getName());
         }
         return inboundRequestProcessor;
     }

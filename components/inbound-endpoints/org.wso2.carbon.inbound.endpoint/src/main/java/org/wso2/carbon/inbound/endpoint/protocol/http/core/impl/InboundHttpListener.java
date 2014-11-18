@@ -1,27 +1,30 @@
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
 
+import org.apache.log4j.Logger;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConfiguration;
+import org.apache.synapse.transport.passthru.SourceHandler;
+import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
+import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 import java.net.InetSocketAddress;
@@ -32,57 +35,52 @@ import java.net.InetSocketAddress;
  */
 public class InboundHttpListener implements InboundRequestProcessor {
 
+    private static final Logger logger = Logger.getLogger(InboundHttpListener.class);
 
     private String injectingSequence;
     private String onErrorSequence;
     private SynapseEnvironment synapseEnvironment;
+    private String name;
     private String port;
-    private InboundConfiguration inboundConfiguration;
 
     public InboundHttpListener(InboundProcessorParams params) {
 
         this.port = params.getProperties().
                 getProperty(InboundConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
+        this.name = params.getName();
         this.injectingSequence = params.getInjectingSeq();
         this.onErrorSequence = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
-        this.inboundConfiguration = new InboundConfiguration();
 
     }
 
-    /**
-     * calls when inbound endpoint init by the synapse deployer
-     */
     @Override
     public void init() {
-        InboundHttpSourceHandler inboundHttpSourceHandler = new InboundHttpSourceHandler
-                (this.inboundConfiguration, synapseEnvironment, injectingSequence, onErrorSequence);
-        InboundHttpGlobalConfiguration.addInboundHttpSourceHandler(Integer.parseInt(this.port), inboundHttpSourceHandler);
-        start();
-    }
+        try {
+            InboundHttpConfiguration inboundHttpConfiguration =
+                    new InboundHttpConfiguration(injectingSequence, onErrorSequence, synapseEnvironment);
+            //Get registered source configuration of PassThrough Transport
+            SourceConfiguration sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
+            if (sourceConfiguration != null) {
+                //Create Handler for handle Http Requests
+                SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration, inboundHttpConfiguration);
+                //Start Endpoint in given port
+                PassThroughInboundEndpointHandler.startEndpoint
+                        (new InetSocketAddress(Integer.parseInt(port)), inboundSourceHandler, name);
+            } else {
+                logger.error("Source Configuration is not registered in PassThrough Transport");
+            }
+        } catch (NumberFormatException e) {
+            logger.error("Exception occurred While initiating Listener  " + name + " May be problem in Port", e);
+        }
 
-    public void start() {
-        startIOReactor();
-        startEndpoint();
+
     }
 
     @Override
     public void destroy() {
-        InboundHttpGlobalConfiguration.closeEndpoint(Integer.parseInt(this.port));
+        PassThroughInboundEndpointHandler.closeEndpoint(Integer.parseInt(port));
     }
 
-    /**
-     * start endpoints for ports specified
-     */
-    private void startEndpoint() {
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(Integer.parseInt(port));
-        InboundHttpGlobalConfiguration.startEndpoint(inetSocketAddress);
-    }
 
-    /**
-     * Start IO Reactor if not yet Started else used start one
-     */
-    private void startIOReactor() {
-        InboundHttpGlobalConfiguration.startIoReactor();
-    }
 }
