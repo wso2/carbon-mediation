@@ -6,7 +6,6 @@ import org.wso2.carbon.ntask.core.TaskInfo;
 import java.util.*;
 
 final class TaskBuilder {
-    public static final String TASK_TYPE_ESB = "ESB_TASK";
     //public static final String REMOTE_SYSTEM_TASK_ID = "__REMOTE_SYSTEM_TASK_ID__";
     //public static final String REMOTE_TASK_URI = "__REMOTE_TASK_URI__";
     public static final String REMOTE_TASK_NAME = "__REMOTE_TASK_NAME__";
