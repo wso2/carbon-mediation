@@ -56,7 +56,6 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
         } else if (params.getClassImpl() != null) {
             inboundRequestProcessor = new GenericProcessor(params);
         } else {
-            log.error("Protocol or Class should be specified for Inbound Endpoint " + params.getName());
             throw new SynapseException("Protocol or Class should be specified for Inbound Endpoint " + params.getName());
         }
         return inboundRequestProcessor;
