@@ -1,0 +1,556 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://admin.core.ntaskint.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:tns="http://ntaskadmin.mediation.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://ntaskadmin.mediation.carbon.wso2.org">
+    <wsdl:documentation>ESBNTaskAdmin</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://admin.core.ntaskint.carbon.wso2.org">
+            <xs:element name="ESBNTaskAdminException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="ESBNTaskAdminException" nillable="true" type="ns:Exception"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Message" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="resumeESBTask">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resumeESBTaskResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resumeAllESBTasks">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="resumeAllESBTasksResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="pauseESBTask">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="pauseESBTaskResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="pauseAllESBTasks">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="pauseAllESBTasksResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isESBTaskRunning">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="taskName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isESBTaskRunningResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRunningESBTaskList">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRunningESBTaskListResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRunningESBTaskCount">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getRunningESBTaskCountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getESBTaskNames">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getESBTaskNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteESBTask">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteESBTaskResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getRunningESBTaskCountRequest">
+        <wsdl:part name="parameters" element="ns:getRunningESBTaskCount"/>
+    </wsdl:message>
+    <wsdl:message name="getRunningESBTaskCountResponse">
+        <wsdl:part name="parameters" element="ns:getRunningESBTaskCountResponse"/>
+    </wsdl:message>
+    <wsdl:message name="ESBNTaskAdminException">
+        <wsdl:part name="parameters" element="ns:ESBNTaskAdminException"/>
+    </wsdl:message>
+    <wsdl:message name="getESBTaskNamesRequest">
+        <wsdl:part name="parameters" element="ns:getESBTaskNames"/>
+    </wsdl:message>
+    <wsdl:message name="getESBTaskNamesResponse">
+        <wsdl:part name="parameters" element="ns:getESBTaskNamesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="pauseAllESBTasksRequest">
+        <wsdl:part name="parameters" element="ns:pauseAllESBTasks"/>
+    </wsdl:message>
+    <wsdl:message name="pauseAllESBTasksResponse">
+        <wsdl:part name="parameters" element="ns:pauseAllESBTasksResponse"/>
+    </wsdl:message>
+    <wsdl:message name="resumeAllESBTasksRequest">
+        <wsdl:part name="parameters" element="ns:resumeAllESBTasks"/>
+    </wsdl:message>
+    <wsdl:message name="resumeAllESBTasksResponse">
+        <wsdl:part name="parameters" element="ns:resumeAllESBTasksResponse"/>
+    </wsdl:message>
+    <wsdl:message name="resumeESBTaskRequest">
+        <wsdl:part name="parameters" element="ns:resumeESBTask"/>
+    </wsdl:message>
+    <wsdl:message name="resumeESBTaskResponse">
+        <wsdl:part name="parameters" element="ns:resumeESBTaskResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isESBTaskRunningRequest">
+        <wsdl:part name="parameters" element="ns:isESBTaskRunning"/>
+    </wsdl:message>
+    <wsdl:message name="isESBTaskRunningResponse">
+        <wsdl:part name="parameters" element="ns:isESBTaskRunningResponse"/>
+    </wsdl:message>
+    <wsdl:message name="pauseESBTaskRequest">
+        <wsdl:part name="parameters" element="ns:pauseESBTask"/>
+    </wsdl:message>
+    <wsdl:message name="pauseESBTaskResponse">
+        <wsdl:part name="parameters" element="ns:pauseESBTaskResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getRunningESBTaskListRequest">
+        <wsdl:part name="parameters" element="ns:getRunningESBTaskList"/>
+    </wsdl:message>
+    <wsdl:message name="getRunningESBTaskListResponse">
+        <wsdl:part name="parameters" element="ns:getRunningESBTaskListResponse"/>
+    </wsdl:message>
+    <wsdl:message name="deleteESBTaskRequest">
+        <wsdl:part name="parameters" element="ns:deleteESBTask"/>
+    </wsdl:message>
+    <wsdl:message name="deleteESBTaskResponse">
+        <wsdl:part name="parameters" element="ns:deleteESBTaskResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="ESBNTaskAdminPortType">
+        <wsdl:operation name="getRunningESBTaskCount">
+            <wsdl:input message="tns:getRunningESBTaskCountRequest" wsaw:Action="urn:getRunningESBTaskCount"/>
+            <wsdl:output message="tns:getRunningESBTaskCountResponse" wsaw:Action="urn:getRunningESBTaskCountResponse"/>
+            <wsdl:fault message="tns:ESBNTaskAdminException" name="ESBNTaskAdminException" wsaw:Action="urn:getRunningESBTaskCountESBNTaskAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getESBTaskNames">
+            <wsdl:input message="tns:getESBTaskNamesRequest" wsaw:Action="urn:getESBTaskNames"/>
+            <wsdl:output message="tns:getESBTaskNamesResponse" wsaw:Action="urn:getESBTaskNamesResponse"/>
+            <wsdl:fault message="tns:ESBNTaskAdminException" name="ESBNTaskAdminException" wsaw:Action="urn:getESBTaskNamesESBNTaskAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="pauseAllESBTasks">
+            <wsdl:input message="tns:pauseAllESBTasksRequest" wsaw:Action="urn:pauseAllESBTasks"/>
+            <wsdl:output message="tns:pauseAllESBTasksResponse" wsaw:Action="urn:pauseAllESBTasksResponse"/>
+            <wsdl:fault message="tns:ESBNTaskAdminException" name="ESBNTaskAdminException" wsaw:Action="urn:pauseAllESBTasksESBNTaskAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="resumeAllESBTasks">
+            <wsdl:input message="tns:resumeAllESBTasksRequest" wsaw:Action="urn:resumeAllESBTasks"/>
+            <wsdl:output message="tns:resumeAllESBTasksResponse" wsaw:Action="urn:resumeAllESBTasksResponse"/>
+            <wsdl:fault message="tns:ESBNTaskAdminException" name="ESBNTaskAdminException" wsaw:Action="urn:resumeAllESBTasksESBNTaskAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="resumeESBTask">
+            <wsdl:input message="tns:resumeESBTaskRequest" wsaw:Action="urn:resumeESBTask"/>
+            <wsdl:output message="tns:resumeESBTaskResponse" wsaw:Action="urn:resumeESBTaskResponse"/>
+            <wsdl:fault message="tns:ESBNTaskAdminException" name="ESBNTaskAdminException" wsaw:Action="urn:resumeESBTaskESBNTaskAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isESBTaskRunning">
+            <wsdl:input message="tns:isESBTaskRunningRequest" wsaw:Action="urn:isESBTaskRunning"/>
+            <wsdl:output message="tns:isESBTaskRunningResponse" wsaw:Action="urn:isESBTaskRunningResponse"/>
+            <wsdl:fault message="tns:ESBNTaskAdminException" name="ESBNTaskAdminException" wsaw:Action="urn:isESBTaskRunningESBNTaskAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="pauseESBTask">
+            <wsdl:input message="tns:pauseESBTaskRequest" wsaw:Action="urn:pauseESBTask"/>
+            <wsdl:output message="tns:pauseESBTaskResponse" wsaw:Action="urn:pauseESBTaskResponse"/>
+            <wsdl:fault message="tns:ESBNTaskAdminException" name="ESBNTaskAdminException" wsaw:Action="urn:pauseESBTaskESBNTaskAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getRunningESBTaskList">
+            <wsdl:input message="tns:getRunningESBTaskListRequest" wsaw:Action="urn:getRunningESBTaskList"/>
+            <wsdl:output message="tns:getRunningESBTaskListResponse" wsaw:Action="urn:getRunningESBTaskListResponse"/>
+            <wsdl:fault message="tns:ESBNTaskAdminException" name="ESBNTaskAdminException" wsaw:Action="urn:getRunningESBTaskListESBNTaskAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteESBTask">
+            <wsdl:input message="tns:deleteESBTaskRequest" wsaw:Action="urn:deleteESBTask"/>
+            <wsdl:output message="tns:deleteESBTaskResponse" wsaw:Action="urn:deleteESBTaskResponse"/>
+            <wsdl:fault message="tns:ESBNTaskAdminException" name="ESBNTaskAdminException" wsaw:Action="urn:deleteESBTaskESBNTaskAdminException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="ESBNTaskAdminSoap11Binding" type="tns:ESBNTaskAdminPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getESBTaskNames">
+            <soap:operation soapAction="urn:getESBTaskNames" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRunningESBTaskCount">
+            <soap:operation soapAction="urn:getRunningESBTaskCount" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="pauseAllESBTasks">
+            <soap:operation soapAction="urn:pauseAllESBTasks" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="resumeAllESBTasks">
+            <soap:operation soapAction="urn:resumeAllESBTasks" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="resumeESBTask">
+            <soap:operation soapAction="urn:resumeESBTask" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isESBTaskRunning">
+            <soap:operation soapAction="urn:isESBTaskRunning" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="pauseESBTask">
+            <soap:operation soapAction="urn:pauseESBTask" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRunningESBTaskList">
+            <soap:operation soapAction="urn:getRunningESBTaskList" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteESBTask">
+            <soap:operation soapAction="urn:deleteESBTask" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ESBNTaskAdminSoap12Binding" type="tns:ESBNTaskAdminPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getESBTaskNames">
+            <soap12:operation soapAction="urn:getESBTaskNames" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap12:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRunningESBTaskCount">
+            <soap12:operation soapAction="urn:getRunningESBTaskCount" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap12:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="pauseAllESBTasks">
+            <soap12:operation soapAction="urn:pauseAllESBTasks" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap12:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="resumeAllESBTasks">
+            <soap12:operation soapAction="urn:resumeAllESBTasks" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap12:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="resumeESBTask">
+            <soap12:operation soapAction="urn:resumeESBTask" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap12:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isESBTaskRunning">
+            <soap12:operation soapAction="urn:isESBTaskRunning" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap12:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="pauseESBTask">
+            <soap12:operation soapAction="urn:pauseESBTask" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap12:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getRunningESBTaskList">
+            <soap12:operation soapAction="urn:getRunningESBTaskList" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap12:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteESBTask">
+            <soap12:operation soapAction="urn:deleteESBTask" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ESBNTaskAdminException">
+                <soap12:fault use="literal" name="ESBNTaskAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="ESBNTaskAdminHttpBinding" type="tns:ESBNTaskAdminPortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="getESBTaskNames">
+            <http:operation location="getESBTaskNames"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRunningESBTaskCount">
+            <http:operation location="getRunningESBTaskCount"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="pauseAllESBTasks">
+            <http:operation location="pauseAllESBTasks"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="resumeAllESBTasks">
+            <http:operation location="resumeAllESBTasks"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="resumeESBTask">
+            <http:operation location="resumeESBTask"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isESBTaskRunning">
+            <http:operation location="isESBTaskRunning"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="pauseESBTask">
+            <http:operation location="pauseESBTask"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getRunningESBTaskList">
+            <http:operation location="getRunningESBTaskList"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteESBTask">
+            <http:operation location="deleteESBTask"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="ESBNTaskAdmin">
+        <wsdl:port name="ESBNTaskAdminHttpsSoap11Endpoint" binding="tns:ESBNTaskAdminSoap11Binding">
+            <soap:address location="https://10.100.0.37:8243/services/ESBNTaskAdmin.ESBNTaskAdminHttpsSoap11Endpoint"/>
+        </wsdl:port>
+        <wsdl:port name="ESBNTaskAdminHttpsSoap12Endpoint" binding="tns:ESBNTaskAdminSoap12Binding">
+            <soap12:address location="https://10.100.0.37:8243/services/ESBNTaskAdmin.ESBNTaskAdminHttpsSoap12Endpoint"/>
+        </wsdl:port>
+        <wsdl:port name="ESBNTaskAdminHttpsEndpoint" binding="tns:ESBNTaskAdminHttpBinding">
+            <http:address location="https://10.100.0.37:8243/services/ESBNTaskAdmin.ESBNTaskAdminHttpsEndpoint"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -1,19 +1,15 @@
 package org.wso2.carbon.mediation.ntask;
 
-import org.apache.synapse.task.*;
+import org.apache.synapse.task.TaskDescription;
 import org.wso2.carbon.ntask.core.TaskInfo;
-import org.wso2.carbon.ntask.core.impl.RoundRobinTaskLocationResolver;
 
 import java.util.*;
 
 final class TaskBuilder {
-    public static final String TASK_TYPE_USER = "CARBON_USER_REMOTE_TASKS";
-    public static final String TASK_TYPE_SYSTEM = "CARBON_SYSTEM_REMOTE_TASKS";
-    public static final String REMOTE_SYSTEM_TASK_HEADER_ID = "REMOTE_SYSTEM_TASK_ID";
-    public static final String REMOTE_SYSTEM_TASK_ID = "__REMOTE_SYSTEM_TASK_ID__";
-    public static final String REMOTE_TASK_URI = "__REMOTE_TASK_URI__";
+    //public static final String REMOTE_SYSTEM_TASK_ID = "__REMOTE_SYSTEM_TASK_ID__";
+    //public static final String REMOTE_TASK_URI = "__REMOTE_TASK_URI__";
     public static final String REMOTE_TASK_NAME = "__REMOTE_TASK_NAME__";
-    public static final String SYSTEM_TASK_FLAG = "__SYSTEM_TASK__";
+    //public static final String SYSTEM_TASK_FLAG = "__SYSTEM_TASK__";
 
     public static TaskInfo buildTaskInfo(TaskDescription taskDescription, Map<String, Object> properties) throws Exception {
         return buildTaskInfo(taskDescription, false, properties);
@@ -42,21 +38,21 @@ final class TaskBuilder {
         triggerInfo.setDisallowConcurrentExecution(true);
         Map<String, String> props = new HashMap<String, String>();
         props.put(REMOTE_TASK_NAME, description.getName());
-        String targetUrl = null;
-        if (system && targetUrl != null) {
-            int i1 = targetUrl.lastIndexOf("/");
-            String systemTaskId = targetUrl.substring(i1 + 1);
-            targetUrl = targetUrl.substring(0, i1);
-            props.put(SYSTEM_TASK_FLAG, Boolean.toString(true));
-            props.put(REMOTE_SYSTEM_TASK_ID, systemTaskId);
-        }
-        props.put(REMOTE_TASK_URI, targetUrl);
+        //String targetUrl = null;
+        //if (system && targetUrl != null) {
+        //    int i1 = targetUrl.lastIndexOf("/");
+        //    String systemTaskId = targetUrl.substring(i1 + 1);
+        //    targetUrl = targetUrl.substring(0, i1);
+        //    props.put(SYSTEM_TASK_FLAG, Boolean.toString(true));
+        //    props.put(REMOTE_SYSTEM_TASK_ID, systemTaskId);
+        //}
+        //props.put(REMOTE_TASK_URI, targetUrl);
         // copy the remaining properties
         Map<String, String> properties = description.getProperties();
         Iterator<String> iterator = properties.keySet().iterator();
         while (iterator.hasNext()) {
             Object o = iterator.next();
-            if (o instanceof String) {
+            if (o != null) {
                 props.put((String) o, properties.get(o));
             }
         }
@@ -81,9 +77,7 @@ final class TaskBuilder {
         if (taskInstance instanceof org.apache.synapse.task.Task) {
             NTaskAdapter.addProperty(nameGroup, taskInstance);
         }
-        return new TaskInfo(description.getName(),
-                NTaskAdapter.class.getName(), props, RoundRobinTaskLocationResolver.class.getName(), triggerInfo);
-        //"org.wso2.carbon.ntask.core.impl.RandomTaskLocationResolver"
+        return new TaskInfo(description.getName(), NTaskAdapter.class.getName(), props, triggerInfo);
     }
 
     public static TaskDescription buildTaskDescription(TaskInfo taskInfo) {

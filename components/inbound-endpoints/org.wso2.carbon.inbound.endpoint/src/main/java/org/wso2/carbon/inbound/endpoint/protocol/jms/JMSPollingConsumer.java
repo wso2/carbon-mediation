@@ -20,21 +20,25 @@ package org.wso2.carbon.inbound.endpoint.protocol.jms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.inbound.InjectHandler;
-import org.apache.synapse.inbound.PollingConsumer;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 
-
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 import java.util.Date;
 import java.util.Properties;
 
-public class JMSPollingConsumer implements MessageConsumer,PollingConsumer {
+public class JMSPollingConsumer implements MessageConsumer {
 
     private static final Log logger = LogFactory.getLog(JMSPollingConsumer.class.getName());
 
     private CachedJMSConnectionFactory jmsConnectionFactory;
-    private InjectHandler injectHandler;
+    private JMSInjectHandler injectHandler;
     private long scanInterval;
     private Long lastRanTime;
     private String strUserName;
@@ -48,7 +52,7 @@ public class JMSPollingConsumer implements MessageConsumer,PollingConsumer {
         this.lastRanTime = null;
     }    
     
-	public void registerHandler(InjectHandler injectHandler){
+	public void registerHandler(JMSInjectHandler injectHandler){
 		this.injectHandler = injectHandler;
 	}    
     public void execute() {        

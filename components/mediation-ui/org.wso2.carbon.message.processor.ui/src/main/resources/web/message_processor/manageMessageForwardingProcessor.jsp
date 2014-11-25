@@ -100,6 +100,18 @@
             form.client_retry_interval.focus();
             return false;
         }
+        
+        if (IsEmpty(form.max_delivery_attempts) && form.max_delivery_drop.value.trim() == "Enabled") {
+            CARBON.showWarningDialog('<fmt:message key="drop.message.Error.empty"/>')
+            form.max_delivery_attempts.focus();
+            return false;
+        }
+        
+        if (form.max_delivery_attempts.value.trim() < 1 && form.max_delivery_drop.value.trim() == "Enabled") {
+            CARBON.showWarningDialog('<fmt:message key="drop.message.Error.less.than.one"/>')
+            form.max_delivery_attempts.focus();
+            return false;
+        }
 
         return true;
     }

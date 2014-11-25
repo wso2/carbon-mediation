@@ -56,19 +56,6 @@ public class BamMediator extends AbstractMediator {
             }
         }
 
-        org.apache.axis2.context.MessageContext msgCtx = ((Axis2MessageContext) messageContext).getAxis2MessageContext();
-
-        AxisService service = msgCtx.getAxisService();
-        if(service == null) {
-            return true;
-        }
-        // When this is not inside an API theses parameters should be there
-        if ((!service.getName().equals("__SynapseService")) &&
-            (service.getParameter(ADMIN_SERVICE_PARAMETER) != null ||
-             service.getParameter(HIDDEN_SERVICE_PARAMETER) != null)) {
-            return true;
-        }
-
         try {
             stream.sendEvents(messageContext);
         } catch (BamMediatorException e) {

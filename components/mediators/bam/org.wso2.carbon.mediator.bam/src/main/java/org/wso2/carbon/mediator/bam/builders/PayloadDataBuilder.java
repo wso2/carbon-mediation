@@ -48,7 +48,7 @@ public class PayloadDataBuilder {
                                              Object[] payloadData) throws BamMediatorException {
         int i = 0;
         boolean direction;
-        String service, operation, messageID;
+        String operation, messageID;
         try{
             try{
                 direction = (!messageContext.isResponse() && !messageContext.isFaultResponse());
@@ -56,13 +56,6 @@ public class PayloadDataBuilder {
                 String errorMsg = "Error occurred while Message Direction is extracted. " + e.getMessage();
                 log.error(errorMsg, e);
                 direction = true;
-            }
-            try{
-                service = msgCtx.getAxisService().getName();
-            } catch (Exception e) {
-                String errorMsg = "Error occurred while Service Name is extracted. " + e.getMessage();
-                log.error(errorMsg, e);
-                service = "";
             }
             try{
                 operation = msgCtx.getAxisOperation().getName().getLocalPart();
@@ -79,7 +72,6 @@ public class PayloadDataBuilder {
                 messageID = "";
             }
             payloadData[i++] = direction ? BamMediatorConstants.DIRECTION_IN : BamMediatorConstants.DIRECTION_OUT;
-            payloadData[i++] = service;
             payloadData[i++] = operation;
             payloadData[i++] = messageID;
             payloadData[i] = System.currentTimeMillis();
