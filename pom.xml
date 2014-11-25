@@ -1788,7 +1788,7 @@
         <xmlsec.version>1.5.5</xmlsec.version>
         <xmlschema.core.version>2.0.3</xmlschema.core.version>
         <xml.resolver.version>1.2</xml.resolver.version>
-        <wss4j.version>1.5.11-wso2v7-SNAPSHOT</wss4j.version>
+        <wss4j.version>1.5.11-wso2v7</wss4j.version>
         <neethi.version>3.0.2</neethi.version>
         <stax2.version>3.1.1</stax2.version>
         <woodstox.core.version>4.2.0</woodstox.core.version>
