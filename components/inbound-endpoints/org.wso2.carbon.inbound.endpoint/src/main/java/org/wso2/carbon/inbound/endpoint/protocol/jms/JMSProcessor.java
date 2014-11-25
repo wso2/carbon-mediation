@@ -21,16 +21,18 @@ package org.wso2.carbon.inbound.endpoint.protocol.jms;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.PollingProcessor;
+import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.startup.quartz.StartUpController;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskStartupObserver;
+import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 
 import java.util.Properties;
 
-public class JMSProcessor implements PollingProcessor,TaskStartupObserver {
+public class JMSProcessor implements InboundRequestProcessor, TaskStartupObserver {
     private static final Log log = LogFactory.getLog(JMSProcessor.class.getName());
 
 
@@ -44,14 +46,19 @@ public class JMSProcessor implements PollingProcessor,TaskStartupObserver {
     private SynapseEnvironment synapseEnvironment;
     private StartUpController startUpController;
     
-    public JMSProcessor(String name, Properties jmsProperties, long pollInterval, String injectingSeq, String onErrorSeq, SynapseEnvironment synapseEnvironment) {
-        this.name = name;
-        this.jmsProperties = jmsProperties;
-        this.interval = pollInterval;
-        this.injectingSeq = injectingSeq;
-        this.onErrorSeq = onErrorSeq;
-        this.synapseEnvironment = synapseEnvironment;
-    }    
+    public JMSProcessor(InboundProcessorParams params) {
+        this.name = params.getName();
+        this.jmsProperties = params.getProperties();
+
+        if (jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL) != null) {
+            this.interval = Long.parseLong(
+                    jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL));
+        }
+        this.injectingSeq = params.getInjectingSeq();
+        this.onErrorSeq  = params.getOnErrorSeq();
+        this.synapseEnvironment = params.getSynapseEnvironment();
+
+    }
 
     public void init() {
         log.info("Initializing inbound JMS listener for destination " + name);

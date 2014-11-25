@@ -3,7 +3,10 @@ package org.wso2.carbon.mediation.ntask;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.Task;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.ntask.core.AbstractTask;
+import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.HashMap;
@@ -52,6 +55,8 @@ public class NTaskAdapter extends AbstractTask {
             taskInstance = synapseTaskProperties.get(taskName);
         }
         if (taskInstance == null) {
+            //If tenant is not super tenant and not loaded load tenant.
+            checkLoadTenant(properties.get(TaskInfo.TENANT_ID_PROP));
             // Nothing to execute.
             return;
         }
@@ -72,6 +77,17 @@ public class NTaskAdapter extends AbstractTask {
         }
         synapseTask.execute();
     }
-
+    /**
+     * If tenant is not super tenant and not loaded load tenant.
+     * */
+    private void checkLoadTenant(String sTenantId){
+        if(sTenantId != null ){
+            Integer iTenantId = Integer.parseInt(sTenantId);
+            if(!iTenantId.equals(MultitenantConstants.SUPER_TENANT_ID)){
+                NtaskService.loadTenant(iTenantId);   
+            }            
+        }
+    }
+    
     private boolean isInitialized() { return initialized; }
 }

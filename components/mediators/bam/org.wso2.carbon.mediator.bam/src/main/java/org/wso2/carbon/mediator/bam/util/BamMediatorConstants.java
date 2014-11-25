@@ -33,7 +33,6 @@ public final class BamMediatorConstants {
 
     public static final String REMOTE_ADDRESS = "remote_address";
 
-    public static final String SERVICE_NAME = "service_name";
     public static final String OPERATION_NAME = "operation_name";
     public static final String MSG_BAM_ACTIVITY_ID = "bam_activity_id";
     public static final String MSG_STR_ACTIVITY_ID = "activity_id";
@@ -67,6 +66,6 @@ public final class BamMediatorConstants {
 
     public static final int NUM_OF_CONST_CORRELATION_PARAMS = 1;
     public static final int NUM_OF_CONST_META_PARAMS = 9;
-    public static final int NUM_OF_CONST_PAYLOAD_PARAMS = 5;
+    public static final int NUM_OF_CONST_PAYLOAD_PARAMS = 4;
 
 }
