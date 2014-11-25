@@ -19,8 +19,8 @@
 
     <ManagementPermissions>
         <ManagementPermission>
-            <DisplayName>Configure ntask integration</DisplayName>
-            <ResourceId>/permission/admin/configure/medntask</ResourceId>
+            <DisplayName>Configure ESB ntask</DisplayName>
+            <ResourceId>/permission/admin/configure/ntaskadmin</ResourceId>
         </ManagementPermission>
     </ManagementPermissions>
 

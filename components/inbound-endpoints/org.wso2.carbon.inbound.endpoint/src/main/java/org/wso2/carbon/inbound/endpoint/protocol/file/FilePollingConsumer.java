@@ -22,13 +22,16 @@ package org.wso2.carbon.inbound.endpoint.protocol.file;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.FileContent;
+import org.apache.commons.vfs2.FileNotFolderException;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.commons.vfs.VFSUtils;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.InjectHandler;
-import org.apache.synapse.inbound.PollingConsumer;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,7 +40,7 @@ import java.util.Map;
 import java.util.Properties;
 
 
-public class FilePollingConsumer implements PollingConsumer {
+public class FilePollingConsumer {
 
     private static final Log log = LogFactory.getLog(FilePollingConsumer.class);
     private Properties vfsProperties;
@@ -49,7 +52,7 @@ public class FilePollingConsumer implements PollingConsumer {
     private long scanInterval;
     private Long lastRanTime;
     private int lastCycle;
-    private InjectHandler injectHandler;
+    private FileInjectHandler injectHandler;
     
 
     public FilePollingConsumer(Properties vfsProperties, String name, SynapseEnvironment synapseEnvironment, long scanInterval) {
@@ -73,7 +76,7 @@ public class FilePollingConsumer implements PollingConsumer {
         }
     }    
     
-	public void registerHandler(InjectHandler injectHandler){
+	public void registerHandler(FileInjectHandler injectHandler){
 		this.injectHandler = injectHandler;
 	}
     

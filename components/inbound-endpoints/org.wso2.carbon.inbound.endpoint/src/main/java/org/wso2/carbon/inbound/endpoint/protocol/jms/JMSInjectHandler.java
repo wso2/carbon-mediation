@@ -33,16 +33,19 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.InboundEndpointUtils;
-import org.apache.synapse.inbound.InjectHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
-import javax.jms.*;
+import javax.jms.BytesMessage;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Message;
+import javax.jms.TextMessage;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
-public class JMSInjectHandler implements InjectHandler {
+public class JMSInjectHandler {
 
 	private static final Log log = LogFactory.getLog(JMSInjectHandler.class);
 	
@@ -88,7 +91,8 @@ public class JMSInjectHandler implements InjectHandler {
             // set the message payload to the message context
             if(msg instanceof TextMessage){
             	String message = ((TextMessage) msg).getText();
-            	InputStream in = new AutoCloseInputStream(InboundEndpointUtils.toInputStream(message));
+            	InputStream in = new AutoCloseInputStream(
+                        new ByteArrayInputStream(message.getBytes()));
             	documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
             } else if (msg instanceof BytesMessage){
                 if (builder instanceof DataSourceMessageBuilder) {

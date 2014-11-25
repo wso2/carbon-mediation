@@ -4,14 +4,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.PollingConsumer;
 
 public class GenericTask implements org.apache.synapse.task.Task, ManagedLifecycle {
     private static final Log logger = LogFactory.getLog(GenericTask.class.getName());
 
-    private PollingConsumer pollingConsumer;
+    private GenericPollingConsumer pollingConsumer;
     
-    public GenericTask(PollingConsumer pollingConsumer) {
+    public GenericTask(GenericPollingConsumer pollingConsumer) {
     	logger.debug("Generic Task initalize.");
     	this.pollingConsumer = pollingConsumer;
     }

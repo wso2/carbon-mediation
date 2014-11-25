@@ -614,7 +614,7 @@
                 = new EndpointTemplateAdminClient(this.getServletConfig(), session);
         EndpointTemplateInfo[] endpointTemplates = null;
         EndpointTemplateInfo[] dynamicEndpointTemplates = null;
-        String endpointPageNumberStr = request.getParameter("pageNumberForEndpoint");
+        String endpointPageNumberStr = request.getParameter("endpointPageNumber");
         String dynamicEndpointPageNumberStr = request.getParameter("dynamicPageNumberForEndpoint");
         int endpointPageNumber = 0;
         int dynamicEndpointPageNumber = 0;
@@ -627,7 +627,7 @@
         int numberOfPagesEndpoint = 0;
         int numberOfDynamicPagesEndpoint = 0;
 
-        endpointTemplates = endpointClient.getEndpointTemplates(pageNumber, TemplateEditorConstants.SEQUENCE_PER_PAGE);
+        endpointTemplates = endpointClient.getEndpointTemplates(endpointPageNumber, TemplateEditorConstants.SEQUENCE_PER_PAGE);
         dynamicEndpointTemplates = endpointClient.getDynamicEndpointTemplates(dynamicPageNumber,
                 TemplateEditorConstants.SEQUENCE_PER_PAGE);
         if(endpointTemplates == null){
