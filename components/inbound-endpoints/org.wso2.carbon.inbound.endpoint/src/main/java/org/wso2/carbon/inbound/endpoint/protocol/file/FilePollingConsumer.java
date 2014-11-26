@@ -282,7 +282,7 @@ public class FilePollingConsumer {
                                 log.debug("Matching file : " + child.getName().getBaseName());
                             }
                             
-                            if((!fileLock || (fileLock && VFSUtils.acquireLock(fsManager, child)))){
+                            if((!fileLock || (fileLock && acquireLock(fsManager, child)))){
                                 //process the file                            	
                                 try {
                                     if (log.isDebugEnabled()) {
@@ -385,6 +385,52 @@ public class FilePollingConsumer {
         return null;
     }
 
+    private boolean acquireLock(FileSystemManager fsManager, FileObject fileObject){
+
+        String strAutoLock = vfsProperties.getProperty(VFSConstants.TRANSPORT_AUTO_LOCK_RELEASE);
+        boolean autoLockRelease = false;
+        Boolean autoLockReleaseSameNode = true;
+        Long autoLockReleaseInterval = null;
+        if (strAutoLock != null) {
+            try {
+                autoLockRelease = Boolean.parseBoolean(strAutoLock);
+            } catch (Exception e) {
+                autoLockRelease = false;
+                log.warn("VFS Auto lock removal not set properly. Current value is : "
+                        + strAutoLock, e);
+            }
+            if (autoLockRelease) {
+                String strAutoLockInterval = vfsProperties
+                        .getProperty(VFSConstants.TRANSPORT_AUTO_LOCK_RELEASE_INTERVAL);
+                if (strAutoLockInterval != null) {
+                    try {
+                        autoLockReleaseInterval = Long.parseLong(strAutoLockInterval);
+                    } catch (Exception e) {
+                        autoLockReleaseInterval = null;
+                        log.warn(
+                                "VFS Auto lock removal property not set properly. Current value is : "
+                                        + strAutoLockInterval, e);
+                    }
+                }
+                String strAutoLockReleaseSameNode = vfsProperties
+                        .getProperty(VFSConstants.TRANSPORT_AUTO_LOCK_RELEASE_SAME_NODE);
+                if (strAutoLockReleaseSameNode != null) {
+                    try {
+                        autoLockReleaseSameNode = Boolean.parseBoolean(strAutoLockReleaseSameNode);
+                    } catch (Exception e) {
+                        autoLockReleaseSameNode = true;
+                        log.warn(
+                                "VFS Auto lock removal property not set properly. Current value is : "
+                                        + autoLockReleaseSameNode, e);
+                    }
+                }
+            }
+
+        }
+        return VFSUtils.acquireLock(fsManager, fileObject, true, autoLockRelease,
+                autoLockReleaseSameNode, autoLockReleaseInterval);
+    }
+    
     /**
      * 
      * Actual processing of the file/folder
