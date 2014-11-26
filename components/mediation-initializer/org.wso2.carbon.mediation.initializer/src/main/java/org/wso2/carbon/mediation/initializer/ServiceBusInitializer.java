@@ -26,6 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
+import org.apache.synapse.debug.*;
 import org.apache.synapse.commons.datasource.DataSourceConstants;
 import org.apache.synapse.commons.datasource.DataSourceInformationRepository;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
@@ -66,14 +67,18 @@ import org.wso2.carbon.task.services.TaskSchedulerService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.utils.ServerConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.securevault.SecurityConstants;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -429,6 +434,11 @@ public class ServiceBusInitializer {
             axisConf.addParameter(
                     new Parameter(ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION, name));
 
+            if (isRunningDebugMode()) {
+                log.info("ESB Started in Debug mode");
+                createSynapseDebugEnvironment(contextInfo);
+            }
+
             serverManager.init(configurationInformation, contextInfo);
             serverManager.start();
 
@@ -473,6 +483,39 @@ public class ServiceBusInitializer {
 
     public static boolean isRunningSamplesMode() {
         return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null;
+    }
+
+    public static boolean isRunningDebugMode() {
+        return System.getProperty(ServiceBusConstants.ESB_DEBUG_SYSTEM_PROPERTY) != null;
+    }
+
+    /**
+     * creates Synapse debug environment
+     * creates TCP channels using command and event ports which initializes the interface to outer debugger
+     * set the relevant information in the server configuration so that it can be used when Synapse environment
+     * initializes
+     * */
+    public void createSynapseDebugEnvironment (ServerContextInformation contextInfo) {
+        try{
+            contextInfo.setServerDebugModeEnabled(true);
+            String carbonHome = System.getProperty(ServerConstants.CARBON_HOME);
+            File synapseProperties = new File(carbonHome + File.separator + "repository" + File.separator + "conf" +
+                    File.separator + "synapse.properties");
+            Properties properties = new Properties();
+            InputStream inputStream=new FileInputStream(synapseProperties);
+            properties.load(inputStream);
+            inputStream.close();
+            int event_port=Integer.parseInt(properties.getProperty(ServiceBusConstants.ESB_DEBUG_EVENT_PORT));
+            int command_port=Integer.parseInt(properties.getProperty(ServiceBusConstants.ESB_DEBUG_COMMAND_PORT));
+            SynapseDebugInterface debugInterface=SynapseDebugInterface.getInstance();
+            debugInterface.init(command_port,event_port);
+            contextInfo.setSynapseDebugInterface(debugInterface);
+            SynapseDebugManager debugManager=SynapseDebugManager.getInstance();
+            contextInfo.setSynapseDebugManager(debugManager);
+            log.info("Synapse debug Environment created successfully");
+        }catch(IOException ex){
+            log.error("Error while creating synapse debug environment " , ex);
+        }
     }
 
     private void createDefaultRegistryStructure(Registry registry) {
