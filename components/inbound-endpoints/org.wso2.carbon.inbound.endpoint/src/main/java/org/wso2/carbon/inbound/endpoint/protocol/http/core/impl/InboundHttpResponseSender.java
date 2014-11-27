@@ -18,6 +18,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
 
 
+import org.apache.axis2.AxisFault;
 import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -51,8 +52,9 @@ public class InboundHttpResponseSender implements InboundResponseSender {
             try {
                 //send for send back the response to the source
                 passThroughHttpSender.invoke(msgContext);
-            } catch (IOException e) {
-                logger.error("IO Exception occurred when submit response in" + InboundHttpResponseSender.class.getName(), e);
+            } catch (AxisFault e) {
+               logger.error("Exception occurred when calling PassThroughHttpSender.invoke may be" +
+                                                                     "message context does not have some properties",e);
             }
         } else {
             logger.error("Response MessageContext is null may be Response read error occurred");

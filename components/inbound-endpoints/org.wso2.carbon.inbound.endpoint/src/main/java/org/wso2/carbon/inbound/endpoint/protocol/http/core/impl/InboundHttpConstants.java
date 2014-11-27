@@ -15,10 +15,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.inbound.endpoint.protocol.http.utils;
+package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
 
 
-public class InboundConstants {
+public class InboundHttpConstants {
 
     public final static String SOAP_ACTION = "SOAPAction";
 

@@ -25,13 +25,13 @@ import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.transport.passthru.SourceHandler;
 import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
-import org.wso2.carbon.inbound.endpoint.protocol.http.utils.InboundConstants;
 
 import java.net.InetSocketAddress;
 
 
 /**
- * Listener class for Http Inbound Endpoint which is trigger by inbound core
+ * Listener class for HttpInboundEndpoint which is trigger by inbound core and
+ * responsible for start ListeningEndpoint related to given port
  */
 public class InboundHttpListener implements InboundRequestProcessor {
 
@@ -46,7 +46,7 @@ public class InboundHttpListener implements InboundRequestProcessor {
     public InboundHttpListener(InboundProcessorParams params) {
 
         this.port = params.getProperties().
-                getProperty(InboundConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
+                getProperty(InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
         this.name = params.getName();
         this.injectingSequence = params.getInjectingSeq();
         this.onErrorSequence = params.getOnErrorSeq();
@@ -56,25 +56,25 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
     @Override
     public void init() {
-        try {
+
             InboundHttpConfiguration inboundHttpConfiguration =
                     new InboundHttpConfiguration(injectingSequence, onErrorSequence, synapseEnvironment);
+
             //Get registered source configuration of PassThrough Transport
             SourceConfiguration sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
             if (sourceConfiguration != null) {
                 //Create Handler for handle Http Requests
                 SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration, inboundHttpConfiguration);
-                //Start Endpoint in given port
-                PassThroughInboundEndpointHandler.startEndpoint
-                        (new InetSocketAddress(Integer.parseInt(port)), inboundSourceHandler, name);
+                try {
+                    //Start Endpoint in given port
+                    PassThroughInboundEndpointHandler.startEndpoint
+                            (new InetSocketAddress(Integer.parseInt(port)), inboundSourceHandler, name);
+                } catch (NumberFormatException e) {
+                    logger.error("Exception occurred while startEndpoint  " + name + " May be given port "+ port, e);
+                }
             } else {
-                logger.error("Source Configuration is not registered in PassThrough Transport");
+                logger.error("SourceConfiguration is not registered in PassThrough Transport");
             }
-        } catch (NumberFormatException e) {
-            logger.error("Exception occurred While initiating Listener  " + name + " May be problem in Port", e);
-        }
-
-
     }
     @Override
     public void destroy() {
