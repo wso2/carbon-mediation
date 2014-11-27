@@ -57,25 +57,30 @@ public class InboundHttpListener implements InboundRequestProcessor {
     @Override
     public void init() {
 
-            InboundHttpConfiguration inboundHttpConfiguration =
-                    new InboundHttpConfiguration(injectingSequence, onErrorSequence, synapseEnvironment);
-
-            //Get registered source configuration of PassThrough Transport
-            SourceConfiguration sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
-            if (sourceConfiguration != null) {
-                //Create Handler for handle Http Requests
-                SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration, inboundHttpConfiguration);
-                try {
-                    //Start Endpoint in given port
-                    PassThroughInboundEndpointHandler.startEndpoint
-                            (new InetSocketAddress(Integer.parseInt(port)), inboundSourceHandler, name);
-                } catch (NumberFormatException e) {
-                    logger.error("Exception occurred while startEndpoint  " + name + " May be given port "+ port, e);
-                }
-            } else {
-                logger.error("SourceConfiguration is not registered in PassThrough Transport");
+        InboundHttpConfiguration inboundHttpConfiguration =
+                new InboundHttpConfiguration(injectingSequence, onErrorSequence, synapseEnvironment);
+        //Get registered source configuration of PassThrough Transport
+        SourceConfiguration sourceConfiguration = null;
+        try {
+            sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
+        } catch (Exception e) {
+            logger.error("Cannot get PassThroughSourceConfiguration ", e);
+        }
+        if (sourceConfiguration != null) {
+            //Create Handler for handle Http Requests
+            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration, inboundHttpConfiguration);
+            try {
+                //Start Endpoint in given port
+                PassThroughInboundEndpointHandler.startEndpoint
+                        (new InetSocketAddress(Integer.parseInt(port)), inboundSourceHandler, name);
+            } catch (NumberFormatException e) {
+                logger.error("Exception occurred while startEndpoint  " + name + " May be given port " + port, e);
             }
+        } else {
+            logger.error("SourceConfiguration is not registered in PassThrough Transport");
+        }
     }
+
     @Override
     public void destroy() {
         PassThroughInboundEndpointHandler.closeEndpoint(Integer.parseInt(port));
