@@ -39,6 +39,7 @@ public class VFSProcessor implements InboundRequestProcessor, TaskStartupObserve
     private long interval;
     private String injectingSeq;
     private String onErrorSeq;
+    private boolean sequential;
     private SynapseEnvironment synapseEnvironment;
     private static final Log log = LogFactory.getLog(VFSProcessor.class);
     private StartUpController startUpController;
@@ -48,6 +49,12 @@ public class VFSProcessor implements InboundRequestProcessor, TaskStartupObserve
         this.vfsProperties = params.getProperties();
         this.interval =
                 Long.parseLong(vfsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL));
+        this.sequential = true;
+        if (vfsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL) != null) {
+            this.sequential = Boolean.parseBoolean(vfsProperties
+                    .getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL));
+        }
+
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
@@ -56,7 +63,7 @@ public class VFSProcessor implements InboundRequestProcessor, TaskStartupObserve
     public void init() {
     	log.info("Inbound file listener " + name + " starting ...");
     	fileScanner = new FilePollingConsumer(vfsProperties, name, synapseEnvironment, interval);
-    	fileScanner.registerHandler(new FileInjectHandler(injectingSeq, onErrorSeq, synapseEnvironment, vfsProperties));
+    	fileScanner.registerHandler(new FileInjectHandler(injectingSeq, onErrorSeq, sequential, synapseEnvironment, vfsProperties));
     	start();
     }
     
