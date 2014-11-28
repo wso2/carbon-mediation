@@ -41,6 +41,7 @@ public class JMSProcessor implements InboundRequestProcessor, TaskStartupObserve
     private String name;
     private Properties jmsProperties;
     private long interval;
+    private boolean sequential;
     private String injectingSeq;
     private String onErrorSeq;
     private SynapseEnvironment synapseEnvironment;
@@ -54,6 +55,11 @@ public class JMSProcessor implements InboundRequestProcessor, TaskStartupObserve
             this.interval = Long.parseLong(
                     jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL));
         }
+        this.sequential = true;
+        if (jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL) != null) {
+            this.sequential = Boolean.parseBoolean(jmsProperties
+                    .getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL));
+        }
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq  = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
@@ -64,7 +70,7 @@ public class JMSProcessor implements InboundRequestProcessor, TaskStartupObserve
         log.info("Initializing inbound JMS listener for destination " + name);
         jmsConnectionFactory = new CachedJMSConnectionFactory(this.jmsProperties);
         pollingConsumer = new JMSPollingConsumer(jmsConnectionFactory, jmsProperties, interval);
-        pollingConsumer.registerHandler(new JMSInjectHandler(injectingSeq, onErrorSeq,
+        pollingConsumer.registerHandler(new JMSInjectHandler(injectingSeq, onErrorSeq, sequential, 
                 synapseEnvironment, jmsProperties));
         start();
     }

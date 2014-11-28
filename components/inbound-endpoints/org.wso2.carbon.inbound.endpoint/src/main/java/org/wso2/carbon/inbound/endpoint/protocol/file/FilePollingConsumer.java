@@ -193,21 +193,27 @@ public class FilePollingConsumer {
                     if (fileObject.getType() == FileType.FILE && !isFailedRecord) {
                     	
                         if (!fileLock || (fileLock &&  VFSUtils.acquireLock(fsManager, fileObject))) {
+                            boolean runPostProcess = true;
                             try {
-                                processFile(fileObject);  
+                                if(processFile(fileObject) == null){
+                                    runPostProcess = false;
+                                }
                                 lastCycle = 1;
                             } catch (AxisFault e) {
                             	lastCycle = 2;
                                 log.error("Error processing File URI : " + fileObject.getName(), e);                             
                             }
 
-                            try {
-                                moveOrDeleteAfterProcessing(fileObject);
-                            } catch (AxisFault axisFault) {
-                            	lastCycle = 3;
-                                log.error("File object '" + fileObject.getURL().toString() + "' " + "cloud not be moved", axisFault);                          
-                                VFSUtils.markFailRecord(fsManager, fileObject);
+                            if(runPostProcess){
+                                try {
+                                    moveOrDeleteAfterProcessing(fileObject);
+                                } catch (AxisFault axisFault) {
+                                    lastCycle = 3;
+                                    log.error("File object '" + fileObject.getURL().toString() + "' " + "cloud not be moved", axisFault);                          
+                                    VFSUtils.markFailRecord(fsManager, fileObject);
+                                }                                
                             }
+
                             if (fileLock) {
                                 VFSUtils.releaseLock(fsManager, fileObject);
                                 if (log.isDebugEnabled()) {
@@ -283,16 +289,20 @@ public class FilePollingConsumer {
                             }
                             
                             if((!fileLock || (fileLock && acquireLock(fsManager, child)))){
-                                //process the file                            	
+                                //process the file  
+                                boolean runPostProcess = true;
                                 try {
                                     if (log.isDebugEnabled()) {
                                         log.debug("Processing file :" + child);
                                     }
                                     processCount++;
-                                    processFile(child);
-                                    successCount++;
+                                    if(processFile(child) == null){
+                                        runPostProcess = false;
+                                    }else{
+                                        successCount++;     
+                                    }
                                     // tell moveOrDeleteAfterProcessing() file was success
-                                    lastCycle = 1;
+                                    lastCycle = 1;                                    
                                 } catch (Exception e) {
                                     log.error("Error processing File URI : " + child.getName(), e);
                                     failCount++;
@@ -301,14 +311,16 @@ public class FilePollingConsumer {
                                 }
                                 //skipping un-locking file if failed to do delete/move after process
                                 boolean skipUnlock = false;
-                                try {
-                                    moveOrDeleteAfterProcessing(child);
-                                } catch (AxisFault axisFault) {
-                                    log.error("File object '" + child.getURL().toString() + "'cloud not be moved, will remain in \"locked\" state", axisFault);
-                                    skipUnlock = true;
-                                    failCount++;
-                                    lastCycle = 3;
-                                    VFSUtils.markFailRecord(fsManager, child);
+                                if(runPostProcess){                                   
+                                    try {
+                                        moveOrDeleteAfterProcessing(child);
+                                    } catch (AxisFault axisFault) {
+                                        log.error("File object '" + child.getURL().toString() + "'cloud not be moved, will remain in \"locked\" state", axisFault);
+                                        skipUnlock = true;
+                                        failCount++;
+                                        lastCycle = 3;
+                                        VFSUtils.markFailRecord(fsManager, child);
+                                    }
                                 }
                                 // if there is a failure or not we'll try to release the lock
                                 if (fileLock && !skipUnlock) {
@@ -455,15 +467,15 @@ public class FilePollingConsumer {
                                                               
             if(injectHandler != null){
             	//injectHandler
-            	injectHandler.invoke(file);
-            }else{
-            	return file;
+            	if(!injectHandler.invoke(file)){
+            	    return null;
+            	}
             }
                        
         } catch (FileSystemException e) {
             log.error("Error reading file content or attributes : " + file, e);            
         }
-        return null; 
+        return file; 
     }
     /**
      * 

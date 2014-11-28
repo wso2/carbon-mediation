@@ -51,12 +51,14 @@ public class JMSInjectHandler {
 	
 	private String injectingSeq;
 	private String onErrorSeq;
+	private boolean sequential;
     private SynapseEnvironment synapseEnvironment;
 
     
-	public JMSInjectHandler(String injectingSeq, String onErrorSeq, SynapseEnvironment synapseEnvironment, Properties jmsProperties){
+	public JMSInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential, SynapseEnvironment synapseEnvironment, Properties jmsProperties){
 		this.injectingSeq = injectingSeq;
 		this.onErrorSeq = onErrorSeq;
+		this.sequential = sequential;
 		this.synapseEnvironment = synapseEnvironment;
 	}	 
 	
@@ -117,8 +119,10 @@ public class JMSInjectHandler {
             if (seq != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("injecting message to sequence : " + injectingSeq);
+                }               
+                if(!synapseEnvironment.injectInbound(msgCtx, seq, sequential)){
+                    return false;
                 }
-                synapseEnvironment.injectAsync(msgCtx, seq);
             } else {
                 log.error("Sequence: " + injectingSeq + " not found");
             }  
