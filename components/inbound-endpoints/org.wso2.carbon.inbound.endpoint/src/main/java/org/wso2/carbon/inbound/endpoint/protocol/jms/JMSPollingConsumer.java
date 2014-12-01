@@ -111,15 +111,30 @@ public class JMSPollingConsumer implements MessageConsumer {
 	            	boolean commitOrAck = true;
 	            	commitOrAck = injectHandler.invoke(msg);
 	                // if client acknowledgement is selected, and processing requested ACK
-	                if (commitOrAck && jmsConnectionFactory.getSessionAckMode() == Session.CLIENT_ACKNOWLEDGE) {
-	                    try {
-	                    	msg.acknowledge();
-	                        if (logger.isDebugEnabled()) {
-	                        	logger.debug("Message : " + msg.getJMSMessageID() + " acknowledged");
-	                        }
-	                    } catch (JMSException e) {
-	                    	logger.error("Error acknowledging message : " + msg.getJMSMessageID(), e);
-	                    }
+	                if (jmsConnectionFactory.getSessionAckMode() == Session.CLIENT_ACKNOWLEDGE) {
+                        if (commitOrAck) {
+                            try {
+                                msg.acknowledge();
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("Message : " + msg.getJMSMessageID()
+                                            + " acknowledged");
+                                }
+                            } catch (JMSException e) {
+                                logger.error(
+                                        "Error acknowledging message : " + msg.getJMSMessageID(), e);
+                            }
+                        }else{
+                            //Need to create a new consumer and session since we need to 
+                            //rollback the message
+                            if(messageConsumer != null){
+                                jmsConnectionFactory.closeConsumer(messageConsumer);
+                            }
+                            if(session != null){
+                                jmsConnectionFactory.closeSession(session);
+                            }                            
+                            session = jmsConnectionFactory.getSession(connection);
+                            messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);  
+                        }
 	                }	 
 	                // if session was transacted, commit it or rollback
 	                if(jmsConnectionFactory.isTransactedSession()){

@@ -80,6 +80,7 @@ public class InboundManagementClient {
 	public List<String> getDefaultParameters(String strType) {
 		List<String> rtnList = new ArrayList<String>();
 		rtnList.add("interval" + InboundClientConstants.STRING_SPLITTER);                
+		rtnList.add("sequential" + InboundClientConstants.STRING_SPLITTER + "false" + InboundClientConstants.STRING_SPLITTER + "true");                
 		if (strType.equals(InboundClientConstants.TYPE_FILE)) {
 			rtnList.add("transport.vfs.FileURI" + InboundClientConstants.STRING_SPLITTER);					
 		} else if (strType.equals(InboundClientConstants.TYPE_JMS)) {
