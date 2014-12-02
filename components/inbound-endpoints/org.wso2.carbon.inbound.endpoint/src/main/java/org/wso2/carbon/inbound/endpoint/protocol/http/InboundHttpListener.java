@@ -45,13 +45,13 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
     public InboundHttpListener(InboundProcessorParams params) {
 
-        this.port = params.getProperties().
-                getProperty(InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
+        this.port = params.getProperties().getProperty(InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
         this.name = params.getName();
         this.injectingSequence = params.getInjectingSeq();
         this.onErrorSequence = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
     }
+
 
     @Override
     public void init() {
@@ -68,11 +68,11 @@ public class InboundHttpListener implements InboundRequestProcessor {
         if (sourceConfiguration != null) {
             //Create Handler for handle Http Requests
             SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration,
-                                                                                               inboundHttpConfiguration);
+                    inboundHttpConfiguration);
             try {
                 //Start Endpoint in given port
-                PassThroughInboundEndpointHandler.startEndpoint
-                        (new InetSocketAddress(Integer.parseInt(port)), inboundSourceHandler, name);
+                PassThroughInboundEndpointHandler.startEndpoint(new InetSocketAddress(Integer.parseInt(port)),
+                        inboundSourceHandler, name);
             } catch (NumberFormatException e) {
                 logger.error("Exception occurred while startEndpoint  " + name + " May be given port " + port, e);
             }

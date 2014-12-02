@@ -78,10 +78,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                 } else {
                     log.error("Sequence: " + inboundHttpConfiguration.getInjectSeq() + " not found");
                 }
-                //need special case to handle REST
-                boolean rest = isRESTRequest(messageContext, method);
 
-                if (!rest) {
+                if (!isRESTRequest(messageContext, method)) {
                     if (request.isEntityEnclosing()) {
                         processEntityEnclosingRequest(messageContext, false);
                     } else {

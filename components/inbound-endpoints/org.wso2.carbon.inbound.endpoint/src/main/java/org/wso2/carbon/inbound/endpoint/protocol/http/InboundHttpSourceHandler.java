@@ -58,7 +58,7 @@ public class InboundHttpSourceHandler extends SourceHandler {
                 return;
             }
             String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
-            //Get output Stream for write response
+            //Get output Stream for write response for HTTP GET and HEAD methods
             OutputStream os = getOutputStream(method, request);
             // Handover Request to Worker Pool
             sourceConfiguration.getWorkerPool().execute

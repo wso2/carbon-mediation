@@ -27,6 +27,9 @@ import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 
+/**
+ * Class responsible for provide  implementation of the request processor according to the port.
+ */
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
     public static enum Protocols {jms, file, http}
@@ -38,8 +41,7 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
      * @return InboundRequestProcessor Implementation
      */
     @Override
-    public InboundRequestProcessor createInboundProcessor(
-            InboundProcessorParams params) {
+    public InboundRequestProcessor createInboundProcessor(InboundProcessorParams params) {
         String protocol = params.getProtocol();
         InboundRequestProcessor inboundRequestProcessor = null;
         if (protocol != null) {

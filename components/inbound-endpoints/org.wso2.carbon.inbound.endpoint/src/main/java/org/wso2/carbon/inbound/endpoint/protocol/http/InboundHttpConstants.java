@@ -20,8 +20,14 @@ package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 public class InboundHttpConstants {
 
+    /**
+     * String representing SOAPAction which is used to set WSAction in synapse message properties.
+     */
     public final static String SOAP_ACTION = "SOAPAction";
 
+    /**
+     *String representing port of the InboundEndpoint
+     */
     public static final String INBOUND_ENDPOINT_PARAMETER_HTTP_PORT = "inbound.http.port";
 
 }
