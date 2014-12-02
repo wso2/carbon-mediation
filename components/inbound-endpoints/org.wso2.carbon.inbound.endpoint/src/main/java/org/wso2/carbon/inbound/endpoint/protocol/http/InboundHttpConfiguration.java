@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
+package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 
 import org.apache.synapse.core.SynapseEnvironment;

@@ -16,17 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
+package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 import org.apache.http.HttpException;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.log4j.Logger;
-import org.apache.synapse.transport.passthru.*;
+import org.apache.synapse.transport.passthru.ProtocolState;
+import org.apache.synapse.transport.passthru.SourceContext;
+import org.apache.synapse.transport.passthru.SourceHandler;
+import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * Handler Class for process HTTP Requests
+ */
 public class InboundHttpSourceHandler extends SourceHandler {
 
     private static final Logger log = Logger.getLogger(InboundHttpSourceHandler.class);
@@ -35,8 +41,8 @@ public class InboundHttpSourceHandler extends SourceHandler {
 
     private final InboundHttpConfiguration inboundHttpConfiguration;
 
-    public InboundHttpSourceHandler
-            (SourceConfiguration sourceConfiguration, InboundHttpConfiguration inboundHttpConfiguration) {
+    public InboundHttpSourceHandler(SourceConfiguration sourceConfiguration,
+                                                                    InboundHttpConfiguration inboundHttpConfiguration) {
         super(sourceConfiguration);
         this.sourceConfiguration = sourceConfiguration;
         this.inboundHttpConfiguration = inboundHttpConfiguration;
@@ -48,7 +54,7 @@ public class InboundHttpSourceHandler extends SourceHandler {
             //Create Source Request related to HTTP Request
             SourceRequest request = getSourceRequest(conn);
             if (request == null) {
-                log.warn("No SourceRequest created for HTTP Request");
+                log.warn("Cannot find SourceRequest created for HTTP Request");
                 return;
             }
             String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase() : "";

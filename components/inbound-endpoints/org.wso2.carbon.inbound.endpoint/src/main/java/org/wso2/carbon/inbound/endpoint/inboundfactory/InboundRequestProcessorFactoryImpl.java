@@ -18,27 +18,24 @@
 package org.wso2.carbon.inbound.endpoint.inboundfactory;
 
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
-import org.wso2.carbon.inbound.endpoint.protocol.http.core.impl.InboundHttpListener;
+import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
-    private static final Log log = LogFactory.getLog(InboundRequestProcessorFactoryImpl.class);
 
     public static enum Protocols {jms, file, http}
 
     /**
      * return underlying Request Processor Implementation according to protocol
      *
-     * @param params <>parameters specific to transports</>
-     * @return <>InboundRequestProcessor</>
+     * @param params parameters specific to transports
+     * @return InboundRequestProcessor Implementation
      */
     @Override
     public InboundRequestProcessor createInboundProcessor(

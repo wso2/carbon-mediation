@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
+package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 
 import org.apache.axis2.AxisFault;
@@ -26,7 +26,6 @@ import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.passthru.PassThroughHttpSender;
 import org.apache.synapse.transport.passthru.api.PassThroughOutboundEndpointHandler;
 
-import java.io.IOException;
 
 /**
  * Get mediated message context from Source Response Worker and created InboundHttpSourceResponse
@@ -49,7 +48,6 @@ public class InboundHttpResponseSender implements InboundResponseSender {
 
     @Override
     public void sendBack(MessageContext messageContext) {
-
         if (messageContext != null) {
             org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) messageContext).
                     getAxis2MessageContext();

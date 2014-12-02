@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
+package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 import org.apache.log4j.Logger;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -51,7 +51,6 @@ public class InboundHttpListener implements InboundRequestProcessor {
         this.injectingSequence = params.getInjectingSeq();
         this.onErrorSequence = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
-
     }
 
     @Override
@@ -68,7 +67,8 @@ public class InboundHttpListener implements InboundRequestProcessor {
         }
         if (sourceConfiguration != null) {
             //Create Handler for handle Http Requests
-            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration, inboundHttpConfiguration);
+            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration,
+                                                                                               inboundHttpConfiguration);
             try {
                 //Start Endpoint in given port
                 PassThroughInboundEndpointHandler.startEndpoint

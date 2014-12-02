@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.inbound.endpoint.protocol.http.core.impl;
+package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 
 import org.apache.axis2.context.MessageContext;
@@ -32,8 +32,8 @@ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import java.io.OutputStream;
 
 /**
- * create SynapseMessageContext from HTTP Request and inject it to the sequence in a synchronous manner
- * This is the worker for Http inbound related requests.
+ * Create SynapseMessageContext from HTTP Request and inject it to the sequence in a synchronous manner
+ * This is the worker for HTTP inbound related requests.
  */
 public class InboundHttpServerWorker extends ServerWorker {
 
@@ -44,8 +44,8 @@ public class InboundHttpServerWorker extends ServerWorker {
     private InboundHttpConfiguration inboundHttpConfiguration;
 
 
-    public InboundHttpServerWorker(SourceRequest sourceRequest,SourceConfiguration sourceConfiguration,
-                                        InboundHttpConfiguration inboundHttpConfiguration, OutputStream outputStream) {
+    public InboundHttpServerWorker(SourceRequest sourceRequest, SourceConfiguration sourceConfiguration,
+                                   InboundHttpConfiguration inboundHttpConfiguration, OutputStream outputStream) {
         super(sourceRequest, sourceConfiguration, outputStream);
         this.inboundHttpConfiguration = inboundHttpConfiguration;
         this.request = sourceRequest;
@@ -61,11 +61,13 @@ public class InboundHttpServerWorker extends ServerWorker {
                 // setting Inbound related properties
                 setInboundProperties(msgCtx);
 
-                String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().toUpperCase() : "";
+                String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().
+                        toUpperCase() : "";
                 processHttpRequestUri(messageContext, method);
 
                 // Get injecting sequence for synapse engine
-                SequenceMediator injectingSequence = (SequenceMediator) inboundHttpConfiguration.getSynapseEnvironment().getSynapseConfiguration().
+                SequenceMediator injectingSequence = (SequenceMediator) inboundHttpConfiguration.
+                        getSynapseEnvironment().getSynapseConfiguration().
                         getSequence(inboundHttpConfiguration.getInjectSeq());
 
                 if (injectingSequence != null) {
