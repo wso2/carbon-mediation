@@ -228,8 +228,6 @@
                 <version>${carbon.kernel.version}</version>
             </dependency>
 
-
-
             <!--Synapse Versions Start-->
             <dependency>
                 <groupId>org.apache.synapse</groupId>
