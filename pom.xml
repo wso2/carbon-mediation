@@ -240,12 +240,12 @@
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>4.3.0.wso2v1</version>
+                <version>4.3.3.wso2v1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
                 <artifactId>httpcore-nio</artifactId>
-                <version>4.2.3.wso2v3</version>
+                <version>4.3.3.wso2v1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
@@ -1795,8 +1795,8 @@
         <jaxb.xjc.version>2.1.13</jaxb.xjc.version>
         <jaxb.impl.version>2.1.13</jaxb.impl.version>
         <javax.ws.rs.version>2.0-m10</javax.ws.rs.version>
-        <httpcore.nio.version>4.2.4</httpcore.nio.version>
-        <httpcore.version>4.2.4</httpcore.version>
+        <httpcore.nio.version>4.3.3</httpcore.nio.version>
+        <httpcore.version>4.3.3</httpcore.version>
         <httpclient.version>4.2.5</httpclient.version>
         <httpasyncclient.version>4.0-beta3</httpasyncclient.version>
         <ehcache.core.version>2.5.1</ehcache.core.version>
