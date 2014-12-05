@@ -17,32 +17,27 @@
 */
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.InboundProcessorParams;
-import org.apache.synapse.inbound.InboundRequestProcessor;
-import org.apache.synapse.startup.quartz.StartUpController;
-import org.apache.synapse.task.Task;
-import org.apache.synapse.task.TaskDescription;
-import org.apache.synapse.task.TaskStartupObserver;
-import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
-
-
 import java.util.Properties;
 
-public class VFSProcessor implements InboundRequestProcessor, TaskStartupObserver {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.task.Task;
+import org.apache.synapse.task.TaskStartupObserver;
+import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
+import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
-	private FilePollingConsumer fileScanner;
-    private String name;
-    private Properties vfsProperties;
-    private long interval;
+public class VFSProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
+
+    private static final String ENDPOINT_POSTFIX = "FILE-EP";
+    
+	private FilePollingConsumer fileScanner;    
+    private Properties vfsProperties;    
     private String injectingSeq;
     private String onErrorSeq;
     private boolean sequential;
-    private SynapseEnvironment synapseEnvironment;
+    
     private static final Log log = LogFactory.getLog(VFSProcessor.class);
-    private StartUpController startUpController;
 
     public VFSProcessor(InboundProcessorParams params) {
         this.name = params.getName();
@@ -54,7 +49,11 @@ public class VFSProcessor implements InboundRequestProcessor, TaskStartupObserve
             this.sequential = Boolean.parseBoolean(vfsProperties
                     .getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL));
         }
-
+        this.coordination = true;
+        if (vfsProperties.getProperty(PollingConstants.INBOUND_COORDINATION) != null) {
+            this.coordination = Boolean.parseBoolean(vfsProperties
+                    .getProperty(PollingConstants.INBOUND_COORDINATION));
+        }
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
@@ -66,32 +65,14 @@ public class VFSProcessor implements InboundRequestProcessor, TaskStartupObserve
     	fileScanner.registerHandler(new FileInjectHandler(injectingSeq, onErrorSeq, sequential, synapseEnvironment, vfsProperties));
     	start();
     }
-    
-    public void destroy() {
-        log.info("Inbound file listener " + name + " stoped.");
-        startUpController.destroy();
-    }
       
     /**
      * Register/start the schedule service
      * */
-    public void start() {        	
-        try {
-        	Task task = new FileTask(fileScanner);
-        	TaskDescription taskDescription = new TaskDescription();
-        	taskDescription.setName(name + "-FILE-EP");
-        	taskDescription.setTaskGroup("FILE-EP");
-        	taskDescription.setInterval(interval);
-        	taskDescription.setIntervalInMs(true);
-        	taskDescription.addResource(TaskDescription.INSTANCE, task);
-        	taskDescription.addResource(TaskDescription.CLASSNAME, task.getClass().getName());
-        	startUpController = new StartUpController();
-        	startUpController.setTaskDescription(taskDescription);
-        	startUpController.init(synapseEnvironment);
-
-        } catch (Exception e) {
-            log.error("Could not start File Processor. Error starting up scheduler. Error: " + e.getLocalizedMessage());
-        }
+    public void start() {       
+        log.info("Inbound FILE listener Started : " + name);
+        Task task = new FileTask(fileScanner);
+        start(task, ENDPOINT_POSTFIX);
     }
 
     public String getName() {
