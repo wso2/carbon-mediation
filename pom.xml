@@ -150,6 +150,84 @@
     </build>
     <dependencyManagement>
         <dependencies>
+
+            <!-- Carbon Kernel Dependencies-->
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.tomcat.ext</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.user.api</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.logging</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.utils</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.securevault</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.registry.core</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.deployer</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.core</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.ui</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.server</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.user.core</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.server.admin</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.ndatasource.common</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.authenticator.stub</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.core.server</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+
             <!--Synapse Versions Start-->
             <dependency>
                 <groupId>org.apache.synapse</groupId>
@@ -192,6 +270,7 @@
                 <version>${synapse.version}</version>
             </dependency>
             <!--Synapse Versions End-->
+
             <!--axis2 Version Start-->
             <dependency>
                 <groupId>org.apache.axis2.wso2</groupId>
@@ -209,6 +288,7 @@
                 <version>${axis2.json.version}</version>
             </dependency>
             <!--axis2 Version End -->
+
             <!--Neethi Start here-->
             <dependency>
                 <groupId>org.apache.neethi.wso2</groupId>
@@ -216,6 +296,7 @@
                 <version>${neethi.osgi.version}</version>
             </dependency>
             <!--Neethi End here-->
+
             <!--Apache Start here-->
             <dependency>
                 <groupId>wsdl4j.wso2</groupId>
@@ -253,40 +334,11 @@
                 <version>4.2.5.wso2v1</version>
             </dependency>
             <!-- Apache End here-->
+
             <!--Carbon common-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.logging</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.mediation.security</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.user.api</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.core</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.server</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.ui</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.utils</artifactId>
                 <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
@@ -311,11 +363,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.user.core</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.event.ws</artifactId>
                 <version>${wso2carbon.version}</version>
             </dependency>
@@ -324,17 +371,8 @@
                 <artifactId>org.wso2.carbon.relay</artifactId>
                 <version>${wso2carbon.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.securevault</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
+
             <!-- Carbon Old version Starts Here -->
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.ndatasource.common</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.registry.extensions</artifactId>
@@ -350,11 +388,7 @@
                 <artifactId>org.wso2.carbon.caching.core</artifactId>
                 <version>${wso2carbon.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.application.deployer</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.datasource</artifactId>
@@ -397,6 +431,7 @@
                 <type>zip</type>
             </dependency>
             <!-- Carbon Old version Ends Here -->
+
             <!--Service Stub Starts here -->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -509,6 +544,7 @@
                 <version>${wso2carbon.version}</version>
             </dependency>
             <!--Service Stub Ends here-->
+
             <!--Mediation Dependencies Start here-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -655,11 +691,7 @@
                 <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
                 <version>${wso2carbon.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.registry.core</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.mediator.service</artifactId>
@@ -782,11 +814,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.authenticator.stub</artifactId>
-                <version>${wso2carbon.old.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
                 <version>${wso2carbon.old.version}</version>
             </dependency>
@@ -795,9 +822,8 @@
                 <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
                 <version>${wso2carbon.version}</version>
             </dependency>
-
-
             <!--Mediation Dependencies Ends here-->
+
             <!--Feature dependencies Start here-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
@@ -1165,6 +1191,7 @@
                 <version>${wso2carbon.version}</version>
             </dependency>
             <!--Feature dependencies End here -->
+
             <!--Misc-->
             <dependency>
                 <groupId>ca.uhn.hapi.wso2</groupId>
@@ -1236,11 +1263,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.tomcat.ext</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
@@ -1273,11 +1296,7 @@
                 <version>${orbit.version.woden}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.server.admin</artifactId>
-                <version>${wso2carbon.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.json.wso2</groupId>
                 <artifactId>json</artifactId>
@@ -1657,8 +1676,13 @@
         </dependencies>
     </dependencyManagement>
     <properties>
+
+        <!-- Carbon kernel version -->
+        <carbon.kernel.version>4.3.0-SNAPSHOT</carbon.kernel.version>
+        <carbon.kernel.package.import.version.range>[4.3.0.SNAPSHOT, 4.4.0)</carbon.kernel.package.import.version.range>
+        <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
+
         <!-- Carbon platform version Start here-->
-        <carbon.platform.version>4.3.0-SNAPSHOT</carbon.platform.version>
         <carbon.platform.package.export.version>4.3.0-SNAPSHOT</carbon.platform.package.export.version>
         <carbon.platform.package.import.version.range>4.3.0.SNAPSHOT</carbon.platform.package.import.version.range>
         <wso2carbon.old.version>4.2.0</wso2carbon.old.version>

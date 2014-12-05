@@ -115,6 +115,4 @@
             <artifactId>org.wso2.carbon.registry.common</artifactId>
          </dependency>
     </dependencies>
-    <properties>
-    </properties>
 </project>
