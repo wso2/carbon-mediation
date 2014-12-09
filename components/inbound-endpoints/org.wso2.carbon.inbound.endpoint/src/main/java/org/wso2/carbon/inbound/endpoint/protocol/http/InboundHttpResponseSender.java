@@ -32,7 +32,7 @@ import org.apache.synapse.transport.passthru.api.PassThroughOutboundEndpointHand
  * extract the pipe and set to the reader
  */
 public class InboundHttpResponseSender implements InboundResponseSender {
-    private Logger logger = Logger.getLogger(InboundHttpResponseSender.class);
+    private Logger log = Logger.getLogger(InboundHttpResponseSender.class);
 
     private PassThroughHttpSender passThroughHttpSender;
 
@@ -41,7 +41,7 @@ public class InboundHttpResponseSender implements InboundResponseSender {
         try {
             passThroughHttpSender = PassThroughOutboundEndpointHandler.getPassThroughHttpSender();
         } catch (Exception e) {
-            logger.error("Cannot successfully create InboundHttpResponseSender", e);
+            log.error("Cannot successfully create InboundHttpResponseSender", e);
         }
     }
 
@@ -55,11 +55,11 @@ public class InboundHttpResponseSender implements InboundResponseSender {
                 //send for send back the response to the source
                 passThroughHttpSender.invoke(msgContext);
             } catch (AxisFault e) {
-                logger.error("Exception occurred when calling PassThroughHttpSender.invoke may be" +
+                log.error("Exception occurred when calling PassThroughHttpSender.invoke may be" +
                         "message context does not have some properties", e);
             }
         } else {
-            logger.error("Response MessageContext is null may be Response read error occurred");
+            log.error("Response MessageContext is null may be Response read error occurred");
         }
     }
 }

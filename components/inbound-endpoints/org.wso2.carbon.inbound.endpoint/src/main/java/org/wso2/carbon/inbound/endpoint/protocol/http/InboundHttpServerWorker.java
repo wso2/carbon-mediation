@@ -52,7 +52,6 @@ public class InboundHttpServerWorker extends ServerWorker {
     }
 
     public void run() {
-        if (request != null) {
             try {
                 //create Synapse Message Context
                 org.apache.synapse.MessageContext msgCtx = createSynapseMessageContext(request);
@@ -63,6 +62,7 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().
                         toUpperCase() : "";
+
                 processHttpRequestUri(messageContext, method);
 
                 // Get injecting sequence for synapse engine
@@ -72,9 +72,6 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 if (injectingSequence != null) {
                     injectingSequence.setErrorHandler(inboundHttpConfiguration.getFaultSeq());
-                    if (log.isDebugEnabled()) {
-                        log.debug("injecting message to sequence : " + inboundHttpConfiguration.getInjectSeq());
-                    }
                 } else {
                     log.error("Sequence: " + inboundHttpConfiguration.getInjectSeq() + " not found");
                 }
@@ -86,6 +83,11 @@ public class InboundHttpServerWorker extends ServerWorker {
                         processNonEntityEnclosingRESTHandler(null, messageContext, false);
                     }
                 }
+
+                if (log.isDebugEnabled()) {
+                    log.debug("injecting message to sequence : " + inboundHttpConfiguration.getInjectSeq());
+                }
+
                 // handover synapse message context to synapse environment for inject it to given sequence in
                 //synchronous manner
                 inboundHttpConfiguration.getSynapseEnvironment().injectMessage(msgCtx, injectingSequence);
@@ -95,9 +97,6 @@ public class InboundHttpServerWorker extends ServerWorker {
             } catch (Exception e) {
                 log.error("Exception occurred when running " + InboundHttpServerWorker.class.getName(), e);
             }
-        } else {
-            log.error("InboundSourceRequest cannot be null");
-        }
     }
 
 

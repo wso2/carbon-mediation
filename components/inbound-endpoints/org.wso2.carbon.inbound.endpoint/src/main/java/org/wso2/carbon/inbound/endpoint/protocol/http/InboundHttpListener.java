@@ -19,6 +19,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 import org.apache.log4j.Logger;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
@@ -35,56 +36,66 @@ import java.net.InetSocketAddress;
  */
 public class InboundHttpListener implements InboundRequestProcessor {
 
-    private static final Logger logger = Logger.getLogger(InboundHttpListener.class);
+    private static final Logger log = Logger.getLogger(InboundHttpListener.class);
 
+    /**
+     * Sequence that messages are injecting
+     */
     private String injectingSequence;
+
+    /**
+     * Sequence which should trigger as fault handler
+     */
     private String onErrorSequence;
+
     private SynapseEnvironment synapseEnvironment;
     private String name;
-    private String port;
+    private int port;
+
 
     public InboundHttpListener(InboundProcessorParams params) {
-
-        this.port = params.getProperties().getProperty(InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
-        this.name = params.getName();
-        this.injectingSequence = params.getInjectingSeq();
-        this.onErrorSequence = params.getOnErrorSeq();
-        this.synapseEnvironment = params.getSynapseEnvironment();
+        try {
+            port = Integer.parseInt(params.getProperties().getProperty
+                    (InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT));
+        } catch (NumberFormatException e) {
+            handleException("Please provide correct port number for given port  " + port, e);
+        }
+        name = params.getName();
+        injectingSequence = params.getInjectingSeq();
+        onErrorSequence = params.getOnErrorSeq();
+        synapseEnvironment = params.getSynapseEnvironment();
     }
 
 
     @Override
     public void init() {
 
-        InboundHttpConfiguration inboundHttpConfiguration =
-                new InboundHttpConfiguration(injectingSequence, onErrorSequence, synapseEnvironment);
-        //Get registered source configuration of PassThrough Transport
-        SourceConfiguration sourceConfiguration = null;
         try {
-            sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
-        } catch (Exception e) {
-            logger.error("Cannot get PassThroughSourceConfiguration ", e);
-        }
-        if (sourceConfiguration != null) {
+            //Create wrapping object for Inbound Configuration
+            InboundHttpConfiguration inboundHttpConfiguration =
+                    new InboundHttpConfiguration(injectingSequence, onErrorSequence, synapseEnvironment);
+
+            //Get registered source configuration of PassThrough Transport
+            SourceConfiguration sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
+
             //Create Handler for handle Http Requests
-            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration,
-                    inboundHttpConfiguration);
-            try {
-                //Start Endpoint in given port
-                PassThroughInboundEndpointHandler.startEndpoint(new InetSocketAddress(Integer.parseInt(port)),
-                        inboundSourceHandler, name);
-            } catch (NumberFormatException e) {
-                logger.error("Exception occurred while startEndpoint  " + name + " May be given port " + port, e);
-            }
-        } else {
-            logger.error("SourceConfiguration is not registered in PassThrough Transport");
+            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration, inboundHttpConfiguration);
+
+            //Start Endpoint in given port
+            PassThroughInboundEndpointHandler.startEndpoint(new InetSocketAddress(port), inboundSourceHandler, name);
+
+        } catch (Exception e) {
+            handleException("Cannot init Inbound Endpoint " + name, e);
         }
     }
 
     @Override
     public void destroy() {
-        PassThroughInboundEndpointHandler.closeEndpoint(Integer.parseInt(port));
+        PassThroughInboundEndpointHandler.closeEndpoint(port);
     }
 
-
+    private void handleException(String msg, Exception e) {
+        log.error(msg, e);
+        throw new SynapseException(msg, e);
+    }
 }
