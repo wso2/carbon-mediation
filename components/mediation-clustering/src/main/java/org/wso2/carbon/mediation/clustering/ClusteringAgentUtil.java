@@ -22,12 +22,13 @@ public final class ClusteringAgentUtil {
         }
     }
     
-    public static ClusteringAgent getClusteringAgent(){
-        if(ClusteringService.getConfigurationContextService() != null){
-            return ClusteringService.getConfigurationContextService().getServerConfigContext().getAxisConfiguration().getClusteringAgent();
+    public static ClusteringAgent getClusteringAgent() {
+        if (ClusteringService.getConfigurationContextService() != null) {
+            return ClusteringService.getConfigurationContextService().getServerConfigContext()
+                    .getAxisConfiguration().getClusteringAgent();
         }
         return null;
-    } 
+    }
     
 
     

@@ -67,14 +67,9 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            !javax.servlet,
-                            !javax.servlet.http,
-                            org.wso2.carbon.mediation.clustering.*,
+                            org.wso2.carbon.mediation.clustering.*
                         </Export-Package>
-                        <Import-Package>
-                            !org.wso2.carbon.mediation.clustering.*,
-                            *;resolution:=optional
-                        </Import-Package>
+                        <Import-Package> </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
