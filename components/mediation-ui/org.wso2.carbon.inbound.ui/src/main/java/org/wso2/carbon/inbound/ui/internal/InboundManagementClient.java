@@ -1,7 +1,10 @@
 package org.wso2.carbon.inbound.ui.internal;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpSession;
@@ -25,6 +28,8 @@ public class InboundManagementClient {
 
 	private InboundAdminStub stub;
 
+	private Properties prop = null;
+	
 	private InboundManagementClient(String cookie, String backendServerURL,
 			ConfigurationContext configCtx) throws AxisFault {
 
@@ -35,10 +40,24 @@ public class InboundManagementClient {
 		option.setManageSession(true);
 		option.setProperty(
 				org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING,
-				cookie);
-
+				cookie);		
 	}
 
+	private void loadProperties(){
+        if (prop == null) {
+            prop = new Properties();
+            InputStream is = getClass().getClassLoader().getResourceAsStream(
+                    "/config/inbound.properties");
+            if (is != null) {
+                try {
+                    prop.load(is);
+                } catch (IOException e) {
+                    log.error("Unable to load properties.", e);
+                }
+            }
+        }
+	}
+	
 	public static InboundManagementClient getInstance(ServletConfig config,
 			HttpSession session) throws AxisFault {
 
@@ -79,46 +98,19 @@ public class InboundManagementClient {
 
 	public List<String> getDefaultParameters(String strType) {
 		List<String> rtnList = new ArrayList<String>();
-		rtnList.add("interval" + InboundClientConstants.STRING_SPLITTER);                
-		rtnList.add("sequential" + InboundClientConstants.STRING_SPLITTER + "false" + InboundClientConstants.STRING_SPLITTER + "true");                
-		if (strType.equals(InboundClientConstants.TYPE_FILE)) {
-			rtnList.add("transport.vfs.FileURI" + InboundClientConstants.STRING_SPLITTER);					
-		} else if (strType.equals(InboundClientConstants.TYPE_JMS)) {
-			rtnList.add("java.naming.factory.initial" + InboundClientConstants.STRING_SPLITTER);
-			rtnList.add("java.naming.provider.url" + InboundClientConstants.STRING_SPLITTER);
-			rtnList.add("transport.jms.ConnectionFactoryJNDIName" + InboundClientConstants.STRING_SPLITTER);
-			rtnList.add("transport.jms.ConnectionFactoryType" + InboundClientConstants.STRING_SPLITTER + "topic"  + InboundClientConstants.STRING_SPLITTER + "queue");			
-			rtnList.add("transport.jms.Destination");
-			rtnList.add("transport.jms.SessionTransacted" + InboundClientConstants.STRING_SPLITTER + "false" + InboundClientConstants.STRING_SPLITTER + "true");
-			rtnList.add("transport.jms.SessionAcknowledgement"+ InboundClientConstants.STRING_SPLITTER + "AUTO_ACKNOWLEDGE" + InboundClientConstants.STRING_SPLITTER + "CLIENT_ACKNOWLEDGE" + InboundClientConstants.STRING_SPLITTER + "DUPS_OK_ACKNOWLEDGE" + InboundClientConstants.STRING_SPLITTER + "SESSION_TRANSACTED");
-			rtnList.add("transport.jms.CacheLevel" + InboundClientConstants.STRING_SPLITTER + "1" + InboundClientConstants.STRING_SPLITTER + "2" + InboundClientConstants.STRING_SPLITTER + "3" + InboundClientConstants.STRING_SPLITTER + "4" + InboundClientConstants.STRING_SPLITTER + "5");
+		if(!strType.equals(InboundClientConstants.TYPE_HTTP)){
+		    rtnList.addAll(getList("common",true));
+		}
+		if(!strType.equals(InboundClientConstants.TYPE_CLASS)){
+		    rtnList.addAll(getList(strType,true));
 		}
 		return rtnList;
 	}
 	public List<String> getAdvParameters(String strType) {
 		List<String> rtnList = new ArrayList<String>();
-		if (strType.equals(InboundClientConstants.TYPE_FILE)) {
-			rtnList.add("transport.vfs.ContentType");
-			rtnList.add("transport.vfs.FileNamePattern" + InboundClientConstants.STRING_SPLITTER);
-			rtnList.add("transport.vfs.FileProcessInterval");
-			rtnList.add("transport.vfs.FileProcessCount");
-			rtnList.add("transport.vfs.Locking" + InboundClientConstants.STRING_SPLITTER + "enable" + InboundClientConstants.STRING_SPLITTER + "disable");
-			rtnList.add("transport.vfs.MaxRetryCount");
-			rtnList.add("transport.vfs.ReconnectTimeout");
-			rtnList.add("transport.vfs.ActionAfterProcess" + InboundClientConstants.STRING_SPLITTER + "NONE" + InboundClientConstants.STRING_SPLITTER + "MOVE");
-			rtnList.add("transport.vfs.MoveAfterProcess");
-		    rtnList.add("transport.vfs.ActionAfterErrors" + InboundClientConstants.STRING_SPLITTER + "NONE" + InboundClientConstants.STRING_SPLITTER + "MOVE");
-		    rtnList.add("transport.vfs.MoveAfterErrors");
-			rtnList.add("transport.vfs.ActionAfterFailure" + InboundClientConstants.STRING_SPLITTER + "NONE" + InboundClientConstants.STRING_SPLITTER + "MOVE");
-			rtnList.add("transport.vfs.MoveAfterFailure");
-		} else if (strType.equals(InboundClientConstants.TYPE_JMS)) {
-			rtnList.add("transport.jms.UserName");
-			rtnList.add("transport.jms.Password");
-			rtnList.add("transport.jms.JMSSpecVersion");
-			rtnList.add("transport.jms.SubscriptionDurable");
-			rtnList.add("transport.jms.DurableSubscriberClientID");
-			rtnList.add("transport.jms.MessageSelector");
-		}
+        if(!strType.equals(InboundClientConstants.TYPE_CLASS)){
+            rtnList.addAll(getList(strType,false));
+        }		
 		return rtnList;
 	}		
 
@@ -141,6 +133,38 @@ public class InboundManagementClient {
 		return false;
 	}
 
+	private List<String> getList(String strProtocol, boolean mandatory){
+	    List<String> rtnList = new ArrayList<String>();
+	    loadProperties();
+	    if(prop != null){
+	        String strKey = strProtocol;
+	        if(mandatory){
+	            strKey += ".mandatory";
+	        }else{
+	            strKey += ".optional";
+	        }
+	        String strLength = prop.getProperty(strKey);
+	        Integer iLength = null;
+	        if(strLength != null){
+	            try{
+	                iLength = Integer.parseInt(strLength);
+	            }catch(Exception e){
+	                iLength = null;
+	            }
+	        }
+	        if(iLength != null){
+	            for(int i = 1;i <= iLength;i++){
+	                String tmpString = strKey + "." + i;
+	                String strVal = prop.getProperty(tmpString);
+	                if(strVal != null){
+	                    rtnList.add(strVal);
+	                }
+	            }
+	        }
+	    }
+	    return rtnList;
+	}
+	
 	public boolean removeInboundEndpoint(String name) {
 		try {
 			stub.removeInboundEndpoint(name);
