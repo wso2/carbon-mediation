@@ -30,8 +30,10 @@ import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.apache.synapse.commons.vfs.VFSConstants;
+import org.apache.synapse.commons.vfs.VFSParamDTO;
 import org.apache.synapse.commons.vfs.VFSUtils;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.wso2.carbon.mediation.clustering.ClusteringServiceUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -192,7 +194,7 @@ public class FilePollingConsumer {
 
                     if (fileObject.getType() == FileType.FILE && !isFailedRecord) {
                     	
-                        if (!fileLock || (fileLock &&  VFSUtils.acquireLock(fsManager, fileObject))) {
+                        if (!fileLock || (fileLock &&  acquireLock(fsManager, fileObject))) {
                             boolean runPostProcess = true;
                             try {
                                 if(processFile(fileObject) == null){
@@ -439,8 +441,51 @@ public class FilePollingConsumer {
             }
 
         }
-        return VFSUtils.acquireLock(fsManager, fileObject, true, autoLockRelease,
-                autoLockReleaseSameNode, autoLockReleaseInterval);
+        
+        boolean distributedLock = false;
+        Long distributedLockTimeout = null;
+        String strDistributedLock = vfsProperties.getProperty(VFSConstants.TRANSPORT_DISTRIBUTED_LOCK);
+        String strContext = fileObject.getName().getURI();
+        if(strDistributedLock != null){
+            try {
+                distributedLock = Boolean.parseBoolean(strDistributedLock);
+            } catch (Exception e) {
+                autoLockRelease = false;
+                log.warn("VFS Distributed lock not set properly. Current value is : " + strDistributedLock, e);
+            }            
+            
+            if(distributedLock){                                  
+                String strDistributedLockTimeout = vfsProperties.getProperty(VFSConstants.TRANSPORT_DISTRIBUTED_LOCK_TIMEOUT);
+                if (strDistributedLockTimeout != null) {
+                    try {
+                        distributedLockTimeout = Long.parseLong(strDistributedLockTimeout);
+                    } catch (Exception e) {
+                        distributedLockTimeout = null;
+                        log.warn(
+                                "VFS Distributed lock timeout property not set properly. Current value is : "
+                                        + strDistributedLockTimeout, e);
+                    }
+                }    
+                if(distributedLockTimeout != null){
+                    if(!ClusteringServiceUtil.setLock(strContext, distributedLockTimeout)){
+                        return false;
+                    }
+                }else if(!ClusteringServiceUtil.setLock(strContext)){
+                    return false;
+                }
+            }
+            
+        }
+        
+        VFSParamDTO vfsParamDTO = new VFSParamDTO();
+        vfsParamDTO.setAutoLockRelease(autoLockRelease);
+        vfsParamDTO.setAutoLockReleaseSameNode(autoLockReleaseSameNode);
+        vfsParamDTO.setAutoLockReleaseInterval(autoLockReleaseInterval);            
+        boolean rtnValue = VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO);
+        if(distributedLock){
+            ClusteringServiceUtil.releaseLock(strContext);
+        }               
+        return rtnValue;
     }
     
     /**

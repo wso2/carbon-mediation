@@ -48,6 +48,7 @@
                 <module>components/mediation-ui</module>
                 <module>components/mediation-ntask</module>
                 <module>components/inbound-endpoints</module>
+                <module>components/mediation-clustering</module>
                 <module>features/scheduled-tasks</module>
                 <module>features/business-adaptors</module>
                 <module>features/mediation-config-admin-features</module>
@@ -59,6 +60,7 @@
                 <module>features/synapse-features</module>
                 <module>features/mediation-ntask-features</module>
                 <module>features/inbound-endpoints</module>
+                <module>features/mediation-clustering</module>
             </modules>
         </profile>
     </profiles>

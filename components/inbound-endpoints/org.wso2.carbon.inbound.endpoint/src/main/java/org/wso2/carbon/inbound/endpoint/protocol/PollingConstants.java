@@ -24,5 +24,7 @@ public class PollingConstants {
    public static final String INBOUND_ENDPOINT_INTERVAL ="interval";
    
    public static final String INBOUND_ENDPOINT_SEQUENTIAL ="sequential";
+   
+   public static final String INBOUND_COORDINATION ="coordination";
 
 }
