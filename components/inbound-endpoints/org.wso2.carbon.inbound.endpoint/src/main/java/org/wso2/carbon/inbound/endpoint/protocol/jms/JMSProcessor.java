@@ -27,25 +27,25 @@ import org.apache.synapse.startup.quartz.StartUpController;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskStartupObserver;
+import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.file.FileTask;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 
 import java.util.Properties;
 
-public class JMSProcessor implements InboundRequestProcessor, TaskStartupObserver {
+public class JMSProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
+    
     private static final Log log = LogFactory.getLog(JMSProcessor.class.getName());
 
-
+    private static final String ENDPOINT_POSTFIX = "JMS-EP";
+    
     private CachedJMSConnectionFactory jmsConnectionFactory;
     private JMSPollingConsumer pollingConsumer;
-    private String name;
     private Properties jmsProperties;
-    private long interval;
     private boolean sequential;
     private String injectingSeq;
     private String onErrorSeq;
-    private SynapseEnvironment synapseEnvironment;
-    private StartUpController startUpController;
     
     public JMSProcessor(InboundProcessorParams params) {
         this.name = params.getName();
@@ -54,12 +54,17 @@ public class JMSProcessor implements InboundRequestProcessor, TaskStartupObserve
         if (jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL) != null) {
             this.interval = Long.parseLong(
                     jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL));
-        }
+        }               
         this.sequential = true;
         if (jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL) != null) {
             this.sequential = Boolean.parseBoolean(jmsProperties
                     .getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL));
         }
+        this.coordination = true;
+        if (jmsProperties.getProperty(PollingConstants.INBOUND_COORDINATION) != null) {
+            this.coordination = Boolean.parseBoolean(jmsProperties
+                    .getProperty(PollingConstants.INBOUND_COORDINATION));
+        }        
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq  = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
@@ -77,30 +82,12 @@ public class JMSProcessor implements InboundRequestProcessor, TaskStartupObserve
     /**
      * Register/start the schedule service
      * */
-    public void start() {    
-    	log.info("Inbound JMS listener Started for destination " + name);
-        try {
-        	Task task = new JMSTask(pollingConsumer);
-        	TaskDescription taskDescription = new TaskDescription();
-        	taskDescription.setName(name + "-JMS-EP");
-        	taskDescription.setTaskGroup("JMS-EP");
-        	taskDescription.setInterval(interval);
-        	taskDescription.setIntervalInMs(true);
-        	taskDescription.addResource(TaskDescription.INSTANCE, task);
-        	taskDescription.addResource(TaskDescription.CLASSNAME, task.getClass().getName());
-        	startUpController = new StartUpController();
-        	startUpController.setTaskDescription(taskDescription);
-        	startUpController.init(synapseEnvironment);
-
-        } catch (Exception e) {
-            log.error("Could not start JMS Processor. Error starting up scheduler. Error: " + e.getLocalizedMessage());
-        }   	
-    }    
-    
-    public void destroy() {
-        log.info("Inbound JMS listener ending operation on destination " + name);
-        startUpController.destroy();
-    }
+    public void start() {
+        log.info("Inbound JMS listener Started : " + name);
+        Task task = new JMSTask(pollingConsumer);
+        start(task, ENDPOINT_POSTFIX);
+    }   
+   
 
     public String getName() {
         return name;
