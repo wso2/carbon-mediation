@@ -15,10 +15,13 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 package org.wso2.carbon.inbound.endpoint.protocol;
 
-
+/**
+ * 
+ * Define the common properties shared by all polling inbound endpoints
+ *
+ */
 public class PollingConstants {
 
    public static final String INBOUND_ENDPOINT_INTERVAL ="interval";
