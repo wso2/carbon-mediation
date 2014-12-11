@@ -797,8 +797,6 @@
                 <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
                 <version>${wso2carbon.version}</version>
             </dependency>
-
-
             <!--Mediation Dependencies Ends here-->
             <!--Feature dependencies Start here-->
             <dependency>
