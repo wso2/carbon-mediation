@@ -15,13 +15,14 @@ package org.wso2.carbon.inbound.endpoint.protocol.jms;
 * limitations under the License.
 */
 
-import org.apache.axiom.attachments.SizeAwareDataSource;
-
-import javax.jms.BytesMessage;
-import javax.jms.JMSException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import javax.jms.BytesMessage;
+import javax.jms.JMSException;
+
+import org.apache.axiom.attachments.SizeAwareDataSource;
 
 /**
  * Data source implementation wrapping a JMS {@link javax.jms.BytesMessage}.

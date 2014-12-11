@@ -15,8 +15,13 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 package org.wso2.carbon.inbound.endpoint.protocol.file;
+
+import java.io.InputStream;
+import java.util.Properties;
+
+import javax.mail.internet.ContentType;
+import javax.mail.internet.ParseException;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.UUIDGenerator;
@@ -37,11 +42,6 @@ import org.apache.synapse.commons.vfs.FileObjectDataSource;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
-
-import javax.mail.internet.ContentType;
-import javax.mail.internet.ParseException;
-import java.io.InputStream;
-import java.util.Properties;
 
 public class FileInjectHandler {
 
