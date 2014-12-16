@@ -18,15 +18,38 @@
 package org.wso2.carbon.inbound;
 
 /**
- * Used to throw inbound admin specific exceptions
- * */
-public class InboundManagementException extends Exception {
+ * This class use to pass paramaters to admin service
+ *
+ */
+public class ParameterDTO {
 
-    public InboundManagementException(String message) {
-        super(message);
+    private String name;
+    private String value;
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
     }
-
-    public InboundManagementException(String message, Throwable e) {
-        super(message, e);
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
+    /**
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+    /**
+     * @param value the value to set
+     */
+    public void setValue(String value) {
+        this.value = value;
+    }
+    
+    
+    
 }
