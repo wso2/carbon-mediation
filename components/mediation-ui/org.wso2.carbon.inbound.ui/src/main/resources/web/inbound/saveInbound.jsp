@@ -15,6 +15,7 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
+<%@page import="org.wso2.carbon.inbound.ui.internal.ParamDTO"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
@@ -43,21 +44,23 @@
 			}else{
 				classImpl = request.getParameter("inboundClass");
 			}
-			List<String>sParams = new ArrayList<String>();
+			List<ParamDTO>sParams = new ArrayList<ParamDTO>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
 				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.")){
 					String strVal = request.getParameter(strKey);
 					if(strVal != null && !strVal.equals("")){
-						sParams.add(strKey + "~:~" + request.getParameter(strKey));
+						sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
 					}
 				}else if(strKey.startsWith("paramkey")){
 					String paramKey = request.getParameter("paramkey" + strKey.replaceAll("paramkey",""));
 					if(paramKey != null && !paramKey.trim().equals("")){
-						sParams.add(paramKey + "~:~" + request.getParameter("paramval" + strKey.replaceAll("paramkey","")));	
+						sParams.add((new ParamDTO(paramKey, request.getParameter("paramval" + strKey.replaceAll("paramkey","")))));	
 					}	
 				}else if(strKey.startsWith("interval")){
-				    sParams.add("interval~:~" + request.getParameter("interval"));						
+				    sParams.add((new ParamDTO("interval",request.getParameter("interval"))));
+				}else if(strKey.startsWith("sequential")){
+				    sParams.add((new ParamDTO("sequential",request.getParameter("sequential"))));				    
 				}	
 			}
 			client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);

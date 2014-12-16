@@ -17,13 +17,45 @@
  */
 package org.wso2.carbon.inbound.ui.internal;
 
-public class InboundClientConstants {
+/**
+ * This class use to pass params from UI to java client
+ *
+ */
+public class ParamDTO {
 
-    public static final String TYPE_HTTP = "http";
-	public static final String TYPE_FILE = "file";
-	public static final String TYPE_JMS = "jms";
-	public static final String TYPE_CLASS = "class";
-	
-	public static final String EXCEPTION = "INBOUND_EXCEPTION";
-	public static final String STRING_SPLITTER = " ~:~ ";
+    private String name;
+    private String value;
+    
+    public ParamDTO(String name, String value){       
+        this.name = name;
+        this.value = value;
+    }
+    
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+    /**
+     * @return the value
+     */
+    public String getValue() {
+        return value;
+    }
+    /**
+     * @param value the value to set
+     */
+    public void setValue(String value) {
+        this.value = value;
+    }
+    
+    
+    
 }
