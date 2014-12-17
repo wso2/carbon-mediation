@@ -52,8 +52,8 @@ public class InboundHttpResponseSender implements InboundResponseSender {
                 //send for send back the response to the source
                 passThroughHttpSender.invoke(msgContext);
             } catch (AxisFault e) {
-                log.error("Exception occurred when calling PassThroughHttpSender.invoke may be" +
-                          "message context does not have some properties", e);
+                log.error("Exception occurred when calling PassThroughHttpSender may be" +
+                          "message context does not have relevant properties", e);
             }
         } else {
             log.error("Response MessageContext is null may be Response read error occurred");
