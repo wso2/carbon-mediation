@@ -17,7 +17,6 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.http;
 
-
 import org.apache.axis2.AxisFault;
 import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
@@ -25,7 +24,6 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.passthru.PassThroughHttpSender;
 import org.apache.synapse.transport.passthru.api.PassThroughOutboundEndpointHandler;
-
 
 /**
  * Get mediated message context from Source Response Worker and created InboundHttpSourceResponse
@@ -45,7 +43,6 @@ public class InboundHttpResponseSender implements InboundResponseSender {
         }
     }
 
-
     @Override
     public void sendBack(MessageContext messageContext) {
         if (messageContext != null) {
@@ -56,7 +53,7 @@ public class InboundHttpResponseSender implements InboundResponseSender {
                 passThroughHttpSender.invoke(msgContext);
             } catch (AxisFault e) {
                 log.error("Exception occurred when calling PassThroughHttpSender.invoke may be" +
-                        "message context does not have some properties", e);
+                          "message context does not have some properties", e);
             }
         } else {
             log.error("Response MessageContext is null may be Response read error occurred");

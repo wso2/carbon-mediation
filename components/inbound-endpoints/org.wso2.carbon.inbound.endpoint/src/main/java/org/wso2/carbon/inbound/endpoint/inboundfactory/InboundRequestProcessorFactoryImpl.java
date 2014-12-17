@@ -17,7 +17,6 @@
 */
 package org.wso2.carbon.inbound.endpoint.inboundfactory;
 
-
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;

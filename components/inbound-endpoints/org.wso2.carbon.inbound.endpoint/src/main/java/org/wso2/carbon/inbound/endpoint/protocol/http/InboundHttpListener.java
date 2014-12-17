@@ -54,18 +54,18 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
 
     public InboundHttpListener(InboundProcessorParams params) {
+        String portParam = params.getProperties().getProperty(
+                InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
         try {
-            port = Integer.parseInt(params.getProperties().getProperty
-                    (InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT));
+            port = Integer.parseInt(portParam);
         } catch (NumberFormatException e) {
-            handleException("Please provide correct port number for given port  " + port, e);
+            handleException("Please provide port number as integer  instead of  port  " + portParam, e);
         }
         name = params.getName();
         injectingSequence = params.getInjectingSeq();
         onErrorSequence = params.getOnErrorSeq();
         synapseEnvironment = params.getSynapseEnvironment();
     }
-
 
     @Override
     public void init() {
