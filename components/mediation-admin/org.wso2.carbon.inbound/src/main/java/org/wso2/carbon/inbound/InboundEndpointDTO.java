@@ -1,117 +1,128 @@
+/*
+ *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.inbound;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.synapse.inbound.InboundEndpoint;
 
 public class InboundEndpointDTO {
 
+    // Name of the inbound endpoint
     private String name;
+    // protocol or class should be specified
     private String protocol;
     private String classImpl;
-    private long interval;
     private boolean isSuspend;
+    // Sequences related to injection
     private String injectingSeq;
     private String onErrorSeq;
-    private String [] parameters;
+    private ParameterDTO[]parameters;
     private String fileName;
 
+    public InboundEndpointDTO(InboundEndpoint inboundEndpoint) {
+        this.name = inboundEndpoint.getName();
+        this.protocol = inboundEndpoint.getProtocol();
+        this.classImpl = inboundEndpoint.getClassImpl();
+        this.isSuspend = inboundEndpoint.isSuspend();
+        this.injectingSeq = inboundEndpoint.getInjectingSeq();
+        this.onErrorSeq = inboundEndpoint.getOnErrorSeq();
+        this.fileName = inboundEndpoint.getFileName();
+        Map<String, String> mParams = inboundEndpoint.getParametersMap();        
+        if (mParams != null && !mParams.isEmpty()) {
+            parameters = new ParameterDTO[mParams.keySet().size()];
+            int i = 0;
+            for (String strKey : mParams.keySet()) {
+                ParameterDTO parameterDTO = new ParameterDTO();
+                parameterDTO.setName(strKey);
+                parameterDTO.setValue(mParams.get(strKey));
+                parameters[i++] = parameterDTO;
+            }
+        }
+    }
 
+    public String getName() {
+        return name;
+    }
 
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public InboundEndpointDTO(InboundEndpoint inboundEndpoint){
-		this.name = inboundEndpoint.getName();
-		this.protocol = inboundEndpoint.getProtocol();
-		this.classImpl = inboundEndpoint.getClassImpl();
-		this.isSuspend = inboundEndpoint.isSuspend();
-		this.injectingSeq = inboundEndpoint.getInjectingSeq();
-		this.onErrorSeq = inboundEndpoint.getOnErrorSeq();
-		this.fileName = inboundEndpoint.getFileName();
-		Map<String, String>mParams = inboundEndpoint.getParametersMap();
-		if(mParams != null && !mParams.isEmpty()){
-			this.parameters = new String[mParams.size()];
-			int i = 0;
-			for(String strKey:mParams.keySet()){				
-				this.parameters[i] = strKey + "~:~" + mParams.get(strKey);
-				i++;
-			}
-		}else{
-			this.parameters = new String[]{}; 
-		}		
-	}
+    public String getProtocol() {
+        return protocol;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getClassImpl() {
+        return classImpl;
+    }
 
-	public String getProtocol() {
-		return protocol;
-	}
+    public void setClassImpl(String classImpl) {
+        this.classImpl = classImpl;
+    }
 
-	public void setProtocol(String protocol) {
-		this.protocol = protocol;
-	}
+    public boolean isSuspend() {
+        return isSuspend;
+    }
 
-	public String getClassImpl() {
-		return classImpl;
-	}
+    public void setSuspend(boolean isSuspend) {
+        this.isSuspend = isSuspend;
+    }
 
-	public void setClassImpl(String classImpl) {
-		this.classImpl = classImpl;
-	}
+    public String getInjectingSeq() {
+        return injectingSeq;
+    }
 
-	public long getInterval() {
-		return interval;
-	}
+    public void setInjectingSeq(String injectingSeq) {
+        this.injectingSeq = injectingSeq;
+    }
 
-	public void setInterval(long interval) {
-		this.interval = interval;
-	}
+    public String getOnErrorSeq() {
+        return onErrorSeq;
+    }
 
-	public boolean isSuspend() {
-		return isSuspend;
-	}
+    public void setOnErrorSeq(String onErrorSeq) {
+        this.onErrorSeq = onErrorSeq;
+    }
+   
+    /**
+     * @return the parameters
+     */
+    public ParameterDTO[] getParameters() {
+        return parameters;
+    }
 
-	public void setSuspend(boolean isSuspend) {
-		this.isSuspend = isSuspend;
-	}
+    /**
+     * @param parameters the parameters to set
+     */
+    public void setParameters(ParameterDTO[]parameters) {
+        this.parameters = parameters;
+    }
 
-	public String getInjectingSeq() {
-		return injectingSeq;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
-	public void setInjectingSeq(String injectingSeq) {
-		this.injectingSeq = injectingSeq;
-	}
-
-	public String getOnErrorSeq() {
-		return onErrorSeq;
-	}
-
-	public void setOnErrorSeq(String onErrorSeq) {
-		this.onErrorSeq = onErrorSeq;
-	}
-
-	public String[] getParameters() {
-		return parameters;
-	}
-
-	public void setParameters(String[] parameters) {
-		this.parameters = parameters;
-	}
-
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 }

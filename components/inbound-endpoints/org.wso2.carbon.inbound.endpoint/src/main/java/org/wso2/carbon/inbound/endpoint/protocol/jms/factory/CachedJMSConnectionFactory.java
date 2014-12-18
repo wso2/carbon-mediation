@@ -15,7 +15,6 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 package org.wso2.carbon.inbound.endpoint.protocol.jms.factory;
 
 import org.apache.commons.logging.Log;
@@ -95,7 +94,9 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
     @Override
     protected Session createSession(Connection connection) {
         Session session = super.createSession(connection);
-        if(this.cacheLevel >= JMSConstants.CACHE_SESSION){
+        //When ack messages JMS will ack for the session not for messages
+        //If cached it will not work for individual messages
+        if(this.cacheLevel >= JMSConstants.CACHE_SESSION && sessionAckMode <= 1){
         	cachedSession = session;
         }
         return session;
@@ -113,7 +114,7 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
 
     public MessageConsumer createMessageConsumer(Session session, Destination destination) { 
     	MessageConsumer  messageConsumer = super.createMessageConsumer(session, destination);
-        if(this.cacheLevel >= JMSConstants.CACHE_CONSUMER){
+        if(this.cacheLevel >= JMSConstants.CACHE_CONSUMER && sessionAckMode <= 1){
         	cachedMessageConsumer = messageConsumer;
         }
         return messageConsumer;

@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
 * Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 * WSO2 Inc. licenses this file to you under the Apache License,
@@ -31,6 +32,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
  */
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
+
     public static enum Protocols {jms, file, http}
 
     /**
@@ -49,11 +51,13 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
             } else if (Protocols.file.toString().equals(protocol)) {
                 inboundRequestProcessor = new VFSProcessor(params);
             } else if (Protocols.http.toString().equals(protocol)) {
+
                 inboundRequestProcessor = new InboundHttpListener(params);
             }
         } else if (params.getClassImpl() != null) {
             inboundRequestProcessor = new GenericProcessor(params);
         } else {
+
             throw new SynapseException("Protocol or Class should be specified for Inbound Endpoint " + params.getName());
         }
         return inboundRequestProcessor;

@@ -15,6 +15,7 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
+<%@page import="org.wso2.carbon.inbound.ui.internal.ParamDTO"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
@@ -42,11 +43,11 @@
 			}else{
 				classImpl = request.getParameter("inboundClass");
 			}
-			List<String>sParams = new ArrayList<String>();
+			List<ParamDTO>sParams = new ArrayList<ParamDTO>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
 				if(strKey.startsWith("param.")){
-					sParams.add(strKey.replaceAll("param.","") + "~:~" + request.getParameter(strKey));
+					sParams.add(new ParamDTO(strKey.replaceAll("param.",""),request.getParameter(strKey)));
 				}	
 			}
 			client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);

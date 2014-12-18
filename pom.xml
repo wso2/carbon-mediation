@@ -48,6 +48,7 @@
                 <module>components/mediation-ui</module>
                 <module>components/mediation-ntask</module>
                 <module>components/inbound-endpoints</module>
+                <module>components/mediation-clustering</module>
                 <module>features/scheduled-tasks</module>
                 <module>features/business-adaptors</module>
                 <module>features/mediation-config-admin-features</module>
@@ -59,6 +60,7 @@
                 <module>features/synapse-features</module>
                 <module>features/mediation-ntask-features</module>
                 <module>features/inbound-endpoints</module>
+                <module>features/mediation-clustering</module>
             </modules>
         </profile>
     </profiles>
@@ -240,12 +242,12 @@
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>4.3.0.wso2v1</version>
+                <version>4.3.3.wso2v1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
                 <artifactId>httpcore-nio</artifactId>
-                <version>4.2.3.wso2v3</version>
+                <version>4.3.3.wso2v1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
@@ -795,8 +797,6 @@
                 <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
                 <version>${wso2carbon.version}</version>
             </dependency>
-
-
             <!--Mediation Dependencies Ends here-->
             <!--Feature dependencies Start here-->
             <dependency>
@@ -1672,16 +1672,16 @@
         <synapse.version>2.1.3-wso2v1-SNAPSHOT</synapse.version>
         <org.eclipse.osgi.version>3.7.0.v20110613</org.eclipse.osgi.version>
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2>
-        <orbit.version.axis2.client>1.6.1.wso2v11-SNAPSHOT</orbit.version.axis2.client>
-        <axis2-transports.version>1.6.1-wso2v11-SNAPSHOT</axis2-transports.version>
-        <axis2.osgi.version.range>[1.6.1.wso2v11-SNAPSHOT, 1.7.0)</axis2.osgi.version.range>
+        <orbit.version.axis2>1.6.1.wso2v11</orbit.version.axis2>
+        <orbit.version.axis2.client>1.6.1.wso2v11</orbit.version.axis2.client>
+        <axis2-transports.version>1.6.1-wso2v11</axis2-transports.version>
+        <axis2.osgi.version.range>[1.6.1.wso2v11, 1.7.0)</axis2.osgi.version.range>
         <axis2.json.version>1.6.1-wso2v5</axis2.json.version>
         <!--End-->
         <!-- Axiom Version Start here -->
-        <axiom.api.wso2.version>1.2.11-wso2v5-SNAPSHOT</axiom.api.wso2.version>
-        <axiom.wso2.version>1.2.11.wso2v5-SNAPSHOT</axiom.wso2.version>
-        <axiom.version>1.2.11.wso2v5-SNAPSHOT</axiom.version>
+        <axiom.api.wso2.version>1.2.11-wso2v5</axiom.api.wso2.version>
+        <axiom.wso2.version>1.2.11.wso2v5</axiom.wso2.version>
+        <axiom.version>1.2.11.wso2v5</axiom.version>
         <axiom.osgi.version.range>[1.2.11.wso2v5, 1.3.0)</axiom.osgi.version.range>
         <!-- Axiom Version end here -->
         <!--Neethi Versions Start here-->
@@ -1710,7 +1710,7 @@
         <com.google.code.gson.version>2.2.4</com.google.code.gson.version>
         <org.slf4j.verison>1.6.1</org.slf4j.verison>
         <rampart.version>1.6.1.wso2v12</rampart.version>
-        <addressing.version>1.6.1-wso2v11-SNAPSHOT</addressing.version>
+        <addressing.version>1.6.1-wso2v11</addressing.version>
         <version.jettison>1.3.4</version.jettison>
         <axis2.wso2.version.aar.plugin>1.6.2</axis2.wso2.version.aar.plugin>
         <carbon.p2.plugin.version>1.5.3</carbon.p2.plugin.version>
@@ -1788,15 +1788,15 @@
         <xmlsec.version>1.5.5</xmlsec.version>
         <xmlschema.core.version>2.0.3</xmlschema.core.version>
         <xml.resolver.version>1.2</xml.resolver.version>
-        <wss4j.version>1.5.11-wso2v7-SNAPSHOT</wss4j.version>
+        <wss4j.version>1.5.11-wso2v8-SNAPSHOT</wss4j.version>
         <neethi.version>3.0.2</neethi.version>
         <stax2.version>3.1.1</stax2.version>
         <woodstox.core.version>4.2.0</woodstox.core.version>
         <jaxb.xjc.version>2.1.13</jaxb.xjc.version>
         <jaxb.impl.version>2.1.13</jaxb.impl.version>
         <javax.ws.rs.version>2.0-m10</javax.ws.rs.version>
-        <httpcore.nio.version>4.2.4</httpcore.nio.version>
-        <httpcore.version>4.2.4</httpcore.version>
+        <httpcore.nio.version>4.3.3</httpcore.nio.version>
+        <httpcore.version>4.3.3</httpcore.version>
         <httpclient.version>4.2.5</httpclient.version>
         <httpasyncclient.version>4.0-beta3</httpasyncclient.version>
         <ehcache.core.version>2.5.1</ehcache.core.version>

@@ -15,8 +15,13 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 package org.wso2.carbon.inbound.endpoint.protocol.file;
+
+import java.io.InputStream;
+import java.util.Properties;
+
+import javax.mail.internet.ContentType;
+import javax.mail.internet.ParseException;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.UUIDGenerator;
@@ -38,25 +43,21 @@ import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
-import javax.mail.internet.ContentType;
-import javax.mail.internet.ParseException;
-import java.io.InputStream;
-import java.util.Properties;
-
 public class FileInjectHandler {
 
 	private static final Log log = LogFactory.getLog(FileInjectHandler.class);
 	
 	private String injectingSeq;
 	private String onErrorSeq;
-	
+	private boolean sequential;
     private Properties vfsProperties;
     private SynapseEnvironment synapseEnvironment;
 
     
-	public FileInjectHandler(String injectingSeq, String onErrorSeq, SynapseEnvironment synapseEnvironment, Properties vfsProperties){
+	public FileInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential, SynapseEnvironment synapseEnvironment, Properties vfsProperties){
 		this.injectingSeq = injectingSeq;
 		this.onErrorSeq = onErrorSeq;
+		this.sequential = sequential;
 		this.synapseEnvironment = synapseEnvironment;
 		this.vfsProperties = vfsProperties;
 	}	 
@@ -143,7 +144,9 @@ public class FileInjectHandler {
                 if (log.isDebugEnabled()) {
                     log.debug("injecting message to sequence : " + injectingSeq);
                 }
-                synapseEnvironment.injectAsync(msgCtx, seq);
+                if(!synapseEnvironment.injectInbound(msgCtx, seq, sequential)){
+                    return false;
+                }
             } else {
                 log.error("Sequence: " + injectingSeq + " not found");
             }     

@@ -1,36 +1,53 @@
+/*
+ *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.inbound.endpoint.protocol.generic;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.core.SynapseEnvironment;
-import org.apache.synapse.inbound.InboundProcessorParams;
-import org.apache.synapse.inbound.InboundRequestProcessor;
-import org.apache.synapse.startup.quartz.StartUpController;
-import org.apache.synapse.task.Task;
-import org.apache.synapse.task.TaskDescription;
-import org.apache.synapse.task.TaskStartupObserver;
-import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
-
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 
-public class GenericProcessor implements InboundRequestProcessor, TaskStartupObserver {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.startup.quartz.StartUpController;
+import org.apache.synapse.task.Task;
+import org.apache.synapse.task.TaskStartupObserver;
+import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
+import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
+
+public class GenericProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
 
 
 	private GenericPollingConsumer pollingConsumer;
-    private String name;
     private Properties properties;
-    private long interval;
     private String injectingSeq;
     private String onErrorSeq;
-    private SynapseEnvironment synapseEnvironment;
     private static final Log log = LogFactory.getLog(GenericProcessor.class);
     private StartUpController startUpController;
     private String classImpl;
+    private boolean sequential;
     
-    public GenericProcessor(String name, String classImpl, Properties properties, long scanInterval, String injectingSeq, String onErrorSeq, SynapseEnvironment synapseEnvironment) {
+    private static final String ENDPOINT_POSTFIX = "CLASS-EP";
+    
+    public GenericProcessor(String name, String classImpl, Properties properties,
+            long scanInterval, String injectingSeq, String onErrorSeq,
+            SynapseEnvironment synapseEnvironment, boolean coordination, boolean sequential) {
         this.name = name;
         this.properties = properties;
         this.interval = scanInterval;
@@ -38,6 +55,8 @@ public class GenericProcessor implements InboundRequestProcessor, TaskStartupObs
         this.onErrorSeq = onErrorSeq;
         this.synapseEnvironment = synapseEnvironment;
         this.classImpl = classImpl;
+        this.coordination = coordination;
+        this.sequential = sequential;
     }
 
     public GenericProcessor(InboundProcessorParams params) {
@@ -45,6 +64,16 @@ public class GenericProcessor implements InboundRequestProcessor, TaskStartupObs
         this.properties = params.getProperties();
         this.interval =
                 Long.parseLong(properties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL));
+        this.coordination = true;
+        if (properties.getProperty(PollingConstants.INBOUND_COORDINATION) != null) {
+            this.coordination = Boolean.parseBoolean(properties
+                    .getProperty(PollingConstants.INBOUND_COORDINATION));
+        }
+        this.sequential = true;
+        if (properties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL) != null) {
+            this.sequential = Boolean.parseBoolean(properties
+                    .getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL));
+        }        
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
@@ -55,8 +84,8 @@ public class GenericProcessor implements InboundRequestProcessor, TaskStartupObs
     	log.info("Inbound listener " + name + " for class " + classImpl + " starting ...");
 		try{
 			Class c = Class.forName(classImpl);
-			Constructor cons = c.getConstructor(Properties.class, String.class, SynapseEnvironment.class, long.class, String.class, String.class);
-			pollingConsumer = (GenericPollingConsumer)cons.newInstance(properties, name, synapseEnvironment, interval, injectingSeq, onErrorSeq);
+			Constructor cons = c.getConstructor(Properties.class, String.class, SynapseEnvironment.class, long.class, String.class, String.class, boolean.class, boolean.class);
+			pollingConsumer = (GenericPollingConsumer)cons.newInstance(properties, name, synapseEnvironment, interval, injectingSeq, onErrorSeq, coordination, sequential);
 		}catch(ClassNotFoundException e){
 			log.error("Class " + classImpl + " not found. Please check the required class is added to the classpath.");
 			log.error(e);
@@ -72,27 +101,12 @@ public class GenericProcessor implements InboundRequestProcessor, TaskStartupObs
 		}    	
     	start();
     }
-    
-    public void destroy() {
-        log.info("Inbound listener ended " + name);
-        startUpController.destroy();
-    }
-      
+         
     
     public void start() {        	
         try {
         	Task task = new GenericTask(pollingConsumer);
-        	TaskDescription taskDescription = new TaskDescription();
-        	taskDescription.setName(name + "-GENERIC-EP");
-        	taskDescription.setTaskGroup("GENERIC-EP");
-        	taskDescription.setInterval(interval);
-        	taskDescription.setIntervalInMs(true);
-        	taskDescription.addResource(TaskDescription.INSTANCE, task);
-        	taskDescription.addResource(TaskDescription.CLASSNAME, task.getClass().getName());
-        	startUpController = new StartUpController();
-        	startUpController.setTaskDescription(taskDescription);
-        	startUpController.init(synapseEnvironment);
-
+        	start(task, ENDPOINT_POSTFIX);
         } catch (Exception e) {
             log.error("Could not start Generic Processor. Error starting up scheduler. Error: " + e.getLocalizedMessage());
         }

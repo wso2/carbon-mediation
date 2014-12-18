@@ -59,6 +59,10 @@ public class ProxyServiceDeployer extends org.apache.synapse.deployers.ProxyServ
     @Override
     public void undeploySynapseArtifact(String artifactName) {
 
+		if (super.cfgCtx.getAxisConfiguration().getFaultyServices() != null) {
+			super.cfgCtx.getAxisConfiguration().getFaultyServices()
+					.remove(artifactName);
+		}
         super.undeploySynapseArtifact(artifactName);
     }
 
