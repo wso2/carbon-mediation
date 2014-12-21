@@ -21,6 +21,7 @@ import org.wso2.carbon.mediators.router.impl.RouterMediator;
 import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.mediators.builtin.CalloutMediator;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
+import org.apache.synapse.mediators.builtin.ForEachMediator;
 import org.apache.synapse.mediators.builtin.CacheMediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.xquery.XQueryMediator;
@@ -46,6 +47,7 @@ public class DependencyResolverFactory {
         resolversMap.put(CalloutMediator.class.getName(), new CalloutMediatorResolver());
         resolversMap.put(CloneMediator.class.getName(), new CloneMediatorResolver());
         resolversMap.put(IterateMediator.class.getName(), new IterateMediatorResolver());
+        resolversMap.put(ForEachMediator.class.getName(), new ForEachMediatorResolver());
         resolversMap.put(RouterMediator.class.getName(), new RouterMediatorResolver());
         resolversMap.put(ScriptMediator.class.getName(), new ScriptMediatorResolver());
         resolversMap.put(SendMediator.class.getName(), new SendMediatorResolver());
@@ -54,7 +56,7 @@ public class DependencyResolverFactory {
         resolversMap.put(ThrottleMediator.class.getName(), new ThrottleMediatorResolver());
         resolversMap.put(ValidateMediator.class.getName(), new ValidateMediatorResolver());
         resolversMap.put(XQueryMediator.class.getName(), new XQueryMediatorResolver());
-        resolversMap.put(XSLTMediator.class.getName(), new XSLTMediatorResolver());
+        resolversMap.put(XSLTMediator.class.getName(), new XSLTMediatorResolver());      
     }
 
     public static DependencyResolverFactory getInstance() {
