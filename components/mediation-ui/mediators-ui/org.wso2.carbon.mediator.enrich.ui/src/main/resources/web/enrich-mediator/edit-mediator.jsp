@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 
 <%--
@@ -18,7 +19,7 @@
 
 <%@ page import="org.wso2.carbon.mediator.enrich.ui.EnrichMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
-<%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath"%>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -60,7 +61,7 @@
     } else if (enrichMediator.getSourceType().equals("custom")) {
         sourceType = CUSTOM;
         if (enrichMediator.getSourceExpression() != null) {
-            SynapseXPath sourceXPath = enrichMediator.getSourceExpression();
+            SynapsePath sourceXPath = enrichMediator.getSourceExpression();
             NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
             if (sourceXPath != null) {
                 nameSpacesRegistrar.registerNameSpaces(sourceXPath, "mediator.enrich.source.val_ex", session);
@@ -92,7 +93,7 @@
     } else if (enrichMediator.getTargetType().equals("custom")) {
         targetType = CUSTOM;
         if (enrichMediator.getTargetExpression() != null) {
-            SynapseXPath targetXPath = enrichMediator.getTargetExpression();
+            SynapsePath targetXPath = enrichMediator.getTargetExpression();
             NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
             if (targetXPath != null) {
                 nameSpacesRegistrar.registerNameSpaces(targetXPath, "mediator.enrich.target.val_ex", session);
