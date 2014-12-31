@@ -20,20 +20,23 @@
 <%@ page import="org.wso2.carbon.mediator.foreach.ForEachMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
-<%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.SynapsePathFactory" %>
 <%@ page import="org.wso2.carbon.mediator.target.TargetMediator" %>
 
 <%
+    //Set refresh, autoload time as 5 seconds
+    //response.setIntHeader("Refresh", 60);
+		 
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     if (!(mediator instanceof ForEachMediator)) {
-        // todo : proper error handling
+        // TODO : proper error handling ? How?
         throw new RuntimeException("Unable to edit the mediator");
     }
     ForEachMediator foreachMediator = (ForEachMediator) mediator;
     
     
-    XPathFactory xPathFactory = XPathFactory.getInstance();
-    foreachMediator.setExpression(xPathFactory.createSynapseXPath("itr_expression", request, session));
+    SynapsePathFactory synapsePathFactory = SynapsePathFactory.getInstance();
+    foreachMediator.setExpression(synapsePathFactory.createSynapsePath("itr_expression", request, session));
     
     
     
