@@ -35,12 +35,10 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ui</artifactId>
-            <version>${wso2carbon.version}</version>
         </dependency>
 	<dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.statistics.stub</artifactId>
-            <version>${wso2carbon.version}</version>
         </dependency>
     </dependencies>
 

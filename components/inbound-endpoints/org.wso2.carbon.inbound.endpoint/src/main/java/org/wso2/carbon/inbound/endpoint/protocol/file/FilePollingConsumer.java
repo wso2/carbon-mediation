@@ -187,6 +187,7 @@ public class FilePollingConsumer {
                                     + "cloud not be moved after first attempt", axisFault);
                         }
                         if (fileLock) {
+                            // TODO: passing null to avoid build break. Fix properly
                             VFSUtils.releaseLock(fsManager, fileObject);
                         }
                         if (log.isDebugEnabled()) {
@@ -266,6 +267,7 @@ public class FilePollingConsumer {
                 }
 
                 if (fileLock) {
+                    // TODO: passing null to avoid build break. Fix properly
                     VFSUtils.releaseLock(fsManager, fileObject);
                     if (log.isDebugEnabled()) {
                         log.debug("Removed the lock file '" + fileObject.toString()
@@ -492,6 +494,7 @@ public class FilePollingConsumer {
                     // if there is a failure or not we'll try to release the
                     // lock
                     if (fileLock && !skipUnlock) {
+                        // TODO: passing null to avoid build break. Fix properly
                         VFSUtils.releaseLock(fsManager, child);
                     }
                     if (injectHandler == null) {
@@ -512,6 +515,7 @@ public class FilePollingConsumer {
                             + "'cloud not be moved, will remain in \"fail\" state", axisFault);
                 }
                 if (fileLock) {
+                    // TODO: passing null to avoid build break. Fix properly
                     VFSUtils.releaseLock(fsManager, child);
                     VFSUtils.releaseLock(fsManager, fileObject);
                 }
@@ -610,6 +614,7 @@ public class FilePollingConsumer {
             vfsParamDTO.setAutoLockRelease(autoLockRelease);
             vfsParamDTO.setAutoLockReleaseSameNode(autoLockReleaseSameNode);
             vfsParamDTO.setAutoLockReleaseInterval(autoLockReleaseInterval);
+            // TODO: passing null to avoid build break. Fix properly
             rtnValue = VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO);
         } finally {
             if (distributedLock) {
