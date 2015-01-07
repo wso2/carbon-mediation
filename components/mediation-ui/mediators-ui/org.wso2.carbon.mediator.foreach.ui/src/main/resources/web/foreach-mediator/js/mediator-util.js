@@ -21,7 +21,7 @@ function showTargetInfo(){
     document.getElementById('target_info_div').style.display = '';
 }
 
-function iterateMediatorValidate() {
+function foreachMediatorValidate() {
     var expression = document.getElementById("itr_expression");
     if (expression && expression.value == "") {
         CARBON.showErrorDialog(foreachi18n["mediator.foreach.msg.specifyexpression"]);
