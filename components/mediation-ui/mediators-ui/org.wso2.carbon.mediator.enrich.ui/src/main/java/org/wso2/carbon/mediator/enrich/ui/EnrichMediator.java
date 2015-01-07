@@ -17,20 +17,22 @@
 */
 package org.wso2.carbon.mediator.enrich.ui;
 
-import java.util.Iterator;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.AXIOMUtil;
-import org.apache.synapse.config.xml.SynapsePath;
-import org.apache.synapse.config.xml.SynapsePathFactory;
-import org.apache.synapse.config.xml.SynapsePathSerializer;
+import org.apache.synapse.config.xml.SynapseXPathFactory;
+import org.apache.synapse.config.xml.SynapseXPathSerializer;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Iterator;
 
 
 public class EnrichMediator extends AbstractMediator {
@@ -46,7 +48,7 @@ public class EnrichMediator extends AbstractMediator {
     private final String DEFAULT_TARGET_ACTION_TYPE = "replace";
     private String sourceClone = "false";
     private String sourceType = DEFAULT_SOURCE_TYPE;
-    private SynapsePath sourceExpression = null;
+    private SynapseXPath sourceExpression = null;
     private String sourceProperty = "";
     private final String INLINE = "inline";
     private final String INLINE_REG_KEY = "key";
@@ -56,7 +58,7 @@ public class EnrichMediator extends AbstractMediator {
     private String inlineSourceRegKey = "";
 
 
-    private SynapsePath targetExpression = null;
+    private SynapseXPath targetExpression = null;
     private String targetProperty = "";
 
 
@@ -79,11 +81,11 @@ public class EnrichMediator extends AbstractMediator {
         this.sourceClone = sourceClone;
     }
 
-    public SynapsePath getSourceExpression() {
+    public SynapseXPath getSourceExpression() {
         return sourceExpression;
     }
 
-    public void setSourceExpression(SynapsePath sourceExpression) {
+    public void setSourceExpression(SynapseXPath sourceExpression) {
         this.sourceExpression = sourceExpression;
     }
 
@@ -121,11 +123,11 @@ public class EnrichMediator extends AbstractMediator {
     }
 
 
-    public SynapsePath getTargetExpression() {
+    public SynapseXPath getTargetExpression() {
         return targetExpression;
     }
 
-    public void setTargetExpression(SynapsePath targetExpression) {
+    public void setTargetExpression(SynapseXPath targetExpression) {
         this.targetExpression = targetExpression;
     }
 
@@ -160,7 +162,7 @@ public class EnrichMediator extends AbstractMediator {
         sourceElem.addAttribute(TYPE, sourceType, nullNS);
 
         if (null != sourceExpression) {
-            SynapsePathSerializer.serializePath(sourceExpression, sourceElem, XPATH);
+            SynapseXPathSerializer.serializeXPath(sourceExpression, sourceElem, XPATH);
         }
         if (sourceProperty != null && !sourceProperty.equals("")) {
             sourceElem.addAttribute(PROPERTY, sourceProperty, nullNS);
@@ -194,7 +196,7 @@ public class EnrichMediator extends AbstractMediator {
         targetElem.addAttribute(TYPE, targetType, nullNS);
 
         if (null != targetExpression) {
-            SynapsePathSerializer.serializePath(targetExpression, targetElem, XPATH);
+            SynapseXPathSerializer.serializeXPath(targetExpression, targetElem, XPATH);
         }
         if (targetProperty != null && !targetProperty.equals("")) {
             targetElem.addAttribute(PROPERTY, targetProperty, nullNS);
@@ -234,7 +236,7 @@ public class EnrichMediator extends AbstractMediator {
                         && sourceXpathAttr.getAttributeValue() != null
                         && !sourceXpathAttr.getAttributeValue().equals("")) {
                     try {
-                        sourceExpression = SynapsePathFactory.getSynapsePath(childElem, new QName(XPATH));
+                        sourceExpression = SynapseXPathFactory.getSynapseXPath(childElem, new QName(XPATH));
                     } catch (JaxenException e) {
                         String msg = "Invalid XPath expression for 'source' attribute 'xpath' : " + sourceXpathAttr.getAttributeValue();
                         throw new MediatorException(msg);
@@ -274,7 +276,7 @@ public class EnrichMediator extends AbstractMediator {
                         && targetXpathAttr.getAttributeValue() != null
                         && !targetXpathAttr.getAttributeValue().equals("")) {
                     try {
-                        targetExpression = SynapsePathFactory.getSynapsePath(childElem, new QName(XPATH));
+                        targetExpression = SynapseXPathFactory.getSynapseXPath(childElem, new QName(XPATH));
                     } catch (JaxenException e) {
                         String msg = "Invalid XPath expression for 'target' attribute 'xpath' : " + targetXpathAttr.getAttributeValue();
                         throw new MediatorException(msg);

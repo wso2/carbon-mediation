@@ -17,17 +17,19 @@
 */
 package org.wso2.carbon.mediator.iterate;
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.synapse.config.xml.SynapseXPathFactory;
+import org.apache.synapse.config.xml.SynapseXPathSerializer;
 import org.apache.synapse.config.xml.OMElementUtils;
-import org.apache.synapse.config.xml.SynapsePath;
-import org.apache.synapse.config.xml.SynapsePathFactory;
-import org.apache.synapse.config.xml.SynapsePathSerializer;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
+import org.wso2.carbon.mediator.service.ui.Mediator;
+import org.wso2.carbon.mediator.target.TargetMediator;
+
+import javax.xml.namespace.QName;
 
 public class IterateMediator extends AbstractListMediator {
 
@@ -41,9 +43,9 @@ public class IterateMediator extends AbstractListMediator {
 
     private boolean preservePayload = false;
 
-    private SynapsePath expression = null;
+    private SynapseXPath expression = null;
 
-    private SynapsePath attachPath = null;
+    private SynapseXPath attachPath = null;
     
     private String id;
     
@@ -61,11 +63,11 @@ public class IterateMediator extends AbstractListMediator {
         return preservePayload;
     }
 
-    public SynapsePath getExpression() {
+    public SynapseXPath getExpression() {
         return expression;
     }
 
-    public SynapsePath getAttachPath() {
+    public SynapseXPath getAttachPath() {
         return attachPath;
     }
 
@@ -77,11 +79,11 @@ public class IterateMediator extends AbstractListMediator {
         this.preservePayload = preservePayload;
     }
 
-    public void setExpression(SynapsePath expression) {
+    public void setExpression(SynapseXPath expression) {
         this.expression = expression;
     }
 
-    public void setAttachPath(SynapsePath attachPath) {
+    public void setAttachPath(SynapseXPath attachPath) {
         this.attachPath = attachPath;
     }
 
@@ -118,11 +120,11 @@ public class IterateMediator extends AbstractListMediator {
         }
 
         if (attachPath != null && !".".equals(attachPath.toString())) {
-            SynapsePathSerializer.serializePath(attachPath, itrElem, "attachPath");
+            SynapseXPathSerializer.serializeXPath(attachPath, itrElem, "attachPath");
         }
 
         if (expression != null) {
-            SynapsePathSerializer.serializePath(expression, itrElem, "expression");
+            SynapseXPathSerializer.serializeXPath(expression, itrElem, "expression");
         } else {
             throw new MediatorException("Missing expression of the IterateMediator which is required.");
         }
@@ -175,13 +177,13 @@ public class IterateMediator extends AbstractListMediator {
         OMAttribute expression = elem.getAttribute(ATT_EXPRN);
         if (expression != null) {
             try {
-            	this.expression = SynapsePathFactory.getSynapsePath(elem, ATT_EXPRN);
+                this.expression = SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN);
             } catch (JaxenException e) {
-                throw new MediatorException("Unable to build the IterateMediator. " + "Invalid PATH " +
+                throw new MediatorException("Unable to build the IterateMediator. " + "Invalid XPATH " +
                     expression.getAttributeValue());
             }
         } else {
-            throw new MediatorException("PATH expression is required " +
+            throw new MediatorException("XPATH expression is required " +
                 "for an IterateMediator under the \"expression\" attribute");
         }
 
@@ -197,7 +199,7 @@ public class IterateMediator extends AbstractListMediator {
 
         if (!attachPathValue.equals("")) {
             try {
-                SynapsePath xp = SynapsePathFactory.getSynapsePath(elem, ATT_ATTACHPATH);
+                SynapseXPath xp = new SynapseXPath(attachPathValue);
                 OMElementUtils.addNameSpaces(xp, elem, null);
                 this.attachPath = xp;
             } catch (JaxenException e) {
