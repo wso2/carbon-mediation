@@ -32,25 +32,21 @@
       <dependency>
          <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.mediator.bam.server.feature</artifactId>
-         <version>${wso2carbon.version}</version>
          <type>zip</type>
       </dependency>
       <dependency>
          <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.mediator.bam.ui.feature</artifactId>
-         <version>${wso2carbon.version}</version>
          <type>zip</type>
       </dependency>
       <dependency>
          <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.mediator.bam.config.server.feature</artifactId>
-         <version>${wso2carbon.version}</version>
          <type>zip</type>
       </dependency>
       <dependency>
          <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.mediator.bam.config.ui.feature</artifactId>
-         <version>${wso2carbon.version}</version>
          <type>zip</type>
       </dependency>
    </dependencies>
