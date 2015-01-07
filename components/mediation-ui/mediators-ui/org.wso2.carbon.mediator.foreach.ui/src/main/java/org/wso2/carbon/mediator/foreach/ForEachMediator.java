@@ -20,9 +20,9 @@ package org.wso2.carbon.mediator.foreach;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.config.xml.SynapsePath;
-import org.apache.synapse.config.xml.SynapsePathFactory;
-import org.apache.synapse.config.xml.SynapsePathSerializer;
+import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.config.xml.SynapseXPathFactory;
+import org.apache.synapse.config.xml.SynapseXPathSerializer;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
@@ -31,17 +31,17 @@ import org.wso2.carbon.mediator.target.TargetMediator;
 
 public class ForEachMediator extends AbstractListMediator {
 
-	private SynapsePath expression = null;
+	private SynapseXPath expression = null;
 
 	public ForEachMediator() {
 
 	}
 
-	public SynapsePath getExpression() {
+	public SynapseXPath getExpression() {
 		return expression;
 	}
 
-	public void setExpression(SynapsePath expression) {
+	public void setExpression(SynapseXPath expression) {
 		this.expression = expression;
 	}
 
@@ -54,7 +54,7 @@ public class ForEachMediator extends AbstractListMediator {
 		saveTracingState(itrElem, this);
 
 		if (expression != null) {
-			SynapsePathSerializer.serializePath(expression, itrElem, "expression");
+			SynapseXPathSerializer.serializeXPath(expression, itrElem, "expression");
 		} else {
 			throw new MediatorException("Missing expression of the ForEach which is required.");
 		}
@@ -76,15 +76,15 @@ public class ForEachMediator extends AbstractListMediator {
 		OMAttribute expression = elem.getAttribute(ATT_EXPRN);
 		if (expression != null) {
 			try {
-				this.expression = SynapsePathFactory.getSynapsePath(elem, ATT_EXPRN);
+				this.expression = SynapseXPathFactory.getSynapseXPath(elem, ATT_EXPRN);
 			} catch (JaxenException e) {
 				throw new MediatorException("Unable to build the ForEach Mediator. " +
-				                            "Invalid XPATH or JsonPath " +
+				                            "Invalid XPath " +
 				                            expression.getAttributeValue());
 			}
 		} else {
 			throw new MediatorException(
-			                            "XPATH or JsonPath expression is required "
+			                            "XPath expression is required "
 			                                    + "for a ForEach Mediator under the \"expression\" attribute");
 		}
 		OMElement targetElement = elem.getFirstChildWithName(TARGET_Q);

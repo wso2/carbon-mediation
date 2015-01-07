@@ -20,7 +20,7 @@
 <%@ page import="org.wso2.carbon.mediator.foreach.ForEachMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
-<%@ page import="org.wso2.carbon.sequences.ui.util.ns.SynapsePathFactory" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
 <%@ page import="org.wso2.carbon.mediator.target.TargetMediator" %>
 
 <%
@@ -35,8 +35,8 @@
     ForEachMediator foreachMediator = (ForEachMediator) mediator;
     
     
-    SynapsePathFactory synapsePathFactory = SynapsePathFactory.getInstance();
-    foreachMediator.setExpression(synapsePathFactory.createSynapsePath("itr_expression", request, session));
+    XPathFactory xPathFactory = XPathFactory.getInstance();
+    foreachMediator.setExpression(xPathFactory.createSynapseXPath("itr_expression", request, session));
     
     
     
