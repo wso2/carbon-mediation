@@ -175,7 +175,7 @@ public class FilePollingConsumer {
                     boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, fileObject);
                     if (!isFailedRecord) {
                         fileHandler();
-                        if (injectHandler != null) {
+                        if (injectHandler == null) {
                             return fileObject;
                         }
                     } else {

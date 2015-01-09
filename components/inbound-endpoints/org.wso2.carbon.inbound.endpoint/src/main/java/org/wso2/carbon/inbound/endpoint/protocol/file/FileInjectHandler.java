@@ -38,6 +38,7 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.vfs.FileObjectDataSource;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -64,7 +65,7 @@ public class FileInjectHandler {
 	/**
 	 * Inject the message to the sequence
 	 * */
-	public boolean invoke(Object object){
+	public boolean invoke(Object object)throws SynapseException{
 		
 		ManagedDataSource dataSource = null;;
 		FileObject file = (FileObject)object;
@@ -150,6 +151,8 @@ public class FileInjectHandler {
             } else {
                 log.error("Sequence: " + injectingSeq + " not found");
             }     
+        } catch (SynapseException se) {
+            throw se;
         } catch (Exception e) {
             log.error("Error while processing the file/folder");
             log.error(e);
