@@ -23,7 +23,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediators.server.feature</artifactId>
     <groupId>org.wso2.carbon</groupId>
-   <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - All Mediators Server Feature</name>
     <url>http://wso2.org</url>
@@ -52,6 +52,10 @@
         <dependency>
             <groupId>org.apache.bsf.wso2</groupId>
             <artifactId>bsf-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>rhino.wso2</groupId>
+            <artifactId>js</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
@@ -90,6 +94,7 @@
                             <importBundles>
                                 <importBundleDef>org.wso2.carbon:org.wso2.carbon.ec2-client</importBundleDef>
                                 <importBundleDef>org.apache.bsf.wso2:bsf-all</importBundleDef>
+                                <importBundleDef>rhino.wso2:js</importBundleDef>
                             </importBundles>
                             <!--importFeatures>
                                 <importFeatureDef>org.wso2.carbon.mediation.admin</importFeatureDef>

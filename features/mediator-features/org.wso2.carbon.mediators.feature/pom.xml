@@ -33,13 +33,11 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediators.server.feature</artifactId>
-            <version>${wso2carbon.version}</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediators.ui.feature</artifactId>
-            <version>${wso2carbon.version}</version>
             <type>zip</type>
         </dependency>
     </dependencies>

@@ -17,6 +17,8 @@
  */
 package org.wso2.carbon.inbound.endpoint.common;
 
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.Task;
@@ -36,6 +38,10 @@ public class InboundRunner implements Runnable {
 
     private volatile boolean execute = true;
     private volatile boolean init = false;
+    // Following will be used to calculate the sleeping interval
+    private long lastRuntime;
+    private long currentRuntime;
+    private long cycleInterval;
 
     private static final Log log = LogFactory.getLog(InboundRunner.class);
 
@@ -75,26 +81,32 @@ public class InboundRunner implements Runnable {
                         e);
             }
         }
-        
-        
+
         log.debug("Configuration context loaded. Running the Inbound Endpoint.");
         // Run the poll cycles
         while (execute) {
             log.debug("Executing the Inbound Endpoint.");
+            lastRuntime = getTime();
             try {
                 task.execute();
             } catch (Exception e) {
                 log.error("Error executing the inbound endpoint polling cycle.", e);
             }
-            try {
-                Thread.sleep(interval);
-            } catch (InterruptedException e) {
-                log.warn(
-                        "Unable to sleep the inbound thread for interval of : " + interval + "ms.",
-                        e);
+            currentRuntime = getTime();
+            cycleInterval = interval - (currentRuntime - lastRuntime);
+            if (cycleInterval > 0) {
+                try {
+                    Thread.sleep(interval);
+                } catch (InterruptedException e) {
+                    log.warn("Unable to sleep the inbound thread for interval of : " + interval
+                            + "ms.", e);
+                }
             }
         }
         log.debug("Exit the Inbound Endpoint running loop.");
     }
 
+    private Long getTime() {
+        return new Date().getTime();
+    }
 }

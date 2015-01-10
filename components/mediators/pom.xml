@@ -36,7 +36,7 @@
 
 			<modules>
 				<module>router</module>
-				<module>bam</module>
+				<!--module>bam</module-->
 				<module>command</module>
 				<module>event</module>
 				<module>fastXSLT</module>
