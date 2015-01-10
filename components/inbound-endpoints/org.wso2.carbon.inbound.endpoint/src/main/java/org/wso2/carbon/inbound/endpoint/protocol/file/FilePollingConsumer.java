@@ -17,7 +17,14 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.axis2.AxisFault;
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileContent;
@@ -25,19 +32,15 @@ import org.apache.commons.vfs2.FileNotFolderException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
+import org.apache.commons.vfs2.provider.UriParser;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.commons.vfs.VFSParamDTO;
 import org.apache.synapse.commons.vfs.VFSUtils;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.mediation.clustering.ClusteringServiceUtil;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * 
@@ -71,6 +74,7 @@ public class FilePollingConsumer {
     private Long autoLockReleaseInterval;
     private boolean distributedLock;
     private Long distributedLockTimeout;
+    private FileSystemOptions fso;
     
     public FilePollingConsumer(Properties vfsProperties, String name,
             SynapseEnvironment synapseEnvironment, long scanInterval) {
@@ -89,6 +93,13 @@ public class FilePollingConsumer {
         } catch (Exception e) {
             log.error(e);
             throw new RuntimeException(e);
+        }
+        //Setup SFTP Options
+        try {
+            fso = VFSUtils.attachFileSystemOptions(parseSchemeFileOptions(fileURI),fsManager);
+        } catch (Exception e) {
+            log.warn("Unable to set the sftp Options", e);
+            fso = null;
         }
     }
 
@@ -188,7 +199,7 @@ public class FilePollingConsumer {
                         }
                         if (fileLock) {
                             // TODO: passing null to avoid build break. Fix properly
-                            VFSUtils.releaseLock(fsManager, fileObject);
+                            VFSUtils.releaseLock(fsManager, fileObject, fso);
                         }
                         if (log.isDebugEnabled()) {
                             log.debug("File '" + fileObject.getURL()
@@ -268,7 +279,7 @@ public class FilePollingConsumer {
 
                 if (fileLock) {
                     // TODO: passing null to avoid build break. Fix properly
-                    VFSUtils.releaseLock(fsManager, fileObject);
+                    VFSUtils.releaseLock(fsManager, fileObject, fso);
                     if (log.isDebugEnabled()) {
                         log.debug("Removed the lock file '" + fileObject.toString()
                                 + ".lock' of the file '" + fileObject.toString());
@@ -301,7 +312,6 @@ public class FilePollingConsumer {
         }
 
         strFilePattern = vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN);
-
         if (vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_INTERVAL) != null) {
             try {
                 iFileProcessingInterval = Integer.valueOf(vfsProperties
@@ -355,7 +365,7 @@ public class FilePollingConsumer {
                 autoLockRelease = false;
                 log.warn("VFS Auto lock removal not set properly. Current value is : "
                         + strAutoLock, e);
-            }
+            }      
             if (autoLockRelease) {
                 String strAutoLockInterval = vfsProperties
                         .getProperty(VFSConstants.TRANSPORT_AUTO_LOCK_RELEASE_INTERVAL);
@@ -414,9 +424,36 @@ public class FilePollingConsumer {
             }
 
         }
-        
     }
 
+    private Map<String, String> parseSchemeFileOptions(String fileURI) {
+        String scheme = UriParser.extractScheme(fileURI);
+        if (scheme == null) {
+            return null;
+        }
+        HashMap<String, String> schemeFileOptions = new HashMap<String, String>();
+        schemeFileOptions.put(VFSConstants.SCHEME, scheme);
+
+        try {
+            addOptions(scheme, schemeFileOptions);
+        } catch (Exception e) {
+            log.warn("Error while loading VFS parameter. " + e.getMessage());
+        }
+        return schemeFileOptions;
+    }
+
+    private void addOptions(String scheme, Map<String, String> schemeFileOptions) {
+        if (scheme.equals(VFSConstants.SCHEME_SFTP)) {
+            for (VFSConstants.SFTP_FILE_OPTION option : VFSConstants.SFTP_FILE_OPTION.values()) {
+                String strValue = vfsProperties.getProperty(VFSConstants.SFTP_PREFIX
+                        + WordUtils.capitalize(option.toString()));
+                if (strValue != null && !strValue.equals("")) {
+                    schemeFileOptions.put(option.toString(), strValue);
+                }
+            }
+        }
+    }
+    
     /**
      * 
      * Handle directory with chile elements
@@ -495,7 +532,7 @@ public class FilePollingConsumer {
                     // lock
                     if (fileLock && !skipUnlock) {
                         // TODO: passing null to avoid build break. Fix properly
-                        VFSUtils.releaseLock(fsManager, child);
+                        VFSUtils.releaseLock(fsManager, child, fso);
                     }
                     if (injectHandler == null) {
                         return child;
@@ -516,8 +553,8 @@ public class FilePollingConsumer {
                 }
                 if (fileLock) {
                     // TODO: passing null to avoid build break. Fix properly
-                    VFSUtils.releaseLock(fsManager, child);
-                    VFSUtils.releaseLock(fsManager, fileObject);
+                    VFSUtils.releaseLock(fsManager, child, fso);
+                    VFSUtils.releaseLock(fsManager, fileObject, fso);
                 }
                 if (log.isDebugEnabled()) {
                     log.debug("File '" + fileObject.getURL()
@@ -560,7 +597,7 @@ public class FilePollingConsumer {
         while (wasError) {
             try {
                 retryCount++;
-                fileObject = fsManager.resolveFile(fileURI);
+                fileObject = fsManager.resolveFile(fileURI, fso);
                 if (fileObject == null) {
                     log.error("fileObject is null");
                     throw new FileSystemException("fileObject is null");
@@ -614,8 +651,7 @@ public class FilePollingConsumer {
             vfsParamDTO.setAutoLockRelease(autoLockRelease);
             vfsParamDTO.setAutoLockReleaseSameNode(autoLockReleaseSameNode);
             vfsParamDTO.setAutoLockReleaseInterval(autoLockReleaseInterval);
-            // TODO: passing null to avoid build break. Fix properly
-            rtnValue = VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO);
+            rtnValue = VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO, fso);
         } finally {
             if (distributedLock) {
                 ClusteringServiceUtil.releaseLock(strContext);
@@ -632,25 +668,26 @@ public class FilePollingConsumer {
      * @throws AxisFault
      */
     private FileObject processFile(FileObject file) throws AxisFault {
-
         try {
             FileContent content = file.getContent();
             String fileName = file.getName().getBaseName();
             String filePath = file.getName().getPath();
             String fileURI = file.getName().getURI();
 
-            Map<String, Object> transportHeaders = new HashMap<String, Object>();
-            transportHeaders.put(VFSConstants.FILE_PATH, filePath);
-            transportHeaders.put(VFSConstants.FILE_NAME, fileName);
-            transportHeaders.put(VFSConstants.FILE_URI, fileURI);
-
-            try {
-                transportHeaders.put(VFSConstants.FILE_LENGTH, content.getSize());
-                transportHeaders.put(VFSConstants.LAST_MODIFIED, content.getLastModifiedTime());
-            } catch (FileSystemException ignore) {
-            }
-
             if (injectHandler != null) {
+                Map<String, Object> transportHeaders = new HashMap<String, Object>();
+                transportHeaders.put(VFSConstants.FILE_PATH, filePath);
+                transportHeaders.put(VFSConstants.FILE_NAME, fileName);
+                transportHeaders.put(VFSConstants.FILE_URI, fileURI);
+
+                try {
+                    transportHeaders.put(VFSConstants.FILE_LENGTH, content.getSize());
+                    transportHeaders.put(VFSConstants.LAST_MODIFIED, content.getLastModifiedTime());
+                } catch (FileSystemException e) {
+                    log.warn("Unable to set file length or last modified date header.", e);
+                }
+
+                injectHandler.setTransportHeaders(transportHeaders);
                 // injectHandler
                 if (!injectHandler.invoke(file)) {
                     return null;
@@ -695,7 +732,7 @@ public class FilePollingConsumer {
             }
 
             if (moveToDirectoryURI != null) {
-                FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI);
+                FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI, fso);
                 String prefix;
                 if (vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT) != null) {
                     prefix = new SimpleDateFormat(

@@ -18,6 +18,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.internet.ContentType;
@@ -53,7 +54,7 @@ public class FileInjectHandler {
 	private boolean sequential;
     private Properties vfsProperties;
     private SynapseEnvironment synapseEnvironment;
-
+    private Map<String, Object> transportHeaders;
     
 	public FileInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential, SynapseEnvironment synapseEnvironment, Properties vfsProperties){
 		this.injectingSeq = injectingSeq;
@@ -154,9 +155,8 @@ public class FileInjectHandler {
         } catch (SynapseException se) {
             throw se;
         } catch (Exception e) {
-            log.error("Error while processing the file/folder");
-            log.error(e);
-            return false;
+            log.error("Error while processing the file/folder", e);
+            throw new SynapseException("Error while processing the file/folder", e);
         } finally {
          if(dataSource != null) {
 				dataSource.destroy();
@@ -164,6 +164,13 @@ public class FileInjectHandler {
         }
         return true;
 	}
+	
+    /**
+     * @param transportHeaders the transportHeaders to set
+     */
+    public void setTransportHeaders(Map<String, Object> transportHeaders) {
+        this.transportHeaders = transportHeaders;
+    }
     /**
      * Create the initial message context for the file
      * */
@@ -172,6 +179,7 @@ public class FileInjectHandler {
         MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext)msgCtx).getAxis2MessageContext();
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setMessageID(UUIDGenerator.getUUID());
+        axis2MsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, transportHeaders);
         // There is a discrepency in what I thought, Axis2 spawns a nes threads to
         // send a message is this is TRUE - and I want it to be the other way
         msgCtx.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, true);
