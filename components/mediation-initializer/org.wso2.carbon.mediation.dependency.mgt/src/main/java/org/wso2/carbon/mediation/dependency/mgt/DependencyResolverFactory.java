@@ -55,7 +55,7 @@ public class DependencyResolverFactory {
         resolversMap.put(ThrottleMediator.class.getName(), new ThrottleMediatorResolver());
         resolversMap.put(ValidateMediator.class.getName(), new ValidateMediatorResolver());
         resolversMap.put(XQueryMediator.class.getName(), new XQueryMediatorResolver());
-        resolversMap.put(XSLTMediator.class.getName(), new XSLTMediatorResolver());      
+        resolversMap.put(XSLTMediator.class.getName(), new XSLTMediatorResolver());
     }
 
     public static DependencyResolverFactory getInstance() {
