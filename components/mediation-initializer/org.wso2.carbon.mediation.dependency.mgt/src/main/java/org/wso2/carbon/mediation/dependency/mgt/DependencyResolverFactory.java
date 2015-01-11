@@ -47,7 +47,6 @@ public class DependencyResolverFactory {
         resolversMap.put(CalloutMediator.class.getName(), new CalloutMediatorResolver());
         resolversMap.put(CloneMediator.class.getName(), new CloneMediatorResolver());
         resolversMap.put(IterateMediator.class.getName(), new IterateMediatorResolver());
-        resolversMap.put(ForEachMediator.class.getName(), new ForEachMediatorResolver());
         resolversMap.put(RouterMediator.class.getName(), new RouterMediatorResolver());
         resolversMap.put(ScriptMediator.class.getName(), new ScriptMediatorResolver());
         resolversMap.put(SendMediator.class.getName(), new SendMediatorResolver());
