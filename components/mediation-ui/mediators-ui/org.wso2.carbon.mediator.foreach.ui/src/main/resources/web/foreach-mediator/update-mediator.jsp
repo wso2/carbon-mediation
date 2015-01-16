@@ -24,25 +24,18 @@
 <%@ page import="org.wso2.carbon.mediator.target.TargetMediator" %>
 
 <%
-   
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
+
     if (!(mediator instanceof ForEachMediator)) {
-        // TODO : proper error handling ? How?
         throw new RuntimeException("Unable to edit the mediator");
     }
     ForEachMediator foreachMediator = (ForEachMediator) mediator;
-    
-    
+
     XPathFactory xPathFactory = XPathFactory.getInstance();
     foreachMediator.setExpression(xPathFactory.createSynapseXPath("itr_expression", request, session));
-    
-    
     
     if (foreachMediator.getList().size() == 0) {
     	foreachMediator.addChild(new TargetMediator());
     }
-    
-   
-      
 %>
 

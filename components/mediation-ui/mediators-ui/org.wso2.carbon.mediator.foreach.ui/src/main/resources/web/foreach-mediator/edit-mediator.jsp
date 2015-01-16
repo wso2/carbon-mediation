@@ -31,7 +31,6 @@
 	Mediator mediator = SequenceEditorHelper.getEditingMediator(
 			request, session);
 	if (!(mediator instanceof ForEachMediator)) {
-		// todo : proper error handling
 		throw new RuntimeException("Unable to edit the mediator");
 	}
 	ForEachMediator foreachMediator = (ForEachMediator) mediator;
