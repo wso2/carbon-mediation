@@ -42,7 +42,6 @@
                         <Import-Package>
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Embed-Dependency>netty-all;scope=compile</Embed-Dependency>
                         <Fragment-Host>synapse-core</Fragment-Host>
                     </instructions>
                 </configuration>
