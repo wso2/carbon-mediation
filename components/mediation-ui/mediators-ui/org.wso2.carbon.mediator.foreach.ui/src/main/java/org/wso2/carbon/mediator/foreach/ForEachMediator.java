@@ -20,18 +20,18 @@ package org.wso2.carbon.mediator.foreach;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.apache.synapse.config.xml.SynapseXPathFactory;
 import org.apache.synapse.config.xml.SynapseXPathSerializer;
+import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
-import org.wso2.carbon.mediator.service.ui.Mediator;
-import org.wso2.carbon.mediator.target.TargetMediator;
 
 public class ForEachMediator extends AbstractListMediator {
 
 	private SynapseXPath expression = null;
+
+	private final String TAG_NAME = "foreach";
 
 	public ForEachMediator() {
 
@@ -46,11 +46,11 @@ public class ForEachMediator extends AbstractListMediator {
 	}
 
 	public String getTagLocalName() {
-		return "foreach";
+		return TAG_NAME;
 	}
 
 	public OMElement serialize(OMElement parent) {
-		OMElement itrElem = fac.createOMElement("foreach", synNS);
+		OMElement itrElem = fac.createOMElement(TAG_NAME, synNS);
 		saveTracingState(itrElem, this);
 
 		if (expression != null) {
@@ -60,8 +60,7 @@ public class ForEachMediator extends AbstractListMediator {
 		}
 
 		serializeChildren(itrElem, getList());
-		
-		// attach the serialized element to the parent if specified
+
 		if (parent != null) {
 			parent.addChild(itrElem);
 		}
@@ -84,15 +83,15 @@ public class ForEachMediator extends AbstractListMediator {
 			}
 		} else {
 			throw new MediatorException(
-			                            "XPath expression is required "
-			                                    + "for a ForEach Mediator under the \"expression\" attribute");
+					"XPath expression is required "
+					+ "for a ForEach Mediator under the \"expression\" attribute");
 		}
 		OMElement targetElement = elem.getFirstChildWithName(TARGET_Q);
 		if (targetElement != null) {
 			addChildren(elem, this);
 		} else {
 			throw new MediatorException(
-			                            "Target for an foreach mediator is required :: missing target");
+					"Target for an foreach mediator is required :: missing target");
 		}
 
 	}
