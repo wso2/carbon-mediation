@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
-<!--
+<%--
  ~ Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~ 
  ~ WSO2 Inc. licenses this file to you under the Apache License,
@@ -16,7 +16,7 @@
  ~ KIND, either express or implied. See the License for the
  ~ specific language governing permissions and limitations
  ~ under the License.
- -->
+ --%>
 
 <%@ page import="org.wso2.carbon.mediator.foreach.ForEachMediator"%>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator"%>

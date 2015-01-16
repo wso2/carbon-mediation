@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
-<!--
+<%-- 
  ~ Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~ 
  ~ WSO2 Inc. licenses this file to you under the Apache License,
@@ -15,8 +15,8 @@
  ~ KIND, either express or implied. See the License for the
  ~ specific language governing permissions and limitations
  ~ under the License.
- -->
-
+--%>
+ 
 <%@ page import="org.wso2.carbon.mediator.foreach.ForEachMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
@@ -24,9 +24,7 @@
 <%@ page import="org.wso2.carbon.mediator.target.TargetMediator" %>
 
 <%
-    //Set refresh, autoload time as 5 seconds
-    //response.setIntHeader("Refresh", 60);
-		 
+   
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     if (!(mediator instanceof ForEachMediator)) {
         // TODO : proper error handling ? How?
