@@ -42,6 +42,7 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
@@ -67,7 +68,7 @@ public class JMSInjectHandler {
         this.synapseEnvironment = synapseEnvironment;
     }
 
-    public boolean invoke(Object object) {
+    public boolean invoke(Object object) throws SynapseException{
 
         Message msg = (Message) object;
         try {
@@ -142,6 +143,8 @@ public class JMSInjectHandler {
                     return false;
                 }
             }
+        } catch (SynapseException se) {
+            throw se;            
         } catch (Exception e) {
             log.error("Error while processing the JMS Message");
         }
