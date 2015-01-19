@@ -54,7 +54,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                        <!--     org.apache.commons.logging;version="[1.2,2)", -->
+                            org.apache.commons.logging;version="[1.2,2)",
                             org.osgi.framework,
                             org.wso2.carbon.mediator.service.*,
                             org.wso2.carbon.mediator.target,
