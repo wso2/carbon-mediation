@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.mediator.foreach;
 
-//import org.apache.commons.logging.Log;
-//import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.wso2.carbon.mediator.service.MediatorService;
@@ -29,25 +29,25 @@ import org.wso2.carbon.mediator.service.MediatorService;
  */
 public class ForEachMediatorActivator implements BundleActivator {
 
-//    private static final Log log = LogFactory.getLog(ForEachMediatorActivator.class);
+    private static final Log log = LogFactory.getLog(ForEachMediatorActivator.class);
 
     public void start(BundleContext bundleContext) throws Exception {
 
-//        if (log.isDebugEnabled()) {
-//            log.debug("Starting the foreach mediator component ...");
-//        }
+        if (log.isDebugEnabled()) {
+            log.debug("Starting the foreach mediator component ...");
+        }
         
         bundleContext.registerService(
                 MediatorService.class.getName(), new ForEachMediatorService(), null);
 
-//        if (log.isDebugEnabled()) {
-//            log.debug("Successfully registered the foreach mediator service");
-//        }
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully registered the foreach mediator service");
+        }
     }
 
     public void stop(BundleContext bundleContext) throws Exception {
-//        if (log.isDebugEnabled()) {
-//            log.debug("Stopped the foreach mediator component ...");
-//        }
+        if (log.isDebugEnabled()) {
+            log.debug("Stopped the foreach mediator component ...");
+        }
     }
 }
