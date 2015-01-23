@@ -53,7 +53,7 @@
             <artifactId>commons-net</artifactId>
         </dependency>
         <dependency>
-            <groupId>jsch.wso2</groupId>
+            <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
         </dependency>
     </dependencies>
@@ -84,7 +84,7 @@
                                 <importBundleDef>org.apache.synapse:synapse-vfs-transport</importBundleDef>
                                 <importBundleDef>org.apache.commons.wso2:commons-vfs2</importBundleDef>
                                 <importBundleDef>commons-net.wso2:commons-net</importBundleDef>
-                                <importBundleDef>jsch.wso2:jsch</importBundleDef>
+                                <importBundleDef>com.jcraft:jsch</importBundleDef>
                             </importBundles>
                         </configuration>
                     </execution>
