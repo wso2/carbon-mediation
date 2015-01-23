@@ -35,7 +35,6 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
 
     private static final String ENDPOINT_POSTFIX = "JMS-EP";
 
-    private CachedJMSConnectionFactory jmsConnectionFactory;
     private JMSPollingConsumer pollingConsumer;
     private Properties jmsProperties;
     private boolean sequential;
@@ -46,23 +45,23 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
         this.name = params.getName();
         this.jmsProperties = params.getProperties();
 
-        if (jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL) != null) {
+        String inboundEndpointInterval = jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL);
+        if (inboundEndpointInterval != null) {
             try {
-                this.interval = Long.parseLong(jmsProperties
-                        .getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL));
+                this.interval = Long.parseLong(inboundEndpointInterval);
             } catch (NumberFormatException nfe) {
                 throw new SynapseException("Invalid numeric value for interval.", nfe);
             }
         }
         this.sequential = true;
-        if (jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL) != null) {
-            this.sequential = Boolean.parseBoolean(jmsProperties
-                    .getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL));
+        String inboundEndpointSequential = jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL);
+        if (inboundEndpointSequential != null) {
+            this.sequential = Boolean.parseBoolean(inboundEndpointSequential);
         }
         this.coordination = true;
-        if (jmsProperties.getProperty(PollingConstants.INBOUND_COORDINATION) != null) {
-            this.coordination = Boolean.parseBoolean(jmsProperties
-                    .getProperty(PollingConstants.INBOUND_COORDINATION));
+        String inboundCoordination = jmsProperties.getProperty(PollingConstants.INBOUND_COORDINATION);
+        if (inboundCoordination != null) {
+            this.coordination = Boolean.parseBoolean(inboundCoordination);
         }
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq = params.getOnErrorSeq();
@@ -75,7 +74,7 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
      */
     public void init() {
         log.info("Initializing inbound JMS listener for inbound endpoint " + name);
-        jmsConnectionFactory = new CachedJMSConnectionFactory(this.jmsProperties);
+        CachedJMSConnectionFactory jmsConnectionFactory = new CachedJMSConnectionFactory(this.jmsProperties);
         pollingConsumer = new JMSPollingConsumer(jmsConnectionFactory, jmsProperties, interval);
         pollingConsumer.registerHandler(new JMSInjectHandler(injectingSeq, onErrorSeq, sequential,
                 synapseEnvironment, jmsProperties));
