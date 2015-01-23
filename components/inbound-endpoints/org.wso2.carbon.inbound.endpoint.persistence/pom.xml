@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- ~ Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~ Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ WSO2 Inc. licenses this file to you under the Apache License,
  ~ Version 2.0 (the "License"); you may not use this file except
@@ -25,30 +25,15 @@
         <version>4.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
+    <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
     <packaging>bundle</packaging>
-    <version>4.3.0-SNAPSHOT</version>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.mediation.clustering</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -57,19 +42,16 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Export-Package>
-                            org.wso2.carbon.inbound.endpoint.protocol.http.management
+                        <Export-Package>  <!-- TODO: add versions-->
+                            org.wso2.carbon.inbound.endpoint.persistence,
+                            org.wso2.carbon.inbound.endpoint.persistence.service,
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.inbound.endpoint.persistence;
                         </Import-Package>
-                        <DynamicImport-Package>*</DynamicImport-Package>
-                        <Fragment-Host>synapse-core</Fragment-Host>
+                        <DynamicImport-Package>*</DynamicImport-Package> <!-- TODO: remove this after adding all imports-->
                     </instructions>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 

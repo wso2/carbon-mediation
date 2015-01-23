@@ -1782,6 +1782,16 @@
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
+                <version>${wso2carbon.snapshot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
+                <version>${wso2carbon.snapshot.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>

@@ -20,14 +20,9 @@ package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
-import org.apache.synapse.transport.passthru.SourceHandler;
-import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
-import org.apache.synapse.transport.passthru.config.SourceConfiguration;
-
-import java.net.InetSocketAddress;
+import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListenerManager;
 
 
 /**
@@ -38,20 +33,8 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
     private static final Logger log = Logger.getLogger(InboundHttpListener.class);
 
-    /**
-     * Sequence that messages are injecting
-     */
-    private String injectingSequence;
-
-    /**
-     * Sequence which should trigger as fault handler
-     */
-    private String onErrorSequence;
-
-    private SynapseEnvironment synapseEnvironment;
     private String name;
     private int port;
-
 
     public InboundHttpListener(InboundProcessorParams params) {
         String portParam = params.getProperties().getProperty(
@@ -62,36 +45,16 @@ public class InboundHttpListener implements InboundRequestProcessor {
             handleException("Please provide port number as integer  instead of  port  " + portParam, e);
         }
         name = params.getName();
-        injectingSequence = params.getInjectingSeq();
-        onErrorSequence = params.getOnErrorSeq();
-        synapseEnvironment = params.getSynapseEnvironment();
     }
 
     @Override
     public void init() {
-
-        try {
-            //Create wrapping object for Inbound Configuration
-            InboundHttpConfiguration inboundHttpConfiguration =
-                    new InboundHttpConfiguration(injectingSequence, onErrorSequence, synapseEnvironment);
-
-            //Get registered source configuration of PassThrough Transport
-            SourceConfiguration sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
-
-            //Create Handler for handle Http Requests
-            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(sourceConfiguration, inboundHttpConfiguration);
-
-            //Start Endpoint in given port
-            PassThroughInboundEndpointHandler.startEndpoint(new InetSocketAddress(port), inboundSourceHandler, name);
-
-        } catch (Exception e) {
-            handleException("Cannot init Inbound Endpoint " + name, e);
-        }
+        EndpointListenerManager.getInstance().startEndpoint(port, name);
     }
 
     @Override
     public void destroy() {
-        PassThroughInboundEndpointHandler.closeEndpoint(port);
+        EndpointListenerManager.getInstance().closeEndpoint(port);
     }
 
     private void handleException(String msg, Exception e) {
