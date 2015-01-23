@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSConstants;
 
-
 import javax.jms.*;
 import java.util.Properties;
 
@@ -49,12 +48,12 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
         return super.getConnectionFactory();
     }
 
-    public Connection getConnection(String userName, String password) { 
-    	Connection connection = null;
+    public Connection getConnection(String userName, String password) {
+    	Connection connection;
         if (cachedConnection == null) {
-        	connection = createConnection(userName, password);
-        }else{
-        	connection = cachedConnection;
+            connection = createConnection(userName, password);
+        } else {
+            connection = cachedConnection;
         }
         if(connection == null){
         	return null;
@@ -70,14 +69,14 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
 
     @Override
     public Connection createConnection(String userName, String password){
-        Connection connection = null;
+        Connection connection;
         if(userName == null || password == null){
         	connection = super.createConnection();
         }else{
         	connection = super.createConnection(userName, password);
         }
-        if(this.cacheLevel >= JMSConstants.CACHE_CONNECTION){
-        	cachedConnection = connection;
+        if (this.cacheLevel >= JMSConstants.CACHE_CONNECTION) {
+            cachedConnection = connection;
         }
         return connection;
     }
