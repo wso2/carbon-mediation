@@ -38,14 +38,12 @@ public class InboundHttpSourceHandler extends SourceHandler {
     private static final Logger log = Logger.getLogger(InboundHttpSourceHandler.class);
 
     private final SourceConfiguration sourceConfiguration;
+    private int port;
 
-    private final InboundHttpConfiguration inboundHttpConfiguration;
-
-    public InboundHttpSourceHandler(SourceConfiguration sourceConfiguration,
-                                                                    InboundHttpConfiguration inboundHttpConfiguration) {
+    public InboundHttpSourceHandler(int port, SourceConfiguration sourceConfiguration) {
         super(sourceConfiguration);
         this.sourceConfiguration = sourceConfiguration;
-        this.inboundHttpConfiguration = inboundHttpConfiguration;
+        this.port = port;
     }
 
     @Override
@@ -61,7 +59,7 @@ public class InboundHttpSourceHandler extends SourceHandler {
             OutputStream os = getOutputStream(method, request);
             // Handover Request to Worker Pool
             sourceConfiguration.getWorkerPool().execute
-                    (new InboundHttpServerWorker(request, sourceConfiguration, inboundHttpConfiguration, os));
+                    (new InboundHttpServerWorker(port, request, sourceConfiguration, os));
         } catch (HttpException e) {
             log.error("HttpException occurred when creating Source Request", e);
             informReaderError(conn);

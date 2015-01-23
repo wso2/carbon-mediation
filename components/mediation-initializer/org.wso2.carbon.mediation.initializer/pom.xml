@@ -88,6 +88,14 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediation.ntask</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

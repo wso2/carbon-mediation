@@ -17,16 +17,27 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.http;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.transport.passthru.ServerWorker;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListenerManager;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.OutputStream;
 
@@ -39,71 +50,90 @@ public class InboundHttpServerWorker extends ServerWorker {
     private static final Log log = LogFactory.getLog(InboundHttpServerWorker.class);
 
     private SourceRequest request = null;
+    private int port;
 
-    private InboundHttpConfiguration inboundHttpConfiguration;
 
-
-    public InboundHttpServerWorker(SourceRequest sourceRequest, SourceConfiguration sourceConfiguration,
-                                   InboundHttpConfiguration inboundHttpConfiguration, OutputStream outputStream) {
+    public InboundHttpServerWorker(int port, SourceRequest sourceRequest,
+                                   SourceConfiguration sourceConfiguration, OutputStream outputStream) {
         super(sourceRequest, sourceConfiguration, outputStream);
-        this.inboundHttpConfiguration = inboundHttpConfiguration;
         this.request = sourceRequest;
+        this.port = port;
     }
 
     public void run() {
-        try {
-            //create Synapse Message Context
-            org.apache.synapse.MessageContext msgCtx = createSynapseMessageContext(request);
-            MessageContext messageContext = ((Axis2MessageContext) msgCtx).getAxis2MessageContext();
+        if (request != null) {
+            try {
+                //create Synapse Message Context
+                org.apache.synapse.MessageContext synCtx = createSynapseMessageContext(request);
+                MessageContext axisCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
 
-            // setting Inbound related properties
-            setInboundProperties(msgCtx);
+                // setting Inbound related properties
+                setInboundProperties(synCtx);
 
-            String method = request.getRequest() != null ? request.getRequest().getRequestLine().getMethod().
-                    toUpperCase() : "";
+                String method =
+                        request.getRequest() != null ? request.getRequest().
+                                getRequestLine().getMethod().toUpperCase() : "";
+                processHttpRequestUri(axisCtx, method);
 
-            processHttpRequestUri(messageContext, method);
+                String endpointName =
+                        EndpointListenerManager.getInstance().getEndpointName(port, getTenantDomain());
 
-            // Get injecting sequence for synapse engine
-            SequenceMediator injectingSequence = (SequenceMediator) inboundHttpConfiguration.
-                    getSynapseEnvironment().getSynapseConfiguration().
-                    getSequence(inboundHttpConfiguration.getInjectSeq());
+                InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
 
-            if (injectingSequence != null) {
-                injectingSequence.setErrorHandler(inboundHttpConfiguration.getFaultSeq());
-            } else {
-                log.error("Sequence: " + inboundHttpConfiguration.getInjectSeq() + " not found");
-            }
+                // Get injecting sequence for synapse engine
+                SequenceMediator injectingSequence =
+                        (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
 
-            if (!isRESTRequest(messageContext, method)) {
-                if (request.isEntityEnclosing()) {
-                    processEntityEnclosingRequest(messageContext, false);
+                if (injectingSequence != null) {
+                    injectingSequence.setErrorHandler(endpoint.getOnErrorSeq());
+                    if (log.isDebugEnabled()) {
+                        log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
+                    }
                 } else {
-                    processNonEntityEnclosingRESTHandler(null, messageContext, false);
+                    log.error("Sequence: " + endpoint.getInjectingSeq() + " not found");
                 }
+                // TODO: stop dispatching to main sequence
+                if (!isRESTRequest(axisCtx, method)) {
+                    if (request.isEntityEnclosing()) {
+                        processEntityEnclosingRequest(axisCtx, false);
+                    } else {
+                        processNonEntityEnclosingRESTHandler(null, axisCtx, false);
+                    }
+                }
+                // handover synapse message context to synapse environment for inject it to given sequence in
+                //synchronous manner
+                synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
+
+                // send ack for client if needed
+                sendAck(axisCtx);
+            } catch (Exception e) {
+                log.error("Exception occurred when running " + InboundHttpServerWorker.class.getName(), e);
             }
-
-            if (log.isDebugEnabled()) {
-                log.debug("injecting message to sequence : " + inboundHttpConfiguration.getInjectSeq());
-            }
-
-            // handover synapse message context to synapse environment for inject it to given sequence in
-            //synchronous manner
-            inboundHttpConfiguration.getSynapseEnvironment().injectMessage(msgCtx, injectingSequence);
-
-            // send ack for client if needed
-            sendAck(messageContext);
-        } catch (Exception e) {
-            log.error("Exception occurred when running " + InboundHttpServerWorker.class.getName(), e);
+        } else {
+            log.error("InboundSourceRequest cannot be null");
         }
     }
 
     // Create Synapse Message Context
-    private org.apache.synapse.MessageContext createSynapseMessageContext(SourceRequest inboundSourceRequest) {
-        org.apache.synapse.MessageContext msgCtx = inboundHttpConfiguration.getSynapseEnvironment().createMessageContext();
-        MessageContext messageContext = ((Axis2MessageContext) msgCtx).getAxis2MessageContext();
-        createMessageContext(messageContext, inboundSourceRequest);
-        return msgCtx;
+    private org.apache.synapse.MessageContext createSynapseMessageContext(
+            SourceRequest inboundSourceRequest) throws AxisFault {
+
+        // Create super tenant message context
+        MessageContext axis2MsgCtx = createMessageContext(null, inboundSourceRequest);
+        ServiceContext svcCtx = new ServiceContext();
+        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
+        axis2MsgCtx.setServiceContext(svcCtx);
+        axis2MsgCtx.setOperationContext(opCtx);
+
+        String tenantDomain = getTenantDomain();
+        // If not super tenant, assign tenant configuration context
+        if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            ConfigurationContext tenantConfigCtx =
+                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
+                                                                  axis2MsgCtx.getConfigurationContext());
+            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+        }
+        return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }
 
     // Setting Inbound Related Properties
@@ -112,6 +142,14 @@ public class InboundHttpServerWorker extends ServerWorker {
         msgContext.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
                                new InboundHttpResponseSender());
         msgContext.setWSAAction(request.getHeaders().get(InboundHttpConstants.SOAP_ACTION));
+    }
+
+    private String getTenantDomain() {
+        String tenant = MultitenantUtils.getTenantDomainFromUrl(request.getUri());
+        if (tenant.equals(request.getUri())) {
+            return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        }
+        return tenant;
     }
 
 }
