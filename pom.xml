@@ -1517,7 +1517,7 @@
                 <version>${javax.ws.rs.version}</version>
             </dependency>
             <dependency>
-                <groupId>jsch.wso2</groupId>
+                <groupId>com.jcraft</groupId>
                 <artifactId>jsch</artifactId>
                 <version>${jsch.wso2.version}</version>
             </dependency>
@@ -1626,7 +1626,7 @@
                 <artifactId>org.eclipse.osgi</artifactId>
                 <version>${org.eclipse.osgi.version}</version>
             </dependency>
-            <!-- Apache MyFaces dependancies-->
+            <!-- Apache MyFaces dependencies-->
             <dependency>
                 <groupId>org.apache.myfaces.core</groupId>
                 <artifactId>myfaces-impl</artifactId>
@@ -1782,6 +1782,16 @@
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
+                <version>${wso2carbon.snapshot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
+                <version>${wso2carbon.snapshot.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
@@ -1826,10 +1836,10 @@
         <wsdl4j.wso2.version>1.6.2.wso2v4</wsdl4j.wso2.version>
         <ca.uhn.hapi.wso2.version>2.1.0.wso2v1</ca.uhn.hapi.wso2.version>
         <org.wso2.securevault.version>1.0.0-wso2v2</org.wso2.securevault.version>
-        <jsch.wso2.version>0.1.41-wso2v1</jsch.wso2.version>
+        <jsch.wso2.version>0.1.49.wso2v1</jsch.wso2.version>
         <org.apache.commons.wso2.version>2.0.wso2v8</org.apache.commons.wso2.version>
         <commons.net.wso2.version>2.0.wso2v1</commons.net.wso2.version>
-        <jcifs.wso2.version>0.8.3-wso2v1</jcifs.wso2.version>
+        <jcifs.wso2.version>1.3.17.wso2v1</jcifs.wso2.version>
         <!--Misc End-->
         <!-- Servlet API -->
         <exp.pkg.version.javax.servlet>2.6.0</exp.pkg.version.javax.servlet>
@@ -1910,7 +1920,7 @@
         <libthrift.wso2.version>0.8.0.wso2v1</libthrift.wso2.version>
         <!-- CXF Runtime Bundles -->
         <org.apache.bsf.wso2.version>3.0.0.wso2v5</org.apache.bsf.wso2.version>
-        <rhino.wso2.js.version>1.7.0.R4.wso2v1</rhino.wso2.js.version>
+        <rhino.wso2.js.version>1.6.0.R7-wso2v1</rhino.wso2.js.version>
         <spring.version>3.0.7.RELEASE</spring.version>
         <carbon.cxf.webapp.ext>1.0.1</carbon.cxf.webapp.ext>
         <aopalliance.version>1.0</aopalliance.version>

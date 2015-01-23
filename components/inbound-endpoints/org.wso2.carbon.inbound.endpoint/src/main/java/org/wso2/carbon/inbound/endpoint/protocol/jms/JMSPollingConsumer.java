@@ -54,7 +54,7 @@ public class JMSPollingConsumer {
 
     /**
      * 
-     * Register a handler to implement injection of the retrived message
+     * Register a handler to implement injection of the retrieved message
      * 
      * @param injectHandler
      */
@@ -77,20 +77,19 @@ public class JMSPollingConsumer {
                 lastRanTime = currentTime;
                 poll();
             } else if (logger.isDebugEnabled()) {
-                logger.debug("Skip cycle since cuncurrent rate is higher than the scan interval : JMS Inbound EP ");
+                logger.debug("Skip cycle since concurrent rate is higher than the scan interval : JMS Inbound EP ");
             }
             if (logger.isDebugEnabled()) {
                 logger.debug("End : JMS Inbound EP : ");
             }
         } catch (Exception e) {
-            logger.error("Error while retieving or injecting JMS message. " + e.getMessage(), e);
+            logger.error("Error while retrieving or injecting JMS message. " + e.getMessage(), e);
         }
     }
 
     /**
-     * 
-     * Create connection with broker and retrive the messages. Then inject
-     * accordin to the registered handler
+     * Create connection with broker and retrieve the messages. Then inject
+     * according to the registered handler
      */
     public Message poll() {
         logger.debug("Polling JMS messages.");
@@ -99,6 +98,7 @@ public class JMSPollingConsumer {
         Session session = null;
         Destination destination = null;
         MessageConsumer messageConsumer = null;
+
         try {
             connection = jmsConnectionFactory.getConnection(strUserName, strPassword);
             if (connection == null) {
@@ -110,7 +110,7 @@ public class JMSPollingConsumer {
             messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);
             Message msg = messageConsumer.receive(1);
             if (msg == null) {
-                logger.debug("Inbound JMS Endpoint. No JMS message recived.");
+                logger.debug("Inbound JMS Endpoint. No JMS message received.");
                 return null;
             }
             while (msg != null) {
@@ -121,6 +121,7 @@ public class JMSPollingConsumer {
                 }
 
                 if (injectHandler != null) {
+
                     boolean commitOrAck = true;
                     commitOrAck = injectHandler.invoke(msg);
                     // if client acknowledgement is selected, and processing

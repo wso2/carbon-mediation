@@ -46,6 +46,8 @@ import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.core.ServerShutdownHandler;
 import org.wso2.carbon.datasource.DataSourceInformationRepositoryService;
 import org.wso2.carbon.event.core.EventBroker;
+import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService;
+import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListenerManager;
 import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.initializer.multitenancy.TenantServiceBusInitializer;
@@ -122,6 +124,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * @scr.reference name="esbntask.taskservice"
  * interface="org.wso2.carbon.mediation.ntask.internal.NtaskService" cardinality="0..1"
  * policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
+ * @scr.reference name="inbound.endpoint.persistence.service"
+ * interface="org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService"
+ * cardinality="1..1" policy="dynamic"
+ * bind="setInboundPersistenceService" unbind="unsetInboundPersistenceService"
  */
 @SuppressWarnings({"JavaDoc", "UnusedDeclaration"})
 public class ServiceBusInitializer {
@@ -254,6 +260,9 @@ public class ServiceBusInitializer {
 
             configCtxSvc.getServerConfigContext().setProperty(
                     ConfigurationManager.CONFIGURATION_MANAGER, configurationManager);
+
+            // Start Http Inbound Endpoint Listeners
+            EndpointListenerManager.getInstance().loadEndpointListeners();
 
 			registerInboundDeployer(configCtxSvc.getServerConfigContext()
 					.getAxisConfiguration(),
@@ -775,5 +784,13 @@ public class ServiceBusInitializer {
 		deploymentEngine.addDeployer(new InboundEndpointDeployer(),
 				inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
 	}
+
+    protected void setInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
+        // This service is just here to make sure that ServiceBus is not getting initialized
+        // before the Inbound Endpoint Persistence component is up and running
+    }
+
+    protected void unsetInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
+    }
 
 }
