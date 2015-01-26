@@ -83,12 +83,10 @@
 	    <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.task.stub</artifactId>
-	    <version>${wso2carbon.version}</version>
         </dependency>        
 	    <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.inbound.stub</artifactId>
-	    <version>${wso2carbon.version}</version>
         </dependency>
     </dependencies>
 </project>

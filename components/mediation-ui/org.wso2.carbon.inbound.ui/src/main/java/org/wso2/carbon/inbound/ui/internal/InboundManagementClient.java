@@ -1,3 +1,20 @@
+/*
+ *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.inbound.ui.internal;
 
 import java.io.IOException;
@@ -18,32 +35,30 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.inbound.stub.InboundAdminStub;
 import org.wso2.carbon.inbound.stub.types.carbon.InboundEndpointDTO;
+import org.wso2.carbon.inbound.stub.types.carbon.ParameterDTO;
 import org.wso2.carbon.ui.CarbonUIUtil;
 import org.wso2.carbon.utils.ServerConstants;
 
 public class InboundManagementClient {
 
-	private static final Log log = LogFactory
-			.getLog(InboundManagementClient.class);
+    private static final Log log = LogFactory.getLog(InboundManagementClient.class);
 
-	private InboundAdminStub stub;
+    private InboundAdminStub stub;
 
-	private Properties prop = null;
-	
-	private InboundManagementClient(String cookie, String backendServerURL,
-			ConfigurationContext configCtx) throws AxisFault {
+    private Properties prop = null;
 
-		String serviceURL = backendServerURL + "InboundAdmin";
-		stub = new InboundAdminStub(configCtx, serviceURL);
-		ServiceClient client = stub._getServiceClient();
-		Options option = client.getOptions();
-		option.setManageSession(true);
-		option.setProperty(
-				org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING,
-				cookie);		
-	}
+    private InboundManagementClient(String cookie, String backendServerURL,
+            ConfigurationContext configCtx) throws AxisFault {
 
-	private void loadProperties(){
+        String serviceURL = backendServerURL + "InboundAdmin";
+        stub = new InboundAdminStub(configCtx, serviceURL);
+        ServiceClient client = stub._getServiceClient();
+        Options option = client.getOptions();
+        option.setManageSession(true);
+        option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
+    }
+
+    private void loadProperties() {
         if (prop == null) {
             prop = new Properties();
             InputStream is = getClass().getClassLoader().getResourceAsStream(
@@ -56,153 +71,148 @@ public class InboundManagementClient {
                 }
             }
         }
-	}
-	
-	public static InboundManagementClient getInstance(ServletConfig config,
-			HttpSession session) throws AxisFault {
+    }
 
-		String backendServerURL = CarbonUIUtil.getServerURL(
-				config.getServletContext(), session);
-		ConfigurationContext configContext = (ConfigurationContext) config
-				.getServletContext().getAttribute(
-						CarbonConstants.CONFIGURATION_CONTEXT);
+    public static InboundManagementClient getInstance(ServletConfig config, HttpSession session)
+            throws AxisFault {
 
-		String cookie = (String) session
-				.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-		return new InboundManagementClient(cookie, backendServerURL,
-				configContext);
-	}
+        String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
+        ConfigurationContext configContext = (ConfigurationContext) config.getServletContext()
+                .getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
 
-	public List<InboundDescription> getAllInboundDescriptions()
-			throws Exception {
+        String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
+        return new InboundManagementClient(cookie, backendServerURL, configContext);
+    }
 
-		String strInboundNames = stub.getAllInboundEndpointNames();
-		if (log.isDebugEnabled()) {
-			log.debug("All Inbound configurations :" + strInboundNames);
-		}
-		List<InboundDescription> descriptions = new ArrayList<InboundDescription>();
-		if (strInboundNames == null || strInboundNames.equals("")) {
-			return descriptions;
-		}
+    public List<InboundDescription> getAllInboundDescriptions() throws Exception {
 
-		for (String strName : strInboundNames.split("~:~")) {
-			InboundDescription inboundDescription = new InboundDescription(
-					strName);
-			descriptions.add(inboundDescription);
-		}
-		if (log.isDebugEnabled()) {
-			log.debug("All Inbound Descriptions :" + descriptions);
-		}
-		return descriptions;
-	}
+        InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
+        if (log.isDebugEnabled()) {
+            log.debug("All Inbound configurations :" + inboundEndpointDTOs);
+        }
+        List<InboundDescription> descriptions = new ArrayList<InboundDescription>();
+        if (inboundEndpointDTOs == null || inboundEndpointDTOs.length == 0) {
+            return descriptions;
+        }
 
-	public List<String> getDefaultParameters(String strType) {
-		List<String> rtnList = new ArrayList<String>();
-		if(!strType.equals(InboundClientConstants.TYPE_HTTP)){
-		    rtnList.addAll(getList("common",true));
-		}
-		if(!strType.equals(InboundClientConstants.TYPE_CLASS)){
-		    rtnList.addAll(getList(strType,true));
-		}
-		return rtnList;
-	}
-	public List<String> getAdvParameters(String strType) {
-		List<String> rtnList = new ArrayList<String>();
-        if(!strType.equals(InboundClientConstants.TYPE_CLASS)){
-            rtnList.addAll(getList(strType,false));
-        }		
-		return rtnList;
-	}		
+        for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
+            InboundDescription inboundDescription = new InboundDescription(
+                    inboundEndpointDTO.getName());
+            descriptions.add(inboundDescription);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("All Inbound Descriptions :" + descriptions);
+        }
+        return descriptions;
+    }
 
-	public boolean addInboundEndpoint(String name, String sequence,
-			String onError,  String protocol, String classImpl,
-			List<String> lParameters) {
-		try {
-			String[] sParams = new String[lParameters.size()];
-			int i = 0;
-			for (String parameter : lParameters) {
-				sParams[i] = parameter;
-				i++;
-			}
-			stub.addInboundEndpoint(name, sequence, onError,
-					protocol, classImpl, sParams);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+    public List<String> getDefaultParameters(String strType) {
+        List<String> rtnList = new ArrayList<String>();
+        if (!strType.equals(InboundClientConstants.TYPE_HTTP)) {
+            rtnList.addAll(getList("common", true));
+        }
+        if (!strType.equals(InboundClientConstants.TYPE_CLASS)) {
+            rtnList.addAll(getList(strType, true));
+        }
+        return rtnList;
+    }
 
-	private List<String> getList(String strProtocol, boolean mandatory){
-	    List<String> rtnList = new ArrayList<String>();
-	    loadProperties();
-	    if(prop != null){
-	        String strKey = strProtocol;
-	        if(mandatory){
-	            strKey += ".mandatory";
-	        }else{
-	            strKey += ".optional";
-	        }
-	        String strLength = prop.getProperty(strKey);
-	        Integer iLength = null;
-	        if(strLength != null){
-	            try{
-	                iLength = Integer.parseInt(strLength);
-	            }catch(Exception e){
-	                iLength = null;
-	            }
-	        }
-	        if(iLength != null){
-	            for(int i = 1;i <= iLength;i++){
-	                String tmpString = strKey + "." + i;
-	                String strVal = prop.getProperty(tmpString);
-	                if(strVal != null){
-	                    rtnList.add(strVal);
-	                }
-	            }
-	        }
-	    }
-	    return rtnList;
-	}
-	
-	public boolean removeInboundEndpoint(String name) {
-		try {
-			stub.removeInboundEndpoint(name);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+    public List<String> getAdvParameters(String strType) {
+        List<String> rtnList = new ArrayList<String>();
+        if (!strType.equals(InboundClientConstants.TYPE_CLASS)) {
+            rtnList.addAll(getList(strType, false));
+        }
+        return rtnList;
+    }
 
-	public InboundDescription getInboundDescription(String name) {
-		try {
-			InboundEndpointDTO inboundEndpointDTO = stub
-					.getInboundEndpointbyName(name);
-			return new InboundDescription(inboundEndpointDTO);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public boolean updteInboundEndpoint(String name, String sequence,
-			String onError,  String protocol, String classImpl,
-			List<String> lParameters) {
-		try {
-			String[] sParams = new String[lParameters.size()];
-			int i = 0;
-			for (String parameter : lParameters) {
-				sParams[i] = parameter;
-				i++;
-			}
-			stub.updateInboundEndpoint(name, sequence, onError,
-					protocol, classImpl, sParams);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}	
+    public boolean addInboundEndpoint(String name, String sequence, String onError,
+            String protocol, String classImpl, List<ParamDTO> lParameters) {
+        try {
+            ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
+            int i = 0;
+            for (ParamDTO parameter : lParameters) {
+                ParameterDTO parameterDTO = new ParameterDTO();
+                parameterDTO.setName(parameter.getName());
+                parameterDTO.setValue(parameter.getValue());
+                parameterDTOs[i++] = parameterDTO;
+            }
+            stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+            return true;
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return false;
+    }
+
+    private List<String> getList(String strProtocol, boolean mandatory) {
+        List<String> rtnList = new ArrayList<String>();
+        loadProperties();
+        if (prop != null) {
+            String strKey = strProtocol;
+            if (mandatory) {
+                strKey += ".mandatory";
+            } else {
+                strKey += ".optional";
+            }
+            String strLength = prop.getProperty(strKey);
+            Integer iLength = null;
+            if (strLength != null) {
+                try {
+                    iLength = Integer.parseInt(strLength);
+                } catch (Exception e) {
+                    iLength = null;
+                }
+            }
+            if (iLength != null) {
+                for (int i = 1; i <= iLength; i++) {
+                    String tmpString = strKey + "." + i;
+                    String strVal = prop.getProperty(tmpString);
+                    if (strVal != null) {
+                        rtnList.add(strVal);
+                    }
+                }
+            }
+        }
+        return rtnList;
+    }
+
+    public boolean removeInboundEndpoint(String name) {
+        try {
+            stub.removeInboundEndpoint(name);
+            return true;
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return false;
+    }
+
+    public InboundDescription getInboundDescription(String name) {
+        try {
+            InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
+            return new InboundDescription(inboundEndpointDTO);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return null;
+    }
+
+    public boolean updteInboundEndpoint(String name, String sequence, String onError,
+            String protocol, String classImpl, List<ParamDTO> lParameters) {
+        try {
+            ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
+            int i = 0;
+            for (ParamDTO parameter : lParameters) {
+                ParameterDTO parameterDTO = new ParameterDTO();
+                parameterDTO.setName(parameter.getName());
+                parameterDTO.setValue(parameter.getValue());
+                parameterDTOs[i++] = parameterDTO;
+            }
+            stub.updateInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+            return true;
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return false;
+    }
 
 }

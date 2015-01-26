@@ -38,6 +38,11 @@
             <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
             <version>4.3.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
+            <version>4.3.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -64,7 +69,8 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound.endpoint</bundleDef>
-                            </bundles>    
+                                <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound.endpoint.persistence</bundleDef>
+                            </bundles>
                         </configuration>
                     </execution>
                 </executions>
