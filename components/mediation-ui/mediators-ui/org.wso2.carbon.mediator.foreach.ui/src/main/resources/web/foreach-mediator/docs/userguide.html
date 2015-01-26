@@ -26,24 +26,25 @@
 <body>
 <h1>ForEach Mediator</h1>
 <p>
-The ForEach mediator provides a general loop construct as a mediator. 
-It allows a message to be processed iteratively while maintaining the original message context. 
+    The ForEach mediator provides a general loop construct as a mediator.
+    It allows a message to be processed iteratively while maintaining the original message context.
 
-The ForEach mediator split the message into a number of different messages derived from the parent message, by finding matching elements for the XPath or JSONPath expression that is specified.
+    The ForEach mediator split the message into a number of different messages derived from the parent message, by finding matching elements for the XPath expression that is specified.
 
-New messages will be created for all each of the matching elements and processed in sequence within the main flow using either specified sequence or endpoint. 
+    New messages will be created for all each of the matching elements and processed in sequence within the main flow using specified sequence.
+    Endpoints and sequences containing Call, CallOut or Send mediators are not allowed in the target.
 
-The original message will be modified by replacing the split elements with the elements that go through the loop construct. 
+    The original message will be modified by replacing the split elements with the elements that go through the loop construct.
 </p>
 
 <img src="images/foreach_mediator_screenshot.png"/>
 <p><strong>Figure1: ForEach Mediator</strong></p>
 
-ForEach Mediator can be configured with the following options.
+    ForEach Mediator can be configured with the following options.
 
 <ul>
 <li>
-Expression: Xpath or JSONPath expression that matches the elements which you want to split the message from. For XPath, namespaces can be specified by clicking the namespace link in the right hand side.
+Expression: Xpath expression that matches the elements which you want to split the message from. For XPath, namespaces can be specified by clicking the namespace link in the right hand side.
 </li>
 </ul>
 </body>
