@@ -110,12 +110,4 @@
         </repository>
     </repositories>
 
-    <distributionManagement>
-        <repository>
-            <id>wso2-maven2-repository</id>
-            <name>WSO2 Maven2 Repository</name>
-            <url>scp://dist.wso2.org/home/httpd/dist.wso2.org/maven2/</url>
-        </repository>
-    </distributionManagement>
-
 </project>
