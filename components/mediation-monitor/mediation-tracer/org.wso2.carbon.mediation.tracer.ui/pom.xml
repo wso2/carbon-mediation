@@ -57,10 +57,6 @@
          <artifactId>org.wso2.carbon.logging</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.wso2.carbon</groupId>
-         <artifactId>org.wso2.carbon.utils</artifactId>
-      </dependency>
-      <dependency>
          <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.mediation.tracer.stub</artifactId>
       </dependency>
