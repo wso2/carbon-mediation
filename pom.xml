@@ -23,9 +23,9 @@
     <artifactId>carbon-mediation</artifactId>
     <packaging>pom</packaging>
     <version>4.3.0-SNAPSHOT</version>
-    <modules>
-        <module>features/inbound-endpoints</module>
-    </modules>
+
+
+
     <name>WSO2 Carbon - Platform Aggregator Pom</name>
     <url>http://wso2.org</url>
     <profiles>
@@ -37,6 +37,7 @@
             <modules>
                 <module>service-stubs/mediation-admin</module>
                 <module>service-stubs/mediation-monitor</module>
+                <module>service-stubs/application-mgt</module>
                 <module>components/mediation-registry</module>
                 <module>components/mediation-initializer</module>
                 <module>components/mediation-monitor</module>
@@ -49,6 +50,8 @@
                 <module>components/mediation-ntask</module>
                 <module>components/inbound-endpoints</module>
                 <module>components/mediation-clustering</module>
+                <module>components/application-deployers</module>
+                <module>components/application-mgt</module>
                 <module>features/scheduled-tasks</module>
                 <module>features/business-adaptors</module>
                 <module>features/mediation-config-admin-features</module>
@@ -61,6 +64,8 @@
                 <module>features/mediation-ntask-features</module>
                 <module>features/inbound-endpoints</module>
                 <module>features/mediation-clustering</module>
+                <module>features/application-deployers</module>
+                <module>features/application-mgt</module>
             </modules>
         </profile>
     </profiles>
@@ -1787,10 +1792,44 @@
                 <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
                 <version>${product.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.deployer.synapse</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.mgt.synapse.stub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.mgt.synapse</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.mgt.synapse.ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.mgt.synapse.server.feature</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.application.mgt.synapse.ui.feature</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <properties>
         <!-- Carbon platform version Start here-->
+        <carbon.kernel.version>4.3.0</carbon.kernel.version>
         <carbon.platform.version>4.3.0-SNAPSHOT</carbon.platform.version>
         <carbon.platform.package.export.version>4.3.0-SNAPSHOT</carbon.platform.package.export.version>
         <carbon.platform.package.import.version.range>4.3.0.SNAPSHOT</carbon.platform.package.import.version.range>
@@ -1817,6 +1856,7 @@
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1.wso2v11</orbit.version.axis2>
         <orbit.version.axis2.client>1.6.1.wso2v11</orbit.version.axis2.client>
+        <orbit.version.axiom>1.2.11.wso2v5</orbit.version.axiom>
         <axis2-transports.version>1.6.1-wso2v11</axis2-transports.version>
         <axis2.osgi.version.range>[1.6.1.wso2v11, 1.7.0)</axis2.osgi.version.range>
         <axis2.json.version>1.6.1-wso2v5</axis2.json.version>
