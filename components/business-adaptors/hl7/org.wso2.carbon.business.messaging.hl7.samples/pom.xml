@@ -101,7 +101,7 @@
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart</artifactId>
-            <version>1.6.1-wso2v12</version>
+            <version>${rampart.mar.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.woden</groupId>
