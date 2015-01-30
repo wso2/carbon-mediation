@@ -20,12 +20,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.application.mgt.synapse.server.feature</artifactId>
             <type>zip</type>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.application.mgt.synapse.ui.feature</artifactId>
             <type>zip</type>
         </dependency>
@@ -52,8 +52,8 @@
                                 <importFeatureDef>org.wso2.carbon.application.mgt:${project.version}</importFeatureDef>
                             </importFeatures>
                             <includedFeatures>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.application.mgt.synapse.server.feature</includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.application.mgt.synapse.ui.feature</includedFeatureDef>
+                                <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.application.mgt.synapse.server.feature</includedFeatureDef>
+                                <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.application.mgt.synapse.ui.feature</includedFeatureDef>
                             </includedFeatures>
                         </configuration>
                     </execution>

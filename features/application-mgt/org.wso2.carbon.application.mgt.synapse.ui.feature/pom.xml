@@ -16,11 +16,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.application.mgt.synapse.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.application.mgt.synapse.stub</artifactId>
         </dependency>
     </dependencies>
@@ -48,8 +48,8 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.application.mgt.synapse.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.application.mgt.synapse.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.application.mgt.synapse.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.application.mgt.synapse.stub</bundleDef>
                             </bundles>
                             <importFeatures>
                             </importFeatures>
