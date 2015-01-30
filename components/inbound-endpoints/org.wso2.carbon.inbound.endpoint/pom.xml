@@ -58,7 +58,8 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.carbon.inbound.endpoint.protocol.http.management
+                            org.wso2.carbon.inbound.endpoint.protocol.http.management,
+                            org.wso2.carbon.inbound.endpoint.protocol.generic
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.inbound.endpoint.persistence;
