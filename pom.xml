@@ -1844,12 +1844,11 @@
         <carbon.commons.version>4.3.1</carbon.commons.version>
         <carbon.deployment.version>4.3.0</carbon.deployment.version>
         <carbon.commons.version>4.3.1</carbon.commons.version>
-        <carbon.deployment.version>4.3.0-SNAPSHOT</carbon.deployment.version>
         <carbon.governance.version>4.3.0-SNAPSHOT</carbon.governance.version>
         <carbon.registry.version>4.3.0</carbon.registry.version>
         <carbon.multitenancy.version>4.3.0</carbon.multitenancy.version>
         <carbon.utils.version>4.3.0-SNAPSHOT</carbon.utils.version>
-        <carbon.rule.version>3.2.0</carbon.rule.version>
+        <carbon.rule.version>4.3.0-SNAPSHOT</carbon.rule.version>
         <carbon.identity.version>4.3.0</carbon.identity.version>
 
 
