@@ -19,12 +19,12 @@
     <parent>
         <artifactId>inbound-endpoints-feature</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.3.1-SNAPSHOT</version>
+        <version>4.3.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.1-SNAPSHOT</version>
+    <version>4.3.0</version>
     <artifactId>org.wso2.carbon.inbound.endpoints.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Initializer Feature</name>

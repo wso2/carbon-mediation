@@ -19,7 +19,7 @@
 
    <parent>
        <artifactId>synapse-features</artifactId>
-       <version>4.3.1-SNAPSHOT</version>
+       <version>4.3.0</version>
        <groupId>org.wso2.carbon</groupId>
     </parent>
 
@@ -28,7 +28,7 @@
     <artifactId>org.apache.synapse.transport.vfs.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Synapse VFS Transport Feature</name>
-    <version>4.3.1-SNAPSHOT</version>
+    <version>4.3.0</version>
     <groupId>org.wso2.carbon</groupId>
     <url>http://wso2.org</url>
     <description>This feature contains the synapse vfs transport feature</description>

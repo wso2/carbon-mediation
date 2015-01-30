@@ -19,7 +19,7 @@
 
    <parent>
        <artifactId>synapse-features</artifactId>
-       <version>4.3.1-SNAPSHOT</version>
+       <version>4.3.0</version>
        <groupId>org.wso2.carbon</groupId>
     </parent>
 
@@ -28,7 +28,7 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Synapse FIX Transport Feature</name>
     <groupId>org.wso2.carbon</groupId>
-    <version>4.3.1-SNAPSHOT</version>
+    <version>4.3.0</version>
     <url>http://wso2.org</url>
     <description>This feature contains the synapse FIX transport feature</description>
 
