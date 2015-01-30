@@ -20,13 +20,13 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-admin-stub</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.3.0</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.wso2.carbon.mediation</groupId>
    <artifactId>org.wso2.carbon.mediators.event.admin.stub</artifactId>
    <packaging>bundle</packaging>
-   <version>4.3.0-SNAPSHOT</version>
+   <version>4.3.0</version>
    <name>WSO2 Carbon - Event Mediator Admin Stub</name>
    <url>http://wso2.org</url>
    <build>
@@ -64,7 +64,7 @@
                            <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                         </path>
                         <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                           <arg line="-uri src/main/resources/EventSourceAdminService.wsdl -u -uw -o target/generated-code                                     -p org.wso2.carbon.mediator.event.stub.service                                     -ns2p http://service.eventsource.eventing.carbon.wso2.org=org.wso2.carbon.mediator.event.stub.service,http://dto.service.eventsource.eventing.carbon.wso2.org/xsd=org.wso2.carbon.mediator.event.stub.service.xsd.dto" />
+                           <arg line="-uri src/main/resources/EventSourceAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.mediator.event.stub.service                                     -ns2p http://service.eventsource.eventing.carbon.wso2.org=org.wso2.carbon.mediator.event.stub.service,http://dto.service.eventsource.eventing.carbon.wso2.org/xsd=org.wso2.carbon.mediator.event.stub.service.xsd.dto" />
                            <classpath refid="wsdl2java.classpath" />
                         </java>
                      </tasks>
