@@ -20,13 +20,13 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-admin-stub</artifactId>
-      <version>4.3.0</version>
+      <version>4.3.0-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <groupId>org.wso2.carbon.mediation</groupId>
    <artifactId>org.wso2.carbon.mediation.library.stub</artifactId>
    <packaging>bundle</packaging>
-   <version>4.3.0</version>
+   <version>4.3.0-SNAPSHOT</version>
    <name>WSO2 Carbon - Mediation Library (Synapse) Management Stub</name>
    <url>http://wso2.org</url>
    <build>
@@ -50,11 +50,11 @@
                            <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                         </path>
                         <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                           <arg line="-uri src/main/resources/MediationLibraryAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.mediation.library.stub                                      -ns2p http://service.library.mediation.carbon.wso2.org=org.wso2.carbon.mediation.library.stub,http://service.library.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.library.stub.types.carbon,http://org.apache.axis2/xsd=org.wso2.carbon.mediation.library.stub.types.axis2,http://org.apache.synapse/xsd=org.wso2.carbon.mediation.library.stub.types.synapse" />
+                           <arg line="-uri src/main/resources/MediationLibraryAdminService.wsdl -u -uw -o target/generated-code                                     -p org.wso2.carbon.mediation.library.stub                                      -ns2p http://service.library.mediation.carbon.wso2.org=org.wso2.carbon.mediation.library.stub,http://service.library.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.library.stub.types.carbon,http://org.apache.axis2/xsd=org.wso2.carbon.mediation.library.stub.types.axis2,http://org.apache.synapse/xsd=org.wso2.carbon.mediation.library.stub.types.synapse" />
                            <classpath refid="wsdl2java.classpath" />
                         </java>
                         <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                           <arg line="-uri src/main/resources/MediationLibraryUploader.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.mediation.library.stub.upload                                      -ns2p http://upload.service.library.mediation.carbon.wso2.org=org.wso2.carbon.mediation.library.stub.upload,http://upload.service.library.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.library.stub.upload.types.carbon,http://org.apache.axis2/xsd=org.wso2.carbon.mediation.library.stub.upload.types.axis2" />
+                           <arg line="-uri src/main/resources/MediationLibraryUploader.wsdl -u -uw -o target/generated-code                                      -p org.wso2.carbon.mediation.library.stub.upload                                      -ns2p http://upload.service.library.mediation.carbon.wso2.org=org.wso2.carbon.mediation.library.stub.upload,http://upload.service.library.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.library.stub.upload.types.carbon,http://org.apache.axis2/xsd=org.wso2.carbon.mediation.library.stub.upload.types.axis2" />
                            <classpath refid="wsdl2java.classpath" />
                         </java>
                      </tasks>
