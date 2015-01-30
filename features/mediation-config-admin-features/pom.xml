@@ -20,7 +20,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-      <groupId>org.wso2.carbon</groupId>
+      <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>carbon-mediation</artifactId>
       <version>4.3.0-SNAPSHOT</version>
       <relativePath>../../pom.xml</relativePath>
@@ -28,7 +28,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediation-config-admin-features</artifactId>
-    <groupId>org.wso2.carbon</groupId>
+    <groupId>org.wso2.carbon.mediation</groupId>
     <version>4.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Config Admin Feature Aggregator Module</name>
@@ -37,7 +37,7 @@
     <modules>
         <module>org.wso2.carbon.mediation.configadmin.feature</module>
         <module>org.wso2.carbon.mediation.configadmin.server.feature</module>
-	<module>org.wso2.carbon.mediation.configadmin.ui.feature</module>
+	    <module>org.wso2.carbon.mediation.configadmin.ui.feature</module>
     </modules>   
 
 </project>

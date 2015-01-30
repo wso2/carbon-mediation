@@ -20,14 +20,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <version>4.3.0-SNAPSHOT</version>
     	<artifactId>mediation-monitor-features</artifactId>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediation-statistics-feature</artifactId>
-    <groupId>org.wso2.carbon</groupId>
+    <groupId>org.wso2.carbon.mediation</groupId>
     <version>4.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Statistics Feature Aggregator Module</name>

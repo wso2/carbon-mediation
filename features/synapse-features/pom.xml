@@ -21,7 +21,7 @@
 
     
     <parent>
-      <groupId>org.wso2.carbon</groupId>
+      <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>carbon-mediation</artifactId>
       <version>4.3.0-SNAPSHOT</version>
       <relativePath>../../pom.xml</relativePath>
@@ -38,7 +38,7 @@
     <modules>
         <module>org.apache.synapse.wso2.feature</module>
         <module>org.apache.synapse.samples.feature</module>
-	<module>org.apache.synapse.transport.fix.feature</module>
+	    <module>org.apache.synapse.transport.fix.feature</module>
         <module>org.apache.synapse.transport.nhttp.feature</module>
         <module>org.apache.synapse.transport.vfs.feature</module>        
         <module>org.apache.synapse.transport.vfs.smb.feature</module>
