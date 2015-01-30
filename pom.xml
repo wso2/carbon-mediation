@@ -16,7 +16,8 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 		 <modelVersion>4.0.0</modelVersion>
 
 		 <parent>
@@ -27,7 +28,7 @@
 
     <groupId>org.wso2.carbon.mediation</groupId>
 	<artifactId>carbon-mediation</artifactId>
- 	<version>4.3.0</version>
+ 	<version>4.3.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
     <name>WSO2 Carbon - Platform Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -1847,7 +1848,7 @@
         <carbon.platform.package.import.version.range>4.3.0.SNAPSHOT</carbon.platform.package.import.version.range>
         <wso2carbon.old.version>4.2.0</wso2carbon.old.version>
         <previous.version>4.2.0</previous.version>
-        <product.version>4.3.0</product.version>
+        <product.version>4.3.0-SNAPSHOT</product.version>
         <wso2carbon.version>4.3.0</wso2carbon.version>
         <org.wso2.uri.template.version>1.6.4</org.wso2.uri.template.version>
         <org.wso2.caching.version>4.0.3</org.wso2.caching.version>
