@@ -91,11 +91,11 @@
             <artifactId>org.wso2.carbon.mediator.service</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.rules</groupId>
             <artifactId>org.wso2.carbon.rule.common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.rules</groupId>
             <artifactId>org.wso2.carbon.rule.mediation</artifactId>
         </dependency>
     </dependencies>

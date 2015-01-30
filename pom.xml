@@ -345,11 +345,6 @@
                 <version>${wso2carbon.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.registry</groupId>
-                <artifactId>org.wso2.carbon.registry.extensions</artifactId>
-                <version>${carbon.governance.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.bam.data.publisher.util</artifactId>
                 <version>${wso2carbon.old.version}</version>
@@ -375,12 +370,12 @@
                 <version>${carbon.registry.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon</groupId>
+                <groupId>org.wso2.carbon.rules</groupId>
                 <artifactId>org.wso2.carbon.rule.common</artifactId>
                 <version>${carbon.rule.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon</groupId>
+                <groupId>org.wso2.carbon.rules</groupId>
                 <artifactId>org.wso2.carbon.rule.mediation</artifactId>
                 <version>${carbon.rule.version}</version>
             </dependency>
@@ -1844,12 +1839,12 @@
         <carbon.commons.version>4.3.1</carbon.commons.version>
         <carbon.deployment.version>4.3.0</carbon.deployment.version>
         <carbon.commons.version>4.3.1</carbon.commons.version>
-        <carbon.governance.version>4.3.0-SNAPSHOT</carbon.governance.version>
         <carbon.registry.version>4.3.0</carbon.registry.version>
         <carbon.multitenancy.version>4.3.0</carbon.multitenancy.version>
-        <carbon.utils.version>4.3.0-SNAPSHOT</carbon.utils.version>
-        <carbon.rule.version>4.3.0-SNAPSHOT</carbon.rule.version>
         <carbon.identity.version>4.3.0</carbon.identity.version>
+        <carbon.registry.version>4.3.0</carbon.registry.version>
+        <carbon.multitenancy.version>4.3.0</carbon.multitenancy.version>
+        <carbon.rule.version>4.3.0</carbon.rule.version>
 
 
         <!-- Carbon platform version End here-->
