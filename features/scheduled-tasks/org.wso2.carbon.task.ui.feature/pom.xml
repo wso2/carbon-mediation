@@ -20,7 +20,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <version>4.3.0-SNAPSHOT</version>
         <artifactId>scheduled-tasks-feature</artifactId>
     </parent>
@@ -34,11 +34,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.task.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.task.stub</artifactId>
         </dependency>
     </dependencies>
@@ -66,8 +66,8 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.task.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.task.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.task.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.task.stub</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.ui:${wso2carbon.version}</importFeatureDef>
