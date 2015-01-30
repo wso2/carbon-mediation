@@ -1,0 +1,26 @@
+<featureSets>
+    <featureSet artifactType="synapse/sequence">
+        <feature id="org.apache.synapse.wso2.feature.group" version="[2.0.0, 3.0.0)"/>
+        <feature id="org.wso2.carbon.mediation.initializer.server.feature.group" version="[4.3.0.SNAPSHOT, 4.4.0)"/>
+    </featureSet>
+    <featureSet artifactType="synapse/endpoint">
+        <feature id="org.apache.synapse.wso2.feature.group" version="[2.0.0, 3.0.0)"/>
+        <feature id="org.wso2.carbon.mediation.initializer.server.feature.group" version="[4.3.0.SNAPSHOT, 4.4.0)"/>
+    </featureSet>
+    <featureSet artifactType="synapse/proxy-service">
+        <feature id="org.apache.synapse.wso2.feature.group" version="[2.0.0, 3.0.0)"/>
+        <feature id="org.wso2.carbon.mediation.initializer.server.feature.group" version="[4.3.0.SNAPSHOT, 4.4.0)"/>
+    </featureSet>
+    <featureSet artifactType="synapse/local-entry">
+        <feature id="org.apache.synapse.wso2.feature.group" version="[2.0.0, 3.0.0)"/>
+        <feature id="org.wso2.carbon.mediation.initializer.server.feature.group" version="[4.3.0.SNAPSHOT, 4.4.0)"/>
+    </featureSet>
+    <featureSet artifactType="synapse/event-source">
+        <feature id="org.apache.synapse.wso2.feature.group" version="[2.0.0, 3.0.0)"/>
+        <feature id="org.wso2.carbon.mediation.initializer.server.feature.group" version="[4.3.0.SNAPSHOT, 4.4.0)"/>
+    </featureSet>
+    <featureSet artifactType="synapse/task">
+        <feature id="org.apache.synapse.wso2.feature.group" version="[2.0.0, 3.0.0)"/>
+        <feature id="org.wso2.carbon.mediation.initializer.server.feature.group" version="[4.3.0.SNAPSHOT, 4.4.0)"/>
+    </featureSet>
+</featureSets>
