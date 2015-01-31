@@ -269,17 +269,17 @@
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
                 <artifactId>httpcore</artifactId>
-                <version>4.3.3.wso2v1</version>
+                <version>${httpcore.wso2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
                 <artifactId>httpcore-nio</artifactId>
-                <version>4.3.3.wso2v1</version>
+                <version>${httpcore.wso2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.2.5.wso2v1</version>
+                <version>${httpclient.wso2.version}</version>
             </dependency>
             <!-- Apache End here-->
             <!--Carbon common-->
@@ -1840,6 +1840,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
     <properties>
         <!-- Carbon platform version Start here-->
         <carbon.kernel.version>4.3.0</carbon.kernel.version>
@@ -1891,6 +1892,9 @@
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>1.6.1.wso2v12</rampart.wso2.version>
         <!--Apache End-->
+        <httpcore.wso2.version>4.3.3.wso2v1</httpcore.wso2.version>
+        <httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>
+
         <!--Misc-->
         <wsdl4j.wso2.version>1.6.2.wso2v4</wsdl4j.wso2.version>
         <ca.uhn.hapi.wso2.version>2.1.0.wso2v1</ca.uhn.hapi.wso2.version>
