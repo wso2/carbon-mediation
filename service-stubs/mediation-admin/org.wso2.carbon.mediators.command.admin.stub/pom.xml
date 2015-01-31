@@ -40,7 +40,7 @@
                   <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                   <Bundle-Name>${project.artifactId}</Bundle-Name>
                   <Private-Package />
-                  <Export-Package>org.wso2.carbon.mediator.command.admin.stub.*;version="${carbon.platform.package.export.version}",</Export-Package>
+                  <Export-Package>org.wso2.carbon.mediator.command.admin.stub.*;version="${carbon.mediation.exp.pkg.version}",</Export-Package>
                   <DynamicImport-Package>*</DynamicImport-Package>
                </instructions>
             </configuration>

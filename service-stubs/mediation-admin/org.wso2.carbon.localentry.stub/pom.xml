@@ -41,7 +41,7 @@
                   <Bundle-Name>${project.artifactId}</Bundle-Name>
                   <Private-Package />
                   <Export-Package>org.wso2.carbon.localentry.stub.*;
-			    version="${carbon.platform.package.export.version}"</Export-Package>
+			    version="${carbon.mediation.exp.pkg.version}"</Export-Package>
                   <Import-Package>!org.wso2.carbon.localentry.stub.*</Import-Package>
                   <DynamicImport-Package>*</DynamicImport-Package>
                </instructions>

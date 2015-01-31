@@ -46,7 +46,7 @@
                         <Private-Package>
                         </Private-Package>
                         <Export-Package>
-                            org.wso2.carbon.inbound.stub.*;version="${carbon.platform.package.export.version}"
+                            org.wso2.carbon.inbound.stub.*;version="${carbon.mediation.exp.pkg.version}"
                         </Export-Package>
                         <Import-Package>
                             !org.wso2.carbon.inbound.stub.*

@@ -47,7 +47,7 @@
                         </Private-Package>
                         <Export-Package>
                             org.wso2.carbon.business.messaging.hl7.store.stub.*;
-                            version="${carbon.platform.package.export.version}",
+                            version="${carbon.mediation.exp.pkg.version}",
                             org.wso2.carbon.business.messaging.hl7.store.entity.*,
                             org.wso2.carbon.business.messaging.hl7.store.entity.xsd.*
                         </Export-Package>

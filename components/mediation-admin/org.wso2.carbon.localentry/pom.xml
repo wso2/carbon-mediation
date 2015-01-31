@@ -80,10 +80,10 @@
                         <Export-Package>
                             !javax.servlet,
                             !javax.servlet.http,
-                            org.wso2.carbon.localentry.service; version=1.0.0,
-                            org.wso2.carbon.localentry.dos; version=1.0.0,
-                            org.wso2.carbon.localentry; version=1.0.0,
-                            org.wso2.carbon.localentry.persistence; version=1.0.0,
+                            org.wso2.carbon.localentry.service; version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.localentry.dos; version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.localentry; version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.localentry.persistence; version="${carbon.mediation.exp.pkg.version}",
                         </Export-Package>
                         <Import-Package>
                             !org.wso2.carbon.localentry.service,

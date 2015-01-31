@@ -44,8 +44,8 @@
                         <Private-Package>
                         </Private-Package>
                         <Export-Package>
-                            org.wso2.carbon.mediation.templates.stub.*;version="${carbon.platform.package.export.version}",
-                            org.wso2.carbon.mediation.templates.endpoint.stub.*;version="${carbon.platform.package.export.version}",
+                            org.wso2.carbon.mediation.templates.stub.*;version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.mediation.templates.endpoint.stub.*;version="${carbon.mediation.exp.pkg.version}",
                         </Export-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

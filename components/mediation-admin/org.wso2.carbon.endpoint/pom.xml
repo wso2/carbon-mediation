@@ -46,9 +46,9 @@
                    <SYNAPSE_DEPLOYER-RequiredServices>
                        org.wso2.carbon.endpoint.service.EndpointDeployerService
                    </SYNAPSE_DEPLOYER-RequiredServices>
-                  <Export-Package>org.wso2.carbon.endpoint.service; version=1.0.0,
-                            org.wso2.carbon.endpoint.*; version=1.0.0,
-                            org.wso2.carbon.endpoint; version=1.0.0,</Export-Package>
+                  <Export-Package>org.wso2.carbon.endpoint.service; version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.endpoint.*; version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.endpoint; version="${carbon.mediation.exp.pkg.version}",</Export-Package>
                   <Import-Package>!org.wso2.carbon.endpoint.service,
                             !org.wso2.carbon.endpoint,
                             org.wso2.carbon.registry.core.service; version=1.0.1,
