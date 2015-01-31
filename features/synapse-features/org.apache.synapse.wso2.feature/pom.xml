@@ -21,7 +21,7 @@
 
     <parent>
        <artifactId>synapse-features</artifactId>
-       <groupId>org.wso2.carbon</groupId>
+       <groupId>org.wso2.carbon.mediation</groupId>
        <version>2.1.3-wso2v1-SNAPSHOT</version>
     </parent>
 
