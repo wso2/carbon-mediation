@@ -253,6 +253,22 @@
                 <artifactId>addressing</artifactId>
                 <version>${addressing.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>addressing</artifactId>
+                <version>${addressing.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-javamail_1.4_spec</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-activation_1.1_spec</artifactId>
+                    </exclusion>
+                </exclusions>
+               <type>mar</type>
+            </dependency>
 
             <!--3 Apache -->
             <dependency>
@@ -549,6 +565,11 @@
                 <groupId>org.wso2.carbon.identity</groupId>
                 <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
                 <version>${carbon.identity.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.identity.entitlement.mediator</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <!--8 Carbon-Rules -->
@@ -1501,6 +1522,24 @@
                 <version>${carbon.mediation.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.smooks.server.feature</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.smooks.ui.feature</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.apache.synapse.wso2.feature</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
 
             <!--11 Carbon 420 Start-->
             <dependency>
@@ -1845,6 +1884,20 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+
+            <!-- mediation clustering -->
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediation.clustering</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Sap -->
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.transports.sap</artifactId>
+                <version>${wso2carbon.version.sap}</version>   
             </dependency>
         </dependencies>
     </dependencyManagement>
