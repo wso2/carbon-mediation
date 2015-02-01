@@ -2108,6 +2108,9 @@
         <!--New -->
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
         <javax.servlet.http.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.http.imp.pkg.version>
+	<javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
+	<javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
+	<org.wso2.carbon.registry.core.service.version>[1.0.1, 1.1.0)</org.wso2.carbon.registry.core.service.version>
         <org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>
 
     </properties>

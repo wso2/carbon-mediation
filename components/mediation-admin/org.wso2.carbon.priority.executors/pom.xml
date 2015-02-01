@@ -54,7 +54,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            org.apache.commons.logging.*;version="1.0.4",
+                            org.apache.commons.logging.*;version="${org.apache.commons.logging.version}",
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
