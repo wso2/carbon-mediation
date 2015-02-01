@@ -100,7 +100,7 @@
                             org.apache.synapse.core.axis2,
                             org.apache.synapse.mediators.base,
                             org.wso2.carbon.core,
-                            org.wso2.carbon.registry.core.service; version="${org.wso2.carbon.registry.core.service.version}",
+                            org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                             javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>

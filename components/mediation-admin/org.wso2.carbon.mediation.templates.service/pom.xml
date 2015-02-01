@@ -57,7 +57,7 @@
                             javax.xml.namespace; version=0.0.0,
                             org.apache.commons.logging,
                             org.osgi.framework,
-                            org.wso2.carbon.registry.core.service; version="${org.wso2.carbon.registry.core.service.version}",
+                            org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

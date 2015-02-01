@@ -107,7 +107,7 @@
                             org.apache.axis2.transport.base,
                             org.wso2.carbon.core,
                             org.wso2.carbon.service.mgt,
-                            org.wso2.carbon.registry.core.service; version="${org.wso2.carbon.registry.core.service.version}",
+                            org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                             javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>

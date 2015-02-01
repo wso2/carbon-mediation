@@ -51,7 +51,7 @@
                             org.wso2.carbon.endpoint; version="${carbon.mediation.exp.pkg.version}",</Export-Package>
                   <Import-Package>!org.wso2.carbon.endpoint.service,
                             !org.wso2.carbon.endpoint,
-                            org.wso2.carbon.registry.core.service; version="${org.wso2.carbon.registry.core.service.version}",
+                            org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                             *;resolution:=optional</Import-Package>
                   <DynamicImport-Package>*</DynamicImport-Package>
                </instructions>
