@@ -1,15 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>business-adaptors</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.0</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.transports.sap</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.0</version>
     <packaging>${packaging.type}</packaging>
     <name>SAP transport</name>
     <description>WSO2 Carbon - SAP Adapter</description>
@@ -125,33 +123,23 @@
                                 <phase>compile</phase>
                                 <configuration>
                                     <tasks>
-                                        <taskdef resource="net/sf/antcontrib/antcontrib.properties"
-                                                 classpathref="maven.plugin.classpath"/>
-                                        <echo message="SAPJCo available"/>
-                                        <echo message="Building SAP Adapter"/>
+                                        <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
+                                        <echo message="SAPJCo available" />
+                                        <echo message="Building SAP Adapter" />
 
-                                        <mkdir dir="${basedir}/target"/>
-                                        <mkdir dir="${basedir}/target/classes"/>
+                                        <mkdir dir="${basedir}/target" />
+                                        <mkdir dir="${basedir}/target/classes" />
 
-                                        <property name="runtime-classpath"
-                                                  refid="maven.runtime.classpath"/>
+                                        <property name="runtime-classpath" refid="maven.runtime.classpath" />
 
                                         <path id="lib.path.ref">
-                                            <fileset dir="${basedir}/lib"
-                                                     includes="*.jar"/>
+                                            <fileset dir="${basedir}/lib" includes="*.jar" />
                                         </path>
 
-                                        <echo message="Maven CLASS PATH : ${runtime-classpath}"/>
+                                        <echo message="Maven CLASS PATH : ${runtime-classpath}" />
 
-                                        <javac fork="true"
-                                               executable="${env.JAVA_HOME}/bin/javac"
-                                               srcdir="${basedir}/src/main/java"
-                                               destdir="${basedir}/target/classes"
-                                               classpathref="lib.path.ref"
-                                               classpath="${runtime-classpath}"
-                                               debug="true" debuglevel="lines,vars,source">
-                                            <include
-                                                    name="org/wso2/carbon/transports/sap/**"/>
+                                        <javac fork="true" executable="${env.JAVA_HOME}/bin/javac" srcdir="${basedir}/src/main/java" destdir="${basedir}/target/classes" classpathref="lib.path.ref" classpath="${runtime-classpath}" debug="true" debuglevel="lines,vars,source">
+                                            <include name="org/wso2/carbon/transports/sap/**" />
                                         </javac>
                                     </tasks>
                                 </configuration>
