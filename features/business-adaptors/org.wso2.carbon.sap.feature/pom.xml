@@ -35,11 +35,10 @@
     <description>This feature contains the bundles required for sap</description>
 
     <dependencies>
-	<dependency>
-	    <groupId>org.wso2.carbon</groupId>
-	    <artifactId>org.wso2.carbon.transports.sap</artifactId>
-	    <version>${wso2carbon.version.sap}</version>	
-	</dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.transports.sap</artifactId>
+        </dependency>
     </dependencies>	
    
     <build>
@@ -68,9 +67,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <wso2carbon.version.sap>1.0</wso2carbon.version.sap>
-    </properties>
 
 </project>

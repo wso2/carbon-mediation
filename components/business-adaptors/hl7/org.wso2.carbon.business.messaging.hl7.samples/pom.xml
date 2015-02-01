@@ -85,7 +85,6 @@
         <dependency>
             <groupId>org.apache.axis2</groupId>
             <artifactId>addressing</artifactId>
-            <version>${addressing.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.geronimo.specs</groupId>
@@ -101,7 +100,6 @@
         <dependency>
             <groupId>org.apache.rampart</groupId>
             <artifactId>rampart</artifactId>
-            <version>${rampart.mar.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.woden</groupId>
