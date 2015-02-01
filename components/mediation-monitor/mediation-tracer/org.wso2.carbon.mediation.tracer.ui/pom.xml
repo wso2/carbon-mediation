@@ -39,8 +39,8 @@
                   <Bundle-Name>${project.artifactId}</Bundle-Name>
                   <Carbon-Component>UIBundle</Carbon-Component>
                   <Export-Package>org.wso2.carbon.mediation.tracer.ui.*</Export-Package>
-                  <Import-Package>org.wso2.carbon.mediation.tracer.stub.*; version="${carbon.platform.package.export.version}",
-                            org.wso2.carbon.mediation.tracer.stub.client.*; version="${carbon.platform.package.export.version}"</Import-Package>
+                  <Import-Package>org.wso2.carbon.mediation.tracer.stub.*; version="${carbon.mediation.imp.pkg.version}",
+                            org.wso2.carbon.mediation.tracer.stub.client.*; version="${carbon.mediation.imp.pkg.version}"</Import-Package>
                   <DynamicImport-Package>*</DynamicImport-Package>
                </instructions>
             </configuration>

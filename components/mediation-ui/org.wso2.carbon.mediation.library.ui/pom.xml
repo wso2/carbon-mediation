@@ -27,7 +27,6 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.library.ui</artifactId>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <version>4.3.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Mediation Library UI</name>
@@ -59,7 +58,7 @@
                         <Import-Package>
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
 			                org.apache.axiom.*; version="${axiom.osgi.version.range}",
-                            org.wso2.carbon.mediation.library.stub.*; version="${wso2carbon.version}",
+                            org.wso2.carbon.mediation.library.stub.*; version="${carbon.mediation.imp.pkg.version}",
                             !javax.xml.namespace,
                             javax.xml.namespace;version="0.0.0",
                             *;resolution:=optional

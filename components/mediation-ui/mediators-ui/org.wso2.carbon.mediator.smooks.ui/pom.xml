@@ -24,7 +24,6 @@
 
     <modelVersion>4.0.0</modelVersion>
     <version>4.3.0-SNAPSHOT</version>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>org.wso2.carbon.mediator.smooks.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Smooks Mediator UI</name>
@@ -52,7 +51,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            org.apache.axiom.om; version=0.0.0,
+                            org.apache.axiom.om; version="${axiom.osgi.version.range}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>

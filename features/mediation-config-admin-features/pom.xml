@@ -28,7 +28,6 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediation-config-admin-features</artifactId>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <version>4.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Config Admin Feature Aggregator Module</name>

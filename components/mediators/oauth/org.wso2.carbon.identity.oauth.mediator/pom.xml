@@ -25,7 +25,6 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <version>4.3.0-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.identity.oauth.mediator</artifactId>
     <packaging>bundle</packaging>
@@ -88,8 +87,8 @@
                             !org.apache.axis2.databinding.utils.reader,
                             !org.pache.axis2.databinding.utils.writer,
                             !org.wso2.carbon.identity.oauth.mediator.*,
-                            org.wso2.carbon.identity.oauth2.stub.*;version="${carbon.platform.package.import.version.range}",
-                            org.wso2.carbon.identity.oauth.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.identity.oauth2.stub.*;version="${carbon.identity.imp.pkg.version}",
+                            org.wso2.carbon.identity.oauth.stub.*;version="${carbon.identity.imp.pkg.version}",
                             *; resolution:=optional
                         </Import-Package>
                         <Fragment-Host>synapse-core</Fragment-Host>
