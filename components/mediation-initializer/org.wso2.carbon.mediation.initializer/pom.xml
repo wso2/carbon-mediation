@@ -50,7 +50,7 @@
             <artifactId>org.wso2.carbon.mediation.registry</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.commons</groupId>
+            <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.datasource</artifactId>
         </dependency>
         <dependency>
