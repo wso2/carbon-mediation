@@ -51,7 +51,7 @@
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
                             org.apache.axiom.om; version=0.0.0,
-                            org.wso2.carbon.mediator.bam.config.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.mediator.bam.config.stub.*;version="${carbon.mediation.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>

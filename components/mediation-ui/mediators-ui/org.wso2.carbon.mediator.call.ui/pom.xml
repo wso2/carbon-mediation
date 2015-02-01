@@ -51,7 +51,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.proxyadmin.stub.*;version="${carbon.platform.package.import.version.range}",
-                            javax.xml.stream.*; version="1.0.1",
+                            javax.xml.stream.*; version="${javax.xml.stream.imp.pkg.version}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,

@@ -98,7 +98,7 @@
 			    !org.pache.axis2.databinding.utils.writer,
                             !org.wso2.carbon.identity.entitlement.mediator.*,
 			    org.wso2.carbon.identity.entitlement.proxy.*,
-                            org.wso2.carbon.identity.entitlement.stub.*;version=&quot;${carbon.platform.package.import.version.range}&quot;,
+                            org.wso2.carbon.identity.entitlement.stub.*;version=&quot;${carbon.identity.imp.pkg.version}&quot;,
                             org.wso2.carbon.authenticator.stub.*;version=&quot;${carbon.platform.package.import.version.range}&quot;,
                             *; resolution:=optional
                         </Import-Package>

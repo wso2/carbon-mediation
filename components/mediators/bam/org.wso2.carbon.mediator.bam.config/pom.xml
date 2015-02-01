@@ -54,7 +54,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            org.apache.axiom.om; version=0.0.0,
+                            org.apache.axiom.om; version="${axiom.osgi.version.range}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
