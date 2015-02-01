@@ -49,7 +49,7 @@
                             !javax.servlet.hpttp,
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.proxyadmin.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.proxyadmin.stub.*;version="${carbon.mediation.imp.pkg.version}",
                             javax.xml.stream.*; version="1.0.1",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             !javax.xml.namespace,

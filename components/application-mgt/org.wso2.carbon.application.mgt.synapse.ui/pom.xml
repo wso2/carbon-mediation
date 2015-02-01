@@ -43,7 +43,7 @@
                         </Export-Package>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Import-Package>
-                            org.wso2.carbon.application.mgt.synapse.stub;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.application.mgt.synapse.stub;version="${carbon.mediation.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

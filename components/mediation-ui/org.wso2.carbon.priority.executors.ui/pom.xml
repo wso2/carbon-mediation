@@ -47,7 +47,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.priority.executors.stub.*;
-                            version="${carbon.platform.package.import.version.range}",
+                            version="${carbon.mediation.imp.pkg.version}",
                             org.wso2.carbon.mediator.service.*,
                             org.wso2.carbon.sequences.common.*,
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",

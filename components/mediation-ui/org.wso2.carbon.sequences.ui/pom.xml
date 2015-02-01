@@ -54,7 +54,7 @@
                             org.wso2.carbon.sequences.ui.*,
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.sequences.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.sequences.stub.*;version="${carbon.mediation.imp.pkg.version}",
                             !org.wso2.carbon.sequences.ui.util,
                             !org.wso2.carbon.sequences.ui.util.ns,
                             !javax.xml.namespace,

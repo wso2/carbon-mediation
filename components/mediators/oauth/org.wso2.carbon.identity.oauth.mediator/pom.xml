@@ -79,7 +79,7 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            org.apache.commons.logging.*; version="1.0.4",
+                            org.apache.commons.logging.*; version="${org.apache.commons.logging.version}",
                             !org.osgi.framework,
                             !javax.servlet,
                             !javax.servlet.http,

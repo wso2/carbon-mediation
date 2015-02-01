@@ -42,7 +42,7 @@
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Import-Package>
                             org.wso2.carbon.task.stub.*;
-                            version="${carbon.platform.package.import.version.range}",
+                            version="${carbon.mediation.imp.pkg.version}",
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.synapse.task.*,

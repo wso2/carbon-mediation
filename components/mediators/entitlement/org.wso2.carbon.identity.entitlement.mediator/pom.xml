@@ -88,7 +88,7 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            org.apache.commons.logging.*; version=&quot;1.0.4&quot;,
+                            org.apache.commons.logging.*; version="${org.apache.commons.logging.version}",
                             !org.osgi.framework,
                             !javax.servlet,
                             !javax.servlet.http,
@@ -97,8 +97,8 @@
 			    !org.pache.axis2.databinding.utils.writer,
                             !org.wso2.carbon.identity.entitlement.mediator.*,
 			    org.wso2.carbon.identity.entitlement.proxy.*,
-                            org.wso2.carbon.identity.entitlement.stub.*;version=&quot;${carbon.identity.imp.pkg.version}&quot;,
-                            org.wso2.carbon.authenticator.stub.*;version=&quot;${carbon.platform.package.import.version.range}&quot;,
+                            org.wso2.carbon.identity.entitlement.stub.*;version="${carbon.identity.imp.pkg.version}",
+                            org.wso2.carbon.authenticator.stub.*;version="${carbon.kernel.imp.pkg.version}",
                             *; resolution:=optional
                         </Import-Package>
                         <Fragment-Host>synapse-core</Fragment-Host>

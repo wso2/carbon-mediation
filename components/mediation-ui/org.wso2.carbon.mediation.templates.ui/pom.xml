@@ -51,8 +51,8 @@
                             org.wso2.carbon.mediation.templates.ui.*,
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.mediation.templates.stub.*;version="${carbon.platform.package.import.version.range}",
-                            org.wso2.carbon.mediation.templates.endpoint.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.mediation.templates.stub.*;version="${carbon.mediation.imp.pkg.version}",
+                            org.wso2.carbon.mediation.templates.endpoint.stub.*;version="${carbon.mediation.imp.pkg.version}",
                             !javax.xml.namespace,
                             org.wso2.carbon.mediator.service.*,
                             org.wso2.carbon.sequences.common.*,
