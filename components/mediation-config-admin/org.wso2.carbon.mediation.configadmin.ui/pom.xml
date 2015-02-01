@@ -24,7 +24,6 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.configadmin.ui</artifactId>
-    <groupId>org.wso2.carbon.mediation</groupId>
 	<version>4.3.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Synapse Configuration Service Administrator UI</name>

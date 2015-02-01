@@ -29,7 +29,6 @@
     <artifactId>org.apache.synapse.transport.fix.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Synapse FIX Transport Feature</name>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <version>2.1.3-wso2v1-SNAPSHOT</version>
     <url>http://wso2.org</url>
     <description>This feature contains the synapse FIX transport feature</description>

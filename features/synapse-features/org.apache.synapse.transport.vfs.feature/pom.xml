@@ -31,7 +31,6 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Synapse VFS Transport Feature</name>
     <version>2.1.3-wso2v1-SNAPSHOT</version>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <url>http://wso2.org</url>
     <description>This feature contains the synapse vfs transport feature</description>
 

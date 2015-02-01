@@ -25,7 +25,6 @@
         <version>4.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
     <packaging>bundle</packaging>
     <version>4.3.0-SNAPSHOT</version>
@@ -38,7 +37,6 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.clustering</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
