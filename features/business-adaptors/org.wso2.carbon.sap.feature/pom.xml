@@ -38,7 +38,6 @@
 	<dependency>
 	    <groupId>org.wso2.carbon</groupId>
 	    <artifactId>org.wso2.carbon.transports.sap</artifactId>
-	    <!-- <version>${wso2carbon.version.sap}</version>	 -->
 	</dependency>
     </dependencies>	
    

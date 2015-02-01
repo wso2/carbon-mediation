@@ -38,7 +38,6 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.clustering</artifactId>
-            <!-- <version>${project.version}</version> -->
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
