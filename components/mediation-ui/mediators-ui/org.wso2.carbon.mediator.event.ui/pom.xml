@@ -23,7 +23,6 @@
     </parent>
     <version>4.3.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>org.wso2.carbon.mediator.event.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Event Mediator UI</name>

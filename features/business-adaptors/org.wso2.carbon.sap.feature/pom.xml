@@ -28,7 +28,6 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.transports.sap.feature</artifactId>
     <packaging>pom</packaging>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <name>WSO2 Carbon - SAP Adapter Feature</name>
     <version>4.3.0-SNAPSHOT</version>
     <url>http://wso2.org</url>

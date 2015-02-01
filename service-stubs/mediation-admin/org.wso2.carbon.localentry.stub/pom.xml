@@ -23,7 +23,6 @@
       <version>4.3.0-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <groupId>org.wso2.carbon.mediation</groupId>
    <artifactId>org.wso2.carbon.localentry.stub</artifactId>
    <packaging>bundle</packaging>
    <version>4.3.0-SNAPSHOT</version>
