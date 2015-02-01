@@ -21,7 +21,6 @@
       <version>4.3.0-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <groupId>org.wso2.carbon.mediation</groupId>
    <version>4.3.0-SNAPSHOT</version>
    <artifactId>bam-mediator-feature</artifactId>
    <packaging>pom</packaging>
