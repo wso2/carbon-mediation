@@ -522,6 +522,11 @@
             <!--6 Carbon-Commons -->
             <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
+                <artifactId>org.wso2.carbon.datasource</artifactId>
+                <version>${carbon.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.commons</groupId>
                 <artifactId>org.wso2.carbon.ntask.core</artifactId>
                 <version>${carbon.commons.version}</version>
             </dependency>
@@ -1559,11 +1564,6 @@
             </dependency>
 
             <!--11 Carbon 420 Start-->
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.datasource</artifactId>
-                <version>${wso2carbon.old.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.caching.core</artifactId>

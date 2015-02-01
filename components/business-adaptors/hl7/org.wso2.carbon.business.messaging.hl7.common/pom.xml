@@ -80,6 +80,7 @@
             <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
         </dependency>
+        <!--TODO: Remove this after refactoring logic-->
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.bam.data.publisher.util</artifactId>
