@@ -18,10 +18,9 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-admin-features</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.3.1-SNAPSHOT</version>
    </parent>
-   <groupId>org.wso2.carbon.mediation</groupId>
-   <version>4.3.0-SNAPSHOT</version>
+   <version>4.3.1-SNAPSHOT</version>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>org.wso2.carbon.mediation.admin.feature</artifactId>
    <packaging>pom</packaging>
@@ -175,9 +174,9 @@
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint</bundleDef>
                      </bundles>
                       <importFeatures>
-                          <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>
-                          <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
-                        <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${wso2carbon.version}</importFeatureDef>
+                          <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
+                          <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
+                        <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${carbon.mediation.version}</importFeatureDef>
                      </importFeatures>
                   </configuration>
                </execution>

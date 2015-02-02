@@ -18,12 +18,11 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>bam-mediator-feature</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.3.1-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>org.wso2.carbon.mediator.bam.feature</artifactId>
-   <groupId>org.wso2.carbon.mediation</groupId>
-   <version>4.3.0-SNAPSHOT</version>
+   <version>4.3.1-SNAPSHOT</version>
    <packaging>pom</packaging>
    <name>WSO2 Carbon - BAM Mediator Aggregate Feature</name>
    <url>http://wso2.org</url>
@@ -67,7 +66,7 @@
                      <id>org.wso2.carbon.mediator.bam</id>
                      <propertiesFile>../../../../etc/feature.properties</propertiesFile>
                      <importFeatures>
-                        <importFeatureDef>org.wso2.carbon.core:${wso2carbon.version}</importFeatureDef>
+                        <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
                         <importFeatureDef>org.wso2.carbon.databridge.datapublisher</importFeatureDef>
                      </importFeatures>
                      <includedFeatures>

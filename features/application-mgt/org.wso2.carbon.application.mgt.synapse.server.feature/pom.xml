@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>application-mgt-features</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.application.mgt.synapse.server.feature</artifactId>
@@ -48,9 +46,9 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
-                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.application.deployer.synapse:${project.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${project.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.application.deployer.synapse:${carbon.mediation.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${carbon.mediation.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

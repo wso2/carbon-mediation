@@ -19,12 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.1-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.proxyadmin.common</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Proxy Services Admin Common</name>
@@ -83,13 +82,13 @@
 			                !javax.xml.namespace,
 			                javax.xml.namespace; version="0.0.0",
                             org.apache.axis2.rpc.receivers; version="${axis2.osgi.version.range}",
-                            javax.xml.stream.*; version="1.0.1",
+                            javax.xml.stream.*; version="${javax.xml.stream.imp.pkg.version}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.axis2; version="${axis2.osgi.version.range}",
                             org.apache.axis2.description; version="${axis2.osgi.version.range}",
                             org.apache.axis2.engine; version="${axis2.osgi.version.range}",
                             org.apache.axis2.context; version="${axis2.osgi.version.range}",
-                            org.apache.commons.logging; version="1.0.4",
+                            org.apache.commons.logging; version="${org.apache.commons.logging.version}",
                             org.apache.synapse,
                             org.apache.synapse.config,
                             org.apache.synapse.config.xml,
@@ -99,8 +98,8 @@
                             org.apache.synapse.mediators.base,
                             org.apache.axis2.transport.base,
                             org.wso2.carbon.core,
-                            org.wso2.carbon.registry.core.service; version=1.0.1,
-                            javax.xml.soap; version=1.0.0,
+                            org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
+                            javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <Private-Package>

@@ -19,12 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.1-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.templates</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Template Editor BE</name>
@@ -63,7 +62,7 @@
                             org.osgi.framework,
                             org.wso2.carbon.mediation.templates.common,
                             org.wso2.carbon.mediation.templates.common.factory,
-                            org.wso2.carbon.registry.core.service; version=1.0.1,
+                            org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>

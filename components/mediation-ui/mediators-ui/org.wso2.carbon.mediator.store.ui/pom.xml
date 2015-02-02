@@ -19,12 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediators-ui</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.1-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediator.store.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Store Mediator UI</name>
@@ -56,7 +55,7 @@
                             org.osgi.framework,
                             org.wso2.carbon.mediator.service.*,
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
-                            org.wso2.carbon.message.store.stub.*; version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.message.store.stub.*; version="${carbon.mediation.imp.pkg.version}",
                             org.apache.synapse.config.xml,
                             org.wso2.carbon.mediator.service,
                             *;resolution:=optional

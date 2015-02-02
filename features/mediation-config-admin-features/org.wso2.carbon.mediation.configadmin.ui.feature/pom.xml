@@ -15,20 +15,17 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-config-admin-features</artifactId>
-      <version>4.3.0-SNAPSHOT</version>    
+      <version>4.3.1-SNAPSHOT</version>    
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.configadmin.ui.feature</artifactId>
-    <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.0-SNAPSHOT</version>    
+    <version>4.3.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Config Admin UI Feature</name>
     <url>http://wso2.org</url>
@@ -73,7 +70,7 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.configadmin.stub</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer.ui:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.initializer.ui:${carbon.mediation.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
