@@ -1895,7 +1895,7 @@
 
         <!-- Carbon mediation version -->
         <carbon.mediation.version>4.3.1-SNAPSHOT</carbon.mediation.version>
-        <carbon.mediation.exp.pkg.version>4.3.0</carbon.mediation.exp.pkg.version>
+        <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 4.4.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
