@@ -1558,11 +1558,12 @@
             </dependency>
 
             <!--11 Previous version components -->
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.datasource</artifactId>
-                <version>${carbon.datastore.version}</version>
-            </dependency>
+            <!--TODO use ndatasources-->
+            <!--<dependency>-->
+                <!--<groupId>org.wso2.carbon</groupId>-->
+                <!--<artifactId>org.wso2.carbon.datasource</artifactId>-->
+                <!--<version>${carbon.datastore.version}</version>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.caching.core</artifactId>
@@ -1898,18 +1899,18 @@
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.3.1</carbon.commons.version>
+        <carbon.commons.version>4.3.4</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
-        <carbon.deployment.version>4.3.0</carbon.deployment.version>
+        <carbon.deployment.version>4.3.1</carbon.deployment.version>
 
         <!-- Carbon Registry version-->
         <carbon.registry.version>4.3.0</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.3.0, 4.4.0)</carbon.registry.imp.pkg.version>
 
         <!-- Carbon Identity version-->
-        <carbon.identity.version>4.3.0</carbon.identity.version>
+        <carbon.identity.version>4.3.2</carbon.identity.version>
         <carbon.identity.imp.pkg.version>[4.3.0, 4.4.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->
@@ -2033,7 +2034,8 @@
         <javax.servlet.http.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.http.imp.pkg.version>
         <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>
         <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
-        <org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>
+        <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
+        <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
 
     </properties>
     <pluginRepositories>
