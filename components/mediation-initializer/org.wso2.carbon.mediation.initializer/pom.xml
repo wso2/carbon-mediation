@@ -115,6 +115,7 @@
                         </CAPP_MANAGER-RequiredServices>
                         <Export-Package>
                             org.wso2.carbon.mediation.initializer.*,
+                            org.wso2.carbon.mediation.initializer.request.processors
                         </Export-Package>
                         <Import-Package>
                             *;resolution:=optional
