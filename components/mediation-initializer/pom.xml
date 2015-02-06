@@ -36,5 +36,6 @@
         <module>org.wso2.carbon.mediation.dependency.mgt</module>
         <module>org.wso2.carbon.mediation.initializer</module>
         <module>org.wso2.carbon.mediation.initializer.ui</module>
+        <module>org.wso2.carbon.mediation.transport.handlers</module>
     </modules>
 </project>

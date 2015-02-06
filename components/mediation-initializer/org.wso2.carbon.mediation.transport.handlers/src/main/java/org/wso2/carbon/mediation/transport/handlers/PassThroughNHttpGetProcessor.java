@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.mediation.initializer.request.processors;
+package org.wso2.carbon.mediation.transport.handlers;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
@@ -65,9 +65,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * Get Processor implementation for Pass-through Transport.
+ * Get Processor implementation for PassThrough Transport.
  */
-public class PassThroughNHttpGetProcessor  implements HttpGetRequestProcessor{
+public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
 
 	
     private Map<String, org.wso2.carbon.core.transports.HttpGetRequestProcessor> getRequestProcessors =

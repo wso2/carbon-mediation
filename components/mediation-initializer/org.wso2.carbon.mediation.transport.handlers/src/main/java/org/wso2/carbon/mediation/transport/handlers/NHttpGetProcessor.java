@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.mediation.initializer.request.processors;
+package org.wso2.carbon.mediation.transport.handlers;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.xpath.AXIOMXPath;
@@ -57,8 +57,8 @@ import java.util.StringTokenizer;
  */
 public class NHttpGetProcessor extends DefaultHttpGetProcessor {
 
-    private Map<String, HttpGetRequestProcessor> getRequestProcessors =
-            new LinkedHashMap<String, HttpGetRequestProcessor>();
+    private Map<String, org.wso2.carbon.core.transports.HttpGetRequestProcessor> getRequestProcessors =
+            new LinkedHashMap<String, org.wso2.carbon.core.transports.HttpGetRequestProcessor>();
 
     private static final QName ITEM_QN = new QName(ServerConstants.CARBON_SERVER_XML_NAMESPACE, "Item");
     private static final QName CLASS_QN = new QName(ServerConstants.CARBON_SERVER_XML_NAMESPACE, "Class");
@@ -81,12 +81,12 @@ public class NHttpGetProcessor extends DefaultHttpGetProcessor {
                         throw new ServletException("Required element, 'Item' not found!");
                     }
                     OMElement classEle = processorEle.getFirstChildWithName(CLASS_QN);
-                    HttpGetRequestProcessor processor;
+                    org.wso2.carbon.core.transports.HttpGetRequestProcessor processor;
                     if (classEle == null) {
                         throw new ServletException("Required element, 'Class' not found!");
                     } else {
                         processor =
-                                (HttpGetRequestProcessor)
+                                (org.wso2.carbon.core.transports.HttpGetRequestProcessor)
                                         Class.forName(classEle.getText().trim()).newInstance();
                     }
                     getRequestProcessors.put(itemEle.getText().trim(), processor);
