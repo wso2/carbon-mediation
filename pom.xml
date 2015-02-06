@@ -2041,6 +2041,7 @@
         <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
+        <project.scm.id>wso2-scm-server</project.scm.id>
 
     </properties>
     <pluginRepositories>
