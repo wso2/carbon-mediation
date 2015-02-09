@@ -1895,7 +1895,7 @@
 
         <!-- Carbon mediation version -->
         <carbon.mediation.version>4.3.2-SNAPSHOT</carbon.mediation.version>
-        <carbon.mediation.exp.pkg.version>4.3.0</carbon.mediation.exp.pkg.version>
+        <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 4.4.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
@@ -2041,6 +2041,7 @@
         <javax.xml.soap.imp.pkg.version>[1.0.0, 1.1.0)</javax.xml.soap.imp.pkg.version>
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
+        <project.scm.id>wso2-scm-server</project.scm.id>
 
     </properties>
     <pluginRepositories>
