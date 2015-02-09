@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer-features</artifactId>
-        <version>4.3.1-SNAPSHOT</version>
+        <version>4.3.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.3.1-SNAPSHOT</version>
+    <version>4.3.2-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.initializer.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Initializer Server Feature</name>
@@ -35,6 +35,10 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediation.transport.handlers</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
@@ -75,13 +79,15 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.initializer</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.transport.handlers</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.registry</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.dependency.mgt</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.startup</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.datasource.server:${carbon.datastore.version}</importFeatureDef>
+                                <!--TODO use ndatasource-->
+                                <!--<importFeatureDef>org.wso2.carbon.datasource.server:${carbon.datastore.version}</importFeatureDef>-->
                                 <importFeatureDef>org.wso2.carbon.task.server</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.event.server</importFeatureDef>
                             </importFeatures>
