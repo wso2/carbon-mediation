@@ -487,7 +487,12 @@ function updateResource(v) {
                         resourceList = (ArrayList<ResourceData>)session.getAttribute("apiResources");
                         %>
                             document.getElementById("resourceSizeVar").innerHTML = data;
-                            var size = document.getElementById("resourcesSize").value;
+                            var tempsize = document.getElementById("resourcesSize");
+                            if(tempsize) {
+                                size = tempsize.value;
+                            } else {
+                                size = 0;
+                            }
                             var parentNode = document.getElementById("parent");
                             var innerHtml = parentNode.innerHTML;
                             innerHtml += getResourceNode(size-1);
