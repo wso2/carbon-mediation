@@ -308,7 +308,6 @@ public class DependencyTracker extends AbstractSynapseObserver {
         dependencyGraph.removeDependencies(dependentObject);
 
         resolveEntry(def.getWsSecPolicyKey(), dependentObject);
-        resolveEntry(def.getWsRMPolicyKey(), dependentObject);
         resolveEntry(def.getInboundWsSecPolicyKey(), dependentObject);
         resolveEntry(def.getOutboundWsSecPolicyKey(), dependentObject);
 
