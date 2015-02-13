@@ -53,7 +53,10 @@ var classRequired = false;
         try {
             client = InboundManagementClient.getInstance(config, session);
             InboundDescription inboundDescription = client.getInboundDescription(request.getParameter("name"));
-    %>
+            List<String>defaultParams = client.getDefaultParameters(inboundDescription.getType());            
+            List<String>advParams = client.getAdvParameters(inboundDescription.getType());            
+    %>       
+    
     <form method="post" name="inboundupdateform" id="inboundupdateform"
           action="updateInbound.jsp">
 
@@ -118,15 +121,97 @@ var classRequired = false;
                         <td></td>
                     </tr>                   
                     <% } %>
-					<% for(String strKey : inboundDescription.getParameters().keySet()) {%>                        
+                    <%if(!defaultParams.isEmpty()){                     
+                    %>
+                    <script type="text/javascript">var requiredParams = new Array(<%=defaultParams.size()%>);</script>
+                    <%} %>       
+					<%  int ctr = -1;
+					    for(String defaultParamOri : defaultParams) {
+						String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
+						String defaultParam = arrParamOri[0].trim();	
+						ctr++;
+					%> 	
+					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
 	                    <tr>
-	                        <td style="width:150px"><%=strKey%></td>
-	                        <td align="left">	                            	                      
-                                <input id="param.<%=strKey%>" name="param.<%=strKey%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(strKey)%>"/>                       
+	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
+	                        <td align="left">
+	                        <%if(arrParamOri.length > 1){%>
+	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>" value="<%=inboundDescription.getParameters().get(defaultParam)%>">
+	                            <%for(int i = 1;i<arrParamOri.length;i++){%>
+	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
+	                            <%}%>                                
+                                </select>
+							<%} else{%>	                            	                      
+                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
+                            <%} %>                       
 	                        </td>
 	                        <td></td>
 	                    </tr>                        
-                     <% } %>
+                     <% } %>                     
+                     <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
+                    <tr>
+                        <td class="buttonRow" colspan="3">       
+	                            <input class="button" type="button"
+	                                   value='<fmt:message key="inbound.add.param"/>'
+	                                   onclick="addRow('tblInput');"/>   
+	                            <input class="button" type="button"
+	                                   value='<fmt:message key="inbound.remove.param"/>'
+	                                   onclick="deleteRow('tblInput');"/>                                                                 
+                        </td>
+                    </tr>  
+					<%  int i = 0;
+					    for(String strKey : inboundDescription.getParameters().keySet()) {
+					    i++;
+					    %>                        
+	                    <tr>
+	                        <td style="width:150px">
+	                            <input id="paramkey<%=i%>" name="paramkey<%=i%>" class="longInput" type="text" value="<%=strKey%>"/>  
+	                        </td>
+	                        <td align="left">	                            	                      
+                                <input id="paramval<%=i%>" name="paramval<%=i%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(strKey)%>"/>                       
+	                        </td>
+	                        <td></td>
+	                    </tr>                        
+                     <% } %> 
+                     <script type="text/javascript">var iParamCount = <%=i%>;</script>
+                     <%}else{ %>
+				    <tr>
+				        <td><span id="_adv" style="float: left; position: relative;">
+				            <a class="icon-link" onclick="javascript:showAdvancedOptions('');"
+				               style="background-image: url(images/down.gif);"><fmt:message
+				                    key="show.advanced.options"/></a>
+				        </span>
+				        </td>
+				    </tr> 
+				    <%} %>                     
+				    <tr>
+					    <td colspan="3">
+						    <div id="_advancedForm" style="display:none">
+						    <table id="tblAdvInput" name="tblAdvInput" class="normal-nopadding" cellspacing="0" cellpadding="0" border="0">
+								<% for(String defaultParamOri : advParams) {
+									String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
+									String defaultParam = arrParamOri[0].trim();						
+								%> 					                       
+				                    <tr>
+				                        <td style="width:150px"><%=defaultParam %></td>
+				                        <td align="left">
+				                        <%if(arrParamOri.length > 1){%>
+				                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+				                            <%for(int i = 1;i<arrParamOri.length;i++){%>
+				                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
+				                            <%}%>                                
+			                                </select>
+										<%} else{%>	                            	                      
+			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"/>
+			                            <%} %>                       
+				                        </td>
+				                        <td></td>
+				                    </tr>                        
+			                     <% } %>						    
+						    	</table>
+						    </div> 			
+					    </td>
+				    </tr>                     
                     <tr>
                         <td class="buttonRow" colspan="3">
                             <input class="button" type="button"
@@ -161,4 +246,5 @@ var classRequired = false;
         }
     %>
 </fmt:bundle>
+
 
