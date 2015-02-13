@@ -1,5 +1,5 @@
 <!--
- ~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~ Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ WSO2 Inc. licenses this file to you under the Apache License,
  ~ Version 2.0 (the "License"); you may not use this file except
@@ -42,7 +42,9 @@
 <script type="text/javascript" src="global-params.js"></script>
 <script type="text/javascript" src="inboundcommon.js"></script>
 <script type="text/javascript">
+var iParamCount = 0;
 var classRequired = false;
+var requiredParams = null;
 </script>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
     <carbon:breadcrumb label="inbound.header.update"
@@ -173,7 +175,7 @@ var classRequired = false;
 	                        <td></td>
 	                    </tr>                        
                      <% } %> 
-                     <script type="text/javascript">var iParamCount = <%=i%>;</script>
+                     <script type="text/javascript">iParamCount = <%=i%>;</script>
                      <%}else{ %>
 				    <tr>
 				        <td><span id="_adv" style="float: left; position: relative;">
@@ -216,7 +218,7 @@ var classRequired = false;
                         <td class="buttonRow" colspan="3">
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.update.button.text"/>"
-                                   onclick="inboundUpdate('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>',document.inboundupdateform); return false;"/>
+                                   onclick="inboundUpdate('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>',document.inboundupdateform); return false;"/>
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.cancel.button.text"/>"
                                    onclick="document.location.href='index.jsp?ordinal=0';"/>                                                                   

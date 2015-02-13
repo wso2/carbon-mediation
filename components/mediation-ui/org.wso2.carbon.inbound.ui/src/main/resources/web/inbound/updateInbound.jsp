@@ -46,8 +46,20 @@
 			List<ParamDTO>sParams = new ArrayList<ParamDTO>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
-				if(strKey.startsWith("param.")){
-					sParams.add(new ParamDTO(strKey.replaceAll("param.",""),request.getParameter(strKey)));
+				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.")){
+					String strVal = request.getParameter(strKey);
+					if(strVal != null && !strVal.equals("")){
+						sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+					}
+				}else if(strKey.startsWith("paramkey")){
+					String paramKey = request.getParameter("paramkey" + strKey.replaceAll("paramkey",""));
+					if(paramKey != null && !paramKey.trim().equals("")){
+						sParams.add((new ParamDTO(paramKey, request.getParameter("paramval" + strKey.replaceAll("paramkey","")))));	
+					}	
+				}else if(strKey.startsWith("interval")){
+				    sParams.add((new ParamDTO("interval",request.getParameter("interval"))));
+				}else if(strKey.startsWith("sequential")){
+				    sParams.add((new ParamDTO("sequential",request.getParameter("sequential"))));				    
 				}	
 			}
 			client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
