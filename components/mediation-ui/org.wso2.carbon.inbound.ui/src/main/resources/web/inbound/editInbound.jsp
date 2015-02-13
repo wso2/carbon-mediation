@@ -15,10 +15,14 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
+<%@page import="java.util.HashSet"%>
+<%@page import="java.util.Set"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundDescription"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundClientConstants"%>
 <%@page import="java.util.List"%>
+<%@page import="java.util.Set"%>
+<%@page import="java.util.HashSet"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -43,6 +47,7 @@
 <script type="text/javascript" src="inboundcommon.js"></script>
 <script type="text/javascript">
 var iParamCount = 0;
+var iParamMax = 0;
 var classRequired = false;
 var requiredParams = null;
 </script>
@@ -56,7 +61,8 @@ var requiredParams = null;
             client = InboundManagementClient.getInstance(config, session);
             InboundDescription inboundDescription = client.getInboundDescription(request.getParameter("name"));
             List<String>defaultParams = client.getDefaultParameters(inboundDescription.getType());            
-            List<String>advParams = client.getAdvParameters(inboundDescription.getType());            
+            List<String>advParams = client.getAdvParameters(inboundDescription.getType()); 
+            Set<String>defaultParamNames = new HashSet<String>();
     %>       
     
     <form method="post" name="inboundupdateform" id="inboundupdateform"
@@ -86,7 +92,8 @@ var requiredParams = null;
                         <td style="width:150px"><fmt:message key="inbound.type"/></td>
                         <td align="left">
                             <%=inboundDescription.getType()%>
-                            <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundDescription.getType()%>"/>                      
+                            <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundDescription.getType()%>"/> 
+                            <input name="inboundMode" id="inboundMode" type="hidden" value="edit"/>                                                  
                         </td>
                         <td></td>
                     </tr>
@@ -130,7 +137,8 @@ var requiredParams = null;
 					<%  int ctr = -1;
 					    for(String defaultParamOri : defaultParams) {
 						String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
-						String defaultParam = arrParamOri[0].trim();	
+						String defaultParam = arrParamOri[0].trim();
+						defaultParamNames.add(defaultParam);
 						ctr++;
 					%> 	
 					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
@@ -138,10 +146,16 @@ var requiredParams = null;
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
 	                        <td align="left">
 	                        <%if(arrParamOri.length > 1){%>
-	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>" value="<%=inboundDescription.getParameters().get(defaultParam)%>">
-	                            <%for(int i = 1;i<arrParamOri.length;i++){%>
-	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
-	                            <%}%>                                
+	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+	                            <%for(int i = 1;i<arrParamOri.length;i++){
+	                                String eleValue = arrParamOri[i].trim();
+	                            %>
+	                            <%if(eleValue.equals(inboundDescription.getParameters().get(defaultParam))){ %>
+	                                <option value="<%=eleValue%>" selected><%=eleValue%></option>
+	                            <%}else{%>
+	                                <option value="<%=eleValue%>"><%=eleValue%></option>	                                                
+	                            <%}%>  	  
+	                            <%}%>
                                 </select>
 							<%} else{%>	                            	                      
                                 <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
@@ -163,6 +177,7 @@ var requiredParams = null;
                     </tr>  
 					<%  int i = 0;
 					    for(String strKey : inboundDescription.getParameters().keySet()) {
+					    if(!defaultParamNames.contains(strKey)){
 					    i++;
 					    %>                        
 	                    <tr>
@@ -175,7 +190,8 @@ var requiredParams = null;
 	                        <td></td>
 	                    </tr>                        
                      <% } %> 
-                     <script type="text/javascript">iParamCount = <%=i%>;</script>
+                     <% } %> 
+                     <script type="text/javascript">iParamCount=<%=i%>;iParamMax=<%=i%>;</script>
                      <%}else{ %>
 				    <tr>
 				        <td><span id="_adv" style="float: left; position: relative;">
@@ -199,12 +215,18 @@ var requiredParams = null;
 				                        <td align="left">
 				                        <%if(arrParamOri.length > 1){%>
 				                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
-				                            <%for(int i = 1;i<arrParamOri.length;i++){%>
-				                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
+				                            <%for(int i = 1;i<arrParamOri.length;i++){
+				                                String eleValue = arrParamOri[i].trim();
+				                                %>
+				                                <%if(eleValue.equals(inboundDescription.getParameters().get(defaultParam))){%>
+				                                <option value="<%=eleValue%>" selected><%=eleValue%></option>
+				                                <%} else {%>
+				                                <option value="<%=eleValue%>"><%=eleValue%></option>
+				                                <%} %>					                            				                                
 				                            <%}%>                                
 			                                </select>
-										<%} else{%>	                            	                      
-			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"/>
+										<%}else{%>	                            	                      
+			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"  value="<%=((inboundDescription.getParameters().get(defaultParam)==null)?"":inboundDescription.getParameters().get(defaultParam))%>"/>
 			                            <%} %>                       
 				                        </td>
 				                        <td></td>
@@ -248,5 +270,4 @@ var requiredParams = null;
         }
     %>
 </fmt:bundle>
-
 

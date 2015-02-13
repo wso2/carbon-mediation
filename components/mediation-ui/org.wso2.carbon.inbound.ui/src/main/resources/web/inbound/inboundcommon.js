@@ -223,10 +223,12 @@ function addRow(tableID) {
 function deleteRow(tableID) {
 	if(iParamCount > 0){
 	    try {
-	    		var table = document.getElementById(tableID);
-	    		var rowCount = table.rows.length;
-	    		table.deleteRow((rowCount-2));
-	    		iParamCount--;
+	    	    if(iParamMax < iParamCount){
+		    		var table = document.getElementById(tableID);
+		    		var rowCount = table.rows.length;
+		    		table.deleteRow((rowCount-2));
+		    		iParamCount--;	    	    	
+	    	    }
 	        }catch(e) {
 	            alert(e);
 	        }
@@ -245,5 +247,4 @@ function showAdvancedOptions(id) {
                                                          'onclick="javascript:showAdvancedOptions(\'' + id + '\');" style="background-image: url(images/down.gif);">' + taskjsi18n['show.advanced.options'] + '</a>';
     }
 }
-
 
