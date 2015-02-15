@@ -31,6 +31,7 @@ import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.rest.RESTRequestHandler;
 import org.apache.synapse.transport.passthru.ServerWorker;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
@@ -51,13 +52,15 @@ public class InboundHttpServerWorker extends ServerWorker {
 
     private SourceRequest request = null;
     private int port;
-
+    private RESTRequestHandler restHandler;
 
     public InboundHttpServerWorker(int port, SourceRequest sourceRequest,
                                    SourceConfiguration sourceConfiguration, OutputStream outputStream) {
         super(sourceRequest, sourceConfiguration, outputStream);
         this.request = sourceRequest;
         this.port = port;
+        restHandler = new RESTRequestHandler();
+
     }
 
     public void run() {
@@ -80,19 +83,6 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
 
-                // Get injecting sequence for synapse engine
-                SequenceMediator injectingSequence =
-                        (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
-
-                if (injectingSequence != null) {
-                    injectingSequence.setErrorHandler(endpoint.getOnErrorSeq());
-                    if (log.isDebugEnabled()) {
-                        log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
-                    }
-                } else {
-                    log.error("Sequence: " + endpoint.getInjectingSeq() + " not found");
-                }
-                // TODO: stop dispatching to main sequence
                 if (!isRESTRequest(axisCtx, method)) {
                     if (request.isEntityEnclosing()) {
                         processEntityEnclosingRequest(axisCtx, false);
@@ -100,10 +90,42 @@ public class InboundHttpServerWorker extends ServerWorker {
                         processNonEntityEnclosingRESTHandler(null, axisCtx, false);
                     }
                 }
-                // handover synapse message context to synapse environment for inject it to given sequence in
-                //synchronous manner
-                synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
 
+                boolean processedByAPI = false;
+
+                String apiDispatchingParam =
+                        endpoint.getParameter(
+                                InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_API_DISPATCHING_ENABLED);
+                if (apiDispatchingParam != null && Boolean.valueOf(apiDispatchingParam)) {
+                    // Trying to dispatch to an API
+
+                    processedByAPI = restHandler.process(synCtx);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Dispatch to API state : enabled, Message is "
+                                  + (!processedByAPI ? "NOT" : "") + "processed by an API");
+                    }
+                }
+
+                if (!processedByAPI) {
+                    //If message is not dispatched to an API, dispatch into the sequence
+
+                    // Get injecting sequence for synapse engine
+                    SequenceMediator injectingSequence =
+                            (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
+
+                    if (injectingSequence != null) {
+                        injectingSequence.setErrorHandler(endpoint.getOnErrorSeq());
+                    } else {
+                        log.error("Sequence: " + endpoint.getInjectingSeq() + " not found");
+                    }
+
+                    // handover synapse message context to synapse environment for inject it to given sequence in
+                    //synchronous manner
+                    if (log.isDebugEnabled()) {
+                        log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
+                    }
+                    synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
+                }
                 // send ack for client if needed
                 sendAck(axisCtx);
             } catch (Exception e) {
