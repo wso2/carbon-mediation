@@ -62,7 +62,6 @@
         <module>org.wso2.carbon.mediator.payloadfactory.ui</module>
         <module>org.wso2.carbon.mediator.property.ui</module>
         <module>org.wso2.carbon.mediator.respond.ui</module>
-        <module>org.wso2.carbon.mediator.rmsequence.ui</module>
         <module>org.wso2.carbon.mediator.rule.ui</module>
         <module>org.wso2.carbon.mediator.script.ui</module>
         <module>org.wso2.carbon.mediator.send.ui</module>
