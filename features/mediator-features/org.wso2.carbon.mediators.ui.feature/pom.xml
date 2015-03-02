@@ -118,10 +118,6 @@
       </dependency>
       <dependency>
          <groupId>org.wso2.carbon.mediation</groupId>
-         <artifactId>org.wso2.carbon.mediator.rmsequence.ui</artifactId>
-      </dependency>
-      <dependency>
-         <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.mediator.rule.ui</artifactId>
       </dependency>
       <dependency>
@@ -282,7 +278,6 @@
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.oauth.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.out.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.property.ui</bundleDef>
-                        <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.rmsequence.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.rule.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.script.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.send.ui</bundleDef>

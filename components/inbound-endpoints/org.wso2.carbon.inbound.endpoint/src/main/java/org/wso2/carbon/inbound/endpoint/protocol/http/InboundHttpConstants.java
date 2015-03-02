@@ -29,5 +29,6 @@ public class InboundHttpConstants {
      *String representing port of the InboundEndpoint
      */
     public static final String INBOUND_ENDPOINT_PARAMETER_HTTP_PORT = "inbound.http.port";
+    public static final String INBOUND_ENDPOINT_PARAMETER_API_DISPATCHING_ENABLED = "api.dispatching.enabled";
 
 }
