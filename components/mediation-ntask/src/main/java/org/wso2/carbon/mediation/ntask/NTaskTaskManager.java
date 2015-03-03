@@ -366,9 +366,9 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 // Run already deployed tasks..
                 if (isStandaloneNode || isWorkerNode) {
                     taskService.registerTaskType(Constants.TASK_TYPE_ESB);
+                    updateAndCleanupObservers();
                 }
                 initialized = true;
-                updateAndCleanupObservers();
                 logger.info("Initialized task manager on " + (!(isStandaloneNode || isWorkerNode) ? "Manager Node " : "Worker Node ") + ". Tenant [" + getCurrentTenantId() + "]");
                 return true;
             } catch (Exception e) {
@@ -646,3 +646,4 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return "[NTaskTaskManager::" + getCurrentTenantId() + " ::" + this.hashCode() + "]";
     }
 }
+

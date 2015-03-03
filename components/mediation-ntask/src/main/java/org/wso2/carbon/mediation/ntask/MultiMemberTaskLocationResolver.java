@@ -34,18 +34,15 @@ import java.util.Map;
  *
  */
 public class MultiMemberTaskLocationResolver implements TaskLocationResolver {
-	private static int counter;
-	static {
-		counter = 0;
-	}
+	private static int counter = 0;
 
-	@Override
+    @Override
 	public int getLocation(TaskServiceContext ctx, TaskInfo taskInfo) throws TaskException {
 		return counter++ % ctx.getServerCount();
 	}
 
-	@Override
-	public void init(Map<String, String> arg0) throws TaskException {
+    @Override
+    public void init(Map<String, String> stringStringMap) throws TaskException {
 
-	}
+    }
 }
