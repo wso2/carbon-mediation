@@ -1,9 +1,20 @@
 package org.wso2.carbon.mediation.ntask;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Queue;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.task.*;
-import org.wso2.carbon.base.MultitenantConstants;
+import org.apache.synapse.task.SynapseTaskException;
+import org.apache.synapse.task.TaskDescription;
+import org.apache.synapse.task.TaskManager;
+import org.apache.synapse.task.TaskManagerObserver;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
@@ -11,15 +22,6 @@ import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Queue;
-import java.util.LinkedList;
-import java.util.Iterator;
 
 public class NTaskTaskManager implements TaskManager, TaskServiceObserver, ServerStartupHandler {
     private final Object lock = new Object();
@@ -41,6 +43,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     private final Queue<TaskDescription> taskDescriptionQueue = new LinkedList<TaskDescription>();
 
     private boolean isServerStarted = false;
+    
+    private boolean isMgrNode = false;
+    
+    private final List<TaskManagerObserver> observers = new ArrayList<TaskManagerObserver>();
 
     public boolean schedule(TaskDescription taskDescription) {
         logger.debug("#schedule Scheduling task:" + taskDescription.getName());
@@ -70,6 +76,11 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     logger.debug("#schedule Could not schedule task " + taskId(taskDescription) + ". Task manager is not available.");
                     return false;
                 }
+                else if (isMgrNode) {
+					logger.warn("#schedule Could not schedule task [" + taskInfo.getName() +
+					            "] since this is a Manager node.");
+					return false;
+				}
                 taskManager.registerTask(taskInfo);
                 //if (!taskManager.isTaskScheduled(taskInfo.getName())) {
                     taskManager.scheduleTask(taskInfo.getName());
@@ -86,27 +97,32 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return true;
     }
 
-    public boolean reschedule(String taskName, TaskDescription taskDescription) {
-        if (!isInitialized()) {
-            return false;
-        }
-        try {
-            synchronized (lock) {
-                if (taskManager == null) {
-                    logger.warn("#reschedule Could not reschedule task [" + taskName + "]. Task manager is not available.");
-                    return false;
-                }
-                TaskInfo taskInfo = taskManager.getTask(taskName);
-                TaskDescription description = TaskBuilder.buildTaskDescription(taskInfo);
-                taskInfo = TaskBuilder.buildTaskInfo(description, properties);
-                taskManager.registerTask(taskInfo);
-                taskManager.rescheduleTask(taskInfo.getName());
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
+	public boolean reschedule(String taskName, TaskDescription taskDescription) {
+		if (!isInitialized()) {
+			return false;
+		}
+		try {
+			synchronized (lock) {
+				if (taskManager == null) {
+					logger.warn("#reschedule Could not reschedule task [" + taskName +
+					            "]. Task manager is not available.");
+					return false;
+				} else if (isMgrNode) {
+					logger.warn("#reschedule Could not reschedule task [" + taskName +
+					            "] since this is a Manager node.");
+					return false;
+				}
+				TaskInfo taskInfo = taskManager.getTask(taskName);
+				TaskDescription description = TaskBuilder.buildTaskDescription(taskInfo);
+				taskInfo = TaskBuilder.buildTaskInfo(description, properties);
+				taskManager.registerTask(taskInfo);
+				taskManager.rescheduleTask(taskInfo.getName());
+			}
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
 
     public boolean delete(String taskName) {
         if (!isInitialized()) {
@@ -182,6 +198,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     logger.warn("#pauseAll Could not pause any task. Task manager is not available.");
                     return false;
                 }
+                else if (isMgrNode) {
+                    logger.warn("#pauseAll Could not pause any task, since this is a Manager node.");
+                    return false;
+				}
                 List<TaskInfo> taskList = taskManager.getAllTasks();
                 for (TaskInfo taskInfo : taskList) {
                     taskManager.pauseTask(taskInfo.getName());
@@ -226,6 +246,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     logger.warn("#resumeAll Could not resume any task. Task manager is not available.");
                     return false;
                 }
+                else if (isMgrNode) {
+                    logger.warn("#resumeAll Could not resume any task, since this is a Manager node.");
+                    return false;
+				}
                 List<TaskInfo> taskList = taskManager.getAllTasks();
                 for (TaskInfo taskInfo : taskList) {
                     taskManager.resumeTask(taskInfo.getName());
@@ -295,9 +319,11 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 }
                 boolean isStandaloneNode = NtaskService.getCcServiceInstance().getServerConfigContext()
                         .getAxisConfiguration().getClusteringAgent() == null;
+
                 boolean isWorkerNode = !isStandaloneNode && CarbonUtils.isWorkerNode();
                 logger.debug("#init Standalone-Node: [" + isStandaloneNode
                         + "] Worker-Node: [" + isWorkerNode + "] " + managerId());
+
                 if ((taskManager = getTaskManager(false)) == null) {
                     logger.debug("#init Could not initialize task manager. " + managerId());
                     return false;
@@ -316,7 +342,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     }
                 }
                 // Register pending tasks..
-                Iterator tasks = pendingTasks.iterator();
+                Iterator<TaskInfo> tasks = pendingTasks.iterator();
                 while (tasks.hasNext()) {
                     TaskInfo taskInfo = (TaskInfo) tasks.next();
                     try {
@@ -343,6 +369,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 // Run already deployed tasks..
                 if (isStandaloneNode || isWorkerNode) {
                     taskService.registerTaskType(Constants.TASK_TYPE_ESB);
+                    updateAndCleanupObservers();
                 }
                 initialized = true;
                 logger.info("Initialized task manager on " + (!(isStandaloneNode || isWorkerNode) ? "Manager Node " : "Worker Node ") + ". Tenant [" + getCurrentTenantId() + "]");
@@ -522,13 +549,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return CarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 
-    private void checkSystemRequest() throws Exception {
-        if (this.getCurrentTenantId() != MultitenantConstants.SUPER_TENANT_ID) {
-            throw new Exception("System request verification failed, " +
-                    "only Super-Tenant can make this type of requests");
-        }
-    }
-
     @Override
     public void invoke() {
         //Initialize the Task Manager after server is started
@@ -545,5 +565,88 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     private String managerId() {
         return "[NTaskTaskManager::" + getCurrentTenantId() + " ::" + this.hashCode() + "]";
     }
+    
+	@Override
+	public void addObserver(TaskManagerObserver o) {
+		if (observers.contains(o)) {
+			return;
+		}
+		observers.add(o);
+	}
+
+	@Override
+	public boolean isTaskDeactivated(String taskName) {
+		if (!isInitialized()) {
+			return false;
+		}
+		synchronized (lock) {
+			if (taskManager == null) {
+				logger.warn("#isTaskRunning Could not determine the state of the task [" +
+				            taskName + "]. Task manager is not available.");
+				return false;
+			}
+			try {
+				return taskManager.getTaskState(taskName)
+				                  .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.PAUSED);
+			} catch (Exception e) {
+				logger.error("Cannot return task status [" + taskName + "]. Error: " +
+				                     e.getLocalizedMessage(), e);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isTaskBlocked(String taskName) {
+		if (!isInitialized()) {
+			return false;
+		}
+		synchronized (lock) {
+			if (taskManager == null) {
+				logger.warn("#isTaskRunning Could not determine the state of the task [" +
+				            taskName + "]. Task manager is not available.");
+				return false;
+			}
+			try {
+				return taskManager.getTaskState(taskName)
+				                  .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.BLOCKED);
+			} catch (Exception e) {
+				logger.error("Cannot return task status [" + taskName + "]. Error: " +
+				                     e.getLocalizedMessage(), e);
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isTaskRunning(String taskName) {
+		if (!isInitialized()) {
+			return false;
+		}
+		synchronized (lock) {
+			if (taskManager == null) {
+				logger.warn("#isTaskRunning Could not determine the state of the task [" +
+				            taskName + "]. Task manager is not available.");
+				return false;
+			}
+			try {
+				return taskManager.getTaskState(taskName)
+				                  .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL);
+			} catch (Exception e) {
+				logger.error("Cannot return task status [" + taskName + "]. Error: " +
+				                     e.getLocalizedMessage(), e);
+			}
+		}
+		return false;
+	}
+
+	private void updateAndCleanupObservers() {
+		Iterator<TaskManagerObserver> i = observers.iterator();
+		while (i.hasNext()) {
+			TaskManagerObserver observer = i.next();
+			observer.update();
+			i.remove();
+		}
+	}
 }
 
