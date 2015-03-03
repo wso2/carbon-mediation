@@ -1,6 +1,7 @@
 package org.wso2.carbon.mediation.ntask;
 
 import org.apache.synapse.task.TaskDescription;
+import org.wso2.carbon.ntask.common.TaskConstants;
 import org.wso2.carbon.ntask.core.TaskInfo;
 
 import java.util.*;
@@ -25,6 +26,9 @@ final class TaskBuilder {
         triggerInfo.setCronExpression(cron);
         if (description.getStartTime() != null) {
             triggerInfo.setStartTime(description.getStartTime().getTime());
+        } else if (triggerInfo.getCronExpression() == null) {
+            triggerInfo.setStartTime(new Date());
+            triggerInfo.setMisfirePolicy(TaskConstants.TaskMisfirePolicy.NOW_WITH_REMAINING_COUNT);
         }
         if (description.getEndTime() != null) {
             triggerInfo.setEndTime(description.getEndTime().getTime());
