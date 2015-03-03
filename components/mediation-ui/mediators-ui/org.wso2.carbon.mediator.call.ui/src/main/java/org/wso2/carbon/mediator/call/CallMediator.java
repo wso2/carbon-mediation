@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.mediator.call;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
@@ -32,7 +33,11 @@ public class CallMediator extends AbstractMediator {
 
     private static final QName ENDPOINT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
 
+    private static final QName BLOCKING_Q = new QName("blocking");
+
     private Endpoint endpoint = null;
+
+    private boolean blocking=false;
 
     public Endpoint getEndpoint() {
         return endpoint;
@@ -40,6 +45,14 @@ public class CallMediator extends AbstractMediator {
 
     public void setEndpoint(Endpoint endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public boolean getBlocking() {
+        return blocking;
+    }
+
+    public void setBlocking(boolean blocking) {
+        this.blocking = blocking;
     }
 
     public String getTagLocalName() {
@@ -54,6 +67,7 @@ public class CallMediator extends AbstractMediator {
         if (activeEndpoint != null) {
             call.addChild(EndpointSerializer.getElementFromEndpoint(activeEndpoint));
         }
+        call.addAttribute(fac.createOMAttribute("blocking",nullNS,Boolean.toString(getBlocking())));
 
         if (parent != null) {
             parent.addChild(call);
@@ -77,6 +91,13 @@ public class CallMediator extends AbstractMediator {
             if (endpoint != null) {
                 setEndpoint(endpoint);
             }
+        }
+        OMAttribute blocking = elem.getAttribute(BLOCKING_Q);
+        if (blocking != null) {
+            setBlocking(Boolean.parseBoolean(blocking.getAttributeValue()));
+
+        } else {
+            setBlocking(false);
         }
 
     }
