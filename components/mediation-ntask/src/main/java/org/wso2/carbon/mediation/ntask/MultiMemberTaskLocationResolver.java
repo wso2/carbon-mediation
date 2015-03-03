@@ -31,15 +31,14 @@ import java.util.Map;
  * to run the task concurrently, you may have to call this
  * {@link org.wso2.carbon.ntask.core.TaskLocationResolver} and get the member location index value. Then
  * you can schedule that particular task on the selected member node.
- *
  */
 public class MultiMemberTaskLocationResolver implements TaskLocationResolver {
-	private static int counter = 0;
+    private static int counter = 0;
 
     @Override
-	public int getLocation(TaskServiceContext ctx, TaskInfo taskInfo) throws TaskException {
-		return counter++ % ctx.getServerCount();
-	}
+    public int getLocation(TaskServiceContext ctx, TaskInfo taskInfo) throws TaskException {
+        return counter++ % ctx.getServerCount();
+    }
 
     @Override
     public void init(Map<String, String> stringStringMap) throws TaskException {
