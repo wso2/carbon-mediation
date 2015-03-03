@@ -27,7 +27,7 @@ import org.apache.synapse.task.TaskDescription;
 
 /**
  * 
- * This class provides the common implemantation for polling protocol processors
+ * This class provides the common implementation for polling protocol processors
  * 
  */
 public abstract class InboundRequestProcessorImpl implements InboundRequestProcessor {
