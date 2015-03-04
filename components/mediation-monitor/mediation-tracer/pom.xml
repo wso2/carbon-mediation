@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-monitor</artifactId>
-        <version>4.3.2-SNAPSHOT</version>
+        <version>4.3.2</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -28,7 +28,7 @@
     <artifactId>mediation-tracer</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Tracer Aggregator Module</name>
-    <version>4.3.2-SNAPSHOT</version>
+    <version>4.3.2</version>
     <url>http://wso2.org</url>
 
     <modules>
