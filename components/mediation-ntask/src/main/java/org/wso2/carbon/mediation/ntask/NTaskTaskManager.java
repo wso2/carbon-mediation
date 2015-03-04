@@ -44,58 +44,50 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 
     private boolean isServerStarted = false;
     
-    private boolean isMgrNode = false;
-    
     private final List<TaskManagerObserver> observers = new ArrayList<TaskManagerObserver>();
 
-    public boolean schedule(TaskDescription taskDescription) {
-        logger.debug("#schedule Scheduling task:" + taskDescription.getName());
-        TaskInfo taskInfo;
-        try {
-            taskInfo = TaskBuilder.buildTaskInfo(taskDescription, properties);
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("#schedule Could not build task info object. Error: " + e.getLocalizedMessage(), e);
-            }
-            synchronized (lock) {
-                taskDescriptionQueue.add(taskDescription);
-            }
-            return false;
-        }
-        if (!isInitialized()) {
-            // if cannot schedule yet, put in the pending tasks list.
-            synchronized (lock) {
-                logger.debug("#schedule Added pending task " + taskId(taskDescription));
-                pendingTasks.add(taskInfo);
-            }
-            return false;
-        }
-        try {
-            synchronized (lock) {
-                if (taskManager == null) {
-                    logger.debug("#schedule Could not schedule task " + taskId(taskDescription) + ". Task manager is not available.");
-                    return false;
-                }
-                else if (isMgrNode) {
-					logger.warn("#schedule Could not schedule task [" + taskInfo.getName() +
-					            "] since this is a Manager node.");
+	public boolean schedule(TaskDescription taskDescription) {
+		logger.debug("#schedule Scheduling task:" + taskDescription.getName());
+		TaskInfo taskInfo;
+		try {
+			taskInfo = TaskBuilder.buildTaskInfo(taskDescription, properties);
+		} catch (Exception e) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("#schedule Could not build task info object. Error: " +
+				                     e.getLocalizedMessage(), e);
+			}
+			synchronized (lock) {
+				taskDescriptionQueue.add(taskDescription);
+			}
+			return false;
+		}
+		if (!isInitialized()) {
+			// if cannot schedule yet, put in the pending tasks list.
+			synchronized (lock) {
+				logger.debug("#schedule Added pending task " + taskId(taskDescription));
+				pendingTasks.add(taskInfo);
+			}
+			return false;
+		}
+		try {
+			synchronized (lock) {
+				if (taskManager == null) {
+					logger.debug("#schedule Could not schedule task " + taskId(taskDescription) +
+					             ". Task manager is not available.");
 					return false;
 				}
-                taskManager.registerTask(taskInfo);
-                //if (!taskManager.isTaskScheduled(taskInfo.getName())) {
-                    taskManager.scheduleTask(taskInfo.getName());
-                //} else {
-                //    taskManager.rescheduleTask(taskInfo.getName());
-                //}
-            }
-            logger.info("Scheduled task " + taskId(taskDescription));
-        } catch (Exception e) {
-            logger.error("Scheduling task [" + taskId(taskDescription)
-                    + "::" + taskDescription.getTaskGroup() + "] FAILED. Error: " + e.getLocalizedMessage(), e);
-            return false;
-        }
-        return true;
-    }
+				taskManager.registerTask(taskInfo);
+				taskManager.scheduleTask(taskInfo.getName());
+			}
+			logger.info("Scheduled task " + taskId(taskDescription));
+		} catch (Exception e) {
+			logger.error("Scheduling task [" + taskId(taskDescription) + "::" +
+			                     taskDescription.getTaskGroup() + "] FAILED. Error: " +
+			                     e.getLocalizedMessage(), e);
+			return false;
+		}
+		return true;
+	}
 
 	public boolean reschedule(String taskName, TaskDescription taskDescription) {
 		if (!isInitialized()) {
@@ -107,11 +99,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 					logger.warn("#reschedule Could not reschedule task [" + taskName +
 					            "]. Task manager is not available.");
 					return false;
-				} else if (isMgrNode) {
-					logger.warn("#reschedule Could not reschedule task [" + taskName +
-					            "] since this is a Manager node.");
-					return false;
-				}
+				} 
 				TaskInfo taskInfo = taskManager.getTask(taskName);
 				TaskDescription description = TaskBuilder.buildTaskDescription(taskInfo);
 				taskInfo = TaskBuilder.buildTaskInfo(description, properties);
@@ -198,10 +186,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     logger.warn("#pauseAll Could not pause any task. Task manager is not available.");
                     return false;
                 }
-                else if (isMgrNode) {
-                    logger.warn("#pauseAll Could not pause any task, since this is a Manager node.");
-                    return false;
-				}
                 List<TaskInfo> taskList = taskManager.getAllTasks();
                 for (TaskInfo taskInfo : taskList) {
                     taskManager.pauseTask(taskInfo.getName());
@@ -246,10 +230,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     logger.warn("#resumeAll Could not resume any task. Task manager is not available.");
                     return false;
                 }
-                else if (isMgrNode) {
-                    logger.warn("#resumeAll Could not resume any task, since this is a Manager node.");
-                    return false;
-				}
                 List<TaskInfo> taskList = taskManager.getAllTasks();
                 for (TaskInfo taskInfo : taskList) {
                     taskManager.resumeTask(taskInfo.getName());
