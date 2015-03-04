@@ -3,11 +3,9 @@ package org.wso2.carbon.mediation.ntask;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Queue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,7 +16,6 @@ import org.apache.synapse.task.TaskManagerObserver;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
-import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -36,36 +33,34 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 
     private final Map<String, Object> properties = new HashMap<String, Object>(5);
 
-    private final List<TaskInfo> pendingTasks = new ArrayList<TaskInfo>();
-
     protected final Properties configProperties = new Properties();
-
-    private final Queue<TaskDescription> taskDescriptionQueue = new LinkedList<TaskDescription>();
-
-    private boolean isServerStarted = false;
     
     private final List<TaskManagerObserver> observers = new ArrayList<TaskManagerObserver>();
 
+    private final List<TaskDescription> taskQueue = new ArrayList<TaskDescription>();
+
+    private final Object taskQueueLock = new Object();
+
 	public boolean schedule(TaskDescription taskDescription) {
-		logger.debug("#schedule Scheduling task:" + taskDescription.getName());
+		logger.debug("#schedule Scheduling task : " + taskId(taskDescription));
 		TaskInfo taskInfo;
 		try {
 			taskInfo = TaskBuilder.buildTaskInfo(taskDescription, properties);
 		} catch (Exception e) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("#schedule Could not build task info object. Error: " +
+				logger.debug("#schedule Could not build task info object of task : " +taskId(taskDescription)+ ". Error: " +
 				                     e.getLocalizedMessage(), e);
 			}
 			synchronized (lock) {
-				taskDescriptionQueue.add(taskDescription);
+                queueTask(taskDescription);
 			}
 			return false;
 		}
 		if (!isInitialized()) {
 			// if cannot schedule yet, put in the pending tasks list.
 			synchronized (lock) {
-				logger.debug("#schedule Added pending task " + taskId(taskDescription));
-				pendingTasks.add(taskInfo);
+				logger.debug("#schedule Added pending task : " + taskId(taskDescription));
+                queueTask(taskDescription);
 			}
 			return false;
 		}
@@ -74,10 +69,12 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 				if (taskManager == null) {
 					logger.debug("#schedule Could not schedule task " + taskId(taskDescription) +
 					             ". Task manager is not available.");
+                    queueTask(taskDescription);
 					return false;
 				}
 				taskManager.registerTask(taskInfo);
 				taskManager.scheduleTask(taskInfo.getName());
+                removeTask(taskDescription);
 			}
 			logger.info("Scheduled task " + taskId(taskDescription));
 		} catch (Exception e) {
@@ -291,68 +288,31 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
             try {
                 TaskService taskService = NtaskService.getTaskService();
                 if (taskService == null || NtaskService.getCcServiceInstance() == null) {
-                    // Cannot proceed with the initialization because the TaskService is not yet
-                    // available. Register this as an observer so that this can be reinitialized
-                    // within the NTaskService when the TaskService is available.
                     NtaskService.addObserver(this);
                     return false;
                 }
                 boolean isStandaloneNode = NtaskService.getCcServiceInstance().getServerConfigContext()
                         .getAxisConfiguration().getClusteringAgent() == null;
-
                 boolean isWorkerNode = !isStandaloneNode && CarbonUtils.isWorkerNode();
-                logger.debug("#init Standalone-Node: [" + isStandaloneNode
-                        + "] Worker-Node: [" + isWorkerNode + "] " + managerId());
-
+                logger.debug("#init standalone node: [" + isStandaloneNode + "] worker node: [" + isWorkerNode + "] " + managerId());
                 if ((taskManager = getTaskManager(false)) == null) {
                     logger.debug("#init Could not initialize task manager. " + managerId());
                     return false;
                 } else {
                     logger.debug("#init Obtained Carbon task manager " + managerId());
                 }
-                //Re-scheduling the tasks missed during the server startup
-                if (isServerStarted) {
-                    Object[] tasksDescriptions = taskDescriptionQueue.toArray();
-                    for (Object o : tasksDescriptions) {
-                        if (o instanceof TaskDescription) {
-                            if (schedule((TaskDescription) o)) {
-                                taskDescriptionQueue.remove(o);
-                            }
-                        }
-                    }
-                }
-                // Register pending tasks..
-                Iterator<TaskInfo> tasks = pendingTasks.iterator();
-                while (tasks.hasNext()) {
-                    TaskInfo taskInfo = (TaskInfo) tasks.next();
-                    try {
-                        List<TaskInfo> taskInfos = taskManager.getAllTasks();
-                        boolean hasTask = false;
-                        for (TaskInfo task : taskInfos) {
-                            if (task.getName().equals(taskInfo.getName())) {
-                                hasTask = true;
-                                break;
-                            }
-                        }
-                        if (hasTask) {
-                            logger.debug("#init Pending task [" + taskInfo.getName() + "] is already available in the registry.");
-                            continue;
-                        }
-                        taskManager.registerTask(taskInfo);
-                        taskManager.scheduleTask(taskInfo.getName());
-                        tasks.remove();
-                        logger.debug("#init Scheduled pending task [" + taskInfo.getName() + "] SUCCESSFUL.");
-                    } catch (TaskException e) {
-                        logger.error("Could not schedule task [" + taskInfo.getName() + "]. Error: " + e.getLocalizedMessage(), e);
-                    }
-                }
-                // Run already deployed tasks..
                 if (isStandaloneNode || isWorkerNode) {
                     taskService.registerTaskType(Constants.TASK_TYPE_ESB);
                     updateAndCleanupObservers();
                 }
                 initialized = true;
                 logger.info("Initialized task manager" + (!(isStandaloneNode || isWorkerNode) ? " on manager node. " : ". ") + "Tenant [" + getCurrentTenantId() + "]");
+                logger.debug("#init Initialized task manager : " + managerId());
+                logger.debug("#init Scheduling existing tasks if any. : " + managerId());
+                Object[] taskDescriptions = pendingTasks();
+                for (Object d : taskDescriptions) {
+                    schedule((TaskDescription) d);
+                }
                 return true;
             } catch (Exception e) {
                 logger.error("Cannot initialize task manager. Error: " + e.getLocalizedMessage(), e);
@@ -532,9 +492,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     @Override
     public void invoke() {
         //Initialize the Task Manager after server is started
-        synchronized (lock) {
-            isServerStarted = true;
-        }
         init(null);
     }
 
@@ -628,5 +585,28 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 			i.remove();
 		}
 	}
+
+    private boolean queueTask(TaskDescription description) {
+        synchronized (taskQueueLock) {
+            logger.debug("#queueTask Queuing task " + taskId(description)) ;
+            if (!taskQueue.contains(description)) {
+                return taskQueue.add(description);
+            }
+        }
+        return false;
+    }
+
+    private boolean removeTask(TaskDescription description) {
+        synchronized (taskQueueLock) {
+            logger.debug("#removeTask removing task " + taskId(description)) ;
+            return taskQueue.remove(description);
+        }
+    }
+
+    private Object[] pendingTasks() {
+        synchronized (taskQueueLock) {
+            return taskQueue.toArray();
+        }
+    }
 }
 
