@@ -1904,7 +1904,7 @@
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.3.5</carbon.commons.version>
+        <carbon.commons.version>4.3.6</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
@@ -1923,7 +1923,7 @@
         <carbon.rule.imp.pkg.version>[4.3.0, 4.4.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.3-wso2v2-SNAPSHOT</synapse.version>
+        <synapse.version>2.1.3-wso2v2</synapse.version>
 
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1.wso2v11</orbit.version.axis2>
