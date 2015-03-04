@@ -352,7 +352,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     updateAndCleanupObservers();
                 }
                 initialized = true;
-                logger.info("Initialized task manager on " + (!(isStandaloneNode || isWorkerNode) ? "Manager Node " : "Worker Node ") + ". Tenant [" + getCurrentTenantId() + "]");
+                logger.info("Initialized task manager" + (!(isStandaloneNode || isWorkerNode) ? " on manager node. " : ". ") + "Tenant [" + getCurrentTenantId() + "]");
                 return true;
             } catch (Exception e) {
                 logger.error("Cannot initialize task manager. Error: " + e.getLocalizedMessage(), e);
