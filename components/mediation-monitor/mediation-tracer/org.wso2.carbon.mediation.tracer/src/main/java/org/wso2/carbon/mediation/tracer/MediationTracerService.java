@@ -18,7 +18,6 @@ package org.wso2.carbon.mediation.tracer;
 
 // MemoryAppender should not be used here,
 // this should be handled using a logging provider
-import org.wso2.carbon.utils.logging.appenders.MemoryAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Appender;
@@ -27,9 +26,11 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.wso2.carbon.utils.logging.appenders.MemoryAppender;
 
 import java.util.List;
 import java.util.ArrayList;
+
 
 public class MediationTracerService {
     private static final Log log = LogFactory.getLog(MediationTracerService.class);

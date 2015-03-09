@@ -15,31 +15,27 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>business-adaptors-features</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.transports.sap.feature</artifactId>
     <packaging>pom</packaging>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <name>WSO2 Carbon - SAP Adapter Feature</name>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles required for sap</description>
 
     <dependencies>
-	<dependency>
-	    <groupId>org.wso2.carbon</groupId>
-	    <artifactId>org.wso2.carbon.transports.sap</artifactId>
-	    <version>${wso2carbon.version.sap}</version>	
-	</dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.transports.sap</artifactId>
+        </dependency>
     </dependencies>	
    
     <build>
@@ -68,9 +64,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <wso2carbon.version.sap>1.0</wso2carbon.version.sap>
-    </properties>
 
 </project>

@@ -30,7 +30,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyEngine;
 import org.apache.rampart.Rampart;
-import org.apache.sandesha2.SandeshaModule;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -234,8 +233,6 @@ public class ProxyObserver implements AxisObserver {
             ProxyService proxy = config.getProxyService(service.getName());
             if (module.getModule() instanceof Rampart) {
                 proxy.setWsSecEnabled(true);
-            } else if (module.getModule() instanceof SandeshaModule) {
-                proxy.setWsRMEnabled(true);
             }
         }
     }
@@ -248,8 +245,6 @@ public class ProxyObserver implements AxisObserver {
                 proxy.setWsSecEnabled(false);
                 proxy.getParameterMap().remove(SecurityConstants.SECURITY_POLICY_PATH);
                 proxy.getParameterMap().remove("disableREST");
-            } else if (module.getModule() instanceof SandeshaModule) {
-                proxy.setWsRMEnabled(false);
             }
         }
     }

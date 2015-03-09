@@ -14,20 +14,17 @@
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
 -->
- <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>org.wso2.carbon.mediation.library</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
 	<name>WSO2 Carbon - Mediation Library</name>
     <url>http://wso2.org</url>
@@ -45,10 +42,6 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
@@ -104,7 +97,7 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.soap,
-                            javax.xml.stream.*; version="1.0.1",
+                            javax.xml.stream.*; version="${javax.xml.stream.imp.pkg.version}",
                             org.apache.axis2.rpc.receivers; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.axis2; version="${axis2.osgi.version.range}",
@@ -122,8 +115,8 @@
                             org.apache.synapse.libraries.*,
                             org.apache.axis2.transport.base,
                             org.wso2.carbon.core,
-                            org.wso2.carbon.registry.core.service; version=1.0.1,
-                            javax.xml.soap; version=1.0.0,
+                            org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
+                            javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>

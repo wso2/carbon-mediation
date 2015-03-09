@@ -15,11 +15,11 @@
 	<parent>
     	<artifactId>entitlement-mediator-feature</artifactId>
     	<groupId>org.wso2.carbon.mediation</groupId>
-   	<version>4.3.0-SNAPSHOT</version>
+   	<version>4.3.3-SNAPSHOT</version>
 	</parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.xacml.mediator.feature</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - XACML Mediation Feature</name>
     <url>http://wso2.org</url>
@@ -28,14 +28,13 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.mediator</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
         </dependency>
         <dependency>
@@ -70,14 +69,14 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>libthrift.wso2:libthrift</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.identity.entitlement.proxy</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.proxy</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.identity.entitlement.mediator</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.identity.entitlement.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.authenticator.stub</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>
-                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

@@ -31,7 +31,7 @@
 <script type="text/javascript" src="global-params.js"></script>
 <script type="text/javascript" src="inboundcommon.js"></script>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
-	<carbon:breadcrumb label="task.edit.header"
+	<carbon:breadcrumb label="inbound.edit.header"
 		resourceBundle="org.wso2.carbon.inbound.ui.i18n.Resources"
 		topPage="false" request="<%=request%>" />
 	<%

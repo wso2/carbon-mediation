@@ -19,12 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.sequences</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Sequence Editor BE</name>
@@ -64,7 +63,7 @@
                             org.wso2.carbon.sequences.common,
                             org.wso2.carbon.sequences.common.to,
                             org.wso2.carbon.sequences.common.factory,
-                            org.wso2.carbon.registry.core.service; version=1.0.1,
+                            org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
@@ -99,10 +98,6 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
         <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>

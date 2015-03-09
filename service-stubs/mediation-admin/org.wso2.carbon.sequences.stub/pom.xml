@@ -16,17 +16,14 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin-stub</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
-    <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.sequences.stub</artifactId>
     <packaging>bundle</packaging>
@@ -48,7 +45,7 @@
                         </Private-Package>
                         <Export-Package>
                             org.wso2.carbon.sequences.stub.*;
-			    version="${carbon.platform.package.export.version}"
+			    version="${carbon.mediation.exp.pkg.version}"
                         </Export-Package>
                         <Import-Package>
                             !org.wso2.carbon.sequences.stub.*
@@ -71,15 +68,15 @@
                         <configuration>
                             <tasks>
                                 <path id="wsdl2java.classpath">
-			 <pathelement location="${settings.localRepository}/org/apache/ws/commons/axiom/wso2/axiom/${axiom.wso2.version}/axiom-${axiom.wso2.version}.jar"/>
-                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2-client/${orbit.version.axis2}/axis2-client-${orbit.version.axis2}.jar"/>
-                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar"/>
+			 <pathelement location="${settings.localRepository}/org/apache/ws/commons/axiom/wso2/axiom/${axiom.wso2.version}/axiom-${axiom.wso2.version}.jar" />
+                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2-client/${orbit.version.axis2}/axis2-client-${orbit.version.axis2}.jar" />
+                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/SequenceAdminService.wsdl -u -uw -o target/generated-code                                     -p org.wso2.carbon.sequences.stub.types                                     -ns2p http://to.common.sequences.carbon.wso2.org/xsd=org.wso2.carbon.sequences.stub.types.common.to,http://common.sequences.carbon.wso2.org/xsd=org.wso2.carbon.sequences.stub.types.common,http://mgt.dependency.mediation.carbon.wso2.org/xsd=org.wso2.carbon.sequences.stub.types.common,http://org.apache.synapse/xsd=org.wso2.carbon.sequences.stub.types.axis2"/>
-                                    <classpath refid="maven.dependency.classpath"/>
-                                    <classpath refid="maven.compile.classpath"/>
-                                    <classpath refid="maven.runtime.classpath"/>
+                                    <arg line="-uri src/main/resources/SequenceAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.sequences.stub.types -ns2p http://to.common.sequences.carbon.wso2.org/xsd=org.wso2.carbon.sequences.stub.types.common.to,http://common.sequences.carbon.wso2.org/xsd=org.wso2.carbon.sequences.stub.types.common,http://mgt.dependency.mediation.carbon.wso2.org/xsd=org.wso2.carbon.sequences.stub.types.common,http://org.apache.synapse/xsd=org.wso2.carbon.sequences.stub.types.axis2" />
+                                    <classpath refid="maven.dependency.classpath" />
+                                    <classpath refid="maven.compile.classpath" />
+                                    <classpath refid="maven.runtime.classpath" />
                                 </java>
                             </tasks>
                         </configuration>

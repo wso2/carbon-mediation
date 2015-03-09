@@ -14,19 +14,16 @@
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer-features</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.initializer.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Initializer Server Feature</name>
@@ -41,6 +38,10 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediation.transport.handlers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.registry</artifactId>
         </dependency>
         <dependency>
@@ -48,7 +49,7 @@
             <artifactId>org.wso2.carbon.startup</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.event.server.feature</artifactId>
             <type>zip</type>
         </dependency>
@@ -78,13 +79,15 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.initializer</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.transport.handlers</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.registry</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.dependency.mgt</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.startup</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.datasource.server:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
+                                <!--TODO use ndatasource-->
+                                <!--<importFeatureDef>org.wso2.carbon.datasource.server:${carbon.datastore.version}</importFeatureDef>-->
                                 <importFeatureDef>org.wso2.carbon.task.server</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.event.server</importFeatureDef>
                             </importFeatures>

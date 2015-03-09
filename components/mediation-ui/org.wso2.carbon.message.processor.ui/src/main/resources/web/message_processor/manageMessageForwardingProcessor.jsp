@@ -155,6 +155,7 @@
         addServiceParameter("is.active", document.getElementById('mp_state').value);
         addServiceParameter("non.retry.status.codes", document.getElementById('non_retry_status_codes').value);
         addServiceParameter("max.delivery.drop",document.getElementById('max_delivery_drop').value);
+        addServiceParameter("member.count", document.getElementById('member_count').value);
 
     }
 
@@ -527,6 +528,14 @@
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
                                         && !processorData.getParams().isEmpty()&&(processorData.getParams().get("pinnedServers")!=null))?processorData.getParams().get("pinnedServers"):""%>"
                                    size="75"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><fmt:message key="member.count"/></td>
+                        <td><input type="text" id="member_count" name="member_count"
+                                   value="<%=((null!=processorData)&& processorData.getParams() != null
+                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("member.count")!=null))?processorData.getParams().get("member.count"):"1"%>"
+                                />
                         </td>
                     </tr>
                     </tbody>

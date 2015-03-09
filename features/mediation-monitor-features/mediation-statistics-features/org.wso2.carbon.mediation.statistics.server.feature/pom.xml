@@ -15,17 +15,15 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-statistics-feature</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <groupId>org.wso2.carbon.mediation</groupId>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.statistics.server.feature</artifactId>
@@ -64,11 +62,11 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.statistics:${project.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.statistics:${carbon.mediation.version}</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${wso2carbon.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${carbon.mediation.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

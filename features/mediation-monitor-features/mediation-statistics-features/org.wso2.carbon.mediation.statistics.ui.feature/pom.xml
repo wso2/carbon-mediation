@@ -18,9 +18,9 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-statistics-feature</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.3.3-SNAPSHOT</version>
    </parent>
-   <version>4.3.0-SNAPSHOT</version>
+   <version>4.3.3-SNAPSHOT</version>
    <groupId>org.wso2.carbon.mediation</groupId>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>org.wso2.carbon.mediation.statistics.ui.feature</artifactId>
@@ -66,7 +66,7 @@
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.statistics.stub</bundleDef>
                      </bundles>
                      <importFeatures>
-                        <importFeatureDef>org.wso2.carbon.mediation.initializer.ui:${wso2carbon.version}</importFeatureDef>
+                        <importFeatureDef>org.wso2.carbon.mediation.initializer.ui:${carbon.mediation.version}</importFeatureDef>
                      </importFeatures>
                   </configuration>
                </execution>

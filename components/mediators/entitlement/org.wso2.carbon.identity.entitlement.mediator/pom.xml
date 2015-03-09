@@ -19,11 +19,10 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>entitlement-mediator</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.identity.entitlement.mediator</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Identity Entitlement Mediator</name>
@@ -36,16 +35,6 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>libthrift</groupId>
-                    <artifactId>libthrift</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom.wso2</groupId>
@@ -64,7 +53,7 @@
             <artifactId>org.wso2.carbon.logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
         </dependency>
         <dependency>
@@ -80,7 +69,7 @@
             <artifactId>slf4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.identity</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
     </dependencies>
@@ -99,7 +88,7 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            org.apache.commons.logging.*; version=&quot;1.0.4&quot;,
+                            org.apache.commons.logging.*; version="${org.apache.commons.logging.version}",
                             !org.osgi.framework,
                             !javax.servlet,
                             !javax.servlet.http,
@@ -108,8 +97,8 @@
 			    !org.pache.axis2.databinding.utils.writer,
                             !org.wso2.carbon.identity.entitlement.mediator.*,
 			    org.wso2.carbon.identity.entitlement.proxy.*,
-                            org.wso2.carbon.identity.entitlement.stub.*;version=&quot;${carbon.platform.package.import.version.range}&quot;,
-                            org.wso2.carbon.authenticator.stub.*;version=&quot;${carbon.platform.package.import.version.range}&quot;,
+                            org.wso2.carbon.identity.entitlement.stub.*;version="${carbon.identity.imp.pkg.version}",
+                            org.wso2.carbon.authenticator.stub.*;version="${carbon.kernel.imp.pkg.version}",
                             *; resolution:=optional
                         </Import-Package>
                         <Fragment-Host>synapse-core</Fragment-Host>

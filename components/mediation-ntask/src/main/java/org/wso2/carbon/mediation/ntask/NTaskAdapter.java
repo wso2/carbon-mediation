@@ -28,7 +28,7 @@ public class NTaskAdapter extends AbstractTask {
             return false;
         }
         synchronized (lock) {
-            return synapseTaskProperties.put(name, property) == property;
+            return synapseTaskProperties.put(NTaskTaskManager.tenantId() + name, property) == property;
         }
     }
 
@@ -37,7 +37,7 @@ public class NTaskAdapter extends AbstractTask {
             return false;
         }
         synchronized (lock) {
-            return synapseTaskProperties.remove(name) == null;
+            return synapseTaskProperties.remove(NTaskTaskManager.tenantId() + name) == null;
         }
     }
 
@@ -52,7 +52,7 @@ public class NTaskAdapter extends AbstractTask {
         }
         Object taskInstance;
         synchronized (lock) {
-            taskInstance = synapseTaskProperties.get(taskName);
+            taskInstance = synapseTaskProperties.get(NTaskTaskManager.tenantId() + taskName);
         }
         if (taskInstance == null) {
             //If tenant is not super tenant and not loaded load tenant.

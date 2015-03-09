@@ -19,13 +19,12 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediators-ui</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>org.wso2.carbon.mediator.target.ui</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Target Mediator UI</name>
     <url>http://wso2.org</url>
@@ -50,7 +49,7 @@
                             !javax.servlet.http,
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.proxyadmin.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.proxyadmin.stub.*;version="${carbon.mediation.imp.pkg.version}",
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
                             org.apache.commons.logging,

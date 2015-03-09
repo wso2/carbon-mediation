@@ -19,12 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-ui</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.inbound.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Inbound EP UI</name>
@@ -44,7 +43,7 @@
                         <Import-Package>
                             org.wso2.carbon.task.stub.*;
                             org.wso2.carbon.inbound.stub.*;
-                            version="${carbon.platform.package.import.version.range}",
+                            version="${carbon.mediation.imp.pkg.version}",
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.synapse.task.*,
