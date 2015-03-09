@@ -129,13 +129,13 @@ public class FastXSLTMediator extends AbstractMediator implements ManagedLifecyc
      */
     private final List<MediatorProperty> transformerFactoryAttributes
             = new ArrayList<MediatorProperty>();
-    
+
     private int bufferSizeSupport = 1024*8;
 
     public boolean mediate(MessageContext context) {
 
         InputStream inMessage = null;
-    
+
         Templates cTemplate = null;
         org.apache.axis2.context.MessageContext axis2MC =null;
         SynapseLog synLog = getLog(context);
@@ -148,8 +148,11 @@ public class FastXSLTMediator extends AbstractMediator implements ManagedLifecyc
         	axis2MC = ((Axis2MessageContext)context).getAxis2MessageContext();
         	Pipe pipe= (Pipe) axis2MC.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
             if(pipe != null){
-            	 inMessage=getMessageInputStreamPT(axis2MC,pipe);
-            	
+                inMessage = getMessageInputStreamFromSoapEnvelop(context);
+                if(inMessage == null ) {
+                    inMessage = getMessageInputStreamPT(axis2MC, pipe);
+                }
+
             } else{
         	 inMessage = getMessageInputStreamBinaryRelay(context);
             }
@@ -157,8 +160,8 @@ public class FastXSLTMediator extends AbstractMediator implements ManagedLifecyc
             if( inMessage == null){
                 inMessage = getMessageInputStreamFromSoapEnvelop(context);
             }
-           
-        
+
+
         } catch (IOException e) {
             handleException("Error while reading the input stream ", e, context);
         }
@@ -221,11 +224,11 @@ public class FastXSLTMediator extends AbstractMediator implements ManagedLifecyc
                 OMElement responseOM = AXIOMUtil.stringToOM(omString);
                 context.getEnvelope().getBody().addChild(responseOM);
             }
-                  
-            //letting pipe know that the raw serialization has been completed and if reach pipe consume operation 
+
+            //letting pipe know that the raw serialization has been completed and if reach pipe consume operation
             //by looking at this variable the the pipe consumer operation encoder will completes after
             //writing the byte stream to the output channel
-         
+
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("XMLConverter mediator : Done");
             }
@@ -317,8 +320,10 @@ public class FastXSLTMediator extends AbstractMediator implements ManagedLifecyc
 
 
 
+
+
     private InputStream getMessageInputStreamPT(org.apache.axis2.context.MessageContext context,Pipe pipe) throws IOException {
-    	//AtomicBoolean inBufferInputMode = new AtomicBoolean(true);
+    	//AtomicBoolean inBufferInputMode = new AtomicBoole
         if (pipe != null && Boolean.TRUE.equals(context.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED)) && context.getProperty(PassThroughConstants.BUFFERED_INPUT_STREAM) != null){
              BufferedInputStream bufferedInputStream= (BufferedInputStream) context.getProperty(PassThroughConstants.BUFFERED_INPUT_STREAM);
              bufferedInputStream.reset();
