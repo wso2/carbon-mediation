@@ -37,10 +37,10 @@
             <artifactId>org.wso2.carbon.mediation.clustering</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <scope>compile</scope>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-nhttp-transport</artifactId>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -62,7 +62,10 @@
                             org.wso2.carbon.inbound.endpoint.persistence;
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Fragment-Host>synapse-core</Fragment-Host>
+                        <Fragment-Host>
+                            synapse-core,
+                            synapse-nhttp-transport
+                        </Fragment-Host>
                     </instructions>
                 </configuration>
             </plugin>
