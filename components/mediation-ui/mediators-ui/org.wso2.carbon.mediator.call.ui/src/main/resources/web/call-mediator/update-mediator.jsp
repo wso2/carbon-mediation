@@ -48,7 +48,6 @@
     }
     CallMediator callMediator = (CallMediator) mediator;
 
-    boolean blocking;
     String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext =
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
@@ -80,7 +79,7 @@
         callMediator.setEndpoint(ep);
     }
 
-    blocking=Boolean.parseBoolean(request.getParameter("mediator.call.blocking"));
+    boolean blocking=Boolean.parseBoolean(request.getParameter("mediator.call.blocking"));
     callMediator.setBlocking(blocking);
 
     session.removeAttribute("anonEpXML");

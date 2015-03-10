@@ -67,7 +67,9 @@ public class CallMediator extends AbstractMediator {
         if (activeEndpoint != null) {
             call.addChild(EndpointSerializer.getElementFromEndpoint(activeEndpoint));
         }
-        call.addAttribute(fac.createOMAttribute("blocking",nullNS,Boolean.toString(getBlocking())));
+        if (blocking==true) {
+            call.addAttribute(fac.createOMAttribute("blocking", nullNS, Boolean.toString(getBlocking())));
+        }
 
         if (parent != null) {
             parent.addChild(call);
