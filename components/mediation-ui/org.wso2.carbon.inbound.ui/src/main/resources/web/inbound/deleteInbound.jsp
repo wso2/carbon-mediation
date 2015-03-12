@@ -48,6 +48,7 @@
         }
     %>
     <script type="text/javascript">
-        forward("index.jsp");
+        document.location.href='index.jsp?ordinal=0';    
+        //forward("index.jsp");
     </script>
 </fmt:bundle>

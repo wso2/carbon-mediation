@@ -14,19 +14,16 @@
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
         <artifactId>inbound-endpoints-feature</artifactId>
-        <groupId>org.wso2.carbon</groupId>
-        <version>4.3.0-SNAPSHOT</version>
+        <groupId>org.wso2.carbon.mediation</groupId>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.inbound.endpoints.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Inbound Endpoint Server Feature</name>
@@ -34,14 +31,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
-            <version>4.3.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -68,8 +63,8 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound.endpoint</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound.endpoint.persistence</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.persistence</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>

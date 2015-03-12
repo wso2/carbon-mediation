@@ -15,19 +15,16 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-ui</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <artifactId>mediators-ui</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediators Aggregator Module</name>
@@ -65,7 +62,6 @@
         <module>org.wso2.carbon.mediator.payloadfactory.ui</module>
         <module>org.wso2.carbon.mediator.property.ui</module>
         <module>org.wso2.carbon.mediator.respond.ui</module>
-        <module>org.wso2.carbon.mediator.rmsequence.ui</module>
         <module>org.wso2.carbon.mediator.rule.ui</module>
         <module>org.wso2.carbon.mediator.script.ui</module>
         <module>org.wso2.carbon.mediator.send.ui</module>

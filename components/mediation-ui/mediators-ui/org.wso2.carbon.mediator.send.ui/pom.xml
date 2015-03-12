@@ -17,14 +17,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediators-ui</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediator.send.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Send Mediator UI</name>
@@ -50,7 +49,7 @@
                             !javax.servlet.hpttp,
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.proxyadmin.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.proxyadmin.stub.*;version="${carbon.mediation.imp.pkg.version}",
                             javax.xml.stream.*; version="1.0.1",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             !javax.xml.namespace,
@@ -83,7 +82,7 @@
             </exclusions>
         </dependency>        
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.service</artifactId>
         </dependency>
         <dependency>
@@ -91,7 +90,7 @@
             <artifactId>org.wso2.carbon.logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.proxyadmin.stub</artifactId>
         </dependency>
     </dependencies>

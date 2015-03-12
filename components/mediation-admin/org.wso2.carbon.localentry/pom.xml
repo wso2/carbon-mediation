@@ -17,15 +17,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
     <artifactId>org.wso2.carbon.localentry</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Localentry BE</name>
     <url>http://wso2.org</url>
@@ -36,7 +35,7 @@
             <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
         </dependency>
         <dependency>
@@ -50,11 +49,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
-        <dependency>
-                <groupId>org.wso2.carbon</groupId>
+                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
             </dependency>
     </dependencies>
@@ -84,10 +79,10 @@
                         <Export-Package>
                             !javax.servlet,
                             !javax.servlet.http,
-                            org.wso2.carbon.localentry.service; version=1.0.0,
-                            org.wso2.carbon.localentry.dos; version=1.0.0,
-                            org.wso2.carbon.localentry; version=1.0.0,
-                            org.wso2.carbon.localentry.persistence; version=1.0.0,
+                            org.wso2.carbon.localentry.service; version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.localentry.dos; version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.localentry; version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.localentry.persistence; version="${carbon.mediation.exp.pkg.version}",
                         </Export-Package>
                         <Import-Package>
                             !org.wso2.carbon.localentry.service,
@@ -95,7 +90,7 @@
                             !org.wso2.carbon.localentry,
                             !javax.xml.soap,
                             org.apache.axis2.rpc.receivers; version="${axis2.osgi.version.range}",
-                            javax.xml.stream.*; version="1.0.1",
+                            javax.xml.stream.*; version="${javax.xml.stream.imp.pkg.version}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.axis2; version="${axis2.osgi.version.range}",
                             org.apache.axis2.description; version="${axis2.osgi.version.range}",
@@ -111,8 +106,8 @@
                             org.apache.synapse.mediators.base,
                             org.apache.axis2.transport.base,
                             org.wso2.carbon.core,
-                            org.wso2.carbon.registry.core.service; version=1.0.1,
-                            javax.xml.soap; version=1.0.0,
+                            org.wso2.carbon.registry.core.service; version="${carbon.kernel.registry.imp.pkg.version}",
+                            javax.xml.soap; version="${javax.xml.soap.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
@@ -121,8 +116,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <derby.version>10.2.2.0</derby.version>
-    </properties>
 </project>

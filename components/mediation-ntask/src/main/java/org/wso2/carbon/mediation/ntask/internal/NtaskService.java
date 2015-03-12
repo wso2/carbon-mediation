@@ -57,10 +57,10 @@ public class NtaskService {
         try {
 
             BundleContext bundleContext = context.getBundleContext();
-            bundleContext
-                    .registerService(this.getClass().getName(), new NtaskService(), null);
-            bundleContext.registerService(ServerStartupHandler.class.getName(),
-                    new NTaskTaskManager(), null);
+            //bundleContext
+            //        .registerService(this.getClass().getName(), new NtaskService(), null);
+            //bundleContext.registerService(ServerStartupHandler.class.getName(),
+            //        new NTaskTaskManager(), null);
 
             logger.debug("ntask-integration bundle is activated.");
         } catch (Throwable e) {

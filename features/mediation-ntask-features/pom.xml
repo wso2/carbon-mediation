@@ -16,14 +16,13 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-      <groupId>org.wso2.carbon</groupId>
+      <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>carbon-mediation</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.3.3-SNAPSHOT</version>
       <relativePath>../../pom.xml</relativePath>
     </parent>
    <modelVersion>4.0.0</modelVersion>
-   <groupId>org.wso2.carbon</groupId>
-   <version>4.3.0-SNAPSHOT</version>
+   <version>4.3.3-SNAPSHOT</version>
    <artifactId>org.wso2.carbon.mediation.ntask.feature</artifactId>
    <packaging>pom</packaging>
    <name>WSO2 Carbon - Mediation NTask Feature</name>
@@ -31,9 +30,8 @@
    <description>This feature contains the bundles required for NTask</description>
    <dependencies>
       <dependency>
-         <groupId>org.wso2.carbon</groupId>
+         <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.mediation.ntask</artifactId>
-         <version>4.3.0-SNAPSHOT</version>
       </dependency>
    </dependencies>
    <build>
@@ -59,7 +57,7 @@
                         </properties>
                      </adviceFile>
                      <bundles>
-                        <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.ntask</bundleDef>                      
+                        <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.ntask</bundleDef>
                      </bundles>                   
                   </configuration>
                </execution>

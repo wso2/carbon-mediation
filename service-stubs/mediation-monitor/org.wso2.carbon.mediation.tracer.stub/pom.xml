@@ -19,16 +19,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
      <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-monitor-stub</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.tracer.stub</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Mediation Tracer Stub</name>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <url>http://wso2.org</url>
 
     <build>
@@ -48,15 +48,13 @@
                         <configuration>
                             <tasks>
                                 <path id="wsdl2java.classpath">
-			 <pathelement location="${settings.localRepository}/org/apache/ws/commons/axiom/wso2/axiom/${axiom.wso2.version}/axiom-${axiom.wso2.version}.jar"/>
-                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2-client/${orbit.version.axis2}/axis2-client-${orbit.version.axis2}.jar"/>
-                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar"/>
+			 <pathelement location="${settings.localRepository}/org/apache/ws/commons/axiom/wso2/axiom/${axiom.wso2.version}/axiom-${axiom.wso2.version}.jar" />
+                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2-client/${orbit.version.axis2}/axis2-client-${orbit.version.axis2}.jar" />
+                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/MediationTracerService.wsdl -uw -sn MediationTracerService
-                                    -pn MediationTracerServiceHttpSoap12Endpoint -o target/generated-code
-                                    -ns2p http://tracer.mediation.carbon.wso2.org=org.wso2.carbon.mediation.tracer.stub.client"/>
-                                    <classpath refid="wsdl2java.classpath"/>
+                                    <arg line="-uri src/main/resources/MediationTracerService.wsdl -uw -sn MediationTracerService -pn MediationTracerServiceHttpSoap12Endpoint -o target/generated-code -ns2p http://tracer.mediation.carbon.wso2.org=org.wso2.carbon.mediation.tracer.stub.client" />
+                                    <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>
                         </configuration>
@@ -94,9 +92,9 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
                             org.wso2.carbon.mediation.tracer.stub.*;
-                            version="${carbon.platform.package.export.version}",
+                            version="${carbon.mediation.exp.pkg.version}",
                             org.wso2.carbon.mediation.statistics.stub.client.*;
-                            version="${carbon.platform.package.export.version}"
+                            version="${carbon.mediation.exp.pkg.version}"
                         </Export-Package>
                         <_nouse>true</_nouse>
                         <Carbon-Component>UIBundle</Carbon-Component>

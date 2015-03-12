@@ -14,15 +14,13 @@
  ~ See the License for the specific language governing permissions and
  ~ limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-ui-features</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
-    <groupId>org.wso2.carbon</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.ui.feature</artifactId>
     <packaging>pom</packaging>
@@ -31,132 +29,132 @@
     <description>This feature contains ui features of mediation</description>
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.endpoint.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.endpoint.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.artifactuploader.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.templates.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.templates.service</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.templates.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.message.processor.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.message.processor.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.message.store.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.message.store.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.priority.executors.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.priority.executors.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.proxyadmin.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.proxyadmin.common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.proxyadmin.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.rest.api.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.rest.api.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.sequences.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.sequences.common</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.service</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.sequences.stub</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.task.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.task.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.library.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.library.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.security.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.security.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.localentry.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.localentry.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.artifactuploader.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.stub</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.ui</artifactId>
         </dependency>
     </dependencies>
@@ -183,50 +181,49 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.endpoint.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.endpoint.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.artifactuploader.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.artifactuploader.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.templates.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.endpoint.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.endpoint.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.artifactuploader.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.artifactuploader.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.templates.ui</bundleDef>
                                 <bundleDef>
-                                    org.wso2.carbon:org.wso2.carbon.mediation.templates.service
-                                </bundleDef>
+                                    org.wso2.carbon.mediation:org.wso2.carbon.mediation.templates.service</bundleDef>
                                 <bundleDef>
-                                    org.wso2.carbon:org.wso2.carbon.mediation.templates.stub
+                                    org.wso2.carbon.mediation:org.wso2.carbon.mediation.templates.stub
                                 </bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.message.processor.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.message.processor.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.message.store.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.message.store.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.priority.executors.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.priority.executors.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.proxyadmin.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.proxyadmin.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.proxyadmin.common</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.rest.api.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.rest.api.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences.common</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.service</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.sequences.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.task.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.task.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.library.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.library.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediation.security.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.localentry.ui</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.localentry.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound.stub</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.inbound.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.message.processor.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.message.processor.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.message.store.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.message.store.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.priority.executors.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.priority.executors.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.proxyadmin.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.proxyadmin.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.proxyadmin.common</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.rest.api.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.rest.api.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences.common</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.service</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.task.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.task.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.library.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.library.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.security.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.localentry.ui</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.localentry.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.stub</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.ui</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server:${wso2carbon.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.core.ui:${wso2carbon.version}</importFeatureDef>
-                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${wso2carbon.version}
+                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.ui:${carbon.kernel.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${carbon.mediation.version}
                                 </importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.admin:${wso2carbon.version}
+                                <importFeatureDef>org.wso2.carbon.mediation.admin:${carbon.mediation.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>

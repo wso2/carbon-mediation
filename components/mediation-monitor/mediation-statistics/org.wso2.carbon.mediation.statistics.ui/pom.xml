@@ -17,15 +17,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-statistics</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.3.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
+    <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>org.wso2.carbon.mediation.statistics.ui</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.3.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Mediation Statistics UI</name>
     <url>http://wso2.org</url>
@@ -37,7 +37,7 @@
             <artifactId>org.wso2.carbon.ui</artifactId>
         </dependency>
 	<dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.statistics.stub</artifactId>
         </dependency>
     </dependencies>
@@ -57,8 +57,8 @@
                             org.wso2.carbon.mediation.statistics.ui.*
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.mediation.statistics.stub.*; version="${carbon.platform.package.import.version.range}",
-                            org.wso2.carbon.mediation.statistics.stub.aspect.*; version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.mediation.statistics.stub.*; version="${carbon.mediation.imp.pkg.version}",
+                            org.wso2.carbon.mediation.statistics.stub.aspect.*; version="${carbon.mediation.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <Carbon-Component>UIBundle</Carbon-Component>
