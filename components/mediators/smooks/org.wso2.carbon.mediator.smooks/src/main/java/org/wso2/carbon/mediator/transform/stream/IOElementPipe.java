@@ -44,7 +44,7 @@ public class IOElementPipe {
     /** Writer used to write XML events. */
     private XMLEventWriter xmlWriter;
     
-    private final XMLInputFactory factory = XMLInputFactory.newInstance();
+    private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
        
     /**
      * Constructor which create IOElementPipe object with an OMElement object.
@@ -53,7 +53,7 @@ public class IOElementPipe {
      * @throws FactoryConfigurationError
      */
     public IOElementPipe(OMElement element) throws XMLStreamException, FactoryConfigurationError {
-    	XMLStreamReader xmlReader = factory.createXMLStreamReader(new StringInputStream(element.toString()));
+    	XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(new StringInputStream(element.toString()));
     	this.eventReader = XMLInputFactory.newInstance().createXMLEventReader(xmlReader);
 		this.outputStream = new ElementOutputStream();
 		this.xmlWriter = XMLOutputFactory.newInstance().createXMLEventWriter(this.outputStream);
