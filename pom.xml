@@ -1910,6 +1910,21 @@
                 <artifactId>cxf-bundle</artifactId>
                 <version>${cxf.wso2.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.aries.blueprint</groupId>
+                <artifactId>org.apache.aries.blueprint</artifactId>
+                <version>${aries.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.aries.proxy</groupId>
+                <artifactId>org.apache.aries.proxy</artifactId>
+                <version>${aries.proxy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.aries</groupId>
+                <artifactId>org.apache.aries.util</artifactId>
+                <version>${aries.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2042,6 +2057,8 @@
         <ehcache.core.version>2.5.1</ehcache.core.version>
         <cxf.version>2.6.2</cxf.version>
         <cxf.wso2.version>3.0.2.wso2v1</cxf.wso2.version>
+        <aries.proxy.version>1.0.1</aries.proxy.version>
+        <aries.version>1.1.0</aries.version>
         <velocity.version>1.7</velocity.version>
         <commons.lang.version>2.6</commons.lang.version>
 
