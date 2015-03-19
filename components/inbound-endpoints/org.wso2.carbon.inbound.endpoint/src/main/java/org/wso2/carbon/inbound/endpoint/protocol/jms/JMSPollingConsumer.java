@@ -108,7 +108,7 @@ public class JMSPollingConsumer {
             session = jmsConnectionFactory.getSession(connection);
             destination = jmsConnectionFactory.getDestination(connection);
             messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);
-            Message msg = messageConsumer.receive(1);
+            Message msg = messageConsumer.receive();
             if (msg == null) {
                 logger.debug("Inbound JMS Endpoint. No JMS message received.");
                 return null;
@@ -179,7 +179,7 @@ public class JMSPollingConsumer {
                 } else {
                     return msg;
                 }
-                msg = messageConsumer.receive(1);
+                msg = messageConsumer.receive();
             }
 
         } catch (JMSException e) {
