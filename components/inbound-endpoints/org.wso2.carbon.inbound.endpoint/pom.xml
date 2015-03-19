@@ -54,8 +54,8 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-
                             org.wso2.carbon.inbound.endpoint.protocol.http.management,
+                            org.wso2.carbon.inbound.endpoint.protocol.http.multitenancy,
                             org.wso2.carbon.inbound.endpoint.protocol.generic
                         </Export-Package>
                         <Import-Package>
@@ -63,8 +63,7 @@
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Fragment-Host>
-                            synapse-core,
-                            synapse-nhttp-transport
+                            synapse-core
                         </Fragment-Host>
                     </instructions>
                 </configuration>
