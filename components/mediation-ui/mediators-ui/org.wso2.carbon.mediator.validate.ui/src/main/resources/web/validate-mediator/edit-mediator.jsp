@@ -19,6 +19,7 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map"%>
 <%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
 <%@ page import="org.apache.synapse.mediators.Value" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.util.MediatorProperty" %>
@@ -91,7 +92,7 @@
                                 int i = 0;
                                 boolean isStaticKey = true;
                                 String showValue = "";
-                                SynapseXPath synapseXPath = null;
+                                SynapsePath synapsePath = null;
 
                                 if (!keys.isEmpty()) {
 
@@ -99,12 +100,12 @@
 
                                         if (schemaKey != null) {
                                             showValue = schemaKey.getKeyValue();
-                                            synapseXPath = schemaKey.getExpression();
+                                            synapsePath = schemaKey.getExpression();
 
                                             isStaticKey = showValue != null && !"".equals(showValue);
 
                                             // If dynamic key : register namespace
-                                            if (!isStaticKey && synapseXPath != null) {
+                                            if (!isStaticKey && synapsePath != null) {
                                                 namespacRegister.registerNameSpaces(schemaKey.getExpression(), ("keyValue" + i), session);
 
                                             }
@@ -146,12 +147,12 @@
                                             />
                                     <%} else {%>
                                     <input id="keyValue<%=i%>" name="keyValue<%=i%>" type="text"
-                                           value="<%=synapseXPath.toString()%>"/>
+                                           value="<%=synapsePath.toString()%>"/>
                                     <%} %>
                                 </td>
 
                                 <td id="nsEditorButtonTD<%=i%>" style="<%=isStaticKey? "display:none;" : ""%>">
-                                    <% if (!isStaticKey && synapseXPath != null) {%>
+                                    <% if (!isStaticKey && synapsePath != null) {%>
                                     <a href="#nsEditorLink" class="nseditor-icon-link"
                                        style="padding-left:40px"
                                        onclick="showNameSpaceEditor('keyValue<%=i%>')"><fmt:message
@@ -160,7 +161,7 @@
                                 </td>
 
                                 <td id="regBrowserTD<%=i%>" style="<%=!isStaticKey? "display:none;" : ""%>">
-                                    <% if (isStaticKey && (synapseXPath == null || synapseXPath.toString() == "")) {%>
+                                    <% if (isStaticKey && (synapsePath == null || synapsePath.toString() == "")) {%>
                                     <a href="#registryBrowserLink" class="registry-picker-icon-link"
                                        onclick="showRegistryBrowser('keyValue<%=i%>','/_system/config')"><fmt:message
                                             key="conf.registry.keys"/></a>
@@ -224,12 +225,12 @@
                                             />
                                     <%} else {%>
                                     <input id="keyValue<%=i%>" name="keyValue<%=i%>" type="text"
-                                           value="<%=synapseXPath.toString()%>"/>
+                                           value="<%=synapsePath.toString()%>"/>
                                     <%} %>
                                 </td>
 
                                 <td id="nsEditorButtonTD<%=i%>" style="<%=isStaticKey? "display:none;" : ""%>">
-                                    <% if (!isStaticKey && synapseXPath != null) {%>
+                                    <% if (!isStaticKey && synapsePath != null) {%>
                                     <a href="#nsEditorLink" class="nseditor-icon-link"
                                        style="padding-left:40px"
                                        onclick="showNameSpaceEditor('keyValue<%=i%>')"><fmt:message
@@ -238,7 +239,7 @@
                                 </td>
 
                                 <td id="regBrowserTD<%=i%>" style="<%=!isStaticKey? "display:none;" : ""%>">
-                                    <% if (isStaticKey && (synapseXPath == null || synapseXPath.toString() == "")) {%>
+                                    <% if (isStaticKey && (synapsePath == null || synapsePath.toString() == "")) {%>
                                     <a href="#registryBrowserLink" class="registry-picker-icon-link"
                                        onclick="showRegistryBrowser('keyValue<%=i%>','/_system/config')"><fmt:message
                                             key="conf.registry.keys"/></a>
