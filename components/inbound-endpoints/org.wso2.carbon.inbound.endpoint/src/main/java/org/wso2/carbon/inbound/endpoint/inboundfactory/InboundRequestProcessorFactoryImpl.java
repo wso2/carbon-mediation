@@ -25,6 +25,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
+import org.wso2.carbon.inbound.endpoint.protocol.kafka.KAFKAProcessor;
 
 /**
  * Class responsible for provide  implementation of the request processor according to the port.
@@ -32,7 +33,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
 
-    public static enum Protocols {jms, file, http}
+    public static enum Protocols {jms, file, http, kafka}
 
     /**
      * return underlying Request Processor Implementation according to protocol
@@ -52,6 +53,9 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
             } else if (Protocols.http.toString().equals(protocol)) {
 
                 inboundRequestProcessor = new InboundHttpListener(params);
+            }else if(Protocols.kafka.toString().equals(protocol))
+            {
+                inboundRequestProcessor = new KAFKAProcessor(params);
             }
         } else if (params.getClassImpl() != null) {
             inboundRequestProcessor = new GenericProcessor(params);
