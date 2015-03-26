@@ -26,11 +26,4 @@ public class MLMediatorUtils {
         List<Feature> features = mlModel.getFeatures();
         return features;
     }
-
-    public static List<String> getFeaturesOfModelFromDB(String modelName) throws DatabaseHandlerException {
-        long modelId = 1;
-        MLCoreServiceValueHolder valueHolder = MLCoreServiceValueHolder.getInstance();
-        DatabaseService databaseService = valueHolder.getDatabaseService();
-        return databaseService.getFeatureNames(modelId);
-    }
 }

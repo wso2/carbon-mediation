@@ -31,7 +31,7 @@
         jQuery('#attribDescription').load(url, {mediatorInput: val, clearAll : 'true'},
                 function(res, status, t) {
                     if (status != "success") {
-                        CARBON.showErrorDialog('<fmt:message key="mediator.ml.errmsg"/>');
+                        CARBON.showErrorDialog('<fmt:message key="mediator.ml.error.msg"/>');
                     }
                 })
         return false;
@@ -47,14 +47,14 @@
     <td>
         <table class="normal">
             <tr>
-                <td><fmt:message key="mediator.ml.modelStorageLocation"/><span class="required">*</span>
+                <td><fmt:message key="mediator.ml.model.name"/><span class="required">*</span>
                 </td>
                 <td align="left">
                     <input type="text" id="mediatorInputId" name="mediatorInput" size="35"
                            value="<%= modelName !=null ? modelName : ""%>"/>
                 </td>
                 <td>
-                    <input id="actionID" type="button" value="<fmt:message key="mediator.ml.loadModel"/>"
+                    <input id="actionID" type="button" value="<fmt:message key="mediator.ml.load.model"/>"
                            class="button"/>
                 </td>
             </tr>

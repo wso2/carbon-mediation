@@ -42,29 +42,10 @@
     boolean modelNotFound = false;
     List<Feature> inputVariables = null;
     response.setHeader("Cache-Control", "no-cache");
-    String backEndServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
-    ConfigurationContext context =
-            (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
-    String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-    // TODO
-    //CommandMediatorAdminClient client = new CommandMediatorAdminClient(cookie,
-    //        backEndServerURL, context, request.getLocale());
     String modelName = request.getParameter("mediatorInput");
     mlMediator.setModelName(modelName);
-    //Map<String,Object> staticSetterProps = pojoCommandMediator.getStaticSetterProperties();
-    //Map<String,SynapseXPath> messageSetterProps = pojoCommandMediator.getMessageSetterProperties();
-    //Map<String, String> contextSetterProps = pojoCommandMediator.getContextSetterProperties();
-    //Map<String, SynapseXPath> messageGetterProps = pojoCommandMediator.getMessageGetterProperties();
-    //Map<String, String> contextGetterProps = pojoCommandMediator.getContextGetterProperties();
-
-//    // TODO
-//    inputVariables = new String[3];
-//    inputVariables[0] = "height";
-//    inputVariables[1] = "weight";
-//    inputVariables[2] ="age";
 
     try {
-//        inputVariables = client.getFeatureMappings(request.getParameter("mediatorInput"));
         inputVariables = org.wso2.carbon.mediator.machineLearner.ui.util.MLMediatorUtils.getFeaturesOfModel(request.getParameter("mediatorInput"));
     } catch (Exception e) {
         modelNotFound = true; // TODO:do nothing, set class not found exception, may be we should be more specific
@@ -79,7 +60,7 @@
                 <tr>
                     <th><fmt:message key="mediator.ml.feature.name"/></th>
                     <th><fmt:message key="mediator.ml.expression"/></th>
-                    <th><fmt:message key="mediator.ml.Action"/></th>
+                    <th><fmt:message key="mediator.ml.action"/></th>
                 </tr>
             </thead>
                 <tbody>
@@ -118,7 +99,7 @@
                                                    class="esb-edit small_textbox"/>
                         </td>
                         <td><a href="#" class="icon-link" style="background-image:url(../admin/images/delete.gif);"
-                                               onclick="deleteRow(this)"><fmt:message key="mediator.ml.delete.variable"/></a>
+                                               onclick="deleteRow(this)"><fmt:message key="mediator.ml.delete"/></a>
                         </td>
 
                     </tr>
@@ -148,7 +129,7 @@
 
             %>
             <script type="text/javascript">
-                CARBON.showErrorDialog('<fmt:message key="mediator.ml.invalidModelMsg"/>');
+                CARBON.showErrorDialog('<fmt:message key="mediator.ml.invalid.model.msg"/>');
             </script>
             <%
 
@@ -156,14 +137,14 @@
 
             %>
             <script type="text/javascript">
-                CARBON.showErrorDialog('<fmt:message key="mediator.ml.modelNotFoundMsg"/>');
+                CARBON.showErrorDialog('<fmt:message key="mediator.ml.model.not.found.msg"/>');
             </script>
             <%
 
             } else if (!modelNotFound) {
             %>
             <script type="text/javascript">
-                CARBON.showInfoDialog('<fmt:message key="mediator.ml.modelStorageLocation.loaded.success"/>');
+                CARBON.showInfoDialog('<fmt:message key="mediator.ml.model.loaded.success"/>');
             </script>
             <%
 
