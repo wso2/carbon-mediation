@@ -92,7 +92,7 @@ public class MachineLearnerMediatorFactory extends AbstractMediatorFactory {
             handleException("Features element not defined.");
         }
 
-        // Configure response variable
+        // Configure prediction
         OMElement predictionElement = omElement.getFirstChildWithName(PREDICTION_QNAME);
         if(predictionElement != null) {
             String responseXpath = getAttributeValue(predictionElement, EXPRESSION_ATT);

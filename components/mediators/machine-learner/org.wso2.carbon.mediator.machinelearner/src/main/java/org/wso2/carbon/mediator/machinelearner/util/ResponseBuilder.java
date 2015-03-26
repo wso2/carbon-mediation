@@ -34,11 +34,8 @@ public class ResponseBuilder {
 
         Object targetElement = responseVariableXpath.selectSingleNode(messageContext);
         if(targetElement == null) {
-            // Insert new element
             //TODO insert or replace element
 //            insertElement(sourceNodeList, targetElem, synLog);
-            responseVariableXpath.getPathType();
-
         } else {
             replaceElement(response, targetElement, synLog);
         }

@@ -54,23 +54,18 @@ import java.util.Properties;
 
 public class ModelHandler {
 
-    private String modelStorageLocation;
+    private String modelName;
     private Map<SynapseXPath, Integer> featureIndexMap;
-    private MLModelHandler mlModelHandler;
     private MLModel mlModel;
     private MLModelConfigurationContext context;
     private long modelId;
 
-    public ModelHandler() {
-        mlModelHandler = new MLModelHandler();
-    }
-
     /**
-     * Set the model storage location
+     * Set the model name
      * @param modelName model name
      */
-    public void setModelStorageLocation(String modelName) {
-        this.modelStorageLocation = modelName;
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
     }
 
     /**
@@ -95,48 +90,6 @@ public class ModelHandler {
             }
         }
         createModelConfigurationContext();
-    }
-
-    /**
-     * Get the ML model
-     * @param modelId
-     * @return
-     * @throws MLModelBuilderException
-     */
-    private MLModel retrieveModel(long modelId) throws MLModelBuilderException {
-
-        MLCoreServiceValueHolder valueHolder = MLCoreServiceValueHolder.getInstance();
-        DatabaseService databaseService = valueHolder.getDatabaseService();
-        Properties mlProperties = valueHolder.getMlProperties();
-
-        InputStream in = null;
-        ObjectInputStream ois = null;
-        try {
-            MLStorage storage = databaseService.getModelStorage(modelId);
-            String storageType = storage.getType();
-            String storageLocation = storage.getLocation();
-            MLIOFactory ioFactory = new MLIOFactory(mlProperties);
-            MLInputAdapter inputAdapter = ioFactory.getInputAdapter(storageType + MLConstants.IN_SUFFIX);
-            in = inputAdapter.readDataset(new URI(storageLocation));
-            ois = new ObjectInputStream(in);
-            return (MLModel) ois.readObject();
-
-        } catch (Exception e) {
-            throw new MLModelBuilderException("Failed to retrieve the model [id] " + modelId, e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException ignore) {
-                }
-            }
-            if (ois != null) {
-                try {
-                    ois.close();
-                } catch (IOException ignore) {
-                }
-            }
-        }
     }
 
     /**
@@ -176,8 +129,8 @@ public class ModelHandler {
 
     /**
      * Get the predicted value for the given input features using the ML-Model
-     * @param messageContext the incoming message context
-     * @return the predicted value as String
+     * @param messageContext    the incoming message context
+     * @return                  the predicted value as String
      */
     public String getPrediction(MessageContext messageContext) throws MLModelBuilderException, JaxenException,
             MLModelHandlerException {
@@ -188,7 +141,7 @@ public class ModelHandler {
             // Read the feature value from the message
             String variableValue = synapseXPath.stringValueOf(messageContext);
 
-            // Get the mapping feature index of the model
+            // Get the mapping feature index of the ML-model
             int featureIndex = featureIndexMap.get(synapseXPath);
             data[featureIndex] = variableValue;
         }
@@ -197,14 +150,12 @@ public class ModelHandler {
 
     /**
      * Predict the value using the feature values
-     * @param data feature values
-     * @return predicted value as String
-     * @throws MLModelBuilderException
+     * @param data  feature values array
+     * @return      predicted value as String
+     * @throws      MLModelBuilderException
      */
     private String predict(String[] data) throws MLModelBuilderException {
 
-        // TODO modelId
-        long modelId = 1;
         context.setDataToBePredicted(data);
         Predictor predictor = new Predictor(modelId, mlModel, context);
         List<?> predictions = predictor.predict();
