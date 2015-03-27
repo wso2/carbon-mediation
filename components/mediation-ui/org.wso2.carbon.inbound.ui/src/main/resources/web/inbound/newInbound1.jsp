@@ -141,8 +141,13 @@ var requiredParams = null;
 	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
 	                            <%}%>                                
                                 </select>
-							<%} else{%>	                            	                      
+							<%}else{ %>
+							        <%if(InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType")) && defaultParam.equals("keystore")){%>
+							        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundcreationform" rows="8" cols="35">
+							        </textarea>
+							        <%}else{ %>
                                 <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"/>
+                              <%} %>
                             <%} %>                       
 	                        </td>
 	                        <td></td>
@@ -186,8 +191,13 @@ var requiredParams = null;
 				                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
 				                            <%}%>                                
 			                                </select>
-										<%} else{%>	                            	                      
+										<%} else{%>
+                                        <%if(InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType")) && (defaultParam.equals("truststore") || defaultParam.equals("CertificateRevocationVerifier"))){%>
+                                        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundcreationform" rows="8" cols="35">
+                                        </textarea>
+                                        <%}else{ %>
 			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"/>
+			                            <%} %>
 			                            <%} %>                       
 				                        </td>
 				                        <td></td>

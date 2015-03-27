@@ -23,6 +23,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -147,13 +148,18 @@ public class InboundHttpServerWorker extends ServerWorker {
         axis2MsgCtx.setServiceContext(svcCtx);
         axis2MsgCtx.setOperationContext(opCtx);
 
+
         String tenantDomain = getTenantDomain();
         // If not super tenant, assign tenant configuration context
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
             ConfigurationContext tenantConfigCtx =
-                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
-                                                                  axis2MsgCtx.getConfigurationContext());
+                       TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
+                                                                     axis2MsgCtx.getConfigurationContext());
+
             axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+
+            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+
         }
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }
