@@ -6,15 +6,9 @@
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
-<%@ page import="java.rmi.RemoteException" %>
-<%@ page import="java.util.Map" %>
 <%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
-<%@ page import="java.util.Set" %>
 <%@ page import="org.wso2.carbon.ml.commons.domain.Feature" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.wso2.carbon.mediator.machineLearner.ui.MLMediatorConstants" %>
-<%@ page import="org.wso2.carbon.ml.core.exceptions.MLModelBuilderException" %>
-<%@ page import="org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException" %>
 <%@ page import="org.wso2.carbon.mediator.machineLearner.ui.util.MLMediatorUtils" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -25,10 +19,10 @@
     <script type="text/javascript" src="../sequences/js/ns-editor.js"></script>
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
-    if (!(mediator instanceof org.wso2.carbon.mediator.machineLearner.ui.MLMediator)) {
+    if (!(mediator instanceof MLMediator)) {
         throw new RuntimeException("Unable to edit the mediator");
     }
-    org.wso2.carbon.mediator.machineLearner.ui.MLMediator mlMediator = (org.wso2.carbon.mediator.machineLearner.ui.MLMediator) mediator;
+    MLMediator mlMediator = (MLMediator) mediator;
     if ("true".equals(request.getParameter("clearAll"))) {
         mlMediator.getFeatureMappings().clear();
     }
@@ -40,17 +34,17 @@
     response.setHeader("Pragma", "no-cache");
 
     boolean modelNotFound = false;
-    List<Feature> inputVariables = null;
+    List<Feature> features = null;
     response.setHeader("Cache-Control", "no-cache");
     String modelName = request.getParameter("mediatorInput");
     mlMediator.setModelName(modelName);
 
     try {
-        inputVariables = org.wso2.carbon.mediator.machineLearner.ui.util.MLMediatorUtils.getFeaturesOfModel(request.getParameter("mediatorInput"));
+        features = MLMediatorUtils.getFeaturesOfModel(request.getParameter("mediatorInput"));
     } catch (Exception e) {
-        modelNotFound = true; // TODO:do nothing, set class not found exception, may be we should be more specific
+        modelNotFound = true;
     }
-    if (inputVariables != null && inputVariables.size() > 0 && inputVariables.get(0) != null && !modelNotFound) {
+    if (features != null && features.size() > 0 && features.get(0) != null && !modelNotFound) {
 %>
     <h3 id="titleLabel" class="mediator"><fmt:message key="mediator.ml.features"/></h3>
 
@@ -60,48 +54,27 @@
                 <tr>
                     <th><fmt:message key="mediator.ml.feature.name"/></th>
                     <th><fmt:message key="mediator.ml.expression"/></th>
-                    <th><fmt:message key="mediator.ml.action"/></th>
                 </tr>
             </thead>
                 <tbody>
                     <%
                         int index;
-                        for (index = 0; index < inputVariables.size()-1; index++) {
-                            String variableName = inputVariables.get(index).getName();
-                            boolean hasValue = true;
+                        for (index = 0; index < features.size()-1; index++) {
+                            String variableName = features.get(index).getName();
+                            String expression = ((MLMediator) mediator).getFeatureMappings().get(variableName);
+                            if(expression == null) {
+                                expression = "";
+                            }
                     %>
                     <tr>
                         <td style="vertical-align:top !important">
                             <input type="hidden" name="variableName<%= index%>" id="variableName<%= index%>"
                                    value="<%=variableName%>"/><%= variableName%>
                         </td>
-
-                        <!--
-                        <td style="vertical-align:top !important">
-                            <%
-                                String xPath = "expression";
-                                //SynapseXPath xPath;
-                                //hasValue = (xPath = messageSetterProps.get(variableName)) != null ||
-                                //        (xPath = messageGetterProps.get(variableName)) != null;
-                                //if (hasValue) {
-                                //    NameSpacesRegistrar nmspRegistrar = NameSpacesRegistrar.getInstance();
-                                //    nmspRegistrar.registerNameSpaces(xPath,
-                                //            "mediator.command.prop.xpath" + index, session);
-                                //}
-                            %>
-                            <input type="text" name="mediator.command.prop.xpath<%=index%>"
-                                   id="mediator.command.prop.xpath.id<%=index%>"
-                                   <%= hasValue ? " value=\"" + xPath.toString() + "\"" : " disabled=\"true\""%>/>
+                        <td>
+                            <input type="text" name="inputXpath<%=index%>" id="inputXpath<%=index%>"
+                                   value="<%=expression%>"    class="esb-edit small_textbox"/>
                         </td>
-                        -->
-
-                        <td><input type="text" name="inputXpath<%=index%>" id="inputXpath<%=index%>"
-                                                   class="esb-edit small_textbox"/>
-                        </td>
-                        <td><a href="#" class="icon-link" style="background-image:url(../admin/images/delete.gif);"
-                                               onclick="deleteRow(this)"><fmt:message key="mediator.ml.delete"/></a>
-                        </td>
-
                     </tr>
                     <%
                         }
@@ -110,22 +83,28 @@
                 </tbody>
         </table>
     </div>
-    <div style="margin-top:0px;">
-        <table>
+    <div style="margin-top:20px;">
+        <h3 id="predictionLabel" class="mediator"><fmt:message key="mediator.ml.prediction"/></h3>
+        <table class="normal">
             <tbody>
                 <tr>
                     <td><input type="hidden" name="response" id="response"
-                               value="response"/><fmt:message key="mediator.ml.prediction"/></td>
+                               value="response"/><fmt:message key="mediator.ml.expression"/></td>
+                    <%
+                        String predictionExpression = ((MLMediator) mediator).getPredictionExpression();
+                        if(predictionExpression == null) {
+                            predictionExpression = "";
+                        }
+                    %>
                     <td><input type="text" name="responseXpath" id="responseXpath"
-                               class="esb-edit small_textbox"/></td>
+                               value="<%=predictionExpression%>" class="esb-edit small_textbox"/></td>
                 </tr>
             </tbody>
         </table>
     </div>
             <%
 
-                //TODO: let the error be more specific,
-            } else if (inputVariables == null && !modelNotFound) {  // no input variables found
+            } else if (features == null && !modelNotFound) {
 
             %>
             <script type="text/javascript">

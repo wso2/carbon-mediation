@@ -12,7 +12,7 @@
     if (!(mediator instanceof org.wso2.carbon.mediator.machineLearner.ui.MLMediator)) {
         throw new RuntimeException("Unable to edit the mediator");
     }
-    org.wso2.carbon.mediator.machineLearner.ui.MLMediator mlMediator = (org.wso2.carbon.mediator.machineLearner.ui.MLMediator) mediator;
+    MLMediator mlMediator = (MLMediator) mediator;
     String modelName = mlMediator.getModelName();
 %>
 
@@ -27,14 +27,16 @@
     var val;
     jQuery('#actionID').click(function() {
         val = document.getElementById('mediatorInputId').value;
-        var url = '../machineLearner-mediator/machineLearner-ajaxprocessor.jsp';
-        jQuery('#attribDescription').load(url, {mediatorInput: val, clearAll : 'true'},
-                function(res, status, t) {
-                    if (status != "success") {
-                        CARBON.showErrorDialog('<fmt:message key="mediator.ml.error.msg"/>');
-                    }
-                })
-        return false;
+        if(mlMediatorValidate()) {
+            var url = '../machineLearner-mediator/machineLearner-ajaxprocessor.jsp';
+            jQuery('#attribDescription').load(url, {mediatorInput: val, clearAll : 'true'},
+                    function(res, status, t) {
+                        if (status != "success") {
+                            CARBON.showErrorDialog('<fmt:message key="mediator.ml.error.msg"/>');
+                        }
+                    })
+            return false;
+        }
     });
 </script>
 <table class="normal" width="100%">

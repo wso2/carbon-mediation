@@ -1,5 +1,6 @@
 package org.wso2.carbon.mediator.machineLearner.ui.util;
 
+import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ml.commons.domain.Feature;
 import org.wso2.carbon.ml.commons.domain.MLModel;
@@ -10,6 +11,7 @@ import org.wso2.carbon.ml.core.impl.MLModelHandler;
 import org.wso2.carbon.ml.core.utils.MLCoreServiceValueHolder;
 import org.wso2.carbon.ml.database.DatabaseService;
 import org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException;
+import org.wso2.carbon.user.api.UserStoreException;
 
 import java.util.List;
 
@@ -20,6 +22,7 @@ public class MLMediatorUtils {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         int tenantId = carbonContext.getTenantId();
         String userName = "admin"; //carbonContext.getUsername();
+
         MLModelHandler mlModelHandler = new MLModelHandler();
         MLModelNew mlModelNew = mlModelHandler.getModel(tenantId, userName, modelName);
         MLModel mlModel = mlModelHandler.retrieveModel(mlModelNew.getId());

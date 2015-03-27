@@ -13,22 +13,18 @@
         throw new RuntimeException("Unable to edit the mediator");
     }
     MLMediator mlMediator = (MLMediator) mediator;
-
     mlMediator.getFeatureMappings().clear(); // to avoid duplicates
+    String featureCount = request.getParameter("inputVariablesCount");
 
-    XPathFactory xPathFactory = XPathFactory.getInstance();
-    String variableCountParameter = request.getParameter("inputVariablesCount");
-
-    if (variableCountParameter != null && !"".equals(variableCountParameter)) {
-        int variableCount = Integer.parseInt(variableCountParameter.trim());
+    if (featureCount != null && !"".equals(featureCount)) {
+        int variableCount = Integer.parseInt(featureCount.trim());
         for (int i = 0; i < variableCount; i++) {
-            String variableName = request.getParameter("variableName" + i);
-            String inputXpath = request.getParameter("inputXpath" + i);
-
-            mlMediator.addInputVariable(variableName, inputXpath);
+            String feature = request.getParameter("variableName" + i);
+            String expression = request.getParameter("inputXpath" + i);
+            mlMediator.addFeatureMapping(feature, expression);
         }
     }
 
     String responseXpath = request.getParameter("responseXpath");
-    mlMediator.setResponse(responseXpath);
+    mlMediator.setPredictionExpression(responseXpath);
 %>

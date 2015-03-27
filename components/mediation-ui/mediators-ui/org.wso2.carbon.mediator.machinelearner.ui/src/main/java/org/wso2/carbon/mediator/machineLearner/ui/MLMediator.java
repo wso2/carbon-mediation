@@ -20,10 +20,6 @@ package org.wso2.carbon.mediator.machineLearner.ui;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.synapse.config.xml.SynapseXPathFactory;
-import org.apache.synapse.util.xpath.SynapseXPath;
-
-import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
 
@@ -37,7 +33,7 @@ import static org.wso2.carbon.mediator.machineLearner.ui.MLMediatorConstants.*;
 public class MLMediator extends AbstractMediator {
 
     private String modelName;
-    private String response;
+    private String predictionExpression;
     private Map<String, String> featureMappings = new HashMap<String, String>();
 
     @Override
@@ -66,9 +62,9 @@ public class MLMediator extends AbstractMediator {
         }
         mlElement.addChild(featuresElement);
 
-        if(response != null) {
+        if(predictionExpression != null) {
             OMElement predictionElement = fac.createOMElement(PREDICTION_QNAME);
-            predictionElement.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS, response));
+            predictionElement.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS, predictionExpression));
             mlElement.addChild(predictionElement);
         } else {
             throw new MediatorException("Invalid ML mediator. Prediction expression is required");
@@ -110,17 +106,8 @@ public class MLMediator extends AbstractMediator {
             }
 
             OMAttribute expression = featureElement.getAttribute(EXPRESSION_ATT);
-            if (expression != null && expression.getAttributeValue() != null
-                    && !"".equals(expression.getAttributeValue())) {
-                SynapseXPath synapseXPath;
-                try {
-                    synapseXPath = SynapseXPathFactory.getSynapseXPath(featureElement, EXPRESSION_ATT);
-                    //this.featureMappings.put(featureName.getAttributeValue(), synapseXPath);
-                    this.featureMappings.put(featureName.getAttributeValue(), expression.getAttributeValue());
-                } catch (JaxenException e) {
-                    throw new MediatorException("Invalid XPath specified for the feature expression attribute : " +
-                            expression);
-                }
+            if (expression != null && expression.getAttributeValue() != null) {
+                this.featureMappings.put(featureName.getAttributeValue(), expression.getAttributeValue());
             } else {
                 throw new MediatorException("feature expression is required.");
             }
@@ -136,7 +123,7 @@ public class MLMediator extends AbstractMediator {
         if(predictionExpression == null) {
             throw new MediatorException("Prediction expression attribute is required.");
         }
-        this.response = predictionExpression.getAttributeValue();
+        this.predictionExpression = predictionExpression.getAttributeValue();
 
         processAuditStatus(this, omElement);
     }
@@ -154,15 +141,15 @@ public class MLMediator extends AbstractMediator {
         this.modelName = modelName;
     }
 
-    public String getResponse() {
-        return response;
+    public String getPredictionExpression() {
+        return predictionExpression;
     }
 
-    public void setResponse(String response) {
-        this.response = response;
+    public void setPredictionExpression(String response) {
+        this.predictionExpression = response;
     }
 
-    public void addInputVariable(String variableName, String expression) {
+    public void addFeatureMapping(String variableName, String expression) {
         this.featureMappings.put(variableName, expression);
     }
 
