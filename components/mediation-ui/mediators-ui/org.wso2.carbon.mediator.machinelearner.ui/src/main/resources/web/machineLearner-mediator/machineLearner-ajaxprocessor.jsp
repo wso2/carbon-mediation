@@ -60,26 +60,26 @@
                     <%
                         int index;
                         for (index = 0; index < features.size()-1; index++) {
-                            String variableName = features.get(index).getName();
-                            String expression = ((MLMediator) mediator).getFeatureMappings().get(variableName);
+                            String featureName = features.get(index).getName();
+                            String expression = ((MLMediator) mediator).getFeatureMappings().get(featureName);
                             if(expression == null) {
                                 expression = "";
                             }
                     %>
                     <tr>
                         <td style="vertical-align:top !important">
-                            <input type="hidden" name="variableName<%= index%>" id="variableName<%= index%>"
-                                   value="<%=variableName%>"/><%= variableName%>
+                            <input type="hidden" name="featureName<%= index%>" id="featureName<%= index%>"
+                                   value="<%=featureName%>"/><%= featureName%>
                         </td>
                         <td>
-                            <input type="text" name="inputXpath<%=index%>" id="inputXpath<%=index%>"
+                            <input type="text" name="featureXpath<%=index%>" id="featureXpath<%=index%>" size="35"
                                    value="<%=expression%>"    class="esb-edit small_textbox"/>
                         </td>
                     </tr>
                     <%
                         }
                     %>
-                    <input type="hidden" name="inputVariablesCount" id="inputVariablesCount" value="<%=index%>"/>
+                    <input type="hidden" name="featureCount" id="featureCount" value="<%=index%>"/>
                 </tbody>
         </table>
     </div>
@@ -96,8 +96,8 @@
                             predictionExpression = "";
                         }
                     %>
-                    <td><input type="text" name="responseXpath" id="responseXpath"
-                               value="<%=predictionExpression%>" class="esb-edit small_textbox"/></td>
+                    <td><input type="text" name="predictionXpath" id="predictionXpath"
+                               value="<%=predictionExpression%>" size="35"/></td>
                 </tr>
             </tbody>
         </table>
