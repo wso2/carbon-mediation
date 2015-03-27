@@ -26,6 +26,7 @@ import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
@@ -79,8 +80,15 @@ public class InboundHttpServerWorker extends ServerWorker {
                                 getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axisCtx, method);
 
+                String tenantDomain = getTenantDomain();
+
                 String endpointName =
-                        EndpointListenerManager.getInstance().getEndpointName(port, getTenantDomain());
+                        EndpointListenerManager.getInstance().getEndpointName(port, tenantDomain);
+
+                if (endpointName == null) {
+                    handleException("Endpoint not found for port : " + port + "" +
+                                    " tenant domain : " + tenantDomain);
+                }
 
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
 
@@ -178,6 +186,11 @@ public class InboundHttpServerWorker extends ServerWorker {
             return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         }
         return tenant;
+    }
+
+    protected void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
 }
