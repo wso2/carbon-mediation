@@ -24,6 +24,7 @@ import org.apache.synapse.inbound.InboundRequestProcessorFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
+import org.wso2.carbon.inbound.endpoint.protocol.https.InboundHttpsListener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 
 /**
@@ -32,7 +33,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
 
-    public static enum Protocols {jms, file, http}
+    public static enum Protocols {jms, file, http , https}
 
     /**
      * return underlying Request Processor Implementation according to protocol
@@ -52,6 +53,8 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
             } else if (Protocols.http.toString().equals(protocol)) {
 
                 inboundRequestProcessor = new InboundHttpListener(params);
+            }else if(Protocols.https.toString().equals(protocol)){
+                inboundRequestProcessor = new InboundHttpsListener(params);
             }
         } else if (params.getClassImpl() != null) {
             inboundRequestProcessor = new GenericProcessor(params);

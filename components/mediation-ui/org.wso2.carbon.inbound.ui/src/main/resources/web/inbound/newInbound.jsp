@@ -60,8 +60,9 @@
                         <td style="width:150px"><fmt:message key="inbound.type"/><span
                                 class="required">*</span></td>
                         <td align="left">
-                            <select id="inboundType" name="inboundType" class="longInput" on>                                
+                            <select id="inboundType" name="inboundType" class="longInput" on>
                                 <option value="<%=InboundClientConstants.TYPE_HTTP%>">HTTP</option>
+                                <option value="<%=InboundClientConstants.TYPE_HTTPS%>">HTTPS</option>
                                 <option value="<%=InboundClientConstants.TYPE_FILE%>">File</option>
                                 <option value="<%=InboundClientConstants.TYPE_JMS%>">JMS</option>
                                 <option value="<%=InboundClientConstants.TYPE_CLASS%>">Custom</option>
