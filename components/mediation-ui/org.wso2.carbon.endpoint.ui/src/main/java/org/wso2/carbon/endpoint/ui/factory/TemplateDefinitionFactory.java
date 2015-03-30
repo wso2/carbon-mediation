@@ -33,20 +33,22 @@ import org.wso2.carbon.endpoint.ui.util.TemplateParameterContainer;
 import javax.xml.namespace.QName;
 import java.util.StringTokenizer;
 
-public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
+public class TemplateDefinitionFactory extends EndpointDefinitionFactory {
     public static final Log log = LogFactory.getLog(TemplateDefinitionFactory.class);
     TemplateParameterContainer instance;
 
-    public TemplateDefinitionFactory(){
+    public TemplateDefinitionFactory() {
         instance = new TemplateParameterContainer();
     }
 
-    public TemplateParameterContainer getParameterContainer(){
+    public TemplateParameterContainer getParameterContainer() {
         return instance;
     }
+
     /**
      * Extracts the QoS information from the XML which represents a WSDL/Address/Default endpoints
      * for Template endpoints
+     *
      * @param elem XML which represents the endpoint with QoS information
      * @return the created endpoint definition
      */
@@ -78,14 +80,14 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
                 definition.setUseMTOM(true);
             } else if ("swa".equalsIgnoreCase(method)) {
                 definition.setUseSwa(true);
-            } else{
-                TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.optimize, method );
+            } else {
+                TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.optimize, method);
             }
         }
 
         if (encoding != null && encoding.getAttributeValue() != null) {
             definition.setCharSetEncoding(encoding.getAttributeValue());
-        }else if(encoding != null) {
+        } else if (encoding != null) {
             TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.charSetEncoding, encoding.getAttributeValue());
         }
 
@@ -112,9 +114,9 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
             if (useSepList != null) {
                 if ("true".equals(useSepList.trim().toLowerCase())) {
                     definition.setUseSeparateListener(true);
-                } else{
+                } else {
                     TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.separateListener,
-                                                              useSepList.trim().toLowerCase() );
+                            useSepList.trim().toLowerCase());
                 }
             }
         }
@@ -125,9 +127,9 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
 
             definition.setSecurityOn(true);
 
-            OMAttribute policyKey      = wsSec.getAttribute(
+            OMAttribute policyKey = wsSec.getAttribute(
                     new QName(XMLConfigConstants.NULL_NAMESPACE, "policy"));
-            OMAttribute inboundPolicyKey  = wsSec.getAttribute(
+            OMAttribute inboundPolicyKey = wsSec.getAttribute(
                     new QName(XMLConfigConstants.NULL_NAMESPACE, "inboundPolicy"));
             OMAttribute outboundPolicyKey = wsSec.getAttribute(
                     new QName(XMLConfigConstants.NULL_NAMESPACE, "outboundPolicy"));
@@ -190,8 +192,8 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
                     if (definition.getTimeoutDuration() == 0) {
                         definition.setTimeoutDuration(30000);
                     }
-                //if value is not even a template mapping handle as exception
-                } else if(!TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.timeoutAction, actionString)) {
+                    //if value is not even a template mapping handle as exception
+                } else if (!TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.timeoutAction, actionString)) {
                     handleException("Invalid timeout action, action : "
                             + actionString + " is not supported");
                 }
@@ -199,14 +201,14 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
         }
 
         OMElement markAsTimedOut = elem.getFirstChildWithName(new QName(
-            SynapseConstants.SYNAPSE_NAMESPACE,
-            XMLConfigConstants.MARK_FOR_SUSPENSION));
+                SynapseConstants.SYNAPSE_NAMESPACE,
+                XMLConfigConstants.MARK_FOR_SUSPENSION));
 
         if (markAsTimedOut != null) {
 
             OMElement timeoutCodes = markAsTimedOut.getFirstChildWithName(new QName(
-                SynapseConstants.SYNAPSE_NAMESPACE,
-                XMLConfigConstants.ERROR_CODES));
+                    SynapseConstants.SYNAPSE_NAMESPACE,
+                    XMLConfigConstants.ERROR_CODES));
             //only set if not a template mapping
             if (timeoutCodes != null && timeoutCodes.getText() != null &&
                     !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.timeoutErrorCodes, timeoutCodes.getText())) {
@@ -217,47 +219,47 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
                         definition.addTimeoutErrorCode(Integer.parseInt(s));
                     } catch (NumberFormatException e) {
                         handleException("The timeout error codes should be specified " +
-                            "as valid numbers separated by commas : " + timeoutCodes.getText(), e);
+                                "as valid numbers separated by commas : " + timeoutCodes.getText(), e);
                     }
                 }
             }
 
             OMElement retriesBeforeSuspend = markAsTimedOut.getFirstChildWithName(new QName(
-                SynapseConstants.SYNAPSE_NAMESPACE,
-                XMLConfigConstants.RETRIES_BEFORE_SUSPENSION));
+                    SynapseConstants.SYNAPSE_NAMESPACE,
+                    XMLConfigConstants.RETRIES_BEFORE_SUSPENSION));
             //only set if not a template mapping
             if (retriesBeforeSuspend != null && retriesBeforeSuspend.getText() != null &&
                     !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.retriesOnTimeoutBeforeSuspend, retriesBeforeSuspend.getText())) {
                 try {
                     definition.setRetriesOnTimeoutBeforeSuspend(
-                        Integer.parseInt(retriesBeforeSuspend.getText().trim()));
+                            Integer.parseInt(retriesBeforeSuspend.getText().trim()));
                 } catch (NumberFormatException e) {
                     handleException("The retries before suspend [for timeouts] should be " +
-                        "specified as a valid number : " + retriesBeforeSuspend.getText(), e);
+                            "specified as a valid number : " + retriesBeforeSuspend.getText(), e);
                 }
             }
 
             OMElement retryDelay = markAsTimedOut.getFirstChildWithName(new QName(
-                SynapseConstants.SYNAPSE_NAMESPACE,
-                XMLConfigConstants.RETRY_DELAY));
+                    SynapseConstants.SYNAPSE_NAMESPACE,
+                    XMLConfigConstants.RETRY_DELAY));
             if (retryDelay != null && retryDelay.getText() != null &&
                     !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.retryDurationOnTimeout, retryDelay.getText())) {
                 try {
                     definition.setRetryDurationOnTimeout(
-                        Integer.parseInt(retryDelay.getText().trim()));
+                            Integer.parseInt(retryDelay.getText().trim()));
                 } catch (NumberFormatException e) {
                     handleException("The retry delay for timeouts should be specified " +
-                        "as a valid number : " + retryDelay.getText(), e);
+                            "as a valid number : " + retryDelay.getText(), e);
                 }
             }
         }
 
         // support backwards compatibility with Synapse 1.2 - for suspendDurationOnFailure
         OMElement suspendDurationOnFailure = elem.getFirstChildWithName(new QName(
-            SynapseConstants.SYNAPSE_NAMESPACE, "suspendDurationOnFailure"));
+                SynapseConstants.SYNAPSE_NAMESPACE, "suspendDurationOnFailure"));
         if (suspendDurationOnFailure != null && suspendDurationOnFailure.getText() != null &&
-            !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.initialSuspendDuration, suspendDurationOnFailure.getText().trim())
-            ) {
+                !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.initialSuspendDuration, suspendDurationOnFailure.getText().trim())
+                ) {
 
             log.warn("Configuration uses deprecated style for endpoint 'suspendDurationOnFailure'");
             try {
@@ -266,21 +268,21 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
                 definition.setSuspendProgressionFactor((float) 1.0);
             } catch (NumberFormatException e) {
                 handleException("The initial suspend duration should be specified " +
-                    "as a valid number : " + suspendDurationOnFailure.getText(), e);
+                        "as a valid number : " + suspendDurationOnFailure.getText(), e);
             }
         }
 
         OMElement suspendOnFailure = elem.getFirstChildWithName(new QName(
-            SynapseConstants.SYNAPSE_NAMESPACE,
-            XMLConfigConstants.SUSPEND_ON_FAILURE));
+                SynapseConstants.SYNAPSE_NAMESPACE,
+                XMLConfigConstants.SUSPEND_ON_FAILURE));
 
         if (suspendOnFailure != null) {
 
             OMElement suspendCodes = suspendOnFailure.getFirstChildWithName(new QName(
-                SynapseConstants.SYNAPSE_NAMESPACE,
-                XMLConfigConstants.ERROR_CODES));
+                    SynapseConstants.SYNAPSE_NAMESPACE,
+                    XMLConfigConstants.ERROR_CODES));
             if (suspendCodes != null && suspendCodes.getText() != null &&
-                !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.suspendErrorCodes, suspendCodes.getText())) {
+                    !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.suspendErrorCodes, suspendCodes.getText())) {
 
                 StringTokenizer st = new StringTokenizer(suspendCodes.getText().trim(), ", ");
                 while (st.hasMoreTokens()) {
@@ -289,61 +291,60 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
                         definition.addSuspendErrorCode(Integer.parseInt(s));
                     } catch (NumberFormatException e) {
                         handleException("The suspend error codes should be specified " +
-                            "as valid numbers separated by commas : " + suspendCodes.getText(), e);
+                                "as valid numbers separated by commas : " + suspendCodes.getText(), e);
                     }
                 }
             }
 
             OMElement initialDuration = suspendOnFailure.getFirstChildWithName(new QName(
-                SynapseConstants.SYNAPSE_NAMESPACE,
-                XMLConfigConstants.SUSPEND_INITIAL_DURATION));
+                    SynapseConstants.SYNAPSE_NAMESPACE,
+                    XMLConfigConstants.SUSPEND_INITIAL_DURATION));
             if (initialDuration != null && initialDuration.getText() != null &&
-                !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.initialSuspendDuration, initialDuration.getText())) {
+                    !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.initialSuspendDuration, initialDuration.getText())) {
                 try {
                     definition.setInitialSuspendDuration(
-                        Integer.parseInt(initialDuration.getText().trim()));
+                            Integer.parseInt(initialDuration.getText().trim()));
                 } catch (NumberFormatException e) {
                     handleException("The initial suspend duration should be specified " +
-                        "as a valid number : " + initialDuration.getText(), e);
+                            "as a valid number : " + initialDuration.getText(), e);
                 }
             }
 
             OMElement progressionFactor = suspendOnFailure.getFirstChildWithName(new QName(
-                SynapseConstants.SYNAPSE_NAMESPACE,
-                XMLConfigConstants.SUSPEND_PROGRESSION_FACTOR));
+                    SynapseConstants.SYNAPSE_NAMESPACE,
+                    XMLConfigConstants.SUSPEND_PROGRESSION_FACTOR));
             if (progressionFactor != null && progressionFactor.getText() != null &&
                     !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.suspendProgressionFactor, progressionFactor.getText())) {
                 try {
                     definition.setSuspendProgressionFactor(
-                        Float.parseFloat(progressionFactor.getText().trim()));
+                            Float.parseFloat(progressionFactor.getText().trim()));
                 } catch (NumberFormatException e) {
                     handleException("The suspend duration progression factor should be specified " +
-                        "as a valid float : " + progressionFactor.getText(), e);
+                            "as a valid float : " + progressionFactor.getText(), e);
                 }
             }
 
             OMElement maximumDuration = suspendOnFailure.getFirstChildWithName(new QName(
-                SynapseConstants.SYNAPSE_NAMESPACE,
-                XMLConfigConstants.SUSPEND_MAXIMUM_DURATION));
+                    SynapseConstants.SYNAPSE_NAMESPACE,
+                    XMLConfigConstants.SUSPEND_MAXIMUM_DURATION));
             if (maximumDuration != null && maximumDuration.getText() != null &&
-                    !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.suspendMaximumDuration, maximumDuration.getText()) ) {
+                    !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.suspendMaximumDuration, maximumDuration.getText())) {
                 try {
-                    definition.setSuspendMaximumDuration(
-                        Long.parseLong(maximumDuration.getText().trim()));
+                    //definition.setSuspendMaximumDuration();
                 } catch (NumberFormatException e) {
                     handleException("The maximum suspend duration should be specified " +
-                        "as a valid number : " + maximumDuration.getText(), e);
+                            "as a valid number : " + maximumDuration.getText(), e);
                 }
             }
         }
 
         OMElement retryConfig = elem.getFirstChildWithName(new QName(
-            SynapseConstants.SYNAPSE_NAMESPACE, XMLConfigConstants.RETRY_CONFIG));
+                SynapseConstants.SYNAPSE_NAMESPACE, XMLConfigConstants.RETRY_CONFIG));
 
         if (retryConfig != null) {
 
             OMElement retryDisabledErrorCodes = retryConfig.getFirstChildWithName(new QName(
-                SynapseConstants.SYNAPSE_NAMESPACE, "disabledErrorCodes"));
+                    SynapseConstants.SYNAPSE_NAMESPACE, "disabledErrorCodes"));
             if (retryDisabledErrorCodes != null && retryDisabledErrorCodes.getText() != null &&
                     !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.retryDisabledErrorCodes, retryDisabledErrorCodes.getText())) {
 
@@ -358,6 +359,23 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
                                 "numbers separated by commas : "
                                 + retryDisabledErrorCodes.getText(), e);
                     }
+                }
+            }
+        }
+
+        //**Support failover on http status codes*/
+        OMElement statusCodes = elem.getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE, "failoverHttpStatusCodes"));
+        if (statusCodes != null && !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.failoverHttpStatusCodes, statusCodes.getText())) {
+            StringTokenizer st = new StringTokenizer(
+                    statusCodes.getText().trim(), ", ");
+            while (st.hasMoreTokens()) {
+                String s = st.nextToken();
+                try {
+                    definition.addFailoverHttpstatusCodes(Integer.parseInt(s));
+                } catch (NumberFormatException e) {
+                    handleException("The failover http status codes should be specified as valid " +
+                            "numbers separated by commas : "
+                            + statusCodes.getText(), e);
                 }
             }
         }

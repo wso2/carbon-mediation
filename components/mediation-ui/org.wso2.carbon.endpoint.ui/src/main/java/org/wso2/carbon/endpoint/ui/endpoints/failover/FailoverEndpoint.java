@@ -122,4 +122,6 @@ public class FailoverEndpoint extends ListEndpoint {
     public boolean isRetryAvailable() {
         return true;
     }
+
+
 }

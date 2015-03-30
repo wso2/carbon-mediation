@@ -79,6 +79,7 @@
     }
 
     //this factory will be used to populate/extract template specific parameters starting with '$'
+
     TemplateDefinitionFactory templateDefinitionFactory = new TemplateDefinitionFactory();
     TemplateParameterContainer templateMappings = templateDefinitionFactory.getParameterContainer();
 
@@ -126,9 +127,12 @@
         CarbonUIMessage.sendCarbonUIMessage(msg, CarbonUIMessage.ERROR, request);
     }
 } else if (origin != null && !"".equals(origin)) {
+
     String epString = (String) session.getAttribute("endpointConfiguration");
     epString = epString.replaceAll("\\s\\s+|\\n|\\r", ""); // remove the pretty printing from the string
+
     OMElement endpointElement = AXIOMUtil.stringToOM(epString);
+
 
     if (isFromTemplateEditor) {
         templateObj = new TemplateFactory().createEndpointTemplate(endpointElement, new Properties());
@@ -136,11 +140,15 @@
             params = templateObj.getParameters().toArray(params);
             templateName = templateObj.getName();
         }
+
         endpoint = new AddressEndpoint();
         endpoint.build(templateObj, templateDefinitionFactory);
+
     } else {
+
         endpoint = new AddressEndpoint();
         endpoint.build(endpointElement, isAnonymous);
+
     }
 
 } else if (isAnonymous && !isTemplateAdd) {
@@ -186,6 +194,7 @@
     boolean isformatDefault = true;
     boolean isSWA = false, isMTOM = false, isOptimizeDefault = true;
     String errorCode = "";
+    String failoverHttpStatusCodes = "";
     long suspendDurationOnFailure = 0;
     long maxDuration = 0;
     float factor = 1.0f; // default value
@@ -222,6 +231,12 @@
         if (endpoint.getDescription() != null) {
             description = endpoint.getDescription();
         }
+
+        //Http status codes support
+        if(endpoint.getFailoverHttpStatusCodes()!=null){
+          failoverHttpStatusCodes = endpoint.getFailoverHttpStatusCodes().trim();
+        }
+
         // Format string
         if (endpoint.isPox()) {
             isPox = true;
@@ -429,7 +444,6 @@
     }
 
 </script>
-
 <table class="normal-nopadding">
     <tbody>
     <%
@@ -550,6 +564,7 @@
 <div id="_advancedForm" style="display:none">
 <table class="normal-nopadding">
 <tbody>
+
 <tr>
     <td colspan="2" class="sub-header"><fmt:message key="message.content"/></td>
 </tr>
@@ -662,6 +677,7 @@
                value="<%=retryTimeOut==0?EndpointConfigurationHelper.getMappingFrom(templateMappings, TemplateParameterContainer.EndpointDefKey.retriesOnTimeoutBeforeSuspend):retryTimeOut%>"/>
     </td>
 </tr>
+
 <tr>
     <td><fmt:message key="retry.delay.millis"/></td>
     <td><input type="text" id="retryDelay" name="retryDelay"
@@ -730,6 +746,21 @@
 <%
     }
 %>
+<% if (isRetryAvailableInParentEndpoint) {%>
+<tr>
+    <td colspan="2" class="sub-header"><fmt:message key="httpstatuscode"/></td>
+</tr>
+    <tr>
+            <td>
+                 <div class="indented"><fmt:message key="enablehttpstatuscodes" /></div>
+            </td>
+            <td>
+                   <input id="failoverHttpStatusCodes" type="text" name="failoverHttpStatusCodes"
+                               value="<%=failoverHttpStatusCodes%>" >
+            </td>
+    </tr>
+
+<%}%>
 <tr>
     <td colspan="2" class="sub-header"><fmt:message key="timeout"/></td>
 </tr>

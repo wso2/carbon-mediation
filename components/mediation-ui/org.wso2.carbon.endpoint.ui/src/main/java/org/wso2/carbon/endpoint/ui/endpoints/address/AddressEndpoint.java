@@ -22,6 +22,7 @@ import org.apache.synapse.endpoints.Template;
 import org.wso2.carbon.endpoint.ui.endpoints.Endpoint;
 import org.wso2.carbon.endpoint.ui.util.EndpointConfigurationHelper;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
 public class AddressEndpoint extends Endpoint {
@@ -42,6 +43,7 @@ public class AddressEndpoint extends Endpoint {
     private boolean pox = false;
     private String timedOutErrorCodes;
     private String retryDisabledErrorCodes;
+    private String failoverHttpStatusCodes;
     private String retryEnabledErrorCodes;
     private String retryTimeout;
     private String retryDelay;
@@ -69,6 +71,14 @@ public class AddressEndpoint extends Endpoint {
 
     public void setEndpointName(String name) {
         this.endpointName = name;
+    }
+
+    public void setFailoverHttpStatusCodes(String failoverHttpStatusCodes) {
+        this.failoverHttpStatusCodes = failoverHttpStatusCodes;
+    }
+
+    public String getFailoverHttpStatusCodes() {
+        return failoverHttpStatusCodes;
     }
 
     public String getSuspendDurationOnFailure() {
@@ -224,7 +234,7 @@ public class AddressEndpoint extends Endpoint {
     }
 
     public void setAddress(String address) {
-        this.address = address.replaceAll("&amp;","&");
+        this.address = address.replaceAll("&amp;", "&");
     }
 
     public String getMaxSusDuration() {
@@ -342,9 +352,9 @@ public class AddressEndpoint extends Endpoint {
 
         // Suspend configuration
         if ((errorCodes != null && !"".equals(errorCodes)) ||
-            (suspendDurationOnFailure != null && !"".equals(suspendDurationOnFailure)) ||
-            (maxSusDuration != null && !"".equals(maxSusDuration)) ||
-            (susProgFactor != null && !"".equals(susProgFactor))) {
+                (suspendDurationOnFailure != null && !"".equals(suspendDurationOnFailure)) ||
+                (maxSusDuration != null && !"".equals(maxSusDuration)) ||
+                (susProgFactor != null && !"".equals(susProgFactor))) {
 
             OMElement suspendOnFailure = fac.createOMElement("suspendOnFailure", synNS);
 
@@ -373,7 +383,7 @@ public class AddressEndpoint extends Endpoint {
 
         // retry time configuration
         if ((timedOutErrorCodes != null && !"".equals(timedOutErrorCodes)) || (retryDelay != null && !"".equals(retryDelay))
-            || (retryTimeout != null && !"".equals(retryTimeout))) {
+                || (retryTimeout != null && !"".equals(retryTimeout))) {
 
             OMElement markForSuspension = fac.createOMElement("markForSuspension", synNS);
 
@@ -411,10 +421,18 @@ public class AddressEndpoint extends Endpoint {
             retryConfig.addChild(enabledErrorCodes);
             addressElement.addChild(retryConfig);
         }
+
+        /**Add failover http status codes child element*/
+        if (failoverHttpStatusCodes != null && !"".equals(failoverHttpStatusCodes)) {
+            OMElement statusCodeElement = fac.createOMElement("failoverHttpStatusCodes", synNS);
+            statusCodeElement.setText(failoverHttpStatusCodes);
+            addressElement.addChild(statusCodeElement);
+        }
+
         // time out configuration
         String timeOutConfiguration;
         if (((timeoutAction != null && !"".equals(timeoutAction)) || (timeoutActionDuration != null && !"".equals(timeoutActionDuration)))
-            && !"neverTimeout".equals(timeoutAction)) {
+                && !"neverTimeout".equals(timeoutAction)) {
             OMElement timeout = fac.createOMElement("timeout", synNS);
 
             if (timeoutActionDuration != null && !"".equals(timeoutActionDuration)) {
@@ -461,6 +479,7 @@ public class AddressEndpoint extends Endpoint {
             }
 
         }
+
         endpoint.addChild(addressElement);
 
         // Properties
@@ -541,9 +560,13 @@ public class AddressEndpoint extends Endpoint {
             setMaxSusDuration(String.valueOf(addressEndpoint.getDefinition().getSuspendMaximumDuration()));
         }
         setSusProgFactor(String.valueOf(addressEndpoint.getDefinition().getSuspendProgressionFactor()));
+
+
         setErrorCodes(EndpointConfigurationHelper.errorCodeListBuilder(addressEndpoint.getDefinition().getSuspendErrorCodes()).trim());
         setRetryDisabledErrorCodes(EndpointConfigurationHelper.errorCodeListBuilder(addressEndpoint.getDefinition().
                 getRetryDisabledErrorCodes()).trim());
+
+        setFailoverHttpStatusCodes(EndpointConfigurationHelper.errorCodeListBuilder(addressEndpoint.getDefinition().getFailoverHttpstatusCodes()).trim());
         setRetryEnabledErrorCodes(EndpointConfigurationHelper.errorCodeListBuilder(addressEndpoint.getDefinition().getRetryEnableErrorCodes()).trim());
         setTimedOutErrorCodes(EndpointConfigurationHelper.errorCodeListBuilder(addressEndpoint.getDefinition().getTimeoutErrorCodes()));
         setRetryTimeout(String.valueOf(addressEndpoint.getDefinition().getRetriesOnTimeoutBeforeSuspend()));
