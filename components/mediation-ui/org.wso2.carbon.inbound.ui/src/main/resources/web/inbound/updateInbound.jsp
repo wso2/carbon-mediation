@@ -60,22 +60,10 @@
 				}else if(strKey.startsWith("interval")){
 				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("interval",request.getParameter("interval"))));
 				}else if(strKey.startsWith("sequential")){
-				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("sequential",request.getParameter("sequential"))));
+				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("sequential",request.getParameter("sequential"))));		
 				}else if(strKey.startsWith("coordination")){
 				    sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));					    
-				}else if(strKey.startsWith("keystore")){
-                    sParams.add((new ParamDTO("keystore",request.getParameter(strKey))));
-                }else if(strKey.startsWith("truststore")){
-                    sParams.add((new ParamDTO("truststore",request.getParameter(strKey))));
-                }else if(strKey.startsWith("SSLVerifyClient")){
-                   sParams.add((new ParamDTO("SSLVerifyClient",request.getParameter(strKey))));
-                }else if(strKey.startsWith("HttpsProtocols")){
-                   sParams.add((new ParamDTO("HttpsProtocols",request.getParameter(strKey))));
-                }else if(strKey.startsWith("SSLProtocol")){
-                   sParams.add((new ParamDTO("SSLProtocol",request.getParameter(strKey))));
-                }else if(strKey.startsWith("CertificateRevocationVerifier")){
-                   sParams.add((new ParamDTO("CertificateRevocationVerifier",request.getParameter(strKey))));
-                }
+				}	
 			}
 			client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
 	%>
