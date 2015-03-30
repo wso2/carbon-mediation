@@ -61,8 +61,6 @@
 				    sParams.add((new ParamDTO("interval",request.getParameter("interval"))));
 				}else if(strKey.startsWith("sequential")){
 				    sParams.add((new ParamDTO("sequential",request.getParameter("sequential"))));
-				}else if(strKey.startsWith("coordination")){
-				    sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));				    
 				}else if(strKey.startsWith("keystore")){
                  	sParams.add((new ParamDTO("keystore",request.getParameter(strKey))));
                 }else if(strKey.startsWith("truststore")){
@@ -75,6 +73,8 @@
                     sParams.add((new ParamDTO("SSLProtocol",request.getParameter(strKey))));
                 }else if(strKey.startsWith("CertificateRevocationVerifier")){
                     sParams.add((new ParamDTO("CertificateRevocationVerifier",request.getParameter(strKey))));
+				}else if(strKey.startsWith("coordination")){
+				    sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));                    
                 }
 			}
 			client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
