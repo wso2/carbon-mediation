@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileNotFolderException;
+import org.apache.commons.vfs2.FileNotFoundException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -507,10 +508,17 @@ public class FilePollingConsumer {
                         // tell moveOrDeleteAfterProcessing() file was success
                         lastCycle = 1;
                     } catch (Exception e) {
-                        log.error("Error processing File URI : " + child.getName(), e);
-                        failCount++;
-                        // tell moveOrDeleteAfterProcessing() file failed
-                        lastCycle = 2;
+                        if (e.getCause() instanceof FileNotFoundException) {
+                            log.warn("Error processing File URI : " + child.getName()
+                                    + ". This can be due to file moved from another process.");
+                            runPostProcess = false;
+                        } else {
+                            log.error("Error processing File URI : " + child.getName(), e);
+                            failCount++;
+                            // tell moveOrDeleteAfterProcessing() file failed
+                            lastCycle = 2;
+                        }
+
                     }
                     // skipping un-locking file if failed to do delete/move
                     // after process
@@ -647,6 +655,17 @@ public class FilePollingConsumer {
                     return false;
                 }
             }
+            // When processing a directory list is fetched initially. Therefore
+            // there is still a chance of file processed by another process.
+            // Need to check the source file before processing.
+            try {
+                FileObject sourceFile = fsManager.resolveFile(strContext);
+                if (!sourceFile.exists()) {
+                    return false;
+                }
+            } catch (FileSystemException e) {
+                return false;
+            }         
             VFSParamDTO vfsParamDTO = new VFSParamDTO();
             vfsParamDTO.setAutoLockRelease(autoLockRelease);
             vfsParamDTO.setAutoLockReleaseSameNode(autoLockReleaseSameNode);

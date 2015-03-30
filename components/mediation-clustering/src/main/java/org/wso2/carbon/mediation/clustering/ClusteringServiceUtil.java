@@ -44,6 +44,9 @@ public class ClusteringServiceUtil {
     public static boolean isLocked(String strContext) {
         HazelcastInstance hz = org.wso2.carbon.mediation.clustering.osgi.ClusteringService
                 .getHazelcastInstance();
+        if(log.isDebugEnabled()){
+            log.debug("Check distributed lock for : " + strContext);
+        }
         if (hz != null) {
             ILock iLock = hz.getLock(strContext);
             return iLock.isLocked();
@@ -59,6 +62,9 @@ public class ClusteringServiceUtil {
      * @return
      */
     public static boolean setLock(String strContext) {
+        if(log.isDebugEnabled()){
+            log.debug("START: distributed lock for : " + strContext);
+        }
         HazelcastInstance hz = org.wso2.carbon.mediation.clustering.osgi.ClusteringService
                 .getHazelcastInstance();
         if (hz != null) {
@@ -70,9 +76,15 @@ public class ClusteringServiceUtil {
                     log.error("Unable to put the distributed lock for " + strContext, e);
                     return false;
                 }
+                if(log.isDebugEnabled()){
+                    log.debug("END: distributed lock for : " + strContext);
+                }                
                 return true;
             }
         }
+        if(log.isDebugEnabled()){
+            log.debug("ERROR: distributed lock for : " + strContext);
+        }         
         return false;
     }
 
@@ -85,15 +97,24 @@ public class ClusteringServiceUtil {
      * @return
      */
     public static boolean setLock(String strContext, long lSeconds) {
+        if(log.isDebugEnabled()){
+            log.debug("START: distributed lock (with timeout) for : " + strContext);
+        }         
         HazelcastInstance hz = org.wso2.carbon.mediation.clustering.osgi.ClusteringService
                 .getHazelcastInstance();
         if (hz != null) {
             ILock iLock = hz.getLock(strContext);
             if (!iLock.isLocked()) {
                 iLock.lock(lSeconds, TimeUnit.SECONDS);
+                if(log.isDebugEnabled()){
+                    log.debug("END: distributed lock (with timeout) for : " + strContext);
+                }    
                 return true;
             }
         }
+        if(log.isDebugEnabled()){
+            log.debug("ERROR: distributed lock (with timeout) for : " + strContext);
+        }    
         return false;
     }
 
@@ -105,7 +126,9 @@ public class ClusteringServiceUtil {
      * @return
      */
     public static boolean releaseLock(String strContext) {
-
+        if(log.isDebugEnabled()){
+            log.debug("START: distributed lock release (unlock) for : " + strContext);
+        }    
         HazelcastInstance hz = org.wso2.carbon.mediation.clustering.osgi.ClusteringService
                 .getHazelcastInstance();
         if (hz != null) {
@@ -114,11 +137,18 @@ public class ClusteringServiceUtil {
                 try {
                     iLock.unlock();
                 } catch (IllegalMonitorStateException e) {
+                    log.error("Unable to unlock the distributed lock for " + strContext, e);                     
                     return false;
                 }
             }
+            if(log.isDebugEnabled()){
+                log.debug("END: distributed lock release (unlock) for : " + strContext);
+            }             
             return true;
         }
+        if(log.isDebugEnabled()){
+            log.debug("ERROR: distributed lock release (unlock) for : " + strContext);
+        }         
         return false;
 
     }
