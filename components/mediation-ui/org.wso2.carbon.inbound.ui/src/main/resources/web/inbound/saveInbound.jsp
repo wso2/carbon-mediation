@@ -73,6 +73,8 @@
                     sParams.add((new ParamDTO("SSLProtocol",request.getParameter(strKey))));
                 }else if(strKey.startsWith("CertificateRevocationVerifier")){
                     sParams.add((new ParamDTO("CertificateRevocationVerifier",request.getParameter(strKey))));
+                }else if(strKey.startsWith("coordination")){
+		    sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));
                 }
 			}
 			client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
