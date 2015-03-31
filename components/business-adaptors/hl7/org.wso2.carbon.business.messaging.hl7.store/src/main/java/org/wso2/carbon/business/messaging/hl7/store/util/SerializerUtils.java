@@ -21,8 +21,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.apache.synapse.message.store.impl.jms.Axis2Message;
-import org.apache.synapse.message.store.impl.jms.SynapseMessage;
+import org.apache.synapse.message.store.impl.commons.Axis2Message;
+import org.apache.synapse.message.store.impl.commons.SynapseMessage;
 import org.wso2.carbon.business.messaging.hl7.common.HL7Constants;
 
 import javax.xml.stream.XMLStreamException;
