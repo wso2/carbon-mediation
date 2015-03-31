@@ -21,8 +21,11 @@ package org.wso2.carbon.mediator.machinelearner.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
+import org.apache.synapse.config.xml.SynapsePath;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.wso2.carbon.mediator.machinelearner.MachineLearnerMediator;
+
+import java.util.Map;
 
 import static org.wso2.carbon.mediator.machinelearner.MachineLearnerMediatorConstants.*;
 
@@ -53,24 +56,28 @@ public class MachineLearnerMediatorSerializer extends AbstractMediatorSerializer
 
         // <model>
         OMElement modelConfiguration = fac.createOMElement(MODEL_QNAME);
-        modelConfiguration.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(), nullNS, machineLearnerMediator.getModelName()));
+        modelConfiguration.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(),
+                nullNS, machineLearnerMediator.getModelName()));
         machineLearner.addChild(modelConfiguration);
 
         // <features>
         OMElement features = fac.createOMElement(FEATURES_QNAME);
         // <feature>+
-        for(String featureName : machineLearnerMediator.getInputVariables().keySet()) {
-            SynapseXPath expression = machineLearnerMediator.getInputVariables().get(featureName);
+        for(Map.Entry<String, SynapsePath> entry : machineLearnerMediator.getInputVariables().entrySet()) {
+            String featureName = entry.getKey();
+            SynapsePath expression = entry.getValue();
             OMElement feature = fac.createOMElement(FEATURE_QNAME);
             feature.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(), nullNS, featureName));
-            feature.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS, expression.getExpression()));
+            feature.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS,
+                    expression.getExpression()));
             features.addChild(feature);
         }
         machineLearner.addChild(features);
 
         // <prediction>
         OMElement prediction = fac.createOMElement(PREDICTION_QNAME);
-        prediction.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS, machineLearnerMediator.getResponseVariableXpath().getExpression()));
+        prediction.addAttribute(fac.createOMAttribute(PROPERTY_ATT.getLocalPart(),
+                nullNS, machineLearnerMediator.getResultPropertyName()));
         machineLearner.addChild(prediction);
         return machineLearner;
     }

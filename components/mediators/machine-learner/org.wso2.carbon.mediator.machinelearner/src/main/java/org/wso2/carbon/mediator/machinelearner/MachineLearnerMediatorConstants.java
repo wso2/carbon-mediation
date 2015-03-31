@@ -33,4 +33,5 @@ public class MachineLearnerMediatorConstants {
 
     public static final QName NAME_ATT = new QName("name");
     public static final QName EXPRESSION_ATT = new QName("expression");
+    public static final QName PROPERTY_ATT = new QName("property");
 }

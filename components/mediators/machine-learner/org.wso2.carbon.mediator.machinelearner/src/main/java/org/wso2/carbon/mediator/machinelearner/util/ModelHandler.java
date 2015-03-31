@@ -21,7 +21,7 @@ package org.wso2.carbon.mediator.machinelearner.util;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.config.xml.SynapsePath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ml.commons.domain.Feature;
@@ -37,6 +37,7 @@ import org.wso2.carbon.ml.core.utils.MLCoreServiceValueHolder;
 import org.wso2.carbon.ml.core.utils.MLUtils;
 import org.wso2.carbon.ml.database.DatabaseService;
 import org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException;
+import org.wso2.carbon.user.api.UserStoreException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,11 +45,35 @@ import java.util.Map;
 
 public class ModelHandler {
 
+    private static ModelHandler instance;
+
     private String modelName;
-    private Map<SynapseXPath, Integer> featureIndexMap;
+    private Map<SynapsePath, Integer> featureIndexMap;
     private MLModel mlModel;
     private MLModelConfigurationContext context;
     private long modelId;
+
+    private ModelHandler(String modelName, Map<String, SynapsePath> featureMappings)
+            throws MLModelHandlerException, DatabaseHandlerException, MLModelBuilderException, UserStoreException {
+        initializeModel(modelName, featureMappings);
+    }
+
+    /**
+     * Get the ModelHandler instance
+     * @param modelName         name of the ML-model
+     * @param featureMappings   Map containing pairs <feature-name, synapse-path>
+     * @return
+     * @throws DatabaseHandlerException
+     * @throws MLModelHandlerException
+     * @throws MLModelBuilderException
+     */
+    public static ModelHandler getInstance(String modelName, Map<String, SynapsePath> featureMappings)
+            throws DatabaseHandlerException, MLModelHandlerException, MLModelBuilderException, UserStoreException {
+        if(instance == null) {
+            instance = new ModelHandler(modelName, featureMappings);
+        }
+        return instance;
+    }
 
     /**
      * Set the model name
@@ -62,21 +87,23 @@ public class ModelHandler {
      * Retrieve the ML model and map the feature indices with the xpath expressions
      * @param inputVariables Map containing the key- value pairs <feature-name, xpath-expression-to-extract-feature-value>
      */
-    public void initializeModel(String modelName, Map<String, SynapseXPath> inputVariables) throws DatabaseHandlerException, MLModelHandlerException, MLModelBuilderException {
+    private void initializeModel(String modelName, Map<String, SynapsePath> inputVariables)
+            throws DatabaseHandlerException, MLModelHandlerException, MLModelBuilderException, UserStoreException {
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         int tenantId = carbonContext.getTenantId();
-        String userName = carbonContext.getUsername();
+        String userName = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().
+                getRealmConfiguration().getAdminUserName();
         MLModelHandler mlModelHandler = new MLModelHandler();
         MLModelNew mlModelNew = mlModelHandler.getModel(tenantId, userName, modelName);
         modelId = mlModelNew.getId();
         mlModel = mlModelHandler.retrieveModel(modelId);
 
-        featureIndexMap = new HashMap<SynapseXPath, Integer>();
+        featureIndexMap = new HashMap<SynapsePath, Integer>();
         List<Feature> features = mlModel.getFeatures();
-        for(int i=0; i<features.size(); i++) {
-            if(inputVariables.get(features.get(i).getName()) != null) {
-                featureIndexMap.put(inputVariables.get(features.get(i).getName()), i);
+        for(Feature feature : features) {
+            if(inputVariables.get(feature.getName()) != null) {
+                featureIndexMap.put(inputVariables.get(feature.getName()), feature.getIndex());
             }
         }
         createModelConfigurationContext();
@@ -86,18 +113,16 @@ public class ModelHandler {
      * Create the spark context and model configuration context
      * @throws DatabaseHandlerException
      */
-    private void createModelConfigurationContext() throws DatabaseHandlerException {
+    private void createModelConfigurationContext() throws DatabaseHandlerException, UserStoreException {
 
         MLCoreServiceValueHolder valueHolder = MLCoreServiceValueHolder.getInstance();
         DatabaseService databaseService = valueHolder.getDatabaseService();
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         int tenantId = carbonContext.getTenantId();
-        String userName = carbonContext.getUsername();
+        String userName = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().
+                getRealmConfiguration().getAdminUserName();
 
-        // assign current thread context class loader to a variable
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        // class loader is switched to JavaSparkContext.class's class loader
         Thread.currentThread().setContextClassLoader(JavaSparkContext.class.getClassLoader());
         MLModelNew model = databaseService.getModel(tenantId, userName, modelId);
         String dataType = databaseService.getDataTypeOfModel(modelId);
@@ -124,14 +149,17 @@ public class ModelHandler {
             MLModelHandlerException {
 
         String data[] = new String[featureIndexMap.size()];
-        for(SynapseXPath synapseXPath : featureIndexMap.keySet()) {
+        for(Map.Entry<SynapsePath, Integer> entry : featureIndexMap.entrySet()) {
 
-            // Read the feature value from the message
-            String variableValue = synapseXPath.stringValueOf(messageContext);
-
-            // Get the mapping feature index of the ML-model
-            int featureIndex = featureIndexMap.get(synapseXPath);
-            data[featureIndex] = variableValue;
+            SynapsePath synapsePath = entry.getKey();
+            // Extract the feature value from the message
+            String variableValue = synapsePath.stringValueOf(messageContext);
+            if(variableValue != null) {
+                // Get the mapping feature index of the ML-model
+                int featureIndex = entry.getValue();
+                data[featureIndex] = variableValue;
+            }
+            // TODO handle null/empty values
         }
         return predict(data);
     }

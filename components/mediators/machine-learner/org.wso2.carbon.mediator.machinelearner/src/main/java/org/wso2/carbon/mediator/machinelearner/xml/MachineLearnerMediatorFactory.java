@@ -24,11 +24,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
-import org.apache.synapse.config.xml.SynapseXPathFactory;
-import org.apache.synapse.util.xpath.SynapseXPath;
+import org.apache.synapse.config.xml.SynapsePath;
+import org.apache.synapse.config.xml.SynapsePathFactory;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.machinelearner.MachineLearnerMediator;
-import org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -62,6 +61,7 @@ public class MachineLearnerMediatorFactory extends AbstractMediatorFactory {
             machineLearnerMediator.setModelName(modelName);
         } else {
             handleException("Model element not defined.");
+
         }
 
         // Configure features
@@ -69,23 +69,22 @@ public class MachineLearnerMediatorFactory extends AbstractMediatorFactory {
         if(featuresElement != null) {
             Iterator featuresItr = featuresElement.getChildrenWithName(FEATURE_QNAME);
             while (featuresItr.hasNext()) {
-                OMElement inputElement = (OMElement) featuresItr.next();
-                String inputXpath = getAttributeValue(inputElement, EXPRESSION_ATT);
-                String featureName = getAttributeValue(inputElement, NAME_ATT);
+                OMElement featureElement = (OMElement) featuresItr.next();
+                String expression = getAttributeValue(featureElement, EXPRESSION_ATT);
+                String featureName = getAttributeValue(featureElement, NAME_ATT);
 
-                if (inputXpath != null || featureName != null) {
-
-                    SynapseXPath xp = null;
-                    if (inputXpath != null) {
+                // TODO json path support
+                if (expression != null || featureName != null) {
+                    SynapsePath synapsePath = null;
+                    if (expression != null) {
                         try {
-                            xp = SynapseXPathFactory.getSynapseXPath(inputElement, EXPRESSION_ATT);
-
+                            synapsePath = SynapsePathFactory.getSynapsePath(featureElement, EXPRESSION_ATT);
                         } catch (JaxenException e) {
-                            handleException("Invalid XPath specified for feature expression attribute : " +
-                                    inputXpath, e);
+                            handleException("Invalid Synapse Path specified for feature expression attribute : " +
+                                    expression, e);
                         }
                     }
-                    machineLearnerMediator.addInputVariable(featureName, xp);
+                    machineLearnerMediator.addFeatureMapping(featureName, synapsePath);
                 }
             }
         } else {
@@ -95,28 +94,14 @@ public class MachineLearnerMediatorFactory extends AbstractMediatorFactory {
         // Configure prediction
         OMElement predictionElement = omElement.getFirstChildWithName(PREDICTION_QNAME);
         if(predictionElement != null) {
-            String responseXpath = getAttributeValue(predictionElement, EXPRESSION_ATT);
-
-            if (responseXpath != null) {
-                SynapseXPath xp = null;
-                    try {
-                        xp = SynapseXPathFactory.getSynapseXPath(predictionElement, EXPRESSION_ATT);
-
-                    } catch (JaxenException e) {
-                        handleException("Invalid XPath specified for the prediction expression attribute : " +
-                                responseXpath, e);
-                    }
-                machineLearnerMediator.setResponseVariable(xp);
+            String predictionPropertyName = getAttributeValue(predictionElement, PROPERTY_ATT);
+            if (predictionPropertyName != null) {
+                machineLearnerMediator.setResultPropertyName(predictionPropertyName);
+            } else {
+                handleException("Prediction property element not defined.");
             }
         } else {
             handleException("Prediction element not defined.");
-        }
-
-        try {
-            machineLearnerMediator.initializeModel();
-        } catch (Exception e) {
-            log.error("Error while configuring machineLearner mediator", e);
-            handleException("Error while initializing ML model", e);
         }
     }
 

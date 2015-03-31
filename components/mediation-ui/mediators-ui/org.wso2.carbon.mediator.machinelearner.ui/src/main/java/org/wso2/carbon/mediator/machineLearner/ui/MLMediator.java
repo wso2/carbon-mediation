@@ -33,7 +33,7 @@ import static org.wso2.carbon.mediator.machineLearner.ui.MLMediatorConstants.*;
 public class MLMediator extends AbstractMediator {
 
     private String modelName;
-    private String predictionExpression;
+    private String predictionPropertyName;
     private Map<String, String> featureMappings = new HashMap<String, String>();
 
     @Override
@@ -47,27 +47,27 @@ public class MLMediator extends AbstractMediator {
             modelElement.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(), nullNS, modelName));
             mlElement.addChild(modelElement);
         } else {
-            throw new MediatorException("Invalid ML mediator. Model storage-location is required");
+            throw new MediatorException("Invalid ML mediator. Model name is required");
         }
 
         if(featureMappings.isEmpty()) {
             throw new MediatorException("Invalid ML mediator. Features required");
         }
         OMElement featuresElement = fac.createOMElement(FEATURES_QNAME);
-        for(String variableName : featureMappings.keySet()) {
+        for(Map.Entry entry : featureMappings.entrySet()) {
             OMElement featureElement = fac.createOMElement(FEATURE_QNAME);
-            featureElement.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(), nullNS, variableName));
-            featureElement.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS, featureMappings.get(variableName)));
+            featureElement.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(), nullNS, (String) entry.getKey()));
+            featureElement.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS, (String) entry.getValue()));
             featuresElement.addChild(featureElement);
         }
         mlElement.addChild(featuresElement);
 
-        if(predictionExpression != null) {
+        if(predictionPropertyName != null) {
             OMElement predictionElement = fac.createOMElement(PREDICTION_QNAME);
-            predictionElement.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS, predictionExpression));
+            predictionElement.addAttribute(fac.createOMAttribute(PROPERTY_ATT.getLocalPart(), nullNS, predictionPropertyName));
             mlElement.addChild(predictionElement);
         } else {
-            throw new MediatorException("Invalid ML mediator. Prediction expression is required");
+            throw new MediatorException("Invalid ML mediator. Prediction property name is required");
         }
 
         if(parent != null) {
@@ -119,11 +119,11 @@ public class MLMediator extends AbstractMediator {
         if (predictionElement == null) {
             throw new MediatorException("Prediction element is required.");
         }
-        OMAttribute predictionExpression = predictionElement.getAttribute(EXPRESSION_ATT);
+        OMAttribute predictionExpression = predictionElement.getAttribute(PROPERTY_ATT);
         if(predictionExpression == null) {
-            throw new MediatorException("Prediction expression attribute is required.");
+            throw new MediatorException("Prediction property attribute is required.");
         }
-        this.predictionExpression = predictionExpression.getAttributeValue();
+        this.predictionPropertyName = predictionExpression.getAttributeValue();
 
         processAuditStatus(this, omElement);
     }
@@ -141,12 +141,12 @@ public class MLMediator extends AbstractMediator {
         this.modelName = modelName;
     }
 
-    public String getPredictionExpression() {
-        return predictionExpression;
+    public String getPredictionPropertyName() {
+        return predictionPropertyName;
     }
 
-    public void setPredictionExpression(String response) {
-        this.predictionExpression = response;
+    public void setPredictionPropertyName(String response) {
+        this.predictionPropertyName = response;
     }
 
     public void addFeatureMapping(String variableName, String expression) {

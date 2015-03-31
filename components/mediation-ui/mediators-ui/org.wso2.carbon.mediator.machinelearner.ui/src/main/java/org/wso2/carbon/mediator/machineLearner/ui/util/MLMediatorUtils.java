@@ -26,19 +26,28 @@ import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
 import org.wso2.carbon.ml.core.impl.MLModelHandler;
 import org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException;
+import org.wso2.carbon.user.api.UserStoreException;
 
 import java.util.List;
 
 public class MLMediatorUtils {
 
-    public static List<Feature> getFeaturesOfModel(String modelName) throws DatabaseHandlerException, MLModelHandlerException, MLModelBuilderException {
+    /**
+     * Get the Features list of the model
+     * @param modelName ML model name
+     * @return
+     * @throws DatabaseHandlerException
+     * @throws MLModelHandlerException
+     * @throws MLModelBuilderException
+     * @throws UserStoreException
+     */
+    public static List<Feature> getFeaturesOfModel(String modelName) throws DatabaseHandlerException,
+            MLModelHandlerException, MLModelBuilderException, UserStoreException {
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         int tenantId = carbonContext.getTenantId();
-
-        // TODO
-        String userName = "admin"; //carbonContext.getUsername();
-
+        String userName = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().
+                getRealmConfiguration().getAdminUserName();
         MLModelHandler mlModelHandler = new MLModelHandler();
         MLModelNew mlModelNew = mlModelHandler.getModel(tenantId, userName, modelName);
         MLModel mlModel = mlModelHandler.retrieveModel(mlModelNew.getId());

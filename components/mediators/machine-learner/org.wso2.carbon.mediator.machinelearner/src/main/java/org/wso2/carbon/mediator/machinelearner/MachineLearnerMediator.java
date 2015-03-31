@@ -20,30 +20,28 @@ package org.wso2.carbon.mediator.machinelearner;
 
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.config.xml.SynapsePath;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.machinelearner.util.ModelHandler;
-import org.wso2.carbon.mediator.machinelearner.util.ResponseBuilder;
 import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
 import org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException;
+import org.wso2.carbon.user.api.UserStoreException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MachineLearnerMediator extends AbstractMediator {
 
-    private SynapseXPath responseVariableXpath;
-    private Map<String, SynapseXPath> inputVariables;
+    private String resultPropertyName;
+    private Map<String, SynapsePath> inputVariables;
     private String modelName;
     private ModelHandler modelHandler;
-    private ResponseBuilder responseBuilder;
 
     public MachineLearnerMediator() {
-        inputVariables = new HashMap<String, SynapseXPath>();
-        modelHandler = new ModelHandler();
-        responseBuilder = new ResponseBuilder();
+        inputVariables = new HashMap<String, SynapsePath>();
     }
 
     @Override
@@ -58,7 +56,8 @@ public class MachineLearnerMediator extends AbstractMediator {
                 synLog.traceTrace("Message : " + messageContext.getEnvelope());
             }
         }
-        getPredctionFromModel(messageContext, synLog);
+        String prediction = getPredictionFromModel(messageContext);
+        messageContext.setProperty(resultPropertyName, prediction);
 
         synLog.traceOrDebug("End : machineLearner mediator");
         return true;
@@ -70,35 +69,38 @@ public class MachineLearnerMediator extends AbstractMediator {
      * @param messageContext
      * @return
      */
-    private void getPredctionFromModel(MessageContext messageContext, SynapseLog synLog) {
+    private String getPredictionFromModel(MessageContext messageContext) {
 
         try {
-            String prediction = modelHandler.getPrediction(messageContext);
-            responseBuilder.buildResponseElement(prediction, messageContext, responseVariableXpath, synLog);
-
+            String prediction = ModelHandler.getInstance(modelName, inputVariables).getPrediction(messageContext);
+            return prediction;
         } catch (JaxenException e) {
-            handleException("Invalid XPath specified for the response-variable attribute : "
-                    + responseVariableXpath.getExpression(), e, messageContext);
+            handleException("Error while extracting feature values ", e, messageContext);
         } catch (MLModelHandlerException e) {
-            handleException("Error while predicting value from the Model ", e, messageContext);
+            handleException("Error while predicting value from the model ", e, messageContext);
         } catch (MLModelBuilderException e) {
             handleException("Error while building the Model ", e, messageContext);
+        } catch (DatabaseHandlerException e) {
+            handleException("Error while predicting value from the model", e, messageContext);
+        } catch (UserStoreException e) {
+            handleException("Error while building the model", e, messageContext);
         }
+        return null;
     }
 
-    public void setResponseVariable(SynapseXPath xpath) {
-        this.responseVariableXpath = xpath;
+    public void setResultPropertyName(String propertyName) {
+        this.resultPropertyName = propertyName;
     }
 
-    public void addInputVariable(String variableName, SynapseXPath xpath) {
-        inputVariables.put(variableName, xpath);
+    public void addFeatureMapping(String variableName, SynapsePath synapsePath) {
+        inputVariables.put(variableName, synapsePath);
     }
 
-    public SynapseXPath getResponseVariableXpath() {
-        return responseVariableXpath;
+    public String getResultPropertyName() {
+        return resultPropertyName;
     }
 
-    public Map<String, SynapseXPath> getInputVariables() {
+    public Map<String, SynapsePath> getInputVariables() {
         return inputVariables;
     }
 
@@ -108,9 +110,5 @@ public class MachineLearnerMediator extends AbstractMediator {
 
     public String getModelName() {
         return modelName;
-    }
-
-    public void initializeModel() throws DatabaseHandlerException, MLModelHandlerException, MLModelBuilderException {
-        modelHandler.initializeModel(modelName, inputVariables);
     }
 }
