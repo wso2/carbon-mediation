@@ -9,7 +9,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.mediator.machineLearner.ui</artifactId>
+    <artifactId>org.wso2.carbon.mediator.machinelearner.ui</artifactId>
     <version>4.3.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Machine Learner Mediator UI</name>
@@ -25,10 +25,10 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Bundle-Activator>org.wso2.carbon.mediator.machineLearner.ui.MLMediatorActivator</Bundle-Activator>
+                        <Bundle-Activator>org.wso2.carbon.mediator.machinelearner.ui.MLMediatorActivator</Bundle-Activator>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
-                            org.wso2.carbon.mediator.machineLearner.ui.*,
+                            org.wso2.carbon.mediator.machinelearner.ui.*,
                             !javax.servlet,
                             !javax.servlet.http,
                         </Export-Package>

@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
-<%@ page import="org.wso2.carbon.mediator.machineLearner.ui.MLMediator" %>
+<%@ page import="org.wso2.carbon.mediator.machinelearner.ui.MLMediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="java.util.*" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -9,16 +9,16 @@
 
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
-    if (!(mediator instanceof org.wso2.carbon.mediator.machineLearner.ui.MLMediator)) {
+    if (!(mediator instanceof MLMediator)) {
         throw new RuntimeException("Unable to edit the mediator");
     }
     MLMediator mlMediator = (MLMediator) mediator;
     String modelName = mlMediator.getModelName();
 %>
 
-<fmt:bundle basename="org.wso2.carbon.mediator.machineLearner.ui.i18n.Resources">
+<fmt:bundle basename="org.wso2.carbon.mediator.machinelearner.ui.i18n.Resources">
 <carbon:jsi18n
-            resourceBundle="org.wso2.carbon.mediator.machineLearner.ui.i18n.JSResources"
+            resourceBundle="org.wso2.carbon.mediator.machinelearner.ui.i18n.JSResources"
             request="<%=request%>"
             i18nObjectName="mli18n"/>
 <div>

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.mediator.machineLearner.ui;
+package org.wso2.carbon.mediator.machinelearner.ui;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
@@ -31,7 +31,7 @@ import org.wso2.carbon.mediator.service.util.MediatorProperty;
 
 import java.util.*;
 
-import static org.wso2.carbon.mediator.machineLearner.ui.MLMediatorConstants.*;
+import static org.wso2.carbon.mediator.machinelearner.ui.MLMediatorConstants.*;
 
 
 public class MLMediator extends AbstractMediator {

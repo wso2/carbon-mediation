@@ -1,7 +1,7 @@
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
-<%@ page import="org.wso2.carbon.mediator.machineLearner.ui.MLMediator" %>
+<%@ page import="org.wso2.carbon.mediator.machinelearner.ui.MLMediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
@@ -9,21 +9,21 @@
 <%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
 <%@ page import="org.wso2.carbon.ml.commons.domain.Feature" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.wso2.carbon.mediator.machineLearner.ui.util.MLMediatorUtils" %>
+<%@ page import="org.wso2.carbon.mediator.machinelearner.ui.util.MLMediatorUtils" %>
 <%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 
-<fmt:bundle basename="org.wso2.carbon.mediator.machineLearner.ui.i18n.Resources">
+<fmt:bundle basename="org.wso2.carbon.mediator.machinelearner.ui.i18n.Resources">
 <div>
     <script type="text/javascript" src="../rule-mediator/js/mediator-util.js"></script>
     <script type="text/javascript" src="../sequences/js/ns-editor.js"></script>
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
-    if (!(mediator instanceof MLMediator)) {
+    if (!(mediator instanceof org.wso2.carbon.mediator.machinelearner.ui.MLMediator)) {
         throw new RuntimeException("Unable to edit the mediator");
     }
-    MLMediator mlMediator = (MLMediator) mediator;
+    org.wso2.carbon.mediator.machinelearner.ui.MLMediator mlMediator = (org.wso2.carbon.mediator.machinelearner.ui.MLMediator) mediator;
     if ("true".equals(request.getParameter("clearAll"))) {
         mlMediator.getFeatures().clear();
     }
@@ -41,7 +41,7 @@
     mlMediator.setModelName(modelName);
 
     try {
-        features = MLMediatorUtils.getFeaturesOfModel(request.getParameter("mediatorInput"));
+        features = org.wso2.carbon.mediator.machinelearner.ui.util.MLMediatorUtils.getFeaturesOfModel(request.getParameter("mediatorInput"));
     } catch (Exception e) {
         modelNotFound = true;
     }
@@ -63,7 +63,7 @@
                         int index;
                         for (index = 0; index < features.size()-1; index++) {
                             String featureName = features.get(index).getName();
-                            SynapsePath synapsePath = ((MLMediator) mediator).getExpressionForFeature(featureName);
+                            SynapsePath synapsePath = ((org.wso2.carbon.mediator.machinelearner.ui.MLMediator) mediator).getExpressionForFeature(featureName);
                             String expression = null;
                             if(synapsePath != null) {
                                 expression = synapsePath.getExpression();
@@ -108,7 +108,7 @@
                     <td><input type="hidden" name="response" id="response"
                                value="response"/><fmt:message key="mediator.ml.prediction.property"/></td>
                     <%
-                        String predictionExpression = ((MLMediator) mediator).getPredictionPropertyName();
+                        String predictionExpression = ((org.wso2.carbon.mediator.machinelearner.ui.MLMediator) mediator).getPredictionPropertyName();
                         if(predictionExpression == null) {
                             predictionExpression = "";
                         }

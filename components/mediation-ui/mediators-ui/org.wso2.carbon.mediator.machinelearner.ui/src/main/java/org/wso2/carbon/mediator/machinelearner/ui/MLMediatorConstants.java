@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.mediator.machineLearner.ui;
+package org.wso2.carbon.mediator.machinelearner.ui;
 
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.mediator.machineLearner.ui.util;
+package org.wso2.carbon.mediator.machinelearner.ui.util;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ml.commons.domain.Feature;

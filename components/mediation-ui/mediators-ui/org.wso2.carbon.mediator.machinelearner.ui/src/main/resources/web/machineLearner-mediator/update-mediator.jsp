@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
-<%@ page import="org.wso2.carbon.mediator.machineLearner.ui.MLMediator" %>
+<%@ page import="org.wso2.carbon.mediator.machinelearner.ui.MLMediator" %>
 <%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
 <%@ page import="org.jaxen.JaxenException" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
@@ -10,10 +10,10 @@
 
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
-    if (!(mediator instanceof MLMediator)) {
+    if (!(mediator instanceof org.wso2.carbon.mediator.machinelearner.ui.MLMediator)) {
         throw new RuntimeException("Unable to edit the mediator");
     }
-    MLMediator mlMediator = (MLMediator) mediator;
+    org.wso2.carbon.mediator.machinelearner.ui.MLMediator mlMediator = (org.wso2.carbon.mediator.machinelearner.ui.MLMediator) mediator;
     mlMediator.getFeatures().clear(); // to avoid duplicates
     String featureCountStr = request.getParameter("featureCount");
     XPathFactory xPathFactory = XPathFactory.getInstance();

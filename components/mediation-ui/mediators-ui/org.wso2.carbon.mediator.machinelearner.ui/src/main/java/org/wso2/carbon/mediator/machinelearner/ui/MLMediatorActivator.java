@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.mediator.machineLearner.ui;
+package org.wso2.carbon.mediator.machinelearner.ui;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
