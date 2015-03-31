@@ -33,7 +33,7 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
 
     private static final Log log = LogFactory.getLog(JMSProcessor.class.getName());
 
-    private static final String ENDPOINT_POSTFIX = "JMS-EP";
+    private static final String ENDPOINT_POSTFIX = "JMS" + COMMON_ENDPOINT_POSTFIX;
 
     private JMSPollingConsumer pollingConsumer;
     private Properties jmsProperties;
