@@ -10,6 +10,7 @@
 <%@ page import="org.wso2.carbon.ml.commons.domain.Feature" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.wso2.carbon.mediator.machineLearner.ui.util.MLMediatorUtils" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 
@@ -24,7 +25,7 @@
     }
     MLMediator mlMediator = (MLMediator) mediator;
     if ("true".equals(request.getParameter("clearAll"))) {
-        mlMediator.getFeatureMappings().clear();
+        mlMediator.getFeatures().clear();
     }
     // Set standard HTTP/1.1 no-cache headers.
     response.setHeader("Cache-Control", "no-store, max-age=0, no-cache, must-revalidate");
@@ -54,6 +55,7 @@
                 <tr>
                     <th><fmt:message key="mediator.ml.feature.name"/></th>
                     <th><fmt:message key="mediator.ml.expression"/></th>
+                    <th><fmt:message key="mediator.ml.namespace"/></th>
                 </tr>
             </thead>
                 <tbody>
@@ -61,7 +63,11 @@
                         int index;
                         for (index = 0; index < features.size()-1; index++) {
                             String featureName = features.get(index).getName();
-                            String expression = ((MLMediator) mediator).getFeatureMappings().get(featureName);
+                            SynapsePath synapsePath = ((MLMediator) mediator).getExpressionForFeature(featureName);
+                            String expression = null;
+                            if(synapsePath != null) {
+                                expression = synapsePath.getExpression();
+                            }
                             if(expression == null) {
                                 expression = "";
                             }
@@ -74,6 +80,17 @@
                         <td>
                             <input type="text" name="featureXpath<%=index%>" id="featureXpath<%=index%>" size="35"
                                    value="<%=expression%>"    class="esb-edit small_textbox"/>
+                        </td>
+
+                        <%--namespace editor--%>
+                        <td id="nsEditorButtonTD<%=index%>">
+                            <script type="text/javascript">
+                                document.getElementById("ns-edior-th").style.display = "";
+                            </script>
+                            <a href="#nsEditorLink" class="nseditor-icon-link"
+                               style="padding-left:40px"
+                               onclick="showNameSpaceEditor('featureXpath<%=index%>')">
+                                <fmt:message key="mediator.ml.namespace"/></a>
                         </td>
                     </tr>
                     <%
@@ -89,9 +106,9 @@
             <tbody>
                 <tr>
                     <td><input type="hidden" name="response" id="response"
-                               value="response"/><fmt:message key="mediator.ml.expression"/></td>
+                               value="response"/><fmt:message key="mediator.ml.prediction.property"/></td>
                     <%
-                        String predictionExpression = ((MLMediator) mediator).getPredictionExpression();
+                        String predictionExpression = ((MLMediator) mediator).getPredictionPropertyName();
                         if(predictionExpression == null) {
                             predictionExpression = "";
                         }

@@ -6,6 +6,7 @@
 <%@ page import="org.jaxen.JaxenException" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
+<%@ page import="org.wso2.carbon.mediator.service.util.MediatorProperty" %>
 
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
@@ -13,18 +14,30 @@
         throw new RuntimeException("Unable to edit the mediator");
     }
     MLMediator mlMediator = (MLMediator) mediator;
-    mlMediator.getFeatureMappings().clear(); // to avoid duplicates
+    mlMediator.getFeatures().clear(); // to avoid duplicates
     String featureCountStr = request.getParameter("featureCount");
+    XPathFactory xPathFactory = XPathFactory.getInstance();
 
     if (featureCountStr != null && !"".equals(featureCountStr)) {
         int featureCount = Integer.parseInt(featureCountStr.trim());
         for (int i = 0; i < featureCount; i++) {
             String feature = request.getParameter("featureName" + i);
-            String expression = request.getParameter("featureXpath" + i);
-            mlMediator.addFeatureMapping(feature, expression);
+            MediatorProperty mediatorProperty = new MediatorProperty();
+            mediatorProperty.setName(feature);
+            String valueId = "featureXpath" + i;
+            String value = request.getParameter(valueId);
+
+            if (value.trim().startsWith("json-eval(")) {
+                SynapseXPath jsonPath =
+                        new SynapseXPath(value.trim().substring(10, value.length() - 1));
+                mediatorProperty.setExpression(jsonPath);
+            } else {
+                mediatorProperty.setExpression(xPathFactory.createSynapseXPath(valueId, value.trim(), session));
+            }
+            mlMediator.addFeature(mediatorProperty);
         }
     }
 
     String predictionXpath = request.getParameter("predictionXpath");
-    mlMediator.setPredictionExpression(predictionXpath);
+    mlMediator.setPredictionPropertyName(predictionXpath);
 %>

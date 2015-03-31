@@ -20,12 +20,16 @@ package org.wso2.carbon.mediator.machineLearner.ui;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.synapse.config.xml.SynapsePath;
+import org.apache.synapse.config.xml.SynapseXPathFactory;
+import org.apache.synapse.config.xml.SynapseXPathSerializer;
+import org.apache.synapse.util.xpath.SynapseXPath;
+import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
+import org.wso2.carbon.mediator.service.util.MediatorProperty;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 import static org.wso2.carbon.mediator.machineLearner.ui.MLMediatorConstants.*;
 
@@ -34,7 +38,7 @@ public class MLMediator extends AbstractMediator {
 
     private String modelName;
     private String predictionPropertyName;
-    private Map<String, String> featureMappings = new HashMap<String, String>();
+    private List<MediatorProperty> features = new ArrayList<MediatorProperty>();
 
     @Override
     public OMElement serialize(OMElement parent) {
@@ -50,14 +54,14 @@ public class MLMediator extends AbstractMediator {
             throw new MediatorException("Invalid ML mediator. Model name is required");
         }
 
-        if(featureMappings.isEmpty()) {
+        if(features.isEmpty()) {
             throw new MediatorException("Invalid ML mediator. Features required");
         }
         OMElement featuresElement = fac.createOMElement(FEATURES_QNAME);
-        for(Map.Entry entry : featureMappings.entrySet()) {
+        for(MediatorProperty mediatorProperty : features) {
             OMElement featureElement = fac.createOMElement(FEATURE_QNAME);
-            featureElement.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(), nullNS, (String) entry.getKey()));
-            featureElement.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS, (String) entry.getValue()));
+            featureElement.addAttribute(fac.createOMAttribute(NAME_ATT. getLocalPart(), nullNS, mediatorProperty.getName()));
+            SynapseXPathSerializer.serializeXPath(mediatorProperty.getExpression(), featureElement, EXPRESSION_ATT.getLocalPart());
             featuresElement.addChild(featureElement);
         }
         mlElement.addChild(featuresElement);
@@ -107,7 +111,17 @@ public class MLMediator extends AbstractMediator {
 
             OMAttribute expression = featureElement.getAttribute(EXPRESSION_ATT);
             if (expression != null && expression.getAttributeValue() != null) {
-                this.featureMappings.put(featureName.getAttributeValue(), expression.getAttributeValue());
+                MediatorProperty mediatorProperty = new MediatorProperty();
+                mediatorProperty.setName(featureName.getAttributeValue());
+                try {
+                    SynapseXPath synapsePath = SynapseXPathFactory.getSynapseXPath(featureElement, EXPRESSION_ATT);
+                    mediatorProperty.setExpression(synapsePath);
+                    this.addFeature(mediatorProperty);
+                    // TODO support json path
+                } catch (JaxenException e) {
+                    throw new MediatorException("Error while extracting expression");
+                }
+
             } else {
                 throw new MediatorException("feature expression is required.");
             }
@@ -133,10 +147,18 @@ public class MLMediator extends AbstractMediator {
         return ML_TAG_LOCAL_NAME;
     }
 
+    /**
+     * Get model name
+     * @return
+     */
     public String getModelName() {
         return modelName;
     }
 
+    /**
+     * Set model name
+     * @param modelName
+     */
     public void setModelName(String modelName) {
         this.modelName = modelName;
     }
@@ -145,15 +167,37 @@ public class MLMediator extends AbstractMediator {
         return predictionPropertyName;
     }
 
+    /**
+     * Set the prediction property name
+     * @param response
+     */
     public void setPredictionPropertyName(String response) {
         this.predictionPropertyName = response;
     }
 
-    public void addFeatureMapping(String variableName, String expression) {
-        this.featureMappings.put(variableName, expression);
+    /**
+     * Add a feature
+     * @param mediatorProperty MediatorProperty containing the feature name, expression
+     */
+    public void addFeature(MediatorProperty mediatorProperty) {
+        this.features.add(mediatorProperty);
     }
 
-    public Map<String, String> getFeatureMappings() {
-        return featureMappings;
+    /**
+     * Get mapping expression for the feature name
+     * @param featureName
+     * @return
+     */
+    public SynapsePath getExpressionForFeature(String featureName) {
+        for(MediatorProperty mediatorProperty : features) {
+            if(mediatorProperty.getName().equals(featureName)) {
+                return mediatorProperty.getExpression();
+            }
+        }
+        return null;
+    }
+
+    public List<MediatorProperty> getFeatures() {
+        return features;
     }
 }

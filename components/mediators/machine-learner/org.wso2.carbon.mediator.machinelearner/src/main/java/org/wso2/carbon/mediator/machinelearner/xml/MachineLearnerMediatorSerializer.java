@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
 import org.apache.synapse.config.xml.SynapsePath;
+import org.apache.synapse.config.xml.SynapseXPathSerializer;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.wso2.carbon.mediator.machinelearner.MachineLearnerMediator;
 
@@ -68,8 +69,7 @@ public class MachineLearnerMediatorSerializer extends AbstractMediatorSerializer
             SynapsePath expression = entry.getValue();
             OMElement feature = fac.createOMElement(FEATURE_QNAME);
             feature.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(), nullNS, featureName));
-            feature.addAttribute(fac.createOMAttribute(EXPRESSION_ATT.getLocalPart(), nullNS,
-                    expression.getExpression()));
+            SynapseXPathSerializer.serializeXPath((SynapseXPath) expression, feature, EXPRESSION_ATT.getLocalPart());
             features.addChild(feature);
         }
         machineLearner.addChild(features);
