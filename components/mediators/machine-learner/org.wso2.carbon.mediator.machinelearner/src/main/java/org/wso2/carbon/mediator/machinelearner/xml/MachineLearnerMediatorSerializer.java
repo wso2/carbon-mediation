@@ -64,7 +64,7 @@ public class MachineLearnerMediatorSerializer extends AbstractMediatorSerializer
         // <features>
         OMElement features = fac.createOMElement(FEATURES_QNAME.getLocalPart(), synNS);
         // <feature>+
-        for(Map.Entry<String, SynapsePath> entry : machineLearnerMediator.getInputVariables().entrySet()) {
+        for(Map.Entry<String, SynapsePath> entry : machineLearnerMediator.getFeatureMappings().entrySet()) {
             String featureName = entry.getKey();
             SynapsePath expression = entry.getValue();
             OMElement feature = fac.createOMElement(FEATURE_QNAME.getLocalPart(), synNS);

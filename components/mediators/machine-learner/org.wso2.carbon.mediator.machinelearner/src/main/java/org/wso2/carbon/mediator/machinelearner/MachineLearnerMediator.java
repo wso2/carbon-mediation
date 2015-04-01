@@ -22,7 +22,6 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.config.xml.SynapsePath;
 import org.apache.synapse.mediators.AbstractMediator;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.machinelearner.util.ModelHandler;
 import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
@@ -36,12 +35,12 @@ import java.util.Map;
 public class MachineLearnerMediator extends AbstractMediator {
 
     private String resultPropertyName;
-    private Map<String, SynapsePath> inputVariables;
+    private Map<String, SynapsePath> featureMappings;
     private String modelName;
     private ModelHandler modelHandler;
 
     public MachineLearnerMediator() {
-        inputVariables = new HashMap<String, SynapsePath>();
+        featureMappings = new HashMap<String, SynapsePath>();
     }
 
     @Override
@@ -72,7 +71,7 @@ public class MachineLearnerMediator extends AbstractMediator {
     private String getPredictionFromModel(MessageContext messageContext) {
 
         try {
-            String prediction = ModelHandler.getInstance(modelName, inputVariables).getPrediction(messageContext);
+            String prediction = ModelHandler.getInstance(modelName, featureMappings).getPrediction(messageContext);
             return prediction;
         } catch (JaxenException e) {
             handleException("Error while extracting feature values ", e, messageContext);
@@ -92,22 +91,43 @@ public class MachineLearnerMediator extends AbstractMediator {
         this.resultPropertyName = propertyName;
     }
 
-    public void addFeatureMapping(String variableName, SynapsePath synapsePath) {
-        inputVariables.put(variableName, synapsePath);
+    /**
+     * Add feature mapping
+     * @param featureName feature name
+     * @param synapsePath synapse path to extract the feature value
+     */
+    public void addFeatureMapping(String featureName, SynapsePath synapsePath) {
+        featureMappings.put(featureName, synapsePath);
     }
 
+    /**
+     * Get the property name to which the prediction value is set
+     * @return
+     */
     public String getResultPropertyName() {
         return resultPropertyName;
     }
 
-    public Map<String, SynapsePath> getInputVariables() {
-        return inputVariables;
+    /**
+     * Ge the feature mappings map
+     * @return
+     */
+    public Map<String, SynapsePath> getFeatureMappings() {
+        return featureMappings;
     }
 
+    /**
+     * set model name
+     * @param modelName
+     */
     public void setModelName(String modelName) {
         this.modelName = modelName;
     }
 
+    /**
+     * Get model name
+     * @return
+     */
     public String getModelName() {
         return modelName;
     }

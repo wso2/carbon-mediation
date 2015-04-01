@@ -163,6 +163,10 @@ public class MLMediator extends AbstractMediator {
         this.modelName = modelName;
     }
 
+    /**
+     * Get the property name to which the prediction value is set
+     * @return
+     */
     public String getPredictionPropertyName() {
         return predictionPropertyName;
     }
@@ -197,6 +201,10 @@ public class MLMediator extends AbstractMediator {
         return null;
     }
 
+    /**
+     * Get the list of feature mappings
+     * @return
+     */
     public List<MediatorProperty> getFeatures() {
         return features;
     }
