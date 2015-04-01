@@ -1605,6 +1605,26 @@
                 <artifactId>org.wso2.carbon.ml.commons</artifactId>
                 <version>${ml.commons.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.machinelearner.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.machinelearner</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.machinelearner.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.machinelearner.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
 
             <!--12 Misc -->
             <dependency>
