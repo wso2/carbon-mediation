@@ -16,9 +16,15 @@ import org.apache.synapse.task.TaskManagerObserver;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
+import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
+import org.wso2.carbon.ntask.core.impl.clustered.ClusterGroupCommunicator;
+import org.wso2.carbon.ntask.core.impl.clustered.ClusteredTaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
+
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IExecutorService;
 
 public class NTaskTaskManager implements TaskManager, TaskServiceObserver, ServerStartupHandler {
     private final Object lock = new Object();
@@ -608,5 +614,23 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
             return taskQueue.toArray();
         }
     }
+
+	@Override
+	public void cleanupResources(String name) {
+		if (taskManager instanceof ClusteredTaskManager) {
+			try {
+				HazelcastInstance hazelcast =
+				                              ((ClusteredTaskManager) taskManager).getClusterComm()
+				                                                                  .getHazelcast();
+				IExecutorService es =
+				                      hazelcast.getExecutorService(ClusterGroupCommunicator.NTASK_P2P_COMM_EXECUTOR);
+				es.submitToAllMembers(new MessageProcessorCleanupTask(name));
+			} catch (TaskException e) {
+				logger.error("Could not cleanup the resources properly" + e.getLocalizedMessage(),
+				             e);
+			}
+		}
+
+	}
 }
 
