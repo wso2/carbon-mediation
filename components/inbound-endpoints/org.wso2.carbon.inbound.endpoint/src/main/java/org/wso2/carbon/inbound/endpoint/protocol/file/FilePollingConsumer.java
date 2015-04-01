@@ -18,6 +18,8 @@
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -455,6 +457,72 @@ public class FilePollingConsumer {
         }
     }
     
+    class FileNameAscComparator implements Comparator<FileObject>{        
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    }
+    
+    class FileLastmodifiedtimestampAscComparator implements Comparator<FileObject>{        
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            Long lDiff = 0l;
+            try {
+                lDiff = o1.getContent().getLastModifiedTime() - o2.getContent().getLastModifiedTime();
+            } catch (FileSystemException e) {
+                log.warn("Unable to compare lastmodified timestamp of the two files.", e);
+            }
+            return lDiff.intValue();
+        }
+    }    
+
+    class FileSizeAscComparator implements Comparator<FileObject>{        
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            Long lDiff = 0l;
+            try {
+                lDiff = o1.getContent().getSize() - o2.getContent().getSize();
+            } catch (FileSystemException e) {
+                log.warn("Unable to compare size of the two files.", e);
+            }
+            return lDiff.intValue();
+        }
+    }      
+
+    class FileNameDesComparator implements Comparator<FileObject>{        
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            return o2.getName().compareTo(o1.getName());
+        }
+    }
+    
+    class FileLastmodifiedtimestampDesComparator implements Comparator<FileObject>{        
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            Long lDiff = 0l;
+            try {
+                lDiff = o2.getContent().getLastModifiedTime() - o1.getContent().getLastModifiedTime();
+            } catch (FileSystemException e) {
+                log.warn("Unable to compare lastmodified timestamp of the two files.", e);
+            }
+            return lDiff.intValue();
+        }
+    }    
+
+    class FileSizeDesComparator implements Comparator<FileObject>{        
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            Long lDiff = 0l;
+            try {
+                lDiff = o2.getContent().getSize() - o1.getContent().getSize();
+            } catch (FileSystemException e) {
+                log.warn("Unable to compare size of the two files.", e);
+            }
+            return lDiff.intValue();
+        }
+    }      
+    
     /**
      * 
      * Handle directory with chile elements
@@ -475,6 +543,34 @@ public class FilePollingConsumer {
                     + vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN));
         }
 
+        //Sort the files        
+        String strSortParam = vfsProperties.getProperty(VFSConstants.FILE_SORT_PARAM);
+        if(strSortParam != null){
+            log.debug("Start Sorting the files.");
+            String strSortOrder = vfsProperties.getProperty(VFSConstants.FILE_SORT_ORDER);
+            boolean bSortOrderAsscending = true;
+            if(strSortOrder != null && strSortOrder.toLowerCase().equals("false")){
+                bSortOrderAsscending = false;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Sorting the files by : " + strSortOrder + ". (" + bSortOrderAsscending + ")");
+            }
+            if(strSortParam.equals(VFSConstants.FILE_SORT_VALUE_NAME) && bSortOrderAsscending){
+                Arrays.sort(children, new FileNameAscComparator());       
+            }else if(strSortParam.equals(VFSConstants.FILE_SORT_VALUE_NAME) && !bSortOrderAsscending){
+                Arrays.sort(children, new FileNameDesComparator());     
+            }else if(strSortParam.equals(VFSConstants.FILE_SORT_VALUE_SIZE) && bSortOrderAsscending){
+                Arrays.sort(children, new FileSizeAscComparator());       
+            }else if(strSortParam.equals(VFSConstants.FILE_SORT_VALUE_SIZE) && !bSortOrderAsscending){
+                Arrays.sort(children, new FileSizeDesComparator());   
+            }else if(strSortParam.equals(VFSConstants.FILE_SORT_VALUE_LASTMODIFIEDTIMESTAMP) && bSortOrderAsscending){
+                Arrays.sort(children, new FileLastmodifiedtimestampAscComparator());       
+            }else if(strSortParam.equals(VFSConstants.FILE_SORT_VALUE_LASTMODIFIEDTIMESTAMP) && !bSortOrderAsscending){
+                Arrays.sort(children, new FileLastmodifiedtimestampDesComparator());                   
+            }   
+            log.debug("End Sorting the files.");
+        }        
+        
         for (FileObject child : children) {
             // skipping *.lock / *.fail file
             if (child.getName().getBaseName().endsWith(".lock")
@@ -482,7 +578,7 @@ public class FilePollingConsumer {
                 continue;
             }
             boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child);
-
+            
             // child's file name matches the file name pattern or process all
             // files now we try to get the lock and process
             if ((strFilePattern == null || child.getName().getBaseName().matches(strFilePattern))

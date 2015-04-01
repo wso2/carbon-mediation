@@ -140,12 +140,12 @@ public class FileInjectHandler {
             if (injectingSeq == null || injectingSeq.equals("")) {
                 log.error("Sequence name not specified. Sequence : " + injectingSeq);
             }
-            SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(injectingSeq);
-            seq.setErrorHandler(onErrorSeq);
-            if (seq != null) {
+            SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(injectingSeq);            
+            if (seq != null) {                
                 if (log.isDebugEnabled()) {
                     log.debug("injecting message to sequence : " + injectingSeq);
                 }
+                seq.setErrorHandler(onErrorSeq);
                 if(!synapseEnvironment.injectInbound(msgCtx, seq, sequential)){
                     return false;
                 }
