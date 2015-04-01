@@ -29,6 +29,7 @@ public class CommentMediator extends AbstractListMediator {
 
     /**
      * Serialize Mediator into the repective OMElement structire and add to the provided parent
+     *
      * @param parent if present the serialize node will be added to the parent
      * @return Serialized OMElement structure
      */
@@ -40,6 +41,7 @@ public class CommentMediator extends AbstractListMediator {
 
     /**
      * Build the mediator with given OMElement node
+     *
      * @param elem synapse mediator configuration
      */
     public void build(OMElement elem) {
@@ -47,6 +49,7 @@ public class CommentMediator extends AbstractListMediator {
 
     /**
      * Build the mediator with given OMComment node
+     *
      * @param elem synapse mediator configuration
      */
     public void build(OMComment elem) {
@@ -55,6 +58,7 @@ public class CommentMediator extends AbstractListMediator {
 
     /**
      * Returns TagLocalName of the mediator
+     *
      * @return
      */
     public String getTagLocalName() {
@@ -63,6 +67,7 @@ public class CommentMediator extends AbstractListMediator {
 
     /**
      * Returns the comment text value
+     *
      * @return String value of comment text
      */
     public String getCommentText() {
@@ -71,6 +76,7 @@ public class CommentMediator extends AbstractListMediator {
 
     /**
      * Set the comment text value
+     *
      * @param commentText value
      */
     public void setCommentText(String commentText) {

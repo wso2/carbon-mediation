@@ -58,10 +58,12 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
 
     protected void addChildren(OMElement el, ListMediator m) {
         Iterator it = el.getChildren();
+
         while (it.hasNext()) {
             OMNode child = (OMNode) it.next();
+
             if (child instanceof OMElement) {
-                //Handle Element Nodes
+                /* Handle Element Nodes*/
                 MediatorService mediatorService = MediatorStore.getInstance().getMediatorService((OMElement) child);
                 if (mediatorService != null) {
                     Mediator med = mediatorService.getMediator();
@@ -74,7 +76,7 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
                     }
                 }
             } else if (child instanceof OMComment) {
-                ////Handle Comment Nodes
+                /* Handle Comment Nodes*/
                 CommentMediator med = new CommentMediator();
                 med.build((OMComment) child);
                 m.addChild(med);
