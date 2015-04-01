@@ -771,6 +771,26 @@ public class FilePollingConsumer {
                         .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS))) {
                     moveToDirectoryURI = vfsProperties
                             .getProperty(VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
+                    //Postfix the date given timestamp format
+                    String strSubfoldertimestamp = vfsProperties
+                            .getProperty(VFSConstants.SUBFOLDER_TIMESTAMP);
+                    if (strSubfoldertimestamp != null) {
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat(strSubfoldertimestamp);
+                            String strDateformat = sdf.format(new Date());
+                            int iIndex = moveToDirectoryURI.indexOf("?");
+                            if (iIndex > -1) {
+                                moveToDirectoryURI = moveToDirectoryURI.substring(0, iIndex)
+                                        + strDateformat
+                                        + moveToDirectoryURI.substring(iIndex,
+                                                moveToDirectoryURI.length());
+                            }else{
+                                moveToDirectoryURI += strDateformat;
+                            }
+                        } catch (Exception e) {
+                            log.warn("Error generating subfolder name with date", e);
+                        }
+                    }
                 }
                 break;
 
@@ -786,7 +806,7 @@ public class FilePollingConsumer {
                 return;
             }
 
-            if (moveToDirectoryURI != null) {
+            if (moveToDirectoryURI != null) {                
                 FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI, fso);
                 String prefix;
                 if (vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT) != null) {
@@ -797,6 +817,13 @@ public class FilePollingConsumer {
                 } else {
                     prefix = "";
                 }
+                
+                //Forcefully create the folder(s) if does not exists
+                String strForceCreateFolder = vfsProperties.getProperty(VFSConstants.FORCE_CREATE_FOLDER);
+                if(strForceCreateFolder != null && strForceCreateFolder.toLowerCase().equals("true") && !moveToDirectory.exists()){
+                    moveToDirectory.createFolder();
+                }
+                
                 FileObject dest = moveToDirectory.resolveFile(prefix
                         + fileObject.getName().getBaseName());
                 if (log.isDebugEnabled()) {
