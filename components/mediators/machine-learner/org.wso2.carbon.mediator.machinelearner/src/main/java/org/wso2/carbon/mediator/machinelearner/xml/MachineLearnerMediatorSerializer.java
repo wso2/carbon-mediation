@@ -53,21 +53,21 @@ public class MachineLearnerMediatorSerializer extends AbstractMediatorSerializer
         assert mediator instanceof MachineLearnerMediator : "machineLearner mediator is expected";
 
         MachineLearnerMediator machineLearnerMediator = (MachineLearnerMediator) mediator;
-        OMElement machineLearner = fac.createOMElement(ML_QNAME);
+        OMElement machineLearner = fac.createOMElement(ML_QNAME.getLocalPart(), synNS);
 
         // <model>
-        OMElement modelConfiguration = fac.createOMElement(MODEL_QNAME);
+        OMElement modelConfiguration = fac.createOMElement(MODEL_QNAME.getLocalPart(), synNS);
         modelConfiguration.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(),
                 nullNS, machineLearnerMediator.getModelName()));
         machineLearner.addChild(modelConfiguration);
 
         // <features>
-        OMElement features = fac.createOMElement(FEATURES_QNAME);
+        OMElement features = fac.createOMElement(FEATURES_QNAME.getLocalPart(), synNS);
         // <feature>+
         for(Map.Entry<String, SynapsePath> entry : machineLearnerMediator.getInputVariables().entrySet()) {
             String featureName = entry.getKey();
             SynapsePath expression = entry.getValue();
-            OMElement feature = fac.createOMElement(FEATURE_QNAME);
+            OMElement feature = fac.createOMElement(FEATURE_QNAME.getLocalPart(), synNS);
             feature.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(), nullNS, featureName));
             SynapseXPathSerializer.serializeXPath((SynapseXPath) expression, feature, EXPRESSION_ATT.getLocalPart());
             features.addChild(feature);
@@ -75,7 +75,7 @@ public class MachineLearnerMediatorSerializer extends AbstractMediatorSerializer
         machineLearner.addChild(features);
 
         // <prediction>
-        OMElement prediction = fac.createOMElement(PREDICTION_QNAME);
+        OMElement prediction = fac.createOMElement(PREDICTION_QNAME.getLocalPart(), synNS);
         prediction.addAttribute(fac.createOMAttribute(PROPERTY_ATT.getLocalPart(),
                 nullNS, machineLearnerMediator.getResultPropertyName()));
         machineLearner.addChild(prediction);
