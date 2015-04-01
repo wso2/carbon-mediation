@@ -94,7 +94,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                 boolean processedByAPI = false;
 
                 String apiDispatchingParam =
-                        endpoint.getParameter(
+                           (String)endpoint.getParameter(
                                 InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_API_DISPATCHING_ENABLED);
                 if (apiDispatchingParam != null && Boolean.valueOf(apiDispatchingParam)) {
                     // Trying to dispatch to an API

@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -38,6 +39,12 @@ public class PersistenceUtils {
     private static final String PORT_ATT = "port";
     private static final String DOMAIN_ATT = "domain";
     private static final String PROTOCOL_ATT = "protocol";
+    private static final String KEYSTORE_ATT = "keystore";
+    private static final String TRUSTSTORE_ATT = "truststore";
+    private static final String CLIENTAUTH_ATT ="SSLVerifyClient";
+    private static final String SSLPROTOCOL_ATT = "SSLProtocol";
+    private static final String HTTPSPROTOCOLS_ATT = "HttpsProtocols";
+    private static final String REVOCATIONVERIFIER_ATT = "CertificateRevocationVerifier";
 
     // QNames
     private static final QName INBOUND_ENDPOINTS_QN = new QName("inboundEndpoints");
@@ -48,6 +55,12 @@ public class PersistenceUtils {
     private static final QName PORT_QN = new QName(PORT_ATT);
     private static final QName DOMAIN_QN = new QName(DOMAIN_ATT);
     private static final QName PROTOCOL_QN = new QName(PROTOCOL_ATT);
+    private static final QName KEYSTORE_QN = new QName(KEYSTORE_ATT);
+    private static final QName TRUSTORE_QN = new QName(TRUSTSTORE_ATT);
+    private static final QName CLIENTAUTH_QN = new QName(CLIENTAUTH_ATT);
+    private static final QName SSLPROTOCOL_QN = new QName(SSLPROTOCOL_ATT);
+    private static final QName HTTPSPROTOCOL_QN = new QName(HTTPSPROTOCOLS_ATT);
+    private static final QName REVOCATIONVERIFIER_QN = new QName(REVOCATIONVERIFIER_ATT);
 
     private static OMFactory fac = OMAbstractFactory.getOMFactory();
     private static final OMNamespace nullNS =
@@ -60,7 +73,7 @@ public class PersistenceUtils {
      * @return equivalent OMElement for EndpointInfo
      */
     public static OMElement convertEndpointInfoToOM(
-            Map<Integer, List<InboundEndpointInfoDTO>> endpointInfo) {
+               Map<Integer, List<InboundEndpointInfoDTO>> endpointInfo) {
 
         OMElement parentElement = fac.createOMElement(INBOUND_ENDPOINTS_QN);
 
@@ -77,6 +90,26 @@ public class PersistenceUtils {
                 endpointElem.addAttribute(NAME_ATT, inboundEndpointInfoDTO.getEndpointName(), nullNS);
                 endpointElem.addAttribute(DOMAIN_ATT, inboundEndpointInfoDTO.getTenantDomain(), nullNS);
                 endpointElem.addAttribute(PROTOCOL_ATT, inboundEndpointInfoDTO.getProtocol(), nullNS);
+                if (inboundEndpointInfoDTO.getSslConfiguration() != null) {
+                    if (inboundEndpointInfoDTO.getSslConfiguration().getKeyStore() != null) {
+                        endpointElem.addAttribute(KEYSTORE_ATT, inboundEndpointInfoDTO.getSslConfiguration().getKeyStore(), nullNS);
+                    }
+                    if (inboundEndpointInfoDTO.getSslConfiguration().getTrustStore() != null) {
+                        endpointElem.addAttribute(TRUSTSTORE_ATT, inboundEndpointInfoDTO.getSslConfiguration().getTrustStore(), nullNS);
+                    }
+                    if (inboundEndpointInfoDTO.getSslConfiguration().getClientAuthEl() != null) {
+                        endpointElem.addAttribute(CLIENTAUTH_ATT, inboundEndpointInfoDTO.getSslConfiguration().getClientAuthEl(), nullNS);
+                    }
+                    if (inboundEndpointInfoDTO.getSslConfiguration().getSslProtocol() != null) {
+                        endpointElem.addAttribute(SSLPROTOCOL_ATT, inboundEndpointInfoDTO.getSslConfiguration().getSslProtocol(), nullNS);
+                    }
+                    if (inboundEndpointInfoDTO.getSslConfiguration().getHttpsProtocolsEl() != null) {
+                        endpointElem.addAttribute(HTTPSPROTOCOLS_ATT, inboundEndpointInfoDTO.getSslConfiguration().getHttpsProtocolsEl(), nullNS);
+                    }
+                    if (inboundEndpointInfoDTO.getSslConfiguration().getRevocationVerifier() != null) {
+                        endpointElem.addAttribute(REVOCATIONVERIFIER_ATT, inboundEndpointInfoDTO.getSslConfiguration().getRevocationVerifier(), nullNS);
+                    }
+                }
             }
         }
         return parentElement;
@@ -109,6 +142,17 @@ public class PersistenceUtils {
                         new InboundEndpointInfoDTO(endpointElement.getAttributeValue(DOMAIN_QN),
                                           endpointElement.getAttributeValue(PROTOCOL_QN),
                                           endpointElement.getAttributeValue(NAME_QN));
+                if (endpointElement.getAttributeValue(PROTOCOL_QN).equals("https")) {
+                    SSLConfiguration sslConfiguration =
+                               new SSLConfiguration(endpointElement.getAttributeValue(KEYSTORE_QN),
+                                                    endpointElement.getAttributeValue(TRUSTORE_QN),
+                                                    endpointElement.getAttributeValue(CLIENTAUTH_QN),
+                                                    endpointElement.getAttributeValue(HTTPSPROTOCOL_QN),
+                                                    endpointElement.getAttributeValue(REVOCATIONVERIFIER_QN),
+                                                    endpointElement.getAttributeValue(SSLPROTOCOL_QN));
+
+                    inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
+                }
 
                 tenantList.add(inboundEndpointInfoDTO);
             }
