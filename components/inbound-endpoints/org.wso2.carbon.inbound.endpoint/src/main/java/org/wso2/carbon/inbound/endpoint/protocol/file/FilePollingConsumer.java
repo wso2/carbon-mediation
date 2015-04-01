@@ -479,7 +479,7 @@ public class FilePollingConsumer {
 
         // Sort the files
         String strSortParam = vfsProperties.getProperty(VFSConstants.FILE_SORT_PARAM);
-        if (strSortParam != null) {
+        if (strSortParam != null && !"NONE".equals(strSortParam)) {
             log.debug("Start Sorting the files.");
             String strSortOrder = vfsProperties.getProperty(VFSConstants.FILE_SORT_ORDER);
             boolean bSortOrderAsscending = true;
