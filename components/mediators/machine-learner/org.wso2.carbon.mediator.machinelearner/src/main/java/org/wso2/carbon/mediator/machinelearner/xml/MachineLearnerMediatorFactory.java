@@ -68,12 +68,12 @@ public class MachineLearnerMediatorFactory extends AbstractMediatorFactory {
         OMElement featuresElement = omElement.getFirstChildWithName(FEATURES_QNAME);
         if(featuresElement != null) {
             Iterator featuresItr = featuresElement.getChildrenWithName(FEATURE_QNAME);
+
             while (featuresItr.hasNext()) {
                 OMElement featureElement = (OMElement) featuresItr.next();
                 String expression = getAttributeValue(featureElement, EXPRESSION_ATT);
                 String featureName = getAttributeValue(featureElement, NAME_ATT);
 
-                // TODO json path support
                 if (expression != null || featureName != null) {
                     SynapsePath synapsePath = null;
                     if (expression != null) {

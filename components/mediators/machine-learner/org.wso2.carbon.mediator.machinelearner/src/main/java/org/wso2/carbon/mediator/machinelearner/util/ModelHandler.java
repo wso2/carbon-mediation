@@ -159,7 +159,6 @@ public class ModelHandler {
                 int featureIndex = entry.getValue();
                 data[featureIndex] = variableValue;
             }
-            // TODO handle null/empty values
         }
         return predict(data);
     }

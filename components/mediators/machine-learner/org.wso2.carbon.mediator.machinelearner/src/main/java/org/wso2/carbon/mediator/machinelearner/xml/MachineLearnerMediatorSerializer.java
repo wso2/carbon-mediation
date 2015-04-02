@@ -42,7 +42,7 @@ public class MachineLearnerMediatorSerializer extends AbstractMediatorSerializer
      *       <features>
      *           <feature name="string" expression="xpath"/>+
      *       </features>
-     *       <prediction expression="xpath"/>
+     *       <prediction property="string"/>
      *   </machineLearner>
      *
      * @param mediator MLMediator instance
