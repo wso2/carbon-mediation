@@ -363,23 +363,6 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory {
             }
         }
 
-        //**Support failover on http status codes*/
-        OMElement statusCodes = elem.getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE, "failoverHttpStatusCodes"));
-        if (statusCodes != null && !TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.failoverHttpStatusCodes, statusCodes.getText())) {
-            StringTokenizer st = new StringTokenizer(
-                    statusCodes.getText().trim(), ", ");
-            while (st.hasMoreTokens()) {
-                String s = st.nextToken();
-                try {
-                    definition.addFailoverHttpstatusCodes(Integer.parseInt(s));
-                } catch (NumberFormatException e) {
-                    handleException("The failover http status codes should be specified as valid " +
-                            "numbers separated by commas : "
-                            + statusCodes.getText(), e);
-                }
-            }
-        }
-
         return definition;
     }
 

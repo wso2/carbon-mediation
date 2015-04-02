@@ -18,7 +18,7 @@ package org.wso2.carbon.endpoint.ui.endpoints.address;
 import org.wso2.carbon.endpoint.ui.endpoints.Endpoint;
 import org.wso2.carbon.endpoint.ui.endpoints.EndpointService;
 
-public class AddressEndpointService implements EndpointService{
+public class AddressEndpointService implements EndpointService {
 
     public Endpoint getEndpoint() {
         return new AddressEndpoint();

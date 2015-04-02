@@ -29,7 +29,6 @@
     String formatOption = request.getParameter("format");
     String optimizeOption = request.getParameter("optimize");
     String description = request.getParameter("endpointDescription").trim();
-    String failoverHttpStatusCodes = request.getParameter("failoverHttpStatusCodes");
     String errorCode = request.getParameter("suspendErrorCode");
     String suspendDuration = request.getParameter("suspendDuration");
     String suspendMaxDuration = request.getParameter("suspendMaxDuration");
@@ -108,10 +107,6 @@
     } else {
         addressEndpoint.setSwa(false);
         addressEndpoint.setMtom(false);
-    }
-
-    if(failoverHttpStatusCodes!=null){
-      addressEndpoint.setFailoverHttpStatusCodes(failoverHttpStatusCodes);
     }
 
     if (description != null && !"".equals(description)) {

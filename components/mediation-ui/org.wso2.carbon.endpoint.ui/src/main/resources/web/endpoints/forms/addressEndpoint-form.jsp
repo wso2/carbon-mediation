@@ -194,7 +194,6 @@
     boolean isformatDefault = true;
     boolean isSWA = false, isMTOM = false, isOptimizeDefault = true;
     String errorCode = "";
-    String failoverHttpStatusCodes = "";
     long suspendDurationOnFailure = 0;
     long maxDuration = 0;
     float factor = 1.0f; // default value
@@ -231,12 +230,6 @@
         if (endpoint.getDescription() != null) {
             description = endpoint.getDescription();
         }
-
-        //Http status codes support
-        if(endpoint.getFailoverHttpStatusCodes()!=null){
-          failoverHttpStatusCodes = endpoint.getFailoverHttpStatusCodes().trim();
-        }
-
         // Format string
         if (endpoint.isPox()) {
             isPox = true;
@@ -746,21 +739,6 @@
 <%
     }
 %>
-<% if (isRetryAvailableInParentEndpoint) {%>
-<tr>
-    <td colspan="2" class="sub-header"><fmt:message key="httpstatuscode"/></td>
-</tr>
-    <tr>
-            <td>
-                 <div class="indented"><fmt:message key="enablehttpstatuscodes" /></div>
-            </td>
-            <td>
-                   <input id="failoverHttpStatusCodes" type="text" name="failoverHttpStatusCodes"
-                               value="<%=failoverHttpStatusCodes%>" >
-            </td>
-    </tr>
-
-<%}%>
 <tr>
     <td colspan="2" class="sub-header"><fmt:message key="timeout"/></td>
 </tr>

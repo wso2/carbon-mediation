@@ -140,6 +140,7 @@
         session.setAttribute("action", "add");
     }
 
+    String failoverHttpStatusCodes =  "";
     String failoverEndpointName = "";
     String properties = "";
 
@@ -149,6 +150,9 @@
         }
         if (endpoint.getProperties() != null) {
             properties = endpoint.getProperties();
+        }
+        if(endpoint.getFailoverHttpStatusCodes()!=null){
+        failoverHttpStatusCodes = endpoint.getFailoverHttpStatusCodes();
         }
     }
 
@@ -266,6 +270,28 @@
                                 </td>
                             </tr>
                             </tbody>
+
+
+
+
+
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <table class="normal-nopadding" width="100%">
+                            <tr>
+                                <td colspan="2" class="sub-header"><fmt:message key="httpstatuscode"/></td>
+                            </tr>
+                            <tr>
+                                <td style = "width:25%">
+                                    <div class="indented"><fmt:message key="enablehttpstatuscodes" /></div>
+                                </td>
+                                <td>
+                                    <input id="failoverHttpStatusCodes" type="text" name="failoverHttpStatusCodes"
+                                                                                           value="<%=failoverHttpStatusCodes%>" />
+                                </td>
                         </table>
                     </td>
                 </tr>

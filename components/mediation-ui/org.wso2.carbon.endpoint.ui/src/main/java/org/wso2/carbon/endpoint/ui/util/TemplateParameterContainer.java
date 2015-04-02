@@ -31,9 +31,8 @@ public class TemplateParameterContainer {
         optimize, format, charSetEncoding, retryDurationOnTimeout,
         timeoutDuration, timeoutAction, initialSuspendDuration, suspendProgressionFactor,
         suspendMaximumDuration, suspendErrorCodes, timeoutErrorCodes, retriesOnTimeoutBeforeSuspend,
-        separateListener, policy, retryDisabledErrorCodes, failoverHttpStatusCodes
+        separateListener, policy, retryDisabledErrorCodes
     }
-
 
     public void addTemplateMapping(EndpointDefKey key, String value) {
         templateMappings.put(key, value);
