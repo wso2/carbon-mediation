@@ -107,7 +107,7 @@ public class SequenceEditorHelper {
         ByteArrayInputStream byteArrayInputStream
                 = new ByteArrayInputStream(parseSequenceToString(sequence).getBytes());
         XMLPrettyPrinter printer = new XMLPrettyPrinter(byteArrayInputStream);
-        return printer.xmlFormat();
+        return printer.xmlFormatWithComments();
     }
 
     public static OMElement parseAnonSequenceToOM(SequenceMediator seqMediator) {
@@ -129,13 +129,13 @@ public class SequenceEditorHelper {
         elem.setLocalName(targetSeqName + "Sequence");
         ByteArrayInputStream stream = new ByteArrayInputStream(elem.toString().getBytes());
         XMLPrettyPrinter printer = new XMLPrettyPrinter(stream);
-        return printer.xmlFormat();
+        return printer.xmlFormatWithComments();
     }
     public static String parseAnonSequenceToPrettyfiedString(SequenceMediator seqMediator) {
         OMElement elem = parseAnonSequenceToOM(seqMediator);
         ByteArrayInputStream stream = new ByteArrayInputStream(elem.toString().getBytes());
         XMLPrettyPrinter printer = new XMLPrettyPrinter(stream);
-        return printer.xmlFormat();
+        return printer.xmlFormatWithComments();
     }
 
    public static Mediator getMediatorAt(AbstractListMediator sequence, String position) {
@@ -401,7 +401,7 @@ public class SequenceEditorHelper {
             ByteArrayInputStream byteArrayInputStream
                 = new ByteArrayInputStream(ele.toString().getBytes());
             XMLPrettyPrinter printer = new XMLPrettyPrinter(byteArrayInputStream);
-            return printer.xmlFormat();
+            return printer.xmlFormatWithComments();
         }
         return null;
     }
