@@ -20,6 +20,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.wso2.carbon.mediator.service.MediatorService;
 import org.wso2.carbon.mediator.service.MediatorStore;
+import org.wso2.carbon.mediator.service.builtin.CommentMediator;
 import org.wso2.carbon.mediator.service.builtin.SequenceMediator;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
 import org.wso2.carbon.mediator.service.ui.Mediator;
@@ -212,6 +213,10 @@ public class SequenceEditorHelper {
                                          ServletConfig config, Mediator before, Mediator after,
                                          Locale locale) {
         ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE, locale);
+
+        if(!isValidMediatorForUI(mediator)){
+            return "";
+        }
 
         MediatorService mediatorInfo
                 = MediatorStore.getInstance().getMediatorService(mediator.getTagLocalName());
@@ -459,5 +464,22 @@ public class SequenceEditorHelper {
 
     public static String getEditorMode(HttpSession session) {
         return getEditorMode(getFactoryFrom(session));
+    }
+
+    /**
+     * Check the validity of a given mediator to be shown in UI
+     *
+     * @param mediator AbstractListMediator instance to be checked
+     * @return true if valid, false otherwise
+     */
+    private static boolean isValidMediatorForUI(Mediator mediator) {
+        boolean validity = true;
+
+        //Mediator List which should not be shown in UI
+        if (mediator instanceof CommentMediator) {
+            validity = false;
+        }
+
+        return validity;
     }
 }
