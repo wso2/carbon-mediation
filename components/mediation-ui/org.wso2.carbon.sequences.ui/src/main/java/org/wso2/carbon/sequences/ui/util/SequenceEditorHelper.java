@@ -214,7 +214,7 @@ public class SequenceEditorHelper {
                                          Locale locale) {
         ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE, locale);
 
-        if(!isValidMediatorForUI(mediator)){
+        if (!isValidMediatorForUI(mediator)) {
             return "";
         }
 
