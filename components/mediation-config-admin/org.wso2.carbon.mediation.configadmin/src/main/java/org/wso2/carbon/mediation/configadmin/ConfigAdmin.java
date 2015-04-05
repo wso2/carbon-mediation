@@ -73,17 +73,15 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
             }
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
                     stream.toByteArray());
-            StAXOMBuilder builder = new StAXOMBuilder(OMAbstractFactory.getOMFactory(),
-                    factory.createXMLStreamReader(byteArrayInputStream));
-            stream.reset();
-            XMLPrettyPrinter.prettify(builder.getDocumentElement(), stream);
-            return new String(stream.toByteArray()).trim();
+            org.wso2.carbon.utils.xml.XMLPrettyPrinter xmlPrettyPrinter = new org.wso2.carbon.utils.xml.XMLPrettyPrinter(byteArrayInputStream);
+            return xmlPrettyPrinter.xmlFormatWithComments();
+
         } catch (XMLStreamException e) {
             handleException("Error serializing the Synapse configuration : Error " + e.getMessage(),
-                    e);
+                            e);
         } catch (Exception e) {
             handleException("Error serializing the Synapse configuration : Error " + e.getMessage(),
-                    e);
+                            e);
         } finally {
             lock.unlock();
         }
@@ -257,8 +255,7 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
             try {
                 fos.close();
                 XMLPrettyPrinter.prettify(new File(config.getPathToConfigFile()));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 // ignore prettify errors
             }
             if (log.isTraceEnabled()) {
