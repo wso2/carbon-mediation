@@ -62,9 +62,9 @@
             </thead>
                 <tbody>
                     <%
-                        int index;
-                        for (index = 0; index < features.size(); index++) {
-                            String featureName = features.get(index).getName();
+                        int index = 0;
+                        for (Feature feature : features) {
+                            String featureName = feature.getName();
                             if(!featureName.equals(responseVariable)) {
                                 SynapsePath synapsePath = ((org.wso2.carbon.mediator.machinelearner.ui.MLMediator) mediator).getExpressionForFeature(featureName);
                                 String expression = null;
@@ -97,7 +97,9 @@
                         </td>
                     </tr>
                     <%
-                        }}
+                                index++;
+                            }
+                        }
                     %>
                     <input type="hidden" name="featureCount" id="featureCount" value="<%=index%>"/>
                 </tbody>
