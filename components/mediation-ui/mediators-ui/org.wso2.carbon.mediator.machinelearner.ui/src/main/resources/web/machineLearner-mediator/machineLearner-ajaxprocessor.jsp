@@ -36,12 +36,14 @@
 
     boolean modelNotFound = false;
     List<Feature> features = null;
+    String responseVariable = null;
     response.setHeader("Cache-Control", "no-cache");
     String modelName = request.getParameter("mediatorInput");
     mlMediator.setModelName(modelName);
 
     try {
         features = org.wso2.carbon.mediator.machinelearner.ui.util.MLMediatorUtils.getFeaturesOfModel(request.getParameter("mediatorInput"));
+        responseVariable = MLMediatorUtils.getResponseVariable(request.getParameter("mediatorInput"));
     } catch (Exception e) {
         modelNotFound = true;
     }
@@ -61,16 +63,17 @@
                 <tbody>
                     <%
                         int index;
-                        for (index = 0; index < features.size()-1; index++) {
+                        for (index = 0; index < features.size(); index++) {
                             String featureName = features.get(index).getName();
-                            SynapsePath synapsePath = ((org.wso2.carbon.mediator.machinelearner.ui.MLMediator) mediator).getExpressionForFeature(featureName);
-                            String expression = null;
-                            if(synapsePath != null) {
-                                expression = synapsePath.getExpression();
-                            }
-                            if(expression == null) {
-                                expression = "";
-                            }
+                            if(!featureName.equals(responseVariable)) {
+                                SynapsePath synapsePath = ((org.wso2.carbon.mediator.machinelearner.ui.MLMediator) mediator).getExpressionForFeature(featureName);
+                                String expression = null;
+                                if(synapsePath != null) {
+                                    expression = synapsePath.getExpression();
+                                }
+                                if(expression == null) {
+                                    expression = "";
+                                }
                     %>
                     <tr>
                         <td style="vertical-align:top !important">
@@ -94,7 +97,7 @@
                         </td>
                     </tr>
                     <%
-                        }
+                        }}
                     %>
                     <input type="hidden" name="featureCount" id="featureCount" value="<%=index%>"/>
                 </tbody>

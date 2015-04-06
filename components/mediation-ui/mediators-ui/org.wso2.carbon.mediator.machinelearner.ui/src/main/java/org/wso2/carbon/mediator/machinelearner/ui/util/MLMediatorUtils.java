@@ -22,8 +22,10 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.ml.commons.domain.Feature;
 import org.wso2.carbon.ml.commons.domain.MLModel;
 import org.wso2.carbon.ml.commons.domain.MLModelNew;
+import org.wso2.carbon.ml.core.exceptions.MLAnalysisHandlerException;
 import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
+import org.wso2.carbon.ml.core.impl.MLAnalysisHandler;
 import org.wso2.carbon.ml.core.impl.MLModelHandler;
 import org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException;
 import org.wso2.carbon.user.api.UserStoreException;
@@ -42,7 +44,7 @@ public class MLMediatorUtils {
      * @throws UserStoreException
      */
     public static List<Feature> getFeaturesOfModel(String modelName) throws DatabaseHandlerException,
-            MLModelHandlerException, MLModelBuilderException, UserStoreException {
+            MLModelHandlerException, MLModelBuilderException, UserStoreException, MLAnalysisHandlerException {
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         int tenantId = carbonContext.getTenantId();
@@ -53,5 +55,27 @@ public class MLMediatorUtils {
         MLModel mlModel = mlModelHandler.retrieveModel(mlModelNew.getId());
         List<Feature> features = mlModel.getFeatures();
         return features;
+    }
+
+    /**
+     * Get the response variable of the model
+     * @param modelName model name
+     * @return
+     * @throws UserStoreException
+     * @throws MLModelHandlerException
+     * @throws MLAnalysisHandlerException
+     */
+    public static String getResponseVariable(String modelName) throws UserStoreException, MLModelHandlerException, MLAnalysisHandlerException {
+
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        int tenantId = carbonContext.getTenantId();
+        String userName = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().
+                getRealmConfiguration().getAdminUserName();
+        MLModelHandler mlModelHandler = new MLModelHandler();
+        MLModelNew mlModelNew = mlModelHandler.getModel(tenantId, userName, modelName);
+
+        MLAnalysisHandler analysisHandler = new MLAnalysisHandler();
+        String responseVariable = analysisHandler.getResponseVariable(mlModelNew.getAnalysisId());
+        return responseVariable;
     }
 }
