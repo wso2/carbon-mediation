@@ -35,13 +35,11 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.machinelearner.server.feature</artifactId>
-            <version>4.3.3-SNAPSHOT</version>
             <type>zip</type>
 	    </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.machinelearner.ui.feature</artifactId>
-            <version>4.3.3-SNAPSHOT</version>
             <type>zip</type>
 	    </dependency>
     </dependencies>
