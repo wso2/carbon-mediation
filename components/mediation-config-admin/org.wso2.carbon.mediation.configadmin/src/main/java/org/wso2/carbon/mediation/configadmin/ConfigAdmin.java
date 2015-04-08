@@ -16,9 +16,7 @@
 
 package org.wso2.carbon.mediation.configadmin;
 
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.util.XMLPrettyPrinter;
 import org.apache.commons.logging.Log;
@@ -74,7 +72,7 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
                     stream.toByteArray());
             org.wso2.carbon.utils.xml.XMLPrettyPrinter xmlPrettyPrinter = new org.wso2.carbon.utils.xml.XMLPrettyPrinter(byteArrayInputStream);
-            return xmlPrettyPrinter.xmlFormatWithComments();
+            return xmlPrettyPrinter.xmlFormat();
 
         } catch (XMLStreamException e) {
             handleException("Error serializing the Synapse configuration : Error " + e.getMessage(),
