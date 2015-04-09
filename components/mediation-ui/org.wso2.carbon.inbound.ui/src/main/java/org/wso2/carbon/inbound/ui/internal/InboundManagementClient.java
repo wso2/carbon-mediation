@@ -225,22 +225,7 @@ public class InboundManagementClient {
         return true;
     }
 
-
-    private boolean removeInboundEndpointIfExists(String name) {
-        try {
-        InboundEndpointDTO[] inboundEndpointDTOs =    stub.getAllInboundEndpointNames();
-            for(InboundEndpointDTO inboundEndpointDTO: inboundEndpointDTOs){
-                if(inboundEndpointDTO.getName().equals(name)){
-                    stub.removeInboundEndpoint(name);
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            log.error(e);
-        }
-        return false;
-    }
-
+    
     public InboundDescription getInboundDescription(String name) {
         try {
             InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
