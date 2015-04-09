@@ -143,7 +143,7 @@
 </script>
 
 <div id="middle">
-<h2><fmt:message key="jms.message.store"/></h2>
+<h2><fmt:message key="rabbitmq.message.store"/></h2>
 
 <div id="workArea">
 <form name="Submit" action="ServiceCaller.jsp" method="POST"
@@ -194,7 +194,7 @@
     <thead>
     <tr>
         <th colspan="2"><span style="float: left; position: relative; margin-top: 2px;">
-                            <fmt:message key="jms.message.store"/></span>
+                            <fmt:message key="rabbitmq.message.store"/></span>
             <a class="icon-link"
                style="background-image: url(images/source-view.gif);"
                onclick="switchToSource();"
@@ -230,26 +230,26 @@
                     <td><fmt:message key="provider"/><span class="required"> *</span></td>
                     <td>
                         <input name="Provider" id="Provider" type="hidden"
-                               value="org.apache.synapse.message.store.impl.jms.JmsStore"/>
-                        <label id="Provider_label" for="Provider">org.apache.synapse.message.store.impl.jms.JmsStore
+                               value="org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore"/>
+                        <label id="Provider_label" for="Provider">org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore
                         </label>
                         <br/>
                     </td>
                 </tr>
                 <%} else {%>
                 <input name="Provider" id="Provider" type="hidden"
-                       value="org.apache.synapse.message.store.impl.jms.JmsStore"/>
+                       value="org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore"/>
                 <%}%>
                 <tr>
-                    <td><fmt:message key="factory.initial"/><span class="required"> *</span></td>
-                    <td><input type="text" size="60" id="factory_initial" name="factory_initial"
-                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("java.naming.factory.initial")!=null))?messageStore.getParams().get("java.naming.factory.initial"):""%>"/>
+                    <td><fmt:message key="rabbitmq.host.name"/><span class="required"> *</span></td>
+                    <td><input type="text" size="60" id="host_name" name="host_name"
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.host.name")!=null))?messageStore.getParams().get("store.rabbitmq.host.name"):""%>"/>
                     </td>
                 </tr>
                 <tr>
-                    <td><fmt:message key="provider.url"/><span class="required"> *</span></td>
-                    <td><input type="text" size="60" id="provider_url" name="provider_url"
-                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("java.naming.provider.url")!=null))?messageStore.getParams().get("java.naming.provider.url"):""%>"/>
+                    <td><fmt:message key="rabbitmq.host.port"/><span class="required"> *</span></td>
+                    <td><input type="text" size="60" id="host_port" name="host_port"
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.host.port")!=null))?messageStore.getParams().get("store.rabbitmq.host.port"):""%>"/>
                     </td>
                 </tr>
 
