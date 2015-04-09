@@ -103,6 +103,13 @@
                 throw new Exception();
             }
         }
+        if ("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore".
+                                                                        equals(provider.trim())) {
+            if (!paramList.containsKey("store.rabbitmq.host.name") ||
+                !paramList.containsKey("store.rabbitmq.host.port")) {
+                throw new Exception();
+            }
+        }
         messageStoreXml.append("</ns1:messageStore>");
         return messageStoreXml.toString().trim();
     }
