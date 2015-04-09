@@ -32,7 +32,7 @@
 <script type="text/javascript" src="localentrycommons.js"></script>
 
 <carbon:breadcrumb
-        label="jms.message.store"
+        label="rabbitmq.message.store"
         resourceBundle="org.wso2.carbon.message.store.ui.i18n.Resources"
         topPage="true"
         request="<%=request%>"/>
@@ -94,8 +94,8 @@
         addServiceParameter("store.rabbitmq.exchange.name", document.getElementById('exchange_name').value);
         addServiceParameter("store.rabbitmq.route.key", document.getElementById('route_key').value);
         addServiceParameter("store.rabbitmq.virtual.host", document.getElementById('virtual_host').value);
-        addServiceParameter("store.jms.username", document.getElementById('rabbitmq_username').value);
-        addServiceParameter("store.jms.password", document.getElementById('rabbitmq_password').value);
+        addServiceParameter("store.rabbitmq.username", document.getElementById('rabbitmq_username').value);
+        addServiceParameter("store.rabbitmq.password", document.getElementById('rabbitmq_password').value);
     }
 
     function addServiceParameter(parameter, value) {
@@ -131,7 +131,7 @@
         var messageStoreStr = {Name : document.getElementById("Name").value, tableParams : document.getElementById("tableParams").value};
         jQuery.ajax({
             type: 'POST',
-            url: 'updatePages/jmsMessageStoreUpdate.jsp',
+            url: 'updatePages/rabbitmqMessageStoreUpdate.jsp',
             data: messageStoreStr,
             success: function(msg) {
                 location.href = "sourceView.jsp";
@@ -273,49 +273,45 @@
                         <td colspan="2" class="sub-header"><fmt:message key="additional.parameters"/></td>
                     </tr>
                     <tr>
-                        <td><fmt:message key="store.jms.destination"/></td>
-                        <td><input type="text" id="jms_destination" name="jms_destination"
-                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jms.destination")!=null))?messageStore.getParams().get("store.jms.destination"):""%>"
+                        <td><fmt:message key="store.rabbitmq.queue.name"/></td>
+                        <td><input type="text" id="queue_name" name="queue_name"
+                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.queue.name")!=null))?messageStore.getParams().get("store.rabbitmq.queue.name"):""%>"
                                    size="75"/>
                         </td>
                     </tr>
                     <tr>
-                        <td><fmt:message key="store.jms.connection.factory"/></td>
-                        <td><input type="text" id="jms_connection_factory" name="jms_connection_factory"
-                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jms.connection.factory")!=null))?messageStore.getParams().get("store.jms.connection.factory"):""%>"
+                        <td><fmt:message key="store.rabbitmq.exchange.name"/></td>
+                        <td><input type="text" id="exchange_name" name="exchange_name"
+                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.exchange.name")!=null))?messageStore.getParams().get("store.rabbitmq.exchange.name"):""%>"
                                    size="75"/>
                         </td>
                     </tr>
                     <tr>
-                        <td><fmt:message key="store.jms.username"/></td>
-                        <td><input type="text" id="jms_username" name="jms_username"
-                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jms.username")!=null))?messageStore.getParams().get("store.jms.username"):""%>"
+                        <td><fmt:message key="store.rabbitmq.route.key"/></td>
+                        <td><input type="text" id="route_key" name="route_key"
+                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.route.key")!=null))?messageStore.getParams().get("store.rabbitmq.route.key"):""%>"
                                    size="75"/>
                         </td>
                     </tr>
                     <tr>
-                        <td><fmt:message key="store.jms.password"/></td>
-                        <td><input type="password" id="jms_password" name="jms_password"
-                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jms.password")!=null))?messageStore.getParams().get("store.jms.password"):""%>"
+                        <td><fmt:message key="store.rabbitmq.username"/></td>
+                        <td><input type="text" id="rabbitmq_username" name="rabbitmq_username"
+                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.username")!=null))?messageStore.getParams().get("store.rabbitmq.username"):""%>"
                                    size="75"/>
                         </td>
                     </tr>
                     <tr>
-                        <td><fmt:message key="store.jms.JMSSpecVersion"/></td>
-                        <td>
-                            <select id="jms_spec_version">
-                                <%
-                                    if ((null != messageStore) && (messageStore.getParams().get("store.jms.JMSSpecVersion") != null) && (messageStore.getParams().get("store.jms.JMSSpecVersion").equals("1.0"))) {
-                                %>
-                                <option value="1.1">1.1</option>
-                                <option selected="selected" value="1.0">1.0</option>
-
-                                <%} else {%>
-
-                                <option selected="selected" value="1.1">1.1</option>
-                                <option value="1.0">1.0</option>
-                                <%}%>
-                            </select>
+                        <td><fmt:message key="store.rabbitmq.password"/></td>
+                        <td><input type="password" id="rabbitmq_password" name="rabbitmq_password"
+                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.password")!=null))?messageStore.getParams().get("store.rabbitmq.password"):""%>"
+                                   size="75"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><fmt:message key="store.rabbitmq.virtual.host"/></td>
+                        <td><input type="text" id="virtual_host" name="virtual_host"
+                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.virtual.host")!=null))?messageStore.getParams().get("store.rabbitmq.virtual.host"):""%>"
+                                   size="75"/>
                         </td>
                     </tr>
                     </tbody>
