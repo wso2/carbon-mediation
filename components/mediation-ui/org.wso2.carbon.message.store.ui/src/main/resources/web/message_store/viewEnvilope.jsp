@@ -235,7 +235,7 @@
                 <tr>
                     <th><fmt:message key="messageStore.name"/></th>
                     <th><fmt:message key="type"/></th>
-                    <%if (!client.getClassName(msName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) {%>
+                    <%if (!client.getClassName(msName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !client.getClassName(msName).trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) {%>
                         <th><fmt:message key="size"/></th>
                     <%}%>
                 </tr>
@@ -258,7 +258,7 @@
                     </td>
                     <td><%= type%>
                     </td>
-                    <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) {%>
+                    <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) {%>
                         <td><%= size%>
                         </td>
                     <%}%>
@@ -302,7 +302,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) {%>
+                                <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) {%>
                                 <input type="button" value="<fmt:message key="delete"/>"
                                        onclick="<%="deleteMsg();"%>"
                                        class="button"/>
