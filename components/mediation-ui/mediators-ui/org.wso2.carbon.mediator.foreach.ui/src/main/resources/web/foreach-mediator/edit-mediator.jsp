@@ -21,8 +21,7 @@
 <%@ page import="org.wso2.carbon.mediator.foreach.ForEachMediator"%>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator"%>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper"%>
-<%@ page
-	import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar"%>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar"
 	prefix="carbon"%>
@@ -34,6 +33,27 @@
 		throw new RuntimeException("Unable to edit the mediator");
 	}
 	ForEachMediator foreachMediator = (ForEachMediator) mediator;
+
+    String whichSeq = "None";
+
+    String inRegKey = "";
+
+    String sequenceStr = foreachMediator.getSequenceRef();
+        if(sequenceStr == null){
+            sequenceStr = "";
+        }
+
+        if(foreachMediator.getList().isEmpty() && foreachMediator.getSequenceRef() == null){
+            whichSeq = "none";
+        } else if(foreachMediator.getSequenceRef() != null && !"anon".equals(foreachMediator.getSequenceRef())) {
+            whichSeq = "reg";
+        } else if(foreachMediator.getSequenceRef() != null    && "anon".equals(foreachMediator.getSequenceRef())){
+            whichSeq = "anon";
+            //if the sequence is anonymous we have to clear the sequence string
+            //in order to avoid it displaying in the registry textbox
+            sequenceStr = "";
+        }
+
 %>
 
 <fmt:bundle
@@ -41,6 +61,10 @@
 	<carbon:jsi18n
 		resourceBundle="org.wso2.carbon.mediator.foreach.ui.i18n.JSResources"
 		request="<%=request%>" i18nObjectName="foreachi18n" />
+
+<script type="text/javascript">
+    var whichSeq = '<%=whichSeq%>'
+</script>
 
 	<div>
 		<script type="text/javascript"
@@ -85,11 +109,57 @@
 				</td>
 			</tr>
 			<tr>
-				<td><fmt:message key="update.for.target" /></td>
+			    <td>
+			        <table class="normal">
+                        <tr>
+                            <td>
+                                <h3 class="mediator">Sequence</h3>
+                                <input type="hidden" name="mediator.foreach.seq.type"
+                                       id="mediator.foreach.seq.type" value="none"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input id="mediator.foreach.seq.radio.none" name="mediator.foreach.seq.radio"  type="radio" value="none"
+                                      onclick="hideSeqRegistryOption(); seqNoneClicked();"/>
+                                      None
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input id="mediator.foreach.seq.radio.anon" name="mediator.foreach.seq.radio" type="radio" onclick="hideSeqRegistryOption()"/>
+                                Anonymous
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input id="mediator.foreach.seq.radio.reg" name="mediator.foreach.seq.radio" type="radio" onclick="showSeqRegistryOption()"/>
+                                Pick From Registry
+                            </td>
+                            <td>
+                                <input type="text" name="mediator.foreach.seq.reg"
+                                       id="mediator.foreach.seq.reg" value="<%=sequenceStr%>"
+                                       style="width:300px;display:none;"
+                                       readonly="disabled" />
+                            </td>
+                            <td>
+                                <a href="#registryBrowserLink" id="mediator.foreach.seq.reg.link_1"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('mediator.foreach.seq.reg','/_system/config')">
+                                    <fmt:message key="conf.registry.keys"/></a>
+                                <a href="#registryBrowserLink" id="mediator.foreach.seq.reg.link_2"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('mediator.foreach.seq.reg','/_system/governance')"><fmt:message
+                                        key="gov.registry.keys"/></a>
+                            </td>
+                        </tr>
+                    </table>
+			    </td>
 			</tr>
 		</table>
 		<a name="nsEditorLink"></a>
-
 		<div id="nsEditor" style="display: none;"></div>
+		<a name="registryBrowserLink"/>
+                <div id="registryBrowser" style="display:none;"/>
 	</div>
 </fmt:bundle>

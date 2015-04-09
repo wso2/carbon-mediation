@@ -50,7 +50,7 @@ public class ForEachMediatorService extends AbstractMediatorService {
 
     @Override
     public boolean isAddChildEnabled() {
-        return false;
+        return true;
     }
 
     @Override

@@ -33,9 +33,19 @@
 
     XPathFactory xPathFactory = XPathFactory.getInstance();
     foreachMediator.setExpression(xPathFactory.createSynapseXPath("itr_expression", request, session));
-    
-    if (foreachMediator.getList().size() == 0) {
-    	foreachMediator.addChild(new TargetMediator());
-    }
+
+    foreachMediator.setSequenceRef(null);
+
+    String seqValueType = request.getParameter("mediator.foreach.seq.type");
+        if(seqValueType.equals("none")){
+            foreachMediator.getList().clear();
+            foreachMediator.setSequenceRef(null);
+        } else if(seqValueType.equals("anonymous")){
+            foreachMediator.setSequenceRef("anon");
+        } else if(seqValueType.equals("pickFromRegistry")){
+            foreachMediator.getList().clear();
+            foreachMediator.setSequenceRef(request.getParameter("mediator.foreach.seq.reg"));
+        }
+
 %>
 
