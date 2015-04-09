@@ -44,10 +44,10 @@
 
     }
 
-//    if (!paramList.containsKey("java.naming.factory.initial") ||
-//            !paramList.containsKey("java.naming.provider.url")) {
-//        throw new Exception();
-//    }
+    if (!paramList.containsKey("store.rabbitmq.host.name") ||
+            !paramList.containsKey("store.rabbitmq.host.port")) {
+        throw new Exception();
+    }
 
     messageStoreXml.append("</messageStore>");
     String configuration = messageStoreXml.toString().trim();
