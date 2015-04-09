@@ -92,6 +92,11 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
 
+                if (endpoint == null) {
+                    log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
+                    return;
+                }
+
                 if (!isRESTRequest(axisCtx, method)) {
                     if (request.isEntityEnclosing()) {
                         processEntityEnclosingRequest(axisCtx, false);
