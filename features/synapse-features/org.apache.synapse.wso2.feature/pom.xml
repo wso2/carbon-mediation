@@ -105,6 +105,7 @@
                                     <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
                                 </properties>
                             </adviceFile>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <bundles>
                                 <bundleDef>org.apache.synapse:synapse-samples</bundleDef>
                                 <bundleDef>org.apache.synapse:synapse-core</bundleDef>
