@@ -78,7 +78,6 @@ function showElem(objid) {
 }
 
 function seqNoneClicked(){
-    alert("hari hari");
     setSeqValueType('none');
 }
 
