@@ -25,8 +25,9 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v22.message.ACK;
 import ca.uhn.hl7v2.parser.DefaultXMLParser;
 import ca.uhn.hl7v2.parser.EncodingNotSupportedException;
-import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
+import ca.uhn.hl7v2.parser.XMLParser;
+import ca.uhn.hl7v2.util.idgenerator.UUIDGenerator;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -49,10 +50,18 @@ import java.io.IOException;
 public class HL7MessageUtils {
     private static final Log log = LogFactory.getLog(HL7MessageUtils.class);
 
-    private static PipeParser parser = new PipeParser();
+    private static PipeParser pipeParser = new PipeParser();
+    private static XMLParser xmlParser = new DefaultXMLParser();
+    private static SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
+    private static OMNamespace ns = fac.createOMNamespace(HL7Constants.HL7_NAMESPACE, HL7Constants.HL7_ELEMENT_NAME);
+
+    static {
+        pipeParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
+        xmlParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
+    }
 
     public static Message parse(String msg) throws HL7Exception {
-        return parser.parse(msg);
+        return pipeParser.parse(msg);
     }
 
     public static MessageContext createSynapseMessageContext(Message message, InboundProcessorParams params,
@@ -80,10 +89,8 @@ public class HL7MessageUtils {
 
     private static SOAPEnvelope createEnvelope(MessageContext synCtx, Message message,
                                                InboundProcessorParams params) throws HL7Exception, XMLStreamException {
-        SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
         SOAPEnvelope envelope = fac.getDefaultEnvelope();
 
-        Parser xmlParser = new DefaultXMLParser();
         String xmlDoc = "";
         try {
             xmlDoc = xmlParser.encode(message);
@@ -105,10 +112,8 @@ public class HL7MessageUtils {
 
     public static OMElement generateHL7MessageElement(String hl7XmlMessage)
             throws XMLStreamException {
-        SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
         OMElement hl7Element = AXIOMUtil.stringToOM(hl7XmlMessage);
-        OMNamespace ns = fac.createOMNamespace(HL7Constants.HL7_NAMESPACE,
-                HL7Constants.HL7_ELEMENT_NAME);
+
         OMElement messageEl = fac.createOMElement(HL7Constants.HL7_MESSAGE_ELEMENT_NAME, ns);
         messageEl.addChild(hl7Element);
         return messageEl;
@@ -170,8 +175,6 @@ public class HL7MessageUtils {
         String hl7XMLPayload = hl7MsgEl.getFirstElement().toString();
         String pipeMsg;
         Message msg = null;
-        Parser xmlParser = new DefaultXMLParser();
-        Parser pipeParser = new PipeParser();
         try {
             msg = xmlParser.parse(hl7XMLPayload);
             pipeMsg = pipeParser.encode(msg);

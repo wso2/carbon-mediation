@@ -24,7 +24,6 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class InboundHL7Listener implements InboundRequestProcessor {
 
