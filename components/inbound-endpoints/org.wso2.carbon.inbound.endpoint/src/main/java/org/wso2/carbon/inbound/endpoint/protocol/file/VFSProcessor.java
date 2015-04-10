@@ -30,7 +30,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
 public class VFSProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
 
-    private static final String ENDPOINT_POSTFIX = "FILE-EP";
+    private static final String ENDPOINT_POSTFIX = "FILE" + COMMON_ENDPOINT_POSTFIX;
     private static final Log log = LogFactory.getLog(VFSProcessor.class);
 
     private FilePollingConsumer fileScanner;

@@ -82,6 +82,9 @@
                         <option value="json" <%=(mediaType!=null && mediaType.contains("json")) ? " selected=\"true\"" : ""%>>
                             <fmt:message key="mediator.payloadFactory.media.json"/>
                         </option>
+                        <option value="text" <%=(mediaType!=null && mediaType.contains("text")) ? " selected=\"true\"" : ""%>>
+                                                    <fmt:message key="mediator.payloadFactory.media.text"/>
+                                                </option>
                     </select>
                 </td>
 

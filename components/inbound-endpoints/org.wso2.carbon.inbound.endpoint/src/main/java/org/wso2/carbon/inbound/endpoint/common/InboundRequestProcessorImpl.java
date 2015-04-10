@@ -41,7 +41,9 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
     private InboundRunner inboundRunner;
     private Thread runningThread;
     private static final Log log = LogFactory.getLog(InboundRequestProcessorImpl.class);
-
+    
+    protected final static String COMMON_ENDPOINT_POSTFIX = "--SYNAPSE_INBOUND_ENDPOINT";
+    
     /**
      * 
      * Based on the coordination option schedule the task with NTASK or run as a

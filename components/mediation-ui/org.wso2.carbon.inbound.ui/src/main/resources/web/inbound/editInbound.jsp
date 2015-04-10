@@ -157,8 +157,14 @@ var requiredParams = null;
 	                            <%}%>  	  
 	                            <%}%>
                                 </select>
-							<%} else{%>	                            	                      
+							<%} else{ %>
+                             <%if(InboundClientConstants.TYPE_HTTPS.equals(inboundDescription.getType()) && defaultParam.equals("keystore")){%>
+                             <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundupdateform" rows="8" cols="35">
+                             <%=inboundDescription.getParameters().get(defaultParam)%>
+                              </textarea>
+                             <%}else{ %>
                                 <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
+                             <%} %>
                             <%} %>                       
 	                        </td>
 	                        <td></td>
@@ -225,9 +231,15 @@ var requiredParams = null;
 				                                <%} %>					                            				                                
 				                            <%}%>                                
 			                                </select>
-										<%}else{%>	                            	                      
+										<%}else{%>
+                                        <%if(InboundClientConstants.TYPE_HTTPS.equals(inboundDescription.getType()) && (defaultParam.equals("truststore") || defaultParam.equals("CertificateRevocationVerifier"))){%>
+                                        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundupdateform" rows="8" cols="35">
+                                        <%=((inboundDescription.getParameters().get(defaultParam)==null)?"":inboundDescription.getParameters().get(defaultParam))%>
+                                        </textarea>
+                                        <%}else{ %>
 			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"  value="<%=((inboundDescription.getParameters().get(defaultParam)==null)?"":inboundDescription.getParameters().get(defaultParam))%>"/>
-			                            <%} %>                       
+			                            <%} %>
+			                            <%} %>
 				                        </td>
 				                        <td></td>
 				                    </tr>                        

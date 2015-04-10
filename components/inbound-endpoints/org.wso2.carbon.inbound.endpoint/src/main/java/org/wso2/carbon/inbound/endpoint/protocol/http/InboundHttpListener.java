@@ -57,7 +57,7 @@ public class InboundHttpListener implements InboundRequestProcessor {
         EndpointListenerManager.getInstance().closeEndpoint(port);
     }
 
-    private void handleException(String msg, Exception e) {
+    protected void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }
