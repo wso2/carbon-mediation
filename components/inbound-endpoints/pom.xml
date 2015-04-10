@@ -56,5 +56,9 @@
         <groupId>org.apache.axis2.wso2</groupId>
         <artifactId>axis2</artifactId>
     </dependency>
+    <dependency>
+        <groupId>ca.uhn.hapi.wso2</groupId>
+        <artifactId>hapi</artifactId>
+    </dependency>
 </dependencies>
 </project>

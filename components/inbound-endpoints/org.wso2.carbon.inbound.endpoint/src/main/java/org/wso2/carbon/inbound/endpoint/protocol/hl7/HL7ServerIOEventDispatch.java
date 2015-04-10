@@ -38,10 +38,10 @@ public class HL7ServerIOEventDispatch implements IOEventDispatch {
 
     public HL7ServerIOEventDispatch() { /* default constructor */ }
 
-    public HL7ServerIOEventDispatch(HL7RequestProcessor HL7RequestProcessor) {
+    public HL7ServerIOEventDispatch(HL7RequestProcessor hl7RequestProcessor) {
         super();
         sessionIdToPort = new HashMap<String, String>();
-        this.HL7RequestProcessor = HL7RequestProcessor;
+        this.HL7RequestProcessor = hl7RequestProcessor;
     }
 
     private String getRemoteAddress(int hashCode) {
@@ -106,17 +106,29 @@ public class HL7ServerIOEventDispatch implements IOEventDispatch {
 
         if (mllpContext.isAutoAck()) {
             writeOut(session, mllpContext);
+            return;
         } else {
 
             if (mllpContext.isAckReady()) {
                 writeOut(session, mllpContext);
+                return;
             }
+
             // if message timeout expired
-//            if (mllpContext.isExpired()) {
-//                session.clearEvent(EventMask.WRITE);
-//                session.setEvent(EventMask.READ);
-//                mllpContext.getCodec().setState(HL7Codec.READ_HEADER);
-//            }
+            if (mllpContext.isExpired()) {
+                log.warn("Timed out while waiting for HL7 Response to be generated. Enable inbound.hl7.AutoAck to auto generate ACK response.");
+                try {
+                    mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(),
+                            "Timed out while waiting for HL7 Response to be generated."));
+                    writeOut(session, mllpContext);
+                } catch (HL7Exception e) {
+                    log.error("Exception while generating NACK response on timeout. " + e.getMessage());
+                    session.clearEvent(EventMask.WRITE);
+                    session.setEvent(EventMask.READ);
+                    mllpContext.reset();
+                }
+
+            }
         }
     }
 
@@ -171,6 +183,6 @@ public class HL7ServerIOEventDispatch implements IOEventDispatch {
     }
 
     private void handleException(Exception e) {
-        System.out.println(e.getMessage());
+        log.error("Exception caught while in IO handler. " + e.getMessage());
     }
 }

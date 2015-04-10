@@ -36,6 +36,25 @@ public class InboundHL7Listener implements InboundRequestProcessor {
     public InboundHL7Listener(InboundProcessorParams params) {
         this.inboundParams = params;
         this.port = params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PORT);
+        validateParameters(params);
+    }
+
+    private void validateParameters(InboundProcessorParams params) {
+        if (!params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equalsIgnoreCase("true")
+                && !params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equalsIgnoreCase("false")) {
+            log.warn("Parameter inbound.hl7.AutoAck is not valid. Default value of true will be used.");
+            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_AUTO_ACK, "true");
+        }
+
+        try {
+            Integer.valueOf(params.getProperties().getProperty(MLLPConstants.PARAM_HL7_TIMEOUT));
+        } catch (NumberFormatException e) {
+            log.warn("Parameter inbound.hl7.TimeOut is not valid. Default timeout " +
+                    "of " + MLLPConstants.PARAM_HL7_TIMEOUT + " milliseconds will be used.");
+            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_TIMEOUT,
+                    String.valueOf(MLLPConstants.DEFAULT_HL7_TIMEOUT));
+        }
+
     }
 
     @Override

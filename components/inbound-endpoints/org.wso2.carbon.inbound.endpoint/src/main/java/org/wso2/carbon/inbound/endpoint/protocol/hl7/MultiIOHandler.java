@@ -45,8 +45,7 @@ public class MultiIOHandler extends HL7ServerIOEventDispatch {
         InetSocketAddress remoteIsa = (InetSocketAddress) session.getRemoteAddress();
         InetSocketAddress localIsa = (InetSocketAddress) session.getLocalAddress();
 
-        InboundProcessorParams params = parameterMap.get(localIsa.getPort());
-        HL7RequestProcessor requestProcessor = new HL7RequestProcessor(params);
+        HL7RequestProcessor requestProcessor = new HL7RequestProcessor(localIsa.getPort(), parameterMap);
 
         HL7ServerIOEventDispatch handler = new HL7ServerIOEventDispatch(requestProcessor);
         handlers.put(remoteIsa.getPort(), handler);
@@ -79,6 +78,7 @@ public class MultiIOHandler extends HL7ServerIOEventDispatch {
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         HL7ServerIOEventDispatch handler = handlers.get(isa.getPort());
         handler.timeout(session);
+        handlers.remove(handler);
 
     }
 
@@ -88,6 +88,7 @@ public class MultiIOHandler extends HL7ServerIOEventDispatch {
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         HL7ServerIOEventDispatch handler = handlers.get(isa.getPort());
         handler.disconnected(session);
+        handlers.remove(handler);
 
     }
 

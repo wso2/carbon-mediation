@@ -34,4 +34,8 @@ public class MLLPConstants {
     public final static String PARAM_HL7_PORT = "inbound.hl7.port";
 
     public final static String PARAM_HL7_AUTO_ACK = "inbound.hl7.AutoAck";
+
+    public final static String PARAM_HL7_TIMEOUT = "inbound.hl7.TimeOut";
+
+    public final static int DEFAULT_HL7_TIMEOUT = 10000;
 }

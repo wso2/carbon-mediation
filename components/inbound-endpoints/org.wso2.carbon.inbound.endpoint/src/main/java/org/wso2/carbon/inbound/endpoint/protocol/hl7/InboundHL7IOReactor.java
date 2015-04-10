@@ -30,7 +30,6 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InboundHL7IOReactor {
@@ -47,7 +46,6 @@ public class InboundHL7IOReactor {
             parameterMap = new ConcurrentHashMap<Integer, InboundProcessorParams>();
 
     public static void start() throws IOException {
-        log.info("LOG 0: start() : isStarted = " + isStarted);
 
         if (reactor != null && reactor.getStatus().equals(IOReactorStatus.ACTIVE)) {
             return;
@@ -99,8 +97,6 @@ public class InboundHL7IOReactor {
     }
 
     public static boolean bind(int port, InboundProcessorParams params) {
-        log.info("LOG 2: bind() : isStarted = " + isStarted);
-
         ListenerEndpoint ep = reactor.listen(getSocketAddress(port));
 
         try {
@@ -115,11 +111,8 @@ public class InboundHL7IOReactor {
     }
 
     public static boolean unbind(int port) {
-        log.info("LOG 3: unbind() : isStarted = " + isStarted);
-
         ListenerEndpoint ep = endpointMap.get(port);
 
-        printEndpoints(reactor.getEndpoints());
         endpointMap.remove(port);
         parameterMap.remove(port);
 
@@ -130,12 +123,6 @@ public class InboundHL7IOReactor {
         ep.close();
 
         return true;
-    }
-
-    private static void printEndpoints(Set<ListenerEndpoint> eps) {
-        for (ListenerEndpoint e: eps) {
-            log.info("LOG 4: " + e.getAddress() + " isClosed() - " + e.isClosed());
-        }
     }
 
     private static SocketAddress getSocketAddress(int port) {

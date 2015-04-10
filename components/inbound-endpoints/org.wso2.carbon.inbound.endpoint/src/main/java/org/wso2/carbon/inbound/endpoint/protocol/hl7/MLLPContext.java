@@ -39,8 +39,7 @@ public class MLLPContext {
         this.codec = new HL7Codec();
         this.requestBuffer = new StringBuffer();
         this.responseBuffer = new StringBuffer();
-        this.requestTime = System.currentTimeMillis();
-        this.expiry = 10000;
+        this.expiry = MLLPConstants.DEFAULT_HL7_TIMEOUT;
     }
 
     public HL7Codec getCodec() {
@@ -87,8 +86,24 @@ public class MLLPContext {
         this.ackReady = ready;
     }
 
+    public void setRequestTime(long timeStamp) {
+        this.requestTime = timeStamp;
+    }
+
+    public long getRequestTime() {
+        return this.requestTime;
+    }
+
+    public void setExpiry(int milliseconds) {
+        if (milliseconds < 1000) {
+            milliseconds = 1000;
+        }
+
+        this.expiry = milliseconds;
+    }
+
     public boolean isExpired() {
-        if (this.expiry + requestTime < System.currentTimeMillis()) {
+        if (System.currentTimeMillis() > requestTime + expiry) {
             return true;
         }
 

@@ -18,9 +18,11 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
  * under the License.
  */
 
+import ca.uhn.hl7v2.AcknowledgmentCode;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.v22.message.ACK;
 import ca.uhn.hl7v2.parser.DefaultXMLParser;
 import ca.uhn.hl7v2.parser.EncodingNotSupportedException;
 import ca.uhn.hl7v2.parser.Parser;
@@ -42,6 +44,7 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 
 public class HL7MessageUtils {
     private static final Log log = LogFactory.getLog(HL7MessageUtils.class);
@@ -109,6 +112,48 @@ public class HL7MessageUtils {
         OMElement messageEl = fac.createOMElement(HL7Constants.HL7_MESSAGE_ELEMENT_NAME, ns);
         messageEl.addChild(hl7Element);
         return messageEl;
+    }
+
+    public static Message createNack(Message hl7Msg, String errorMsg) throws HL7Exception {
+        if (errorMsg == null) {
+            errorMsg = "";
+        }
+        if (hl7Msg == null) {
+            return createDefaultNackMessage(errorMsg);
+        } else {
+            try {
+                return hl7Msg.generateACK(AcknowledgmentCode.AE, new HL7Exception(errorMsg));
+            } catch (IOException e) {
+                throw new HL7Exception(e);
+            }
+        }
+    }
+
+    private static Message createDefaultNackMessage(String errorMsg) throws DataTypeException {
+        ACK ack = new ACK();
+        ack.getMSH().getFieldSeparator().setValue(
+                HL7Constants.HL7_DEFAULT_FIELD_SEPARATOR);
+        ack.getMSH().getEncodingCharacters().setValue(
+                HL7Constants.HL7_DEFAULT_ENCODING_CHARS);
+        ack.getMSH().getReceivingApplication().setValue(
+                HL7Constants.HL7_DEFAULT_RECEIVING_APPLICATION);
+        ack.getMSH().getReceivingFacility().setValue(
+                HL7Constants.HL7_DEFAULT_RECEIVING_FACILITY);
+        ack.getMSH().getProcessingID().setValue(
+                HL7Constants.HL7_DEFAULT_PROCESSING_ID);
+        ack.getMSA().getAcknowledgementCode().setValue(HL7Constants.HL7_DEFAULT_ACK_CODE_AR);
+        ack.getMSA().getMessageControlID().setValue(HL7Constants.HL7_DEFAULT_MESSAGE_CONTROL_ID);
+        ack.getERR().getErrorCodeAndLocation(0).getCodeIdentifyingError().
+                getIdentifier().setValue(errorMsg);
+        return ack;
+    }
+
+    public static int getInt(String key, InboundProcessorParams params) throws NumberFormatException {
+        return Integer.valueOf(params.getProperties().getProperty(key));
+    }
+
+    public static boolean getBoolean(String key, InboundProcessorParams params) {
+        return Boolean.valueOf(params.getProperties().getProperty(key));
     }
 
     /**
