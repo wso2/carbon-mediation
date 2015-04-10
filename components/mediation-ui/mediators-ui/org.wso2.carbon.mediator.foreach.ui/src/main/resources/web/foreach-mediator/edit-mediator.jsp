@@ -39,21 +39,21 @@
     String inRegKey = "";
 
     String sequenceStr = foreachMediator.getSequenceRef();
-        if(sequenceStr == null){
-            sequenceStr = "";
-        }
 
-        if(foreachMediator.getList().isEmpty() && foreachMediator.getSequenceRef() == null){
-            whichSeq = "none";
-        } else if(foreachMediator.getSequenceRef() != null && !"anon".equals(foreachMediator.getSequenceRef())) {
-            whichSeq = "reg";
-        } else if(foreachMediator.getSequenceRef() != null    && "anon".equals(foreachMediator.getSequenceRef())){
-            whichSeq = "anon";
-            //if the sequence is anonymous we have to clear the sequence string
-            //in order to avoid it displaying in the registry textbox
-            sequenceStr = "";
-        }
+    if(sequenceStr == null){
+        sequenceStr = "";
+    }
 
+    if(foreachMediator.getList().isEmpty() && foreachMediator.getSequenceRef() == null){
+        whichSeq = "none";
+    } else if(foreachMediator.getSequenceRef() != null && !"anon".equals(foreachMediator.getSequenceRef())) {
+        whichSeq = "reg";
+    } else if(foreachMediator.getSequenceRef() != null && "anon".equals(foreachMediator.getSequenceRef())){
+        whichSeq = "anon";
+        //if the sequence is anonymous we have to clear the sequence string
+        //in order to avoid it displaying in the registry textbox
+        sequenceStr = "";
+    }
 %>
 
 <fmt:bundle
@@ -87,18 +87,20 @@
 								<%
 									NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar
 												.getInstance();
-										nameSpacesRegistrar.registerNameSpaces(
+									nameSpacesRegistrar.registerNameSpaces(
 												foreachMediator.getExpression(), "itr_expression",
 												session);
-										if (foreachMediator.getExpression() == null) {
-								%> <input value="" id="itr_expression"
-								name="itr_expression" type="text"> <%
- 	} else {
- %> <input
-								value="<%=foreachMediator.getExpression().toString()%>"
-								id="itr_expression" name="itr_expression" type="text"> <%
- 	}
- %>
+									if (foreachMediator.getExpression() == null) {
+								%>
+								<input value="" id="itr_expression" name="itr_expression" type="text">
+								<%
+                                    } else {
+                                %>
+                                <input value="<%=foreachMediator.getExpression().toString()%>"
+								    id="itr_expression" name="itr_expression" type="text">
+								<%
+								    }
+                                %>
 							</td>
 							<td><a href="#nsEditorLink" class="nseditor-icon-link"
 								style="padding-left: 40px"

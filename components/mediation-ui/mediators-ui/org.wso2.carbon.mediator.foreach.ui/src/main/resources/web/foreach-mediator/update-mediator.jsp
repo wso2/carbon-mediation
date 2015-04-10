@@ -21,7 +21,6 @@
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
-<%@ page import="org.wso2.carbon.mediator.target.TargetMediator" %>
 
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);

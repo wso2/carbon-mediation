@@ -16,11 +16,6 @@
  * under the License.
  */
 
-function showTargetInfo(){
-    document.getElementById('taget_info_button').style.display = 'none';
-    document.getElementById('target_info_div').style.display = '';
-}
-
 function foreachMediatorValidate() {
     var expression = document.getElementById("itr_expression");
     if (expression && expression.value == "") {
