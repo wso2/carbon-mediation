@@ -32,7 +32,7 @@
     The ForEach mediator split the message into a number of different messages derived from the parent message, by finding matching elements for the XPath expression that is specified.
 
     New messages will be created for all each of the matching elements and processed in sequence within the main flow using specified sequence.
-    Endpoints and sequences containing Call, CallOut or Send mediators are not allowed in the target.
+    However, Call, CallOut or Send mediators are not allowed in the sequence.
 
     The original message will be modified by replacing the split elements with the elements that go through the loop construct.
 </p>
@@ -45,6 +45,9 @@
 <ul>
 <li>
 Expression: Xpath expression that matches the elements which you want to split the message from. For XPath, namespaces can be specified by clicking the namespace link in the right hand side.
+</li>
+<li>
+Sequence: Mediates the message through a sequence. You can either pick a named sequence from the registry or define an anonymous sequence by adding mediators as children.
 </li>
 </ul>
 </body>
