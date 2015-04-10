@@ -32,6 +32,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.rest.RESTRequestHandler;
 import org.apache.synapse.transport.passthru.ServerWorker;
@@ -126,11 +127,11 @@ public class InboundHttpServerWorker extends ServerWorker {
                     // Get injecting sequence for synapse engine
                     SequenceMediator injectingSequence =
                             (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
+                    if(endpoint.getOnErrorSeq() != null) {
+                        SequenceMediator faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
 
-                    if (injectingSequence != null) {
-                        injectingSequence.setErrorHandler(endpoint.getOnErrorSeq());
-                    } else {
-                        log.error("Sequence: " + endpoint.getInjectingSeq() + " not found");
+                        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
+                        synCtx.pushFaultHandler(mediatorFaultHandler);
                     }
 
                     // handover synapse message context to synapse environment for inject it to given sequence in
