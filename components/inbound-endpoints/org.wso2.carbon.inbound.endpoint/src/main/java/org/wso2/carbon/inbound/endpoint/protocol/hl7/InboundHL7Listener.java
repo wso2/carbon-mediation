@@ -50,7 +50,7 @@ public class InboundHL7Listener implements InboundRequestProcessor {
             Integer.valueOf(params.getProperties().getProperty(MLLPConstants.PARAM_HL7_TIMEOUT));
         } catch (NumberFormatException e) {
             log.warn("Parameter inbound.hl7.TimeOut is not valid. Default timeout " +
-                    "of " + MLLPConstants.PARAM_HL7_TIMEOUT + " milliseconds will be used.");
+                    "of " + MLLPConstants.DEFAULT_HL7_TIMEOUT + " milliseconds will be used.");
             params.getProperties().setProperty(MLLPConstants.PARAM_HL7_TIMEOUT,
                     String.valueOf(MLLPConstants.DEFAULT_HL7_TIMEOUT));
         }

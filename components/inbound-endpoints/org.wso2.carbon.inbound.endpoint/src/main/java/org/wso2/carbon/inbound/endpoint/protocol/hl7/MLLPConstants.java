@@ -31,7 +31,7 @@ public class MLLPConstants {
 
     public final static String MLLP_CONTEXT = "HL7_MLLP_CONTEXT";
 
-    public final static String PARAM_HL7_PORT = "inbound.hl7.port";
+    public final static String PARAM_HL7_PORT = "inbound.hl7.Port";
 
     public final static String PARAM_HL7_AUTO_ACK = "inbound.hl7.AutoAck";
 

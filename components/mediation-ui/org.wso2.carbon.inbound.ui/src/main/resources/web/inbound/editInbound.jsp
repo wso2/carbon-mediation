@@ -145,7 +145,7 @@ var requiredParams = null;
 	                    <tr>
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
 	                        <td align="left">
-	                        <%if(arrParamOri.length > 1){%>
+	                        <%if(arrParamOri.length > 2){%>
 	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
 	                            <%for(int i = 1;i<arrParamOri.length;i++){
 	                                String eleValue = arrParamOri[i].trim();
@@ -219,7 +219,7 @@ var requiredParams = null;
 				                    <tr>
 				                        <td style="width:150px"><%=defaultParam %></td>
 				                        <td align="left">
-				                        <%if(arrParamOri.length > 1){%>
+				                        <%if(arrParamOri.length > 2){%>
 				                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
 				                            <%for(int i = 1;i<arrParamOri.length;i++){
 				                                String eleValue = arrParamOri[i].trim();
