@@ -24,172 +24,172 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.message.store.ui.i18n.Resources">
-    <carbon:jsi18n resourceBundle="org.wso2.carbon.message.store.ui.i18n.Resources"
-                   request="<%=request%>"/>
-    <carbon:breadcrumb
-            label="Message Store"
-            resourceBundle="org.wso2.carbon.message.store.ui.i18n.Resources"
-            topPage="true"
-            request="<%=request%>"/>
+<carbon:jsi18n resourceBundle="org.wso2.carbon.message.store.ui.i18n.Resources"
+               request="<%=request%>"/>
+<carbon:breadcrumb
+        label="Message Store"
+        resourceBundle="org.wso2.carbon.message.store.ui.i18n.Resources"
+        topPage="true"
+        request="<%=request%>"/>
 
-    <link type="text/css" href="../dialog/js/jqueryui/tabs/ui.all.css" rel="stylesheet"/>
-    <link type="text/css" href="css/customStyle.css" rel="stylesheet"/>
-    <script type="text/javascript" src="../dialog/js/jqueryui/tabs/jquery-1.2.6.min.js"></script>
-    <script type="text/javascript" src="../dialog/js/jqueryui/tabs/jquery-ui-1.6.custom.min.js"></script>
-    <script type="text/javascript" src="../dialog/js/jqueryui/tabs/jquery.cookie.js"></script>
+<link type="text/css" href="../dialog/js/jqueryui/tabs/ui.all.css" rel="stylesheet"/>
+<link type="text/css" href="css/customStyle.css" rel="stylesheet"/>
+<script type="text/javascript" src="../dialog/js/jqueryui/tabs/jquery-1.2.6.min.js"></script>
+<script type="text/javascript" src="../dialog/js/jqueryui/tabs/jquery-ui-1.6.custom.min.js"></script>
+<script type="text/javascript" src="../dialog/js/jqueryui/tabs/jquery.cookie.js"></script>
 
-    <script type="text/javascript">
-        var allowTabChange = true;
-        var emtpyEntries = false;
+<script type="text/javascript">
+    var allowTabChange = true;
+    var emtpyEntries = false;
 
-        $(function() {
-            var $myTabs = $("#tabs");
+    $(function() {
+        var $myTabs = $("#tabs");
 
-            $myTabs.tabs({
-                select: function(event, ui) {
-                    if (!allowTabChange) {
-                        alert("Tab selection is disabled, while you are in the middle of a workflow");
-                    }
-                    return allowTabChange;
-                },
-
-                show: function(event, ui) {
-                    var selectedTab = $myTabs.tabs('option', 'selected');
-                    allowTabChange = true;
+        $myTabs.tabs({
+            select: function(event, ui) {
+                if (!allowTabChange) {
+                    alert("Tab selection is disabled, while you are in the middle of a workflow");
                 }
-            });
+                return allowTabChange;
+            },
 
-            $myTabs.tabs('select', 0);
-            if (emtpyEntries) {
-                $myTabs.tabs('select', 1);
+            show: function(event, ui) {
+                var selectedTab = $myTabs.tabs('option', 'selected');
+                allowTabChange = true;
             }
         });
-    </script>
 
-    <script type="text/javascript">
-        function deleteRow(i) {
-            var table = document.getElementById("msgTable");
-            var row = table.rows[i];
-            var cell = row.cells[0];
-            var content = cell.firstChild.nodeValue;
-            var msName = document.getElementById("messageStoreName_elem").value;
+        $myTabs.tabs('select', 0);
+        if (emtpyEntries) {
+            $myTabs.tabs('select', 1);
+        }
+    });
+</script>
 
-            function delEp() {
-                document.location.href = "deleteMessage.jsp?" + "messageStoreName=" + msName + "&messageId=" + content;
-            }
+<script type="text/javascript">
+    function deleteRow(i) {
+        var table = document.getElementById("msgTable");
+        var row = table.rows[i];
+        var cell = row.cells[0];
+        var content = cell.firstChild.nodeValue;
+        var msName = document.getElementById("messageStoreName_elem").value;
 
-            CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", delEp);
+        function delEp() {
+            document.location.href = "deleteMessage.jsp?" + "messageStoreName=" + msName + "&messageId=" + content;
         }
 
-        function deleteFirstRow() {
-            var msName = document.getElementById("messageStoreName_elem").value;
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", delEp);
+    }
 
-            function delEp() {
-                document.location.href = "deleteFirstMessage.jsp?" + "messageStoreName=" + msName;
-            }
+    function deleteFirstRow() {
+        var msName = document.getElementById("messageStoreName_elem").value;
 
-            CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", delEp);
-
+        function delEp() {
+            document.location.href = "deleteFirstMessage.jsp?" + "messageStoreName=" + msName;
         }
 
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", delEp);
 
-        function resendRow(i) {
-            var table = document.getElementById("msgTable");
-            var row = table.rows[i];
-            var cell = row.cells[0];
-            var content = cell.firstChild.nodeValue;
-            var dlcName = document.getElementById("messageStoreName_elem").value;
+    }
 
-            function delEp() {
-                document.location.href = "resendMessage.jsp?" + "messageStoreName=" + dlcName + "&messageId=" + content;
-            }
 
-            CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", delEp);
+    function resendRow(i) {
+        var table = document.getElementById("msgTable");
+        var row = table.rows[i];
+        var cell = row.cells[0];
+        var content = cell.firstChild.nodeValue;
+        var dlcName = document.getElementById("messageStoreName_elem").value;
+
+        function delEp() {
+            document.location.href = "resendMessage.jsp?" + "messageStoreName=" + dlcName + "&messageId=" + content;
         }
 
-        function viewEnvRow(i) {
-            var table = document.getElementById("msgTable");
-            var index = i;
-            var row = table.rows[i];
-            var cell = row.cells[0];
-            var type = row.cells[1];
-            var content = cell.firstChild.nodeValue;
-            var msName = document.getElementById("messageStoreName_elem").value;
-            document.location.href = "viewEnvilope.jsp?" + "messageStoreName=" + msName + "&messageIndex=" + index + "&messageId=" + content ;
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", delEp);
+    }
 
+    function viewEnvRow(i) {
+        var table = document.getElementById("msgTable");
+        var index = i;
+        var row = table.rows[i];
+        var cell = row.cells[0];
+        var type = row.cells[1];
+        var content = cell.firstChild.nodeValue;
+        var msName = document.getElementById("messageStoreName_elem").value;
+        document.location.href = "viewEnvilope.jsp?" + "messageStoreName=" + msName + "&messageIndex=" + index + "&messageId=" + content ;
+
+    }
+
+    function deleteAll() {
+        var msName = document.getElementById("messageStoreName_elem").value;
+
+        function delEp() {
+            document.location.href = "deleteAll.jsp?" + "messageStoreName=" + msName;
         }
 
-        function deleteAll() {
-            var msName = document.getElementById("messageStoreName_elem").value;
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.all.messages"/>", delEp);
 
-            function delEp() {
-                document.location.href = "deleteAll.jsp?" + "messageStoreName=" + msName;
-            }
+    }
 
-            CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.all.messages"/>", delEp);
+    function resendAll() {
 
+        var dlcName = document.getElementById("messageStoreName_elem").value;
+
+        function delEp() {
+            document.location.href = "resendAll.jsp?" + "dlcName=" + dlcName;
         }
 
-        function resendAll() {
-
-            var dlcName = document.getElementById("messageStoreName_elem").value;
-
-            function delEp() {
-                document.location.href = "resendAll.jsp?" + "dlcName=" + dlcName;
-            }
-
-            CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.all.messages"/>", delEp);
-        }
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.all.messages"/>", delEp);
+    }
 
 
-        String.prototype.trim = function() {
-            return this.replace(/^\s+|\s+$/g, "");
-        }
+    String.prototype.trim = function() {
+        return this.replace(/^\s+|\s+$/g, "");
+    }
 
-        String.prototype.ltrim = function() {
-            return this.replace(/^\s+/, "");
-        }
+    String.prototype.ltrim = function() {
+        return this.replace(/^\s+/, "");
+    }
 
-        String.prototype.rtrim = function() {
-            return this.replace(/\s+$/, "");
-        }
-
-
-        String.prototype.trim = function() {
-            return this.replace(/^\s+|\s+$/g, "");
-        }
-
-        String.prototype.ltrim = function() {
-            return this.replace(/^\s+/, "");
-        }
-
-        String.prototype.rtrim = function() {
-            return this.replace(/\s+$/, "");
-        }
+    String.prototype.rtrim = function() {
+        return this.replace(/\s+$/, "");
+    }
 
 
-        function redirect(selNode) {
-            var selected = selNode.options[selNode.selectedIndex].value;
-            if (selected != "")window.location.href = selNode.options[selNode.selectedIndex].value;
-        }
+    String.prototype.trim = function() {
+        return this.replace(/^\s+|\s+$/g, "");
+    }
 
-        function confirmForceDelete(entry, msg) {
-            CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
-            + msg + '<br/><fmt:message key="force.delete"/>', function() {
-                document.location.href = "deleteMessageStoresHandler.jsp?" + "entryName=" + entry + "&force=true";
-            });
-        }
+    String.prototype.ltrim = function() {
+        return this.replace(/^\s+/, "");
+    }
 
-    </script>
+    String.prototype.rtrim = function() {
+        return this.replace(/\s+$/, "");
+    }
 
-    <div id="middle">
+
+    function redirect(selNode) {
+        var selected = selNode.options[selNode.selectedIndex].value;
+        if (selected != "")window.location.href = selNode.options[selNode.selectedIndex].value;
+    }
+
+    function confirmForceDelete(entry, msg) {
+        CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
+                + msg + '<br/><fmt:message key="force.delete"/>', function() {
+            document.location.href = "deleteMessageStoresHandler.jsp?" + "entryName=" + entry + "&force=true";
+        });
+    }
+
+</script>
+
+<div id="middle">
     <h2><fmt:message key="manage.message.store"/></h2>
 
     <div id="workArea" style="background-color:#F4F4F4;">
         <div id="tabs">
             <%
                 String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
-                                                       session);
+                        session);
                 ConfigurationContext configContext =
                         (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
                 String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
@@ -240,8 +240,8 @@
 
                     messageInfos = client.getPaginatedMessages(messageStoreName, pageNumberInt);
                     numberOfPages = (int) Math.ceil((double)
-                                                            client.getSize(messageStoreName) / MessageStoreAdminServiceClient.
-                                                            MESSAGE_STORES_PER_PAGE);
+                            client.getSize(messageStoreName) / MessageStoreAdminServiceClient.
+                            MESSAGE_STORES_PER_PAGE);
 
                 } catch (Exception e) {
                     CarbonUIMessage.sendCarbonUIMessage(e.getMessage(), CarbonUIMessage.ERROR, request, e);
@@ -255,8 +255,8 @@
                 }
                 if (messageStoreName == null) {
                     CarbonUIMessage.sendCarbonUIMessage("Error while accessing the Message Store",
-                                                        CarbonUIMessage.ERROR, request,
-                                                        new Exception("Error while accessing the Message Store"));
+                            CarbonUIMessage.ERROR, request,
+                            new Exception("Error while accessing the Message Store"));
                 }
             %>
 
@@ -272,7 +272,7 @@
                     <th><fmt:message key="messageStore.name"/></th>
                     <th><fmt:message key="type"/></th>
                     <%if (!client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
-                    <th><fmt:message key="size"/></th>
+                        <th><fmt:message key="size"/></th>
                     <%}%>
                 </tr>
                 </thead>
