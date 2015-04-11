@@ -225,7 +225,9 @@ public class InboundManagementClient {
         return true;
     }
 
-    
+
+
+
     public InboundDescription getInboundDescription(String name) {
         try {
             InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
@@ -247,17 +249,20 @@ public class InboundManagementClient {
                 parameterDTO.setValue(parameter.getValue());
                 parameterDTOs[i++] = parameterDTO;
             }
-            if (canAdd(name, protocol, parameterDTOs)) {
-                stub.updateInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+
+               InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
+                if(inboundEndpointDTO != null){
+                    stub.removeInboundEndpoint(name);
+                }
+            if(canAdd(name,protocol,parameterDTOs)) {
+                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
                 return true;
-            }else {
-                log.warn("Cannot update Inbound endpoint " + name + " may be duplicate inbound already exists");
             }
-            return true;
         } catch (Exception e) {
             log.error(e);
             return false;
         }
+        return false;
     }
 
 }

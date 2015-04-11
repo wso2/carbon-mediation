@@ -135,7 +135,7 @@ public class ClusteringServiceUtil {
             ILock iLock = hz.getLock(strContext);
             if (iLock.isLocked()) {
                 try {
-                    iLock.unlock();
+                    iLock.forceUnlock();
                 } catch (IllegalMonitorStateException e) {
                     log.error("Unable to unlock the distributed lock for " + strContext, e);                     
                     return false;

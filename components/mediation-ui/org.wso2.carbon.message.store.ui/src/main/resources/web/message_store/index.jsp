@@ -104,6 +104,8 @@
             document.location.href = "rabbitmqMessageStore.jsp?" + "messageStoreName=" + content;
         } else if (storeType == "org.apache.synapse.message.store.impl.memory.InMemoryStore") {
             document.location.href = "inMemoryMessageStore.jsp?" + "messageStoreName=" + content;
+        } else if (storeType == "org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore") {
+            document.location.href = "jdbcMessageStore.jsp?" + "messageStoreName=" + content;
         } else {
             document.location.href = "customMessageStore.jsp?" + "messageStoreName=" + content;
         }
@@ -305,6 +307,18 @@
                         </td>
                         <td>
                             <fmt:message key="rabbitmq.message.store.desc"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a class="icon-link"
+                               href="jdbcMessageStore.jsp"
+                               style="background-image: url(../admin/images/add.gif);">
+                                <fmt:message key="jdbc.message.store"/>
+                            </a>
+                        </td>
+                        <td>
+                            <fmt:message key="jdbc.message.store.desc"/>
                         </td>
                     </tr>
                     <tr>
