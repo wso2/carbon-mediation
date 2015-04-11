@@ -183,208 +183,208 @@
     </script>
 
     <div id="middle">
-        <h2><fmt:message key="manage.message.store"/></h2>
+    <h2><fmt:message key="manage.message.store"/></h2>
 
-        <div id="workArea" style="background-color:#F4F4F4;">
-            <div id="tabs">
-                <%
-                    String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
-                                                           session);
-                    ConfigurationContext configContext =
-                            (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
-                    String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-                    MessageStoreAdminServiceClient client = null;
-                    String[] messageStoreNames = null;
-                    String messageStoreName = null;
-                    MessageInfo[] messageInfos = null;
-                    int numberOfMessageStores = 0;
-                    boolean displayMessageInDetail = true;
+    <div id="workArea" style="background-color:#F4F4F4;">
+        <div id="tabs">
+            <%
+                String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
+                                                       session);
+                ConfigurationContext configContext =
+                        (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
+                String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
+                MessageStoreAdminServiceClient client = null;
+                String[] messageStoreNames = null;
+                String messageStoreName = null;
+                MessageInfo[] messageInfos = null;
+                int numberOfMessageStores = 0;
+                boolean displayMessageInDetail = true;
 
-                    int numberOfPages = 1;
-                    String pageNumber = request.getParameter("pageNumber");
-                    if (pageNumber == null) {
-                        pageNumber = "0";
-                    }
-                    int pageNumberInt = 0;
-                    try {
-                        pageNumberInt = Integer.parseInt(pageNumber);
-                    } catch (NumberFormatException ignored) {
-                    }
+                int numberOfPages = 1;
+                String pageNumber = request.getParameter("pageNumber");
+                if (pageNumber == null) {
+                    pageNumber = "0";
+                }
+                int pageNumberInt = 0;
+                try {
+                    pageNumberInt = Integer.parseInt(pageNumber);
+                } catch (NumberFormatException ignored) {
+                }
 
-                    try {
-                        client = new MessageStoreAdminServiceClient(cookie, url, configContext);
-                        messageStoreNames = client.getMessageStoreNames();
+                try {
+                    client = new MessageStoreAdminServiceClient(cookie, url, configContext);
+                    messageStoreNames = client.getMessageStoreNames();
 
-                        String name = request.getParameter("messageStoreName");
-                        if (messageStoreNames != null && name != null) {
-                            for (String n : messageStoreNames) {
-                                if (name.equals(n)) {
-                                    messageStoreName = n;
-                                }
+                    String name = request.getParameter("messageStoreName");
+                    if (messageStoreNames != null && name != null) {
+                        for (String n : messageStoreNames) {
+                            if (name.equals(n)) {
+                                messageStoreName = n;
                             }
-
-
-                        } else {
-                            throw new Exception("Error while accessing Message Stores ");
                         }
 
-                        // Hide messages in details div when JDBC Message Store is used
-                        if(client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore")){
-                            displayMessageInDetail = false;
-                        }
 
-                        // Hide messages in details div when RabbitMQ is used
-                        if(client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")){
-                            displayMessageInDetail = false;
-                        }
+                    } else {
+                        throw new Exception("Error while accessing Message Stores ");
+                    }
 
-                        messageInfos = client.getPaginatedMessages(messageStoreName, pageNumberInt);
-                        numberOfPages = (int) Math.ceil((double)
-                                                                client.getSize(messageStoreName) / MessageStoreAdminServiceClient.
-                                                                MESSAGE_STORES_PER_PAGE);
+                    // Hide messages in details div when JDBC Message Store is used
+                    if(client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore")){
+                        displayMessageInDetail = false;
+                    }
 
+                    // Hide messages in details div when RabbitMQ is used
+                    if(client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")){
+                        displayMessageInDetail = false;
+                    }
+
+                    messageInfos = client.getPaginatedMessages(messageStoreName, pageNumberInt);
+                    numberOfPages = (int) Math.ceil((double)
+                                                            client.getSize(messageStoreName) / MessageStoreAdminServiceClient.
+                                                            MESSAGE_STORES_PER_PAGE);
+
+                } catch (Exception e) {
+                    CarbonUIMessage.sendCarbonUIMessage(e.getMessage(), CarbonUIMessage.ERROR, request, e);
+            %>
+
+
+            <script type="text/javascript">
+                location.href = "../admin/error.jsp";
+            </script>
+            <%
+                }
+                if (messageStoreName == null) {
+                    CarbonUIMessage.sendCarbonUIMessage("Error while accessing the Message Store",
+                                                        CarbonUIMessage.ERROR, request,
+                                                        new Exception("Error while accessing the Message Store"));
+                }
+            %>
+
+
+            <%
+                if (messageStoreName != null) {
+                    String myUrl = "messageStoreName=" + messageStoreName;
+            %>
+            <input id="messageStoreName_elem" type="hidden" value="<%=messageStoreName%>"/>
+            <table id="messageStoreInfoTable" border="0" cellspacing="0" cellpadding="0" class="styledLeft">
+                <thead>
+                <tr>
+                    <th><fmt:message key="messageStore.name"/></th>
+                    <th><fmt:message key="type"/></th>
+                    <%if (!client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                    <th><fmt:message key="size"/></th>
+                    <%}%>
+                </tr>
+                </thead>
+                <tbody>
+                <%
+                    String type = "Not defined";
+                    int size = 0;
+                    try {
+                        size = client.getSize(messageStoreName);
+                        type = client.getClassName(messageStoreName);
                     } catch (Exception e) {
-                        CarbonUIMessage.sendCarbonUIMessage(e.getMessage(), CarbonUIMessage.ERROR, request, e);
-                %>
 
-
-                <script type="text/javascript">
-                    location.href = "../admin/error.jsp";
-                </script>
-                <%
                     }
-                    if (messageStoreName == null) {
-                        CarbonUIMessage.sendCarbonUIMessage("Error while accessing the Message Store",
-                                                            CarbonUIMessage.ERROR, request,
-                                                            new Exception("Error while accessing the Message Store"));
-                    }
+
                 %>
 
+                <tr>
+                    <td><%= messageStoreName%>
+                    </td>
+                    <td><%= type%>
+                    </td>
+                    <%if (!client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                    <td><%= size%>
+                    </td>
+                    <%}%>
+                </tr>
+                </tbody>
+            </table>
+            <br/>
+            <div id="messages_in_detail" <%=!displayMessageInDetail ? "style=\"display:none\";" : ""%>>
+                <h3><fmt:message key="stored.messages"/></h3>
+                <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
+                                  page="viewMessageStore.jsp"
+                                  pageNumberParameterName="pageNumber"
+                                  resourceBundle="org.wso2.carbon.service.mgt.ui.i18n.Resources"
+                                  prevKey="prev" nextKey="next"
+                                  parameters="<%=myUrl%>" showPageNumbers="false"/>
 
-                <%
-                    if (messageStoreName != null) {
-                        String myUrl = "messageStoreName=" + messageStoreName;
-                %>
-                <input id="messageStoreName_elem" type="hidden" value="<%=messageStoreName%>"/>
-                <table id="messageStoreInfoTable" border="0" cellspacing="0" cellpadding="0" class="styledLeft">
+                <table id="msgTable" border="0" cellspacing="0" cellpadding="0" class="styledLeft">
                     <thead>
                     <tr>
-                        <th><fmt:message key="messageStore.name"/></th>
-                        <th><fmt:message key="type"/></th>
-                        <%if (!client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
-                        <th><fmt:message key="size"/></th>
-                        <%}%>
+                        <th><fmt:message key="message.id"/></th>
+                        <th><fmt:message key="action"/></th>
                     </tr>
                     </thead>
                     <tbody>
                     <%
-                        String type = "Not defined";
-                        int size = 0;
-                        try {
-                            size = client.getSize(messageStoreName);
-                            type = client.getClassName(messageStoreName);
-                        } catch (Exception e) {
-
+                        if (messageInfos == null || messageInfos.length == 0) {
+                    %>
+                    <tr>
+                        <td colspan="2"><fmt:message key="messsage.store.empty"/></td>
+                    </tr>
+                    <%
                         }
+                    %>
 
+                    <%
+                        try {
+
+                            for (MessageInfo mi : messageInfos) {
                     %>
 
                     <tr>
-                        <td><%= messageStoreName%>
+                        <td><%= mi.getMessageId()%>
                         </td>
-                        <td><%= type%>
+
+
+                        <td><a onclick="viewEnvRow(this.parentNode.parentNode.rowIndex)" href="#"
+                               class="icon-link"
+                               style="background-image:url(../message_store/images/envelop.gif);"><fmt:message
+                                key="view.envelope"/></a>
+                            <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                            <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+                               id="delete_link" class="icon-link"
+                               style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                    key="delete"/></a>
+                            <%}%>
                         </td>
-                        <%if (!client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
-                        <td><%= size%>
-                        </td>
-                        <%}%>
                     </tr>
+                    <%
+                            }
+                        } catch (Exception e) {
+                            CarbonUIMessage.sendCarbonUIMessage(e.getMessage(), CarbonUIMessage.ERROR, request, e);
+                        }
+
+                    %>
+                    <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                    <tr>
+                        <td colspan="2">
+                            <a onclick="<%=(messageInfos == null || messageInfos.length == 0)?"return false":"deleteAll();"%>"
+                               href="#" id="delete_all_link" class="<%=(messageInfos == null || messageInfos.length == 0)?"icon-link-disabled":"icon-link"%>"
+                               style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                    key="deleteAll"/></a>
+                        </td>
+                    </tr>
+                    <%}%>
                     </tbody>
                 </table>
                 <br/>
-                <div id="messages_in_detail" <%=!displayMessageInDetail ? "style=\"display:none\";" : ""%>>
-                    <h3><fmt:message key="stored.messages"/></h3>
-                    <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
-                                      page="viewMessageStore.jsp"
-                                      pageNumberParameterName="pageNumber"
-                                      resourceBundle="org.wso2.carbon.service.mgt.ui.i18n.Resources"
-                                      prevKey="prev" nextKey="next"
-                                      parameters="<%=myUrl%>" showPageNumbers="false"/>
+                <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
+                                  page="viewMessageStore.jsp"
+                                  pageNumberParameterName="pageNumber"
+                                  resourceBundle="org.wso2.carbon.service.mgt.ui.i18n.Resources"
+                                  prevKey="prev" nextKey="next"
+                                  parameters="<%=myUrl%>" showPageNumbers="false"/>
 
-                    <table id="msgTable" border="0" cellspacing="0" cellpadding="0" class="styledLeft">
-                        <thead>
-                        <tr>
-                            <th><fmt:message key="message.id"/></th>
-                            <th><fmt:message key="action"/></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <%
-                            if (messageInfos == null || messageInfos.length == 0) {
-                        %>
-                        <tr>
-                            <td colspan="2"><fmt:message key="messsage.store.empty"/></td>
-                        </tr>
-                        <%
-                            }
-                        %>
-
-                        <%
-                            try {
-
-                                for (MessageInfo mi : messageInfos) {
-                        %>
-
-                        <tr>
-                            <td><%= mi.getMessageId()%>
-                            </td>
-
-
-                            <td><a onclick="viewEnvRow(this.parentNode.parentNode.rowIndex)" href="#"
-                                   class="icon-link"
-                                   style="background-image:url(../message_store/images/envelop.gif);"><fmt:message
-                                    key="view.envelope"/></a>
-                                <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
-                                <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
-                                   id="delete_link" class="icon-link"
-                                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                                        key="delete"/></a>
-                                <%}%>
-                            </td>
-                        </tr>
-                        <%
-                                }
-                            } catch (Exception e) {
-                                CarbonUIMessage.sendCarbonUIMessage(e.getMessage(), CarbonUIMessage.ERROR, request, e);
-                            }
-
-                        %>
-                        <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
-                        <tr>
-                            <td colspan="2">
-                                <a onclick="<%=(messageInfos == null || messageInfos.length == 0)?"return false":"deleteAll();"%>"
-                                   href="#" id="delete_all_link" class="<%=(messageInfos == null || messageInfos.length == 0)?"icon-link-disabled":"icon-link"%>"
-                                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                                        key="deleteAll"/></a>
-                            </td>
-                        </tr>
-                        <%}%>
-                        </tbody>
-                    </table>
-                    <br/>
-                    <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
-                                      page="viewMessageStore.jsp"
-                                      pageNumberParameterName="pageNumber"
-                                      resourceBundle="org.wso2.carbon.service.mgt.ui.i18n.Resources"
-                                      prevKey="prev" nextKey="next"
-                                      parameters="<%=myUrl%>" showPageNumbers="false"/>
-
-                    <%}%>
-                </div>
+                <%}%>
             </div>
         </div>
-        <script type="text/javascript">
-            alternateTableRows('msgTable', 'tableEvenRow', 'tableOddRow');
-            alternateTableRows('messageStoreInfoTable', 'tableEvenRow', 'tableOddRow');
-        </script>
+    </div>
+    <script type="text/javascript">
+        alternateTableRows('msgTable', 'tableEvenRow', 'tableOddRow');
+        alternateTableRows('messageStoreInfoTable', 'tableEvenRow', 'tableOddRow');
+    </script>
 </fmt:bundle>
