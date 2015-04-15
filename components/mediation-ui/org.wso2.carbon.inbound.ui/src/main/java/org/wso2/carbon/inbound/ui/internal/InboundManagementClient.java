@@ -251,10 +251,11 @@ public class InboundManagementClient {
             }
 
                InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
+
+            if(canAdd(name,protocol,parameterDTOs)) {
                 if(inboundEndpointDTO != null){
                     stub.removeInboundEndpoint(name);
                 }
-            if(canAdd(name,protocol,parameterDTOs)) {
                 stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
                 return true;
             }
