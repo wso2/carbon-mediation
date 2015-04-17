@@ -104,7 +104,8 @@ public class HL7RequestProcessor implements InboundResponseSender {
 
     private void sendBack(MessageContext messageContext, MLLPContext mllpContext) {
         try {
-            if (((String) messageContext.getProperty(HL7Constants.HL7_RESULT_MODE)).equals(HL7Constants.HL7_RESULT_MODE_NACK)) {
+            if ((((String) messageContext.getProperty(HL7Constants.HL7_RESULT_MODE)) != null) &&
+                    ((String) messageContext.getProperty(HL7Constants.HL7_RESULT_MODE)).equals(HL7Constants.HL7_RESULT_MODE_NACK)) {
                 String nackMessage = (String) messageContext.getProperty(HL7Constants.HL7_NACK_MESSAGE);
                 mllpContext.setNackMode(true);
                 mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(), nackMessage));
