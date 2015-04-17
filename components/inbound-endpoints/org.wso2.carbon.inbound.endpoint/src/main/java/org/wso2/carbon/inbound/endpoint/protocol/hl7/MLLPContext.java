@@ -19,8 +19,11 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
  */
 
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.parser.Parser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.Map;
 
 public class MLLPContext {
     private static final Log log = LogFactory.getLog(MLLPContext.class);
@@ -34,12 +37,17 @@ public class MLLPContext {
 
     private volatile boolean autoAck = true;
     private volatile boolean ackReady = false;
+    private volatile boolean preProcess = false;
+    private volatile boolean nackMode = false;
 
-    public MLLPContext() {
+    private Map<String, Object> inboundParameters;
+
+    public MLLPContext(Map<String, Object> inboundParameters) {
         this.codec = new HL7Codec();
         this.requestBuffer = new StringBuffer();
         this.responseBuffer = new StringBuffer();
         this.expiry = MLLPConstants.DEFAULT_HL7_TIMEOUT;
+        this.inboundParameters = inboundParameters;
     }
 
     public HL7Codec getCodec() {
@@ -110,10 +118,32 @@ public class MLLPContext {
         return false;
     }
 
+    public boolean isNackMode() {
+        return nackMode;
+    }
+
+    public void setNackMode(boolean nackMode) {
+        this.nackMode = nackMode;
+    }
+
+    public boolean isPreProcess() {
+        return preProcess;
+    }
+
+    public void setPreProcess(boolean preProcess) {
+        this.preProcess = preProcess;
+    }
+
+    public Parser getPreProcessParser() {
+        return (Parser) this.inboundParameters.get(MLLPConstants.HL7_PRE_PROC_PARSER_CLASS);
+    }
+
     public void reset() {
         // Resets MLLP Context and HL7Codec to default states.
         this.getCodec().setState(HL7Codec.READ_HEADER);
         this.setAckReady(false);
         this.setAutoAck(true);
+        this.setPreProcess(false);
+        this.setNackMode(false);
     }
 }

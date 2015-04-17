@@ -30,6 +30,7 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InboundHL7IOReactor {
@@ -42,8 +43,8 @@ public class InboundHL7IOReactor {
 
     private static volatile boolean isStarted = false;
 
-    private static ConcurrentHashMap<Integer, InboundProcessorParams>
-            parameterMap = new ConcurrentHashMap<Integer, InboundProcessorParams>();
+    private static ConcurrentHashMap<Integer, Map<String, Object>>
+            parameterMap = new ConcurrentHashMap<Integer, Map<String, Object>>();
 
     public static void start() throws IOException {
 
@@ -96,7 +97,7 @@ public class InboundHL7IOReactor {
         return isStarted;
     }
 
-    public static boolean bind(int port, InboundProcessorParams params) {
+    public static boolean bind(int port, Map<String, Object> params) {
         ListenerEndpoint ep = reactor.listen(getSocketAddress(port));
 
         try {
@@ -132,21 +133,19 @@ public class InboundHL7IOReactor {
 
 
     private static IOReactorConfig getDefaultReactorConfig() {
-        IOReactorConfig config =  new IOReactorConfig();
-        config.setSelectInterval(1000);
-        config.setShutdownGracePeriod(500);
-        config.setInterestOpQueued(false);
-        config.setIoThreadCount(Runtime.getRuntime().availableProcessors());
-        config.setSoTimeout(0);
-        config.setSoReuseAddress(true);
-        config.setSoLinger(-1);
-        config.setSoKeepalive(false);
-        config.setTcpNoDelay(true);
-        config.setConnectTimeout(0);
-        //config.setSndBufSize(0);
-        //config.setRcvBufSize(0);
-
-        return config;
+        IOReactorConfig.Builder builder = IOReactorConfig.custom();
+        return builder.setSelectInterval(1000)
+                .setShutdownGracePeriod(500)
+                .setInterestOpQueued(false)
+                .setIoThreadCount(Runtime.getRuntime().availableProcessors())
+                .setSoTimeout(0)
+                .setSoReuseAddress(true)
+                .setSoLinger(-1)
+                .setSoKeepAlive(true)
+                .setTcpNoDelay(true)
+                .setConnectTimeout(0).build();
+                //.setSndBufSize(0)
+                //.setRcvBufSize(0)
     }
 
 }

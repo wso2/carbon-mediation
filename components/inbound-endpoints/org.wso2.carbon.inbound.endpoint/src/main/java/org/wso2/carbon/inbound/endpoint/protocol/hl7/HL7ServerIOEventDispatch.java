@@ -34,14 +34,14 @@ public class HL7ServerIOEventDispatch implements IOEventDispatch {
     private static final Log log = LogFactory.getLog(HL7ServerIOEventDispatch.class);
 
     private Map<String, String> sessionIdToPort;
-    private volatile HL7RequestProcessor HL7RequestProcessor;
+    private volatile HL7RequestProcessor hl7RequestProcessor;
 
     public HL7ServerIOEventDispatch() { /* default constructor */ }
 
     public HL7ServerIOEventDispatch(HL7RequestProcessor hl7RequestProcessor) {
         super();
         sessionIdToPort = new HashMap<String, String>();
-        this.HL7RequestProcessor = hl7RequestProcessor;
+        this.hl7RequestProcessor = hl7RequestProcessor;
     }
 
     private String getRemoteAddress(int hashCode) {
@@ -54,7 +54,7 @@ public class HL7ServerIOEventDispatch implements IOEventDispatch {
         sessionIdToPort.put(String.valueOf(session.hashCode()), String.valueOf(session.getRemoteAddress()));
 
         if (session.getAttribute(MLLPConstants.MLLP_CONTEXT) == null) {
-            session.setAttribute(MLLPConstants.MLLP_CONTEXT, new MLLPContext());
+            session.setAttribute(MLLPConstants.MLLP_CONTEXT, new MLLPContext(hl7RequestProcessor.getInboundParameterMap()));
         }
     }
 
@@ -83,7 +83,7 @@ public class HL7ServerIOEventDispatch implements IOEventDispatch {
             }
 
             if (mllpContext.getCodec().isReadComplete())  {
-                HL7RequestProcessor.processRequest(mllpContext);
+                hl7RequestProcessor.processRequest(mllpContext);
                 session.clearEvent(EventMask.READ);
                 session.setEvent(EventMask.WRITE);
             }

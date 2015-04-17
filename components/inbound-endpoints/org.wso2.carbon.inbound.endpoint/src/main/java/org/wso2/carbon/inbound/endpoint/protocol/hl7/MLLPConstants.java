@@ -38,4 +38,19 @@ public class MLLPConstants {
     public final static String PARAM_HL7_TIMEOUT = "inbound.hl7.TimeOut";
 
     public final static int DEFAULT_HL7_TIMEOUT = 10000;
+
+    public final static String PARAM_HL7_ID_GENERATOR = "inbound.hl7.IDGenerator";
+
+    public final static String FILE_BASED_ID_GENERATOR = "FILE_BASED";
+
+    public final static String DEFAULT_ID_GENERATOR = FILE_BASED_ID_GENERATOR;
+
+    public final static String UUID_GENERATOR = "UUID_GENERATOR";
+
+    public final static String PARAM_HL7_PRE_PROC = "inbound.hl7.MessagePreProcessor";
+
+    public final static String HL7_PRE_PROC_PARSER_CLASS = "HL7_PRE_PROC_PARSER_CLASS";
+
+    public final static String INBOUND_PARAMS = "HL7_INBOUND_PARAMS";
+
 }

@@ -90,8 +90,13 @@ public class HL7Codec {
         if (this.state == READ_TRAILER) {
             this.state = READ_COMPLETE;
             try {
-                context.setHl7Message(HL7MessageUtils.parse(context.getRequestBuffer().toString()));
-//                System.out.println(context.getRequestBuffer().toString());
+                if (context.isPreProcess()) {
+                    context.setHl7Message(HL7MessageUtils.parse(context.getRequestBuffer().toString(),
+                            context.getPreProcessParser()));
+                } else {
+                    context.setHl7Message(HL7MessageUtils.parse(context.getRequestBuffer().toString()));
+                }
+//                  System.out.println(context.getRequestBuffer().toString());
                 context.setRequestBuffer(new StringBuffer());
             } catch (HL7Exception e) {
                 throw e;

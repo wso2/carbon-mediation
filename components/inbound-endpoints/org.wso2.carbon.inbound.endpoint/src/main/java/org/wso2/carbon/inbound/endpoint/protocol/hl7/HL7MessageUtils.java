@@ -23,10 +23,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v22.message.ACK;
-import ca.uhn.hl7v2.parser.DefaultXMLParser;
-import ca.uhn.hl7v2.parser.EncodingNotSupportedException;
-import ca.uhn.hl7v2.parser.PipeParser;
-import ca.uhn.hl7v2.parser.XMLParser;
+import ca.uhn.hl7v2.parser.*;
 import ca.uhn.hl7v2.util.idgenerator.UUIDGenerator;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.axiom.om.OMAbstractFactory;
@@ -62,6 +59,10 @@ public class HL7MessageUtils {
 
     public static Message parse(String msg) throws HL7Exception {
         return pipeParser.parse(msg);
+    }
+
+    public static Message parse(String msg, final Parser preProcessor) throws HL7Exception {
+        return preProcessor.parse(msg);
     }
 
     public static MessageContext createSynapseMessageContext(Message message, InboundProcessorParams params,

@@ -24,6 +24,7 @@ import org.apache.http.nio.reactor.IOSession;
 import org.apache.synapse.inbound.InboundProcessorParams;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MultiIOHandler extends HL7ServerIOEventDispatch {
@@ -32,9 +33,9 @@ public class MultiIOHandler extends HL7ServerIOEventDispatch {
 
     public ConcurrentHashMap<Integer, HL7ServerIOEventDispatch> handlers = new ConcurrentHashMap<Integer, HL7ServerIOEventDispatch>();
 
-    private ConcurrentHashMap<Integer, InboundProcessorParams> parameterMap;
+    private ConcurrentHashMap<Integer, Map<String, Object>> parameterMap;
 
-    public MultiIOHandler(ConcurrentHashMap<Integer, InboundProcessorParams> parameterMap) {
+    public MultiIOHandler(ConcurrentHashMap<Integer, Map<String, Object>> parameterMap) {
         super();
         this.parameterMap = parameterMap;
     }

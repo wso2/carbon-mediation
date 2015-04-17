@@ -1,6 +1,8 @@
 package org.wso2.carbon.inbound.endpoint.protocol.hl7;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.parser.PipeParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -11,6 +13,7 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,33 +40,39 @@ public class HL7RequestProcessor implements InboundResponseSender {
 
     private static ExecutorService executorService;
 
-    private ConcurrentHashMap<Integer, InboundProcessorParams> params;
+    private ConcurrentHashMap<Integer, Map<String, Object>> paramMap;
+    private InboundProcessorParams params;
     private int servicePort;
     private String inSequence;
     private String onErrorSequence;
     private SynapseEnvironment synEnv;
 
-    public HL7RequestProcessor(int servicePort, ConcurrentHashMap<Integer, InboundProcessorParams> params) {
+    public HL7RequestProcessor(int servicePort, ConcurrentHashMap<Integer, Map<String, Object>> paramMap) {
         executorService  = Executors.newFixedThreadPool(2);
+        this.paramMap = paramMap;
         this.servicePort = servicePort;
-        this.params = params;
-        this.inSequence = params.get(servicePort).getInjectingSeq();
-        this.onErrorSequence = params.get(servicePort).getOnErrorSeq();
-        this.synEnv = params.get(servicePort).getSynapseEnvironment();
+        this.params = (InboundProcessorParams) paramMap.get(servicePort).get(MLLPConstants.INBOUND_PARAMS);
+        this.inSequence = params.getInjectingSeq();
+        this.onErrorSequence = params.getOnErrorSeq();
+        this.synEnv = params.getSynapseEnvironment();
     }
 
     public void processRequest(MLLPContext mllpContext) {
         mllpContext.setAckReady(false);
-        mllpContext.setExpiry(HL7MessageUtils.getInt(MLLPConstants.PARAM_HL7_TIMEOUT, params.get(servicePort)));
+        mllpContext.setExpiry(HL7MessageUtils.getInt(MLLPConstants.PARAM_HL7_TIMEOUT, params));
         mllpContext.setRequestTime(System.currentTimeMillis());
-        // Set AUTO ACK - no need to do else clause as
-        if (params.get(servicePort).getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equals("false")) {
+        // Set AUTO ACK - no need of else clause as mllpContext.reset() resets value to default at end of req/resp cycle.
+        if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equals("false")) {
             mllpContext.setAutoAck(false);
+        }
+
+        if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PRE_PROC) != null) {
+            mllpContext.setPreProcess(true);
         }
 
         // Prepare Synapse Context for message injection
         MessageContext synCtx = HL7MessageUtils.createSynapseMessageContext(mllpContext.getHl7Message(),
-                params.get(servicePort), synEnv);
+                params, synEnv);
 
         // If AUTO ACK lets ACK immediately.
         if (mllpContext.isAutoAck()) {
@@ -83,6 +92,10 @@ public class HL7RequestProcessor implements InboundResponseSender {
         executorService.execute(task);
     }
 
+    public Map<String, Object> getInboundParameterMap() {
+        return this.paramMap.get(servicePort);
+    }
+
     @Override
     public void sendBack(MessageContext messageContext) {
         MLLPContext mllpContext = (MLLPContext) messageContext.getProperty(MLLPConstants.MLLP_CONTEXT);
@@ -91,7 +104,13 @@ public class HL7RequestProcessor implements InboundResponseSender {
 
     private void sendBack(MessageContext messageContext, MLLPContext mllpContext) {
         try {
-            mllpContext.setHl7Message(HL7MessageUtils.payloadToHL7Message(messageContext, params.get(servicePort)));
+            if (((String) messageContext.getProperty(HL7Constants.HL7_RESULT_MODE)).equals(HL7Constants.HL7_RESULT_MODE_NACK)) {
+                String nackMessage = (String) messageContext.getProperty(HL7Constants.HL7_NACK_MESSAGE);
+                mllpContext.setNackMode(true);
+                mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(), nackMessage));
+            } else {
+                mllpContext.setHl7Message(HL7MessageUtils.payloadToHL7Message(messageContext, params));
+            }
             mllpContext.setAckReady(true);
         } catch (HL7Exception e) {
             log.error("Error while generating HL7 response from payload.");
