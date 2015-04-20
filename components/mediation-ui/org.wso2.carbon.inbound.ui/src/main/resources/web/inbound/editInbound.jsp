@@ -140,8 +140,8 @@ var requiredParams = null;
 						String defaultParam = arrParamOri[0].trim();
 						defaultParamNames.add(defaultParam);
 						ctr++;
-					%> 	
-					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
+					%>
+					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>
 	                    <tr>
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
 	                        <td align="left">

@@ -55,7 +55,7 @@ var requiredParams = null;
     <% InboundManagementClient client;
         try {
             client = InboundManagementClient.getInstance(config, session);
-            List<String>defaultParams = client.getDefaultParameters(request.getParameter("inboundType"));            
+            List<String>defaultParams = client.getDefaultParameters(request.getParameter("inboundType"));
             List<String>advParams = client.getAdvParameters(request.getParameter("inboundType"));
     %>
     <form method="post" name="inboundcreationform" id="inboundcreationform"
@@ -124,13 +124,13 @@ var requiredParams = null;
                     <%if(!defaultParams.isEmpty()){                     
                     %>
                     <script type="text/javascript">var requiredParams = new Array(<%=defaultParams.size()%>);</script>
-                    <%} %>       
+                    <%} %>
 					<%  int ctr = -1;
 					    for(String defaultParamOri : defaultParams) {
 						String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
-						String defaultParam = arrParamOri[0].trim();	
+						String defaultParam = arrParamOri[0].trim();
 						ctr++;
-					%> 	
+					%>
 					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
 	                    <tr>
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
