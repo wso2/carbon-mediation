@@ -250,14 +250,18 @@ public class InboundManagementClient {
                 parameterDTOs[i++] = parameterDTO;
             }
 
-               InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
-
+            InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
+            if(inboundEndpointDTO != null){
+                stub.removeInboundEndpoint(name);
+            }
             if(canAdd(name,protocol,parameterDTOs)) {
-                if(inboundEndpointDTO != null){
-                    stub.removeInboundEndpoint(name);
-                }
                 stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
                 return true;
+            }else if(inboundEndpointDTO != null){
+                stub.addInboundEndpoint(inboundEndpointDTO.getName(), inboundEndpointDTO.getInjectingSeq(),
+                                        inboundEndpointDTO.getOnErrorSeq(), inboundEndpointDTO.getProtocol(),
+                                        inboundEndpointDTO.getClassImpl(), inboundEndpointDTO.getParameters());
+                return false;
             }
         } catch (Exception e) {
             log.error(e);
