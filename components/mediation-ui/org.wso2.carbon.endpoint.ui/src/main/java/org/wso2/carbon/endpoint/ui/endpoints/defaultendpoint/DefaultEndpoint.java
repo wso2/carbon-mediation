@@ -50,6 +50,7 @@ public class DefaultEndpoint extends Endpoint {
     private boolean wsadd;
     private boolean sepList;
     private boolean wssec;
+    @Deprecated
     private boolean wsrm;
     private String secPolKey;
     private String rmPolKey;
@@ -188,10 +189,12 @@ public class DefaultEndpoint extends Endpoint {
         this.wssec = wssec;
     }
 
+    @Deprecated
     public boolean isWsrm() {
         return wsrm;
     }
 
+    @Deprecated
     public void setWsrm(boolean wsrm) {
         this.wsrm = wsrm;
     }
@@ -420,14 +423,6 @@ public class DefaultEndpoint extends Endpoint {
             defaultElement.addChild(enableSecurity);
         }
 
-        if (wsrm) {
-            OMElement enableRM = fac.createOMElement("enableRM", synNS);
-            if (rmPolKey != null && !"".equals(rmPolKey)) {
-                enableRM.addAttribute(fac.createOMAttribute(
-                        "policy", nullNS, rmPolKey));
-            }
-            defaultElement.addChild(enableRM);
-        }
         endpoint.addChild(defaultElement);
 
         // Properties

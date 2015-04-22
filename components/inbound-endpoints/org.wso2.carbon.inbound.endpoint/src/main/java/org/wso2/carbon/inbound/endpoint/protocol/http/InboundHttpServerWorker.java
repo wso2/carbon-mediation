@@ -23,14 +23,18 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
+import org.apache.axis2.description.WSDL2Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.rest.RESTRequestHandler;
 import org.apache.synapse.transport.passthru.ServerWorker;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
@@ -51,13 +55,15 @@ public class InboundHttpServerWorker extends ServerWorker {
 
     private SourceRequest request = null;
     private int port;
-
+    private RESTRequestHandler restHandler;
 
     public InboundHttpServerWorker(int port, SourceRequest sourceRequest,
                                    SourceConfiguration sourceConfiguration, OutputStream outputStream) {
         super(sourceRequest, sourceConfiguration, outputStream);
         this.request = sourceRequest;
         this.port = port;
+        restHandler = new RESTRequestHandler();
+
     }
 
     public void run() {
@@ -75,24 +81,23 @@ public class InboundHttpServerWorker extends ServerWorker {
                                 getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axisCtx, method);
 
+                String tenantDomain = getTenantDomain();
+
                 String endpointName =
-                        EndpointListenerManager.getInstance().getEndpointName(port, getTenantDomain());
+                        EndpointListenerManager.getInstance().getEndpointName(port, tenantDomain);
+
+                if (endpointName == null) {
+                    handleException("Endpoint not found for port : " + port + "" +
+                                    " tenant domain : " + tenantDomain);
+                }
 
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
 
-                // Get injecting sequence for synapse engine
-                SequenceMediator injectingSequence =
-                        (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
-
-                if (injectingSequence != null) {
-                    injectingSequence.setErrorHandler(endpoint.getOnErrorSeq());
-                    if (log.isDebugEnabled()) {
-                        log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
-                    }
-                } else {
-                    log.error("Sequence: " + endpoint.getInjectingSeq() + " not found");
+                if (endpoint == null) {
+                    log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
+                    return;
                 }
-                // TODO: stop dispatching to main sequence
+
                 if (!isRESTRequest(axisCtx, method)) {
                     if (request.isEntityEnclosing()) {
                         processEntityEnclosingRequest(axisCtx, false);
@@ -100,10 +105,42 @@ public class InboundHttpServerWorker extends ServerWorker {
                         processNonEntityEnclosingRESTHandler(null, axisCtx, false);
                     }
                 }
-                // handover synapse message context to synapse environment for inject it to given sequence in
-                //synchronous manner
-                synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
 
+                boolean processedByAPI = false;
+
+                String apiDispatchingParam =
+                           (String)endpoint.getParameter(
+                                InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_API_DISPATCHING_ENABLED);
+                if (apiDispatchingParam != null && Boolean.valueOf(apiDispatchingParam)) {
+                    // Trying to dispatch to an API
+
+                    processedByAPI = restHandler.process(synCtx);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Dispatch to API state : enabled, Message is "
+                                  + (!processedByAPI ? "NOT" : "") + "processed by an API");
+                    }
+                }
+
+                if (!processedByAPI) {
+                    //If message is not dispatched to an API, dispatch into the sequence
+
+                    // Get injecting sequence for synapse engine
+                    SequenceMediator injectingSequence =
+                            (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
+                    if(endpoint.getOnErrorSeq() != null) {
+                        SequenceMediator faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
+
+                        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
+                        synCtx.pushFaultHandler(mediatorFaultHandler);
+                    }
+
+                    // handover synapse message context to synapse environment for inject it to given sequence in
+                    //synchronous manner
+                    if (log.isDebugEnabled()) {
+                        log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
+                    }
+                    synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
+                }
                 // send ack for client if needed
                 sendAck(axisCtx);
             } catch (Exception e) {
@@ -125,13 +162,18 @@ public class InboundHttpServerWorker extends ServerWorker {
         axis2MsgCtx.setServiceContext(svcCtx);
         axis2MsgCtx.setOperationContext(opCtx);
 
+
         String tenantDomain = getTenantDomain();
         // If not super tenant, assign tenant configuration context
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
             ConfigurationContext tenantConfigCtx =
-                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
-                                                                  axis2MsgCtx.getConfigurationContext());
+                       TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
+                                                                     axis2MsgCtx.getConfigurationContext());
+
             axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+
+            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+
         }
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }
@@ -150,6 +192,11 @@ public class InboundHttpServerWorker extends ServerWorker {
             return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         }
         return tenant;
+    }
+
+    protected void handleException(String msg) {
+        log.error(msg);
+        throw new SynapseException(msg);
     }
 
 }

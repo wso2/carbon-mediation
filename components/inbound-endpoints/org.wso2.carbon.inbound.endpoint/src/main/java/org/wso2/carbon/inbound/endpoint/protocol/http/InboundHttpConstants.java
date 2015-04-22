@@ -26,8 +26,18 @@ public class InboundHttpConstants {
     public final static String SOAP_ACTION = "SOAPAction";
 
     /**
-     *String representing port of the InboundEndpoint
+     * String representing port of the InboundEndpoint
      */
     public static final String INBOUND_ENDPOINT_PARAMETER_HTTP_PORT = "inbound.http.port";
+    public static final String INBOUND_ENDPOINT_PARAMETER_API_DISPATCHING_ENABLED = "api.dispatching.enabled";
+    public static final String KEY_STORE = "keystore";
+    public static final String TRUST_STORE = "truststore";
+    public static final String SSL_VERIFY_CLIENT = "SSLVerifyClient";
+    public static final String SSL_PROTOCOL = "SSLProtocol";
+    public static final String HTTPS_PROTOCOL = "HttpsProtocols";
+    public static final String CLIENT_REVOCATION = "CertificateRevocationVerifier";
+    public static final String HTTP = "http";
+    public static final String HTTPS = "https";
+
 
 }

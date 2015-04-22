@@ -43,7 +43,7 @@ public class GenericProcessor extends InboundRequestProcessorImpl implements Tas
     private String classImpl;
     private boolean sequential;
     
-    private static final String ENDPOINT_POSTFIX = "CLASS-EP";
+    private static final String ENDPOINT_POSTFIX = "CLASS" + COMMON_ENDPOINT_POSTFIX;
     
     public GenericProcessor(String name, String classImpl, Properties properties,
             long scanInterval, String injectingSeq, String onErrorSeq,
