@@ -89,7 +89,7 @@
                                 <!--TODO use ndatasource-->
                                 <!--<importFeatureDef>org.wso2.carbon.datasource.server:${carbon.datastore.version}</importFeatureDef>-->
                                 <importFeatureDef>org.wso2.carbon.task.server</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.event.server</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.server:${carbon.commons.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
