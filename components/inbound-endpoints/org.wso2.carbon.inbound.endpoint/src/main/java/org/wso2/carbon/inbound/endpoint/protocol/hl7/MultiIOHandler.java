@@ -21,7 +21,6 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.IOSession;
-import org.apache.synapse.inbound.InboundProcessorParams;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
@@ -40,6 +39,7 @@ public class MultiIOHandler extends HL7ServerIOEventDispatch {
         this.parameterMap = parameterMap;
     }
 
+    // TODO create HL7RequestProcessor at endpoint init and pass it down, instead of creating one per connect
     @Override
     public void connected(IOSession session) {
 

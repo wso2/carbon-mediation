@@ -25,6 +25,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v22.message.ACK;
 import ca.uhn.hl7v2.parser.*;
 import ca.uhn.hl7v2.util.idgenerator.UUIDGenerator;
+import ca.uhn.hl7v2.validation.impl.DefaultValidation;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
@@ -47,6 +48,8 @@ import java.io.IOException;
 public class HL7MessageUtils {
     private static final Log log = LogFactory.getLog(HL7MessageUtils.class);
 
+    private static PipeParser noValidationPipeParser = new PipeParser();
+    private static XMLParser noValidationXmlParser = new DefaultXMLParser();
     private static PipeParser pipeParser = new PipeParser();
     private static XMLParser xmlParser = new DefaultXMLParser();
     private static SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
@@ -55,10 +58,21 @@ public class HL7MessageUtils {
     static {
         pipeParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
         xmlParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
+        pipeParser.setValidationContext(new DefaultValidation());
+        xmlParser.setValidationContext(new DefaultValidation());
+
+        noValidationPipeParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
+        noValidationXmlParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
+        noValidationPipeParser.setValidationContext(new NoValidation());
+        noValidationXmlParser.setValidationContext(new NoValidation());
     }
 
-    public static Message parse(String msg) throws HL7Exception {
-        return pipeParser.parse(msg);
+    public static Message parse(String msg, boolean validate) throws HL7Exception {
+        if (validate) {
+            return pipeParser.parse(msg);
+        } else {
+            return noValidationPipeParser.parse(msg);
+        }
     }
 
     public static Message parse(String msg, final Parser preProcessor) throws HL7Exception {
@@ -78,11 +92,11 @@ public class HL7MessageUtils {
         try {
             synCtx.setEnvelope(createEnvelope(synCtx, message, params));
         } catch (AxisFault e) {
-            log.error("Error while building envelope from HL7 message. " + e.getMessage());
+            log.error("Error while building envelope from HL7 message. ", e);
         } catch (HL7Exception e) {
-            log.error("Error while building envelope from HL7 message. " + e.getMessage());
+            log.error("Error while building envelope from HL7 message. ", e);
         } catch (XMLStreamException e) {
-            log.error("Error while building envelope from HL7 message. " + e.getMessage());
+            log.error("Error while building envelope from HL7 message. ", e);
         }
 
         return synCtx;
@@ -101,8 +115,8 @@ public class HL7MessageUtils {
             if (params.getProperties().getProperty(HL7Constants.HL7_BUILD_RAW_MESSAGE).equals("true")) {
                 xmlDoc =  "<rawMessage>" + StringEscapeUtils.escapeXml(message.encode()) + "</rawMessage>";
             } else {
-                log.error("Could not encode HL7 message into XML: " + e.getMessage() + " " +
-                        "Set " + HL7Constants.HL7_BUILD_RAW_MESSAGE + " to build invalid HL7 messages containing raw HL7 message.");
+                log.error("Could not encode HL7 message into XML. " +
+                        "Set " + HL7Constants.HL7_BUILD_RAW_MESSAGE + " to build invalid HL7 messages containing raw HL7 message.", e);
             }
         }
 
@@ -189,7 +203,7 @@ public class HL7MessageUtils {
         catch (DataTypeException e) {
             // Make this as warning.Since some remote systems require enriched messages that violate some HL7
             //rules it would 	be nice to be able to still send the message.
-            log.warn("Rule validation fails."+ e);
+            log.warn("Rule validation fails.", e);
             if (!(params.getProperties().getProperty(HL7Constants.HL7_VALIDATE_MESSAGE).equals("false"))) {
                 xmlParser.setValidationContext(new NoValidation());
                 msg = xmlParser.parse(hl7XMLPayload);

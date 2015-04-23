@@ -22,7 +22,10 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.transport.passthru.util.BufferFactory;
 
+import java.nio.charset.CharsetDecoder;
 import java.util.Map;
 
 public class MLLPContext {
@@ -34,16 +37,21 @@ public class MLLPContext {
     private final HL7Codec codec;
     private long requestTime;
     private int expiry;
+    private boolean validateMessage;
 
     private volatile boolean autoAck = true;
     private volatile boolean ackReady = false;
     private volatile boolean preProcess = false;
     private volatile boolean nackMode = false;
+    private volatile boolean transportError = false;
 
     private Map<String, Object> inboundParameters;
+    private InboundProcessorParams inboundProcessorParams;
 
     public MLLPContext(Map<String, Object> inboundParameters) {
-        this.codec = new HL7Codec();
+        this.inboundProcessorParams = (InboundProcessorParams) inboundParameters.get(MLLPConstants.INBOUND_PARAMS);
+        this.codec = new HL7Codec((CharsetDecoder) inboundParameters.get(MLLPConstants.HL7_CHARSET_DECODER));
+        this.validateMessage = Boolean.valueOf(inboundProcessorParams.getProperties().getProperty(MLLPConstants.PARAM_HL7_VALIDATE));
         this.requestBuffer = new StringBuffer();
         this.responseBuffer = new StringBuffer();
         this.expiry = MLLPConstants.DEFAULT_HL7_TIMEOUT;
@@ -58,16 +66,8 @@ public class MLLPContext {
         return this.requestBuffer;
     }
 
-    public void setRequestBuffer(StringBuffer requestBuffer) {
-        this.requestBuffer = requestBuffer;
-    }
-
     public StringBuffer getResponseBuffer() {
         return responseBuffer;
-    }
-
-    public void setResponseBuffer(StringBuffer responseBuffer) {
-        this.responseBuffer = responseBuffer;
     }
 
     public Message getHl7Message() {
@@ -138,8 +138,29 @@ public class MLLPContext {
         return (Parser) this.inboundParameters.get(MLLPConstants.HL7_PRE_PROC_PARSER_CLASS);
     }
 
+    public BufferFactory getBufferFactory() {
+        return (BufferFactory) this.inboundParameters.get(MLLPConstants.INBOUND_HL7_BUFFER_FACTORY);
+    }
+
+    public boolean isValidateMessage() {
+        return validateMessage;
+    }
+
+    public void setValidateMessage(boolean validateMessage) {
+        this.validateMessage = validateMessage;
+    }
+
+    public boolean isTransportError() {
+        return transportError;
+    }
+
+    public void setTransportError(boolean transportError) {
+        this.transportError = transportError;
+    }
+
     public void reset() {
         // Resets MLLP Context and HL7Codec to default states.
+        this.responseBuffer.setLength(0);
         this.getCodec().setState(HL7Codec.READ_HEADER);
         this.setAckReady(false);
         this.setAutoAck(true);

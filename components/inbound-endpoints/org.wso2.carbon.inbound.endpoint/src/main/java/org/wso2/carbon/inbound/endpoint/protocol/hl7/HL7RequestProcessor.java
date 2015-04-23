@@ -1,8 +1,6 @@
 package org.wso2.carbon.inbound.endpoint.protocol.hl7;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.parser.PipeParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -38,6 +36,7 @@ import java.util.concurrent.Executors;
 public class HL7RequestProcessor implements InboundResponseSender {
     private static final Log log = LogFactory.getLog(InboundHL7IOReactor.class);
 
+    // TODO: use axis2 worker pool here.
     private static ExecutorService executorService;
 
     private ConcurrentHashMap<Integer, Map<String, Object>> paramMap;

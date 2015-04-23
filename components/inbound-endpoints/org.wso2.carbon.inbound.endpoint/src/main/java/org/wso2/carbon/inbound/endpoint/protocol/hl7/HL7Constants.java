@@ -87,18 +87,6 @@ public class HL7Constants {
 
     public static final String HL7_CONFORMANCE_PROFILE_PATH = "transport.hl7.ConformanceProfilePath";
 
-    public static final String HL7_MESSAGE_PREPROCESSOR_CLASS = "transport.hl7.MessagePreprocessorClass";
-
-    public static final String HL7_MESSAGE_PUBLISHER_ENABLE = "transport.hl7.PublisherEnable";
-
-    public static final String HL7_MESSAGE_PUBLISHER_SERVER_URL = "transport.hl7.PublisherServerUrl";
-
-    public static final String HL7_MESSAGE_PUBLISHER_SECURE_SERVER_URL = "transport.hl7.PublisherSecureServerUrl";
-
-    public static final String HL7_MESSAGE_PUBLISHER_SERVER_USERNAME = "transport.hl7.PublisherServerUsername";
-
-    public static final String HL7_MESSAGE_PUBLISHER_SERVER_PASSWORD = "transport.hl7.PublisherServerPassword";
-
     public static final String HL7_NAMESPACE = "http://wso2.org/hl7";
 
     public static final String HL7_ELEMENT_NAME = "hl7";

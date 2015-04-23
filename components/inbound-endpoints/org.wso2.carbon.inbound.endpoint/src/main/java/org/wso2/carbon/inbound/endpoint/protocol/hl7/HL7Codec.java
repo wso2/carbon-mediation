@@ -17,17 +17,14 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
 
 public class HL7Codec {
     private static final Log log = LogFactory.getLog(HL7Codec.class);
@@ -43,21 +40,23 @@ public class HL7Codec {
     public static final int WRITE_TRAILER  = 6;
     public static final int WRITE_COMPLETE = 7;
 
-    private final CharsetDecoder charsetDecoder;
-    private final CharsetEncoder charsetEncoder;
+    private CharsetDecoder charsetDecoder;
 
     private int state;
 
+    private ByteBuffer byteBuffer;
+
+    private int responseReadPosition = 0;
+    private byte[] responseBytes = null;
+
     public HL7Codec() {
         this.state = READ_HEADER;
-        this.charsetEncoder = MLLPConstants.UTF8_CHARSET.newEncoder();
         this.charsetDecoder = MLLPConstants.UTF8_CHARSET.newDecoder();
     }
 
-    public HL7Codec(CharsetEncoder encoder, CharsetDecoder decoder) {
+    public HL7Codec(CharsetDecoder charsetDecoder) {
         this.state = READ_HEADER;
-        this.charsetEncoder = encoder;
-        this.charsetDecoder = decoder;
+        setCharsetDecoder(charsetDecoder);
     }
 
     public int decode(ByteBuffer dst, MLLPContext context) throws IOException, MLLProtocolException, HL7Exception {
@@ -94,10 +93,10 @@ public class HL7Codec {
                     context.setHl7Message(HL7MessageUtils.parse(context.getRequestBuffer().toString(),
                             context.getPreProcessParser()));
                 } else {
-                    context.setHl7Message(HL7MessageUtils.parse(context.getRequestBuffer().toString()));
+                    context.setHl7Message(HL7MessageUtils.parse(context.getRequestBuffer().toString(), context.isValidateMessage()));
                 }
 //                  System.out.println(context.getRequestBuffer().toString());
-                context.setRequestBuffer(new StringBuffer());
+                context.getRequestBuffer().setLength(0);
             } catch (HL7Exception e) {
                 throw e;
             }
@@ -119,46 +118,78 @@ public class HL7Codec {
         return -1;
     }
 
-    public ByteBuffer encode(Message hl7Message, MLLPContext context) throws UnsupportedEncodingException,
-            HL7Exception, IOException {
+    public int encode(ByteBuffer outBuf, MLLPContext context) throws HL7Exception, IOException {
 
         if (this.state < READ_COMPLETE) {
-            return null;
+            return 0;
         }
 
         if (this.state == READ_COMPLETE) {
 
-            StringBuffer response = new StringBuffer();
-            response.append(new String(MLLPConstants.HL7_HEADER, "UTF-8"));
             if (context.isAutoAck()) {
-                response.append(hl7Message.generateACK());
+                responseBytes = context.getHl7Message().generateACK().encode().getBytes(charsetDecoder.charset());
             } else {
-                response.append(hl7Message.encode());
-            }
-            response.append(new String(MLLPConstants.HL7_TRAILER, "UTF-8"));
-            context.setResponseBuffer(response);
-
-            CharBuffer charBuffer = CharBuffer.allocate(context.getResponseBuffer().length());
-
-            for (int i=0; i<context.getResponseBuffer().length(); i++) {
-                charBuffer.put(context.getResponseBuffer().charAt(i));
+                responseBytes = context.getHl7Message().encode().getBytes(charsetDecoder.charset());
             }
 
-            charBuffer.flip();
-
-            ByteBuffer buffer = ByteBuffer.allocate(charBuffer.length());
-
-            charsetEncoder.encode(charBuffer, buffer, true);
-            buffer.flip();
-
-            return buffer;
+            this.state = WRITE_HEADER;
         }
 
-        return null;
+        if (this.state >= WRITE_HEADER) {
+            return fillBuffer(outBuf, responseBytes);
+        }
+
+        return 0;
+    }
+
+    private int fillBuffer(ByteBuffer byteBuffer, byte[] responseBytes) {
+
+        if (responseBytes == null) {
+            return 0;
+        }
+
+        byte b;
+        int count = 0;
+        int headerPosition = 0;
+
+        if (this.state == WRITE_HEADER) {
+            byteBuffer.put(MLLPConstants.HL7_HEADER[0]);
+            headerPosition = 1;
+            this.state = WRITE_CONTENT;
+        }
+
+        int MAX = byteBuffer.capacity();
+        if (byteBuffer.capacity() - (responseBytes.length - responseReadPosition + headerPosition) > 0) {
+            MAX = responseBytes.length - responseReadPosition + headerPosition;
+        }
+
+        for (int i=responseReadPosition; i<MAX+responseReadPosition-headerPosition; i++) {
+            count++;
+            b = responseBytes[i];
+            byteBuffer.put(b);
+        }
+
+        responseReadPosition += count;
+
+        if (responseReadPosition == responseBytes.length) {
+            this.state = WRITE_TRAILER;
+            responseReadPosition = 0;
+        }
+
+        byteBuffer.flip();
+        return count;
     }
 
     public boolean isReadComplete() {
         if (this.state >= READ_COMPLETE) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isWriteTrailer() {
+        if (this.state == WRITE_TRAILER) {
             return true;
         }
 
@@ -185,7 +216,8 @@ public class HL7Codec {
         return charsetDecoder;
     }
 
-    public CharsetEncoder getCharsetEncoder() {
-        return charsetEncoder;
+    private void setCharsetDecoder(CharsetDecoder charsetDecoder) {
+        this.charsetDecoder = charsetDecoder;
     }
+
 }

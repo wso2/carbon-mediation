@@ -25,10 +25,10 @@ import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.reactor.IOReactorStatus;
 import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.nio.reactor.ListeningIOReactor;
-import org.apache.synapse.inbound.InboundProcessorParams;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,7 +65,7 @@ public class InboundHL7IOReactor {
                     reactor.execute(new MultiIOHandler(parameterMap));
                 } catch (IOException e) {
                     isStarted = false;
-                    log.error("Error while starting the MLLP Transport IO Reactor. " + e.getMessage());
+                    log.error("Error while starting the MLLP Transport IO Reactor.", e);
                 }
             }
         });
@@ -74,14 +74,12 @@ public class InboundHL7IOReactor {
     }
 
     public static void stop() {
-        log.info("LOG 1: stop() : isStarted = " + isStarted);
-
         try {
             reactor.shutdown();
             endpointMap.clear();
             isStarted = false;
         } catch (IOException e) {
-            log.error("Error while shutting down MLLP Transport IO Reactor. " + e.getMessage());
+            log.error("Error while shutting down MLLP Transport IO Reactor. ", e);
         }
     }
 
@@ -89,7 +87,7 @@ public class InboundHL7IOReactor {
         try {
             reactor.pause();
         } catch (IOException e) {
-            log.error("Error while pausing MLLP Transport IO Reactor. " + e.getMessage());
+            log.error("Error while pausing MLLP Transport IO Reactor. ", e);
         }
     }
 
@@ -98,6 +96,12 @@ public class InboundHL7IOReactor {
     }
 
     public static boolean bind(int port, Map<String, Object> params) {
+        if (!isPortAvailable(port)) {
+            log.error("A service is already listening on port " +
+                    port + ". Please select a different port for this endpoint.");
+            return false;
+        }
+
         ListenerEndpoint ep = reactor.listen(getSocketAddress(port));
 
         try {
@@ -106,7 +110,17 @@ public class InboundHL7IOReactor {
             parameterMap.put(port, params);
             return true;
         } catch (InterruptedException e) {
-            log.error("Error while starting a new MLLP Listener on port " + port + ". " + e.getMessage());
+            log.error("Error while starting a new MLLP Listener on port " + port + ". ", e);
+            return false;
+        }
+    }
+
+    private static boolean isPortAvailable(int port) {
+        try {
+            ServerSocket ss = new ServerSocket(port);
+            ss.close();
+            return true;
+        } catch (IOException e) {
             return false;
         }
     }
@@ -131,14 +145,14 @@ public class InboundHL7IOReactor {
         return isa;
     }
 
-
+    // TODO: configurable using properties
     private static IOReactorConfig getDefaultReactorConfig() {
         IOReactorConfig.Builder builder = IOReactorConfig.custom();
         return builder.setSelectInterval(1000)
                 .setShutdownGracePeriod(500)
                 .setInterestOpQueued(false)
                 .setIoThreadCount(Runtime.getRuntime().availableProcessors())
-                .setSoTimeout(0)
+                .setSoTimeout(10000)
                 .setSoReuseAddress(true)
                 .setSoLinger(-1)
                 .setSoKeepAlive(true)

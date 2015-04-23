@@ -18,6 +18,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
  * under the License.
  */
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 public class MLLPConstants {
@@ -25,6 +26,7 @@ public class MLLPConstants {
     public static final byte[] CR          = {0x0D};
     public static final byte[] HL7_TRAILER = {0x1C,CR[0]};
     public static final byte[] HL7_HEADER  = {0x0B};
+    public static final ByteBuffer HL7_TRAILER_BBUF = ByteBuffer.wrap(HL7_TRAILER);
 
     // default charset
     public final static Charset UTF8_CHARSET = Charset.forName("UTF-8");
@@ -53,4 +55,11 @@ public class MLLPConstants {
 
     public final static String INBOUND_PARAMS = "HL7_INBOUND_PARAMS";
 
+    public final static String INBOUND_HL7_BUFFER_FACTORY = "INBOUND_HL7_BUFFER_FACTORY";
+
+    public final static String PARAM_HL7_CHARSET = "inbound.hl7.CharSet";
+
+    public final static String HL7_CHARSET_DECODER = "HL7_CHARSET_DECODER";
+
+    public final static String PARAM_HL7_VALIDATE = "inbound.hl7.ValidateMessage";
 }
