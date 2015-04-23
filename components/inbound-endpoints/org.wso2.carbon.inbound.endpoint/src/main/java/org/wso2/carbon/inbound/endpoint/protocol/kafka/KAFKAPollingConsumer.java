@@ -31,20 +31,16 @@ public class KAFKAPollingConsumer {
 
     private InjectHandler injectHandler;
     private Properties kafkaProperties;
-    private String strUserName;
-    private String strPassword;
     private int threadCount;
     private List<String> topics;
     private AbstractKafkaMessageListener messageListener;
     private static int msgCounter;// uses for logging purpose
-    private static final String POISON_OBJ = "poison object";
-    long interval;
+    private long scanInterval;
 
-
-    public KAFKAPollingConsumer(Properties kafkaProperties,long interval) throws Exception {
+    public KAFKAPollingConsumer(Properties kafkaProperties, long interval) throws Exception {
 
         this.kafkaProperties = kafkaProperties;
-        this.interval=interval;
+        this.scanInterval = interval;
         if (kafkaProperties.getProperty(KAFKAConstants.THREAD_COUNT) == null
                 || kafkaProperties.getProperty(KAFKAConstants.THREAD_COUNT)
                 .equals("")
@@ -89,7 +85,25 @@ public class KAFKAPollingConsumer {
     }
 
     public void execute() {
-        poll();
+        try {
+            logger.debug("Executing : KAFKA Inbound EP : ");
+            if (this.scanInterval > 0 && this.scanInterval < KAFKAConstants.THRESHOLD_INTERVAL) {
+                while (true) {
+                    try {
+                        Thread.sleep(this.scanInterval);
+                    } catch (InterruptedException e) {
+                        logger.debug("Current Thread was interrupted while it is sleeping.");
+                    }
+                    poll();
+                }
+            }
+            if (this.scanInterval > 0 && this.scanInterval >= KAFKAConstants.THRESHOLD_INTERVAL) {
+                poll();
+            }
+
+        } catch (Exception e) {
+            logger.error("Error while retrieving or injecting Kafka message. " + e.getMessage(), e);
+        }
     }
 
     public void registerHandler(InjectHandler processingHandler) {

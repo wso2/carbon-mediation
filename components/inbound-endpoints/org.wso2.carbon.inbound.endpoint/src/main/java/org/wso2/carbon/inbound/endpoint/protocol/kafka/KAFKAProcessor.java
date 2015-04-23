@@ -87,7 +87,11 @@ public class KAFKAProcessor implements org.apache.synapse.inbound.InboundRequest
             TaskDescription taskDescription = new TaskDescription();
             taskDescription.setName(name + "-KAFKA-EP");
             taskDescription.setTaskGroup("KAFKA-EP");
-            taskDescription.setInterval(interval);
+            if (interval < KAFKAConstants.THRESHOLD_INTERVAL) {
+                taskDescription.setInterval(KAFKAConstants.THRESHOLD_INTERVAL);
+            } else {
+                taskDescription.setInterval(interval);
+            }
             taskDescription.setIntervalInMs(true);
             taskDescription.addResource(TaskDescription.INSTANCE, task);
             taskDescription.addResource(TaskDescription.CLASSNAME, task.getClass().getName());

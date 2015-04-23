@@ -123,7 +123,7 @@ public class KAFKAInjectHandler implements InjectHandler {
     }
 
     /**
-     * Create the initial message context for the kafka
+     * Create the initial message context for kafka
      */
     private org.apache.synapse.MessageContext createMessageContext() {
         org.apache.synapse.MessageContext msgCtx = synapseEnvironment
@@ -132,9 +132,6 @@ public class KAFKAInjectHandler implements InjectHandler {
                 .getAxis2MessageContext();
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setMessageID(UUIDGenerator.getUUID());
-        // There is a discrepency in what I thought, Axis2 spawns a nes threads
-        // to
-        // send a message is this is TRUE - and I want it to be the other way
         msgCtx.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, true);
         return msgCtx;
     }

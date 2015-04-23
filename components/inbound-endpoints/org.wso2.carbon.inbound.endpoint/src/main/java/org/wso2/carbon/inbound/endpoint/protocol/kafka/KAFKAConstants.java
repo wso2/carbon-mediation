@@ -55,4 +55,9 @@ public class KAFKAConstants {
 
     public static final int BUFFER_SIZE = 64 * 1024;
 
+    /**
+     * Threshold interval value is 1000.
+     */
+    public static final long THRESHOLD_INTERVAL = 1000;
+
 }
