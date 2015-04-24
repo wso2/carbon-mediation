@@ -23,22 +23,25 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.SynapsePath;
 import org.jaxen.JaxenException;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.context.RegistryType;
+import org.wso2.carbon.ml.commons.constants.MLConstants;
 import org.wso2.carbon.ml.commons.domain.Feature;
 import org.wso2.carbon.ml.commons.domain.MLModel;
+import org.wso2.carbon.ml.commons.domain.config.ModelStorage;
+import org.wso2.carbon.ml.core.exceptions.MLInputAdapterException;
 import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
+import org.wso2.carbon.ml.core.impl.MLIOFactory;
 import org.wso2.carbon.ml.core.impl.Predictor;
+import org.wso2.carbon.ml.core.interfaces.MLInputAdapter;
 import org.wso2.carbon.ml.core.internal.MLModelConfigurationContext;
 import org.wso2.carbon.ml.core.utils.MLCoreServiceValueHolder;
-import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.api.RegistryException;
-import org.wso2.carbon.registry.api.Resource;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +57,7 @@ public class ModelHandler {
     private MLModelConfigurationContext context;
 
     private ModelHandler(String modelName, Map<String, SynapsePath> featureMappings)
-            throws IOException, RegistryException, ClassNotFoundException {
+            throws IOException, RegistryException, ClassNotFoundException, URISyntaxException, MLInputAdapterException {
         initializeModel(modelName, featureMappings);
     }
 
@@ -65,7 +68,7 @@ public class ModelHandler {
      * @return
      */
     public static ModelHandler getInstance(String modelName, Map<String, SynapsePath> featureMappings)
-            throws  ClassNotFoundException, IOException, RegistryException {
+            throws ClassNotFoundException, IOException, RegistryException, URISyntaxException, MLInputAdapterException {
         if(instance == null) {
             instance = new ModelHandler(modelName, featureMappings);
         }
@@ -85,7 +88,7 @@ public class ModelHandler {
      * @param inputVariables Map containing the key- value pairs <feature-name, xpath-expression-to-extract-feature-value>
      */
     private void initializeModel(String modelName, Map<String, SynapsePath> inputVariables)
-            throws RegistryException, IOException, ClassNotFoundException {
+            throws RegistryException, IOException, ClassNotFoundException, URISyntaxException, MLInputAdapterException {
 
         this.modelName = modelName;
         mlModel = retrieveModelFromRegistry();
@@ -107,16 +110,20 @@ public class ModelHandler {
      * @throws ClassNotFoundException
      * @throws RegistryException
      */
-    private MLModel retrieveModelFromRegistry() throws IOException, ClassNotFoundException, RegistryException {
+    private MLModel retrieveModelFromRegistry()
+            throws IOException, ClassNotFoundException, RegistryException, URISyntaxException, MLInputAdapterException {
 
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        Registry registry = carbonContext.getRegistry(RegistryType.SYSTEM_GOVERNANCE);
-        Resource resource = registry.get(MLCoreServiceValueHolder.getInstance().getModelStorage().getStorageDirectory() + "/" + modelName);
-        byte[] readArray = (byte[]) resource.getContent();
-        ByteArrayInputStream bis = new ByteArrayInputStream(readArray);
-        ObjectInputStream objectInputStream = new ObjectInputStream(bis);
-        MLModel model = (MLModel) objectInputStream.readObject();
-        return model;
+        MLCoreServiceValueHolder mlCoreServiceValueHolder = MLCoreServiceValueHolder.getInstance();
+        ModelStorage modelStorage = mlCoreServiceValueHolder.getModelStorage();
+        String storageType = modelStorage.getStorageType();
+        String storageLocation = modelStorage.getStorageDirectory();
+
+        MLIOFactory ioFactory = new MLIOFactory(MLCoreServiceValueHolder.getInstance().getMlProperties());
+        MLInputAdapter inputAdapter = ioFactory.getInputAdapter(storageType + MLConstants.IN_SUFFIX);
+        InputStream in = inputAdapter.readDataset(new URI(storageLocation  + "/" + modelName));
+        ObjectInputStream ois = new ObjectInputStream(in);
+        MLModel mlModel = (MLModel) ois.readObject();
+        return mlModel;
     }
 
     /**

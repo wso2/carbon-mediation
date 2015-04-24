@@ -18,21 +18,24 @@
 
 package org.wso2.carbon.mediator.predict.ui.util;
 
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.context.RegistryType;
+import org.wso2.carbon.ml.commons.constants.MLConstants;
 import org.wso2.carbon.ml.commons.domain.Feature;
 import org.wso2.carbon.ml.commons.domain.MLModel;
+import org.wso2.carbon.ml.commons.domain.config.ModelStorage;
 import org.wso2.carbon.ml.core.exceptions.MLAnalysisHandlerException;
+import org.wso2.carbon.ml.core.exceptions.MLInputAdapterException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
+import org.wso2.carbon.ml.core.impl.MLIOFactory;
+import org.wso2.carbon.ml.core.interfaces.MLInputAdapter;
 import org.wso2.carbon.ml.core.utils.MLCoreServiceValueHolder;
-import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.api.RegistryException;
-import org.wso2.carbon.registry.api.Resource;
 import org.wso2.carbon.user.api.UserStoreException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 public class PredictMediatorUtils {
@@ -45,16 +48,21 @@ public class PredictMediatorUtils {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    private static MLModel retrieveModelFromRegistry(String modelName) throws RegistryException, IOException, ClassNotFoundException {
+    private static MLModel retrieveModelFromRegistry(String modelName)
+            throws RegistryException, ClassNotFoundException, URISyntaxException, MLInputAdapterException, IOException {
 
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        Registry registry = carbonContext.getRegistry(RegistryType.SYSTEM_GOVERNANCE);
-        Resource resource = registry.get(MLCoreServiceValueHolder.getInstance().getModelStorage().getStorageDirectory() + "/" + modelName);
-        byte[] readArray = (byte[]) resource.getContent();
-        ByteArrayInputStream bis = new ByteArrayInputStream(readArray);
-        ObjectInputStream objectInputStream = new ObjectInputStream(bis);
-        MLModel model = (MLModel) objectInputStream.readObject();
-        return model;
+        MLCoreServiceValueHolder mlCoreServiceValueHolder = MLCoreServiceValueHolder.getInstance();
+        ModelStorage modelStorage = mlCoreServiceValueHolder.getModelStorage();
+        String storageType = modelStorage.getStorageType();
+        String storageLocation = modelStorage.getStorageDirectory();
+
+        MLIOFactory ioFactory = new MLIOFactory(MLCoreServiceValueHolder.getInstance().getMlProperties());
+        MLInputAdapter inputAdapter = ioFactory.getInputAdapter(storageType + MLConstants.IN_SUFFIX);
+        InputStream in = inputAdapter.readDataset(new URI(storageLocation  + "/" + modelName));
+        ObjectInputStream ois = new ObjectInputStream(in);
+        MLModel mlModel = (MLModel) ois.readObject();
+        return mlModel;
+
     }
 
     /**
@@ -63,7 +71,7 @@ public class PredictMediatorUtils {
      * @return
      */
     public static List<Feature> getFeaturesOfModel(String modelName) throws IOException,
-            RegistryException, ClassNotFoundException {
+            RegistryException, ClassNotFoundException, URISyntaxException, MLInputAdapterException {
 
         MLModel mlModel = retrieveModelFromRegistry(modelName);
         List<Feature> features = mlModel.getFeatures();
@@ -79,7 +87,7 @@ public class PredictMediatorUtils {
      * @throws MLAnalysisHandlerException
      */
     public static String getResponseVariable(String modelName) throws IOException,
-            RegistryException, ClassNotFoundException {
+            RegistryException, ClassNotFoundException, URISyntaxException, MLInputAdapterException {
         MLModel mlModel = retrieveModelFromRegistry(modelName);
         return mlModel.getResponseVariable();
     }

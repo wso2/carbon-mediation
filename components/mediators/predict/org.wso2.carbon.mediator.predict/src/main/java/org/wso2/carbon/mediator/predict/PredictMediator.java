@@ -24,11 +24,13 @@ import org.apache.synapse.config.xml.SynapsePath;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.predict.util.ModelHandler;
+import org.wso2.carbon.ml.core.exceptions.MLInputAdapterException;
 import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
 import org.wso2.carbon.registry.api.RegistryException;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,6 +85,10 @@ public class PredictMediator extends AbstractMediator {
         } catch (RegistryException e) {
             handleException("Error while retrieving the Model ", e, messageContext);
         } catch (IOException e) {
+            handleException("Error while retrieving the Model ", e, messageContext);
+        } catch (MLInputAdapterException e) {
+            handleException("Error while retrieving the Model ", e, messageContext);
+        } catch (URISyntaxException e) {
             handleException("Error while retrieving the Model ", e, messageContext);
         }
         return null;
