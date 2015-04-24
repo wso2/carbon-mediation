@@ -26,9 +26,9 @@ import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.predict.util.ModelHandler;
 import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
-import org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException;
-import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.registry.api.RegistryException;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +37,6 @@ public class PredictMediator extends AbstractMediator {
     private String resultPropertyName;
     private Map<String, SynapsePath> featureMappings;
     private String modelName;
-    private ModelHandler modelHandler;
 
     public PredictMediator() {
         featureMappings = new HashMap<String, SynapsePath>();
@@ -79,10 +78,12 @@ public class PredictMediator extends AbstractMediator {
             handleException("Error while predicting value from the model ", e, messageContext);
         } catch (MLModelBuilderException e) {
             handleException("Error while building the Model ", e, messageContext);
-        } catch (DatabaseHandlerException e) {
-            handleException("Error while predicting value from the model", e, messageContext);
-        } catch (UserStoreException e) {
-            handleException("Error while building the model", e, messageContext);
+        } catch (ClassNotFoundException e) {
+            handleException("Error while building the Model ", e, messageContext);
+        } catch (RegistryException e) {
+            handleException("Error while retrieving the Model ", e, messageContext);
+        } catch (IOException e) {
+            handleException("Error while retrieving the Model ", e, messageContext);
         }
         return null;
     }

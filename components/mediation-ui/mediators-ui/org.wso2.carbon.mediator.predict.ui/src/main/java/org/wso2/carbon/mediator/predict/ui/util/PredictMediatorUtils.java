@@ -19,40 +19,53 @@
 package org.wso2.carbon.mediator.predict.ui.util;
 
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.context.RegistryType;
 import org.wso2.carbon.ml.commons.domain.Feature;
 import org.wso2.carbon.ml.commons.domain.MLModel;
-import org.wso2.carbon.ml.commons.domain.MLModelNew;
 import org.wso2.carbon.ml.core.exceptions.MLAnalysisHandlerException;
-import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
-import org.wso2.carbon.ml.core.impl.MLAnalysisHandler;
-import org.wso2.carbon.ml.core.impl.MLModelHandler;
-import org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException;
+import org.wso2.carbon.ml.core.utils.MLCoreServiceValueHolder;
+import org.wso2.carbon.registry.api.Registry;
+import org.wso2.carbon.registry.api.RegistryException;
+import org.wso2.carbon.registry.api.Resource;
 import org.wso2.carbon.user.api.UserStoreException;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.List;
 
 public class PredictMediatorUtils {
 
     /**
+     * Retrieve the ML-Model from the Registry
+     * @param modelName
+     * @return
+     * @throws RegistryException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    private static MLModel retrieveModelFromRegistry(String modelName) throws RegistryException, IOException, ClassNotFoundException {
+
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        Registry registry = carbonContext.getRegistry(RegistryType.SYSTEM_GOVERNANCE);
+        Resource resource = registry.get(MLCoreServiceValueHolder.getInstance().getModelStorage().getStorageDirectory() + "/" + modelName);
+        byte[] readArray = (byte[]) resource.getContent();
+        ByteArrayInputStream bis = new ByteArrayInputStream(readArray);
+        ObjectInputStream objectInputStream = new ObjectInputStream(bis);
+        MLModel model = (MLModel) objectInputStream.readObject();
+        return model;
+    }
+
+    /**
      * Get the Features list of the model
      * @param modelName ML model name
      * @return
-     * @throws DatabaseHandlerException
-     * @throws MLModelHandlerException
-     * @throws MLModelBuilderException
-     * @throws UserStoreException
      */
-    public static List<Feature> getFeaturesOfModel(String modelName) throws DatabaseHandlerException,
-            MLModelHandlerException, MLModelBuilderException, UserStoreException, MLAnalysisHandlerException {
+    public static List<Feature> getFeaturesOfModel(String modelName) throws IOException,
+            RegistryException, ClassNotFoundException {
 
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        int tenantId = carbonContext.getTenantId();
-        String userName = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().
-                getRealmConfiguration().getAdminUserName();
-        MLModelHandler mlModelHandler = new MLModelHandler();
-        MLModelNew mlModelNew = mlModelHandler.getModel(tenantId, userName, modelName);
-        MLModel mlModel = mlModelHandler.retrieveModel(mlModelNew.getId());
+        MLModel mlModel = retrieveModelFromRegistry(modelName);
         List<Feature> features = mlModel.getFeatures();
         return features;
     }
@@ -65,17 +78,9 @@ public class PredictMediatorUtils {
      * @throws MLModelHandlerException
      * @throws MLAnalysisHandlerException
      */
-    public static String getResponseVariable(String modelName) throws UserStoreException, MLModelHandlerException, MLAnalysisHandlerException {
-
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        int tenantId = carbonContext.getTenantId();
-        String userName = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().
-                getRealmConfiguration().getAdminUserName();
-        MLModelHandler mlModelHandler = new MLModelHandler();
-        MLModelNew mlModelNew = mlModelHandler.getModel(tenantId, userName, modelName);
-
-        MLAnalysisHandler analysisHandler = new MLAnalysisHandler();
-        String responseVariable = analysisHandler.getResponseVariable(mlModelNew.getAnalysisId());
-        return responseVariable;
+    public static String getResponseVariable(String modelName) throws IOException,
+            RegistryException, ClassNotFoundException {
+        MLModel mlModel = retrieveModelFromRegistry(modelName);
+        return mlModel.getResponseVariable();
     }
 }

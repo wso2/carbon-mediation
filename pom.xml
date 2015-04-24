@@ -1597,11 +1597,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.ml.database</artifactId>
-                <version>${ml.database.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.ml.commons</artifactId>
                 <version>${ml.commons.version}</version>
             </dependency>
@@ -1926,9 +1921,9 @@
                 <version>${netty.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.spark.wso2</groupId>
-                <artifactId>spark</artifactId>
-                <version>${spark.version}</version>
+                <groupId>org.wso2.orbit.org.apache.spark</groupId>
+                <artifactId>spark-core_2.10</artifactId>
+                <version>${spark.core.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -2085,10 +2080,9 @@
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
         <project.scm.id>wso2-scm-server</project.scm.id>
 
-        <spark.version>1.1.0.wso2v1</spark.version>
+        <spark.core.version>1.2.1.wso2v2</spark.core.version>
         <ml.core.version>1.0.0-SNAPSHOT</ml.core.version>
         <ml.commons.version>1.0.0-SNAPSHOT</ml.commons.version>
-        <ml.database.version>1.0.0-SNAPSHOT</ml.database.version>
 
     </properties>
     <pluginRepositories>

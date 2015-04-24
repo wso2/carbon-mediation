@@ -24,21 +24,21 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.SynapsePath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.context.RegistryType;
 import org.wso2.carbon.ml.commons.domain.Feature;
 import org.wso2.carbon.ml.commons.domain.MLModel;
-import org.wso2.carbon.ml.commons.domain.MLModelNew;
-import org.wso2.carbon.ml.commons.domain.Workflow;
 import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
-import org.wso2.carbon.ml.core.impl.MLModelHandler;
 import org.wso2.carbon.ml.core.impl.Predictor;
 import org.wso2.carbon.ml.core.internal.MLModelConfigurationContext;
 import org.wso2.carbon.ml.core.utils.MLCoreServiceValueHolder;
-import org.wso2.carbon.ml.core.utils.MLUtils;
-import org.wso2.carbon.ml.database.DatabaseService;
-import org.wso2.carbon.ml.database.exceptions.DatabaseHandlerException;
-import org.wso2.carbon.user.api.UserStoreException;
+import org.wso2.carbon.registry.api.Registry;
+import org.wso2.carbon.registry.api.RegistryException;
+import org.wso2.carbon.registry.api.Resource;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,13 +48,13 @@ public class ModelHandler {
     private static ModelHandler instance;
 
     private String modelName;
+    private long modelId;
     private Map<SynapsePath, Integer> featureIndexMap;
     private MLModel mlModel;
     private MLModelConfigurationContext context;
-    private long modelId;
 
     private ModelHandler(String modelName, Map<String, SynapsePath> featureMappings)
-            throws MLModelHandlerException, DatabaseHandlerException, MLModelBuilderException, UserStoreException {
+            throws IOException, RegistryException, ClassNotFoundException {
         initializeModel(modelName, featureMappings);
     }
 
@@ -63,12 +63,9 @@ public class ModelHandler {
      * @param modelName         name of the ML-model
      * @param featureMappings   Map containing pairs <feature-name, synapse-path>
      * @return
-     * @throws DatabaseHandlerException
-     * @throws MLModelHandlerException
-     * @throws MLModelBuilderException
      */
     public static ModelHandler getInstance(String modelName, Map<String, SynapsePath> featureMappings)
-            throws DatabaseHandlerException, MLModelHandlerException, MLModelBuilderException, UserStoreException {
+            throws  ClassNotFoundException, IOException, RegistryException {
         if(instance == null) {
             instance = new ModelHandler(modelName, featureMappings);
         }
@@ -88,16 +85,10 @@ public class ModelHandler {
      * @param inputVariables Map containing the key- value pairs <feature-name, xpath-expression-to-extract-feature-value>
      */
     private void initializeModel(String modelName, Map<String, SynapsePath> inputVariables)
-            throws DatabaseHandlerException, MLModelHandlerException, MLModelBuilderException, UserStoreException {
+            throws RegistryException, IOException, ClassNotFoundException {
 
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        int tenantId = carbonContext.getTenantId();
-        String userName = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().
-                getRealmConfiguration().getAdminUserName();
-        MLModelHandler mlModelHandler = new MLModelHandler();
-        MLModelNew mlModelNew = mlModelHandler.getModel(tenantId, userName, modelName);
-        modelId = mlModelNew.getId();
-        mlModel = mlModelHandler.retrieveModel(modelId);
+        this.modelName = modelName;
+        mlModel = retrieveModelFromRegistry();
 
         featureIndexMap = new HashMap<SynapsePath, Integer>();
         List<Feature> features = mlModel.getFeatures();
@@ -110,32 +101,33 @@ public class ModelHandler {
     }
 
     /**
-     * Create the spark context and model configuration context
-     * @throws DatabaseHandlerException
+     * Get the MLModel from the Registry
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws RegistryException
      */
-    private void createModelConfigurationContext() throws DatabaseHandlerException, UserStoreException {
-
-        MLCoreServiceValueHolder valueHolder = MLCoreServiceValueHolder.getInstance();
-        DatabaseService databaseService = valueHolder.getDatabaseService();
+    private MLModel retrieveModelFromRegistry() throws IOException, ClassNotFoundException, RegistryException {
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        int tenantId = carbonContext.getTenantId();
-        String userName = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUserRealm().
-                getRealmConfiguration().getAdminUserName();
+        Registry registry = carbonContext.getRegistry(RegistryType.SYSTEM_GOVERNANCE);
+        Resource resource = registry.get(MLCoreServiceValueHolder.getInstance().getModelStorage().getStorageDirectory() + "/" + modelName);
+        byte[] readArray = (byte[]) resource.getContent();
+        ByteArrayInputStream bis = new ByteArrayInputStream(readArray);
+        ObjectInputStream objectInputStream = new ObjectInputStream(bis);
+        MLModel model = (MLModel) objectInputStream.readObject();
+        return model;
+    }
+
+    /**
+     * Create the spark context and model configuration context
+     */
+    private void createModelConfigurationContext() {
 
         Thread.currentThread().setContextClassLoader(JavaSparkContext.class.getClassLoader());
-        MLModelNew model = databaseService.getModel(tenantId, userName, modelId);
-        String dataType = databaseService.getDataTypeOfModel(modelId);
-        String columnSeparator = MLUtils.ColumnSeparatorFactory.getColumnSeparator(dataType);
         SparkConf sparkConf = MLCoreServiceValueHolder.getInstance().getSparkConf();
-        Workflow facts = databaseService.getWorkflow(model.getAnalysisId());
-
         context = new MLModelConfigurationContext();
-        context.setModelId(modelId);
-        context.setColumnSeparator(columnSeparator);
-        context.setFacts(facts);
-
-        sparkConf.setAppName(String.valueOf(modelId));
+        sparkConf.setAppName(modelName);
         JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
         context.setSparkContext(sparkContext);
     }
