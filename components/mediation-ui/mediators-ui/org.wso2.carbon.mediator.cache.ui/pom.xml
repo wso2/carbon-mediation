@@ -41,10 +41,10 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Bundle-Activator>org.wso2.carbon.mediator.cache.CacheMediatorActivator</Bundle-Activator>                        
+                        <Bundle-Activator>org.wso2.carbon.mediator.cache.ui.CacheMediatorActivator</Bundle-Activator>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>
-                            org.wso2.carbon.mediator.cache.*,
+                            org.wso2.carbon.mediator.cache.ui.*,
                             !javax.servlet,
                             !javax.servlet.http,
                         </Export-Package>
@@ -55,8 +55,8 @@
                             org.osgi.framework,
                             org.wso2.carbon.mediator.service.*,
                             org.apache.synapse.util.xpath,
-                            org.wso2.carbon.caching.core,
-                            org.wso2.carbon.caching.core.digest,
+                            org.wso2.carbon.mediator.cache.*,
+                            org.wso2.carbon.mediator.cache.mediation.cache.impl.*,
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
                             *;resolution:=optional
                         </Import-Package>
@@ -68,8 +68,54 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.axis2</groupId>
+            <artifactId>axis2-saaj</artifactId>
+            <version>1.6.1-wso2v11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediator.cache</artifactId>
+            <version>4.3.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.relay</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.caching.core</artifactId>
+            <artifactId>javax.cache.wso2</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-saaj_1.3_spec</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom.wso2</groupId>
+            <artifactId>axiom</artifactId>
+        </dependency>
+
+        <!-- Neethi jar for the policy processor -->
+        <dependency>
+            <groupId>org.apache.neethi.wso2</groupId>
+            <artifactId>neethi</artifactId>
+        </dependency>
+
+        <!-- Third party dependencies -->
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>

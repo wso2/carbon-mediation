@@ -17,7 +17,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon"%>
-<%@ page import="org.wso2.carbon.mediator.cache.CacheMediator" %>
+<%@ page import="org.wso2.carbon.mediator.cache.ui.CacheMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -49,13 +49,16 @@
 	<td>
         <table class="normal">
             <tbody>
-                <%if (cacheMediator.getId() != null) {%>
+                <%if (cacheMediator.getId() != null) {
+                System.out.println("cacheMediator.getId() : "+cacheMediator.getId());%>
                 <tr>
                     <td class="leftCol-small"><fmt:message key="mediator.cache.id"/></td>
                     <td><input type="text" name="cacheId" value="<%=cacheMediator.getId()%>"
                                size="40"/></td>
                 </tr>
-                <%} else {%>
+                <%} else {
+                    System.out.println("cacheMediator.getId() null : "+cacheMediator.getId());
+                %>
                 <tr>
                     <td class="leftCol-small"><fmt:message key="mediator.cache.id"/></td>
                     <td><input type="text" name="cacheId" value="" size="40"/></td>

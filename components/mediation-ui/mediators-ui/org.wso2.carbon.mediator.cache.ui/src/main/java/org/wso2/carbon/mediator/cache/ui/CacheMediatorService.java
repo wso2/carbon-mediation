@@ -14,7 +14,7 @@
  *  limitations under the License.
  **/
 
-package org.wso2.carbon.mediator.cache;
+package org.wso2.carbon.mediator.cache.ui;
 
 import org.wso2.carbon.mediator.service.AbstractMediatorService;
 import org.wso2.carbon.mediator.service.ui.Mediator;
@@ -41,6 +41,6 @@ public class CacheMediatorService extends AbstractMediatorService {
     }
 
     public Mediator getMediator() {
-        return new CacheMediator();
+        return new org.wso2.carbon.mediator.cache.ui.CacheMediator();
     }
 }
