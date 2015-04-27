@@ -21,6 +21,7 @@ package org.wso2.carbon.inbound.endpoint.persistence;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.log4j.Logger;
+import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.core.RegistryResources;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
@@ -52,8 +53,10 @@ public class InboundEndpointsDataStore {
         try {
             Resource fetchedResource = registry.get(rootPath);
             if (fetchedResource != null) {
-                String fetchedData = fetchedResource.getProperty(REG_PROP);
-
+                String fetchedData=null;
+               if(fetchedResource.getContent() instanceof byte[]){
+                   fetchedData = new String((byte[])fetchedResource.getContent());
+               };
                 OMElement fetchedOM = null;
                 try {
                     fetchedOM = AXIOMUtil.stringToOM(fetchedData);
@@ -78,7 +81,7 @@ public class InboundEndpointsDataStore {
         endpointInfo = new ConcurrentHashMap<Integer, List<InboundEndpointInfoDTO>>();
         try {
             Resource resource = registry.newResource();
-            resource.setProperty(REG_PROP, PersistenceUtils.convertEndpointInfoToOM(endpointInfo).toString());
+            resource.setContent(PersistenceUtils.convertEndpointInfoToOM(endpointInfo).toString());
             registry.put(rootPath, resource);
         } catch (RegistryException e) {
             handleException("Initializing registry data.Error while creating registry resource", e);
@@ -102,6 +105,29 @@ public class InboundEndpointsDataStore {
             endpointInfo.put(port, tenantList);
         }
         tenantList.add(new InboundEndpointInfoDTO(tenantDomain, protocol, name));
+        updateRegistry();
+    }
+
+    /**
+     * Register SSL endpoint in the InboundEndpointsDataStore
+     *
+     * @param port         listener port
+     * @param tenantDomain tenant domain
+     * @param protocol     protocol
+     * @param name         endpoint name
+     */
+    public void registerSSLEndpoint(int port, String tenantDomain, String protocol, String name,SSLConfiguration sslConfiguration) {
+
+        List<InboundEndpointInfoDTO> tenantList = endpointInfo.get(port);
+        if (tenantList == null) {
+            // If there is no existing listeners in the port, create a new list
+            tenantList = new ArrayList<InboundEndpointInfoDTO>();
+            endpointInfo.put(port, tenantList);
+        }
+        InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name);
+        inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
+        tenantList.add(inboundEndpointInfoDTO);
+
         updateRegistry();
     }
 
@@ -140,7 +166,7 @@ public class InboundEndpointsDataStore {
                 }
             }
         }
-        if (endpointInfo.get(port).size() == 0) {
+        if (endpointInfo.get(port) != null && endpointInfo.get(port).size() == 0) {
             endpointInfo.remove(port);
         }
         updateRegistry();
@@ -172,7 +198,7 @@ public class InboundEndpointsDataStore {
         OMElement dataOM = PersistenceUtils.convertEndpointInfoToOM(endpointInfo);
         try {
             Resource resource = registry.get(rootPath);
-            resource.setProperty(REG_PROP, dataOM.toString());
+            resource.setContent(dataOM.toString());
             registry.put(rootPath, resource);
         } catch (RegistryException e) {
             handleException("Exception occurred while updating registry data", e);

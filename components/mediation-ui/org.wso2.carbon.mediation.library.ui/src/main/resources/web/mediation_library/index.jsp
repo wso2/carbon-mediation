@@ -214,12 +214,17 @@ if(tabs!=null && tabs.equals("0")) {
                             }
                         %>
 									<%
-                            if (libDesc != null) {
-                        %>
-									<td><%=libDesc%></td>
-									<%
-                            }
-                        %>
+                                        if (libDesc != null) {
+                                    %>
+                                    <td><%=libDesc%>
+                                    </td>
+                                    <%
+                                        } else {
+                                    %>
+                                    <td></td>
+                                    <%
+                                        }
+                                    %>
 									<td> <%if(libStatus){ %>
 									   <a href="#" class="icon-link-nofloat"
 										style="background-image: url(images/activate.gif);"

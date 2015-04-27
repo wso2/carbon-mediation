@@ -1,7 +1,7 @@
 package org.wso2.carbon.business.messaging.hl7.store.util;
 
-import org.apache.synapse.message.store.impl.jms.Axis2Message;
-import org.apache.synapse.message.store.impl.jms.SynapseMessage;
+import org.apache.synapse.message.store.impl.commons.Axis2Message;
+import org.apache.synapse.message.store.impl.commons.SynapseMessage;
 
 import java.io.Serializable;
 

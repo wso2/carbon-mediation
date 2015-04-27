@@ -20,12 +20,12 @@
     <parent>
         <artifactId>inbound-endpoints</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.3.3-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
     <packaging>bundle</packaging>
-    <version>4.3.3-SNAPSHOT</version>
+    <version>4.4.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -37,10 +37,10 @@
             <artifactId>org.wso2.carbon.mediation.clustering</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <scope>compile</scope>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-nhttp-transport</artifactId>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -54,15 +54,17 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-
                             org.wso2.carbon.inbound.endpoint.protocol.http.management,
+                            org.wso2.carbon.inbound.endpoint.protocol.http.multitenancy,
                             org.wso2.carbon.inbound.endpoint.protocol.generic
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.inbound.endpoint.persistence;
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Fragment-Host>synapse-core</Fragment-Host>
+                        <Fragment-Host>
+                            synapse-core
+                        </Fragment-Host>
                     </instructions>
                 </configuration>
             </plugin>
