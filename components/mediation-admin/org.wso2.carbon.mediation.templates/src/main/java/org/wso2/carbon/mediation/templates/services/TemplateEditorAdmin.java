@@ -78,7 +78,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             templates = getSynapseConfiguration().getSequenceTemplates().values();
 
-            TemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArray(templates);
+            TemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArrayByTemplateMediator(templates);
             TemplateInfo[] ret;
             if (info.length >= (templatePerPage * pageNumber + templatePerPage)) {
                 ret = new TemplateInfo[templatePerPage];

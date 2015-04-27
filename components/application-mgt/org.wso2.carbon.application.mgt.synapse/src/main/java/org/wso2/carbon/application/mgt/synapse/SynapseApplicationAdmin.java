@@ -21,6 +21,7 @@ import org.wso2.carbon.application.deployer.AppDeployerUtils;
 import org.wso2.carbon.application.deployer.synapse.SynapseAppDeployerConstants;
 import org.wso2.carbon.application.deployer.config.Artifact;
 import org.wso2.carbon.application.mgt.synapse.internal.SynapseAppServiceComponent;
+import org.wso2.carbon.application.mgt.synapse.internal.SynapseConfigAdmin;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.apache.synapse.Startup;
 import org.apache.synapse.endpoints.*;
@@ -53,6 +54,7 @@ public class SynapseApplicationAdmin extends AbstractAdmin {
     public SynapseApplicationMetadata getSynapseAppData(String appName) throws Exception {
         SynapseApplicationMetadata data = new SynapseApplicationMetadata();
         String tenantId = AppDeployerUtils.getTenantIdString(getAxisConfig());
+        SynapseConfigAdmin synapseConfigAdmin = new SynapseConfigAdmin();
 
         // Check whether there is an application in the system from the given name
         ArrayList<CarbonApplication> appList
@@ -99,13 +101,9 @@ public class SynapseApplicationAdmin extends AbstractAdmin {
             if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(type)) {
                 sequenceList.add(instanceName);
             } else if (SynapseAppDeployerConstants.ENDPOINT_TYPE.equals(type)) {
-                Endpoint endpoint = SynapseAppServiceComponent.getScService().
-                        getSynapseConfiguration().getEndpoint(instanceName);
-                if (endpoint != null) {
-                    EndpointMetadata epData = new EndpointMetadata();
-                    epData.setName(instanceName);
-                    epData.setType(getEndpointType(endpoint));
-                    endpointList.add(epData);
+                EndpointMetadata endpointMetadata = synapseConfigAdmin.getEndpointMetadata(instanceName);
+                if(endpointMetadata != null){
+                    endpointList.add(endpointMetadata);
                 }
             } else if (SynapseAppDeployerConstants.PROXY_SERVICE_TYPE.equals(type)) {
                 proxyList.add(instanceName);
@@ -116,13 +114,10 @@ public class SynapseApplicationAdmin extends AbstractAdmin {
             } else if (SynapseAppDeployerConstants.MEDIATOR_TYPE.equals(type)) {
                 mediatorList.add(instanceName);
             } else if (SynapseAppDeployerConstants.TASK_TYPE.equals(type)) {
-                Startup task = SynapseAppServiceComponent.getScService().
-                        getSynapseConfiguration().getStartup(instanceName);
-                TaskDescription taskDescription = ((StartUpController) task).getTaskDescription();
-                TaskMetadata taskMetadata = new TaskMetadata();
-                taskMetadata.setName(taskDescription.getName());
-                taskMetadata.setGroupName(taskDescription.getTaskGroup());
-                taskList.add(taskMetadata);
+                TaskMetadata taskMetadata = synapseConfigAdmin.getTaskMetaData(instanceName);
+                if(taskMetadata != null){
+                    taskList.add(taskMetadata);
+                }
             }
         }
 

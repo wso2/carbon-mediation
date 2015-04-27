@@ -60,6 +60,7 @@ public class PayloadFactoryMediator extends AbstractMediator {
 
     private final String JSON_TYPE="json";
     private final String XML_TYPE="xml";
+    private final String TEXT_TYPE="text";
 
     private String format = null;
     private String type = null;
@@ -81,7 +82,7 @@ public class PayloadFactoryMediator extends AbstractMediator {
             if (format != null) {
                 try {
                     OMElement formatElem = fac.createOMElement(FORMAT, synNS);
-                    if(type!=null && type.contains(JSON_TYPE)){
+                    if(type!=null && (type.contains(JSON_TYPE) || type.contains(TEXT_TYPE))){
                         formatElem.setText(format);
                     } else{
                         formatElem.addChild(AXIOMUtil.stringToOM(format));
@@ -147,7 +148,7 @@ public class PayloadFactoryMediator extends AbstractMediator {
         if (formatElem != null) {
             OMAttribute n = formatElem.getAttribute(ATT_KEY);
             if (n == null) {
-                if(type!=null && type.contains(JSON_TYPE)){
+                if(type!=null && (type.contains(JSON_TYPE) || type.contains(TEXT_TYPE))){
                     this.format = formatElem.getText();
                 } else{
                     this.format = formatElem.getFirstElement().toString();

@@ -22,7 +22,11 @@ import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
+import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListenerManager;
+
+import java.io.IOException;
+import java.net.ServerSocket;
 
 
 /**
@@ -49,7 +53,13 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
     @Override
     public void init() {
-        EndpointListenerManager.getInstance().startEndpoint(port, name);
+        if(isPortUsedByAnotherApplication(port)){
+            log.warn("Port " + port + " used by inbound endpoint " + name + " is already used by another application " +
+                     "hence undeploying inbound endpoint");
+            this.destroy();
+        }else {
+            EndpointListenerManager.getInstance().startEndpoint(port, name);
+        }
     }
 
     @Override
@@ -57,8 +67,24 @@ public class InboundHttpListener implements InboundRequestProcessor {
         EndpointListenerManager.getInstance().closeEndpoint(port);
     }
 
-    private void handleException(String msg, Exception e) {
+    protected void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
+    }
+
+
+    protected boolean isPortUsedByAnotherApplication(int port) {
+        if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
+            return false;
+        } else {
+            try {
+                ServerSocket srv = new ServerSocket(port);
+                srv.close();
+                srv = null;
+                return false;
+            } catch (IOException e) {
+                return true;
+            }
+        }
     }
 }

@@ -18,16 +18,22 @@
 
 package org.wso2.carbon.inbound.endpoint.persistence;
 
+import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
+
 public class InboundEndpointInfoDTO {
 
     private String tenantDomain;
     private String protocol;
     private String endpointName;
+    private SSLConfiguration sslConfiguration;
+
+
 
     public InboundEndpointInfoDTO(String tenantDomain, String protocol, String endpointName) {
         this.tenantDomain = tenantDomain;
         this.protocol = protocol;
         this.endpointName = endpointName;
+
     }
 
     public String getTenantDomain() {
@@ -44,5 +50,12 @@ public class InboundEndpointInfoDTO {
 
     public void setEndpointName(String endpointName) {
         this.endpointName = endpointName;
+    }
+    public SSLConfiguration getSslConfiguration() {
+        return sslConfiguration;
+    }
+
+    public void setSslConfiguration(SSLConfiguration sslConfiguration) {
+        this.sslConfiguration = sslConfiguration;
     }
 }
