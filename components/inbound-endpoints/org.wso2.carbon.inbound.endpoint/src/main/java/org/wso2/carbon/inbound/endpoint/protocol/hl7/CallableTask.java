@@ -6,6 +6,9 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
@@ -23,39 +26,33 @@ import org.apache.synapse.mediators.base.SequenceMediator;
  * specific language governing permissions and limitations
  * under the License.
  */
-class CallbackRunnableTask implements CallbackRunnable {
-    private static final Log log = LogFactory.getLog(CallbackRunnableTask.class);
-
-    private volatile boolean complete = false;
+public class CallableTask implements Callable<Boolean> {
+    private static final Log log = LogFactory.getLog(CallableTask.class);
 
     private MessageContext requestMessageContext;
 
     private SequenceMediator injectingSequence;
     private SynapseEnvironment synapseEnvironment;
 
-    public CallbackRunnableTask(MessageContext synCtx, SequenceMediator injectingSequence,
-                                SynapseEnvironment synapseEnvironment) {
+    private Future handler;
+
+    public CallableTask(MessageContext synCtx, SequenceMediator injectingSequence,
+                        SynapseEnvironment synapseEnvironment, Future handler) {
         this.requestMessageContext = synCtx;
         this.injectingSequence = injectingSequence;
         this.synapseEnvironment = synapseEnvironment;
+        this.handler = handler;
     }
 
     @Override
-    public void run() {
+    public Boolean call() throws Exception {
         // inject to synapse here
         synapseEnvironment.injectMessage(requestMessageContext, injectingSequence);
-        complete = true;
-        return;
+        // cancel timeout handler thread
+        if (handler != null && !handler.isDone()) {
+            log.info("CANCELLING");
+            handler.cancel(true);
+        }
+        return true;
     }
-
-    @Override
-    public void onComplete() {
-        // handler to call when thread execution is finished.
-    }
-
-    @Override
-    public boolean isComplete() {
-        return complete;
-    }
-
 }

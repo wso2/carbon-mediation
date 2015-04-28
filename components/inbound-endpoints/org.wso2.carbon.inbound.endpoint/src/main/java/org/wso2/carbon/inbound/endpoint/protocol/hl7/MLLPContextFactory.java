@@ -6,7 +6,6 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
 
 import java.nio.charset.CharsetDecoder;
-import java.util.Map;
 
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.

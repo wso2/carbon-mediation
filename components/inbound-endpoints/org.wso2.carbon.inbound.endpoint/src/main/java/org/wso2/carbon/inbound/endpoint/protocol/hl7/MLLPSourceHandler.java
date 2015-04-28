@@ -96,6 +96,7 @@ public class MLLPSourceHandler implements IOEventDispatch {
             }
 
             if (mllpContext.getCodec().isReadComplete())  {
+                mllpContext.setResponded(false);
                 if (mllpContext.isAutoAck()) {
                     mllpContext.requestOutput();
                     bufferFactory.release(inputBuffer);
@@ -181,9 +182,14 @@ public class MLLPSourceHandler implements IOEventDispatch {
         }
 
         if (mllpContext.getCodec().isWriteComplete()) {
-            bufferFactory.release(outputBuffer);
-            mllpContext.reset();
-            mllpContext.requestInput();
+            if (mllpContext.isMarkForClose()) {
+                shutdownConnection(session, mllpContext, null);
+            } else {
+                bufferFactory.release(outputBuffer);
+                mllpContext.setResponded(true);
+                mllpContext.reset();
+                mllpContext.requestInput();
+            }
         }
 
     }

@@ -24,11 +24,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.EventMask;
 import org.apache.http.nio.reactor.IOSession;
-import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
 
 import java.nio.charset.CharsetDecoder;
-import java.util.Map;
 
 public class MLLPContext {
     private static final Log log = LogFactory.getLog(MLLPContext.class);
@@ -45,7 +43,10 @@ public class MLLPContext {
     private volatile boolean autoAck = true;
     private volatile boolean nackMode = false;
     private volatile boolean transportError = false;
+    private volatile boolean responded = false;
+    private volatile boolean markForClose = false;
     private boolean preProcess = true;
+
 
     private Parser preProcessorParser = null;
     private BufferFactory bufferFactory;
@@ -168,6 +169,22 @@ public class MLLPContext {
 
     public void setTransportError(boolean transportError) {
         this.transportError = transportError;
+    }
+
+    public boolean hasResponded() {
+        return responded;
+    }
+
+    public void setResponded(boolean responded) {
+        this.responded = responded;
+    }
+
+    public boolean isMarkForClose() {
+        return markForClose;
+    }
+
+    public void setMarkForClose(boolean markForClose) {
+        this.markForClose = markForClose;
     }
 
     public void reset() {

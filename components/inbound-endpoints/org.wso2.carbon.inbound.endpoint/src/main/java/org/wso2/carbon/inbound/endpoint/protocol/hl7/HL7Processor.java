@@ -12,8 +12,10 @@ import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -33,10 +35,10 @@ import java.util.concurrent.Executors;
  * under the License.
  */
 public class HL7Processor implements InboundResponseSender {
-    private static final Log log = LogFactory.getLog(InboundHL7IOReactor.class);
+    private static final Log log = LogFactory.getLog(HL7Processor.class);
 
     // TODO: use axis2 worker pool here.
-    private static ExecutorService executorService;
+    private static ScheduledExecutorService executorService;
 
     private Map<String, Object> parameters;
     private InboundProcessorParams params;
@@ -48,7 +50,7 @@ public class HL7Processor implements InboundResponseSender {
     private int timeOut;
 
     public HL7Processor(Map<String, Object> parameters) {
-        executorService  = Executors.newFixedThreadPool(50);
+        executorService  = Executors.newScheduledThreadPool(50);
         this.parameters = parameters;
 
         params = (InboundProcessorParams) parameters.get(MLLPConstants.INBOUND_PARAMS);
@@ -64,7 +66,7 @@ public class HL7Processor implements InboundResponseSender {
 
     }
 
-    public void processRequest(MLLPContext mllpContext) {
+    public void processRequest(final MLLPContext mllpContext) {
         mllpContext.setRequestTime(System.currentTimeMillis());
 
         // Prepare Synapse Context for message injection
@@ -81,8 +83,16 @@ public class HL7Processor implements InboundResponseSender {
         SequenceMediator injectSeq = (SequenceMediator) synEnv.getSynapseConfiguration().getSequence(inSequence);
         injectSeq.setErrorHandler(onErrorSequence);
 
-        CallbackRunnable task = new CallbackRunnableTask(synCtx, injectSeq, synEnv);
-        executorService.execute(task);
+        Future timeoutFuture = null;
+
+        if (!autoAck) {
+            timeoutFuture = executorService.schedule(new TimeoutHandler(mllpContext), timeOut, TimeUnit.MILLISECONDS);
+        }
+
+        CallableTask task = new CallableTask(synCtx, injectSeq, synEnv, timeoutFuture);
+
+        executorService.submit(task);
+
     }
 
     public Map<String, Object> getInboundParameterMap() {
@@ -131,6 +141,30 @@ public class HL7Processor implements InboundResponseSender {
             mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(), msg));
         } catch (HL7Exception e) {
             log.error("Error while generating NACK response.", e);
+        }
+    }
+}
+
+class TimeoutHandler implements Runnable {
+    private static final Log log = LogFactory.getLog(TimeoutHandler.class);
+
+    private MLLPContext context;
+
+    public TimeoutHandler(MLLPContext context) {
+        this.context = context;
+    }
+
+    public void run() {
+        if (!context.hasResponded()) {
+            try {
+                log.warn("Timed out while waiting for HL7 Response to be generated.");
+                context.setHl7Message(HL7MessageUtils.createNack(context.getHl7Message(),
+                        "Timed out while waiting for HL7 Response to be generated."));
+                context.setMarkForClose(true);
+                context.requestOutput();
+            } catch (HL7Exception e) {
+                log.error("Could not generate timeout NACK response.", e);
+            }
         }
     }
 }

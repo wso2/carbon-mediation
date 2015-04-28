@@ -18,7 +18,6 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
  * under the License.
  */
 
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 public class MLLPConstants {
