@@ -41,13 +41,16 @@ public class InboundHL7Listener implements InboundRequestProcessor {
 
     private String port;
     private Map<String, Object> parameters = new HashMap<String, Object>();
+    private HL7Processor hl7Processor;
 
     public InboundHL7Listener(InboundProcessorParams params) {
+        validateParameters(params);
         parameters.put(MLLPConstants.INBOUND_PARAMS, params);
         this.port = params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PORT);
         parameters.put(MLLPConstants.INBOUND_HL7_BUFFER_FACTORY,
-                new BufferFactory(8 * 1024, new HeapByteBufferAllocator(), 512));
-        validateParameters(params);
+                new BufferFactory(8 * 1024, new HeapByteBufferAllocator(), 1024));
+        parameters.put(MLLPConstants.HL7_REQ_PROC, hl7Processor);
+        hl7Processor = new HL7Processor(parameters);
     }
 
     private void validateParameters(InboundProcessorParams params) {
@@ -131,7 +134,7 @@ public class InboundHL7Listener implements InboundRequestProcessor {
 
         try {
             int port = Integer.parseInt(this.port);
-            InboundHL7IOReactor.bind(port, this.parameters);
+            InboundHL7IOReactor.bind(port, hl7Processor);
         } catch (NumberFormatException e) {
             log.error("The port specified is of an invalid type: " + this.port + ". HL7 Inbound Endpoint not started.");
         }

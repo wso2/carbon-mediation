@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharsetDecoder;
 
@@ -42,7 +43,7 @@ public class HL7Codec {
 
     private CharsetDecoder charsetDecoder;
 
-    private int state;
+    private volatile int state;
 
     private ByteBuffer byteBuffer;
 
@@ -61,7 +62,7 @@ public class HL7Codec {
 
     public int decode(ByteBuffer dst, MLLPContext context) throws IOException, MLLProtocolException, HL7Exception {
 
-        if (this.state >= READ_COMPLETE) {
+        if (this.state >= READ_COMPLETE || dst.position() < 0) {
             return -1;
         }
 
@@ -98,7 +99,8 @@ public class HL7Codec {
 //                  System.out.println(context.getRequestBuffer().toString());
                 context.getRequestBuffer().setLength(0);
             } catch (HL7Exception e) {
-                throw e;
+                log.error("Error while parsing request message: " + context.getRequestBuffer());
+                //throw e;
             }
         }
 

@@ -108,7 +108,7 @@ public class GenericProcessor extends InboundRequestProcessorImpl implements Tas
         	Task task = new GenericTask(pollingConsumer);
         	start(task, ENDPOINT_POSTFIX);
         } catch (Exception e) {
-            log.error("Could not start Generic Processor. Error starting up scheduler. Error: " + e.getLocalizedMessage());
+            log.error("Could not start Generic HL7Processor. Error starting up scheduler. Error: " + e.getLocalizedMessage());
         }
     }
 

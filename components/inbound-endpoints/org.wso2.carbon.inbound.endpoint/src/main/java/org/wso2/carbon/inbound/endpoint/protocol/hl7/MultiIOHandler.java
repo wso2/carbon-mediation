@@ -23,32 +23,28 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.IOSession;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MultiIOHandler extends HL7ServerIOEventDispatch {
+public class MultiIOHandler extends MLLPSourceHandler {
 
     private static final Log log = LogFactory.getLog(MultiIOHandler.class);
 
-    public ConcurrentHashMap<Integer, HL7ServerIOEventDispatch> handlers = new ConcurrentHashMap<Integer, HL7ServerIOEventDispatch>();
+    public ConcurrentHashMap<Integer, MLLPSourceHandler> handlers = new ConcurrentHashMap<Integer, MLLPSourceHandler>();
 
-    private ConcurrentHashMap<Integer, Map<String, Object>> parameterMap;
+    private ConcurrentHashMap<Integer, HL7Processor> processorMap;
 
-    public MultiIOHandler(ConcurrentHashMap<Integer, Map<String, Object>> parameterMap) {
+    public MultiIOHandler(ConcurrentHashMap<Integer, HL7Processor> processorMap) {
         super();
-        this.parameterMap = parameterMap;
+        this.processorMap = processorMap;
     }
 
-    // TODO create HL7RequestProcessor at endpoint init and pass it down, instead of creating one per connect
     @Override
     public void connected(IOSession session) {
 
         InetSocketAddress remoteIsa = (InetSocketAddress) session.getRemoteAddress();
         InetSocketAddress localIsa = (InetSocketAddress) session.getLocalAddress();
 
-        HL7RequestProcessor requestProcessor = new HL7RequestProcessor(localIsa.getPort(), parameterMap);
-
-        HL7ServerIOEventDispatch handler = new HL7ServerIOEventDispatch(requestProcessor);
+        MLLPSourceHandler handler = new MLLPSourceHandler(processorMap.get(localIsa.getPort()));
         handlers.put(remoteIsa.getPort(), handler);
 
         handler.connected(session);
@@ -59,7 +55,7 @@ public class MultiIOHandler extends HL7ServerIOEventDispatch {
     public void inputReady(IOSession session) {
 
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
-        HL7ServerIOEventDispatch handler = handlers.get(isa.getPort());
+        MLLPSourceHandler handler = handlers.get(isa.getPort());
         handler.inputReady(session);
 
     }
@@ -68,7 +64,7 @@ public class MultiIOHandler extends HL7ServerIOEventDispatch {
     public void outputReady(IOSession session) {
 
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
-        HL7ServerIOEventDispatch handler = handlers.get(isa.getPort());
+        MLLPSourceHandler handler = handlers.get(isa.getPort());
         handler.outputReady(session);
 
     }
@@ -77,7 +73,7 @@ public class MultiIOHandler extends HL7ServerIOEventDispatch {
     public void timeout(IOSession session) {
 
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
-        HL7ServerIOEventDispatch handler = handlers.get(isa.getPort());
+        MLLPSourceHandler handler = handlers.get(isa.getPort());
         handler.timeout(session);
         handlers.remove(handler);
 
@@ -87,7 +83,10 @@ public class MultiIOHandler extends HL7ServerIOEventDispatch {
     public void disconnected(IOSession session) {
 
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
-        HL7ServerIOEventDispatch handler = handlers.get(isa.getPort());
+        if (isa == null) {
+            return;
+        }
+        MLLPSourceHandler handler = handlers.get(isa.getPort());
         handler.disconnected(session);
         handlers.remove(handler);
 

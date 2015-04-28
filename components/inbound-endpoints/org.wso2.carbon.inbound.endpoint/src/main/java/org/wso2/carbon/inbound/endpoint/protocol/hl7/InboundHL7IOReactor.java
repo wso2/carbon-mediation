@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketAddress;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InboundHL7IOReactor {
@@ -41,10 +40,9 @@ public class InboundHL7IOReactor {
 
     private static ConcurrentHashMap<Integer, ListenerEndpoint> endpointMap = new ConcurrentHashMap<Integer, ListenerEndpoint>();
 
-    private static volatile boolean isStarted = false;
+    private static ConcurrentHashMap<Integer, HL7Processor> processorMap = new ConcurrentHashMap<Integer, HL7Processor>();
 
-    private static ConcurrentHashMap<Integer, Map<String, Object>>
-            parameterMap = new ConcurrentHashMap<Integer, Map<String, Object>>();
+    private static volatile boolean isStarted = false;
 
     public static void start() throws IOException {
 
@@ -62,7 +60,7 @@ public class InboundHL7IOReactor {
                 try {
                     isStarted = true;
                     log.info("MLLP Transport IO Reactor Started");
-                    reactor.execute(new MultiIOHandler(parameterMap));
+                    reactor.execute(new MultiIOHandler(processorMap));
                 } catch (IOException e) {
                     isStarted = false;
                     log.error("Error while starting the MLLP Transport IO Reactor.", e);
@@ -95,7 +93,7 @@ public class InboundHL7IOReactor {
         return isStarted;
     }
 
-    public static boolean bind(int port, Map<String, Object> params) {
+    public static boolean bind(int port, HL7Processor processor) {
         if (!isPortAvailable(port)) {
             log.error("A service is already listening on port " +
                     port + ". Please select a different port for this endpoint.");
@@ -107,7 +105,7 @@ public class InboundHL7IOReactor {
         try {
             ep.waitFor();
             endpointMap.put(port, ep);
-            parameterMap.put(port, params);
+            processorMap.put(port, processor);
             return true;
         } catch (InterruptedException e) {
             log.error("Error while starting a new MLLP Listener on port " + port + ". ", e);
@@ -129,7 +127,7 @@ public class InboundHL7IOReactor {
         ListenerEndpoint ep = endpointMap.get(port);
 
         endpointMap.remove(port);
-        parameterMap.remove(port);
+        processorMap.remove(port);
 
         if (ep == null) {
             return false;
@@ -152,7 +150,7 @@ public class InboundHL7IOReactor {
                 .setShutdownGracePeriod(500)
                 .setInterestOpQueued(false)
                 .setIoThreadCount(Runtime.getRuntime().availableProcessors())
-                .setSoTimeout(10000)
+                .setSoTimeout(0)
                 .setSoReuseAddress(true)
                 .setSoLinger(-1)
                 .setSoKeepAlive(true)
