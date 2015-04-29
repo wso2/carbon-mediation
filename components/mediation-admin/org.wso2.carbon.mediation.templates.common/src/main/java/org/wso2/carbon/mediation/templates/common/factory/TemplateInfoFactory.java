@@ -119,7 +119,7 @@ public class TemplateInfoFactory {
      * {@link org.wso2.carbon.mediation.templates.common.TemplateInfo} array needs to be created
      * @return an array of TemplateInfo instances representing the sequences
      */
-    public static TemplateInfo[] getSortedTemplateInfoArray(
+    public static TemplateInfo[] getSortedTemplateInfoArrayByTemplateMediator(
             Collection<TemplateMediator> templateMediators) {
 
         ArrayList<TemplateInfo> templateInfoList = new ArrayList<TemplateInfo>();
@@ -136,7 +136,7 @@ public class TemplateInfoFactory {
         return templateInfoList.toArray(new TemplateInfo[templateInfoList.size()]);
     }
 
-    public static EndpointTemplateInfo[] getSortedTemplateInfoArray(
+    public static EndpointTemplateInfo[] getSortedTemplateInfoArrayByTemplate(
             Collection<Template> templateMediators) {
 
         ArrayList<EndpointTemplateInfo> templateInfoList = new ArrayList<EndpointTemplateInfo>();
