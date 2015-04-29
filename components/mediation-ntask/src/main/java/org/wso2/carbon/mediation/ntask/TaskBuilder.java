@@ -1,16 +1,13 @@
 package org.wso2.carbon.mediation.ntask;
 
 import org.apache.synapse.task.TaskDescription;
+import org.wso2.carbon.ntask.common.TaskConstants;
 import org.wso2.carbon.ntask.core.TaskInfo;
 
 import java.util.*;
 
 final class TaskBuilder {
-    public static final String TASK_TYPE_ESB = "ESB_TASK";
-    //public static final String REMOTE_SYSTEM_TASK_ID = "__REMOTE_SYSTEM_TASK_ID__";
-    //public static final String REMOTE_TASK_URI = "__REMOTE_TASK_URI__";
     public static final String REMOTE_TASK_NAME = "__REMOTE_TASK_NAME__";
-    //public static final String SYSTEM_TASK_FLAG = "__SYSTEM_TASK__";
 
     public static TaskInfo buildTaskInfo(TaskDescription taskDescription, Map<String, Object> properties) throws Exception {
         return buildTaskInfo(taskDescription, false, properties);
@@ -26,6 +23,9 @@ final class TaskBuilder {
         triggerInfo.setCronExpression(cron);
         if (description.getStartTime() != null) {
             triggerInfo.setStartTime(description.getStartTime().getTime());
+        } else if (triggerInfo.getCronExpression() == null) {
+            //triggerInfo.setStartTime(new Date());
+            //triggerInfo.setMisfirePolicy(TaskConstants.TaskMisfirePolicy.NOW_WITH_REMAINING_COUNT);
         }
         if (description.getEndTime() != null) {
             triggerInfo.setEndTime(description.getEndTime().getTime());
@@ -39,15 +39,6 @@ final class TaskBuilder {
         triggerInfo.setDisallowConcurrentExecution(true);
         Map<String, String> props = new HashMap<String, String>();
         props.put(REMOTE_TASK_NAME, description.getName());
-        //String targetUrl = null;
-        //if (system && targetUrl != null) {
-        //    int i1 = targetUrl.lastIndexOf("/");
-        //    String systemTaskId = targetUrl.substring(i1 + 1);
-        //    targetUrl = targetUrl.substring(0, i1);
-        //    props.put(SYSTEM_TASK_FLAG, Boolean.toString(true));
-        //    props.put(REMOTE_SYSTEM_TASK_ID, systemTaskId);
-        //}
-        //props.put(REMOTE_TASK_URI, targetUrl);
         // copy the remaining properties
         Map<String, String> properties = description.getProperties();
         Iterator<String> iterator = properties.keySet().iterator();

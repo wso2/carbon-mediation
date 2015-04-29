@@ -18,14 +18,13 @@
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>event-mediator</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.4.1-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediator.event</artifactId>
     <packaging>bundle</packaging>    
     <name>WSO2 Carbon - Event mediators</name>
@@ -51,7 +50,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            org.apache.commons.logging.*;version="1.0.4",
+                            org.apache.commons.logging.*;version="${org.apache.commons.logging.version}",
                             org.osgi.framework,                                                        
                             *;resolution:=optional,
                         </Import-Package>
@@ -69,16 +68,12 @@
             <artifactId>synapse-core</artifactId>           
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.event.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.event.ws</artifactId>
-        </dependency>
-         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>

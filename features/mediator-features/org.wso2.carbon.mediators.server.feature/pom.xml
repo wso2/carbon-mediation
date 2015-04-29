@@ -16,33 +16,32 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <parent>
-      <groupId>org.wso2.carbon</groupId>
+      <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediator-features</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.4.1-SNAPSHOT</version>
    </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediators.server.feature</artifactId>
-    <groupId>org.wso2.carbon</groupId>
-   <version>4.3.0-SNAPSHOT</version>
+    <version>4.4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - All Mediators Server Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the bundles required for All mediator Back-ends</description>
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.clazz.services</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.command.services</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.router.impl</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.fastXSLT</artifactId>
         </dependency>
         <dependency>
@@ -54,7 +53,11 @@
             <artifactId>bsf-all</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>rhino.wso2</groupId>
+            <artifactId>js</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.event</artifactId>
         </dependency>
     </dependencies>
@@ -81,15 +84,16 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.clazz.services</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.command.services</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.router.impl</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.fastXSLT</bundleDef>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.event</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.clazz.services</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.command.services</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.router.impl</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.fastXSLT</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.event</bundleDef>
                             </bundles>
                             <importBundles>
                                 <importBundleDef>org.wso2.carbon:org.wso2.carbon.ec2-client</importBundleDef>
                                 <importBundleDef>org.apache.bsf.wso2:bsf-all</importBundleDef>
+                                <importBundleDef>rhino.wso2:js</importBundleDef>
                             </importBundles>
                             <!--importFeatures>
                                 <importFeatureDef>org.wso2.carbon.mediation.admin</importFeatureDef>

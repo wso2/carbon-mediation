@@ -26,8 +26,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.*;
-import org.apache.synapse.commons.datasource.DataSourceConstants;
-import org.apache.synapse.commons.datasource.DataSourceInformationRepository;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.deployers.InboundEndpointDeployer;
@@ -44,8 +42,9 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.application.deployer.service.ApplicationManagerService;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.core.ServerShutdownHandler;
-import org.wso2.carbon.datasource.DataSourceInformationRepositoryService;
 import org.wso2.carbon.event.core.EventBroker;
+import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService;
+import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListenerManager;
 import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.initializer.multitenancy.TenantServiceBusInitializer;
@@ -95,11 +94,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * interface="org.wso2.carbon.mediation.registry.services.SynapseRegistryService"
  * cardinality="1..1" policy="dynamic"
  * bind="setSynapseRegistryService" unbind="unsetSynapseRegistryService"
- * @scr.reference name="datasource.information.repository.service"
- * interface="org.wso2.carbon.datasource.DataSourceInformationRepositoryService"
  * cardinality="1..1" policy="dynamic"
- * bind="setDataSourceInformationRepositoryService"
- * unbind="unsetDataSourceInformationRepositoryService"
  * @scr.reference name="task.description.repository.service"
  * interface="org.wso2.carbon.task.services.TaskDescriptionRepositoryService"
  * cardinality="1..1" policy="dynamic"
@@ -122,6 +117,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * @scr.reference name="esbntask.taskservice"
  * interface="org.wso2.carbon.mediation.ntask.internal.NtaskService" cardinality="0..1"
  * policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
+ * @scr.reference name="inbound.endpoint.persistence.service"
+ * interface="org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService"
+ * cardinality="1..1" policy="dynamic"
+ * bind="setInboundPersistenceService" unbind="unsetInboundPersistenceService"
  */
 @SuppressWarnings({"JavaDoc", "UnusedDeclaration"})
 public class ServiceBusInitializer {
@@ -135,7 +134,7 @@ public class ServiceBusInitializer {
     private static String configPath;
     private ConfigurationContextService configCtxSvc;
     private SynapseRegistryService synRegSvc;
-    private DataSourceInformationRepositoryService dataSourceInformationRepositoryService;
+    //    private DataSourceInformationRepositoryService dataSourceInformationRepositoryService;
     private TaskDescriptionRepositoryService repositoryService;
     private TaskSchedulerService taskSchedulerService;
     private SecretCallbackHandlerService secretCallbackHandlerService;
@@ -255,6 +254,9 @@ public class ServiceBusInitializer {
             configCtxSvc.getServerConfigContext().setProperty(
                     ConfigurationManager.CONFIGURATION_MANAGER, configurationManager);
 
+            // Start Http Inbound Endpoint Listeners
+            EndpointListenerManager.getInstance().loadEndpointListeners();
+
 			registerInboundDeployer(configCtxSvc.getServerConfigContext()
 					.getAxisConfiguration(),
 					contextInfo.getSynapseEnvironment());
@@ -271,7 +273,8 @@ public class ServiceBusInitializer {
     }
 
     private void initPersistence(SynapseConfigurationService synCfgSvc, String configName)
-            throws RegistryException, AxisFault {
+            throws RegistryException,
+                   AxisFault {
         // Initialize the mediation persistence manager if required
         ServerConfiguration serverConf = ServerConfiguration.getInstance();
         String persistence = serverConf.getFirstProperty(ServiceBusConstants.PERSISTENCE);
@@ -401,13 +404,13 @@ public class ServiceBusInitializer {
             serverManager = new ServerManager();
             ServerContextInformation contextInfo = new ServerContextInformation(configContext,
                     configurationInformation);
-
-            if (dataSourceInformationRepositoryService != null) {
-                DataSourceInformationRepository repository =
-                        dataSourceInformationRepositoryService.getDataSourceInformationRepository();
-                contextInfo.addProperty(DataSourceConstants.DATA_SOURCE_INFORMATION_REPOSITORY,
-                        repository);
-            }
+            //  TODO: Initialize with ndatasources
+            //            if (dataSourceInformationRepositoryService != null) {
+            //                DataSourceInformationRepository repository =
+            //                        dataSourceInformationRepositoryService.getDataSourceInformationRepository();
+            //                contextInfo.addProperty(DataSourceConstants.DATA_SOURCE_INFORMATION_REPOSITORY,
+            //                        repository);
+            //            }
 
             if (taskSchedulerService != null) {
                 TaskScheduler scheduler = taskSchedulerService.getTaskScheduler();
@@ -564,24 +567,25 @@ public class ServiceBusInitializer {
         this.synRegSvc = null;
     }
 
-    protected void setDataSourceInformationRepositoryService(
-            DataSourceInformationRepositoryService repositoryService) {
-
-        if (log.isDebugEnabled()) {
-            log.debug("DataSourceInformationRepositoryService " +
-                    "bound to the ESB initialization process");
-        }
-        this.dataSourceInformationRepositoryService = repositoryService;
-    }
-
-    protected void unsetDataSourceInformationRepositoryService(
-            DataSourceInformationRepositoryService repositoryService) {
-
-        if (log.isDebugEnabled()) {
-            log.debug("DataSourceInformationRepositoryService unbound from the ESB environment");
-        }
-        this.dataSourceInformationRepositoryService = null;
-    }
+    //	 TODO: Initialize with ndatasources
+    //    protected void setDataSourceInformationRepositoryService(
+    //            DataSourceInformationRepositoryService repositoryService) {
+    //
+    //        if (log.isDebugEnabled()) {
+    //            log.debug("DataSourceInformationRepositoryService " +
+    //                    "bound to the ESB initialization process");
+    //        }
+    //        this.dataSourceInformationRepositoryService = repositoryService;
+    //    }
+    //
+    //    protected void unsetDataSourceInformationRepositoryService(
+    //            DataSourceInformationRepositoryService repositoryService) {
+    //
+    //        if (log.isDebugEnabled()) {
+    //            log.debug("DataSourceInformationRepositoryService unbound from the ESB environment");
+    //        }
+    //        this.dataSourceInformationRepositoryService = null;
+    //    }
 
     protected void setTaskDescriptionRepositoryService(
             TaskDescriptionRepositoryService repositoryService) {
@@ -775,5 +779,13 @@ public class ServiceBusInitializer {
 		deploymentEngine.addDeployer(new InboundEndpointDeployer(),
 				inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
 	}
+
+    protected void setInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
+        // This service is just here to make sure that ServiceBus is not getting initialized
+        // before the Inbound Endpoint Persistence component is up and running
+    }
+
+    protected void unsetInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
+    }
 
 }

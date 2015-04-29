@@ -18,15 +18,14 @@
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>bam-mediator</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
     <artifactId>org.wso2.carbon.mediator.bam</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.4.1-SNAPSHOT</version>
     <packaging>bundle</packaging>    
     <name>WSO2 Carbon - BAM mediator</name>
     <url>http://wso2.org</url>
@@ -52,7 +51,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            org.apache.commons.logging.*;version="1.0.4",
+                            org.apache.commons.logging.*;version="${org.apache.commons.logging.version}",
                             org.osgi.framework,
                             org.wso2.carbon.mediator.bam.config,
                             *;resolution:=optional,
@@ -71,14 +70,14 @@
             <artifactId>synapse-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>commons-pool.wso2</groupId>
             <artifactId>commons-pool</artifactId>
         </dependency>
@@ -89,7 +88,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
@@ -103,18 +102,8 @@
             <artifactId>org.wso2.carbon.logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.bam.config</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.registry.common</artifactId>
-         </dependency>
     </dependencies>
-    <properties>
-    </properties>
 </project>

@@ -17,14 +17,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediators-ui</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.4.1-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediator.store.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Store Mediator UI</name>
@@ -56,7 +55,7 @@
                             org.osgi.framework,
                             org.wso2.carbon.mediator.service.*,
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
-                            org.wso2.carbon.message.store.stub.*; version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.message.store.stub.*; version="${carbon.mediation.imp.pkg.version}",
                             org.apache.synapse.config.xml,
                             org.wso2.carbon.mediator.service,
                             *;resolution:=optional
@@ -79,7 +78,7 @@
             </exclusions>
         </dependency>        
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.service</artifactId>
         </dependency>
         <dependency>
@@ -87,7 +86,7 @@
             <artifactId>org.wso2.carbon.logging</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.message.store.stub</artifactId>
         </dependency>
         <dependency>
@@ -97,10 +96,6 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
     </dependencies>
 

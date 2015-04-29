@@ -1,5 +1,5 @@
 <!--
- ~ Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~ Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ WSO2 Inc. licenses this file to you under the Apache License,
  ~ Version 2.0 (the "License"); you may not use this file except
@@ -15,10 +15,14 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
+<%@page import="java.util.HashSet"%>
+<%@page import="java.util.Set"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundDescription"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundClientConstants"%>
 <%@page import="java.util.List"%>
+<%@page import="java.util.Set"%>
+<%@page import="java.util.HashSet"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -42,7 +46,10 @@
 <script type="text/javascript" src="global-params.js"></script>
 <script type="text/javascript" src="inboundcommon.js"></script>
 <script type="text/javascript">
+var iParamCount = 0;
+var iParamMax = 0;
 var classRequired = false;
+var requiredParams = null;
 </script>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
     <carbon:breadcrumb label="inbound.header.update"
@@ -53,7 +60,11 @@ var classRequired = false;
         try {
             client = InboundManagementClient.getInstance(config, session);
             InboundDescription inboundDescription = client.getInboundDescription(request.getParameter("name"));
-    %>
+            List<String>defaultParams = client.getDefaultParameters(inboundDescription.getType());            
+            List<String>advParams = client.getAdvParameters(inboundDescription.getType()); 
+            Set<String>defaultParamNames = new HashSet<String>();
+    %>       
+    
     <form method="post" name="inboundupdateform" id="inboundupdateform"
           action="updateInbound.jsp">
 
@@ -81,7 +92,8 @@ var classRequired = false;
                         <td style="width:150px"><fmt:message key="inbound.type"/></td>
                         <td align="left">
                             <%=inboundDescription.getType()%>
-                            <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundDescription.getType()%>"/>                      
+                            <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundDescription.getType()%>"/> 
+                            <input name="inboundMode" id="inboundMode" type="hidden" value="edit"/>                                                  
                         </td>
                         <td></td>
                     </tr>
@@ -118,20 +130,129 @@ var classRequired = false;
                         <td></td>
                     </tr>                   
                     <% } %>
-					<% for(String strKey : inboundDescription.getParameters().keySet()) {%>                        
+                    <%if(!defaultParams.isEmpty()){                     
+                    %>
+                    <script type="text/javascript">var requiredParams = new Array(<%=defaultParams.size()%>);</script>
+                    <%} %>       
+					<%  int ctr = -1;
+					    for(String defaultParamOri : defaultParams) {
+						String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
+						String defaultParam = arrParamOri[0].trim();
+						defaultParamNames.add(defaultParam);
+						ctr++;
+					%> 	
+					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
 	                    <tr>
-	                        <td style="width:150px"><%=strKey%></td>
-	                        <td align="left">	                            	                      
-                                <input id="param.<%=strKey%>" name="param.<%=strKey%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(strKey)%>"/>                       
+	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
+	                        <td align="left">
+	                        <%if(arrParamOri.length > 1){%>
+	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+	                            <%for(int i = 1;i<arrParamOri.length;i++){
+	                                String eleValue = arrParamOri[i].trim();
+	                            %>
+	                            <%if(eleValue.equals(inboundDescription.getParameters().get(defaultParam))){ %>
+	                                <option value="<%=eleValue%>" selected><%=eleValue%></option>
+	                            <%}else{%>
+	                                <option value="<%=eleValue%>"><%=eleValue%></option>	                                                
+	                            <%}%>  	  
+	                            <%}%>
+                                </select>
+							<%} else{ %>
+                             <%if(InboundClientConstants.TYPE_HTTPS.equals(inboundDescription.getType()) && defaultParam.equals("keystore")){%>
+                             <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundupdateform" rows="8" cols="35">
+                             <%=inboundDescription.getParameters().get(defaultParam)%>
+                              </textarea>
+                             <%}else{ %>
+                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
+                             <%} %>
+                            <%} %>                       
 	                        </td>
 	                        <td></td>
 	                    </tr>                        
-                     <% } %>
+                     <% } %>                     
+                     <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
+                    <tr>
+                        <td class="buttonRow" colspan="3">       
+	                            <input class="button" type="button"
+	                                   value='<fmt:message key="inbound.add.param"/>'
+	                                   onclick="addRow('tblInput');"/>   
+	                            <input class="button" type="button"
+	                                   value='<fmt:message key="inbound.remove.param"/>'
+	                                   onclick="deleteRow('tblInput');"/>                                                                 
+                        </td>
+                    </tr>  
+					<%  int i = 0;
+					    for(String strKey : inboundDescription.getParameters().keySet()) {
+					    if(!defaultParamNames.contains(strKey)){
+					    i++;
+					    %>                        
+	                    <tr>
+	                        <td style="width:150px">
+	                            <input id="paramkey<%=i%>" name="paramkey<%=i%>" class="longInput" type="text" value="<%=strKey%>"/>  
+	                        </td>
+	                        <td align="left">	                            	                      
+                                <input id="paramval<%=i%>" name="paramval<%=i%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(strKey)%>"/>                       
+	                        </td>
+	                        <td></td>
+	                    </tr>                        
+                     <% } %> 
+                     <% } %> 
+                     <script type="text/javascript">iParamCount=<%=i%>;iParamMax=<%=i%>;</script>
+                     <%}else{ %>
+				    <tr>
+				        <td><span id="_adv" style="float: left; position: relative;">
+				            <a class="icon-link" onclick="javascript:showAdvancedOptions('');"
+				               style="background-image: url(images/down.gif);"><fmt:message
+				                    key="show.advanced.options"/></a>
+				        </span>
+				        </td>
+				    </tr> 
+				    <%} %>                     
+				    <tr>
+					    <td colspan="3">
+						    <div id="_advancedForm" style="display:none">
+						    <table id="tblAdvInput" name="tblAdvInput" class="normal-nopadding" cellspacing="0" cellpadding="0" border="0">
+								<% for(String defaultParamOri : advParams) {
+									String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
+									String defaultParam = arrParamOri[0].trim();						
+								%> 					                       
+				                    <tr>
+				                        <td style="width:150px"><%=defaultParam %></td>
+				                        <td align="left">
+				                        <%if(arrParamOri.length > 1){%>
+				                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+				                            <%for(int i = 1;i<arrParamOri.length;i++){
+				                                String eleValue = arrParamOri[i].trim();
+				                                %>
+				                                <%if(eleValue.equals(inboundDescription.getParameters().get(defaultParam))){%>
+				                                <option value="<%=eleValue%>" selected><%=eleValue%></option>
+				                                <%} else {%>
+				                                <option value="<%=eleValue%>"><%=eleValue%></option>
+				                                <%} %>					                            				                                
+				                            <%}%>                                
+			                                </select>
+										<%}else{%>
+                                        <%if(InboundClientConstants.TYPE_HTTPS.equals(inboundDescription.getType()) && (defaultParam.equals("truststore") || defaultParam.equals("CertificateRevocationVerifier"))){%>
+                                        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundupdateform" rows="8" cols="35">
+                                        <%=((inboundDescription.getParameters().get(defaultParam)==null)?"":inboundDescription.getParameters().get(defaultParam))%>
+                                        </textarea>
+                                        <%}else{ %>
+			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"  value="<%=((inboundDescription.getParameters().get(defaultParam)==null)?"":inboundDescription.getParameters().get(defaultParam))%>"/>
+			                            <%} %>
+			                            <%} %>
+				                        </td>
+				                        <td></td>
+				                    </tr>                        
+			                     <% } %>						    
+						    	</table>
+						    </div> 			
+					    </td>
+				    </tr>                     
                     <tr>
                         <td class="buttonRow" colspan="3">
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.update.button.text"/>"
-                                   onclick="inboundUpdate('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>',document.inboundupdateform); return false;"/>
+                                   onclick="inboundUpdate('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>',document.inboundupdateform); return false;"/>
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.cancel.button.text"/>"
                                    onclick="document.location.href='index.jsp?ordinal=0';"/>                                                                   

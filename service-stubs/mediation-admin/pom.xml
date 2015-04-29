@@ -15,20 +15,18 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-      <groupId>org.wso2.carbon</groupId>
+      <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>carbon-mediation</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.4.1-SNAPSHOT</version>
       <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <groupId>org.wso2.carbon.mediation</groupId>
+    <version>4.4.1-SNAPSHOT</version>
     <artifactId>mediation-admin-stub</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Business Adaptors Aggregator Module</name>
@@ -37,7 +35,7 @@
     <modules>
         <module>org.wso2.carbon.business.messaging.hl7.store.stub</module>
         <module>org.wso2.carbon.endpoint.stub</module>
-	<module>org.wso2.carbon.localentry.stub</module>
+	    <module>org.wso2.carbon.localentry.stub</module>
         <module>org.wso2.carbon.mediation.artifactuploader.stub</module>
         <module>org.wso2.carbon.mediation.configadmin.stub</module>
         <module>org.wso2.carbon.mediation.library.stub</module>

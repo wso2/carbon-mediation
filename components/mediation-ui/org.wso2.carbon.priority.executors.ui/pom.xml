@@ -17,13 +17,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-ui</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
     <artifactId>org.wso2.carbon.priority.executors.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Priority Mediation UI</name>
@@ -48,7 +47,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.priority.executors.stub.*;
-                            version="${carbon.platform.package.import.version.range}",
+                            version="${carbon.mediation.imp.pkg.version}",
                             org.wso2.carbon.mediator.service.*,
                             org.wso2.carbon.sequences.common.*,
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
@@ -108,17 +107,12 @@
             <artifactId>org.wso2.carbon.ui</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>            
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.priority.executors.stub</artifactId>
-            <version>${wso2carbon.version}</version> 
         </dependency>
     </dependencies>
 

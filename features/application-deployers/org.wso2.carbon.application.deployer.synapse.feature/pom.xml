@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>application-deployer-features</artifactId>
+        <groupId>org.wso2.carbon.mediation</groupId>
+        <version>4.4.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>org.wso2.carbon.application.deployer.synapse.feature</artifactId>
+    <packaging>pom</packaging>
+    <version>4.4.1-SNAPSHOT</version>
+    <name>WSO2 Carbon - Synapse Application Deployer Feature</name>
+    <url>http://wso2.org</url>
+    <description>This feature contains the core bundles required for Synapse application deployment functionality</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.application.deployer.synapse</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.wso2.maven</groupId>
+                <artifactId>carbon-p2-plugin</artifactId>
+                <version>${carbon.p2.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>4-p2-feature-generation</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-feature-gen</goal>
+                        </goals>
+                        <configuration>
+                            <id>org.wso2.carbon.application.deployer.synapse</id>
+                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                            <adviceFile>
+                                <properties>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
+                                </properties>
+                            </adviceFile>
+                            <bundles>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.application.deployer.synapse:${carbon.mediation.version}</bundleDef>
+                            </bundles>
+                            <importFeatures>
+                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
+                            </importFeatures>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

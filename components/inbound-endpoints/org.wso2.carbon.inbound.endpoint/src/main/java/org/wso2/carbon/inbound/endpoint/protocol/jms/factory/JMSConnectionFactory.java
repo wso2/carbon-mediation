@@ -15,21 +15,32 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-
 package org.wso2.carbon.inbound.endpoint.protocol.jms.factory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSConstants;
+import java.util.Properties;
 
-
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSession;
+import javax.jms.Session;
+import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicSession;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSConstants;
 
 /**
  * use of factory
@@ -67,7 +78,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         }
 
         String connectionFactoryType = properties.getProperty(JMSConstants.CONNECTION_FACTORY_TYPE);
-        if (connectionFactoryType.equals("topic")) {
+        if ("topic".equals(connectionFactoryType)) {
             this.destinationType = JMSConstants.JMSDestinationType.TOPIC;
         } else {
             this.destinationType = JMSConstants.JMSDestinationType.QUEUE;
@@ -75,17 +86,20 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
         if(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER) == null || "1.1".equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
         	jmsSpec11 = true;
-        }    
-        
-        if(properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID) != null){
-        	clientId = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
-        }               
+        }
 
-        if(properties.getProperty(JMSConstants.PARAM_SUB_DURABLE) != null ){
-        	isDurable = Boolean.valueOf(properties.getProperty(JMSConstants.PARAM_SUB_DURABLE));
-        }         
-        if(properties.getProperty(JMSConstants.PARAM_MSG_SELECTOR) != null ){
-        	messageSelector = properties.getProperty(JMSConstants.PARAM_MSG_SELECTOR);
+        String durableSubClientId = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
+        if (durableSubClientId != null) {
+            clientId = durableSubClientId;
+        }
+
+        String subDurable = properties.getProperty(JMSConstants.PARAM_SUB_DURABLE);
+        if(subDurable != null ){
+            isDurable = Boolean.parseBoolean(subDurable);
+        }
+        String msgSelector = properties.getProperty(JMSConstants.PARAM_MSG_SELECTOR);
+        if(msgSelector != null ){
+        	messageSelector = msgSelector;
         }         
         this.connectionFactoryString = properties.getProperty(JMSConstants.CONNECTION_FACTORY_JNDI_NAME);
         if(connectionFactoryString == null || "".equals(connectionFactoryString)) {
@@ -100,7 +114,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         String strTransactedSession = properties.getProperty(JMSConstants.SESSION_TRANSACTED);
         if(strTransactedSession == null || "".equals(strTransactedSession) || !strTransactedSession.equals("true")) {
             transactedSession = false;
-        } else if(strTransactedSession.equals("true")) {
+        } else if("true".equals(strTransactedSession)) {
             transactedSession = true;
         }
 

@@ -17,15 +17,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-config-admin</artifactId>
-        <version>4.3.0-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.configadmin.ui</artifactId>
-        <groupId>org.wso2.carbon</groupId>
-	<version>4.3.0-SNAPSHOT</version>
+	<version>4.4.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Synapse Configuration Service Administrator UI</name>
     <url>http://wso2.org</url>
@@ -43,7 +42,7 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Import-Package>
-                            org.wso2.carbon.mediation.configadmin.stub.*;version="${carbon.platform.package.import.version.range}",
+                            org.wso2.carbon.mediation.configadmin.stub.*;version="${carbon.mediation.imp.pkg.version}",
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             javax.servlet;version="${imp.pkg.version.javax.servlet}",
@@ -78,12 +77,8 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ui</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>org.wso2.carbon.utils</artifactId>
-        </dependency>
 	<dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.configadmin.stub</artifactId>
         </dependency>
     </dependencies>

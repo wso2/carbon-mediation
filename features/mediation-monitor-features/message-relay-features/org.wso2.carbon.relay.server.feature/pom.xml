@@ -16,29 +16,28 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <parent>
-      <groupId>org.wso2.carbon</groupId>
-      <version>4.3.0-SNAPSHOT</version>
+      <groupId>org.wso2.carbon.mediation</groupId>
+      <version>4.4.1-SNAPSHOT</version>
       <artifactId>message-relay-feature</artifactId>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>org.wso2.carbon.relay.server.feature</artifactId>
-   <groupId>org.wso2.carbon</groupId>
-   <version>4.3.0-SNAPSHOT</version>
+   <version>4.4.1-SNAPSHOT</version>
    <packaging>pom</packaging>
    <name>WSO2 Carbon - Message Relay Core Feature</name>
    <url>http://wso2.org</url>
    <description>This feature contains the core bundles required for Message Relay functionality</description>
    <dependencies>
       <dependency>
-         <groupId>org.wso2.carbon</groupId>
+         <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.relay</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.wso2.carbon</groupId>
+         <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.relay.module</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.wso2.carbon</groupId>
+         <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.relay.mediators.builder</artifactId>
       </dependency>
    </dependencies>
@@ -48,7 +47,7 @@
             <groupId>org.wso2.maven</groupId>
             <artifactId>carbon-p2-plugin</artifactId>
             <version>${carbon.p2.plugin.version}</version>
-            <executions>
+            <executions>	
                <execution>
                   <id>4-p2-feature-generation</id>
                   <phase>package</phase>
@@ -65,13 +64,13 @@
                         </properties>
                      </adviceFile>
                      <bundles>
-                        <bundleDef>org.wso2.carbon:org.wso2.carbon.relay</bundleDef>
-                        <bundleDef>org.wso2.carbon:org.wso2.carbon.relay.module</bundleDef>
-                        <bundleDef>org.wso2.carbon:org.wso2.carbon.relay.mediators.builder</bundleDef>
+                        <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.relay</bundleDef>
+                        <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.relay.module</bundleDef>
+                        <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.relay.mediators.builder</bundleDef>
                      </bundles>
                      <importFeatures>
-                        <importFeatureDef>org.wso2.carbon.core.server</importFeatureDef>
-                        <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
+                        <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
+                        <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
                      </importFeatures>
                   </configuration>
                </execution>

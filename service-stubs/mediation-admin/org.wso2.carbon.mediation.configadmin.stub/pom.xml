@@ -18,15 +18,14 @@
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
    <parent>
-      <groupId>org.wso2.carbon</groupId>
+      <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-admin-stub</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.4.1-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <groupId>org.wso2.carbon</groupId>
    <artifactId>org.wso2.carbon.mediation.configadmin.stub</artifactId>
    <packaging>bundle</packaging>
-   <version>4.3.0-SNAPSHOT</version>
+   <version>4.4.1-SNAPSHOT</version>
    <name>WSO2 Carbon - Synapse Configuration Service Administrator Stub</name>
    <url>http://wso2.org</url>
    <build>
@@ -40,7 +39,7 @@
                   <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                   <Bundle-Name>${project.artifactId}</Bundle-Name>
                   <Private-Package />
-                  <Export-Package>org.wso2.carbon.mediation.configadmin.stub.*;version="${carbon.platform.package.export.version}",</Export-Package>
+                  <Export-Package>org.wso2.carbon.mediation.configadmin.stub.*;version="${carbon.mediation.exp.pkg.version}",</Export-Package>
                   <DynamicImport-Package>*</DynamicImport-Package>
                </instructions>
             </configuration>
@@ -64,7 +63,7 @@
                            <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                         </path>
                         <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                           <arg line="-uri src/main/resources/configadmin.wsdl -u -uw -o target/generated-code                                     -ns2p http://org.apache.synapse/xsd=org.wso2.carbon.mediation.configadmin.stub.types.synapse,http://configadmin.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.configadmin.stub.types.carbon,http://configadmin.mediation.carbon.wso2.org=org.wso2.carbon.mediation.configadmin.stub,http://util.java/xsd=org.wso2.carbon.mediation.configadmin.stub.types.java" />
+                           <arg line="-uri src/main/resources/configadmin.wsdl -u -uw -o target/generated-code -ns2p http://org.apache.synapse/xsd=org.wso2.carbon.mediation.configadmin.stub.types.synapse,http://configadmin.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.configadmin.stub.types.carbon,http://configadmin.mediation.carbon.wso2.org=org.wso2.carbon.mediation.configadmin.stub,http://util.java/xsd=org.wso2.carbon.mediation.configadmin.stub.types.java" />
                            <classpath refid="wsdl2java.classpath" />
                         </java>
                      </tasks>

@@ -15,21 +15,18 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
    <parent>
-      <groupId>org.wso2.carbon</groupId>
+      <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>bam-mediator-feature</artifactId>
-      <version>4.3.0-SNAPSHOT</version>
+      <version>4.4.1-SNAPSHOT</version>
    </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediator.bam.config.server.feature</artifactId>
    
-   <groupId>org.wso2.carbon</groupId>
-   <version>4.3.0-SNAPSHOT</version>
+   <version>4.4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - BAM Mediator Configuration Feature</name>
     <url>http://wso2.org</url>
@@ -37,7 +34,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.bam.config</artifactId>
         </dependency>
     </dependencies>
@@ -65,10 +62,10 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon:org.wso2.carbon.mediator.bam.config</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.bam.config</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.apache.synapse.wso2:${synapse.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
                                 <importFeatureDef>org.wso2.carbon.mediation.initializer.server</importFeatureDef>
                             </importFeatures>
                         </configuration>

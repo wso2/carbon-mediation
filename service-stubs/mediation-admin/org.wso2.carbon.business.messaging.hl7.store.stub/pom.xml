@@ -19,14 +19,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <parent>
-        <groupId>org.wso2.carbon</groupId>
+        <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-admin-stub</artifactId>
-	<version>4.3.0-SNAPSHOT</version>
+	<version>4.4.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.wso2.carbon</groupId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>4.4.1-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.business.messaging.hl7.store.stub</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - HL7 Store Stub</name>
@@ -47,7 +46,7 @@
                         </Private-Package>
                         <Export-Package>
                             org.wso2.carbon.business.messaging.hl7.store.stub.*;
-                            version="${carbon.platform.package.export.version}",
+                            version="${carbon.mediation.exp.pkg.version}",
                             org.wso2.carbon.business.messaging.hl7.store.entity.*,
                             org.wso2.carbon.business.messaging.hl7.store.entity.xsd.*
                         </Export-Package>
@@ -73,16 +72,15 @@
                         <configuration>
                             <tasks>
                                 <path id="wsdl2java.classpath">
-			 <pathelement location="${settings.localRepository}/org/apache/ws/commons/axiom/wso2/axiom/${axiom.wso2.version}/axiom-${axiom.wso2.version}.jar"/>
-                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2-client/${orbit.version.axis2}/axis2-client-${orbit.version.axis2}.jar"/>
-                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar"/>
+			 <pathelement location="${settings.localRepository}/org/apache/ws/commons/axiom/wso2/axiom/${axiom.wso2.version}/axiom-${axiom.wso2.version}.jar" />
+                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2-client/${orbit.version.axis2}/axis2-client-${orbit.version.axis2}.jar" />
+                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/HL7StoreAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.business.messaging.hl7.store.stub
-                                    -ns2p http://org.apache.synapse/xsd=org.wso2.carbon.business.messaging.hl7.store.stub.types,http://store.message.carbon.wso2.org/xsd=org.wso2.carbon.business.messaging.hl7.store.stub.types,http://service.store.hl7.messaging.business.carbon.wso2.org/xsd=org.wso2.carbon.business.messaging.hl7.store.stub,http://util.java/xsd=org.wso2.carbon.business.messaging.hl7.store.stub.types.java, http://store.hl7.messaging.businnes.carbon.wso2.org/xsd=org.wso2.carbon.business.messaging.hl7.store.stub,http://service.store.hl7.messaging.business.carbon.wso2.org/xsd=org.wso2.carbon.business.messaging.hl7.store.stub"/>
-                                    <classpath refid="maven.dependency.classpath"/>
-                                    <classpath refid="maven.compile.classpath"/>
-                                    <classpath refid="maven.runtime.classpath"/>
+                                    <arg line="-uri src/main/resources/HL7StoreAdminService.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.business.messaging.hl7.store.stub -ns2p http://org.apache.synapse/xsd=org.wso2.carbon.business.messaging.hl7.store.stub.types,http://store.message.carbon.wso2.org/xsd=org.wso2.carbon.business.messaging.hl7.store.stub.types,http://service.store.hl7.messaging.business.carbon.wso2.org/xsd=org.wso2.carbon.business.messaging.hl7.store.stub,http://util.java/xsd=org.wso2.carbon.business.messaging.hl7.store.stub.types.java, http://store.hl7.messaging.businnes.carbon.wso2.org/xsd=org.wso2.carbon.business.messaging.hl7.store.stub,http://service.store.hl7.messaging.business.carbon.wso2.org/xsd=org.wso2.carbon.business.messaging.hl7.store.stub" />
+                                    <classpath refid="maven.dependency.classpath" />
+                                    <classpath refid="maven.compile.classpath" />
+                                    <classpath refid="maven.runtime.classpath" />
                                 </java>
                             </tasks>
                         </configuration>

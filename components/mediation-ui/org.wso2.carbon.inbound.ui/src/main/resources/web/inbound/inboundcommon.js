@@ -90,7 +90,7 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     return false;	
 }
 
-function inboundUpdate(msg1,msg2,msg3,msg4,form){
+function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
     if (document.getElementById('inboundSequence').value == '') {
         CARBON.showWarningDialog(msg1);
         return false;
@@ -103,6 +103,16 @@ function inboundUpdate(msg1,msg2,msg3,msg4,form){
         CARBON.showWarningDialog(msg4);
         return false;
     }    	
+    
+    if(requiredParams != null){
+    	for(var i = 0;i<requiredParams.length;i++){
+    	    if (document.getElementById(requiredParams[i]).value == '') {
+    	        CARBON.showWarningDialog(msg5);
+    	        return false;
+    	    }    		
+    	}
+    }    
+    
     form.submit();
     return false;	
 }
@@ -213,10 +223,12 @@ function addRow(tableID) {
 function deleteRow(tableID) {
 	if(iParamCount > 0){
 	    try {
-	    		var table = document.getElementById(tableID);
-	    		var rowCount = table.rows.length;
-	    		table.deleteRow((rowCount-2));
-	    		iParamCount--;
+	    	    if(iParamMax < iParamCount){
+		    		var table = document.getElementById(tableID);
+		    		var rowCount = table.rows.length;
+		    		table.deleteRow((rowCount-2));
+		    		iParamCount--;	    	    	
+	    	    }
 	        }catch(e) {
 	            alert(e);
 	        }
