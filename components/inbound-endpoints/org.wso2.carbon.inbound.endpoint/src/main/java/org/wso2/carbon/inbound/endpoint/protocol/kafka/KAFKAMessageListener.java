@@ -34,9 +34,11 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
         this.topics = topics;
         this.kafkaProperties = kafkaProperties;
         this.injectHandler = injectHandler;
-
     }
 
+    /**
+     * Create the connection with the zookeeper to consume the messages
+     */
     public boolean createKafkaConsumerConnector() throws Exception {
 
         boolean isCreated = false;
@@ -68,17 +70,16 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
         return isCreated;
     }
 
-	/*
-     * Starts topics consuming
-	 */
-
+    /**
+     * Starts topics consuming the messages,the message can be consumed by topic or topic filter which are white list and black list.
+     */
     public void start() throws Exception {
         try {
             logger.info("Starting KAFKA consumer listener...");
             Map<String, Integer> topicCount = new HashMap<String, Integer>();
 
             if (topics != null && topics.size() > 0) {
-                // Define #threadCount thread/s for topic
+                // Define threadCount thread/s for topic
                 for (String topic : topics) {
                     topicCount.put(topic, threadCount);
                 }
@@ -127,10 +128,14 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
         }
     }
 
+    /**
+     * Use one stream from kafka stream iterator
+     * @param streams
+     */
     protected void startConsumers(List<KafkaStream<byte[], byte[]>> streams) {
         for (KafkaStream<byte[], byte[]> stream : streams) {
             consumerIte = stream.iterator();
-            break; // we only use one stream as per suggested in the review
+            break;
         }
     }
 

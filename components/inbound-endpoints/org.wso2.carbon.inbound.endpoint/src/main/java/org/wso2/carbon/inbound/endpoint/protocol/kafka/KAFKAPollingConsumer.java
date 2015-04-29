@@ -34,9 +34,11 @@ public class KAFKAPollingConsumer {
     private int threadCount;
     private List<String> topics;
     private AbstractKafkaMessageListener messageListener;
-    private static int msgCounter;// uses for logging purpose
     private long scanInterval;
 
+    /**
+     * Initialize the kafka properties and the polling interval
+     */
     public KAFKAPollingConsumer(Properties kafkaProperties, long interval) throws Exception {
 
         this.kafkaProperties = kafkaProperties;
@@ -55,12 +57,14 @@ public class KAFKAPollingConsumer {
             this.topics = Arrays.asList(kafkaProperties.getProperty(
                     KAFKAConstants.TOPICS).split(","));
         }
-        this.msgCounter = 1;
-
     }
 
+    /**
+     * Start the listener to listen when new messages come to the esb,the listener can be high level or low level.
+     */
     public void startsMessageListener() throws Exception {
         if (messageListener == null) {
+            //Start a high level listener
             if (kafkaProperties.getProperty(KAFKAConstants.CONSUMER_TYPE) == null
                     || kafkaProperties
                     .getProperty(KAFKAConstants.CONSUMER_TYPE)
@@ -72,6 +76,7 @@ public class KAFKAPollingConsumer {
                                     .getName())) {
                 messageListener = new KAFKAMessageListener(threadCount, topics,
                         kafkaProperties, injectHandler);
+                //Start a low level listener
             } else if (kafkaProperties
                     .getProperty(KAFKAConstants.CONSUMER_TYPE)
                     .equalsIgnoreCase(
@@ -84,9 +89,13 @@ public class KAFKAPollingConsumer {
 
     }
 
+    /**
+     * Polling the messages according to the polling interval
+     */
     public void execute() {
         try {
             logger.debug("Executing : KAFKA Inbound EP : ");
+            //Poll the messages when the polling interval is less than threshold value 1000ms
             if (this.scanInterval > 0 && this.scanInterval < KAFKAConstants.THRESHOLD_INTERVAL) {
                 while (true) {
                     try {
@@ -97,6 +106,7 @@ public class KAFKAPollingConsumer {
                     poll();
                 }
             }
+            //Poll the messages when the polling interval is grater than threshold value 1000ms
             if (this.scanInterval > 0 && this.scanInterval >= KAFKAConstants.THRESHOLD_INTERVAL) {
                 poll();
             }
@@ -106,14 +116,22 @@ public class KAFKAPollingConsumer {
         }
     }
 
+    /**
+     * Register a handler to implement injection of the retrieved message
+     * @param processingHandler
+     */
     public void registerHandler(InjectHandler processingHandler) {
         injectHandler = processingHandler;
     }
 
+    /**
+     * Create the connection with the zookeeper and inject the messages to the sequence
+     */
     public Object poll() {
         if (logger.isDebugEnabled()) {
             logger.debug("run() - polling messages");
         }
+        //Create the connection to the zookeeper
         try {
             if (!messageListener.createKafkaConsumerConnector()) {
                 return null;
@@ -122,6 +140,7 @@ public class KAFKAPollingConsumer {
             logger.error(e.getMessage());
             return null;
         }
+        //Inject the messages to the sequence
         try {
             if (injectHandler != null && messageListener.hasNext()) {
                 messageListener.injectMessageToESB();
@@ -136,12 +155,10 @@ public class KAFKAPollingConsumer {
         return null;
     }
 
-    public AbstractKafkaMessageListener getMessageListener() {
-        return messageListener;
-    }
-
+    /**
+     * Stop to consume the messages
+     */
     public void destroy() throws Exception {
-
         messageListener.destroy();
     }
 }

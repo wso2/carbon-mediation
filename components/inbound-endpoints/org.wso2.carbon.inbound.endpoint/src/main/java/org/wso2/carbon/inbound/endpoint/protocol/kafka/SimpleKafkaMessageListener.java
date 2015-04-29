@@ -15,6 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.inbound.endpoint.protocol.kafka;
 
 import kafka.api.FetchRequest;
@@ -50,6 +51,9 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
         validateInputParameters();
     }
 
+    /**
+     * Validate the input parameters for low level consumer
+     */
     private void validateInputParameters() throws Exception {
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_TOPIC) == null) {
             throw new Exception("simple consumer topic is invalid");
@@ -85,6 +89,11 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
 
     }
 
+    /**
+     * Get the brokers from the broker list parameter
+     * @param brokers
+     * @return
+     */
     private List<String> getSeedBrokers(String brokers) {
         return Arrays.asList(brokers.split(","));
     }
@@ -213,7 +222,6 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                 }
 
             }
-//          consumer.commitOffsets();
             consumer.close();
         }
 

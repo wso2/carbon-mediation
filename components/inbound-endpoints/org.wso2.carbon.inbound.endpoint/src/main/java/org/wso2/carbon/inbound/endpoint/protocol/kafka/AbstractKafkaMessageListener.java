@@ -18,7 +18,6 @@
 package org.wso2.carbon.inbound.endpoint.protocol.kafka;
 
 import kafka.consumer.ConsumerIterator;
-import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +34,10 @@ public abstract class AbstractKafkaMessageListener {
     protected ConsumerIterator<byte[], byte[]> consumerIte;
     protected static final Log logger = LogFactory
             .getLog(KAFKAMessageListener.class.getName());
-
+    /**
+     * the consumer types are high level and simple,high level is used for kafka high level configuration
+     * and simple is used for kafka low level configuration
+     */
     public static enum CONSUMER_TYPE {
 
         HIGHLEVEL("highlevel"), SIMPLE("simple");
@@ -50,31 +52,29 @@ public abstract class AbstractKafkaMessageListener {
         }
     }
 
+    /**
+     * Create the connection with the zookeeper
+     */
     public abstract boolean createKafkaConsumerConnector() throws Exception;
 
-	/*
-     * Starts topics consuming
-	 */
-
+    /**
+     * Start to consume the messages from topics
+     */
     public abstract void start() throws Exception;
 
+    /**
+     * Destroy consuming the messages
+     */
     public void destroy() {
-//		executerService.shutdownNow();
     }
 
-    protected void startConsumers(List<KafkaStream<byte[], byte[]>> streams,
-                                  int threadNo) {
-    }
-
-    public ConsumerConnector getConsumerConnector() {
-        return consumerConnector;
-    }
-
-    public ConsumerIterator<byte[], byte[]> getConsumerIte() {
-        return consumerIte;
-    }
-
+    /**
+     * Poll the messages from the zookeeper and injected to the sequence
+     */
     public abstract void injectMessageToESB();
 
+    /**
+     * Check ConsumerIterator whether It has next value
+     */
     public abstract boolean hasNext();
 }

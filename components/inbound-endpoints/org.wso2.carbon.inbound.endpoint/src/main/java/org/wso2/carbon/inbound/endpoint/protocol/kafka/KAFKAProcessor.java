@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.startup.quartz.StartUpController;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskDescription;
@@ -30,7 +31,8 @@ import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
 import java.util.Properties;
 
-public class KAFKAProcessor implements org.apache.synapse.inbound.InboundRequestProcessor, TaskStartupObserver {
+
+public class KAFKAProcessor implements InboundRequestProcessor, TaskStartupObserver {
     private static final Log log = LogFactory.getLog(KAFKAProcessor.class.getName());
 
 
@@ -42,7 +44,6 @@ public class KAFKAProcessor implements org.apache.synapse.inbound.InboundRequest
     private String onErrorSeq;
     private SynapseEnvironment synapseEnvironment;
     private StartUpController startUpController;
-    private int threadCount;
 
     public KAFKAProcessor(InboundProcessorParams params) {
 
@@ -62,10 +63,13 @@ public class KAFKAProcessor implements org.apache.synapse.inbound.InboundRequest
         this.synapseEnvironment = params.getSynapseEnvironment();
     }
 
+    /**
+     * This will be called at the time of synapse artifact deployment.
+     */
     public void init() {
         log.info("Initializing inbound KAFKA listener for destination " + name);
         try {
-            pollingConsumer = new KAFKAPollingConsumer(kafkaProperties,interval);
+            pollingConsumer = new KAFKAPollingConsumer(kafkaProperties, interval);
         } catch (Exception e) {
             log.error(e.getMessage());
             return;
@@ -77,9 +81,11 @@ public class KAFKAProcessor implements org.apache.synapse.inbound.InboundRequest
             log.error("Error initializing message listener");
         }
         start();
-
     }
 
+    /**
+     * Start the schedule service
+     */
     public void start() {
         log.info("Inbound KAFKA listener Started for destination " + name);
         try {

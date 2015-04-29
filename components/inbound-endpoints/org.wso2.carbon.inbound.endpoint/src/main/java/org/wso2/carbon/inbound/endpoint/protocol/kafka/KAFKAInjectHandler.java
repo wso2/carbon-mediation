@@ -33,6 +33,9 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+/**
+ * KafkaInjectHandler uses to mediate the received Kafka message
+ */
 public class KAFKAInjectHandler implements InjectHandler {
     private static final Log log = LogFactory.getLog(KAFKAInjectHandler.class);
 
@@ -49,6 +52,10 @@ public class KAFKAInjectHandler implements InjectHandler {
         this.contentType = contentType;
     }
 
+    /**
+     * Determine the message builder to use, set the message payload to the message context and
+     * inject the message to the sequence
+     */
     public boolean invoke(Object object) {
         byte[] msg = (byte[]) object;
 

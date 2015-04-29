@@ -17,7 +17,11 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.kafka;
 
+/**
+ * The constant parameters for kafka protocol
+ */
 public class KAFKAConstants {
+
 
     public static final String ZOOKEEPER_CONNECT = "zookeeper.connect";
 
