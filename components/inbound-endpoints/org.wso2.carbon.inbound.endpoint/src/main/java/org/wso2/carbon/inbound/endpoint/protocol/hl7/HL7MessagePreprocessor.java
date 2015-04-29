@@ -27,9 +27,9 @@ public interface HL7MessagePreprocessor {
     /**
      * Processes the incoming message and returns a possibly modified message.
      * @param message The incomding message
-     * @param type The type of the message, i.e. v2 or v3, defined at HL7Constants.MessageType
+     * @param type The type of the message, i.e. v2 or v3, defined at Axis2HL7Constants.MessageType
      * @param encoding The encoding of the message, i.e. ER7 or XML,
-     * defined at HL7Constants.MessageEncoding
+     * defined at Axis2HL7Constants.MessageEncoding
      * @return
      */
     String process(String message, String type, String encoding);

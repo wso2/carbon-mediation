@@ -50,7 +50,10 @@ public class CallableTask implements Callable<Boolean> {
         synapseEnvironment.injectMessage(requestMessageContext, injectingSequence);
         // cancel timeout handler thread
         if (handler != null && !handler.isDone()) {
-            log.info("CANCELLING");
+            if (log.isDebugEnabled()) {
+                log.debug("Cancelling timeout thread");
+            }
+
             handler.cancel(true);
         }
         return true;

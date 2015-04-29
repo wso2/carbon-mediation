@@ -17,7 +17,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
  * specific language governing permissions and limitations
  * under the License.
  */
-public class HL7Constants {
+public class Axis2HL7Constants {
 
     public static final String HL7_CONTENT_TYPE = "application/edi-hl7";
 
@@ -63,27 +63,13 @@ public class HL7Constants {
 
     public static final String HL7_BUILD_RAW_MESSAGE = "transport.hl7.BuildInvalidMessages"; // if message is invalid, build XML including raw invalid HL7 message
 
-    public static final String HL7_CORE_POOL_SIZE = "transport.hl7.corePoolSize";
-
-    public static final String HL7_PUBLISHER_STREAM_NAME = "bam_hl7_data_publisher_store";
-
-    public static final String HL7_PUBLISHER_STREAM_VERSION = "1.0.0";
-
-    public static final String HL7_MAX_POOL_SIZE = "transport.hl7.maxPoolSize";
-
-    public static final String HL7_IDLE_THREAD_KEEPALIVE = "transport.hl7.idleThreadKeepAlive";
-
-    public static final String HL7_AUTO_ACKNOWLEDGE = "transport.hl7.AutoAck";
-
     public static final String HL7_RESULT_MODE = "HL7_RESULT_MODE";
-
-    public static final String HL7_RESULT_MODE_ACK = "ACK";
 
     public static final String HL7_RESULT_MODE_NACK = "NACK";
 
     public static final String HL7_NACK_MESSAGE = "HL7_NACK_MESSAGE";
 
-    public static final String HL7_MSA_ERROR_FIELD_VALUE = "AE";
+    public static final String HL7_APPLICATION_ACK = "HL7_APPLICATION_ACK";
 
     public static final String HL7_CONFORMANCE_PROFILE_PATH = "transport.hl7.ConformanceProfilePath";
 
@@ -92,12 +78,6 @@ public class HL7Constants {
     public static final String HL7_ELEMENT_NAME = "hl7";
 
     public static final String HL7_MESSAGE_ELEMENT_NAME = "message";
-
-    public static final String HL7_SYNAPSE_INBOUND_REQ_PROC = "HL7_SYNAPSE_INBOUND_REQ_PROC";
-
-    public static final String HL7_GENERATE_ACK = "HL7_GENERATE_ACK";
-
-    public static final String HL7_APPLICATION_ACK  = "HL7_APPLICATION_ACK";
 
     public static final String HL7_MESSAGE_CHARSET = "HL7_MESSAGE_CHARSET";
 
@@ -117,7 +97,4 @@ public class HL7Constants {
 
     }
 
-    //HL7 Transport parameters
-
-    public static final String HL7_TRANSPORT_TIMEOUT = "transport.hl7.TimeOut";
 }

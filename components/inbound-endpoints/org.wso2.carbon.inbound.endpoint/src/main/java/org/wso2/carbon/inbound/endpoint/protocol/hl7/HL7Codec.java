@@ -99,7 +99,7 @@ public class HL7Codec {
                 context.getRequestBuffer().setLength(0);
             } catch (HL7Exception e) {
                 log.error("Error while parsing request message: " + context.getRequestBuffer());
-                //throw e;
+                throw new MLLProtocolException(e);
             }
         }
 
@@ -127,8 +127,9 @@ public class HL7Codec {
 
         if (this.state == READ_COMPLETE) {
 
-            if (context.isAutoAck()) {
+            if (context.isAutoAck() || context.isApplicationAck()) {
                 responseBytes = context.getHl7Message().generateACK().encode().getBytes(charsetDecoder.charset());
+                context.setApplicationAck(false);
             } else {
                 responseBytes = context.getHl7Message().encode().getBytes(charsetDecoder.charset());
             }
@@ -220,5 +221,4 @@ public class HL7Codec {
     private void setCharsetDecoder(CharsetDecoder charsetDecoder) {
         this.charsetDecoder = charsetDecoder;
     }
-
 }

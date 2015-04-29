@@ -76,8 +76,8 @@ public class InboundHL7Listener implements InboundRequestProcessor {
 
                 Parser preProcParser = new PipeParser() {
                     public Message parse(String message) throws HL7Exception {
-                        message = preProcessor.process(message, HL7Constants.MessageType.V2X,
-                                HL7Constants.MessageEncoding.ER7);
+                        message = preProcessor.process(message, Axis2HL7Constants.MessageType.V2X,
+                                Axis2HL7Constants.MessageEncoding.ER7);
                         return super.parse(message);
                     }
                 };
@@ -106,10 +106,26 @@ public class InboundHL7Listener implements InboundRequestProcessor {
             params.getProperties().setProperty(MLLPConstants.PARAM_HL7_VALIDATE, "true");
         }
 
+        if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE) == null) {
+            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE, "false");
+        } else {
+            if (!params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE).equalsIgnoreCase("true") &&
+                    !params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE).equalsIgnoreCase("false")) {
+                params.getProperties().setProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE, "false");
+            }
+        }
+
+        if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES) == null) {
+            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES, "false");
+        } else {
+            if (!params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES).equalsIgnoreCase("true") &&
+                    !params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES).equalsIgnoreCase("false")) {
+                params.getProperties().setProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES, "false");
+            }
+        }
     }
 
     @Override
-
     public void init() {
         if (!InboundHL7IOReactor.isStarted()) {
             log.info("Starting MLLP Transport Reactor");

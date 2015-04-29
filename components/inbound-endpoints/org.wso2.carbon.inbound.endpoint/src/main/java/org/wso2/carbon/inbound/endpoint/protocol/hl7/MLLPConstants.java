@@ -62,4 +62,8 @@ public class MLLPConstants {
     public final static String PARAM_HL7_VALIDATE = "inbound.hl7.ValidateMessage";
 
     public final static String HL7_REQ_PROC = "HL7_REQ_PROCESSOR";
+
+    public final static String PARAM_HL7_BUILD_RAW_MESSAGE = "inbound.hl7.BuildInvalidMessages";
+
+    public final static String PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES = "inbound.hl7.PassThroughInvalidMessages";
 }

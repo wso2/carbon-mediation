@@ -27,9 +27,9 @@ import ca.uhn.hl7v2.parser.*;
 import ca.uhn.hl7v2.util.idgenerator.UUIDGenerator;
 import ca.uhn.hl7v2.validation.impl.DefaultValidation;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.*;
+import org.apache.axiom.om.impl.dom.factory.OMDOMFactory;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -42,8 +42,10 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 public class HL7MessageUtils {
     private static final Log log = LogFactory.getLog(HL7MessageUtils.class);
@@ -53,7 +55,8 @@ public class HL7MessageUtils {
     private static PipeParser pipeParser = new PipeParser();
     private static XMLParser xmlParser = new DefaultXMLParser();
     private static SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
-    private static OMNamespace ns = fac.createOMNamespace(HL7Constants.HL7_NAMESPACE, HL7Constants.HL7_ELEMENT_NAME);
+    private static OMNamespace ns = fac.createOMNamespace(Axis2HL7Constants.HL7_NAMESPACE, Axis2HL7Constants.HL7_ELEMENT_NAME);
+    private static OMFactory omFactory = new OMDOMFactory();
 
     static {
         pipeParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
@@ -80,47 +83,51 @@ public class HL7MessageUtils {
     }
 
     public static MessageContext createSynapseMessageContext(Message message, InboundProcessorParams params,
-                                                             SynapseEnvironment synapseEnvironment) {
+                                                             SynapseEnvironment synapseEnvironment) throws HL7Exception {
 
         MessageContext synCtx = synapseEnvironment.createMessageContext();
 
-        if (params.getProperties().getProperty(HL7Constants.HL7_VALIDATION_PASSED) != null) {
-            synCtx.setProperty(HL7Constants.HL7_VALIDATION_PASSED,
-                    params.getProperties().getProperty(HL7Constants.HL7_VALIDATION_PASSED));
+        if (params.getProperties().getProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED) != null) {
+            synCtx.setProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED,
+                    params.getProperties().getProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED));
         }
 
         try {
             synCtx.setEnvelope(createEnvelope(synCtx, message, params));
-        } catch (AxisFault e) {
-            log.error("Error while building envelope from HL7 message. ", e);
-        } catch (HL7Exception e) {
-            log.error("Error while building envelope from HL7 message. ", e);
-        } catch (XMLStreamException e) {
-            log.error("Error while building envelope from HL7 message. ", e);
+        } catch (Exception e) {
+            throw new HL7Exception(e);
         }
 
         return synCtx;
     }
 
-    private static SOAPEnvelope createEnvelope(MessageContext synCtx, Message message,
-                                               InboundProcessorParams params) throws HL7Exception, XMLStreamException {
+    private static SOAPEnvelope createEnvelope(MessageContext synCtx, Message message, InboundProcessorParams params)
+            throws HL7Exception, XMLStreamException, MLLProtocolException {
         SOAPEnvelope envelope = fac.getDefaultEnvelope();
-
+        boolean rawMessage = false;
         String xmlDoc = "";
         try {
             xmlDoc = xmlParser.encode(message);
-            synCtx.setProperty(HL7Constants.HL7_VALIDATION_PASSED, new Boolean(true));
+            synCtx.setProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED, new Boolean(true));
         } catch (HL7Exception e) {
-            synCtx.setProperty(HL7Constants.HL7_VALIDATION_PASSED, new Boolean(false));
-            if (params.getProperties().getProperty(HL7Constants.HL7_BUILD_RAW_MESSAGE).equals("true")) {
-                xmlDoc =  "<rawMessage>" + StringEscapeUtils.escapeXml(message.encode()) + "</rawMessage>";
+            synCtx.setProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED, new Boolean(false));
+            if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE) != null &&
+                    params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE).equals("true")) {
+                xmlDoc =  message.encode();
+                rawMessage = true;
             } else {
                 log.error("Could not encode HL7 message into XML. " +
-                        "Set " + HL7Constants.HL7_BUILD_RAW_MESSAGE + " to build invalid HL7 messages containing raw HL7 message.", e);
+                        "Set " + MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE + " to build invalid HL7 messages containing raw HL7 message.", e);
+                throw new HL7Exception("Could not encode HL7 message into XML", e);
             }
         }
 
-        OMElement messageEl = generateHL7MessageElement(xmlDoc);
+        OMElement messageEl;
+        if (!rawMessage) {
+            messageEl = generateHL7MessageElement(xmlDoc);
+        } else {
+            messageEl = generateHL7RawMessaegElement(xmlDoc);
+        }
         envelope.getBody().addChild(messageEl);
         return envelope;
     }
@@ -129,7 +136,16 @@ public class HL7MessageUtils {
             throws XMLStreamException {
         OMElement hl7Element = AXIOMUtil.stringToOM(hl7XmlMessage);
 
-        OMElement messageEl = fac.createOMElement(HL7Constants.HL7_MESSAGE_ELEMENT_NAME, ns);
+        OMElement messageEl = fac.createOMElement(Axis2HL7Constants.HL7_MESSAGE_ELEMENT_NAME, ns);
+        messageEl.addChild(hl7Element);
+        return messageEl;
+    }
+
+    public static OMElement generateHL7RawMessaegElement(String hl7XmlMessage) {
+        OMElement hl7Element = omFactory.createOMElement(new QName("rawMessage"));
+        OMText rawMessage = hl7Element.getOMFactory().createOMText(hl7Element, hl7XmlMessage, XMLStreamConstants.CDATA);
+        hl7Element.addChild(rawMessage);
+        OMElement messageEl = fac.createOMElement(Axis2HL7Constants.HL7_MESSAGE_ELEMENT_NAME, ns);
         messageEl.addChild(hl7Element);
         return messageEl;
     }
@@ -152,17 +168,17 @@ public class HL7MessageUtils {
     private static Message createDefaultNackMessage(String errorMsg) throws DataTypeException {
         ACK ack = new ACK();
         ack.getMSH().getFieldSeparator().setValue(
-                HL7Constants.HL7_DEFAULT_FIELD_SEPARATOR);
+                Axis2HL7Constants.HL7_DEFAULT_FIELD_SEPARATOR);
         ack.getMSH().getEncodingCharacters().setValue(
-                HL7Constants.HL7_DEFAULT_ENCODING_CHARS);
+                Axis2HL7Constants.HL7_DEFAULT_ENCODING_CHARS);
         ack.getMSH().getReceivingApplication().setValue(
-                HL7Constants.HL7_DEFAULT_RECEIVING_APPLICATION);
+                Axis2HL7Constants.HL7_DEFAULT_RECEIVING_APPLICATION);
         ack.getMSH().getReceivingFacility().setValue(
-                HL7Constants.HL7_DEFAULT_RECEIVING_FACILITY);
+                Axis2HL7Constants.HL7_DEFAULT_RECEIVING_FACILITY);
         ack.getMSH().getProcessingID().setValue(
-                HL7Constants.HL7_DEFAULT_PROCESSING_ID);
-        ack.getMSA().getAcknowledgementCode().setValue(HL7Constants.HL7_DEFAULT_ACK_CODE_AR);
-        ack.getMSA().getMessageControlID().setValue(HL7Constants.HL7_DEFAULT_MESSAGE_CONTROL_ID);
+                Axis2HL7Constants.HL7_DEFAULT_PROCESSING_ID);
+        ack.getMSA().getAcknowledgementCode().setValue(Axis2HL7Constants.HL7_DEFAULT_ACK_CODE_AR);
+        ack.getMSA().getMessageControlID().setValue(Axis2HL7Constants.HL7_DEFAULT_MESSAGE_CONTROL_ID);
         ack.getERR().getErrorCodeAndLocation(0).getCodeIdentifyingError().
                 getIdentifier().setValue(errorMsg);
         return ack;
@@ -182,10 +198,11 @@ public class HL7MessageUtils {
      * @return
      * @throws HL7Exception
      */
-    public static Message payloadToHL7Message(MessageContext ctx, InboundProcessorParams params) throws HL7Exception  {
+    public static Message payloadToHL7Message(MessageContext ctx, InboundProcessorParams params)
+            throws HL7Exception, NoSuchElementException {
 
         OMElement hl7MsgEl = (OMElement) ctx.getEnvelope().getBody().getChildrenWithName(new
-                QName(HL7Constants.HL7_NAMESPACE, HL7Constants.HL7_MESSAGE_ELEMENT_NAME))
+                QName(Axis2HL7Constants.HL7_NAMESPACE, Axis2HL7Constants.HL7_MESSAGE_ELEMENT_NAME))
                 .next();
         String hl7XMLPayload = hl7MsgEl.getFirstElement().toString();
         String pipeMsg;
@@ -204,7 +221,7 @@ public class HL7MessageUtils {
             // Make this as warning.Since some remote systems require enriched messages that violate some HL7
             //rules it would 	be nice to be able to still send the message.
             log.warn("Rule validation fails.", e);
-            if (!(params.getProperties().getProperty(HL7Constants.HL7_VALIDATE_MESSAGE).equals("false"))) {
+            if (!(params.getProperties().getProperty(Axis2HL7Constants.HL7_VALIDATE_MESSAGE).equals("false"))) {
                 xmlParser.setValidationContext(new NoValidation());
                 msg = xmlParser.parse(hl7XMLPayload);
                 return msg;

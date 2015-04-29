@@ -46,6 +46,7 @@ public class MLLPContext {
     private volatile boolean responded = false;
     private volatile boolean markForClose = false;
     private boolean preProcess = true;
+    private boolean applicationAck = false;
 
 
     private Parser preProcessorParser = null;
@@ -133,6 +134,14 @@ public class MLLPContext {
 
     public void setAutoAck(boolean autoAck) {
         this.autoAck = autoAck;
+    }
+
+    public boolean isApplicationAck() {
+        return applicationAck;
+    }
+
+    public void setApplicationAck(boolean applicationAck) {
+        this.applicationAck = applicationAck;
     }
 
     public boolean isPreProcess() {
