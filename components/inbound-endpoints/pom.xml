@@ -101,5 +101,9 @@
         <groupId>org.apache.aries</groupId>
         <artifactId>org.apache.aries.util</artifactId>
     </dependency>
+    <dependency>
+        <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+        <artifactId>jetty-bundle</artifactId>
+    </dependency>
 </dependencies>
 </project>

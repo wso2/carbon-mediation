@@ -108,6 +108,30 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         }
     }
 
+    public boolean startCXFEndpoint(int port, String name) {
+
+        boolean authorization;
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        String tenantDomain = carbonContext.getTenantDomain();
+
+        String epName = dataStore.getEndpointName(port, tenantDomain);
+        if (epName != null) {
+            authorization = false;
+            if (epName.equalsIgnoreCase(name)) {
+                log.info(epName + " endpoint is already running on port : " + port);
+            } else {
+                String msg = "Another endpoint named : " + epName + " is currently bound to port: " + port;
+                log.warn(msg);
+                throw new SynapseException(msg);
+            }
+        } else {
+            dataStore.registerEndpoint
+                    (port, tenantDomain, InboundRequestProcessorFactoryImpl.Protocols.cxf_ws_rm.toString(), name);
+            authorization = true;
+        }
+        return authorization;
+    }
+
 
 
     /**
@@ -192,6 +216,12 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
     }
 
+    public void closeCXFEndpoint(int port) {
+        PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        String tenantDomain = cc.getTenantDomain();
+        dataStore.unregisterEndpoint(port, tenantDomain);
+    }
+
     /**
      * Start Http listeners for all the Inbound Endpoints. This should be called in the
      * server startup to load all the required listeners for endpoints in all tenants
@@ -208,8 +238,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                 startListener(port, inboundEndpointInfoDTO.getEndpointName());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTPS)) {
                 startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getSslConfiguration());
+                startSSLEndpoint(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getSslConfiguration());
+            } else if (inboundEndpointInfoDTO.getProtocol().equals("cxf_ws_rm")) {
+                closeCXFEndpoint(port);
             }
-
         }
     }
 

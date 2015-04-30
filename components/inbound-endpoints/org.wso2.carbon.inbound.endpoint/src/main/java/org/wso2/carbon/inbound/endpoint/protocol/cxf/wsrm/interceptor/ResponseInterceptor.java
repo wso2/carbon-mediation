@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.interceptor;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPHeader;
 import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
 import org.apache.cxf.helpers.IOUtils;
@@ -114,22 +115,24 @@ public class ResponseInterceptor extends AbstractPhaseInterceptor<Message> {
     private SOAPEnvelope changeOutboundMessage(SOAPEnvelope cxfOutEnvelope, Message message) {
 
         SOAPEnvelope originalEnvelope = (SOAPEnvelope) message.get(RMConstants.SOAP_ENVELOPE);
-        Iterator it = originalEnvelope.getHeader().examineAllHeaderBlocks();
-        /*
-         * Add the SOAPHeaders of the originalEnvelope to the cxfOutEnvelope
-         */
-        if (it != null) {
-            while (it.hasNext()) {
-                SOAPHeaderBlock block = (SOAPHeaderBlock) it.next();
-                QName name = block.getQName();
+        SOAPHeader soapHeader = originalEnvelope.getHeader();
+
+        if (soapHeader != null) {
+            Iterator it = soapHeader.examineAllHeaderBlocks();
+            //Add the SOAPHeaders of the originalEnvelope to the cxfOutEnvelope
+            if (it != null) {
+                while (it.hasNext()) {
+                    SOAPHeaderBlock block = (SOAPHeaderBlock) it.next();
+                    QName name = block.getQName();
                 /*
                  * If the cxfOutEnvelope already has those headers, they will be replaced
                  */
-                OMElement existingHeader = cxfOutEnvelope.getHeader().getFirstChildWithName(name);
-                if (existingHeader != null) {
-                    existingHeader.detach();
+                    OMElement existingHeader = cxfOutEnvelope.getHeader().getFirstChildWithName(name);
+                    if (existingHeader != null) {
+                        existingHeader.detach();
+                    }
+                    cxfOutEnvelope.getHeader().addChild(block);
                 }
-                cxfOutEnvelope.getHeader().addChild(block);
             }
         }
 
@@ -139,7 +142,9 @@ public class ResponseInterceptor extends AbstractPhaseInterceptor<Message> {
                 PayloadHelper.setXMLPayload(cxfOutEnvelope, originalResponseBody);
             }
         } catch (Exception e) {
-            logger.error("Could not merge the CXF generated response body and response body sent from the back end service", e);
+            logger.error(
+                    "Could not merge the CXF generated response body and response body sent from the back end service",
+                    e);
         }
         return cxfOutEnvelope;
     }

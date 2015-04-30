@@ -32,6 +32,8 @@ public class RMConstants {
     public static final String INBOUND_CXF_RM_HOST = "inbound.cxf.rm.host";
     public static final String INBOUND_CXF_RM_CONFIG_FILE = "inbound.cxf.rm.config-file";
     public static final String PASS_THROUGH_TARGET_BUFFER = "pass-through.pipe";
+    public static final String AXIS2_FILE_PATH = "axis2.file.path";
+    public static final String CXF_ENABLE_SSL = "enableSSL";
 
     public final static int THREAD_POOL_SIZE = 100;
 }
