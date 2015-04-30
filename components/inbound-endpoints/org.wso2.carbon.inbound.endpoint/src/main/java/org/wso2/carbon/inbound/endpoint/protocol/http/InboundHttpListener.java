@@ -28,7 +28,6 @@ import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListene
 import java.io.IOException;
 import java.net.ServerSocket;
 
-
 /**
  * Listener class for HttpInboundEndpoint which is trigger by inbound core and
  * responsible for start ListeningEndpoint related to given port
