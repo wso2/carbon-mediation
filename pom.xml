@@ -1888,6 +1888,33 @@
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
             </dependency>
+
+            <!-- Cache mediatoer dependencies -->
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-saaj</artifactId>
+                <version>${axis2-saaj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>javax.cache.wso2</artifactId>
+                <version>${javax.cache.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${custom.osgi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-saaj_1.3_spec</artifactId>
+                <version>${org.apache.geronimo.specs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xmlunit</groupId>
+                <artifactId>xmlunit</artifactId>
+                <version>${xmlunit.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2042,6 +2069,13 @@
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
         <project.scm.id>wso2-scm-server</project.scm.id>
+
+        <!-- Cache mediator dependency versions -->
+        <axis2-saaj.version>1.6.1-wso2v11</axis2-saaj.version>
+        <javax.cache.wso2.version>4.3.0</javax.cache.wso2.version>
+        <custom.osgi.version>5.0.0</custom.osgi.version>
+        <org.apache.geronimo.specs.version>1.0.0</org.apache.geronimo.specs.version>
+        <xmlunit.version>1.1</xmlunit.version>
 
     </properties>
     <pluginRepositories>
