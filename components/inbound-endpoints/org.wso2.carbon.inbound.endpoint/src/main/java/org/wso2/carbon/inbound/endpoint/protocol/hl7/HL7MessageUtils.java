@@ -19,22 +19,20 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
  */
 
 import ca.uhn.hl7v2.AcknowledgmentCode;
+import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v22.message.ACK;
 import ca.uhn.hl7v2.parser.*;
 import ca.uhn.hl7v2.util.idgenerator.UUIDGenerator;
-import ca.uhn.hl7v2.validation.impl.DefaultValidation;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.dom.factory.OMDOMFactory;
-import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-import org.apache.axis2.AxisFault;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -50,24 +48,28 @@ import java.util.NoSuchElementException;
 public class HL7MessageUtils {
     private static final Log log = LogFactory.getLog(HL7MessageUtils.class);
 
-    private static PipeParser noValidationPipeParser = new PipeParser();
-    private static XMLParser noValidationXmlParser = new DefaultXMLParser();
-    private static PipeParser pipeParser = new PipeParser();
-    private static XMLParser xmlParser = new DefaultXMLParser();
+    private static HapiContext validationContext = new DefaultHapiContext();
+    private static HapiContext noValidationContext = new DefaultHapiContext();
+
+    static {
+        noValidationContext.setValidationContext(new NoValidation());
+    }
+
+    private static PipeParser noValidationPipeParser = new PipeParser(noValidationContext);
+    private static XMLParser noValidationXmlParser = new DefaultXMLParser(noValidationContext);
+    private static PipeParser pipeParser = new PipeParser(validationContext);
+    private static XMLParser xmlParser = new DefaultXMLParser(validationContext);
+
     private static SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
     private static OMNamespace ns = fac.createOMNamespace(Axis2HL7Constants.HL7_NAMESPACE, Axis2HL7Constants.HL7_ELEMENT_NAME);
     private static OMFactory omFactory = new OMDOMFactory();
 
     static {
-        pipeParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
-        xmlParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
-        pipeParser.setValidationContext(new DefaultValidation());
-        xmlParser.setValidationContext(new DefaultValidation());
 
-        noValidationPipeParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
-        noValidationXmlParser.getParserConfiguration().setIdGenerator(new UUIDGenerator());
-        noValidationPipeParser.setValidationContext(new NoValidation());
-        noValidationXmlParser.setValidationContext(new NoValidation());
+        if (HL7Configuration.getInstance().getStringProperty(MLLPConstants.HL7_ID_GENERATOR, "file").equals("uuid")) {
+            validationContext.getParserConfiguration().setIdGenerator(new UUIDGenerator());
+            noValidationContext.getParserConfiguration().setIdGenerator(new UUIDGenerator());
+        }
     }
 
     public static Message parse(String msg, boolean validate) throws HL7Exception {
@@ -219,11 +221,10 @@ public class HL7MessageUtils {
         }
         catch (DataTypeException e) {
             // Make this as warning.Since some remote systems require enriched messages that violate some HL7
-            //rules it would 	be nice to be able to still send the message.
+            //rules it would be nice to be able to still send the message.
             log.warn("Rule validation fails.", e);
             if (!(params.getProperties().getProperty(Axis2HL7Constants.HL7_VALIDATE_MESSAGE).equals("false"))) {
-                xmlParser.setValidationContext(new NoValidation());
-                msg = xmlParser.parse(hl7XMLPayload);
+                msg = noValidationXmlParser.parse(hl7XMLPayload);
                 return msg;
             }
 

@@ -131,7 +131,7 @@ public class HL7Processor implements InboundResponseSender {
                     ((CharsetDecoder) parameters.get(MLLPConstants.HL7_CHARSET_DECODER)).charset().displayName());
         }
 
-        // Below is expensive, it is in HL7 Axis2 transport but this needs to be removed!
+        // Below is expensive, it is in HL7 Axis2 transport but we should not depend on this!
         //axis2MsgCtx.setProperty(Axis2HL7Constants.HL7_RAW_MESSAGE_PROPERTY_NAME, context.getCodec());
 
     }
@@ -155,7 +155,8 @@ public class HL7Processor implements InboundResponseSender {
                 mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(), nackMessage));
             } else {
                 // if HL7_APPLICATION_ACK is set then we are going to send the auto-generated ACK
-                if (messageContext.getProperty(Axis2HL7Constants.HL7_APPLICATION_ACK).equals("true")) {
+                if (messageContext.getProperty(Axis2HL7Constants.HL7_APPLICATION_ACK) != null &&
+                        messageContext.getProperty(Axis2HL7Constants.HL7_APPLICATION_ACK).equals("true")) {
                     mllpContext.setApplicationAck(true);
                 } else {
                     mllpContext.setHl7Message(HL7MessageUtils.payloadToHL7Message(messageContext, params));

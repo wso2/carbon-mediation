@@ -19,8 +19,6 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
  */
 public class Axis2HL7Constants {
 
-    public static final String HL7_CONTENT_TYPE = "application/edi-hl7";
-
     public static final String HL7_DEFAULT_FIELD_SEPARATOR = "|";
 
     public static final String HL7_DEFAULT_ENCODING_CHARS = "^~\\&";
@@ -35,27 +33,9 @@ public class Axis2HL7Constants {
 
     public static final String HL7_DEFAULT_MESSAGE_CONTROL_ID = "123456789";
 
-    public static final String TRANSPORT_NAME = "hl7";
-
-    public static final String HL7_PORT = "transport.hl7.Port";
-
-    public static final String OUT_DIRECTION = "out";
-
-    public static final int DEFAULT_TIMEOUT = 60000;
-
-    public static final int DEFAULT_SYNAPSE_HL7_PORT = 9792;
-
-    public static final String TIMEOUT_PARAM = "timeout";
-
-    public static final String HL7_RAW_MESSAGE_PROPERTY_NAME = "HL7_RAW_MESSAGE";
-
     public static final String HL7_MESSAGE_OBJECT = "HL7_MESSAGE_OBJECT";
 
-    public static final int ACTIVITY_ID_GEN= 123456789;
-
     public static final String HL7_VALIDATE_MESSAGE = "transport.hl7.ValidateMessage";
-
-    public static final String HL7_DEFAULT_VALIDATION_PASSED = "HL7_DEFAULT_VALIDATION_PASSED";
 
     public static final String HL7_VALIDATION_PASSED = "HL7_VALIDATION_PASSED";   // internal to track invalid HL7 messages
 

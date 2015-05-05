@@ -39,14 +39,6 @@ public class MLLPConstants {
 
     public final static int DEFAULT_HL7_TIMEOUT = 10000;
 
-    public final static String PARAM_HL7_ID_GENERATOR = "inbound.hl7.IDGenerator";
-
-    public final static String FILE_BASED_ID_GENERATOR = "FILE_BASED";
-
-    public final static String DEFAULT_ID_GENERATOR = FILE_BASED_ID_GENERATOR;
-
-    public final static String UUID_GENERATOR = "UUID_GENERATOR";
-
     public final static String PARAM_HL7_PRE_PROC = "inbound.hl7.MessagePreProcessor";
 
     public final static String HL7_PRE_PROC_PARSER_CLASS = "HL7_PRE_PROC_PARSER_CLASS";
@@ -66,4 +58,27 @@ public class MLLPConstants {
     public final static String PARAM_HL7_BUILD_RAW_MESSAGE = "inbound.hl7.BuildInvalidMessages";
 
     public final static String PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES = "inbound.hl7.PassThroughInvalidMessages";
+
+    public final static String HL7_ID_GENERATOR = "hl7_id_generator";
+
+    public static class TCPConstants {
+
+        public final static String IO_THREAD_COUNT = "io_thread_count";
+
+        public final static String CONNECT_TIMEOUT = "connect_timeout";
+
+        public final static String TCP_NO_DELAY = "tcp_no_delay";
+
+        public final static String SO_KEEP_ALIVE = "so_keep_alive";
+
+        public final static String SO_TIMEOUT = "so_timeout";
+
+        public final static String SELECT_INTERVAL = "select_interval";
+
+        public final static String SHUTDOWN_GRACE_PERIOD = "shutdown_grace_period";
+
+        public final static String SO_RCVBUF = "so_rcvbuf";
+
+        public final static String SO_SNDBUF = "so_sndbuf";
+    }
 }

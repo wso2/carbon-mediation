@@ -143,21 +143,32 @@ public class InboundHL7IOReactor {
         return isa;
     }
 
-    // TODO: configurable using properties
     private static IOReactorConfig getDefaultReactorConfig() {
         IOReactorConfig.Builder builder = IOReactorConfig.custom();
-        return builder.setSelectInterval(1000)
-                .setShutdownGracePeriod(500)
+
+        return builder
+                .setSelectInterval(HL7Configuration.getInstance().getIntProperty(
+                        MLLPConstants.TCPConstants.SELECT_INTERVAL, 1000))
+                .setShutdownGracePeriod(HL7Configuration.getInstance().getIntProperty(
+                        MLLPConstants.TCPConstants.SHUTDOWN_GRACE_PERIOD, 500))
+                .setIoThreadCount(HL7Configuration.getInstance().getIntProperty(
+                        MLLPConstants.TCPConstants.IO_THREAD_COUNT, Runtime.getRuntime().availableProcessors()))
+                .setSoTimeout(HL7Configuration.getInstance().getIntProperty(
+                        MLLPConstants.TCPConstants.SO_TIMEOUT, 0))
+                .setSoKeepAlive(HL7Configuration.getInstance().getBooleanProperty(
+                        MLLPConstants.TCPConstants.SO_KEEP_ALIVE, true))
+                .setTcpNoDelay(HL7Configuration.getInstance().getBooleanProperty(
+                        MLLPConstants.TCPConstants.TCP_NO_DELAY, true))
+                .setConnectTimeout(HL7Configuration.getInstance().getIntProperty(
+                        MLLPConstants.TCPConstants.CONNECT_TIMEOUT, 0))
+                .setRcvBufSize(HL7Configuration.getInstance().getIntProperty(
+                        MLLPConstants.TCPConstants.SO_RCVBUF, 0))
+                .setSndBufSize(HL7Configuration.getInstance().getIntProperty(
+                        MLLPConstants.TCPConstants.SO_SNDBUF, 0))
                 .setInterestOpQueued(false)
-                .setIoThreadCount(Runtime.getRuntime().availableProcessors())
-                .setSoTimeout(0)
                 .setSoReuseAddress(true)
                 .setSoLinger(-1)
-                .setSoKeepAlive(true)
-                .setTcpNoDelay(true)
-                .setConnectTimeout(0).build();
-                //.setSndBufSize(0)
-                //.setRcvBufSize(0)
+                .build();
     }
 
 }

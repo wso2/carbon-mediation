@@ -48,14 +48,15 @@ public class CallableTask implements Callable<Boolean> {
     public Boolean call() throws Exception {
         // inject to synapse here
         synapseEnvironment.injectMessage(requestMessageContext, injectingSequence);
-        // cancel timeout handler thread
-        if (handler != null && !handler.isDone()) {
-            if (log.isDebugEnabled()) {
-                log.debug("Cancelling timeout thread");
-            }
-
-            handler.cancel(true);
-        }
+        // cancel timeout handler thread - this doesn't always work since injector thread can return immediately and we
+        // may have used drop in mediation logic.
+        //if (handler != null && !handler.isDone()) {
+        //    if (log.isDebugEnabled()) {
+        //        log.debug("Cancelling timeout thread");
+        //    }
+        //
+        //    handler.cancel(true);
+        //}
         return true;
     }
 }
