@@ -19,8 +19,8 @@ package org.wso2.carbon.inbound.endpoint.protocol.file;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 
 /**
  * 
@@ -28,18 +28,19 @@ import org.apache.synapse.core.SynapseEnvironment;
  * required (coordination==true)
  * 
  */
-public class FileTask implements org.apache.synapse.task.Task, ManagedLifecycle {
+public class FileTask extends InboundTask {
 
     private static final Log logger = LogFactory.getLog(FileTask.class.getName());
 
     private FilePollingConsumer fileScanner;
 
-    public FileTask(FilePollingConsumer fileScanner) {
+    public FileTask(FilePollingConsumer fileScanner, long interval) {
         logger.debug("File Task initalize.");
+        this.interval = interval;
         this.fileScanner = fileScanner;
     }
 
-    public void execute() {
+    protected void taskExecute() {
         logger.debug("File Task executing.");
         fileScanner.execute();
     }
