@@ -166,7 +166,7 @@ public class InboundEndpointsDataStore {
                 }
             }
         }
-        if (endpointInfo.get(port).size() == 0) {
+        if (endpointInfo.get(port) != null && endpointInfo.get(port).size() == 0) {
             endpointInfo.remove(port);
         }
         updateRegistry();

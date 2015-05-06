@@ -55,7 +55,14 @@ public class InboundHttpsListener extends InboundHttpListener {
 
     @Override
     public void init() {
-        EndpointListenerManager.getInstance().startSSLEndpoint(port, name, sslConfiguration);
+        if (isPortUsedByAnotherApplication(port)) {
+            log.warn("Port " + port + "used by inbound endpoint " + name + " is already used by another application " +
+                     "hence undeploying inbound endpoint");
+            this.destroy();
+        } else {
+            EndpointListenerManager.getInstance().startSSLEndpoint(port, name, sslConfiguration);
+        }
+
     }
 
 }
