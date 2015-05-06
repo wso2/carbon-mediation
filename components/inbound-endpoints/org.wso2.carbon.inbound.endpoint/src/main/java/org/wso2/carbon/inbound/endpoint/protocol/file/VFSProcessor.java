@@ -26,6 +26,7 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
+import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
 public class VFSProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
@@ -80,7 +81,7 @@ public class VFSProcessor extends InboundRequestProcessorImpl implements TaskSta
      * Register/start the schedule service
      * */
     public void start() {
-        Task task = new FileTask(fileScanner);
+        InboundTask task = new FileTask(fileScanner, interval);
         start(task, ENDPOINT_POSTFIX);
     }
 
