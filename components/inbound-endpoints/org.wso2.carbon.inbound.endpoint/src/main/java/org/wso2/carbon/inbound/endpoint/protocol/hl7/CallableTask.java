@@ -3,6 +3,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
@@ -34,29 +35,16 @@ public class CallableTask implements Callable<Boolean> {
     private SequenceMediator injectingSequence;
     private SynapseEnvironment synapseEnvironment;
 
-    private Future handler;
-
     public CallableTask(MessageContext synCtx, SequenceMediator injectingSequence,
-                        SynapseEnvironment synapseEnvironment, Future handler) {
+                        SynapseEnvironment synapseEnvironment) {
         this.requestMessageContext = synCtx;
         this.injectingSequence = injectingSequence;
         this.synapseEnvironment = synapseEnvironment;
-        this.handler = handler;
     }
 
     @Override
     public Boolean call() throws Exception {
-        // inject to synapse here
-        synapseEnvironment.injectMessage(requestMessageContext, injectingSequence);
-        // cancel timeout handler thread - this doesn't always work since injector thread can return immediately and we
-        // may have used drop in mediation logic.
-        //if (handler != null && !handler.isDone()) {
-        //    if (log.isDebugEnabled()) {
-        //        log.debug("Cancelling timeout thread");
-        //    }
-        //
-        //    handler.cancel(true);
-        //}
-        return true;
+        // inject to synapse here, call synchronously.
+        return synapseEnvironment.injectInbound(requestMessageContext, injectingSequence, true);
     }
 }

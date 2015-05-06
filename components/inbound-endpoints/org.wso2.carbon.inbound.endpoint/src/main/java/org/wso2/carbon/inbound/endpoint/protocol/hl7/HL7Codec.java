@@ -95,7 +95,6 @@ public class HL7Codec {
                 } else {
                     context.setHl7Message(HL7MessageUtils.parse(context.getRequestBuffer().toString(), context.isValidateMessage()));
                 }
-//                  System.out.println(context.getRequestBuffer().toString());
                 context.getRequestBuffer().setLength(0);
             } catch (HL7Exception e) {
                 log.error("Error while parsing request message: " + context.getRequestBuffer());

@@ -14,10 +14,7 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import java.nio.charset.CharsetDecoder;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -39,8 +36,7 @@ import java.util.concurrent.TimeUnit;
 public class HL7Processor implements InboundResponseSender {
     private static final Log log = LogFactory.getLog(HL7Processor.class);
 
-    // TODO: use axis2 worker pool here.
-    private static ScheduledExecutorService executorService;
+    private ScheduledExecutorService executorService = HL7ExecutorServiceFactory.getExecutorService();
 
     private Map<String, Object> parameters;
     private InboundProcessorParams params;
@@ -52,7 +48,6 @@ public class HL7Processor implements InboundResponseSender {
     private int timeOut;
 
     public HL7Processor(Map<String, Object> parameters) {
-        executorService  = Executors.newScheduledThreadPool(50);
         this.parameters = parameters;
 
         params = (InboundProcessorParams) parameters.get(MLLPConstants.INBOUND_PARAMS);
@@ -81,6 +76,9 @@ public class HL7Processor implements InboundResponseSender {
             return;
         }
 
+        mllpContext.setMessageId(synCtx.getMessageID());
+        synCtx.setProperty(MLLPConstants.HL7_INBOUND_MSG_ID, synCtx.getMessageID());
+
         // If not AUTO ACK, we need response invocation through this processor
         if (!autoAck) {
             synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
@@ -93,13 +91,11 @@ public class HL7Processor implements InboundResponseSender {
         SequenceMediator injectSeq = (SequenceMediator) synEnv.getSynapseConfiguration().getSequence(inSequence);
         injectSeq.setErrorHandler(onErrorSequence);
 
-        Future timeoutFuture = null;
-
-        if (!autoAck) {
-            timeoutFuture = executorService.schedule(new TimeoutHandler(mllpContext), timeOut, TimeUnit.MILLISECONDS);
+        if (!autoAck && timeOut > 0) {
+            executorService.schedule(new TimeoutHandler(mllpContext, synCtx.getMessageID()), timeOut, TimeUnit.MILLISECONDS);
         }
 
-        CallableTask task = new CallableTask(synCtx, injectSeq, synEnv, timeoutFuture);
+        CallableTask task = new CallableTask(synCtx, injectSeq, synEnv);
 
         executorService.submit(task);
 
@@ -147,6 +143,13 @@ public class HL7Processor implements InboundResponseSender {
     }
 
     private void sendBack(MessageContext messageContext, MLLPContext mllpContext) {
+
+        if (messageContext.getProperty(MLLPConstants.HL7_INBOUND_MSG_ID) != null
+                && !mllpContext.getMessageId().equals(messageContext.getProperty(MLLPConstants.HL7_INBOUND_MSG_ID))) {
+            log.warn("Response ID does not match request ID. Response may have been received after timeout.");
+            return;
+        }
+
         try {
             if ((((String) messageContext.getProperty(Axis2HL7Constants.HL7_RESULT_MODE)) != null) &&
                     ((String) messageContext.getProperty(Axis2HL7Constants.HL7_RESULT_MODE)).equals(Axis2HL7Constants.HL7_RESULT_MODE_NACK)) {
@@ -194,27 +197,27 @@ public class HL7Processor implements InboundResponseSender {
             log.error("Error while generating NACK response.", e);
         }
     }
-}
 
-class TimeoutHandler implements Runnable {
-    private static final Log log = LogFactory.getLog(TimeoutHandler.class);
+    private class TimeoutHandler implements Runnable {
+        private MLLPContext context;
+        private String messageId;
 
-    private MLLPContext context;
+        public TimeoutHandler(MLLPContext context, String messageId) {
+            this.context = context;
+            this.messageId = messageId;
+        }
 
-    public TimeoutHandler(MLLPContext context) {
-        this.context = context;
-    }
-
-    public void run() {
-        if (!context.hasResponded()) {
-            try {
-                log.warn("Timed out while waiting for HL7 Response to be generated.");
-                context.setHl7Message(HL7MessageUtils.createNack(context.getHl7Message(),
-                        "Timed out while waiting for HL7 Response to be generated."));
-                context.setMarkForClose(true);
-                context.requestOutput();
-            } catch (HL7Exception e) {
-                log.error("Could not generate timeout NACK response.", e);
+        public void run() {
+            if (messageId.equals(context.getMessageId())) {
+                try {
+                    log.warn("Timed out while waiting for HL7 Response to be generated.");
+                    context.setHl7Message(HL7MessageUtils.createNack(context.getHl7Message(),
+                            "Timed out while waiting for HL7 Response to be generated."));
+                    context.setMessageId("TIMEOUT");
+                    context.requestOutput();
+                } catch (HL7Exception e) {
+                    log.error("Could not generate timeout NACK response.", e);
+                }
             }
         }
     }

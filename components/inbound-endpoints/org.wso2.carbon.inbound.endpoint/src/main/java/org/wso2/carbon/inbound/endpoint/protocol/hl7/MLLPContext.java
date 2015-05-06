@@ -42,11 +42,11 @@ public class MLLPContext {
 
     private volatile boolean autoAck = true;
     private volatile boolean nackMode = false;
-    private volatile boolean transportError = false;
-    private volatile boolean responded = false;
     private volatile boolean markForClose = false;
     private boolean preProcess = true;
     private boolean applicationAck = false;
+
+    private volatile String messageId;
 
 
     private Parser preProcessorParser = null;
@@ -172,28 +172,20 @@ public class MLLPContext {
         this.validateMessage = validateMessage;
     }
 
-    public boolean isTransportError() {
-        return transportError;
-    }
-
-    public void setTransportError(boolean transportError) {
-        this.transportError = transportError;
-    }
-
-    public boolean hasResponded() {
-        return responded;
-    }
-
-    public void setResponded(boolean responded) {
-        this.responded = responded;
-    }
-
     public boolean isMarkForClose() {
         return markForClose;
     }
 
     public void setMarkForClose(boolean markForClose) {
         this.markForClose = markForClose;
+    }
+
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     public void reset() {

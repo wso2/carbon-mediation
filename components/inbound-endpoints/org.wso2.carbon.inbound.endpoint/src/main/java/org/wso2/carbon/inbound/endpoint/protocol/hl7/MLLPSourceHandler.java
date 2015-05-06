@@ -57,7 +57,6 @@ public class MLLPSourceHandler implements IOEventDispatch {
 
     @Override
     public void connected(IOSession session) {
-//        System.out.println("connected: " + session.getRemoteAddress() + " hashCode " + this.hashCode() + " session.hashCode() " + session.hashCode());
         sessionIdToPort.put(String.valueOf(session.hashCode()), String.valueOf(session.getRemoteAddress()));
 
         if (session.getAttribute(MLLPConstants.MLLP_CONTEXT) == null) {
@@ -67,14 +66,10 @@ public class MLLPSourceHandler implements IOEventDispatch {
 
         inputBuffer = bufferFactory.getBuffer();
         outputBuffer = bufferFactory.getBuffer();
-//        inputBuffer = ByteBuffer.allocate(8 * 1024);
-//        outputBuffer = ByteBuffer.allocate(8 * 1024);
     }
 
     @Override
     public void inputReady(IOSession session) {
-//        System.out.println("input ready " + getRemoteAddress(session.hashCode()));
-//        System.out.println(session.getStatus());
         ReadableByteChannel ch = (ReadableByteChannel) session.channel();
 
         MLLPContext mllpContext = (MLLPContext) session.getAttribute(MLLPConstants.MLLP_CONTEXT);
@@ -96,7 +91,6 @@ public class MLLPSourceHandler implements IOEventDispatch {
             }
 
             if (mllpContext.getCodec().isReadComplete())  {
-                mllpContext.setResponded(false);
                 if (mllpContext.isAutoAck()) {
                     mllpContext.requestOutput();
                     bufferFactory.release(inputBuffer);
@@ -117,39 +111,8 @@ public class MLLPSourceHandler implements IOEventDispatch {
 
     @Override
     public void outputReady(IOSession session) {
-//        System.out.println("output ready " + getRemoteAddress(session.hashCode()));
-
         MLLPContext mllpContext = (MLLPContext) session.getAttribute(MLLPConstants.MLLP_CONTEXT);
-
         writeOut(session, mllpContext);
-
-//        if (hl7Processor.isAutoAck()) {
-//            writeOut(session, mllpContext);
-//            return;
-//        } else {
-//
-//            if (mllpContext.isAckReady()) {
-//                writeOut(session, mllpContext);
-////                bufferFactory.release(inputBuffer);
-//                return;
-//            }
-//
-//            // if message timeout expired
-//            if (mllpContext.isExpired()) {
-//                log.warn("Timed out while waiting for HL7 Response to be generated. Enable inbound.hl7.AutoAck to auto generate ACK response.");
-//                try {
-//                    mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(),
-//                            "Timed out while waiting for HL7 Response to be generated."));
-//                    writeOut(session, mllpContext);
-//                } catch (HL7Exception e) {
-//                    log.error("Exception while generating NACK response on timeout. ", e);
-//                    session.clearEvent(EventMask.WRITE);
-//                    session.setEvent(EventMask.READ);
-//                    mllpContext.reset();
-//                }
-//
-//            }
-//        }
     }
 
     private void writeOut(IOSession session, MLLPContext mllpContext) {
@@ -186,7 +149,7 @@ public class MLLPSourceHandler implements IOEventDispatch {
                 shutdownConnection(session, mllpContext, null);
             } else {
                 bufferFactory.release(outputBuffer);
-                mllpContext.setResponded(true);
+                mllpContext.setMessageId("RESPONDED");
                 mllpContext.reset();
                 mllpContext.requestInput();
             }
@@ -196,14 +159,12 @@ public class MLLPSourceHandler implements IOEventDispatch {
 
     @Override
     public void timeout(IOSession session) {
-        System.out.println("timeout " + getRemoteAddress(session.hashCode()));
         MLLPContext mllpContext = (MLLPContext) session.getAttribute(MLLPConstants.MLLP_CONTEXT);
         shutdownConnection(session, mllpContext, null);
     }
 
     @Override
     public void disconnected(IOSession session) {
-        System.out.println("disconnected " + getRemoteAddress(session.hashCode()));
         MLLPContext mllpContext = (MLLPContext) session.getAttribute(MLLPConstants.MLLP_CONTEXT);
         shutdownConnection(session, mllpContext, null);
     }

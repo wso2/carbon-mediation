@@ -27,7 +27,7 @@ public class HL7Configuration {
     private static final Log log = LogFactory.getLog(HL7Configuration.class);
 
     private static String CONF_LOCATION = "conf.location";
-    private static HL7Configuration _instance = new HL7Configuration();
+    private static HL7Configuration instance = new HL7Configuration();
     private Properties props;
 
     private HL7Configuration() {
@@ -37,7 +37,7 @@ public class HL7Configuration {
     }
 
     public static HL7Configuration getInstance() {
-        return _instance;
+        return instance;
     }
 
     /**

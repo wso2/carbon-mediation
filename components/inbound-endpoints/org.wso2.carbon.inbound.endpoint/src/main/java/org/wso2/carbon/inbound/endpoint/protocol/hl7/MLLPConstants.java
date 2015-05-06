@@ -61,6 +61,8 @@ public class MLLPConstants {
 
     public final static String HL7_ID_GENERATOR = "hl7_id_generator";
 
+    public final static String HL7_INBOUND_MSG_ID = "HL7_INBOUND_MSG_ID";
+
     public static class TCPConstants {
 
         public final static String IO_THREAD_COUNT = "io_thread_count";
@@ -80,5 +82,21 @@ public class MLLPConstants {
         public final static String SO_RCVBUF = "so_rcvbuf";
 
         public final static String SO_SNDBUF = "so_sndbuf";
+
+        public final static String WORKER_THREADS_CORE = "worker_threads_core";
+
+        public final static int WORKER_THREADS_CORE_DEFAULT = 100;
+
+//        public final static String WORKER_THREADS_MAX = "worker_threads_max";
+//
+//        public final static int WORKER_THREADS_MAX_DEFAULT = 200;
+//
+//        public final static String WORKER_THREADS_KEEP_ALIVE = "worker_threads_keep_alive";
+//
+//        public final static int WORKER_THREADS_KEEP_ALIVE_DEFAULT = 60000;
+//
+//        public final static String WORKER_POOL_QUEUE_LEN  = "worker_pool_queue_length";
+
+//        public final static int WORKER_POOL_QUEUE_LEN_DEFAULT = -1;
     }
 }
