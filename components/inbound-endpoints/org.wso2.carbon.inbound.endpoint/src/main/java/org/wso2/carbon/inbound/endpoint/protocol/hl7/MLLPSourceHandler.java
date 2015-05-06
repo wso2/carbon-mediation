@@ -94,12 +94,14 @@ public class MLLPSourceHandler implements IOEventDispatch {
                 if (mllpContext.isAutoAck()) {
                     mllpContext.requestOutput();
                     bufferFactory.release(inputBuffer);
+                    inputBuffer = bufferFactory.getBuffer();
                 }
                 hl7Processor.processRequest(mllpContext);
             }
 
             if (read < 0) {
                 bufferFactory.release(inputBuffer);
+                inputBuffer = bufferFactory.getBuffer();
                 session.close();
             }
 
@@ -139,7 +141,7 @@ public class MLLPSourceHandler implements IOEventDispatch {
                 hl7TrailerBuf.flip();
                 mllpContext.getCodec().setState(HL7Codec.WRITE_COMPLETE);
             }
-            bufferFactory.release(outputBuffer);
+//            bufferFactory.release(outputBuffer);
         } catch (IOException e) {
             shutdownConnection(session, mllpContext, e);
         }
@@ -149,6 +151,7 @@ public class MLLPSourceHandler implements IOEventDispatch {
                 shutdownConnection(session, mllpContext, null);
             } else {
                 bufferFactory.release(outputBuffer);
+                outputBuffer = bufferFactory.getBuffer();
                 mllpContext.setMessageId("RESPONDED");
                 mllpContext.reset();
                 mllpContext.requestInput();

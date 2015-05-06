@@ -144,7 +144,6 @@ public class HL7Codec {
     }
 
     private int fillBuffer(ByteBuffer byteBuffer, byte[] responseBytes) {
-
         if (responseBytes == null) {
             return 0;
         }
@@ -154,9 +153,13 @@ public class HL7Codec {
         int headerPosition = 0;
 
         if (this.state == WRITE_HEADER) {
-            byteBuffer.put(MLLPConstants.HL7_HEADER[0]);
-            headerPosition = 1;
-            this.state = WRITE_CONTENT;
+            try {
+                byteBuffer.put(MLLPConstants.HL7_HEADER[0]);
+                headerPosition = 1;
+                this.state = WRITE_CONTENT;
+            } catch (Exception e) {
+                log.error("pos: " + byteBuffer.position() + " - limit: " + byteBuffer.limit() + " - remaining: " + byteBuffer.remaining() + " - capacity: " + byteBuffer.capacity());
+            }
         }
 
         int MAX = byteBuffer.capacity();
