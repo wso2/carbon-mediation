@@ -215,7 +215,7 @@ public class EndpointListenerManager {
             if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTP)) {
                 startListener(port, inboundEndpointInfoDTO.getEndpointName());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTPS)) {
-                startSSLEndpoint(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getSslConfiguration());
+                startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getSslConfiguration());
             }
 
         }
