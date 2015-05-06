@@ -82,6 +82,9 @@ public class InboundHttpServerWorker extends ServerWorker {
                 //Create Axis2 message context using request properties
                 processHttpRequestUri(axis2MsgContext, method);
 
+                // setting Inbound related properties
+                setInboundProperties(axis2MsgContext);
+
                 if (!isRESTRequest(axis2MsgContext, method)) {
                     if (request.isEntityEnclosing()) {
                         processEntityEnclosingRequest(axis2MsgContext, isAxis2Path);
@@ -92,7 +95,7 @@ public class InboundHttpServerWorker extends ServerWorker {
             } else {
                 try {
                     //create Synapse Message Context
-                    synCtx = createSynapseMessageContext(request);
+                    synCtx = createSynapseMessageContext(request, axis2MsgContext);
                     MessageContext axisCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
 
                     // setting Inbound related properties
@@ -173,10 +176,10 @@ public class InboundHttpServerWorker extends ServerWorker {
 
     // Create Synapse Message Context
     private org.apache.synapse.MessageContext createSynapseMessageContext(
-            SourceRequest inboundSourceRequest) throws AxisFault {
+            SourceRequest inboundSourceRequest, MessageContext axis2Context) throws AxisFault {
 
         // Create super tenant message context
-        MessageContext axis2MsgCtx = createMessageContext(null, inboundSourceRequest);
+        MessageContext axis2MsgCtx = axis2Context;
         ServiceContext svcCtx = new ServiceContext();
         OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
         axis2MsgCtx.setServiceContext(svcCtx);
@@ -198,12 +201,17 @@ public class InboundHttpServerWorker extends ServerWorker {
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }
 
-    // Setting Inbound Related Properties
+    // Setting Inbound Related Properties for Synapse Message Context
     private void setInboundProperties(org.apache.synapse.MessageContext msgContext) {
         msgContext.setProperty(SynapseConstants.IS_INBOUND, true);
         msgContext.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
                                new InboundHttpResponseSender());
         msgContext.setWSAAction(request.getHeaders().get(InboundHttpConstants.SOAP_ACTION));
+    }
+
+    // Setting Inbound Related Properties for Axis2 Message Context
+    private void setInboundProperties(MessageContext axis2Context){
+        axis2Context.setProperty(SynapseConstants.IS_INBOUND, true);
     }
 
     private String getTenantDomain() {
