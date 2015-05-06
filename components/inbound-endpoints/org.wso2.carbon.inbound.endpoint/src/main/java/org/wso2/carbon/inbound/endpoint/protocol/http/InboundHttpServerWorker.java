@@ -68,14 +68,17 @@ public class InboundHttpServerWorker extends ServerWorker {
     }
 
     public void run() {
+
         org.apache.synapse.MessageContext synCtx;
-//        MessageContext axis2MsgContext = getRequestContext();
-        MessageContext axis2MsgContext = createMessageContext(null, request);
+
+        //get already created axis2 message context
+        MessageContext axis2MsgContext = getRequestContext();
 
         if (request != null) {
             String method = request.getRequest() != null ? request.getRequest().
                     getRequestLine().getMethod().toUpperCase() : "";
 
+            //check the validity of message routing to axis2 path
             boolean isAxis2Path = isAllowedAxis2Path(axis2MsgContext);
 
             if (isAxis2Path) {
