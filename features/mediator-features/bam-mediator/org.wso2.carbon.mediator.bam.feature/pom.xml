@@ -64,7 +64,7 @@
                   </goals>
                   <configuration>
                      <id>org.wso2.carbon.mediator.bam</id>
-                     <propertiesFile>../../../../etc/feature.properties</propertiesFile>
+                     <propertiesFile>../../../etc/feature.properties</propertiesFile>
                      <importFeatures>
                         <importFeatureDef>org.wso2.carbon.core:${carbon.kernel.version}</importFeatureDef>
                         <importFeatureDef>org.wso2.carbon.databridge.datapublisher:${carbon.commons.version}</importFeatureDef>
