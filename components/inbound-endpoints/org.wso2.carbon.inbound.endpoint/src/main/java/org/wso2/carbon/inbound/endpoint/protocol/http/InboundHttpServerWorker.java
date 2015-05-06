@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -69,6 +70,7 @@ public class InboundHttpServerWorker extends ServerWorker {
 
     public void run() {
 
+        boolean isAxis2Path;
         org.apache.synapse.MessageContext synCtx;
 
         //get already created axis2 message context
@@ -79,7 +81,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                     getRequestLine().getMethod().toUpperCase() : "";
 
             //check the validity of message routing to axis2 path
-            boolean isAxis2Path = isAllowedAxis2Path(axis2MsgContext);
+            isAxis2Path = isAllowedAxis2Path(axis2MsgContext);
 
             if (isAxis2Path) {
                 //Create Axis2 message context using request properties
@@ -204,7 +206,10 @@ public class InboundHttpServerWorker extends ServerWorker {
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }
 
-    // Setting Inbound Related Properties for Synapse Message Context
+    /**
+     * Set Inbound Related Properties for Synapse Message Context
+     * @param msgContext Message context of incoming request
+     */
     private void setInboundProperties(org.apache.synapse.MessageContext msgContext) {
         msgContext.setProperty(SynapseConstants.IS_INBOUND, true);
         msgContext.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
@@ -212,8 +217,11 @@ public class InboundHttpServerWorker extends ServerWorker {
         msgContext.setWSAAction(request.getHeaders().get(InboundHttpConstants.SOAP_ACTION));
     }
 
-    // Setting Inbound Related Properties for Axis2 Message Context
-    private void setInboundProperties(MessageContext axis2Context){
+    /**
+     * Set Inbound Related Properties for Axis2 Message Context
+     * @param axis2Context Axis2 Message Context of incoming request
+     */
+    private void setInboundProperties(MessageContext axis2Context) {
         axis2Context.setProperty(SynapseConstants.IS_INBOUND, true);
     }
 
@@ -230,22 +238,46 @@ public class InboundHttpServerWorker extends ServerWorker {
         throw new SynapseException(msg);
     }
 
+    /**
+     * Checks whether the message should be routed to Axis2 path
+     * @param msgContext Message Context of incoming message
+     * @return true if the message should be routed, false otherwise
+     */
     private boolean isAllowedAxis2Path(MessageContext msgContext) {
         boolean isProxy = false;
         String reqUri = request.getUri();
 
         /*
            Get the operation part from the request URL
-           e.g. /services/TestProxy > TestProxy when service path is '/service/'
+           e.g. '/services/TestProxy/' > TestProxy when service path is '/service/' > result 'TestProxy/'
          */
         String serviceOpPart = Utils.getServiceAndOperationPart(reqUri,
                                                                 msgContext.getConfigurationContext().getServiceContextPath());
-
+        //if proxy, then check whether it is deployed in the environment
         if (serviceOpPart != null) {
-            isProxy = true;
+            isProxy = isProxyDeployed(msgContext, serviceOpPart.substring(0,(serviceOpPart.length()-1)));
         }
         return isProxy;
     }
 
+    /**
+     * Checks wheather the given proxy is deployed in synapse environment
+     * @param msgContext Message Context of incoming message
+     * @param proxyName String name of the Proxy
+     * @return true if the proxy is deployed, false otherwise
+     */
+    private boolean isProxyDeployed(MessageContext msgContext, String proxyName){
+        boolean isDeployed = false;
+
+        //get synapse configuration
+        SynapseConfiguration synapseConfiguration = (SynapseConfiguration)msgContext.getConfigurationContext().getAxisConfiguration().getParameter(
+                SynapseConstants.SYNAPSE_CONFIG).getValue();
+
+        //check whether the proxy is deployed in synapse environment
+        if(synapseConfiguration.getProxyService(proxyName) != null){
+            isDeployed = true;
+        }
+        return isDeployed;
+    }
 
 }
