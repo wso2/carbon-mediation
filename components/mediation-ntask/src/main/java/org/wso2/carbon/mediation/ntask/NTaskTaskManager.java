@@ -6,16 +6,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.SynapseTaskException;
+import org.apache.synapse.task.TaskBasedArtifactType;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskManager;
 import org.apache.synapse.task.TaskManagerObserver;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
+import org.wso2.carbon.message.processor.MessageProcessorCleanupTask;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
 import org.wso2.carbon.ntask.core.impl.clustered.ClusterGroupCommunicator;
@@ -23,7 +26,6 @@ import org.wso2.carbon.ntask.core.impl.clustered.ClusteredTaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
 
 public class NTaskTaskManager implements TaskManager, TaskServiceObserver, ServerStartupHandler {
@@ -616,20 +618,28 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     }
 
 	@Override
-	public void cleanupResources(String name) {
+	public void sendClusterMessage(Callable<Void> callable) {
 		if (taskManager instanceof ClusteredTaskManager) {
 			try {
-				HazelcastInstance hazelcast =
-				                              ((ClusteredTaskManager) taskManager).getClusterComm()
-				                                                                  .getHazelcast();
-				IExecutorService es =
-				                      hazelcast.getExecutorService(ClusterGroupCommunicator.NTASK_P2P_COMM_EXECUTOR);
-				es.submitToAllMembers(new MessageProcessorCleanupTask(name));
+				IExecutorService executorService =
+				                                   ((ClusteredTaskManager) taskManager).getClusterComm()
+				                                                                       .getHazelcast()
+				                                                                       .getExecutorService(ClusterGroupCommunicator.NTASK_P2P_COMM_EXECUTOR);
+				executorService.submitToAllMembers(callable);
 			} catch (TaskException e) {
-				logger.error("Could not cleanup the resources properly" + e.getLocalizedMessage(),
-				             e);
+				e.printStackTrace();
 			}
 		}
+
+	}
+
+	@Override
+	public void cleanupResources(String name, TaskBasedArtifactType taskArtifactType) {
+		Callable<Void> clusterTask = null;
+		if (taskArtifactType.equals(TaskBasedArtifactType.MESSAGEPROCESSOR)) {
+			clusterTask = new MessageProcessorCleanupTask(name);
+		}
+		this.sendClusterMessage(clusterTask);
 
 	}
 }
