@@ -97,7 +97,7 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             templates = getSynapseConfiguration().getEndpointTemplates().values();
 
-            EndpointTemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArray(templates);
+            EndpointTemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArrayByTemplate(templates);
             EndpointTemplateInfo[] ret;
             if (info.length >= (endpointTemplatesPerPage * pageNumber + endpointTemplatesPerPage)) {
                 ret = new EndpointTemplateInfo[endpointTemplatesPerPage];

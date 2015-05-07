@@ -52,7 +52,7 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
      * @param task
      * @param endpointPostfix
      */
-    protected void start(Task task, String endpointPostfix) {
+    protected void start(InboundTask task, String endpointPostfix) {
         log.info("Starting the inbound endpoint " + name + ", with coordination " + coordination
                 + ". Interval : " + interval + ". Type : " + endpointPostfix);
         if (coordination) {
@@ -60,7 +60,11 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
                 TaskDescription taskDescription = new TaskDescription();
                 taskDescription.setName(name + "-" + endpointPostfix);
                 taskDescription.setTaskGroup(endpointPostfix);
-                taskDescription.setInterval(interval);
+                if (interval < InboundTask.TASK_THRESHOLD_INTERVAL) {
+                    taskDescription.setInterval(InboundTask.TASK_THRESHOLD_INTERVAL);
+                } else {
+                    taskDescription.setInterval(interval);
+                }
                 taskDescription.setIntervalInMs(true);
                 taskDescription.addResource(TaskDescription.INSTANCE, task);
                 taskDescription.addResource(TaskDescription.CLASSNAME, task.getClass().getName());

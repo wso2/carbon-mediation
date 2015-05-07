@@ -273,7 +273,7 @@ public class CipherInitializer {
 
 	
 	/**
-	 * Initializing the encryption key store which uses to encypt the given
+	 * Initializing the encryption key store which uses to encrypt the given
 	 * plain text
 	 * 
 	 */
@@ -283,15 +283,14 @@ public class CipherInitializer {
 		
 		Properties properties = SecureVaultUtil.loadProperties();
 			
-		String keyStoreFile = null;
-		String keyType = null;
-		String aliasName = null;
-		String password = null;
+		String keyStoreFile;
+		String keyType;
+		String aliasName;
+		String password;
 		String provider = null;
 		Cipher cipher = null;
 
 		keyStoreFile = properties.getProperty("keystore.identity.location");
-		               
 
 		File keyStore = new File(keyStoreFile);
 
@@ -300,15 +299,12 @@ public class CipherInitializer {
 		}
 		
 		keyType =  properties.getProperty("keystore.identity.type"); 
-		          
 		aliasName = properties.getProperty("keystore.identity.alias"); ;
 	
 		// Create a KeyStore Information for private key entry KeyStore
-		IdentityKeyStoreInformation identityInformation =
-		                                                  KeyStoreInformationFactory.createIdentityKeyStoreInformation(properties);
+		IdentityKeyStoreInformation identityInformation = KeyStoreInformationFactory.createIdentityKeyStoreInformation(properties);
 
-		
-		password = identityInformation.getKeyPasswordProvider().getResolvedSecret(); 
+		password = identityInformation.getKeyStorePasswordProvider().getResolvedSecret();
 
 		try {
 			KeyStore primaryKeyStore = getKeyStore(keyStoreFile, password, keyType, provider);
@@ -324,8 +320,6 @@ public class CipherInitializer {
 		} catch (NoSuchPaddingException e) {
 			handleException("Error initializing Cipher ", e);
 		}
-
-		
 		encryptionProvider = cipher;
 	}
 	

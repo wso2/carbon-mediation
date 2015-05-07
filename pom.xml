@@ -27,7 +27,7 @@
 
     <groupId>org.wso2.carbon.mediation</groupId>
 	<artifactId>carbon-mediation</artifactId>
- 	<version>4.3.3-SNAPSHOT</version>
+ 	<version>4.4.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -78,7 +78,7 @@
         <connection>scm:git:https://github.com/wso2/carbon-mediation.git</connection>
         <url>https://github.com/wso2/carbon-mediation.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-mediation.git</developerConnection>
-        <tag>carbon-mediation-4.3.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <build>
@@ -122,8 +122,8 @@
                 <version>2.3.1</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -245,7 +245,7 @@
             <dependency>
                 <groupId>org.apache.axis2</groupId>
                 <artifactId>axis2-transport-base</artifactId>
-                <version>${axis2-transports.version}</version>
+                <version>${axis2-transports.base.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.axis2</groupId>
@@ -1895,49 +1895,49 @@
     <properties>
 
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.3.3-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.4.1-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
-        <carbon.mediation.imp.pkg.version>[4.3.0, 4.4.0)</carbon.mediation.imp.pkg.version>
+        <carbon.mediation.imp.pkg.version>[4.3.0, 4.5.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.3.0</carbon.kernel.version>
-        <carbon.kernel.imp.pkg.version>[4.3.0, 4.4.0)</carbon.kernel.imp.pkg.version>
+        <carbon.kernel.version>4.4.0</carbon.kernel.version>
+        <carbon.kernel.imp.pkg.version>[4.4.0, 4.5.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.3.6</carbon.commons.version>
-        <carbon.commons.imp.pkg.version>[4.3.0, 4.4.0)</carbon.commons.imp.pkg.version>
+        <carbon.commons.version>4.4.0</carbon.commons.version>
+        <carbon.commons.imp.pkg.version>[4.4.0, 4.5.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
-        <carbon.deployment.version>4.3.1</carbon.deployment.version>
+        <carbon.deployment.version>4.4.0</carbon.deployment.version>
 
         <!-- Carbon Registry version-->
-        <carbon.registry.version>4.3.0</carbon.registry.version>
-        <carbon.registry.imp.pkg.version>[4.3.0, 4.4.0)</carbon.registry.imp.pkg.version>
+        <carbon.registry.version>4.4.0</carbon.registry.version>
+        <carbon.registry.imp.pkg.version>[4.4.0, 4.5.0)</carbon.registry.imp.pkg.version>
 
         <!-- Carbon Identity version-->
-        <carbon.identity.version>4.3.2</carbon.identity.version>
-        <carbon.identity.imp.pkg.version>[4.3.0, 4.4.0)</carbon.identity.imp.pkg.version>
+        <carbon.identity.version>4.4.0</carbon.identity.version>
+        <carbon.identity.imp.pkg.version>[4.4.0, 4.5.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->
-        <carbon.rule.version>4.3.0</carbon.rule.version>
-        <carbon.rule.imp.pkg.version>[4.3.0, 4.4.0)</carbon.rule.imp.pkg.version>
+        <carbon.rule.version>4.4.0</carbon.rule.version>
+        <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.3-wso2v3-SNAPSHOT</synapse.version>
+        <synapse.version>2.1.3-wso2v3</synapse.version>
 
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1.wso2v11</orbit.version.axis2>
-        <orbit.version.axis2.client>1.6.1.wso2v11</orbit.version.axis2.client>
-        <orbit.version.axiom>1.2.11.wso2v5</orbit.version.axiom>
-        <axis2-transports.version>1.6.1-wso2v11</axis2-transports.version>
+        <orbit.version.axis2>1.6.1.wso2v12</orbit.version.axis2>
+        <orbit.version.axis2.client>1.6.1.wso2v12</orbit.version.axis2.client>
+        <orbit.version.axiom>1.2.11.wso2v6</orbit.version.axiom>
+        <axis2-transports.base.version>1.6.1-wso2v12</axis2-transports.base.version>
         <axis2.osgi.version.range>[1.6.1.wso2v11, 1.7.0)</axis2.osgi.version.range>
         <axis2.json.version>1.6.1-wso2v5</axis2.json.version>
 
         <!-- Axiom Version -->
-        <axiom.api.wso2.version>1.2.11-wso2v5</axiom.api.wso2.version>
-        <axiom.wso2.version>1.2.11.wso2v5</axiom.wso2.version>
-        <axiom.version>1.2.11.wso2v5</axiom.version>
+        <axiom.api.wso2.version>1.2.11-wso2v6</axiom.api.wso2.version>
+        <axiom.wso2.version>1.2.11.wso2v6</axiom.wso2.version>
+        <axiom.version>1.2.11.wso2v6</axiom.version>
         <axiom.osgi.version.range>[1.2.11.wso2v5, 1.3.0)</axiom.osgi.version.range>
 
         <!-- Apache Versions -->
