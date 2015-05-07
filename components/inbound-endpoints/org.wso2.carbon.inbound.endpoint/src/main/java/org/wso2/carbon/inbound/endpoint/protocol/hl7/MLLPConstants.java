@@ -87,16 +87,5 @@ public class MLLPConstants {
 
         public final static int WORKER_THREADS_CORE_DEFAULT = 100;
 
-//        public final static String WORKER_THREADS_MAX = "worker_threads_max";
-//
-//        public final static int WORKER_THREADS_MAX_DEFAULT = 200;
-//
-//        public final static String WORKER_THREADS_KEEP_ALIVE = "worker_threads_keep_alive";
-//
-//        public final static int WORKER_THREADS_KEEP_ALIVE_DEFAULT = 60000;
-//
-//        public final static String WORKER_POOL_QUEUE_LEN  = "worker_pool_queue_length";
-
-//        public final static int WORKER_POOL_QUEUE_LEN_DEFAULT = -1;
     }
 }

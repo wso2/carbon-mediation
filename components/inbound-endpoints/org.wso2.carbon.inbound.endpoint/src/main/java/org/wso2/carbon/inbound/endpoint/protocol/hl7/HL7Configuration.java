@@ -3,7 +3,11 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Properties;
 
 /**
@@ -149,6 +153,7 @@ public class HL7Configuration {
 
         //if we reach to this assume that the we may have to looking to the customer provided external location for the
         //given properties
+
         if (System.getProperty(CONF_LOCATION) != null) {
             try {
                 in = new FileInputStream(System.getProperty(CONF_LOCATION) + File.separator + filePath);
