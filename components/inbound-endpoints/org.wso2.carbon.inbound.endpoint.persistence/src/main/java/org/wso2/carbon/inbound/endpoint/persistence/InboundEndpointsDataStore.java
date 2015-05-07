@@ -41,9 +41,15 @@ public class InboundEndpointsDataStore {
     private Map<Integer,List<InboundEndpointInfoDTO>> endpointInfo;
     private Registry registry = null;
     private final String rootPath = RegistryResources.ROOT + "inbound-endpoints/";
-    private final String REG_PROP = "endpoints";
 
-    public InboundEndpointsDataStore() {
+    private static InboundEndpointsDataStore instance = new InboundEndpointsDataStore();
+
+    public static InboundEndpointsDataStore getInstance() {
+        return instance;
+    }
+
+
+    private InboundEndpointsDataStore() {
         try {
             registry = ServiceReferenceHolder.getInstance().getRegistry();
         } catch (RegistryException e) {
