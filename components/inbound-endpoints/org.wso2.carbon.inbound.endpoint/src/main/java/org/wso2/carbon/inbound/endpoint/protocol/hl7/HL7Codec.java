@@ -153,13 +153,9 @@ public class HL7Codec {
         int headerPosition = 0;
 
         if (this.state == WRITE_HEADER) {
-            try {
-                byteBuffer.put(MLLPConstants.HL7_HEADER[0]);
-                headerPosition = 1;
-                this.state = WRITE_CONTENT;
-            } catch (Exception e) {
-                log.error("pos: " + byteBuffer.position() + " - limit: " + byteBuffer.limit() + " - remaining: " + byteBuffer.remaining() + " - capacity: " + byteBuffer.capacity());
-            }
+            byteBuffer.put(MLLPConstants.HL7_HEADER[0]);
+            headerPosition = 1;
+            this.state = WRITE_CONTENT;
         }
 
         int MAX = byteBuffer.capacity();
