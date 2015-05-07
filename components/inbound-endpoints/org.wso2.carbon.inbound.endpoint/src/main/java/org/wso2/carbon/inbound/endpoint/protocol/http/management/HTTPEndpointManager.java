@@ -28,33 +28,31 @@ import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpSourceHandler;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manager which handles Http Listeners activities for Inbound Endpoints, coordinating
  * with Pass-through APIs and registry etc. This is the central place to mange Http Listeners
  * for Inbound endpoints
  */
-public class EndpointListenerManager {
+public class HTTPEndpointManager {
 
-    private static EndpointListenerManager instance = new EndpointListenerManager();
+    private static HTTPEndpointManager instance = new HTTPEndpointManager();
 
     private InboundEndpointsDataStore dataStore;
 
-    private static final Logger log = Logger.getLogger(EndpointListenerManager.class);
+    private static final Logger log = Logger.getLogger(HTTPEndpointManager.class);
 
 
-    private EndpointListenerManager() {
-        dataStore = new InboundEndpointsDataStore();
+    private HTTPEndpointManager() {
+        dataStore = InboundEndpointsDataStore.getInstance();
     }
 
-    public static EndpointListenerManager getInstance() {
+    public static HTTPEndpointManager getInstance() {
         return instance;
     }
 
@@ -123,7 +121,7 @@ public class EndpointListenerManager {
      * @param port  port
      * @param name  endpoint name
      */
-    private void startListener(int port, String name) {
+    public void startListener(int port, String name) {
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener is already started for port : " + port);
             return;
@@ -156,7 +154,7 @@ public class EndpointListenerManager {
      * @param port  port
      * @param name  endpoint name
      */
-    private void startSSLListener(int port, String name ,SSLConfiguration sslConfiguration ) {
+    public void startSSLListener(int port, String name, SSLConfiguration sslConfiguration) {
 
         SourceConfiguration sourceConfiguration = null;
         try {
