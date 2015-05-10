@@ -92,8 +92,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         	jmsSpec = "1.1";
         }else if("2.0".equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
             jmsSpec = "2.0";
-        }
-        else{
+        }else{
             jmsSpec = "1.0";
         }
 
