@@ -71,8 +71,9 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
             }
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
                     stream.toByteArray());
-            org.wso2.carbon.utils.xml.XMLPrettyPrinter xmlPrettyPrinter = new org.wso2.carbon.utils.xml.XMLPrettyPrinter(byteArrayInputStream);
-            return xmlPrettyPrinter.xmlFormat();
+            org.wso2.carbon.mediation.configadmin.util.XMLPrettyPrinter xmlPrettyPrinter =
+                    new org.wso2.carbon.mediation.configadmin.util.XMLPrettyPrinter(byteArrayInputStream);
+            return xmlPrettyPrinter.xmlFormatWithComments();
 
         } catch (XMLStreamException e) {
             handleException("Error serializing the Synapse configuration : Error " + e.getMessage(),
