@@ -16,9 +16,13 @@
 
 package org.wso2.carbon.mediator.service.ui;
 
+import org.apache.axiom.om.OMComment;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
 import org.wso2.carbon.mediator.service.*;
+import org.wso2.carbon.mediator.service.builtin.CommentMediator;
 
+import javax.print.attribute.standard.Media;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -54,19 +58,25 @@ public abstract class AbstractListMediator extends AbstractMediator implements L
     }
 
     protected void addChildren(OMElement el, ListMediator m) {
-        Iterator it = el.getChildElements();
+        Iterator it = el.getChildren();
         while (it.hasNext()) {
-            OMElement child = (OMElement) it.next();
-            MediatorService mediatorService = MediatorStore.getInstance().getMediatorService(child);
-            if (mediatorService != null) {
-                Mediator med = mediatorService.getMediator();
-                if (med != null) {
-                    med.build(child);
-                    m.addChild(med);
-                } else {
-                    String msg = "Unknown mediator : " + child.getLocalName();
-                    throw new MediatorException(msg);
+            OMNode child = (OMNode) it.next();
+            if(child instanceof OMElement) {
+                MediatorService mediatorService = MediatorStore.getInstance().getMediatorService((OMElement)child);
+                if (mediatorService != null) {
+                    Mediator med = mediatorService.getMediator();
+                    if (med != null) {
+                        med.build((OMElement)child);
+                        m.addChild(med);
+                    } else {
+                        String msg = "Unknown mediator : " + ((OMElement)child).getLocalName();
+                        throw new MediatorException(msg);
+                    }
                 }
+            } else if(child instanceof OMComment){
+                Mediator med = new CommentMediator();
+                ((CommentMediator)med).build((OMComment)child);
+                m.addChild(med);
             }
         }
     }
