@@ -27,42 +27,42 @@ import org.wso2.carbon.message.processor.util.ConfigHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
- * 
+ *
  * Cleans up the resources used by the message processor such as JMS consumers
  * etc especially in a clustered environment.
  *
  */
 public class MessageProcessorCleanupTask implements Callable<Void>, Serializable {
-	private static final long serialVersionUID = 1L;
-	private final String name;
+    private static final long serialVersionUID = 1L;
+    private final String name;
 
-	public MessageProcessorCleanupTask(String name) {
-		this.name = name;
-	}
+    public MessageProcessorCleanupTask(String name) {
+        this.name = name;
+    }
 
-	public Void call() throws Exception {
-		/*
-		 * Get the message processor instance running inside this worker node
-		 * using an OSGI service, synapse-env, synapse-config.
-		 */
-		SynapseEnvironmentService synEnvService =
-		                                          ConfigHolder.getInstance()
-		                                                      .getSynapseEnvironmentService(MultitenantConstants.SUPER_TENANT_ID);
-		MessageProcessor messageProcessor =
-		                                    synEnvService.getSynapseEnvironment()
-		                                                 .getSynapseConfiguration()
-		                                                 .getMessageProcessors().get(name);
+    public Void call() throws Exception {
+        /*
+         * Get the message processor instance running inside this worker node
+         * using an OSGI service, synapse-env, synapse-config.
+         */
+        SynapseEnvironmentService synEnvService =
+                                                  ConfigHolder.getInstance()
+                                                              .getSynapseEnvironmentService(MultitenantConstants.SUPER_TENANT_ID);
+        MessageProcessor messageProcessor =
+                                            synEnvService.getSynapseEnvironment()
+                                                         .getSynapseConfiguration()
+                                                         .getMessageProcessors().get(name);
 
-		/*
-		 * Get all the message processors run in this VM and filter using the
-		 * name.
-		 * Then cleanup the resources used by that message processor.
-		 */
-		if (messageProcessor != null && messageProcessor instanceof ScheduledMessageProcessor) {
-			((ScheduledMessageProcessor) messageProcessor).cleanupLocalResources();
-		}
+        /*
+         * Get all the message processors run in this VM and filter using the
+         * name.
+         * Then cleanup the resources used by that message processor.
+         */
+        if (messageProcessor != null && messageProcessor instanceof ScheduledMessageProcessor) {
+            ((ScheduledMessageProcessor) messageProcessor).cleanupLocalResources();
+        }
 
-		return null;
-	}
+        return null;
+    }
 
 }
