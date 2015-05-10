@@ -122,9 +122,18 @@ public class PayloadDataBuilder {
     private Object produceEntityValue(String valueName, MessageContext messageContext){
         try{
             if(valueName.startsWith("$")){ // When entity value is a mediator parameter
-                if("$SOAPHeader".equals(valueName)){
-                    return messageContext.getEnvelope().getHeader().toString();
-                } else if ("$SOAPBody".equals(valueName)){
+                if ("$SOAPHeader".equals(valueName)) {
+                    if (messageContext.getEnvelope().getHeader() != null) {
+                        if (messageContext.getEnvelope().getHeader().getFirstElement() != null) {
+                            return messageContext.getEnvelope().getHeader().toString();
+                        } else {
+                            return "Header is empty";
+                        }
+                    } else {
+                        return "Header is empty";
+                    }
+
+                } else if ("$SOAPBody".equals(valueName)) {
                     return messageContext.getEnvelope().getBody().toString();
                 } else {
                     return "Invalid Entity Parameter !";

@@ -26,9 +26,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.startup.quartz.StartUpController;
-import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
+import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
 public class GenericProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
@@ -43,7 +43,7 @@ public class GenericProcessor extends InboundRequestProcessorImpl implements Tas
     private String classImpl;
     private boolean sequential;
     
-    private static final String ENDPOINT_POSTFIX = "CLASS-EP";
+    private static final String ENDPOINT_POSTFIX = "CLASS" + COMMON_ENDPOINT_POSTFIX;
     
     public GenericProcessor(String name, String classImpl, Properties properties,
             long scanInterval, String injectingSeq, String onErrorSeq,
@@ -105,7 +105,7 @@ public class GenericProcessor extends InboundRequestProcessorImpl implements Tas
     
     public void start() {        	
         try {
-        	Task task = new GenericTask(pollingConsumer);
+            InboundTask task = new GenericTask(pollingConsumer, interval);
         	start(task, ENDPOINT_POSTFIX);
         } catch (Exception e) {
             log.error("Could not start Generic Processor. Error starting up scheduler. Error: " + e.getLocalizedMessage());

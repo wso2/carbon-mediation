@@ -47,7 +47,7 @@
 			List<org.wso2.carbon.inbound.ui.internal.ParamDTO>sParams = new ArrayList<org.wso2.carbon.inbound.ui.internal.ParamDTO>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
-				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.")){
+				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.") || strKey.startsWith("api.")){
 					String strVal = request.getParameter(strKey);
 					if(strVal != null && !strVal.equals("")){
 						sParams.add(new org.wso2.carbon.inbound.ui.internal.ParamDTO(strKey, request.getParameter(strKey)));
@@ -73,9 +73,26 @@
                    sParams.add((new ParamDTO("SSLProtocol",request.getParameter(strKey))));
                 }else if(strKey.startsWith("CertificateRevocationVerifier")){
                    sParams.add((new ParamDTO("CertificateRevocationVerifier",request.getParameter(strKey))));
-                }
-			}
-			client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
+                }else if(strKey.startsWith("coordination")){
+		   sParams.add((new ParamDTO("coordination",request.getParameter("coordination")))); 
+		}
+                        }
+		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
+			if(!added){
+            		%>
+            		<script type="text/javascript">
+                        jQuery(document).ready(function() {
+                            CARBON.showErrorDialog('Cannot update inbound endpoint may be name or port already consumed ', function() {
+                    				goBackOnePage();
+                    			}, function() {
+                    				goBackOnePage();
+                    			});
+                    		});
+                    	</script>
+
+
+            		<%
+            		}
 	%>
 	<script type="text/javascript">
     forward("index.jsp");

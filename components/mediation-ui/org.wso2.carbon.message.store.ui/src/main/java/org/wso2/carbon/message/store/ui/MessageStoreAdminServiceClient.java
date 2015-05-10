@@ -26,12 +26,18 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.message.store.stub.MessageInfo;
 import org.wso2.carbon.message.store.stub.MessageStoreAdminServiceStub;
 import org.wso2.carbon.message.store.ui.utils.MessageStoreData;
+import org.wso2.carbon.ndatasource.ui.stub.NDataSourceAdminDataSourceException;
+import org.wso2.carbon.ndatasource.ui.stub.NDataSourceAdminStub;
+import org.wso2.carbon.ndatasource.ui.stub.core.services.xsd.WSDataSourceInfo;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MessageStoreAdminServiceClient {
 
     private MessageStoreAdminServiceStub stub;
+    private NDataSourceAdminStub nDataSourceAdminStub;
 
     private static final String adminServiceName = "MessageStoreAdminService";
 
@@ -51,6 +57,9 @@ public class MessageStoreAdminServiceClient {
         Options option = client.getOptions();
         option.setManageSession(true);
         option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
+
+        // Get nDatasourceAdminStub
+        nDataSourceAdminStub = new NDataSourceAdminStub(configurationContext, "local://services/NDataSourceAdmin");
     }
 
     /**
@@ -255,6 +264,28 @@ public class MessageStoreAdminServiceClient {
         }
 
         return className;
+    }
+
+    /**
+     * Get carbon ndatasourcelist for jdbc message stores
+     */
+    public List<String> getAllDataSourceInformations() throws RemoteException,
+                                                              NDataSourceAdminDataSourceException {
+
+        WSDataSourceInfo wsDataSourceInfo[] = nDataSourceAdminStub.getAllDataSources();
+
+        List<String> sourceList = new ArrayList<String>();
+        if (wsDataSourceInfo == null || wsDataSourceInfo.length == 0) {
+            return sourceList;
+        }
+
+        for(WSDataSourceInfo info : wsDataSourceInfo) {
+            if (info.getDsMetaInfo().getJndiConfig() != null) {
+                sourceList.add(info.getDsMetaInfo().getJndiConfig().getName());
+            }
+        }
+
+        return sourceList;
     }
 
     private void handleException(Exception e) throws Exception {

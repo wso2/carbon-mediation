@@ -18,6 +18,8 @@
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileNotFolderException;
+import org.apache.commons.vfs2.FileNotFoundException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -452,7 +455,7 @@ public class FilePollingConsumer {
                 }
             }
         }
-    }
+    }    
     
     /**
      * 
@@ -474,6 +477,40 @@ public class FilePollingConsumer {
                     + vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_FILE_NAME_PATTERN));
         }
 
+        // Sort the files
+        String strSortParam = vfsProperties.getProperty(VFSConstants.FILE_SORT_PARAM);
+        if (strSortParam != null && !"NONE".equals(strSortParam)) {
+            log.debug("Start Sorting the files.");
+            String strSortOrder = vfsProperties.getProperty(VFSConstants.FILE_SORT_ORDER);
+            boolean bSortOrderAsscending = true;
+            if (strSortOrder != null && strSortOrder.toLowerCase().equals("false")) {
+                bSortOrderAsscending = false;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("Sorting the files by : " + strSortOrder + ". (" + bSortOrderAsscending
+                        + ")");
+            }
+            if (strSortParam.equals(VFSConstants.FILE_SORT_VALUE_NAME) && bSortOrderAsscending) {
+                Arrays.sort(children, new FileNameAscComparator());
+            } else if (strSortParam.equals(VFSConstants.FILE_SORT_VALUE_NAME)
+                    && !bSortOrderAsscending) {
+                Arrays.sort(children, new FileNameDesComparator());
+            } else if (strSortParam.equals(VFSConstants.FILE_SORT_VALUE_SIZE)
+                    && bSortOrderAsscending) {
+                Arrays.sort(children, new FileSizeAscComparator());
+            } else if (strSortParam.equals(VFSConstants.FILE_SORT_VALUE_SIZE)
+                    && !bSortOrderAsscending) {
+                Arrays.sort(children, new FileSizeDesComparator());
+            } else if (strSortParam.equals(VFSConstants.FILE_SORT_VALUE_LASTMODIFIEDTIMESTAMP)
+                    && bSortOrderAsscending) {
+                Arrays.sort(children, new FileLastmodifiedtimestampAscComparator());
+            } else if (strSortParam.equals(VFSConstants.FILE_SORT_VALUE_LASTMODIFIEDTIMESTAMP)
+                    && !bSortOrderAsscending) {
+                Arrays.sort(children, new FileLastmodifiedtimestampDesComparator());
+            }
+            log.debug("End Sorting the files.");
+        }      
+        
         for (FileObject child : children) {
             // skipping *.lock / *.fail file
             if (child.getName().getBaseName().endsWith(".lock")
@@ -481,7 +518,7 @@ public class FilePollingConsumer {
                 continue;
             }
             boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child);
-
+            
             // child's file name matches the file name pattern or process all
             // files now we try to get the lock and process
             if ((strFilePattern == null || child.getName().getBaseName().matches(strFilePattern))
@@ -507,10 +544,17 @@ public class FilePollingConsumer {
                         // tell moveOrDeleteAfterProcessing() file was success
                         lastCycle = 1;
                     } catch (Exception e) {
-                        log.error("Error processing File URI : " + child.getName(), e);
-                        failCount++;
-                        // tell moveOrDeleteAfterProcessing() file failed
-                        lastCycle = 2;
+                        if (e.getCause() instanceof FileNotFoundException) {
+                            log.warn("Error processing File URI : " + child.getName()
+                                    + ". This can be due to file moved from another process.");
+                            runPostProcess = false;
+                        } else {
+                            log.error("Error processing File URI : " + child.getName(), e);
+                            failCount++;
+                            // tell moveOrDeleteAfterProcessing() file failed
+                            lastCycle = 2;
+                        }
+
                     }
                     // skipping un-locking file if failed to do delete/move
                     // after process
@@ -647,6 +691,17 @@ public class FilePollingConsumer {
                     return false;
                 }
             }
+            // When processing a directory list is fetched initially. Therefore
+            // there is still a chance of file processed by another process.
+            // Need to check the source file before processing.
+            try {
+                FileObject sourceFile = fsManager.resolveFile(strContext);
+                if (!sourceFile.exists()) {
+                    return false;
+                }
+            } catch (FileSystemException e) {
+                return false;
+            }         
             VFSParamDTO vfsParamDTO = new VFSParamDTO();
             vfsParamDTO.setAutoLockRelease(autoLockRelease);
             vfsParamDTO.setAutoLockReleaseSameNode(autoLockReleaseSameNode);
@@ -716,6 +771,26 @@ public class FilePollingConsumer {
                         .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS))) {
                     moveToDirectoryURI = vfsProperties
                             .getProperty(VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
+                    //Postfix the date given timestamp format
+                    String strSubfoldertimestamp = vfsProperties
+                            .getProperty(VFSConstants.SUBFOLDER_TIMESTAMP);
+                    if (strSubfoldertimestamp != null) {
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat(strSubfoldertimestamp);
+                            String strDateformat = sdf.format(new Date());
+                            int iIndex = moveToDirectoryURI.indexOf("?");
+                            if (iIndex > -1) {
+                                moveToDirectoryURI = moveToDirectoryURI.substring(0, iIndex)
+                                        + strDateformat
+                                        + moveToDirectoryURI.substring(iIndex,
+                                                moveToDirectoryURI.length());
+                            }else{
+                                moveToDirectoryURI += strDateformat;
+                            }
+                        } catch (Exception e) {
+                            log.warn("Error generating subfolder name with date", e);
+                        }
+                    }
                 }
                 break;
 
@@ -731,7 +806,7 @@ public class FilePollingConsumer {
                 return;
             }
 
-            if (moveToDirectoryURI != null) {
+            if (moveToDirectoryURI != null) {                
                 FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI, fso);
                 String prefix;
                 if (vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT) != null) {
@@ -742,6 +817,13 @@ public class FilePollingConsumer {
                 } else {
                     prefix = "";
                 }
+                
+                //Forcefully create the folder(s) if does not exists
+                String strForceCreateFolder = vfsProperties.getProperty(VFSConstants.FORCE_CREATE_FOLDER);
+                if(strForceCreateFolder != null && strForceCreateFolder.toLowerCase().equals("true") && !moveToDirectory.exists()){
+                    moveToDirectory.createFolder();
+                }
+                
                 FileObject dest = moveToDirectory.resolveFile(prefix
                         + fileObject.getName().getBaseName());
                 if (log.isDebugEnabled()) {
@@ -778,5 +860,75 @@ public class FilePollingConsumer {
             }
         }
     }
+    /**
+     * Comparator classed used to sort the files according to user input
+     * */
+    class FileNameAscComparator implements Comparator<FileObject> {
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
+    }
 
+    class FileLastmodifiedtimestampAscComparator implements Comparator<FileObject> {
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            Long lDiff = 0l;
+            try {
+                lDiff = o1.getContent().getLastModifiedTime()
+                        - o2.getContent().getLastModifiedTime();
+            } catch (FileSystemException e) {
+                log.warn("Unable to compare lastmodified timestamp of the two files.", e);
+            }
+            return lDiff.intValue();
+        }
+    }
+
+    class FileSizeAscComparator implements Comparator<FileObject> {
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            Long lDiff = 0l;
+            try {
+                lDiff = o1.getContent().getSize() - o2.getContent().getSize();
+            } catch (FileSystemException e) {
+                log.warn("Unable to compare size of the two files.", e);
+            }
+            return lDiff.intValue();
+        }
+    }
+
+    class FileNameDesComparator implements Comparator<FileObject> {
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            return o2.getName().compareTo(o1.getName());
+        }
+    }
+
+    class FileLastmodifiedtimestampDesComparator implements Comparator<FileObject> {
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            Long lDiff = 0l;
+            try {
+                lDiff = o2.getContent().getLastModifiedTime()
+                        - o1.getContent().getLastModifiedTime();
+            } catch (FileSystemException e) {
+                log.warn("Unable to compare lastmodified timestamp of the two files.", e);
+            }
+            return lDiff.intValue();
+        }
+    }
+
+    class FileSizeDesComparator implements Comparator<FileObject> {
+        @Override
+        public int compare(FileObject o1, FileObject o2) {
+            Long lDiff = 0l;
+            try {
+                lDiff = o2.getContent().getSize() - o1.getContent().getSize();
+            } catch (FileSystemException e) {
+                log.warn("Unable to compare size of the two files.", e);
+            }
+            return lDiff.intValue();
+        }
+    }     
+    
 }

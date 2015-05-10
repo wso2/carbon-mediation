@@ -198,6 +198,7 @@
                 String messageStoreName = null;
                 MessageInfo[] messageInfos = null;
                 int numberOfMessageStores = 0;
+                boolean displayMessageInDetail = true;
 
                 int numberOfPages = 1;
                 String pageNumber = request.getParameter("pageNumber");
@@ -225,6 +226,11 @@
 
                     } else {
                         throw new Exception("Error while accessing Message Stores ");
+                    }
+
+                    // Hide messages in details div when JDBC Message Store is used
+                    if(client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore")){
+                        displayMessageInDetail = false;
                     }
 
                     messageInfos = client.getPaginatedMessages(messageStoreName, pageNumberInt);
@@ -291,85 +297,85 @@
                 </tbody>
             </table>
             <br/>
+            <div id="messages_in_detail" <%=!displayMessageInDetail ? "style=\"display:none\";" : ""%>>
+                <h3><fmt:message key="stored.messages"/></h3>
+                <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
+                                  page="viewMessageStore.jsp"
+                                  pageNumberParameterName="pageNumber"
+                                  resourceBundle="org.wso2.carbon.service.mgt.ui.i18n.Resources"
+                                  prevKey="prev" nextKey="next"
+                                  parameters="<%=myUrl%>" showPageNumbers="false"/>
 
-            <h3><fmt:message key="stored.messages"/></h3>
-            <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
-                              page="viewMessageStore.jsp"
-                              pageNumberParameterName="pageNumber"
-                              resourceBundle="org.wso2.carbon.service.mgt.ui.i18n.Resources"
-                              prevKey="prev" nextKey="next"
-                              parameters="<%=myUrl%>" showPageNumbers="false"/>
-
-            <table id="msgTable" border="0" cellspacing="0" cellpadding="0" class="styledLeft">
-                <thead>
-                <tr>
-                    <th><fmt:message key="message.id"/></th>
-                    <th><fmt:message key="action"/></th>
-                </tr>
-                </thead>
-                <tbody>
-                <%
-                    if (messageInfos == null || messageInfos.length == 0) {
-                %>
-                <tr>
-                    <td colspan="2"><fmt:message key="messsage.store.empty"/></td>
-                </tr>
-                <%
-                    }
-                %>
-
-                <%
-                    try {
-
-                        for (MessageInfo mi : messageInfos) {
-                %>
-
-                <tr>
-                    <td><%= mi.getMessageId()%>
-                    </td>
-
-
-                    <td><a onclick="viewEnvRow(this.parentNode.parentNode.rowIndex)" href="#"
-                           class="icon-link"
-                           style="background-image:url(../message_store/images/envelop.gif);"><fmt:message
-                            key="view.envelope"/></a>
-                        <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
-                        <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
-                           id="delete_link" class="icon-link"
-                           style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                                key="delete"/></a>
-                        <%}%>
-                    </td>
-                </tr>
-                <%
+                <table id="msgTable" border="0" cellspacing="0" cellpadding="0" class="styledLeft">
+                    <thead>
+                    <tr>
+                        <th><fmt:message key="message.id"/></th>
+                        <th><fmt:message key="action"/></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <%
+                        if (messageInfos == null || messageInfos.length == 0) {
+                    %>
+                    <tr>
+                        <td colspan="2"><fmt:message key="messsage.store.empty"/></td>
+                    </tr>
+                    <%
                         }
-                    } catch (Exception e) {
-                        CarbonUIMessage.sendCarbonUIMessage(e.getMessage(), CarbonUIMessage.ERROR, request, e);
-                    }
+                    %>
 
-                %>
-                <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
-                <tr>
-                    <td colspan="2">
-                        <a onclick="<%=(messageInfos == null || messageInfos.length == 0)?"return false":"deleteAll();"%>"
-                           href="#" id="delete_all_link" class="<%=(messageInfos == null || messageInfos.length == 0)?"icon-link-disabled":"icon-link"%>"
-                           style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                                key="deleteAll"/></a>
-                    </td>
-                </tr>
+                    <%
+                        try {
+
+                            for (MessageInfo mi : messageInfos) {
+                    %>
+
+                    <tr>
+                        <td><%= mi.getMessageId()%>
+                        </td>
+
+
+                        <td><a onclick="viewEnvRow(this.parentNode.parentNode.rowIndex)" href="#"
+                               class="icon-link"
+                               style="background-image:url(../message_store/images/envelop.gif);"><fmt:message
+                                key="view.envelope"/></a>
+                            <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                            <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+                               id="delete_link" class="icon-link"
+                               style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                    key="delete"/></a>
+                            <%}%>
+                        </td>
+                    </tr>
+                    <%
+                            }
+                        } catch (Exception e) {
+                            CarbonUIMessage.sendCarbonUIMessage(e.getMessage(), CarbonUIMessage.ERROR, request, e);
+                        }
+
+                    %>
+                    <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                    <tr>
+                        <td colspan="2">
+                            <a onclick="<%=(messageInfos == null || messageInfos.length == 0)?"return false":"deleteAll();"%>"
+                               href="#" id="delete_all_link" class="<%=(messageInfos == null || messageInfos.length == 0)?"icon-link-disabled":"icon-link"%>"
+                               style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                    key="deleteAll"/></a>
+                        </td>
+                    </tr>
+                    <%}%>
+                    </tbody>
+                </table>
+                <br/>
+                <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
+                                  page="viewMessageStore.jsp"
+                                  pageNumberParameterName="pageNumber"
+                                  resourceBundle="org.wso2.carbon.service.mgt.ui.i18n.Resources"
+                                  prevKey="prev" nextKey="next"
+                                  parameters="<%=myUrl%>" showPageNumbers="false"/>
+
                 <%}%>
-                </tbody>
-            </table>
-            <br/>
-            <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
-                              page="viewMessageStore.jsp"
-                              pageNumberParameterName="pageNumber"
-                              resourceBundle="org.wso2.carbon.service.mgt.ui.i18n.Resources"
-                              prevKey="prev" nextKey="next"
-                              parameters="<%=myUrl%>" showPageNumbers="false"/>
-
-            <%}%>
-
+            </div>
         </div>
     </div>
     <script type="text/javascript">

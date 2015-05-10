@@ -22,7 +22,7 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
-import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListenerManager;
+import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 
 public class InboundHttpsListener extends InboundHttpListener {
 
@@ -55,7 +55,14 @@ public class InboundHttpsListener extends InboundHttpListener {
 
     @Override
     public void init() {
-        EndpointListenerManager.getInstance().startSSLEndpoint(port, name, sslConfiguration);
+        if (isPortUsedByAnotherApplication(port)) {
+            log.warn("Port " + port + "used by inbound endpoint " + name + " is already used by another application " +
+                     "hence undeploying inbound endpoint");
+            this.destroy();
+        } else {
+            HTTPEndpointManager.getInstance().startSSLEndpoint(port, name, sslConfiguration);
+        }
+
     }
 
 }
