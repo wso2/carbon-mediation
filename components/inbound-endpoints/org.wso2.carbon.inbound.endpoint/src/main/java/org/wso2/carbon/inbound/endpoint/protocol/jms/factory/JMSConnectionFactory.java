@@ -542,18 +542,20 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         return sessionAckMode;
     }
 
-    public javax.jms.JMSContext createContext(int sessionMode){
-        return null;
-    }
-    public javax.jms.JMSContext createContext(String userName, String password, int sessionMode){
-        return null;
+    public javax.jms.JMSContext createContext() {
+        return connectionFactory.createContext();
     }
 
-    public javax.jms.JMSContext createContext(String userName, String password){
-        return null;
+    public javax.jms.JMSContext createContext(int sessionMode) {
+        return connectionFactory.createContext(sessionMode);
     }
 
-    public javax.jms.JMSContext createContext(){
-        return null;
+    public javax.jms.JMSContext createContext(String userName, String password) {
+        return connectionFactory.createContext(userName, password);
     }
+
+    public javax.jms.JMSContext createContext(String userName, String password, int sessionMode) {
+        return connectionFactory.createContext(userName, password, sessionMode);
+    }
+
 }
