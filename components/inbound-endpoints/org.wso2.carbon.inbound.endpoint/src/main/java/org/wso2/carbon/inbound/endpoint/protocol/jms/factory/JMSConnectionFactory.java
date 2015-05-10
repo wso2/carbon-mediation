@@ -65,10 +65,12 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     protected boolean transactedSession = false;
     protected int sessionAckMode = 0;
-    protected boolean jmsSpec11;
+    protected String jmsSpec;
     protected boolean isDurable;
     protected String clientId;
     protected String messageSelector;
+    protected boolean isSharedSubscription;
+    protected String subscriptionName;
     
     public JMSConnectionFactory(Properties properties) {
         try {
@@ -85,7 +87,28 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         }
 
         if(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER) == null || "1.1".equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
-        	jmsSpec11 = true;
+        	jmsSpec = "1.1";
+        }else if("2.0".equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
+            jmsSpec = "2.0";
+        }
+        else{
+            jmsSpec = "1.0";
+        }
+
+        if( "true".equalsIgnoreCase(properties.getProperty(JMSConstants.PARAM_IS_SHARED_SUBSCRIPTION))){
+            isSharedSubscription = true;
+        } else{
+            isSharedSubscription = false;
+        }
+
+        if (isSharedSubscription) {
+            if ( properties.getProperty(JMSConstants.PARAM_SUBSCRIPTION_NAME) != null ){
+                subscriptionName = properties.getProperty(JMSConstants.PARAM_SUBSCRIPTION_NAME);
+            }
+            else {
+                logger.info( "Subscription name is not given. Therefor declaring a non-shared subscription" );
+                isSharedSubscription = false;
+            }
         }
 
         String durableSubClientId = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
@@ -176,7 +199,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             return null;
         }
         try {
-        	if (jmsSpec11) {        		
+        	if ( "1.1".equals(jmsSpec) ) {
 	             if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE )) {
 	                 return ((QueueConnectionFactory) (this.connectionFactory)).createQueueConnection();
 	             } else if(this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
@@ -210,7 +233,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     public Connection createConnection(String userName, String password) {
         try {
-        	if (jmsSpec11) {        		
+        	if ( "1.1".equals(jmsSpec) ) {
 	             if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE )) {
 	                 return ((QueueConnectionFactory) (this.connectionFactory)).createQueueConnection(userName, password);
 	             } else if(this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
@@ -291,7 +314,14 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     
     public MessageConsumer createMessageConsumer(Session session, Destination destination) {
         try {
-        	if(jmsSpec11){
+            if ( "2.0".equals(jmsSpec) && isSharedSubscription ){
+                if (isDurable) {
+                    return session.createSharedDurableConsumer((Topic) destination,
+                                                               subscriptionName, messageSelector);
+                } else {
+                    return session.createSharedConsumer((Topic) destination, subscriptionName, messageSelector);
+                }
+            } else if( ("1.1".equals(jmsSpec)) || ( "2.0".equals(jmsSpec) && !isSharedSubscription ) ){
                 if (isDurable) {
                     return session.createDurableSubscriber((Topic) destination, messageSelector);
                 } else {
@@ -299,7 +329,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 }        		
         	}else{
 	        	if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-	                return ((QueueSession) session).createReceiver((Queue) destination, messageSelector);
+                    return ((QueueSession) session).createReceiver((Queue) destination, messageSelector);
 	            } else {
 	                if (isDurable) {
 	                    return ((TopicSession) session).createDurableSubscriber((Topic) destination, messageSelector);
@@ -357,7 +387,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     protected Session createSession(Connection connection) {
         try {       
-        	if(jmsSpec11){
+        	if( "1.1".equals(jmsSpec) ){
         		return connection.createSession(transactedSession, sessionAckMode);
         	}else{
 	            if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
@@ -419,6 +449,19 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 	public int getSessionAckMode() {
 		return sessionAckMode;
 	}
-    
-    
+
+    public javax.jms.JMSContext createContext(int sessionMode){
+        return null;
+    }
+    public javax.jms.JMSContext createContext(String userName, String password, int sessionMode){
+        return null;
+    }
+
+    public javax.jms.JMSContext createContext(String userName, String password){
+        return null;
+    }
+
+    public javax.jms.JMSContext createContext(){
+        return null;
+    }
 }
