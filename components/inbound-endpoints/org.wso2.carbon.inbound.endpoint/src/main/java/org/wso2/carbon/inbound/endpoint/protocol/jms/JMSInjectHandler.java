@@ -116,6 +116,15 @@ public class JMSInjectHandler {
                 documentElement = convertJMSMapToXML((MapMessage) msg);
             }
 
+            // Setting JMSXDeliveryCount header on the message context
+            try {
+                int deliveryCount = msg.getIntProperty("JMSXDeliveryCount");
+                msgCtx.setProperty(JMSConstants.DELIVERY_COUNT, deliveryCount);
+            } catch (NumberFormatException nfe) {
+                // when JMSXDeliveryCount it not used
+                //TODO : try catch wont be required, check for it
+            }
+
             // Inject the message to the sequence.
             msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
             if (injectingSeq == null || injectingSeq.equals("")) {
