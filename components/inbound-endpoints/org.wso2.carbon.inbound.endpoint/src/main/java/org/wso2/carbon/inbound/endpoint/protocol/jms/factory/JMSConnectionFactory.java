@@ -1,20 +1,20 @@
 /*
-*  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-*
-*  WSO2 Inc. licenses this file to you under the Apache License,
-*  Version 2.0 (the "License"); you may not use this file except
-*  in compliance with the License.
-*  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied.  See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.inbound.endpoint.protocol.jms.factory;
 
 import java.util.Properties;
@@ -43,15 +43,13 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSConstants;
 
 /**
- * use of factory
- * server down and up
- * jms spec
- * transport.jms.MessageSelector
+ * use of factory server down and up jms spec transport.jms.MessageSelector
  * isDurable
  * 
  * */
 
-public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionFactory, TopicConnectionFactory {
+public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionFactory,
+        TopicConnectionFactory {
     private static final Log logger = LogFactory.getLog(JMSConnectionFactory.class.getName());
 
     protected Context ctx;
@@ -69,7 +67,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     protected boolean isDurable;
     protected String clientId;
     protected String messageSelector;
-    
+
     public JMSConnectionFactory(Properties properties) {
         try {
             ctx = new InitialContext(properties);
@@ -84,50 +82,54 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             this.destinationType = JMSConstants.JMSDestinationType.QUEUE;
         }
 
-        if(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER) == null || "1.1".equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
-        	jmsSpec11 = true;
+        if (properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER) == null
+                || "1.1".equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))) {
+            jmsSpec11 = true;
         }
 
-        String durableSubClientId = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
+        String durableSubClientId = properties
+                .getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
         if (durableSubClientId != null) {
             clientId = durableSubClientId;
         }
 
         String subDurable = properties.getProperty(JMSConstants.PARAM_SUB_DURABLE);
-        if(subDurable != null ){
+        if (subDurable != null) {
             isDurable = Boolean.parseBoolean(subDurable);
         }
         String msgSelector = properties.getProperty(JMSConstants.PARAM_MSG_SELECTOR);
-        if(msgSelector != null ){
-        	messageSelector = msgSelector;
-        }         
-        this.connectionFactoryString = properties.getProperty(JMSConstants.CONNECTION_FACTORY_JNDI_NAME);
-        if(connectionFactoryString == null || "".equals(connectionFactoryString)) {
+        if (msgSelector != null) {
+            messageSelector = msgSelector;
+        }
+        this.connectionFactoryString = properties
+                .getProperty(JMSConstants.CONNECTION_FACTORY_JNDI_NAME);
+        if (connectionFactoryString == null || "".equals(connectionFactoryString)) {
             connectionFactoryString = "QueueConnectionFactory";
         }
 
         this.destinationName = properties.getProperty(JMSConstants.DESTINATION_NAME);
-        if(destinationName == null || "".equals(destinationName)) {
+        if (destinationName == null || "".equals(destinationName)) {
             destinationName = "QUEUE_" + System.currentTimeMillis();
         }
 
         String strTransactedSession = properties.getProperty(JMSConstants.SESSION_TRANSACTED);
-        if(strTransactedSession == null || "".equals(strTransactedSession) || !strTransactedSession.equals("true")) {
+        if (strTransactedSession == null || "".equals(strTransactedSession)
+                || !strTransactedSession.equals("true")) {
             transactedSession = false;
-        } else if("true".equals(strTransactedSession)) {
+        } else if ("true".equals(strTransactedSession)) {
             transactedSession = true;
         }
 
         String strSessionAck = properties.getProperty(JMSConstants.SESSION_ACK);
-        if(null == strSessionAck) {
+        if (null == strSessionAck) {
             sessionAckMode = 1;
-        } else if(strSessionAck.equals("AUTO_ACKNOWLEDGE")) {
+        } else if (strSessionAck.equals("AUTO_ACKNOWLEDGE")) {
             sessionAckMode = Session.AUTO_ACKNOWLEDGE;
-        } else if(strSessionAck.equals("CLIENT_ACKNOWLEDGE")) {
+        } else if (strSessionAck.equals("CLIENT_ACKNOWLEDGE")) {
             sessionAckMode = Session.CLIENT_ACKNOWLEDGE;
-        } else if(strSessionAck.equals("DUPS_OK_ACKNOWLEDGE")) {
+        } else if (strSessionAck.equals("DUPS_OK_ACKNOWLEDGE")) {
             sessionAckMode = Session.DUPS_OK_ACKNOWLEDGE;
-        } else if(strSessionAck.equals("SESSION_TRANSACTED")) {
+        } else if (strSessionAck.equals("SESSION_TRANSACTED")) {
             sessionAckMode = Session.SESSION_TRANSACTED;
         } else {
             sessionAckMode = 1;
@@ -148,19 +150,22 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         if (this.connectionFactory != null) {
             return this.connectionFactory;
         }
-        
-        if(ctx == null){
+
+        if (ctx == null) {
             return null;
         }
 
         try {
-            if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-                this.connectionFactory = (QueueConnectionFactory) ctx.lookup(this.connectionFactoryString);
-            } else if(this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-                this.connectionFactory = (TopicConnectionFactory) ctx.lookup(this.connectionFactoryString);
+            if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
+                this.connectionFactory = (QueueConnectionFactory) ctx
+                        .lookup(this.connectionFactoryString);
+            } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
+                this.connectionFactory = (TopicConnectionFactory) ctx
+                        .lookup(this.connectionFactoryString);
             }
         } catch (NamingException e) {
-            logger.error("Naming exception while obtaining connection factory for '" + this.connectionFactoryString +"'");
+            logger.error("Naming exception while obtaining connection factory for '"
+                    + this.connectionFactoryString + "'");
         }
 
         return this.connectionFactory;
@@ -171,38 +176,41 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     }
 
     public Connection createConnection() {
-        if(connectionFactory == null){
+        if (connectionFactory == null) {
             logger.error("Connection cannot bb establish to the broke. Plese check the broker libs provided.");
             return null;
         }
         try {
-        	if (jmsSpec11) {        		
-	             if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE )) {
-	                 return ((QueueConnectionFactory) (this.connectionFactory)).createQueueConnection();
-	             } else if(this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-	                 return ((TopicConnectionFactory) (this.connectionFactory)).createTopicConnection();
-	             }
-        	}else{
+            if (jmsSpec11) {
+                if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
+                    return ((QueueConnectionFactory) (this.connectionFactory))
+                            .createQueueConnection();
+                } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
+                    return ((TopicConnectionFactory) (this.connectionFactory))
+                            .createTopicConnection();
+                }
+            } else {
                 QueueConnectionFactory qConFac = null;
                 TopicConnectionFactory tConFac = null;
                 Connection connection = null;
-                if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE )) {
+                if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                     qConFac = (QueueConnectionFactory) this.connectionFactory;
                 } else {
                     tConFac = (TopicConnectionFactory) this.connectionFactory;
-                }        		
+                }
                 if (qConFac != null) {
                     connection = qConFac.createQueueConnection();
                 } else if (tConFac != null) {
                     connection = tConFac.createTopicConnection();
-                }          
-                if(isDurable){
+                }
+                if (isDurable) {
                     connection.setClientID(clientId);
-                }                                
+                }
                 return connection;
-        	}
+            }
         } catch (JMSException e) {
-            logger.error("JMS Exception while creating connection through factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while creating connection through factory '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
 
         return null;
@@ -210,52 +218,59 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     public Connection createConnection(String userName, String password) {
         try {
-        	if (jmsSpec11) {        		
-	             if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE )) {
-	                 return ((QueueConnectionFactory) (this.connectionFactory)).createQueueConnection(userName, password);
-	             } else if(this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-	                 return ((TopicConnectionFactory) (this.connectionFactory)).createTopicConnection(userName, password);
-	             }
-        	}else{
+            if (jmsSpec11) {
+                if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
+                    return ((QueueConnectionFactory) (this.connectionFactory))
+                            .createQueueConnection(userName, password);
+                } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
+                    return ((TopicConnectionFactory) (this.connectionFactory))
+                            .createTopicConnection(userName, password);
+                }
+            } else {
                 QueueConnectionFactory qConFac = null;
                 TopicConnectionFactory tConFac = null;
                 Connection connection = null;
-                if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE )) {
+                if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                     qConFac = (QueueConnectionFactory) this.connectionFactory;
                 } else {
                     tConFac = (TopicConnectionFactory) this.connectionFactory;
-                }        		
+                }
                 if (qConFac != null) {
                     connection = qConFac.createQueueConnection(userName, password);
                 } else if (tConFac != null) {
                     connection = tConFac.createTopicConnection(userName, password);
-                }          
-                if(isDurable){
+                }
+                if (isDurable) {
                     connection.setClientID(clientId);
-                }                                
+                }
                 return connection;
-        	}
+            }
         } catch (JMSException e) {
-            logger.error("JMS Exception while creating connection through factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while creating connection through factory '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
 
-        return null;    	
+        return null;
     }
 
     public QueueConnection createQueueConnection() throws JMSException {
         try {
             return ((QueueConnectionFactory) (this.connectionFactory)).createQueueConnection();
         } catch (JMSException e) {
-            logger.error("JMS Exception while creating queue connection through factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while creating queue connection through factory '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
         return null;
     }
 
-    public QueueConnection createQueueConnection(String userName, String password) throws JMSException {
+    public QueueConnection createQueueConnection(String userName, String password)
+            throws JMSException {
         try {
-            return ((QueueConnectionFactory) (this.connectionFactory)).createQueueConnection(userName, password);
+            return ((QueueConnectionFactory) (this.connectionFactory)).createQueueConnection(
+                    userName, password);
         } catch (JMSException e) {
-            logger.error("JMS Exception while creating queue connection through factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while creating queue connection through factory '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
 
         return null;
@@ -265,87 +280,104 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         try {
             return ((TopicConnectionFactory) (this.connectionFactory)).createTopicConnection();
         } catch (JMSException e) {
-            logger.error("JMS Exception while creating topic connection through factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while creating topic connection through factory '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
 
         return null;
     }
 
-    public TopicConnection createTopicConnection(String userName, String password) throws JMSException {
+    public TopicConnection createTopicConnection(String userName, String password)
+            throws JMSException {
         try {
-            return ((TopicConnectionFactory) (this.connectionFactory)).createTopicConnection(userName, password);
+            return ((TopicConnectionFactory) (this.connectionFactory)).createTopicConnection(
+                    userName, password);
         } catch (JMSException e) {
-            logger.error("JMS Exception while creating topic connection through factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while creating topic connection through factory '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
 
         return null;
     }
 
     public Destination getDestination(Connection connection) {
-        if(this.destination != null) {
+        if (this.destination != null) {
             return this.destination;
         }
 
         return createDestination(connection);
     }
-    
+
     public MessageConsumer createMessageConsumer(Session session, Destination destination) {
         try {
-        	if(jmsSpec11){
+            if (jmsSpec11) {
                 if (isDurable) {
                     return session.createDurableSubscriber((Topic) destination, messageSelector);
                 } else {
                     return session.createConsumer(destination, messageSelector);
-                }        		
-        	}else{
-	        	if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-	                return ((QueueSession) session).createReceiver((Queue) destination, messageSelector);
-	            } else {
-	                if (isDurable) {
-	                    return ((TopicSession) session).createDurableSubscriber((Topic) destination, messageSelector);
-	                } else {
-	                    return ((TopicSession) session).createSubscriber((Topic) destination, messageSelector, false);
-	                }
-	            }	        	
-        	}
+                }
+            } else {
+                if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
+                    return ((QueueSession) session).createReceiver((Queue) destination,
+                            messageSelector);
+                } else {
+                    if (isDurable) {
+                        return ((TopicSession) session).createDurableSubscriber(
+                                (Topic) destination, messageSelector);
+                    } else {
+                        return ((TopicSession) session).createSubscriber((Topic) destination,
+                                messageSelector, false);
+                    }
+                }
+            }
         } catch (JMSException e) {
             logger.error("JMS Exception while creating consumer. " + e.getMessage());
         }
         return null;
     }
-    
-    
+
     private Destination createDestination(Connection connection) {
 
         try {
-            if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
+            if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                 this.destination = (Queue) ctx.lookup(this.destinationName);
-            } else if(this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
+            } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
                 this.destination = (Topic) ctx.lookup(this.destinationName);
             }
         } catch (NameNotFoundException e) {
-            logger.warn("Could not find destination '" + this.destinationName + "' on connection factory for '" + this.connectionFactoryString + "'. " + e.getMessage());
-            logger.info("Creating destination '" + this.destinationName + "' on connection factory for '" + this.connectionFactoryString + ".");
-
+            if (logger.isDebugEnabled()) {
+                logger.debug("Could not find destination '" + this.destinationName
+                        + "' on connection factory for '" + this.connectionFactoryString + "'. "
+                        + e.getMessage());
+                logger.debug("Creating destination '" + this.destinationName
+                        + "' on connection factory for '" + this.connectionFactoryString + ".");
+            }
             Session createSession = createSession(connection);
             try {
-                if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
+                if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                     this.destination = (Queue) createSession.createQueue(this.destinationName);
-                } else if(this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
+                } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
                     this.destination = (Topic) createSession.createTopic(this.destinationName);
                 }
-                logger.error("Created '" + this.destinationName + "' on connection factory for '" + this.connectionFactoryString + "'.");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Created '" + this.destinationName
+                            + "' on connection factory for '" + this.connectionFactoryString + "'.");
+                }
             } catch (JMSException e1) {
-                logger.error("Could not find nor create '" + this.destinationName + "' on connection factory for '" + this.connectionFactoryString + "'. " + e.getMessage());
-            }finally{
-            	try{
-            		createSession.close();
-            	}catch(JMSException je){}
-            	createSession = null;
+                logger.error("Could not find nor create '" + this.destinationName
+                        + "' on connection factory for '" + this.connectionFactoryString + "'. "
+                        + e.getMessage());
+            } finally {
+                try {
+                    createSession.close();
+                } catch (JMSException je) {
+                }
+                createSession = null;
             }
 
         } catch (NamingException e) {
-            logger.error("Naming exception while obtaining connection factory for '" + this.connectionFactoryString +"' " + e.getMessage());
+            logger.error("Naming exception while obtaining connection factory for '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
 
         return this.destination;
@@ -356,18 +388,21 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     }
 
     protected Session createSession(Connection connection) {
-        try {       
-        	if(jmsSpec11){
-        		return connection.createSession(transactedSession, sessionAckMode);
-        	}else{
-	            if(this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-	                return (QueueSession) ((QueueConnection) (connection)).createQueueSession(transactedSession, sessionAckMode);
-	            } else if(this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-	                return  (TopicSession) ((TopicConnection) (connection)).createTopicSession(transactedSession, sessionAckMode);
-	            }
-        	}
+        try {
+            if (jmsSpec11) {
+                return connection.createSession(transactedSession, sessionAckMode);
+            } else {
+                if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
+                    return (QueueSession) ((QueueConnection) (connection)).createQueueSession(
+                            transactedSession, sessionAckMode);
+                } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
+                    return (TopicSession) ((TopicConnection) (connection)).createTopicSession(
+                            transactedSession, sessionAckMode);
+                }
+            }
         } catch (JMSException e) {
-            logger.error("JMS Exception while obtaining session for factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while obtaining session for factory '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
 
         return null;
@@ -377,7 +412,8 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         try {
             connection.start();
         } catch (JMSException e) {
-            logger.error("JMS Exception while starting connection for factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while starting connection for factory '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
     }
 
@@ -385,7 +421,8 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         try {
             connection.stop();
         } catch (JMSException e) {
-            logger.error("JMS Exception while stopping connection for factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while stopping connection for factory '"
+                    + this.connectionFactoryString + "' " + e.getMessage());
         }
     }
 
@@ -412,13 +449,12 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         return connectionFactoryString;
     }
 
-	public boolean isTransactedSession() {
-		return transactedSession;
-	}
+    public boolean isTransactedSession() {
+        return transactedSession;
+    }
 
-	public int getSessionAckMode() {
-		return sessionAckMode;
-	}
-    
-    
+    public int getSessionAckMode() {
+        return sessionAckMode;
+    }
+
 }

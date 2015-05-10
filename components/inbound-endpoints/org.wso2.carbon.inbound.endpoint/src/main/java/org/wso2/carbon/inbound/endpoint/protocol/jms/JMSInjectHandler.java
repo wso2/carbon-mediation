@@ -43,6 +43,7 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
@@ -59,6 +60,7 @@ public class JMSInjectHandler {
     private String onErrorSeq;
     private boolean sequential;
     private SynapseEnvironment synapseEnvironment;
+    private Properties jmsProperties;
 
     public JMSInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
             SynapseEnvironment synapseEnvironment, Properties jmsProperties) {
@@ -66,6 +68,7 @@ public class JMSInjectHandler {
         this.onErrorSeq = onErrorSeq;
         this.sequential = sequential;
         this.synapseEnvironment = synapseEnvironment;
+        this.jmsProperties = jmsProperties;
     }
 
     public boolean invoke(Object object) throws SynapseException{
@@ -74,6 +77,9 @@ public class JMSInjectHandler {
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
             String contentType = msg.getJMSType();
+            if(contentType == null || contentType.trim().equals("")){
+                contentType = jmsProperties.getProperty(JMSConstants.CONTENT_TYPE);
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Processed JMS Message of Content-type : " + contentType);
             }
