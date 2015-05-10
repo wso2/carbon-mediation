@@ -129,12 +129,12 @@ public class JMSInjectHandler {
                 return false;
             }
             SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration()
-                    .getSequence(injectingSeq);
-            seq.setErrorHandler(onErrorSeq);
+                    .getSequence(injectingSeq);           
             if (seq != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("injecting message to sequence : " + injectingSeq);
                 }
+                seq.setErrorHandler(onErrorSeq);
                 if (!synapseEnvironment.injectInbound(msgCtx, seq, sequential)) {
                     return false;
                 }
