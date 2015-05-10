@@ -181,4 +181,10 @@ public class JMSConstants {
 
     public static final String DEFAULT_HYPHEN_SUPPORT = HYPHEN_MODE_NONE;     
 
+    /**
+     *  JMS 2.0 Parameters
+     */
+    public static final String PARAM_IS_SHARED_SUBSCRIPTION = "transport.jms.shared.subscription";
+
+    public static final String PARAM_SUBSCRIPTION_NAME = "transport.jms.subscription.name";
 }
