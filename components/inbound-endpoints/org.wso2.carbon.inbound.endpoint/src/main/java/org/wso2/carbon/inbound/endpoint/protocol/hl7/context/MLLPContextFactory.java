@@ -1,9 +1,12 @@
-package org.wso2.carbon.inbound.endpoint.protocol.hl7;
+package org.wso2.carbon.inbound.endpoint.protocol.hl7.context;
 
 import ca.uhn.hl7v2.parser.Parser;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.HL7Processor;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLPConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContext;
 
 import java.nio.charset.CharsetDecoder;
 

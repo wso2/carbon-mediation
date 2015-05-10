@@ -23,7 +23,7 @@ import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
-import org.wso2.carbon.inbound.endpoint.protocol.hl7.InboundHL7Listener;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.InboundHL7Listener;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
 import org.wso2.carbon.inbound.endpoint.protocol.https.InboundHttpsListener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;

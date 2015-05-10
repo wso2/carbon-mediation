@@ -1,4 +1,4 @@
-package org.wso2.carbon.inbound.endpoint.protocol.hl7;
+package org.wso2.carbon.inbound.endpoint.protocol.hl7.util;
 
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -36,34 +36,25 @@ import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.Axis2SynapseController;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.ServerManager;
-import org.apache.synapse.SynapseException;
-import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundProcessorParams;
-import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.core.ServerInitializer;
-import org.wso2.carbon.core.ServerManagement;
-import org.wso2.carbon.core.multitenancy.MultitenantServerManager;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
-import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.HL7Configuration;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLPConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLProtocolException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
@@ -158,15 +149,8 @@ public class HL7MessageUtils {
         org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
         axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
 
-//        ConfigurationContextService ccs = new ConfigurationContextService();
-        //ConfigurationContext context = null;
-//        try {
-//            context = ConfigurationContextFactory.createDefaultConfigurationContext();
-//        } catch (Exception e) {
-//            log.error("Error while creating axis2 configuration context.", e);
-//            throw new SynapseException(e);
-//        }
-        axis2MsgCtx.setConfigurationContext(ServiceReferenceHolder.getInstance().getConfigurationContextService().getServerConfigContext());
+        axis2MsgCtx.setConfigurationContext(ServiceReferenceHolder.getInstance().getConfigurationContextService()
+                .getServerConfigContext());
 
         // Axis2 spawns a new threads to send a message if this is TRUE
         axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING,

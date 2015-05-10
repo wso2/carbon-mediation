@@ -1,4 +1,4 @@
-package org.wso2.carbon.inbound.endpoint.protocol.hl7;
+package org.wso2.carbon.inbound.endpoint.protocol.hl7.core;
 
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -18,22 +18,13 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7;
  * under the License.
  */
 
-import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.parser.Parser;
-import ca.uhn.hl7v2.parser.PipeParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
-import org.apache.synapse.transport.passthru.util.BufferFactory;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class InboundHL7Listener implements InboundRequestProcessor {
 

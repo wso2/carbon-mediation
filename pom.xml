@@ -1900,7 +1900,7 @@
     <properties>
 
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.4.0</carbon.mediation.version>
+        <carbon.mediation.version>4.4.1-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 4.5.0)</carbon.mediation.imp.pkg.version>
 

@@ -1,4 +1,4 @@
-package org.wso2.carbon.inbound.endpoint.protocol.hl7;
+package org.wso2.carbon.inbound.endpoint.protocol.hl7.core;
 
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -23,6 +23,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.codec.HL7Codec;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContext;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContextFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

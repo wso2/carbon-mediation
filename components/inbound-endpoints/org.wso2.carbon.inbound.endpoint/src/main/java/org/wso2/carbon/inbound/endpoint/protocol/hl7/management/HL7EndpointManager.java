@@ -1,4 +1,4 @@
-package org.wso2.carbon.inbound.endpoint.protocol.hl7;
+package org.wso2.carbon.inbound.endpoint.protocol.hl7.management;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
@@ -8,11 +8,15 @@ import org.apache.http.nio.util.HeapByteBufferAllocator;
 import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
-import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
 import org.wso2.carbon.inbound.endpoint.inboundfactory.InboundRequestProcessorFactoryImpl;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.*;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.HL7Processor;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.InboundHL7IOReactor;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLPConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.Axis2HL7Constants;
 
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;

@@ -1,4 +1,4 @@
-package org.wso2.carbon.inbound.endpoint.protocol.hl7;
+package org.wso2.carbon.inbound.endpoint.protocol.hl7.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

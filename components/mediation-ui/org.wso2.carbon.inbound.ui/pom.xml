@@ -23,7 +23,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.4.0</version>
+    <version>4.4.1-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.inbound.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Inbound EP UI</name>
