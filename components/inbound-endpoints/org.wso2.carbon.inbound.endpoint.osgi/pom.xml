@@ -8,16 +8,10 @@
         <version>4.4.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.inbound.endpoint.service</artifactId>
+    <artifactId>org.wso2.carbon.inbound.endpoint.osgi</artifactId>
     <packaging>bundle</packaging>
     <version>4.4.0</version>
-    <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.synapse</groupId>-->
-            <!--<artifactId>synapse-nhttp-transport</artifactId>-->
-        <!--</dependency>-->
 
-    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -33,7 +27,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>  <!-- TODO: add versions-->
-                            org.wso2.carbon.inbound.endpoint.service.*,
+                            org.wso2.carbon.inbound.endpoint.osgi.service,
                         </Export-Package>
                         <Import-Package>
                         </Import-Package>
