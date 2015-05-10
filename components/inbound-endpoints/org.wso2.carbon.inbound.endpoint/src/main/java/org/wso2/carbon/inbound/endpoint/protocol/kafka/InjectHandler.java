@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -15,17 +15,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.inbound.ui.internal;
 
-public class InboundClientConstants {
+package org.wso2.carbon.inbound.endpoint.protocol.kafka;
 
-    public static final String TYPE_HTTP = "http";
-	public static final String TYPE_HTTPS = "https";
-	public static final String TYPE_FILE = "file";
-	public static final String TYPE_JMS = "jms";
-    public static final String TYPE_KAFKA = "kafka";
-	public static final String TYPE_CLASS = "class";
-	
-	public static final String EXCEPTION = "INBOUND_EXCEPTION";
-	public static final String STRING_SPLITTER = " ~:~ ";
+public interface InjectHandler {
+
+    public boolean invoke(Object object);
+
 }

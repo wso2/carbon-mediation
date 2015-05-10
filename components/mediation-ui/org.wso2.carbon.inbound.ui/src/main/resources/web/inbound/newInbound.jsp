@@ -65,6 +65,7 @@
                                 <option value="<%=InboundClientConstants.TYPE_HTTPS%>">HTTPS</option>
                                 <option value="<%=InboundClientConstants.TYPE_FILE%>">File</option>
                                 <option value="<%=InboundClientConstants.TYPE_JMS%>">JMS</option>
+                                <option value="<%=InboundClientConstants.TYPE_KAFKA%>">KAFKA</option>
                                 <option value="<%=InboundClientConstants.TYPE_CLASS%>">Custom</option>
                             </select>
                         </td>
