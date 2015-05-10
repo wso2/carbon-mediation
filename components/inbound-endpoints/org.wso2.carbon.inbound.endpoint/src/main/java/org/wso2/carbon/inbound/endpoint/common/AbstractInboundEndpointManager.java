@@ -22,14 +22,17 @@ import org.apache.log4j.Logger;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 
 public abstract class AbstractInboundEndpointManager implements InboundEndpointManager {
+    private static final Logger log = Logger.getLogger(AbstractInboundEndpointManager.class);
 
     protected InboundEndpointsDataStore dataStore;
 
-    private static final Logger log = Logger.getLogger(AbstractInboundEndpointManager.class);
-
-
     protected AbstractInboundEndpointManager() {
         dataStore = InboundEndpointsDataStore.getInstance();
+    }
+
+    @Override
+    public String getEndpointName(int port, String domain) {
+        return dataStore.getEndpointName(port, domain);
     }
 
 }

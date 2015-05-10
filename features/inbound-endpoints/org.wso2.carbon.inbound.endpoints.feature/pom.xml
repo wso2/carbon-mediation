@@ -23,7 +23,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.0</version>
     <artifactId>org.wso2.carbon.inbound.endpoints.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Initializer Feature</name>

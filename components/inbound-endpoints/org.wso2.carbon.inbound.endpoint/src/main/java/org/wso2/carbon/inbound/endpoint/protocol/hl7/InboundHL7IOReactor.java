@@ -138,6 +138,10 @@ public class InboundHL7IOReactor {
         return true;
     }
 
+    public static boolean isEndpointRunning(int port) {
+        return endpointMap.get(port) != null;
+    }
+
     private static SocketAddress getSocketAddress(int port) {
         InetSocketAddress isa = new InetSocketAddress(port);
         return isa;

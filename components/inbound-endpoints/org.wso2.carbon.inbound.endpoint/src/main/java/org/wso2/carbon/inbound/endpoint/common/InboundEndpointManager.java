@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.inbound.endpoint.common;
 
+import org.apache.synapse.inbound.InboundProcessorParams;
+
 public interface InboundEndpointManager {
 
     /**
@@ -26,6 +28,7 @@ public interface InboundEndpointManager {
      * @param name  endpoint name
      */
     public void startListener(int port, String name);
+
 
     /**
      * Start Inbound endpoint on a particular port
@@ -42,10 +45,10 @@ public interface InboundEndpointManager {
 
 
     /**
-     * Get endpoint name from underlying store.
-     * @return endpoint name
+     * Get endpoint name from underlying store for particular port and tenant domain.
+     * @param port
+     * @param domain
      */
-    public String getEndpointName();
-
+    public String getEndpointName(int port, String domain);
 
 }

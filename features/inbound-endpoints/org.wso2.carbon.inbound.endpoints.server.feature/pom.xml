@@ -23,7 +23,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.0</version>
     <artifactId>org.wso2.carbon.inbound.endpoints.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Inbound Endpoint Server Feature</name>
@@ -38,6 +38,11 @@
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.inbound.endpoint.osgi</artifactId>
+        </dependency>
+ 
         <dependency>
             <groupId>ca.uhn.hapi.wso2</groupId>
             <artifactId>hapi</artifactId>
@@ -69,6 +74,7 @@
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.persistence</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.osgi</bundleDef>
                                 <bundleDef>ca.uhn.hapi.wso2:hapi</bundleDef>
                             </bundles>
                         </configuration>

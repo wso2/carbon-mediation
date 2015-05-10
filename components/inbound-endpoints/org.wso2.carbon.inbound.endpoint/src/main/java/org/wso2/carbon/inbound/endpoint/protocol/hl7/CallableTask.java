@@ -33,11 +33,10 @@ public class CallableTask implements Callable<Boolean> {
     private SequenceMediator injectingSequence;
     private SynapseEnvironment synapseEnvironment;
 
-    public CallableTask(MessageContext synCtx, SequenceMediator injectingSequence,
-                        SynapseEnvironment synapseEnvironment) {
+    public CallableTask(MessageContext synCtx, SequenceMediator injectingSequence) {
         this.requestMessageContext = synCtx;
         this.injectingSequence = injectingSequence;
-        this.synapseEnvironment = synapseEnvironment;
+        this.synapseEnvironment = synCtx.getEnvironment();
     }
 
     @Override

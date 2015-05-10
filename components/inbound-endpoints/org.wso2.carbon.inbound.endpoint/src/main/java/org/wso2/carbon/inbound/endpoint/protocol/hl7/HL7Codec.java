@@ -44,8 +44,6 @@ public class HL7Codec {
 
     private volatile int state;
 
-    private ByteBuffer byteBuffer;
-
     private int responseReadPosition = 0;
     private byte[] responseBytes = null;
 

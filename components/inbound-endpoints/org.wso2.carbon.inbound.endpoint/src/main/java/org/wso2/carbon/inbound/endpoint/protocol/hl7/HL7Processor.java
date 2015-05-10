@@ -1,11 +1,11 @@
 package org.wso2.carbon.inbound.endpoint.protocol.hl7;
 
 import ca.uhn.hl7v2.HL7Exception;
+import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundResponseSender;
@@ -42,7 +42,6 @@ public class HL7Processor implements InboundResponseSender {
     private InboundProcessorParams params;
     private String inSequence;
     private String onErrorSequence;
-    private SynapseEnvironment synEnv;
 
     private boolean autoAck = true;
     private int timeOut;
@@ -53,7 +52,6 @@ public class HL7Processor implements InboundResponseSender {
         params = (InboundProcessorParams) parameters.get(MLLPConstants.INBOUND_PARAMS);
         inSequence = params.getInjectingSeq();
         onErrorSequence = params.getOnErrorSeq();
-        synEnv = params.getSynapseEnvironment();
 
         if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equals("false")) {
             autoAck = false;
@@ -69,9 +67,11 @@ public class HL7Processor implements InboundResponseSender {
         // Prepare Synapse Context for message injection
         MessageContext synCtx;
         try {
-             synCtx = HL7MessageUtils.createSynapseMessageContext(mllpContext.getHl7Message(),
-                    params, synEnv);
+            synCtx = HL7MessageUtils.createSynapseMessageContext(mllpContext.getHl7Message(), params);
         } catch (HL7Exception e) {
+            handleException(mllpContext, e.getMessage());
+            return;
+        } catch (AxisFault e) {
             handleException(mllpContext, e.getMessage());
             return;
         }
@@ -88,14 +88,14 @@ public class HL7Processor implements InboundResponseSender {
 
         addProperties(synCtx, mllpContext);
 
-        SequenceMediator injectSeq = (SequenceMediator) synEnv.getSynapseConfiguration().getSequence(inSequence);
+        SequenceMediator injectSeq = (SequenceMediator) synCtx.getEnvironment().getSynapseConfiguration().getSequence(inSequence);
         injectSeq.setErrorHandler(onErrorSequence);
 
         if (!autoAck && timeOut > 0) {
             executorService.schedule(new TimeoutHandler(mllpContext, synCtx.getMessageID()), timeOut, TimeUnit.MILLISECONDS);
         }
 
-        CallableTask task = new CallableTask(synCtx, injectSeq, synEnv);
+        CallableTask task = new CallableTask(synCtx, injectSeq);
 
         executorService.submit(task);
 
@@ -178,14 +178,6 @@ public class HL7Processor implements InboundResponseSender {
 
     public boolean isAutoAck() {
         return autoAck;
-    }
-
-    public int getTimeOut() {
-        return timeOut;
-    }
-
-    public void setTimeOut(int timeOut) {
-        this.timeOut = timeOut;
     }
 
     private void handleException(MLLPContext mllpContext, String msg) {

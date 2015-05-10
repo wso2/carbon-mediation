@@ -33,15 +33,37 @@ import org.apache.axiom.om.impl.dom.factory.OMDOMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.util.UIDGenerator;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.InOutAxisOperation;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Axis2SynapseController;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.ServerManager;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
+import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundProcessorParams;
+import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.ServerInitializer;
+import org.wso2.carbon.core.ServerManagement;
+import org.wso2.carbon.core.multitenancy.MultitenantServerManager;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
+import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
@@ -50,6 +72,8 @@ public class HL7MessageUtils {
 
     private static HapiContext validationContext = new DefaultHapiContext();
     private static HapiContext noValidationContext = new DefaultHapiContext();
+
+    private static ConfigurationContext context;
 
     static {
         noValidationContext.setValidationContext(new NoValidation());
@@ -84,10 +108,11 @@ public class HL7MessageUtils {
         return preProcessor.parse(msg);
     }
 
-    public static MessageContext createSynapseMessageContext(Message message, InboundProcessorParams params,
-                                                             SynapseEnvironment synapseEnvironment) throws HL7Exception {
+    public static MessageContext createSynapseMessageContext(Message message, InboundProcessorParams params)
+            throws HL7Exception, AxisFault {
 
-        MessageContext synCtx = synapseEnvironment.createMessageContext();
+        MessageContext synCtx = createSynapseMessageContext(params.getProperties()
+                .getProperty(MLLPConstants.HL7_INBOUND_TENANT_DOMAIN));
 
         if (params.getProperties().getProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED) != null) {
             synCtx.setProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED,
@@ -101,6 +126,59 @@ public class HL7MessageUtils {
         }
 
         return synCtx;
+    }
+
+    // Create Synapse Message Context
+    private static org.apache.synapse.MessageContext createSynapseMessageContext(String tenantDomain) throws AxisFault {
+
+        // Create super tenant message context
+        org.apache.axis2.context.MessageContext axis2MsgCtx = createAxis2MessageContext();
+        ServiceContext svcCtx = new ServiceContext();
+        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
+        axis2MsgCtx.setServiceContext(svcCtx);
+        axis2MsgCtx.setOperationContext(opCtx);
+
+        // If not super tenant, assign tenant configuration context
+        if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            ConfigurationContext tenantConfigCtx =
+                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
+                            axis2MsgCtx.getConfigurationContext());
+
+            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+
+            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+
+        }
+        return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
+    }
+
+    // Create Axis2 Message Context
+    private static org.apache.axis2.context.MessageContext createAxis2MessageContext() {
+
+        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
+        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
+
+//        ConfigurationContextService ccs = new ConfigurationContextService();
+        //ConfigurationContext context = null;
+//        try {
+//            context = ConfigurationContextFactory.createDefaultConfigurationContext();
+//        } catch (Exception e) {
+//            log.error("Error while creating axis2 configuration context.", e);
+//            throw new SynapseException(e);
+//        }
+        axis2MsgCtx.setConfigurationContext(ServiceReferenceHolder.getInstance().getConfigurationContextService().getServerConfigContext());
+
+        // Axis2 spawns a new threads to send a message if this is TRUE
+        axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING,
+                Boolean.FALSE);
+
+        axis2MsgCtx.setServerSide(true);
+
+        return axis2MsgCtx;
+    }
+
+    private static String getTenantDomain() {
+       return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
     }
 
     private static SOAPEnvelope createEnvelope(MessageContext synCtx, Message message, InboundProcessorParams params)

@@ -39,90 +39,11 @@ public class InboundHL7Listener implements InboundRequestProcessor {
 
     private static final Log log = LogFactory.getLog(InboundHL7Listener.class);
 
-    private String port;
-    private Map<String, Object> parameters = new HashMap<String, Object>();
-    private HL7Processor hl7Processor;
+    private int port;
+    private InboundProcessorParams params;
 
     public InboundHL7Listener(InboundProcessorParams params) {
-        validateParameters(params);
-        parameters.put(MLLPConstants.INBOUND_PARAMS, params);
-        this.port = params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PORT);
-        parameters.put(MLLPConstants.INBOUND_HL7_BUFFER_FACTORY,
-                new BufferFactory(8 * 1024, new HeapByteBufferAllocator(), 1024));
-        parameters.put(MLLPConstants.HL7_REQ_PROC, hl7Processor);
-        hl7Processor = new HL7Processor(parameters);
-    }
-
-    private void validateParameters(InboundProcessorParams params) {
-        if (!params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equalsIgnoreCase("true")
-                && !params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equalsIgnoreCase("false")) {
-            log.warn("Parameter inbound.hl7.AutoAck is not valid. Default value of true will be used.");
-            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_AUTO_ACK, "true");
-        }
-
-        try {
-            Integer.valueOf(params.getProperties().getProperty(MLLPConstants.PARAM_HL7_TIMEOUT));
-        } catch (NumberFormatException e) {
-            log.warn("Parameter inbound.hl7.TimeOut is not valid. Default timeout " +
-                    "of " + MLLPConstants.DEFAULT_HL7_TIMEOUT + " milliseconds will be used.");
-            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_TIMEOUT,
-                    String.valueOf(MLLPConstants.DEFAULT_HL7_TIMEOUT));
-        }
-
-        try {
-            if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PRE_PROC) != null) {
-                final HL7MessagePreprocessor preProcessor = (HL7MessagePreprocessor) Class.forName(params.getProperties()
-                        .getProperty(MLLPConstants.PARAM_HL7_PRE_PROC)).newInstance();
-
-                Parser preProcParser = new PipeParser() {
-                    public Message parse(String message) throws HL7Exception {
-                        message = preProcessor.process(message, Axis2HL7Constants.MessageType.V2X,
-                                Axis2HL7Constants.MessageEncoding.ER7);
-                        return super.parse(message);
-                    }
-                };
-
-                parameters.put(MLLPConstants.HL7_PRE_PROC_PARSER_CLASS, preProcParser);
-            }
-        } catch (Exception e) {
-            log.error("Error creating message preprocessor: ", e);
-        }
-
-        try {
-            if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_CHARSET) == null) {
-                params.getProperties().setProperty(MLLPConstants.PARAM_HL7_CHARSET, MLLPConstants.UTF8_CHARSET.displayName());
-                parameters.put(MLLPConstants.HL7_CHARSET_DECODER, MLLPConstants.UTF8_CHARSET.newDecoder());
-            } else {
-                parameters.put(MLLPConstants.HL7_CHARSET_DECODER, Charset
-                        .forName(params.getProperties().getProperty(MLLPConstants.PARAM_HL7_CHARSET)).newDecoder());
-            }
-        } catch (UnsupportedCharsetException e) {
-            parameters.put(MLLPConstants.HL7_CHARSET_DECODER, MLLPConstants.UTF8_CHARSET.newDecoder());
-            log.error("Unsupported charset '" + params.getProperties()
-                    .getProperty(MLLPConstants.PARAM_HL7_CHARSET) + "' specified. Default UTF-8 will be used instead.");
-        }
-
-        if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_VALIDATE) == null) {
-            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_VALIDATE, "true");
-        }
-
-        if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE) == null) {
-            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE, "false");
-        } else {
-            if (!params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE).equalsIgnoreCase("true") &&
-                    !params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE).equalsIgnoreCase("false")) {
-                params.getProperties().setProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE, "false");
-            }
-        }
-
-        if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES) == null) {
-            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES, "false");
-        } else {
-            if (!params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES).equalsIgnoreCase("true") &&
-                    !params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES).equalsIgnoreCase("false")) {
-                params.getProperties().setProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES, "false");
-            }
-        }
+        this.params = params;
     }
 
     @Override
@@ -143,22 +64,19 @@ public class InboundHL7Listener implements InboundRequestProcessor {
     public void start() {
         log.info("Starting HL7 Inbound Endpoint on port " + this.port);
 
-        if (this.port == null) {
-            log.error("The port specified is null");
+        try {
+            this.port = Integer.parseInt(params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PORT));
+        } catch (NumberFormatException e) {
+            log.error("The port specified is of an invalid type: " + this.port + ". Endpoint not started.");
             return;
         }
+        HL7EndpointManager.getInstance().startEndpoint(port, params.getName(), params);
 
-        try {
-            int port = Integer.parseInt(this.port);
-            InboundHL7IOReactor.bind(port, hl7Processor);
-        } catch (NumberFormatException e) {
-            log.error("The port specified is of an invalid type: " + this.port + ". HL7 Inbound Endpoint not started.");
-        }
     }
 
     @Override
     public void destroy() {
-        InboundHL7IOReactor.unbind(Integer.parseInt(port));
+        HL7EndpointManager.getInstance().closeEndpoint(port);
     }
 
 }

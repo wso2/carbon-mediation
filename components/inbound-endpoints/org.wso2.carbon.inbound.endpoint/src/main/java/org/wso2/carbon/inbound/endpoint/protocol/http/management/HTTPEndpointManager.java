@@ -24,6 +24,7 @@ import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandl
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
@@ -39,25 +40,18 @@ import java.util.Map;
  * with Pass-through APIs and registry etc. This is the central place to mange Http Listeners
  * for Inbound endpoints
  */
-public class HTTPEndpointManager {
+public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
     private static HTTPEndpointManager instance = new HTTPEndpointManager();
 
-    private InboundEndpointsDataStore dataStore;
-
     private static final Logger log = Logger.getLogger(HTTPEndpointManager.class);
 
-
     private HTTPEndpointManager() {
-        dataStore = InboundEndpointsDataStore.getInstance();
+        super();
     }
 
     public static HTTPEndpointManager getInstance() {
         return instance;
-    }
-
-    public String getEndpointName(int port, String domain) {
-        return dataStore.getEndpointName(port, domain);
     }
 
     /**
@@ -80,7 +74,7 @@ public class HTTPEndpointManager {
                 throw new SynapseException(msg);
             }
         } else {
-            dataStore.registerEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name);
+            dataStore.registerEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name, null);
             startListener(port, name);
         }
 
