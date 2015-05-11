@@ -504,8 +504,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
-                        getMediationPersistenceManager()
-                                .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                     } else {
                         log.warn("Scheduled Message Forwarding Processor is already active");
                     }
@@ -514,8 +512,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((SamplingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
-                        getMediationPersistenceManager()
-                                .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                     } else {
                         log.warn("Sampling Processor is already active");
                     }
@@ -544,8 +540,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if (view.isActive()) {
                         view.deactivate();
-                        getMediationPersistenceManager()
-                                .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                     } else {
                         log.warn("Scheduled Message Forwarding Processor - already deActive");
                     }
@@ -553,8 +547,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     SamplingProcessorView view = ((SamplingProcessor) processor).getView();
                     if (view.isActive()) {
                         view.deactivate();
-                        getMediationPersistenceManager()
-                                .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                     } else {
                         log.warn("Sampling Message Processor - already in the deactivated state");
                     }
