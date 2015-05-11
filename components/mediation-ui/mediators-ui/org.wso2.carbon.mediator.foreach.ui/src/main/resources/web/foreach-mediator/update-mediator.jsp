@@ -46,5 +46,10 @@
         foreachMediator.setSequenceRef(request.getParameter("mediator.foreach.seq.reg"));
     }
 
+    if (request.getParameter("mediator.foreach.id") != null &&
+             !request.getParameter("mediator.foreach.id").trim().equals("")) {
+        foreachMediator.setId(request.getParameter("mediator.foreach.id"));
+    }
+
 %>
 

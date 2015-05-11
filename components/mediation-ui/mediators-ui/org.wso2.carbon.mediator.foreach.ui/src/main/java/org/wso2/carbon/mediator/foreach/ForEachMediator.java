@@ -40,6 +40,8 @@ public class ForEachMediator extends AbstractListMediator {
 
     private String sequenceRef = null;
 
+    private String id = null;
+
     private final String TAG_NAME = "foreach";
 
     public ForEachMediator() {
@@ -74,6 +76,10 @@ public class ForEachMediator extends AbstractListMediator {
             SynapseXPathSerializer.serializeXPath(expression, forEachElem, "expression");
         } else {
             throw new MediatorException("Missing expression of the ForEach which is required.");
+        }
+
+        if (id != null) {
+            forEachElem.addAttribute("id", id, nullNS);
         }
 
         if (sequenceRef != null) {
@@ -119,6 +125,12 @@ public class ForEachMediator extends AbstractListMediator {
                             + "for a ForEach Mediator under the \"expression\" attribute");
         }
 
+        OMAttribute idAttr = elem.getAttribute(
+                new QName(XMLConfigConstants.NULL_NAMESPACE, "id"));
+        if (idAttr != null) {
+            this.id = idAttr.getAttributeValue();
+        }
+
         OMAttribute sequenceAttr = elem.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence"));
         if (sequenceAttr != null && sequenceAttr.getAttributeValue() != null) {
@@ -141,4 +153,11 @@ public class ForEachMediator extends AbstractListMediator {
         }
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 }

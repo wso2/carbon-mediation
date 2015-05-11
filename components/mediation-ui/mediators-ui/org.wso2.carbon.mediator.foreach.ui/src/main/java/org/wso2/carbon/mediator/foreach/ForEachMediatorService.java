@@ -26,7 +26,7 @@ public class ForEachMediatorService extends AbstractMediatorService {
     private final String TAG_NAME = "foreach";
     private final String DISPLAY_NAME = "ForEach";
     private final String LOGICAL_NAME = "ForEachMediator";
-    private final String GROUP_NAME = "Core";
+    private final String GROUP_NAME = "Advanced";
 
     public String getTagLocalName() {
         return TAG_NAME;

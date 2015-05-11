@@ -80,6 +80,16 @@
 			<tr>
 				<td>
 					<table class="normal">
+					    <tr>
+                            <td>
+                                <fmt:message key="mediator.foreach.id"/>
+                            </td>
+                            <td>
+                                <input type="text" id="mediator.foreach.id" name="mediator.foreach.id"
+                                       value='<%= foreachMediator.getId() != null ? foreachMediator.getId(): ""%>' />
+                            </td>
+                            <td></td>
+                        </tr>
 						<tr>
 							<td><fmt:message key="mediator.foreach.expression" /><span
 								class="required">*</span></td>
