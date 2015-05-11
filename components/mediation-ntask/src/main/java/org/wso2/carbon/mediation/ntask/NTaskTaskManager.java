@@ -644,8 +644,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     public void sendClusterMessage(Callable<Void> callable) {
         if (taskManager instanceof ClusteredTaskManager) {
             try {
-                IExecutorService executorService =
-                                                   ((ClusteredTaskManager) taskManager).getClusterComm()
+                IExecutorService executorService = ((ClusteredTaskManager) taskManager).getClusterComm()
                                                                                        .getHazelcast()
                                                                                        .getExecutorService(ClusterGroupCommunicator.NTASK_P2P_COMM_EXECUTOR);
                 executorService.submitToAllMembers(callable);

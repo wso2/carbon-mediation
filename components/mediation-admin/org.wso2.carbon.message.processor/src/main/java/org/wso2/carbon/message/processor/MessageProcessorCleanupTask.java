@@ -45,11 +45,9 @@ public class MessageProcessorCleanupTask implements Callable<Void>, Serializable
          * Get the message processor instance running inside this worker node
          * using an OSGI service, synapse-env, synapse-config.
          */
-        SynapseEnvironmentService synEnvService =
-                                                  ConfigHolder.getInstance()
+        SynapseEnvironmentService synEnvService = ConfigHolder.getInstance()
                                                               .getSynapseEnvironmentService(MultitenantConstants.SUPER_TENANT_ID);
-        MessageProcessor messageProcessor =
-                                            synEnvService.getSynapseEnvironment()
+        MessageProcessor messageProcessor = synEnvService.getSynapseEnvironment()
                                                          .getSynapseConfiguration()
                                                          .getMessageProcessors().get(name);
 
