@@ -21,6 +21,7 @@ package org.wso2.carbon.inbound.endpoint.persistence;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.log4j.Logger;
+import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.core.RegistryResources;
 import org.wso2.carbon.registry.core.Registry;
@@ -47,7 +48,6 @@ public class InboundEndpointsDataStore {
     public static InboundEndpointsDataStore getInstance() {
         return instance;
     }
-
 
     private InboundEndpointsDataStore() {
         try {
@@ -102,7 +102,7 @@ public class InboundEndpointsDataStore {
      * @param protocol     protocol
      * @param name         endpoint name
      */
-    public void registerEndpoint(int port, String tenantDomain, String protocol, String name) {
+    public void registerEndpoint(int port, String tenantDomain, String protocol, String name, InboundProcessorParams params) {
 
         List<InboundEndpointInfoDTO> tenantList = endpointInfo.get(port);
         if (tenantList == null) {
@@ -110,7 +110,7 @@ public class InboundEndpointsDataStore {
             tenantList = new ArrayList<InboundEndpointInfoDTO>();
             endpointInfo.put(port, tenantList);
         }
-        tenantList.add(new InboundEndpointInfoDTO(tenantDomain, protocol, name));
+        tenantList.add(new InboundEndpointInfoDTO(tenantDomain, protocol, name, params));
         updateRegistry();
     }
 
@@ -130,7 +130,7 @@ public class InboundEndpointsDataStore {
             tenantList = new ArrayList<InboundEndpointInfoDTO>();
             endpointInfo.put(port, tenantList);
         }
-        InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name);
+        InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name, null);
         inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
         tenantList.add(inboundEndpointInfoDTO);
 
