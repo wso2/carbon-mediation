@@ -26,6 +26,7 @@
 <%@ page import="com.google.gson.JsonObject" %>
 <%@ page import="com.google.gson.GsonBuilder" %>
 <%@ page import="javax.xml.stream.XMLStreamException" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <%
 
@@ -56,7 +57,7 @@
         object.addProperty("success", true);
     } else {
         object.addProperty("success", false);
-        object.addProperty("reason", errorMsg);
+        object.addProperty("reason", StringEscapeUtils.escapeXml(errorMsg));
     }
 
     // Convert the object to a JSON string

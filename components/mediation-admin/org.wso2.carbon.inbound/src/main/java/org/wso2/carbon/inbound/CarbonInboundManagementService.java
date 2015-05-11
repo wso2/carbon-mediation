@@ -107,7 +107,9 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         for (ParameterDTO parameterDTO : lParameterDTOs) {
             OMElement param = fac.createOMElement("parameter", omNs);
             param.addAttribute(fac.createOMAttribute("name", null, parameterDTO.getName()));
-            if (parameterDTO.getValue() != null) {
+            if (parameterDTO.getKey() != null) {
+            	 param.addAttribute(fac.createOMAttribute("key", null, parameterDTO.getKey()));
+            }else if (parameterDTO.getValue() != null) {
                 param.setText(parameterDTO.getValue());
             }
             params.addChild(param);
@@ -175,10 +177,12 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         OMElement params = fac.createOMElement("parameters", omNs);
         for (ParameterDTO lParameterDTO : lParameterDTOs) {
             OMElement param = fac.createOMElement("parameter", omNs);
-            param.addAttribute(fac.createOMAttribute("name", null, lParameterDTO.getName()));
-            if (lParameterDTO.getValue() != null) {
+            param.addAttribute(fac.createOMAttribute("name", null, lParameterDTO.getName()));            
+            if (lParameterDTO.getKey() != null) {
+           	    param.addAttribute(fac.createOMAttribute("key", null, lParameterDTO.getKey()));
+            }else if (lParameterDTO.getValue() != null) {
                 param.setText(lParameterDTO.getValue());
-            }
+            }            
             params.addChild(param);
         }
         elem.addChild(params);

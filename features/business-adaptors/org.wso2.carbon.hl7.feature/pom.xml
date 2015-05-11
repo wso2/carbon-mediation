@@ -56,7 +56,6 @@
             <groupId>ca.uhn.hapi.wso2</groupId>
             <artifactId>hapi</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.openjpa.wso2</groupId>
             <artifactId>openjpa-all</artifactId>
