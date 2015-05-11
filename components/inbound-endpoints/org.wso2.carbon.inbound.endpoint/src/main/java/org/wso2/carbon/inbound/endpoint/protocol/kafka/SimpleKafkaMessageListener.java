@@ -58,21 +58,21 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
     private void validateInputParameters() throws Exception {
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_TOPIC) == null) {
             logger.error("simple consumer topic is invalid");
-            throw new Exception("simple consumer topic is invalid");
+            throw new SynapseException("simple consumer topic is invalid");
         } else {
             this.topic = kafkaProperties
                     .getProperty(KAFKAConstants.SIMPLE_TOPIC);
         }
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_BROKERS) == null) {
             logger.error("simple consumer brokers is invalid");
-            throw new Exception("simple consumer brokers is invalid");
+            throw new SynapseException("simple consumer brokers is invalid");
         } else {
             this.seedBrokers = getSeedBrokers(kafkaProperties
                     .getProperty(KAFKAConstants.SIMPLE_BROKERS));
         }
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_PORT) == null) {
             logger.error("simple consumer port is invalid");
-            throw new Exception("simple consumer port is invalid");
+            throw new SynapseException("simple consumer port is invalid");
         } else {
             try {
                 this.port = Integer.parseInt(kafkaProperties
@@ -84,7 +84,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
         }
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_PARTITION) == null) {
             logger.error("simple consumer partition is invalid");
-            throw new Exception("simple consumer partition is invalid");
+            throw new SynapseException("simple consumer partition is invalid");
         } else {
             try {
                 this.partition = Integer.parseInt(kafkaProperties
@@ -96,7 +96,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
         }
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_MAX_MSG_TO_READ) == null) {
             logger.error("simple consumer maximum messages to read is invalid");
-            throw new Exception(
+            throw new SynapseException(
                     "simple consumer maximum messages to read is invalid");
         } else {
             try {
