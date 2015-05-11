@@ -133,7 +133,11 @@ public class InboundManagementClient {
             for (ParamDTO parameter : lParameters) {
                 ParameterDTO parameterDTO = new ParameterDTO();
                 parameterDTO.setName(parameter.getName());
-                parameterDTO.setValue(parameter.getValue());
+                String strValue = parameter.getValue();
+                if(strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)){
+               	 parameterDTO.setKey(strValue.replaceFirst(InboundDescription.REGISTRY_KEY_PREFIX, ""));	
+                }                 
+                parameterDTO.setValue(strValue);
                 parameterDTOs[i++] = parameterDTO;
             }
             if (canAdd(name, protocol, parameterDTOs)) {
@@ -246,7 +250,11 @@ public class InboundManagementClient {
             for (ParamDTO parameter : lParameters) {
                 ParameterDTO parameterDTO = new ParameterDTO();
                 parameterDTO.setName(parameter.getName());
-                parameterDTO.setValue(parameter.getValue());
+                String strValue = parameter.getValue();
+                if(strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)){
+               	 parameterDTO.setKey(strValue.replaceFirst(InboundDescription.REGISTRY_KEY_PREFIX, ""));	
+                }  
+                parameterDTO.setValue(strValue);	 
                 parameterDTOs[i++] = parameterDTO;
             }
 
