@@ -69,6 +69,12 @@ public class HL7Constants {
 
     public static final String HL7_CORE_POOL_SIZE = "transport.hl7.corePoolSize";
 
+    public static final int HL7_DEFAULT_CORE_POOL_SIZE = 10;
+
+    public static final int HL7_DEFAULT_MAX_POOL_SIZE = 20;
+
+    public static final int HL7_DEFAULT_IDLE_THREAD_KEEPALIVE = 10000;
+
     public static final String HL7_PUBLISHER_STREAM_NAME = "bam_hl7_data_publisher_store";
 
     public static final String HL7_PUBLISHER_STREAM_VERSION = "1.0.0";

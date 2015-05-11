@@ -31,9 +31,9 @@
 <%@ page import="ca.uhn.hl7v2.parser.Parser" %>
 <%@ page import="ca.uhn.hl7v2.parser.DefaultXMLParser" %>
 <%@ page import="ca.uhn.hl7v2.HL7Exception" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <%
-
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
             session);
     ConfigurationContext configContext =
@@ -58,11 +58,11 @@
     } catch (EncodingNotSupportedException e) {
         errorMessage = "Could not parse ER7 Encoding message into XML. " + e.getMessage();
         object.addProperty("success", false);
-        object.addProperty("reason", errorMessage);
+        object.addProperty("reason", StringEscapeUtils.escapeXml(errorMessage));
     } catch (HL7Exception e) {
         errorMessage = "Could not parse ER7 Encoding message into XML. " + e.getMessage();
         object.addProperty("success", false);
-        object.addProperty("reason", errorMessage);
+        object.addProperty("reason", StringEscapeUtils.escapeXml(errorMessage));
     }
 
     out.write(gson.toJson(object));
