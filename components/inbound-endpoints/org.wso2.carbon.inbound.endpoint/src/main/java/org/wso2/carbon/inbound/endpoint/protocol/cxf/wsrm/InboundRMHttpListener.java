@@ -18,23 +18,22 @@
 package org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.configuration.security.FiltersType;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
 import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.w3c.dom.Document;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.interceptor.RequestInterceptor;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.interceptor.ResponseInterceptor;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.invoker.InboundRMHttpInvoker;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointListenerManager;
+import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.utils.RMConstants;
 
 import javax.net.ssl.KeyManager;
@@ -53,7 +52,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Creates an endpoint that supports WS-RM using Apache CXF
@@ -63,13 +63,13 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
     private static final Logger logger = Logger.getLogger(InboundRMHttpListener.class);
     private String injectingSequence;
     private String onErrorSequence;
-    private SynapseEnvironment synapseEnvironment;
     private int port;
-    private Bus bus;
     private InboundRMHttpInvoker invoker;
     private String cxfServerConfigFileLoc;
     private String name;
     private String host;
+    private Server server;
+    private InboundProcessorParams params;
 
     //For Secured inbound endpoints
     private Boolean enableSSL = false;
@@ -79,38 +79,39 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
     private String keyPassword;
     private String trustStoreLocation;
     private String trustStorePassword;
-
-
+    private String socketLayerProtocol;
 
     public InboundRMHttpListener(InboundProcessorParams params) {
 
         this.port = Integer.parseInt(params.getProperties().getProperty(RMConstants.INBOUND_CXF_RM_PORT));
         this.injectingSequence = params.getInjectingSeq();
         this.onErrorSequence = params.getOnErrorSeq();
-        this.synapseEnvironment = params.getSynapseEnvironment();
         this.cxfServerConfigFileLoc = params.getProperties().getProperty(RMConstants.INBOUND_CXF_RM_CONFIG_FILE);
         this.host = params.getProperties().getProperty(RMConstants.INBOUND_CXF_RM_HOST);
         this.enableSSL = Boolean.parseBoolean(params.getProperties().getProperty(RMConstants.CXF_ENABLE_SSL));
         this.axis2FilePath = params.getProperties().getProperty(RMConstants.AXIS2_FILE_PATH);
+        this.socketLayerProtocol = params.getProperties().getProperty(RMConstants.SOCKET_LAYER_PROTOCOL);
         this.name = params.getName();
+        this.params = params;
+    }
+
+    @Override
+    public void init() {
+        if (CXFEndpointManager.getInstance().authorizeCXFInboundEndpoint(port, name, params)) {
+            startListener();
+        }
     }
 
     /**
      * Starts a new CXF WS-RM Inbound Endpoint
      */
-    @Override
-    public void init() {
-
-        if (!CXFEndpointListenerManager.getInstance().authorizeCXFInboundEndpoint(port, name)) {
-            logger.info("A CXF RM inbound endpoint is already running on port " + port);
-            return;
-        }
-
+    public void startListener() {
         logger.info("Starting CXF RM Listener on " + this.host + ":" + this.port);
         SpringBusFactory bf = new SpringBusFactory();
         /*
          * Create the CXF Bus using the server config file
          */
+        Bus bus;
         if (cxfServerConfigFileLoc != null) {
             File cxfServerConfigFile = new File(cxfServerConfigFileLoc);
             try {
@@ -125,8 +126,6 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
                          "The CXF RM inbound endpoint requires a configuration file to initialize");
             return;
         }
-
-        BusFactory.setDefaultBus(bus);
         /*
          * Create a dummy class to act as the service class of the CXF endpoint
          */
@@ -139,7 +138,7 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
         //Add an interceptor to alter the outgoing messages
         serverFactory.getOutInterceptors().add(new ResponseInterceptor());
         //Add an invoker to extract the message and inject to Synapse
-        invoker = new InboundRMHttpInvoker(RMServiceImpl, synapseEnvironment, injectingSequence, onErrorSequence);
+        invoker = new InboundRMHttpInvoker(RMServiceImpl, injectingSequence, onErrorSequence);
         serverFactory.setInvoker(invoker);
 
         serverFactory.setServiceBean(RMServiceImpl);
@@ -164,8 +163,8 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
             //set the host and port to listen to
             serverFactory.setAddress("http://" + host + ":" + port);
         }
-        serverFactory.create();
-        CXFEndpointListenerManager.getInstance().addCXFEndpoint(port, bus);
+        server = serverFactory.create();
+        CXFEndpointManager.getInstance().registerCXFInboundEndpoint(port, this);
     }
 
     /**
@@ -173,9 +172,10 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
      */
     @Override
     public void destroy() {
-        CXFEndpointListenerManager.getInstance().unregisterCXFInboundEndpoint(port);
-        if (bus != null) {
-            bus.shutdown(true);
+        CXFEndpointManager.getInstance().unregisterCXFInboundEndpoint(port);
+        if (server != null) {
+            server.stop();
+            server.destroy();
         }
         invoker.getExecutorService().shutdown();
         logger.info("CXF-WS-RM Inbound Listener on " + host + ":" + port + " is shutting down");
@@ -209,21 +209,19 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
             throws GeneralSecurityException, IOException {
 
         TLSServerParameters tlsParams = new TLSServerParameters();
-        KeyStore keyStore = KeyStore.getInstance("JKS");
-        File truststore = new File(keyStoreLocation);
 
-        keyStore.load(new FileInputStream(truststore), keyStorePassword.toCharArray());
-        KeyManagerFactory keyFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyFactory.init(keyStore, keyStorePassword.toCharArray());
-        KeyManager[] keyManagers = keyFactory.getKeyManagers();
+        KeyStore keyStore = KeyStore.getInstance("JKS");
+        File keyStoreFile = new File(this.keyStoreLocation);
+        keyStore.load(new FileInputStream(keyStoreFile), keyStorePassword.toCharArray());
+        KeyManager[] keyManagers = getKeyManagers(keyStore, keyPassword);
         tlsParams.setKeyManagers(keyManagers);
 
-        truststore = new File(trustStoreLocation);
-        keyStore.load(new FileInputStream(truststore), trustStorePassword.toCharArray());
-        TrustManagerFactory trustFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustFactory.init(keyStore);
-        TrustManager[] tm = trustFactory.getTrustManagers();
-        tlsParams.setTrustManagers(tm);
+        KeyStore trustStore = KeyStore.getInstance("JKS");
+        File trustStoreFile = new File(trustStoreLocation);
+        trustStore.load(new FileInputStream(trustStoreFile), trustStorePassword.toCharArray());
+        TrustManager[] trustManagers = getTrustManagers(trustStore);
+        tlsParams.setTrustManagers(trustManagers);
+
         FiltersType filter = new FiltersType();
         filter.getInclude().add(".*_EXPORT_.*");
         filter.getInclude().add(".*_EXPORT1024_.*");
@@ -231,13 +229,32 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
         filter.getInclude().add(".*_WITH_NULL_.*");
         filter.getExclude().add(".*_DH_anon_.*");
         tlsParams.setCipherSuitesFilter(filter);
+
         ClientAuthentication ca = new ClientAuthentication();
         ca.setRequired(true);
         ca.setWant(true);
         tlsParams.setClientAuthentication(ca);
+        if (socketLayerProtocol != null) {
+            tlsParams.setSecureSocketProtocol(socketLayerProtocol);
+        }
         JettyHTTPServerEngineFactory factory = new JettyHTTPServerEngineFactory();
         factory.setTLSServerParametersForPort(host, port, tlsParams);
 
         return sf;
+    }
+
+    private TrustManager[] getTrustManagers(KeyStore trustStore) throws NoSuchAlgorithmException, KeyStoreException {
+        String alg = KeyManagerFactory.getDefaultAlgorithm();
+        TrustManagerFactory fac = TrustManagerFactory.getInstance(alg);
+        fac.init(trustStore);
+        return fac.getTrustManagers();
+    }
+
+    private KeyManager[] getKeyManagers(KeyStore keyStore, String keyPassword) throws GeneralSecurityException, IOException {
+        String alg = KeyManagerFactory.getDefaultAlgorithm();
+        char[] keyPass = keyPassword != null ? keyPassword.toCharArray() : null;
+        KeyManagerFactory fac = KeyManagerFactory.getInstance(alg);
+        fac.init(keyStore, keyPass);
+        return fac.getKeyManagers();
     }
 }

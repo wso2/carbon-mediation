@@ -34,6 +34,7 @@ public class RMConstants {
     public static final String PASS_THROUGH_TARGET_BUFFER = "pass-through.pipe";
     public static final String AXIS2_FILE_PATH = "axis2.file.path";
     public static final String CXF_ENABLE_SSL = "enableSSL";
+    public static final String SOCKET_LAYER_PROTOCOL = "socket.layer.protocol";
 
     public final static int THREAD_POOL_SIZE = 100;
 }

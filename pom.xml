@@ -1906,24 +1906,9 @@
                 <version>${netty.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.cxf</groupId>
+                <groupId>org.wso2.orbit.org.apache.cxf</groupId>
                 <artifactId>cxf-bundle</artifactId>
                 <version>${cxf.wso2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.aries.blueprint</groupId>
-                <artifactId>org.apache.aries.blueprint</artifactId>
-                <version>${aries.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.aries.proxy</groupId>
-                <artifactId>org.apache.aries.proxy</artifactId>
-                <version>${aries.proxy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.aries</groupId>
-                <artifactId>org.apache.aries.util</artifactId>
-                <version>${aries.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
@@ -2054,20 +2039,16 @@
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xmlsec.version>1.5.5</xmlsec.version>
         <xml.resolver.version>1.2</xml.resolver.version>
-        <stax2.version>3.1.1</stax2.version>
+        <stax2.version>3.1.4</stax2.version>
         <woodstox.core.version>4.2.0</woodstox.core.version>
         <jaxb.xjc.version>2.1.13</jaxb.xjc.version>
         <jaxb.impl.version>2.1.13</jaxb.impl.version>
         <javax.ws.rs.version>2.0-m10</javax.ws.rs.version>
         <ehcache.core.version>2.5.1</ehcache.core.version>
-        <cxf.version>2.6.2</cxf.version>
-        <cxf.wso2.version>3.0.2.wso2v1</cxf.wso2.version>
-        <aries.proxy.version>1.0.1</aries.proxy.version>
-        <aries.version>1.1.0</aries.version>
-        <jetty.wso2.version>8.1.15.v20140411.wso2v1</jetty.wso2.version>
+        <cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
+        <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
         <velocity.version>1.7</velocity.version>
         <commons.lang.version>2.6</commons.lang.version>
-
         <myfaces.version>2.1.11</myfaces.version>
         <jpa-commons-pool.version>1.5.4</jpa-commons-pool.version>
         <commons-xmlschema.version>1.4.7</commons-xmlschema.version>

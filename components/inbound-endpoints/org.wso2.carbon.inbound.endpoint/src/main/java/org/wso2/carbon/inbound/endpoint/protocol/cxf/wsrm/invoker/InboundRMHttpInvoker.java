@@ -22,7 +22,6 @@ import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.AbstractInvoker;
 import org.apache.log4j.Logger;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.InboundRMResponseSender;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.RMRequestCallable;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.utils.RMConstants;
@@ -37,7 +36,6 @@ import java.util.concurrent.FutureTask;
 public class InboundRMHttpInvoker extends AbstractInvoker {
 
     private static Logger logger = Logger.getLogger(InboundRMHttpInvoker.class);
-    private SynapseEnvironment synapseEnvironment;
     private String injectingSequence;
     private String onErrorSequence;
     private ExecutorService executorService;
@@ -48,13 +46,10 @@ public class InboundRMHttpInvoker extends AbstractInvoker {
      * Constructor for the invoker
      *
      * @param bean               An instance of the backend business logic implementing class
-     * @param synapseEnvironment The SynapseEnvironment
      * @param injectingSequence  The injecting sequence name
      * @param onErrorSequence    The fault sequence name
      */
-    public InboundRMHttpInvoker(Object bean, SynapseEnvironment synapseEnvironment,
-                                String injectingSequence, String onErrorSequence) {
-        this.synapseEnvironment = synapseEnvironment;
+    public InboundRMHttpInvoker(Object bean, String injectingSequence, String onErrorSequence) {
         this.injectingSequence = injectingSequence;
         this.onErrorSequence = onErrorSequence;
         this.bean = bean;
@@ -87,7 +82,7 @@ public class InboundRMHttpInvoker extends AbstractInvoker {
                  * This is a new request
                  * execute a task asynchronously
                  */
-                FutureTask<Boolean> futureTask = new FutureTask<Boolean>(new RMRequestCallable(exchange, continuation, synapseEnvironment,
+                FutureTask<Boolean> futureTask = new FutureTask<Boolean>(new RMRequestCallable(exchange, continuation,
                         injectingSequence,
                         onErrorSequence,
                         inboundRMResponseSender));

@@ -18,9 +18,13 @@
 package org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm;
 
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.message.Exchange;
@@ -29,20 +33,23 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundEndpointConstants;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
-import org.apache.synapse.transport.nhttp.util.NhttpUtil;
-import org.apache.synapse.transport.passthru.PassThroughConstants;
+import org.eclipse.jetty.http.HttpURI;
 import org.eclipse.jetty.server.Request;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.utils.RMConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
 /**
@@ -54,7 +61,6 @@ public class RMRequestCallable implements Callable<Boolean> {
 
     private Exchange exchange;
     private Continuation continuation;
-    private SynapseEnvironment synapseEnvironment;
     private String injectingSequence;
     private String onErrorSequence;
     private Map<String, String> httpHeaders;
@@ -62,11 +68,10 @@ public class RMRequestCallable implements Callable<Boolean> {
     private InboundRMResponseSender inboundRMResponseSender;
 
 
-    public RMRequestCallable(Exchange exchange, Continuation continuation, SynapseEnvironment synapseEnvironment,
+    public RMRequestCallable(Exchange exchange, Continuation continuation,
                              String injectingSequence, String onErrorSequence, InboundRMResponseSender inboundRMResponseSender) {
         this.setExchange(exchange);
         this.setContinuation(continuation);
-        this.setSynapseEnvironment(synapseEnvironment);
         this.setInjectingSequence(injectingSequence);
         this.setOnErrorSequence(onErrorSequence);
         this.inboundRMResponseSender = inboundRMResponseSender;
@@ -90,43 +95,45 @@ public class RMRequestCallable implements Callable<Boolean> {
 
         setReceiver(request.getRequestURL().toString());
         byte[] bytes = (byte[]) message.get(RMConstants.CXF_RM_MESSAGE_PAYLOAD);
-        return injectToSynapse(request.getContentType(), request.getCharacterEncoding(), bytes);
+        return injectToSynapse(request, bytes);
     }
 
     /**
      * Creates the SynapseMessageContext and injects the message in to Synapse for mediation
-     *
-     * @param contentType       Content type of the request
-     * @param characterEncoding Character encoding used
-     * @param bytes             Request in bytes
+     * @param request The HttpServletRequest
+     * @param bytes Request in bytes
+     * @return success
+     * @throws AxisFault
      */
-    private boolean injectToSynapse(String contentType, String characterEncoding, byte[] bytes) {
+    private boolean injectToSynapse(Request request, byte[] bytes) throws AxisFault {
 
-        MessageContext msgCtx = createMessageContext();
+        String contentType = request.getContentType();
+        MessageContext msgCtx = createMessageContext(request.getUri());
         org.apache.axis2.context.MessageContext axis2MsgCtx =
                 ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx).getAxis2MessageContext();
         boolean isSuccess;
 
         try {
             msgCtx.setWSAAction(getHttpHeaders().get(RMConstants.SOAP_ACTION));
-            setMessageContextProperties(contentType, characterEncoding, msgCtx);
+            setMessageContextProperties(contentType, request.getCharacterEncoding() , msgCtx);
 
             SOAPEnvelope soapEnvelope = TransportUtils.createSOAPMessage(axis2MsgCtx, new ByteArrayInputStream(bytes), contentType);
             msgCtx.setEnvelope(soapEnvelope);
+            msgCtx.getConfiguration();
 
             if (getInjectingSequence() == null || "".equals(getInjectingSequence())) {
                 logger.error("Sequence name not specified. Sequence : " + getInjectingSequence());
                 isSuccess = false;
             } else {
-                SequenceMediator seq = (SequenceMediator) getSynapseEnvironment().getSynapseConfiguration().
-                        getSequence(getInjectingSequence());
-
+                SequenceMediator seq = (SequenceMediator) msgCtx.getSequence(getInjectingSequence());
                 if (seq != null) {
-                    seq.setErrorHandler(getOnErrorSequence());
+                    SequenceMediator faultSequence = (SequenceMediator) msgCtx.getSequence(getOnErrorSequence());
+                    MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
+                    msgCtx.pushFaultHandler(mediatorFaultHandler);
                     if (logger.isDebugEnabled()) {
                         logger.debug("injecting message to sequence : " + getInjectingSequence());
                     }
-                    getSynapseEnvironment().injectAsync(msgCtx, seq);
+                    msgCtx.getEnvironment().injectMessage(msgCtx, seq);
                     isSuccess = true;
                 } else {
                     logger.error("Sequence: " + getInjectingSequence() + " not found");
@@ -164,26 +171,57 @@ public class RMRequestCallable implements Callable<Boolean> {
      * Creates a Synapse MessageContext from the request details
      *
      * @return Synapse MessageContext
+     * @param uri the uri, the request was sent to
      */
-    private MessageContext createMessageContext() {
+    private MessageContext createMessageContext(HttpURI uri) throws AxisFault {
 
-        MessageContext messageContext = this.getSynapseEnvironment().createMessageContext();
-        org.apache.axis2.context.MessageContext axis2MsgCtx =
-                ((org.apache.synapse.core.axis2.Axis2MessageContext) messageContext).getAxis2MessageContext();
+        String tenantDomain = getTenantDomain(uri.toString());
+        // Create super tenant message context
+        org.apache.axis2.context.MessageContext axis2MsgCtx = createAxis2MessageContext();
+        ServiceContext svcCtx = new ServiceContext();
+        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
+        axis2MsgCtx.setServiceContext(svcCtx);
+        axis2MsgCtx.setOperationContext(opCtx);
 
+        // If not super tenant, assign tenant configuration context
+        if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            ConfigurationContext tenantConfigCtx =
+                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain, axis2MsgCtx.getConfigurationContext());
+            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+        }
+        return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
+    }
+
+    /**
+     * Creates an Axis2 MessageContext instance
+     * @return Axis2 Message Context
+     */
+    private static org.apache.axis2.context.MessageContext createAxis2MessageContext() {
+
+        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
+        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
+
+        axis2MsgCtx.setConfigurationContext(ServiceReferenceHolder.getInstance().getConfigurationContextService()
+                                                                  .getServerConfigContext());
+        // Axis2 spawns a new thread to send a message if this is TRUE
+        axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING,
+                                Boolean.FALSE);
         axis2MsgCtx.setServerSide(true);
-        axis2MsgCtx.setMessageID(UUID.randomUUID().toString());
+        return axis2MsgCtx;
+    }
 
-        String restUrlPostfix = NhttpUtil
-                .getRestUrlPostfix(getReceiver(), axis2MsgCtx.getConfigurationContext().getServicePath());
-        String servicePrefix = getReceiver().substring(0, getReceiver().indexOf(restUrlPostfix));
-        axis2MsgCtx.setProperty(PassThroughConstants.SERVICE_PREFIX, servicePrefix);
-        axis2MsgCtx.setProperty(PassThroughConstants.REST_URL_POSTFIX, restUrlPostfix);
-
-        messageContext.setTo(new EndpointReference(getReceiver()));
-        messageContext.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING, Boolean.FALSE);
-
-        return messageContext;
+    /**
+     *
+     * @param uri uri of the request
+     * @return the tenant domain from the uri
+     */
+    private String getTenantDomain(String uri) {
+        String tenant = MultitenantUtils.getTenantDomainFromUrl(uri);
+        if (tenant.equals(uri)) {
+            return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        }
+        return tenant;
     }
 
 
@@ -201,14 +239,6 @@ public class RMRequestCallable implements Callable<Boolean> {
 
     public final void setContinuation(Continuation continuation) {
         this.continuation = continuation;
-    }
-
-    public SynapseEnvironment getSynapseEnvironment() {
-        return synapseEnvironment;
-    }
-
-    public final void setSynapseEnvironment(SynapseEnvironment synapseEnvironment) {
-        this.synapseEnvironment = synapseEnvironment;
     }
 
     public String getInjectingSequence() {

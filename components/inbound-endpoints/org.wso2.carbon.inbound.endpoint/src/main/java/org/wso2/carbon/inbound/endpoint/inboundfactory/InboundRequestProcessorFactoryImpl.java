@@ -21,7 +21,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.InboundRMHttpListener;
+import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.InboundHL7Listener;
@@ -61,7 +61,7 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
             }else if(Protocols.kafka.toString().equals(protocol)){
                 inboundRequestProcessor = new KAFKAProcessor(params);
             } else if (Protocols.cxf_ws_rm.toString().equals(protocol)) {
-                inboundRequestProcessor = new InboundRMHttpListener(params);
+                inboundRequestProcessor = CXFEndpointManager.getInstance().getCXFEndpoint(params);
             }
         } else if (params.getClassImpl() != null) {
             inboundRequestProcessor = new GenericProcessor(params);
