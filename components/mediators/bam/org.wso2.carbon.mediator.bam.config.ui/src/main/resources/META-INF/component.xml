@@ -29,7 +29,7 @@
             <style-class>manage</style-class>
             <icon>../bam-mediator-config/images/activity_monitor_icon.png</icon>
 			<require-super-tenant>false</require-super-tenant>
-            <require-permission>/permissions/admin/manage</require-permission>
+            <require-permission>/permission/admin/manage</require-permission>
         </menu>
 	</menus>
 </component>

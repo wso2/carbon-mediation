@@ -27,7 +27,10 @@
 <%@ page import="com.google.gson.JsonObject" %>
 <%@ page import="com.google.gson.GsonBuilder" %>
 
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+
 <%
+    String dtd = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
             session);
@@ -48,10 +51,10 @@
     object = new JsonObject();
 
     object.addProperty("id", message.getId());
-    object.addProperty("messageId", message.getMessageId());
-    object.addProperty("controlId", message.getControlId());
-    object.addProperty("rawMessage", message.getRawMessage());
-    object.addProperty("xmlMessage", message.getEnvelope());
+    object.addProperty("messageId", StringEscapeUtils.escapeXml(message.getMessageId()));
+    object.addProperty("controlId", StringEscapeUtils.escapeXml(message.getControlId()));
+    object.addProperty("rawMessage", StringEscapeUtils.escapeXml(message.getRawMessage()));
+    object.addProperty("xmlMessage", dtd + "\n" + StringEscapeUtils.escapeXml(message.getEnvelope()));
     object.addProperty("date", message.getDate());
     object.addProperty("timestamp", message.getTimestamp());
 

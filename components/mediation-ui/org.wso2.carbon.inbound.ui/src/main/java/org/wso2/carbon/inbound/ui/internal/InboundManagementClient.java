@@ -108,7 +108,9 @@ public class InboundManagementClient {
 
     public List<String> getDefaultParameters(String strType) {
         List<String> rtnList = new ArrayList<String>();
-        if (!strType.equals(InboundClientConstants.TYPE_HTTP)) {
+        if (!strType.equals(InboundClientConstants.TYPE_HTTP)
+                && !strType.equals(InboundClientConstants.TYPE_HTTPS)
+                && !strType.equals(InboundClientConstants.TYPE_HL7)) {
             rtnList.addAll(getList("common", true));
         }
         if (!strType.equals(InboundClientConstants.TYPE_CLASS)) {
@@ -126,20 +128,29 @@ public class InboundManagementClient {
     }
 
     public boolean addInboundEndpoint(String name, String sequence, String onError,
-            String protocol, String classImpl, List<ParamDTO> lParameters) {
+                                      String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
         try {
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
             int i = 0;
             for (ParamDTO parameter : lParameters) {
                 ParameterDTO parameterDTO = new ParameterDTO();
                 parameterDTO.setName(parameter.getName());
-                parameterDTO.setValue(parameter.getValue());
+                String strValue = parameter.getValue();
+                if(strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)){
+               	 parameterDTO.setKey(strValue.replaceFirst(InboundDescription.REGISTRY_KEY_PREFIX, ""));	
+                }                 
+                parameterDTO.setValue(strValue);
                 parameterDTOs[i++] = parameterDTO;
             }
-            stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
-            return true;
+            if (canAdd(name, protocol, parameterDTOs)) {
+                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+                return true;
+            }else {
+                log.warn("Cannot add Inbound endpoint " + name + " may be duplicate inbound already exists");
+            }
         } catch (Exception e) {
             log.error(e);
+            return false;
         }
         return false;
     }
@@ -176,15 +187,52 @@ public class InboundManagementClient {
         return rtnList;
     }
 
-    public boolean removeInboundEndpoint(String name) {
+    public boolean removeInboundEndpoint(String name) throws Exception {
         try {
             stub.removeInboundEndpoint(name);
             return true;
         } catch (Exception e) {
             log.error(e);
+            return false;
         }
-        return false;
     }
+
+    private boolean canAdd(String name, String protocol, ParameterDTO[] parameterDTOs) {
+        try {
+            String port = null;
+            InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
+            if(inboundEndpointDTOs != null) {
+                for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
+                    if (inboundEndpointDTO.getName().equals(name)) {
+                        return false;
+                    }
+                    if (protocol.equals("http") || protocol.equals("https")) {
+                        ParameterDTO[] existparameterDTOs = inboundEndpointDTO.getParameters();
+                        for (ParameterDTO parameterDTO : existparameterDTOs) {
+                            if (parameterDTO.getName().equals("inbound.http.port")) {
+                                port = parameterDTO.getValue();
+                            }
+                        }
+                    }
+                }
+                if (protocol.equals("http") || protocol.equals("https")) {
+                    for (ParameterDTO parameterDTO : parameterDTOs) {
+                        if (parameterDTO.getName().equals("inbound.http.port") && parameterDTO.getValue().equals(port)) {
+                            log.warn("Already used port " + port + "by another endpoint may be inbound endpoint " + name + " deployment failed");
+                            return false;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error(e);
+            return false;
+        }
+        return true;
+    }
+
+
+
 
     public InboundDescription getInboundDescription(String name) {
         try {
@@ -197,20 +245,37 @@ public class InboundManagementClient {
     }
 
     public boolean updteInboundEndpoint(String name, String sequence, String onError,
-            String protocol, String classImpl, List<ParamDTO> lParameters) {
+            String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
         try {
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
             int i = 0;
             for (ParamDTO parameter : lParameters) {
                 ParameterDTO parameterDTO = new ParameterDTO();
                 parameterDTO.setName(parameter.getName());
-                parameterDTO.setValue(parameter.getValue());
+                String strValue = parameter.getValue();
+                if(strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)){
+               	 parameterDTO.setKey(strValue.replaceFirst(InboundDescription.REGISTRY_KEY_PREFIX, ""));	
+                }  
+                parameterDTO.setValue(strValue);	 
                 parameterDTOs[i++] = parameterDTO;
             }
-            stub.updateInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
-            return true;
+
+            InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
+            if(inboundEndpointDTO != null){
+                stub.removeInboundEndpoint(name);
+            }
+            if(canAdd(name,protocol,parameterDTOs)) {
+                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+                return true;
+            }else if(inboundEndpointDTO != null){
+                stub.addInboundEndpoint(inboundEndpointDTO.getName(), inboundEndpointDTO.getInjectingSeq(),
+                                        inboundEndpointDTO.getOnErrorSeq(), inboundEndpointDTO.getProtocol(),
+                                        inboundEndpointDTO.getClassImpl(), inboundEndpointDTO.getParameters());
+                return false;
+            }
         } catch (Exception e) {
             log.error(e);
+            return false;
         }
         return false;
     }

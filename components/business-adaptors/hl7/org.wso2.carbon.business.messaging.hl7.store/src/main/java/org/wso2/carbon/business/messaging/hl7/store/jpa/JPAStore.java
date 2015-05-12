@@ -80,6 +80,10 @@ public class JPAStore implements MessageStore {
             this.jpaProperties.put("openjpa.jdbc.SynchronizeMappings", "buildSchema(ForeignKeys=true)");
         }
 
+        if(!this.jpaProperties.contains("openjpa.Log")) {
+            this.jpaProperties.put("openjpa.Log", "none");
+        }
+
     }
 
     @Override

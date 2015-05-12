@@ -145,7 +145,7 @@ var requiredParams = null;
 	                    <tr>
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
 	                        <td align="left">
-	                        <%if(arrParamOri.length > 1){%>
+	                        <%if(arrParamOri.length > 2){%>
 	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
 	                            <%for(int i = 1;i<arrParamOri.length;i++){
 	                                String eleValue = arrParamOri[i].trim();
@@ -157,8 +157,14 @@ var requiredParams = null;
 	                            <%}%>  	  
 	                            <%}%>
                                 </select>
-							<%} else{%>	                            	                      
+							<%} else{ %>
+                             <%if(InboundClientConstants.TYPE_HTTPS.equals(inboundDescription.getType()) && defaultParam.equals("keystore")){%>
+                             <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundupdateform" rows="8" cols="35">
+                             <%=inboundDescription.getParameters().get(defaultParam)%>
+                              </textarea>
+                             <%}else{ %>
                                 <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
+                             <%} %>
                             <%} %>                       
 	                        </td>
 	                        <td></td>
@@ -213,7 +219,7 @@ var requiredParams = null;
 				                    <tr>
 				                        <td style="width:150px"><%=defaultParam %></td>
 				                        <td align="left">
-				                        <%if(arrParamOri.length > 1){%>
+				                        <%if(arrParamOri.length > 2){%>
 				                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
 				                            <%for(int i = 1;i<arrParamOri.length;i++){
 				                                String eleValue = arrParamOri[i].trim();
@@ -225,9 +231,15 @@ var requiredParams = null;
 				                                <%} %>					                            				                                
 				                            <%}%>                                
 			                                </select>
-										<%}else{%>	                            	                      
+										<%}else{%>
+                                        <%if(InboundClientConstants.TYPE_HTTPS.equals(inboundDescription.getType()) && (defaultParam.equals("truststore") || defaultParam.equals("CertificateRevocationVerifier"))){%>
+                                        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundupdateform" rows="8" cols="35">
+                                        <%=((inboundDescription.getParameters().get(defaultParam)==null)?"":inboundDescription.getParameters().get(defaultParam))%>
+                                        </textarea>
+                                        <%}else{ %>
 			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"  value="<%=((inboundDescription.getParameters().get(defaultParam)==null)?"":inboundDescription.getParameters().get(defaultParam))%>"/>
-			                            <%} %>                       
+			                            <%} %>
+			                            <%} %>
 				                        </td>
 				                        <td></td>
 				                    </tr>                        

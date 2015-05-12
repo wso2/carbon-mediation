@@ -128,21 +128,29 @@ var requiredParams = null;
 					<%  int ctr = -1;
 					    for(String defaultParamOri : defaultParams) {
 						String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
-						String defaultParam = arrParamOri[0].trim();	
+						String defaultParam = arrParamOri[0].trim();
+                        String defaultVal = "";
+                        if (arrParamOri.length == 2) { defaultVal = arrParamOri[1].trim(); }
 						ctr++;
 					%> 	
 					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
 	                    <tr>
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
 	                        <td align="left">
-	                        <%if(arrParamOri.length > 1){%>
+	                        <%if(arrParamOri.length > 2){%>
 	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
 	                            <%for(int i = 1;i<arrParamOri.length;i++){%>
 	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
 	                            <%}%>                                
                                 </select>
-							<%} else{%>	                            	                      
-                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"/>
+							<%}else{ %>
+							        <%if(InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType")) && defaultParam.equals("keystore")){%>
+							        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundcreationform" rows="8" cols="35">
+							        </textarea>
+							        <%}else{ %>
+
+                                    <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=defaultVal%>"/>
+                              <%} %>
                             <%} %>                       
 	                        </td>
 	                        <td></td>
@@ -175,19 +183,27 @@ var requiredParams = null;
 						    <table id="tblAdvInput" name="tblAdvInput" class="normal-nopadding" cellspacing="0" cellpadding="0" border="0">
 								<% for(String defaultParamOri : advParams) {
 									String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
-									String defaultParam = arrParamOri[0].trim();						
+									String defaultParam = arrParamOri[0].trim();
+                                    String defaultVal = "";
+                                    if (arrParamOri.length == 2) { defaultVal = arrParamOri[1].trim(); }
 								%> 					                       
 				                    <tr>
 				                        <td style="width:150px"><%=defaultParam %></td>
 				                        <td align="left">
-				                        <%if(arrParamOri.length > 1){%>
+				                        <%if(arrParamOri.length > 2){%>
 				                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
 				                            <%for(int i = 1;i<arrParamOri.length;i++){%>
 				                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
 				                            <%}%>                                
 			                                </select>
-										<%} else{%>	                            	                      
-			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text"/>
+										<%} else{%>
+                                        <%if(InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType")) && (defaultParam.equals("truststore") || defaultParam.equals("CertificateRevocationVerifier"))){%>
+                                        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundcreationform" rows="8" cols="35">
+                                        </textarea>
+                                        <%}else{ %>
+
+			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=defaultVal%>"/>
+			                            <%} %>
 			                            <%} %>                       
 				                        </td>
 				                        <td></td>

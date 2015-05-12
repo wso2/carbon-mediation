@@ -21,6 +21,7 @@ package org.wso2.carbon.inbound.endpoint.persistence;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.log4j.Logger;
+import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.core.RegistryResources;
 import org.wso2.carbon.registry.core.Registry;
@@ -41,9 +42,14 @@ public class InboundEndpointsDataStore {
     private Map<Integer,List<InboundEndpointInfoDTO>> endpointInfo;
     private Registry registry = null;
     private final String rootPath = RegistryResources.ROOT + "inbound-endpoints/";
-    private final String REG_PROP = "endpoints";
 
-    public InboundEndpointsDataStore() {
+    private static InboundEndpointsDataStore instance = new InboundEndpointsDataStore();
+
+    public static InboundEndpointsDataStore getInstance() {
+        return instance;
+    }
+
+    private InboundEndpointsDataStore() {
         try {
             registry = ServiceReferenceHolder.getInstance().getRegistry();
         } catch (RegistryException e) {
@@ -96,7 +102,7 @@ public class InboundEndpointsDataStore {
      * @param protocol     protocol
      * @param name         endpoint name
      */
-    public void registerEndpoint(int port, String tenantDomain, String protocol, String name) {
+    public void registerEndpoint(int port, String tenantDomain, String protocol, String name, InboundProcessorParams params) {
 
         List<InboundEndpointInfoDTO> tenantList = endpointInfo.get(port);
         if (tenantList == null) {
@@ -104,7 +110,7 @@ public class InboundEndpointsDataStore {
             tenantList = new ArrayList<InboundEndpointInfoDTO>();
             endpointInfo.put(port, tenantList);
         }
-        tenantList.add(new InboundEndpointInfoDTO(tenantDomain, protocol, name));
+        tenantList.add(new InboundEndpointInfoDTO(tenantDomain, protocol, name, params));
         updateRegistry();
     }
 
@@ -124,7 +130,7 @@ public class InboundEndpointsDataStore {
             tenantList = new ArrayList<InboundEndpointInfoDTO>();
             endpointInfo.put(port, tenantList);
         }
-        InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name);
+        InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name, null);
         inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
         tenantList.add(inboundEndpointInfoDTO);
 
@@ -166,7 +172,7 @@ public class InboundEndpointsDataStore {
                 }
             }
         }
-        if (endpointInfo.get(port).size() == 0) {
+        if (endpointInfo.get(port) != null && endpointInfo.get(port).size() == 0) {
             endpointInfo.remove(port);
         }
         updateRegistry();
