@@ -20,17 +20,18 @@
     <parent>
         <artifactId>carbon-mediation</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.3.3-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>inbound-endpoints</artifactId>
-    <version>4.3.3-SNAPSHOT</version>
+    <version>4.4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Inbound Endpoint Module</name>
     <url>http://wso2.org</url>
 
     <modules>
+        <module>org.wso2.carbon.inbound.endpoint.osgi</module>
         <module>org.wso2.carbon.inbound.endpoint.persistence</module>
         <module>org.wso2.carbon.inbound.endpoint</module>
     </modules>
@@ -55,6 +56,10 @@
     <dependency>
         <groupId>org.apache.axis2.wso2</groupId>
         <artifactId>axis2</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>ca.uhn.hapi.wso2</groupId>
+        <artifactId>hapi</artifactId>
     </dependency>
 </dependencies>
 </project>

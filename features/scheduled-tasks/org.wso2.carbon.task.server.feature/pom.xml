@@ -19,7 +19,7 @@
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.3.3-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
         <artifactId>scheduled-tasks-feature</artifactId>
     </parent>
 
@@ -56,7 +56,7 @@
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.task.server</id>
-                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <adviceFile>
                                 <properties>
                                     <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>

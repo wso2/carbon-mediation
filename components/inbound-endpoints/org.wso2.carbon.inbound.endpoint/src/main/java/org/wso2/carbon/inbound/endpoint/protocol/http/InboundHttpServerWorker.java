@@ -23,7 +23,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
-import org.apache.axis2.description.WSDL2Constants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -39,7 +38,7 @@ import org.apache.synapse.transport.passthru.ServerWorker;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListenerManager;
+import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -84,7 +83,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                 String tenantDomain = getTenantDomain();
 
                 String endpointName =
-                        EndpointListenerManager.getInstance().getEndpointName(port, tenantDomain);
+                        HTTPEndpointManager.getInstance().getEndpointName(port, tenantDomain);
 
                 if (endpointName == null) {
                     handleException("Endpoint not found for port : " + port + "" +

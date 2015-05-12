@@ -108,7 +108,9 @@ public class InboundManagementClient {
 
     public List<String> getDefaultParameters(String strType) {
         List<String> rtnList = new ArrayList<String>();
-        if (!strType.equals(InboundClientConstants.TYPE_HTTP) && !strType.equals(InboundClientConstants.TYPE_HTTPS)) {
+        if (!strType.equals(InboundClientConstants.TYPE_HTTP)
+                && !strType.equals(InboundClientConstants.TYPE_HTTPS)
+                && !strType.equals(InboundClientConstants.TYPE_HL7)) {
             rtnList.addAll(getList("common", true));
         }
         if (!strType.equals(InboundClientConstants.TYPE_CLASS)) {
@@ -133,7 +135,11 @@ public class InboundManagementClient {
             for (ParamDTO parameter : lParameters) {
                 ParameterDTO parameterDTO = new ParameterDTO();
                 parameterDTO.setName(parameter.getName());
-                parameterDTO.setValue(parameter.getValue());
+                String strValue = parameter.getValue();
+                if(strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)){
+               	 parameterDTO.setKey(strValue.replaceFirst(InboundDescription.REGISTRY_KEY_PREFIX, ""));	
+                }                 
+                parameterDTO.setValue(strValue);
                 parameterDTOs[i++] = parameterDTO;
             }
             if (canAdd(name, protocol, parameterDTOs)) {
@@ -246,7 +252,11 @@ public class InboundManagementClient {
             for (ParamDTO parameter : lParameters) {
                 ParameterDTO parameterDTO = new ParameterDTO();
                 parameterDTO.setName(parameter.getName());
-                parameterDTO.setValue(parameter.getValue());
+                String strValue = parameter.getValue();
+                if(strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)){
+               	 parameterDTO.setKey(strValue.replaceFirst(InboundDescription.REGISTRY_KEY_PREFIX, ""));	
+                }  
+                parameterDTO.setValue(strValue);	 
                 parameterDTOs[i++] = parameterDTO;
             }
 

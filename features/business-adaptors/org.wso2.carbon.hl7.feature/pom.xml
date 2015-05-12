@@ -20,13 +20,13 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>business-adaptors-features</artifactId>
-        <version>4.3.3-SNAPSHOT</version>
+        <version>4.4.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.hl7.feature</artifactId>
     <packaging>pom</packaging>
-    <version>4.3.3-SNAPSHOT</version>
+    <version>4.4.1-SNAPSHOT</version>
     <name>WSO2 Carbon - Business Adaptor HL7 Feature</name>
     <url>http://wso2.org</url>
     <description>This feature contains the HL7 core feature</description>
@@ -56,7 +56,6 @@
             <groupId>ca.uhn.hapi.wso2</groupId>
             <artifactId>hapi</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.openjpa.wso2</groupId>
             <artifactId>openjpa-all</artifactId>
