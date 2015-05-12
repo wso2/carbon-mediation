@@ -29,7 +29,7 @@ public class PredictMediatorTest extends TestCase{
 
     private String xml =
             "<predict xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-            "        <model name=\"lrboston-model\"/>\n" +
+            "        <model storage-location=\"lrboston-model\"/>\n" +
             "        <features>\n" +
             "            <feature xmlns:ns=\"http://ws.apache.org/axis2\"\n" +
             "                     name=\"fixed acidity\"\n" +
@@ -76,7 +76,7 @@ public class PredictMediatorTest extends TestCase{
         PredictMediator mediator =
                 (PredictMediator) factory.createSpecificMediator(mediatorElement, new Properties());
 
-        assertEquals(mediator.getModelName(), "lrboston-model");
+        assertEquals(mediator.getModelStorageLocation(), "lrboston-model");
 
         assertEquals(mediator.getFeatureMappings().get("fixed acidity").getExpression(), "$body/ns:getWineQuality/ns:features/ns:fixed-acidity");
         assertEquals(mediator.getFeatureMappings().get("fixed acidity").getNamespaces().get("ns"), "http://ws.apache.org/axis2");

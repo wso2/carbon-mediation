@@ -31,7 +31,7 @@
         throw new RuntimeException("Unable to edit the mediator");
     }
     PredictMediator predictMediator = (PredictMediator) mediator;
-    String modelName = predictMediator.getModelName();
+    String modelName = predictMediator.getModelStorageLocation();
 %>
 
 <fmt:bundle basename="org.wso2.carbon.mediator.predict.ui.i18n.Resources">

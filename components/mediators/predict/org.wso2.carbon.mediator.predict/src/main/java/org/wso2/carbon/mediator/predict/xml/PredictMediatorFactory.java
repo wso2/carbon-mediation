@@ -57,8 +57,8 @@ public class PredictMediatorFactory extends AbstractMediatorFactory {
         // Configure model
         OMElement modelElement = omElement.getFirstChildWithName(MODEL_QNAME);
         if(modelElement != null) {
-            String modelName = getAttributeValue(modelElement, NAME_ATT);
-            predictMediator.setModelName(modelName);
+            String modelName = getAttributeValue(modelElement, STORAGE_LOCATION_ATT);
+            predictMediator.setModelStorageLocation(modelName);
         } else {
             handleException("Model element not defined.");
 

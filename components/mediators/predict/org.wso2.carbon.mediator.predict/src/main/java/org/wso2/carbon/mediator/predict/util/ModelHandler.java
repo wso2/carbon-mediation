@@ -18,80 +18,68 @@
 
 package org.wso2.carbon.mediator.predict.util;
 
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.xml.SynapsePath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.ml.commons.constants.MLConstants;
 import org.wso2.carbon.ml.commons.domain.Feature;
 import org.wso2.carbon.ml.commons.domain.MLModel;
-import org.wso2.carbon.ml.commons.domain.config.ModelStorage;
 import org.wso2.carbon.ml.core.exceptions.MLInputAdapterException;
 import org.wso2.carbon.ml.core.exceptions.MLModelBuilderException;
 import org.wso2.carbon.ml.core.exceptions.MLModelHandlerException;
 import org.wso2.carbon.ml.core.impl.MLIOFactory;
 import org.wso2.carbon.ml.core.impl.Predictor;
 import org.wso2.carbon.ml.core.interfaces.MLInputAdapter;
-import org.wso2.carbon.ml.core.internal.MLModelConfigurationContext;
 import org.wso2.carbon.ml.core.utils.MLCoreServiceValueHolder;
-import org.wso2.carbon.registry.api.RegistryException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ModelHandler {
 
+    public static final String REGISTRY_STORAGE_PREFIX = "registry";
+    public static final String FILE_STORAGE_PREFIX = "file";
+
     private static ModelHandler instance;
 
-    private String modelName;
     private long modelId;
     private Map<SynapsePath, Integer> featureIndexMap;
     private MLModel mlModel;
-    private MLModelConfigurationContext context;
 
-    private ModelHandler(String modelName, Map<String, SynapsePath> featureMappings)
-            throws IOException, RegistryException, ClassNotFoundException, URISyntaxException, MLInputAdapterException {
-        initializeModel(modelName, featureMappings);
+    private ModelHandler(String modelStorageLocation, Map<String, SynapsePath> featureMappings)
+            throws IOException, ClassNotFoundException, URISyntaxException, MLInputAdapterException {
+        initializeModel(modelStorageLocation, featureMappings);
     }
 
     /**
      * Get the ModelHandler instance
-     * @param modelName         name of the ML-model
+     * @param storageLocation         storage location of the ML-model
      * @param featureMappings   Map containing pairs <feature-name, synapse-path>
      * @return
      */
-    public static ModelHandler getInstance(String modelName, Map<String, SynapsePath> featureMappings)
-            throws ClassNotFoundException, IOException, RegistryException, URISyntaxException, MLInputAdapterException {
+    public static ModelHandler getInstance(String storageLocation, Map<String, SynapsePath> featureMappings)
+            throws ClassNotFoundException, IOException, URISyntaxException, MLInputAdapterException {
         if(instance == null) {
-            instance = new ModelHandler(modelName, featureMappings);
+            instance = new ModelHandler(storageLocation, featureMappings);
         }
         return instance;
-    }
-
-    /**
-     * Set the model name
-     * @param modelName model name
-     */
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
     }
 
     /**
      * Retrieve the ML model and map the feature indices with the xpath expressions
      * @param inputVariables Map containing the key- value pairs <feature-name, xpath-expression-to-extract-feature-value>
      */
-    private void initializeModel(String modelName, Map<String, SynapsePath> inputVariables)
-            throws RegistryException, IOException, ClassNotFoundException, URISyntaxException, MLInputAdapterException {
+    private void initializeModel(String modelStorageLocation, Map<String, SynapsePath> inputVariables)
+            throws IOException, ClassNotFoundException, URISyntaxException, MLInputAdapterException {
 
-        this.modelName = modelName;
-        mlModel = retrieveModelFromRegistry();
+        mlModel = retrieveModel(modelStorageLocation);
 
         featureIndexMap = new HashMap<SynapsePath, Integer>();
         List<Feature> features = mlModel.getFeatures();
@@ -100,43 +88,29 @@ public class ModelHandler {
                 featureIndexMap.put(inputVariables.get(feature.getName()), feature.getIndex());
             }
         }
-        createModelConfigurationContext();
-    }
+   }
 
     /**
-     * Get the MLModel from the Registry
+     * Get the MLModel from its storage location
      * @return
      * @throws IOException
      * @throws ClassNotFoundException
-     * @throws RegistryException
      */
-    private MLModel retrieveModelFromRegistry()
-            throws IOException, ClassNotFoundException, RegistryException, URISyntaxException, MLInputAdapterException {
+    private MLModel retrieveModel(String modelStorageLocation)
+            throws IOException, ClassNotFoundException, URISyntaxException, MLInputAdapterException {
 
-        MLCoreServiceValueHolder mlCoreServiceValueHolder = MLCoreServiceValueHolder.getInstance();
-        ModelStorage modelStorage = mlCoreServiceValueHolder.getModelStorage();
-        String storageType = modelStorage.getStorageType();
-        String storageLocation = modelStorage.getStorageDirectory();
-
+        String[] modelStorage = modelStorageLocation.split(":");
+        String storageType = modelStorage[0];
+        if(storageType.equals(REGISTRY_STORAGE_PREFIX)) {
+            modelStorageLocation = modelStorage[1];
+        }
         MLIOFactory ioFactory = new MLIOFactory(MLCoreServiceValueHolder.getInstance().getMlProperties());
         MLInputAdapter inputAdapter = ioFactory.getInputAdapter(storageType + MLConstants.IN_SUFFIX);
-        InputStream in = inputAdapter.readDataset(new URI(storageLocation  + "/" + modelName));
+        InputStream in = inputAdapter.readDataset(new URI(modelStorageLocation));
         ObjectInputStream ois = new ObjectInputStream(in);
         MLModel mlModel = (MLModel) ois.readObject();
+        ois.close();
         return mlModel;
-    }
-
-    /**
-     * Create the spark context and model configuration context
-     */
-    private void createModelConfigurationContext() {
-
-        Thread.currentThread().setContextClassLoader(JavaSparkContext.class.getClassLoader());
-        SparkConf sparkConf = MLCoreServiceValueHolder.getInstance().getSparkConf();
-        context = new MLModelConfigurationContext();
-        sparkConf.setAppName(modelName);
-        JavaSparkContext sparkContext = new JavaSparkContext(sparkConf);
-        context.setSparkContext(sparkContext);
     }
 
     /**
@@ -147,7 +121,7 @@ public class ModelHandler {
     public String getPrediction(MessageContext messageContext) throws MLModelBuilderException, JaxenException,
             MLModelHandlerException {
 
-        String data[] = new String[featureIndexMap.size()];
+        double data[] = new double[featureIndexMap.size()];
         for(Map.Entry<SynapsePath, Integer> entry : featureIndexMap.entrySet()) {
 
             SynapsePath synapsePath = entry.getKey();
@@ -156,7 +130,7 @@ public class ModelHandler {
             if(variableValue != null) {
                 // Get the mapping feature index of the ML-model
                 int featureIndex = entry.getValue();
-                data[featureIndex] = variableValue;
+                data[featureIndex] = Double.parseDouble(variableValue);
             }
         }
         return predict(data);
@@ -168,10 +142,9 @@ public class ModelHandler {
      * @return      predicted value as String
      * @throws      MLModelBuilderException
      */
-    private String predict(String[] data) throws MLModelBuilderException {
+    private String predict(double[] data) throws MLModelBuilderException {
 
-        context.setDataToBePredicted(data);
-        Predictor predictor = new Predictor(modelId, mlModel, context);
+        Predictor predictor = new Predictor(modelId, mlModel, Arrays.asList(data));
         List<?> predictions = predictor.predict();
         return predictions.get(0).toString();
     }

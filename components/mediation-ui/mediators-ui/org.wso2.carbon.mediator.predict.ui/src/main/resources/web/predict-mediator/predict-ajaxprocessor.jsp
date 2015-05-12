@@ -56,7 +56,7 @@
     String responseVariable = null;
     response.setHeader("Cache-Control", "no-cache");
     String modelName = request.getParameter("mediatorInput");
-    predictMediator.setModelName(modelName);
+    predictMediator.setModelStorageLocation(modelName);
 
     try {
         features = PredictMediatorUtils.getFeaturesOfModel(request.getParameter("mediatorInput"));

@@ -1595,6 +1595,38 @@
                 <version>${ec2.client.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.ml.core</artifactId>
+                <version>${ml.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.ml.commons</artifactId>
+                <version>${ml.commons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.predict.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.predict</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.predict.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.predict.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
 
             <!--12 Misc -->
             <dependency>
@@ -1893,7 +1925,11 @@
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.spark</groupId>
+                <artifactId>spark-core_2.10</artifactId>
+                <version>${spark.core.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2048,6 +2084,10 @@
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
         <project.scm.id>wso2-scm-server</project.scm.id>
+
+        <spark.core.version>1.2.1.wso2v2</spark.core.version>
+        <ml.core.version>1.0.0-SNAPSHOT</ml.core.version>
+        <ml.commons.version>1.0.0-SNAPSHOT</ml.commons.version>
 
     </properties>
     <pluginRepositories>

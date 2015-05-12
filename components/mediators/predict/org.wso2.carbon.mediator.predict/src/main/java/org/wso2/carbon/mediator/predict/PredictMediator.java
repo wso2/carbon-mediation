@@ -38,7 +38,7 @@ public class PredictMediator extends AbstractMediator {
 
     private String resultPropertyName;
     private Map<String, SynapsePath> featureMappings;
-    private String modelName;
+    private String modelStorageLocation;
 
     public PredictMediator() {
         featureMappings = new HashMap<String, SynapsePath>();
@@ -72,7 +72,7 @@ public class PredictMediator extends AbstractMediator {
     private String getPredictionFromModel(MessageContext messageContext) {
 
         try {
-            String prediction = ModelHandler.getInstance(modelName, featureMappings).getPrediction(messageContext);
+            String prediction = ModelHandler.getInstance(modelStorageLocation, featureMappings).getPrediction(messageContext);
             return prediction;
         } catch (JaxenException e) {
             handleException("Error while extracting feature values ", e, messageContext);
@@ -82,8 +82,6 @@ public class PredictMediator extends AbstractMediator {
             handleException("Error while building the Model ", e, messageContext);
         } catch (ClassNotFoundException e) {
             handleException("Error while building the Model ", e, messageContext);
-        } catch (RegistryException e) {
-            handleException("Error while retrieving the Model ", e, messageContext);
         } catch (IOException e) {
             handleException("Error while retrieving the Model ", e, messageContext);
         } catch (MLInputAdapterException e) {
@@ -125,17 +123,17 @@ public class PredictMediator extends AbstractMediator {
 
     /**
      * set model name
-     * @param modelName
+     * @param modelStorageLocation
      */
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
+    public void setModelStorageLocation(String modelStorageLocation) {
+        this.modelStorageLocation = modelStorageLocation;
     }
 
     /**
      * Get model name
      * @return
      */
-    public String getModelName() {
-        return modelName;
+    public String getModelStorageLocation() {
+        return modelStorageLocation;
     }
 }

@@ -37,6 +37,7 @@ public class PredictMediatorConstants {
     public static final QName FEATURE_QNAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "feature");
     public static final QName PREDICTION_OUTPUT_QNAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "predictionOutput");
 
+    public static final QName STORAGE_LOCATION_ATT = new QName("storage-location");
     public static final QName NAME_ATT = new QName("name");
     public static final QName EXPRESSION_ATT = new QName("expression");
     public static final QName PROPERTY_ATT = new QName("property");

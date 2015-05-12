@@ -36,7 +36,7 @@ import static org.wso2.carbon.mediator.predict.ui.PredictMediatorConstants.*;
 
 public class PredictMediator extends AbstractMediator {
 
-    private String modelName;
+    private String modelStorageLocation;
     private String predictionPropertyName;
     private List<MediatorProperty> features = new ArrayList<MediatorProperty>();
 
@@ -46,12 +46,12 @@ public class PredictMediator extends AbstractMediator {
         OMElement mlElement = fac.createOMElement(PREDICT_QNAME);
         saveTracingState(mlElement, this);
 
-        if (modelName != null) {
+        if (modelStorageLocation != null) {
             OMElement modelElement = fac.createOMElement(MODEL_QNAME);
-            modelElement.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(), nullNS, modelName));
+            modelElement.addAttribute(fac.createOMAttribute(STORAGE_LOCATION_ATT.getLocalPart(), nullNS, modelStorageLocation));
             mlElement.addChild(modelElement);
         } else {
-            throw new MediatorException("Invalid Predict mediator. Model name is required");
+            throw new MediatorException("Invalid Predict mediator. Model storage-location is required");
         }
 
         if(features.isEmpty()) {
@@ -88,11 +88,11 @@ public class PredictMediator extends AbstractMediator {
         if (modelElement == null) {
             throw new MediatorException("Model element is required.");
         }
-        OMAttribute modelName = modelElement.getAttribute(NAME_ATT);
+        OMAttribute modelName = modelElement.getAttribute(STORAGE_LOCATION_ATT);
         if(modelName == null) {
-            throw new MediatorException("Model name attribute is required.");
+            throw new MediatorException("Model storage-location attribute is required.");
         }
-        this.modelName = modelName.getAttributeValue();
+        this.modelStorageLocation = modelName.getAttributeValue();
 
         // features
         OMElement featuresElement = omElement.getFirstChildWithName(FEATURES_QNAME);
@@ -151,16 +151,16 @@ public class PredictMediator extends AbstractMediator {
      * Get model name
      * @return
      */
-    public String getModelName() {
-        return modelName;
+    public String getModelStorageLocation() {
+        return modelStorageLocation;
     }
 
     /**
      * Set model name
      * @param modelName
      */
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
+    public void setModelStorageLocation(String modelName) {
+        this.modelStorageLocation = modelName;
     }
 
     /**

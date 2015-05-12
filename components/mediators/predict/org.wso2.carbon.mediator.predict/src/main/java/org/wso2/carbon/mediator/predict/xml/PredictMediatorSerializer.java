@@ -56,8 +56,8 @@ public class PredictMediatorSerializer extends AbstractMediatorSerializer {
 
         // <model>
         OMElement modelConfiguration = fac.createOMElement(MODEL_QNAME.getLocalPart(), synNS);
-        modelConfiguration.addAttribute(fac.createOMAttribute(NAME_ATT.getLocalPart(),
-                nullNS, predictMediator.getModelName()));
+        modelConfiguration.addAttribute(fac.createOMAttribute(STORAGE_LOCATION_ATT.getLocalPart(),
+                nullNS, predictMediator.getModelStorageLocation()));
         predictElement.addChild(modelConfiguration);
 
         // <features>
