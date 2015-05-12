@@ -79,8 +79,7 @@
         callMediator.setEndpoint(ep);
     }
 
-    boolean blocking=Boolean.parseBoolean(request.getParameter("mediator.call.blocking"));
-    callMediator.setBlocking(blocking);
+    callMediator.setBlocking(Boolean.parseBoolean(request.getParameter("mediator.call.blocking")));
 
     session.removeAttribute("anonEpXML");
     session.removeAttribute("endpointXML");
