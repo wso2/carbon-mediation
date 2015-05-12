@@ -23,7 +23,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
-import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListenerManager;
+import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -57,13 +57,13 @@ public class InboundHttpListener implements InboundRequestProcessor {
                      "hence undeploying inbound endpoint");
             this.destroy();
         }else {
-            EndpointListenerManager.getInstance().startEndpoint(port, name);
+            HTTPEndpointManager.getInstance().startEndpoint(port, name);
         }
     }
 
     @Override
     public void destroy() {
-        EndpointListenerManager.getInstance().closeEndpoint(port);
+        HTTPEndpointManager.getInstance().closeEndpoint(port);
     }
 
     protected void handleException(String msg, Exception e) {

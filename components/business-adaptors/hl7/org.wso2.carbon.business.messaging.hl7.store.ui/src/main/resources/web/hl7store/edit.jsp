@@ -23,12 +23,14 @@
 
 <%@ page import="org.wso2.carbon.business.messaging.hl7.store.ui.HL7StoreAdminServiceClient" %>
 <%@ page import="org.wso2.carbon.business.messaging.hl7.store.entity.xsd.TransferableHL7Message" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
 <%
 
+    String dtd = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
             session);
     ConfigurationContext configContext =
@@ -128,7 +130,7 @@
                         <tr><td>Control ID</td><td><%=message.getControlId()%></td><td></td></tr>
                         <tr class="shortRow"></tr>
                         <tr><td>ER7 Encoding</td><td><textarea id="rawMessage" class="er7TextArea"><%=message.getRawMessage()%></textarea></td><td><button id="btnRawMessage">Update</button></td></tr>
-                        <tr><td>XML Encoding</td><td><textarea id="xmlMessage" class="xmlTextArea"><%=message.getEnvelope()%></textarea></td><td><button id="btnXmlMessage">Update</button></td></tr>
+                        <tr><td>XML Encoding</td><td><textarea id="xmlMessage" class="xmlTextArea"><%=dtd + "\n" + StringEscapeUtils.escapeXml(message.getEnvelope())%></textarea></td><td><button id="btnXmlMessage">Update</button></td></tr>
                     </tbody>
                 </table>
 

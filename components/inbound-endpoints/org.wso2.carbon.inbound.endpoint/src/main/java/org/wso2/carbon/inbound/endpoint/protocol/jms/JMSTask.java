@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 
 /**
  * 
@@ -28,17 +29,18 @@ import org.apache.synapse.core.SynapseEnvironment;
  * is required
  * 
  */
-public class JMSTask implements org.apache.synapse.task.Task, ManagedLifecycle {
+public class JMSTask extends InboundTask {
     private static final Log logger = LogFactory.getLog(JMSTask.class.getName());
 
     private JMSPollingConsumer jmsPollingConsumer;
 
-    public JMSTask(JMSPollingConsumer jmsPollingConsumer) {
+    public JMSTask(JMSPollingConsumer jmsPollingConsumer, long interval) {
         logger.debug("Initializing JMS Task.");
         this.jmsPollingConsumer = jmsPollingConsumer;
+        this.interval = interval;
     }
 
-    public void execute() {
+    protected void taskExecute() {
         logger.debug("Executing JMS Task Execution.");
         jmsPollingConsumer.execute();
     }
@@ -50,4 +52,5 @@ public class JMSTask implements org.apache.synapse.task.Task, ManagedLifecycle {
     public void destroy() {
         logger.debug("Destroying.");
     }
+
 }
