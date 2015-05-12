@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,15 +16,9 @@ import org.apache.synapse.task.TaskManagerObserver;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
-import org.wso2.carbon.message.processor.MessageProcessorCleanupTask;
-import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
-import org.wso2.carbon.ntask.core.impl.clustered.ClusterGroupCommunicator;
-import org.wso2.carbon.ntask.core.impl.clustered.ClusteredTaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
-
-import com.hazelcast.core.IExecutorService;
 
 public class NTaskTaskManager implements TaskManager, TaskServiceObserver, ServerStartupHandler {
     private final Object lock = new Object();
@@ -41,15 +34,14 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     private final Map<String, Object> properties = new HashMap<String, Object>(5);
 
     protected final Properties configProperties = new Properties();
-
+    
     private final List<TaskManagerObserver> observers = new ArrayList<TaskManagerObserver>();
 
     private final List<TaskDescription> taskQueue = new ArrayList<TaskDescription>();
 
     private final Object taskQueueLock = new Object();
 
-	@Override
-    public boolean schedule(TaskDescription taskDescription) {
+	public boolean schedule(TaskDescription taskDescription) {
 		logger.debug("#schedule Scheduling task : " + taskId(taskDescription));
 		TaskInfo taskInfo;
 		try {
@@ -94,8 +86,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 		return true;
 	}
 
-	@Override
-    public boolean reschedule(String taskName, TaskDescription taskDescription) {
+	public boolean reschedule(String taskName, TaskDescription taskDescription) {
 		if (!isInitialized()) {
 			return false;
 		}
@@ -105,7 +96,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 					logger.warn("#reschedule Could not reschedule task [" + taskName +
 					            "]. Task manager is not available.");
 					return false;
-				}
+				} 
 				TaskInfo taskInfo = taskManager.getTask(taskName);
 				TaskDescription description = TaskBuilder.buildTaskDescription(taskInfo);
 				taskInfo = TaskBuilder.buildTaskInfo(description, properties);
@@ -118,7 +109,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 		return true;
 	}
 
-    @Override
     public boolean delete(String taskName) {
         if (!isInitialized()) {
             return false;
@@ -164,7 +154,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         }
     }
 
-    @Override
     public boolean pause(String taskName) {
         if (!isInitialized()) {
             return false;
@@ -184,7 +173,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return false;
     }
 
-    @Override
     public boolean pauseAll() {
         if (!isInitialized()) {
             return false;
@@ -207,7 +195,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return false;
     }
 
-    @Override
     public boolean resume(String taskName) {
         if (!isInitialized()) {
             return false;
@@ -230,7 +217,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return true;
     }
 
-    @Override
     public boolean resumeAll() {
         if (!isInitialized()) {
             return false;
@@ -253,7 +239,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return false;
     }
 
-    @Override
     public TaskDescription getTask(String taskName) {
         if (!isInitialized()) {
             return null;
@@ -274,7 +259,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         }
     }
 
-    @Override
     public String[] getTaskNames() {
         if (!isInitialized()) {
             return new String[0];
@@ -299,7 +283,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return new String[0];
     }
 
-    @Override
     public boolean init(Properties properties) {
         synchronized (lock) {
             try {
@@ -339,31 +322,26 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return false;
     }
 
-    @Override
     public boolean update(Map<String, Object> parameters) {
         return init(parameters == null || !parameters.containsKey("init.properties") ? null
                 : (Properties) parameters.get("init.properties"));
     }
 
-    @Override
     public boolean isInitialized() {
         synchronized (lock) {
             return initialized;
         }
     }
 
-    @Override
     public boolean start() {
         return isInitialized();
     }
 
-    @Override
     public boolean stop() {
         // Nothing to do here.
         return true;
     }
 
-    @Override
     public int getRunningTaskCount() {
         if (!isInitialized()) {
             return -1;
@@ -411,7 +389,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     }
 
 
-    @Override
     public boolean isTaskRunning(Object o) {
         if (!isInitialized()) {
             return false;
@@ -438,7 +415,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return false;
     }
 
-    @Override
     public boolean setProperties(Map<String, Object> properties) {
         if (properties == null) {
             return false;
@@ -451,7 +427,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return true;
     }
 
-    @Override
     public boolean setProperty(String name, Object property) {
         if (name == null) {
             return false;
@@ -462,7 +437,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return true;
     }
 
-    @Override
     public Object getProperty(String name) {
         if (name == null) {
             return null;
@@ -472,29 +446,24 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         }
     }
 
-    @Override
     public void setName(String name) {
         this.name = name;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public String getProviderClass() {
         return this.getClass().getName();
     }
 
-    @Override
     public Properties getConfigurationProperties() {
         synchronized (lock) {
             return configProperties;
         }
     }
 
-    @Override
     public void setConfigurationProperties(Properties properties) {
         if (properties == null) {
             return;
@@ -533,7 +502,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     private String managerId() {
         return "[NTaskTaskManager::" + getCurrentTenantId() + " ::" + this.hashCode() + "]";
     }
-
+    
 	@Override
 	public void addObserver(TaskManagerObserver o) {
 		if (observers.contains(o)) {
@@ -638,31 +607,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         synchronized (taskQueueLock) {
             return taskQueue.toArray();
         }
-    }
-
-    @Override
-    public void sendClusterMessage(Callable<Void> callable) {
-        if (taskManager instanceof ClusteredTaskManager) {
-            try {
-                IExecutorService executorService = ((ClusteredTaskManager) taskManager).getClusterComm()
-                                                                                       .getHazelcast()
-                                                                                       .getExecutorService(ClusterGroupCommunicator.NTASK_P2P_COMM_EXECUTOR);
-                executorService.submitToAllMembers(callable);
-            } catch (TaskException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    @Override
-    public void cleanupResources(String name, TaskBasedArtifactType taskArtifactType) {
-        Callable<Void> clusterTask = null;
-        if (taskArtifactType.equals(TaskBasedArtifactType.MESSAGEPROCESSOR)) {
-            clusterTask = new MessageProcessorCleanupTask(name);
-        }
-        this.sendClusterMessage(clusterTask);
-
     }
 }
 
