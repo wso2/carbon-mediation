@@ -23,25 +23,20 @@ import org.wso2.carbon.mediator.service.ui.Mediator;
 
 public class ForEachMediatorService extends AbstractMediatorService {
 
-    private final String TAG_NAME = "foreach";
-    private final String DISPLAY_NAME = "ForEach";
-    private final String LOGICAL_NAME = "ForEachMediator";
-    private final String GROUP_NAME = "Advanced";
-
     public String getTagLocalName() {
-        return TAG_NAME;
+        return "foreach";
     }
 
     public String getDisplayName() {
-        return DISPLAY_NAME;
+        return "ForEach";
     }
 
     public String getLogicalName() {
-        return LOGICAL_NAME;
+        return "ForEachMediator";
     }
 
     public String getGroupName() {
-        return GROUP_NAME;
+        return "Advanced";
     }
 
     public Mediator getMediator() {

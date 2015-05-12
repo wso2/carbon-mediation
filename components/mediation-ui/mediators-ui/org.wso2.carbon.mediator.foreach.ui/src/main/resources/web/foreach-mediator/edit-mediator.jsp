@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
+    pageEncoding="ISO-8859-1"%>
 <%--
  ~ Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~ 
@@ -24,15 +24,15 @@
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar"
-	prefix="carbon"%>
+    prefix="carbon"%>
 
 <%
-	Mediator mediator = SequenceEditorHelper.getEditingMediator(
-			request, session);
-	if (!(mediator instanceof ForEachMediator)) {
-		throw new RuntimeException("Unable to edit the mediator");
-	}
-	ForEachMediator foreachMediator = (ForEachMediator) mediator;
+    Mediator mediator = SequenceEditorHelper.getEditingMediator(
+            request, session);
+    if (!(mediator instanceof ForEachMediator)) {
+        throw new RuntimeException("Unable to edit the mediator");
+    }
+    ForEachMediator foreachMediator = (ForEachMediator) mediator;
 
     String whichSeq = "None";
 
@@ -57,30 +57,30 @@
 %>
 
 <fmt:bundle
-	basename="org.wso2.carbon.mediator.foreach.ui.i18n.Resources">
-	<carbon:jsi18n
-		resourceBundle="org.wso2.carbon.mediator.foreach.ui.i18n.JSResources"
-		request="<%=request%>" i18nObjectName="foreachi18n" />
+    basename="org.wso2.carbon.mediator.foreach.ui.i18n.Resources">
+    <carbon:jsi18n
+        resourceBundle="org.wso2.carbon.mediator.foreach.ui.i18n.JSResources"
+        request="<%=request%>" i18nObjectName="foreachi18n" />
 
 <script type="text/javascript">
     var whichSeq = '<%=whichSeq%>'
 </script>
 
-	<div>
-		<script type="text/javascript"
-			src="../foreach-mediator/js/mediator-util.js"></script>
-		<table class="normal" width="100%">
-			<tr>
-				<td>
-					<h2>
-						<fmt:message key="mediator.foreach.header" />
-					</h2>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<table class="normal">
-					    <tr>
+    <div>
+        <script type="text/javascript"
+            src="../foreach-mediator/js/mediator-util.js"></script>
+        <table class="normal" width="100%">
+            <tr>
+                <td>
+                    <h2>
+                        <fmt:message key="mediator.foreach.header" />
+                    </h2>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table class="normal">
+                        <tr>
                             <td>
                                 <fmt:message key="mediator.foreach.id"/>
                             </td>
@@ -90,39 +90,39 @@
                             </td>
                             <td></td>
                         </tr>
-						<tr>
-							<td><fmt:message key="mediator.foreach.expression" /><span
-								class="required">*</span></td>
-							<td>
-								<%
-									NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar
-												.getInstance();
-									nameSpacesRegistrar.registerNameSpaces(
-												foreachMediator.getExpression(), "itr_expression",
-												session);
-									if (foreachMediator.getExpression() == null) {
-								%>
-								<input value="" id="itr_expression" name="itr_expression" type="text">
-								<%
+                        <tr>
+                            <td><fmt:message key="mediator.foreach.expression" /><span
+                                class="required">*</span></td>
+                            <td>
+                                <%
+                                    NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar
+                                                .getInstance();
+                                    nameSpacesRegistrar.registerNameSpaces(
+                                                foreachMediator.getExpression(), "itr_expression",
+                                                session);
+                                    if (foreachMediator.getExpression() == null) {
+                                %>
+                                <input value="" id="itr_expression" name="itr_expression" type="text">
+                                <%
                                     } else {
                                 %>
                                 <input value="<%=foreachMediator.getExpression().toString()%>"
-								    id="itr_expression" name="itr_expression" type="text">
-								<%
-								    }
+                                    id="itr_expression" name="itr_expression" type="text">
+                                <%
+                                    }
                                 %>
-							</td>
-							<td><a href="#nsEditorLink" class="nseditor-icon-link"
-								style="padding-left: 40px"
-								onclick="showNameSpaceEditor('itr_expression')"><fmt:message
-										key="mediator.foreach.nameSpaces" /></a></td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<tr>
-			    <td>
-			        <table class="normal">
+                            </td>
+                            <td><a href="#nsEditorLink" class="nseditor-icon-link"
+                                style="padding-left: 40px"
+                                onclick="showNameSpaceEditor('itr_expression')"><fmt:message
+                                        key="mediator.foreach.nameSpaces" /></a></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table class="normal">
                         <tr>
                             <td>
                                 <h3 class="mediator">Sequence</h3>
@@ -166,12 +166,13 @@
                             </td>
                         </tr>
                     </table>
-			    </td>
-			</tr>
-		</table>
-		<a name="nsEditorLink"></a>
-		<div id="nsEditor" style="display: none;"></div>
-		<a name="registryBrowserLink"/>
+                </td>
+            </tr>
+        </table>
+        <a name="nsEditorLink"></a>
+        <div id="nsEditor" style="display: none;"></div>
+        <a name="registryBrowserLink"/>
                 <div id="registryBrowser" style="display:none;"/>
-	</div>
+    </div>
 </fmt:bundle>
+

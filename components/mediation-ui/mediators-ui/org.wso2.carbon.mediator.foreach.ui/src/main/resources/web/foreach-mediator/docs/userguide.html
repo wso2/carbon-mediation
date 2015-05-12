@@ -1,23 +1,23 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-<!--
- ~ Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- ~ 
- ~ WSO2 Inc. licenses this file to you under the Apache License,
- ~ Version 2.0 (the "License"); you may not use this file except
- ~ in compliance with the License.
- ~ You may obtain a copy of the License at
- ~ 
- ~ http://www.apache.org/licenses/LICENSE-2.0
- ~ 
- ~ Unless required by applicable law or agreed to in writing,
- ~ software distributed under the License is distributed on an
- ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- ~ KIND, either express or implied. See the License for the
- ~ specific language governing permissions and limitations
- ~ under the License.
- -->
+    <!--
+     ~ Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+     ~
+     ~ WSO2 Inc. licenses this file to you under the Apache License,
+     ~ Version 2.0 (the "License"); you may not use this file except
+     ~ in compliance with the License.
+     ~ You may obtain a copy of the License at
+     ~
+     ~ http://www.apache.org/licenses/LICENSE-2.0
+     ~
+     ~ Unless required by applicable law or agreed to in writing,
+     ~ software distributed under the License is distributed on an
+     ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     ~ KIND, either express or implied. See the License for the
+     ~ specific language governing permissions and limitations
+     ~ under the License.
+     -->
     <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
     <title>ForEach Mediator - User Guide</title>
     <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
@@ -25,30 +25,49 @@
 
 <body>
 <h1>ForEach Mediator</h1>
+
 <p>
     The ForEach mediator provides a general loop construct as a mediator.
     It allows a message to be processed iteratively while maintaining the original message context.
 
-    The ForEach mediator split the message into a number of different messages derived from the parent message, by finding matching elements for the XPath expression that is specified.
+    The ForEach mediator split the message into a number of different messages derived from the parent message, by
+    finding matching elements for the XPath expression that is specified.
 
-    New messages will be created for all each of the matching elements and processed in sequence within the main flow using specified sequence.
+    New messages will be created for all each of the matching elements and processed in sequence within the main flow
+    using specified sequence.
     However, Call, CallOut or Send mediators are not allowed in the sequence.
 
-    The original message will be modified by replacing the split elements with the elements that go through the loop construct.
+    The original message will be modified by replacing the split elements with the elements that go through the loop
+    construct.
 </p>
 
 <img src="images/foreach_mediator_screenshot.png"/>
+
 <p><strong>Figure1: ForEach Mediator</strong></p>
 
-    ForEach Mediator can be configured with the following options.
+ForEach Mediator can be configured with the following options.
 
 <ul>
-<li>
-Expression: Xpath expression that matches the elements which you want to split the message from. For XPath, namespaces can be specified by clicking the namespace link in the right hand side.
-</li>
-<li>
-Sequence: Mediates the message through a sequence. You can either pick a named sequence from the registry or define an anonymous sequence by adding mediators as children.
-</li>
+    <li>
+        ForEach ID: Can be used to identify messages created by the foreach mediator. Useful when defining nested foreach mediators.
+    </li>
+    <li>
+        Expression: Xpath expression that matches the elements which you want to split the message from. For XPath,
+        namespaces can be specified by clicking the namespace link in the right hand side.
+    </li>
+    <li>
+        Sequence: Mediates the message through a sequence. You can either pick a named sequence from the registry or
+        define an anonymous sequence by adding mediators as children.
+    </li>
 </ul>
+
+Foreach mediator will create two properties during mediation.
+<ul>
+    <li>&lt;ForEachID&gt;_FOREACH_ORIGINAL_MESSAGE : Contains the original envelope as when entered foreach mediator</li>
+    <li>&lt;ForEachID&gt;_FOREACH_COUNTER : Contains the count of the messages processed. This will increment during each iteration.
+</ul>
+<p>Both these properties are defined in default (synapse) scope. Defining ForEach ID is optional. If not defined the properties will be defined without the prefix.
+    However, in a nested foreach scenario it is best to define the ForEach ID to avoid properties getting overwritten.
+</p>
 </body>
 </html>
