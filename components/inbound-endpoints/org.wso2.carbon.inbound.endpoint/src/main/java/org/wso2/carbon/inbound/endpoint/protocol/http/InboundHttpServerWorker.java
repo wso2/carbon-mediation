@@ -156,8 +156,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                             synCtx.pushFaultHandler(mediatorFaultHandler);
                         }
 
-                        // handover synapse message context to synapse environment for inject it to given sequence in
-                        //synchronous manner
+                        /* handover synapse message context to synapse environment for inject it to given sequence in
+                        synchronous manner*/
                         if (log.isDebugEnabled()) {
                             log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
                         }
@@ -292,7 +292,14 @@ public class InboundHttpServerWorker extends ServerWorker {
         return isDeployed;
     }
 
-    // Create Synapse Message Context
+    /**
+     * Creates synapse message context from axis2 context
+     *
+     * @param inboundSourceRequest Source Request of inbound
+     * @param axis2Context Axis2 message context of message
+     * @return Synapse Message Context instance
+     * @throws AxisFault
+     */
     private org.apache.synapse.MessageContext createSynapseMessageContext(
             SourceRequest inboundSourceRequest, MessageContext axis2Context) throws AxisFault {
 
@@ -300,7 +307,7 @@ public class InboundHttpServerWorker extends ServerWorker {
         MessageContext axis2MsgCtx = axis2Context;
 
         String tenantDomain = getTenantDomain();
-//        // If not super tenant, assign tenant configuration context
+        // If not super tenant, assign tenant configuration context
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
             ConfigurationContext tenantConfigCtx =
                     TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
@@ -315,12 +322,20 @@ public class InboundHttpServerWorker extends ServerWorker {
     }
 
 
+    /**
+     * Updates additional properties in Axis2 Message Context from Synapse Message Context
+     * @param synCtx Synapse Message Context
+     * @return Updated Axis2 Message Context
+     * @throws AxisFault
+     */
     private org.apache.synapse.MessageContext updateAxis2MessageContextForSynapse(
             org.apache.synapse.MessageContext synCtx) throws AxisFault {
+
         ServiceContext svcCtx = new ServiceContext();
         OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
         ((Axis2MessageContext) synCtx).getAxis2MessageContext().setServiceContext(svcCtx);
         ((Axis2MessageContext) synCtx).getAxis2MessageContext().setOperationContext(opCtx);
+
         return synCtx;
     }
 }
