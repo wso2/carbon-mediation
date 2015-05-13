@@ -50,7 +50,7 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            javax.xml.namespace; version=0.0.0,
+                            javax.xml.namespace; version=${javax.xml.namespace.version},
                             org.apache.commons.logging,
                             org.osgi.framework,
                             org.wso2.carbon.mediator.service.*,
@@ -68,54 +68,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-saaj</artifactId>
-            <version>1.6.1-wso2v11</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.cache</artifactId>
-            <version>4.3.3-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.relay</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon</groupId>
-            <artifactId>javax.cache.wso2</artifactId>
-            <version>4.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>5.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-saaj_1.3_spec</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom.wso2</groupId>
-            <artifactId>axiom</artifactId>
-        </dependency>
-
-        <!-- Neethi jar for the policy processor -->
-        <dependency>
-            <groupId>org.apache.neethi.wso2</groupId>
-            <artifactId>neethi</artifactId>
-        </dependency>
-
-        <!-- Third party dependencies -->
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>

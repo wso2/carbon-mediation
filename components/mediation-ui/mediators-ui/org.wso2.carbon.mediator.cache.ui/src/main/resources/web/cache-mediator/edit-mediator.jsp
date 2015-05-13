@@ -49,16 +49,13 @@
 	<td>
         <table class="normal">
             <tbody>
-                <%if (cacheMediator.getId() != null) {
-                System.out.println("cacheMediator.getId() : "+cacheMediator.getId());%>
+                <%if (cacheMediator.getId() != null) { %>
                 <tr>
                     <td class="leftCol-small"><fmt:message key="mediator.cache.id"/></td>
                     <td><input type="text" name="cacheId" value="<%=cacheMediator.getId()%>"
                                size="40"/></td>
                 </tr>
-                <%} else {
-                    System.out.println("cacheMediator.getId() null : "+cacheMediator.getId());
-                %>
+                <%} else { %>
                 <tr>
                     <td class="leftCol-small"><fmt:message key="mediator.cache.id"/></td>
                     <td><input type="text" name="cacheId" value="" size="40"/></td>

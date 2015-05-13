@@ -20,117 +20,282 @@ package org.wso2.carbon.mediator.cache.ui;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.XMLConfigConstants;
-import org.wso2.carbon.mediator.cache.mediation.cache.impl.CachingConstants;
+import org.wso2.carbon.mediator.cache.CachingConstants;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
 
+/**
+ * Object of this class is used to store mediator information in UI side.
+ */
 public class CacheMediator extends AbstractListMediator {
 
-    private static final QName ATT_ID = new QName("id");
-    private static final QName ATT_COLLECTOR = new QName("collector");
-    private static final QName ATT_HASH_GENERATOR = new QName("hashGenerator");
-    private static final QName ATT_MAX_MSG_SIZE = new QName("maxMessageSize");
-    private static final QName ATT_TIMEOUT = new QName("timeout");
-    private static final QName ATT_SCOPE = new QName("scope");
-    private static final QName ATT_SEQUENCE = new QName("sequence");
-    private static final QName ATT_TYPE = new QName("type");
-    private static final QName ATT_SIZE = new QName("maxSize");
-    private static final QName ON_CACHE_HIT_Q =
-        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "onCacheHit");
-    private static final QName IMPLEMENTATION_Q =
-        new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "implementation");
-    private static final long DEFAULT_TIMEOUT = 5000L;
-    private static final int DEFAULT_DISK_CACHE_SIZE = 200;
+	/** QName of the ID of cache configuration */
+	private static final QName ATT_ID = new QName("id");
 
+	/** QName of the collector */
+	private static final QName ATT_COLLECTOR = new QName("collector");
+
+	/** QName of the digest generator */
+	private static final QName ATT_HASH_GENERATOR = new QName("hashGenerator");
+
+	/** QName of the maximum message size */
+	private static final QName ATT_MAX_MSG_SIZE = new QName("maxMessageSize");
+
+	/** QName of the timeout */
+	private static final QName ATT_TIMEOUT = new QName("timeout");
+
+	/** QName of the cache scope */
+	private static final QName ATT_SCOPE = new QName("scope");
+
+	/** QName of the mediator sequence  */
+	private static final QName ATT_SEQUENCE = new QName("sequence");
+
+	/** QName of the implementation type */
+	private static final QName ATT_TYPE = new QName("type");
+
+	/** QName of the maximum message size */
+	private static final QName ATT_SIZE = new QName("maxSize");
+
+	/** QName of the onCacheHit mediator sequence reference */
+	private static final QName ON_CACHE_HIT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "onCacheHit");
+
+	/** QName of the cache implementation */
+	private static final QName IMPLEMENTATION_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "implementation");
+
+	/** This holds the default timeout of the mediator cache */
+	private static final long DEFAULT_TIMEOUT = 5000L;
+
+	/** This holds the default disk cache size used in cache mediator */
+	private static final int DEFAULT_DISK_CACHE_SIZE = 200;
+
+	/**
+	 * Cache configuration ID.
+	 */
     private String id = null;
+
+	/**
+	 * The scope of the cache
+	 */
     private String scope = CachingConstants.SCOPE_PER_HOST;
+
+	/**
+	 * This specifies whether the mediator should be in the incoming path (to check the request) or in the outgoing
+	 * path (to cache the response).
+	 */
     private boolean collector = false;
+
+	/**
+	 * This is used to define the logic used by the mediator to evaluate the hash values of incoming messages.
+	 */
     private String digestGenerator = CachingConstants.DEFAULT_XML_IDENTIFIER.getClass().toString();
+
+	/**
+	 * The size of the messages to be cached in memory. If this is 0 then no disk cache,
+	 * and if there is no size specified in the config  factory will asign a default value to enable disk based caching.
+	 */
     private int inMemoryCacheSize = CachingConstants.DEFAULT_CACHE_SIZE;
+
+	/**
+	 * The size of the messages to be cached in memory. Disk based and hirearchycal caching is not implemented yet.
+	 */
     private int diskCacheSize = 0;
+
+	/**
+	 * The time duration for which the cache is kept.
+	 */
     private long timeout = 0L;
+
+	/**
+	 * The reference to the onCacheHit sequence to be executed when an incoming message is identified as an
+	 * equivalent to a previously received message based on the value defined for the Hash Generator field.
+	 */
     private String onCacheHitRef = null;
+
+	/**
+	 * The maximum size of the messages to be cached. This is specified in bytes.
+	 */
     private int maxMessageSize = 0;
 
+	/**
+	 * This methods gives the ID of the cache configuration.
+	 *
+	 * @return string cache configuration ID.
+	 */
     public String getId() {
         return id;
     }
 
+	/**
+	 * This methods sets the ID of the cache configuration.
+	 *
+	 * @param id cache configuration ID to be set.
+	 */
     public void setId(String id) {
         this.id = id;
     }
 
+	/**
+	 * This method gives the scope of the cache.
+	 *
+	 * @return value of the cache scope.
+	 */
     public String getScope() {
         return scope;
     }
 
+	/**
+	 * This method sets the scope of the cache.
+	 *
+	 * @param scope cache scope to be set.
+	 */
     public void setScope(String scope) {
         this.scope = scope;
     }
 
+	/**
+	 * This method gives whether the mediator should be in the incoming path or in the outgoing path as a boolean.
+	 *
+	 * @return boolean true if incoming path false if outgoing path.
+	 */
     public boolean isCollector() {
         return collector;
     }
 
+	/**
+	 * This method sets whether the mediator should be in the incoming path or in the outgoing path as a boolean.
+	 *
+	 * @param collector boolean value to be set as collector.
+	 */
     public void setCollector(boolean collector) {
         this.collector = collector;
     }
 
+	/**
+	 * This method gives the DigestGenerator to evaluate the hash values of incoming messages.
+	 *
+	 * @return Name of the digestGenerator used evaluate hash values.
+	 */
     public String getDigestGenerator() {
         return digestGenerator;
     }
 
+	/**
+	 * This method sets the DigestGenerator to evaluate the hash values of incoming messages.
+	 *
+	 * @param digestGenerator Name of the digestGenerator to be set to evaluate hash values.
+	 */
     public void setDigestGenerator(String digestGenerator) {
         this.digestGenerator = digestGenerator;
     }
 
+	/**
+	 * This method gives the size of the messages to be cached in memory.
+	 *
+	 * @return memory cache size in bytes.
+	 */
     public int getInMemoryCacheSize() {
         return inMemoryCacheSize;
     }
 
+	/**
+	 * This method sets the size of the messages to be cached in memory.
+	 *
+	 * @param inMemoryCacheSize value(number of bytes) to be set as memory cache size.
+	 */
     public void setInMemoryCacheSize(int inMemoryCacheSize) {
         this.inMemoryCacheSize = inMemoryCacheSize;
     }
 
+	/**
+	 * This method gives the size of the messages to be cached in disk.
+	 *
+	 * @return disk cache size in bytes.
+	 */
     public int getDiskCacheSize() {
         return diskCacheSize;
     }
 
+	/**
+	 * This method sets the size of the messages to be cached in disk.
+	 *
+	 * @param diskCacheSize value(number of bytes) to be set as disk cache size.
+	 */
     public void setDiskCacheSize(int diskCacheSize) {
         this.diskCacheSize = diskCacheSize;
     }
 
+	/**
+	 * This method gives the timeout period in milliseconds.
+	 *
+	 * @return timeout in milliseconds
+	 */
     public long getTimeout() {
         return timeout;
     }
 
+	/**
+	 * This method sets the timeout period as milliseconds.
+	 *
+	 * @param timeout millisecond timeout period to be set.
+	 */
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }
 
+	/**
+	 * This method gives reference to the onCacheHit sequence to be executed.
+	 *
+	 * @return reference to the onCacheHit sequence.
+	 */
     public String getOnCacheHitRef() {
         return onCacheHitRef;
     }
 
+	/**
+	 * This method sets reference to the onCacheHit sequence to be executed.
+	 *
+	 * @param onCacheHitRef reference to the onCacheHit sequence to be set.
+	 */
     public void setOnCacheHitRef(String onCacheHitRef) {
         this.onCacheHitRef = onCacheHitRef;
     }
 
+	/**
+	 * This method gives the maximum size of the messages to be cached in bytes.
+	 *
+	 * @return maximum size of the messages to be cached in bytes.
+	 */
     public int getMaxMessageSize() {
         return maxMessageSize;
     }
 
+	/**
+	 * This method sets the maximum size of the messages to be cached in bytes.
+	 *
+	 * @param maxMessageSize maximum size of the messages to be set in bytes.
+	 */
     public void setMaxMessageSize(int maxMessageSize) {
         this.maxMessageSize = maxMessageSize;
     }
 
+	/**
+	 * This method gives the local name of the mediator.
+	 *
+	 * @return local name of mediator.
+	 */
     public String getTagLocalName() {
         return "cache";
     }
 
+	/**
+	 * Creates XML representation of the cache mediator as an OMElement
+	 *
+	 * @param parent OMElement which take child as created OMElement
+	 *
+	 */
     public OMElement serialize(OMElement parent) {
         OMElement cache = fac.createOMElement("cache", synNS);
         saveTracingState(cache, this);
@@ -150,25 +315,20 @@ public class CacheMediator extends AbstractListMediator {
             cache.addAttribute(fac.createOMAttribute("collector", nullNS, "false"));
 
             if (digestGenerator != null) {
-                cache.addAttribute(fac.createOMAttribute("hashGenerator", nullNS,
-                    digestGenerator));
+                cache.addAttribute(fac.createOMAttribute("hashGenerator", nullNS, digestGenerator));
             }
 
             if (timeout != 0) {
-                cache.addAttribute(
-                    fac.createOMAttribute("timeout", nullNS, Long.toString(timeout)));
+                cache.addAttribute(fac.createOMAttribute("timeout", nullNS, Long.toString(timeout)));
             }
 
             if (maxMessageSize != 0) {
-                cache.addAttribute(
-                    fac.createOMAttribute("maxMessageSize", nullNS,
-                        Integer.toString(maxMessageSize)));
+                cache.addAttribute(fac.createOMAttribute("maxMessageSize", nullNS,Integer.toString(maxMessageSize)));
             }
 
             if (onCacheHitRef != null) {
                 OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
-                onCacheHit.addAttribute(
-                    fac.createOMAttribute("sequence", nullNS, onCacheHitRef));
+                onCacheHit.addAttribute(fac.createOMAttribute("sequence", nullNS, onCacheHitRef));
                 cache.addChild(onCacheHit);
             } else if (getList().size() > 0) {
                 OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
@@ -179,16 +339,14 @@ public class CacheMediator extends AbstractListMediator {
             if (inMemoryCacheSize != 0) {
                 OMElement implElem = fac.createOMElement("implementation", synNS);
                 implElem.addAttribute(fac.createOMAttribute("type", nullNS, "memory"));
-                implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS,
-                    Integer.toString(inMemoryCacheSize)));
+                implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS,Integer.toString(inMemoryCacheSize)));
                 cache.addChild(implElem);
             }
 
             if (diskCacheSize != 0) {
                 OMElement implElem = fac.createOMElement("implementation", synNS);
                 implElem.addAttribute(fac.createOMAttribute("type", nullNS, "disk"));
-                implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS,
-                    Integer.toString(diskCacheSize)));
+                implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS,Integer.toString(diskCacheSize)));
                 cache.addChild(implElem);
             }
         }
@@ -200,6 +358,11 @@ public class CacheMediator extends AbstractListMediator {
         return cache;
     }
 
+	/**
+	 * Creates the cache mediator with given configuration XML as OMElement
+	 *
+	 * @param elem OMElement to be converted to cache mediator Object.
+	 */
     public void build(OMElement elem) {
         OMAttribute idAttr = elem.getAttribute(ATT_ID);
         if (idAttr != null && idAttr.getAttributeValue() != null) {
@@ -220,7 +383,6 @@ public class CacheMediator extends AbstractListMediator {
             collector = true;
         } else {
             collector = false;
-
             OMAttribute hashGeneratorAttr = elem.getAttribute(ATT_HASH_GENERATOR);
             if (hashGeneratorAttr != null && hashGeneratorAttr.getAttributeValue() != null) {
                 this.digestGenerator = hashGeneratorAttr.getAttributeValue();
@@ -271,6 +433,13 @@ public class CacheMediator extends AbstractListMediator {
         }
     }
 
+	/**
+	 * Checks the validity of the provided cache scope in cache mediator configuration
+	 *
+	 * @param scope value of the scope attribute parsed in configuration
+	 * @param id value of the id attribute parsed in configuration
+	 * @return boolean value whether the scope is valid or not
+	 */
     private boolean isValidScope(String scope, String id) {
         if (CachingConstants.SCOPE_PER_HOST.equals(scope)) {
             return true;
@@ -281,7 +450,6 @@ public class CacheMediator extends AbstractListMediator {
                 throw new MediatorException("Id is required for a cache wirth scope : " + scope);                
             }
         } else if (CachingConstants.SCOPE_DISTRIBUTED.equals(scope)) {
-//            throw new MediatorException("Scope distributed is not supported yet by the Cache mediator");
 	        return true;
         } else {
             throw new MediatorException("Unknown scope " + scope + " for the Cache mediator");

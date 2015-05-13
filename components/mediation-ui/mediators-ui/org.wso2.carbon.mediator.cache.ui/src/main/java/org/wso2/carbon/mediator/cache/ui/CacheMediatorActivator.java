@@ -23,7 +23,7 @@ import org.osgi.framework.BundleContext;
 import org.wso2.carbon.mediator.service.MediatorService;
 
 /**
- *
+ * Activator class for Cache Mediator
  */
 public class CacheMediatorActivator implements BundleActivator {
 
@@ -35,9 +35,7 @@ public class CacheMediatorActivator implements BundleActivator {
             log.debug("Starting the cache mediator component ...");
         }
 
-        //Properties props = new Properties();
-        bundleContext.registerService(
-                MediatorService.class.getName(), new CacheMediatorService(), null);
+        bundleContext.registerService(MediatorService.class.getName(), new CacheMediatorService(), null);
 
         if (log.isDebugEnabled()) {
             log.debug("Successfully registered the cache mediator service");

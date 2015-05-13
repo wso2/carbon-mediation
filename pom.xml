@@ -1920,6 +1920,11 @@
                 <artifactId>xmlunit</artifactId>
                 <version>${xmlunit.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.cache</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2081,6 +2086,7 @@
         <custom.osgi.version>5.0.0</custom.osgi.version>
         <org.apache.geronimo.specs.version>1.0.0</org.apache.geronimo.specs.version>
         <xmlunit.version>1.1</xmlunit.version>
+        <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
 
     </properties>
     <pluginRepositories>
