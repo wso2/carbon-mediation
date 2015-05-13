@@ -75,11 +75,11 @@ public class ClusteringService {
      */
     public static HazelcastInstance getHazelcastInstance() {
         BundleContext ctx = FrameworkUtil.getBundle(ClusteringService.class).getBundleContext();
-        ServiceReference<HazelcastInstance> ref = ctx.getServiceReference(HazelcastInstance.class);
+        ServiceReference ref = ctx.getServiceReference(HazelcastInstance.class);
         if (ref == null) {
             return null;
         }
-        return ctx.getService(ref);
+        return (HazelcastInstance)ctx.getService(ref);
     }
     
 }
