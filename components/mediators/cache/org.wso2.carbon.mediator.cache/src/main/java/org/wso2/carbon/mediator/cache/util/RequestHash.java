@@ -28,25 +28,25 @@ public class RequestHash implements Serializable {
 	 * This holds the hash value of the request payload which is calculated form the specified DigestGenerator,
 	 * and is used to index the cached response.
 	 */
-    public String requestHash;
+	public String requestHash;
 
 	/**
 	 * RequestHash constructor sets the hash of the request to the cache
 	 *
-	 * @param requestHash   - hash of the request payload to be set as an String
+	 * @param requestHash - hash of the request payload to be set as an String
 	 */
-    public RequestHash(String requestHash) {
-        this.requestHash = requestHash;
-    }
+	public RequestHash(String requestHash) {
+		this.requestHash = requestHash;
+	}
 
 	/**
 	 * This method gives the hash value of the request payload stored in the cache
 	 *
 	 * @return String hash of the request payload
 	 */
-    public String getRequestHash() {
-        return requestHash;
-    }
+	public String getRequestHash() {
+		return requestHash;
+	}
 
     @Override
     public boolean equals(Object o) {

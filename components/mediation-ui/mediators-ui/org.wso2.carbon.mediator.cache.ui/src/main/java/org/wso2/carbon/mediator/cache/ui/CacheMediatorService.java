@@ -41,6 +41,6 @@ public class CacheMediatorService extends AbstractMediatorService {
     }
 
     public Mediator getMediator() {
-        return new org.wso2.carbon.mediator.cache.ui.CacheMediator();
+        return new CacheMediator();
     }
 }

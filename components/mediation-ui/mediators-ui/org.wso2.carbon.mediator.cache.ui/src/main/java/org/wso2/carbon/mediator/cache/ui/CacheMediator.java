@@ -74,221 +74,221 @@ public class CacheMediator extends AbstractListMediator {
 	/**
 	 * Cache configuration ID.
 	 */
-    private String id = null;
+	private String id = null;
 
 	/**
 	 * The scope of the cache
 	 */
-    private String scope = CachingConstants.SCOPE_PER_HOST;
+	private String scope = CachingConstants.SCOPE_PER_HOST;
 
 	/**
 	 * This specifies whether the mediator should be in the incoming path (to check the request) or in the outgoing
 	 * path (to cache the response).
 	 */
-    private boolean collector = false;
+	private boolean collector = false;
 
 	/**
 	 * This is used to define the logic used by the mediator to evaluate the hash values of incoming messages.
 	 */
-    private String digestGenerator = CachingConstants.DEFAULT_XML_IDENTIFIER.getClass().toString();
+	private String digestGenerator = CachingConstants.DEFAULT_XML_IDENTIFIER.getClass().toString();
 
 	/**
 	 * The size of the messages to be cached in memory. If this is 0 then no disk cache,
 	 * and if there is no size specified in the config  factory will asign a default value to enable disk based caching.
 	 */
-    private int inMemoryCacheSize = CachingConstants.DEFAULT_CACHE_SIZE;
+	private int inMemoryCacheSize = CachingConstants.DEFAULT_CACHE_SIZE;
 
 	/**
 	 * The size of the messages to be cached in memory. Disk based and hirearchycal caching is not implemented yet.
 	 */
-    private int diskCacheSize = 0;
+	private int diskCacheSize = 0;
 
 	/**
 	 * The time duration for which the cache is kept.
 	 */
-    private long timeout = 0L;
+	private long timeout = 0L;
 
 	/**
 	 * The reference to the onCacheHit sequence to be executed when an incoming message is identified as an
 	 * equivalent to a previously received message based on the value defined for the Hash Generator field.
 	 */
-    private String onCacheHitRef = null;
+	private String onCacheHitRef = null;
 
 	/**
 	 * The maximum size of the messages to be cached. This is specified in bytes.
 	 */
-    private int maxMessageSize = 0;
+	private int maxMessageSize = 0;
 
 	/**
 	 * This methods gives the ID of the cache configuration.
 	 *
 	 * @return string cache configuration ID.
 	 */
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
 	/**
 	 * This methods sets the ID of the cache configuration.
 	 *
 	 * @param id cache configuration ID to be set.
 	 */
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	/**
 	 * This method gives the scope of the cache.
 	 *
 	 * @return value of the cache scope.
 	 */
-    public String getScope() {
-        return scope;
-    }
+	public String getScope() {
+		return scope;
+	}
 
 	/**
 	 * This method sets the scope of the cache.
 	 *
 	 * @param scope cache scope to be set.
 	 */
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
 
 	/**
 	 * This method gives whether the mediator should be in the incoming path or in the outgoing path as a boolean.
 	 *
 	 * @return boolean true if incoming path false if outgoing path.
 	 */
-    public boolean isCollector() {
-        return collector;
-    }
+	public boolean isCollector() {
+		return collector;
+	}
 
 	/**
 	 * This method sets whether the mediator should be in the incoming path or in the outgoing path as a boolean.
 	 *
 	 * @param collector boolean value to be set as collector.
 	 */
-    public void setCollector(boolean collector) {
-        this.collector = collector;
-    }
+	public void setCollector(boolean collector) {
+		this.collector = collector;
+	}
 
 	/**
 	 * This method gives the DigestGenerator to evaluate the hash values of incoming messages.
 	 *
 	 * @return Name of the digestGenerator used evaluate hash values.
 	 */
-    public String getDigestGenerator() {
-        return digestGenerator;
-    }
+	public String getDigestGenerator() {
+		return digestGenerator;
+	}
 
 	/**
 	 * This method sets the DigestGenerator to evaluate the hash values of incoming messages.
 	 *
 	 * @param digestGenerator Name of the digestGenerator to be set to evaluate hash values.
 	 */
-    public void setDigestGenerator(String digestGenerator) {
-        this.digestGenerator = digestGenerator;
-    }
+	public void setDigestGenerator(String digestGenerator) {
+		this.digestGenerator = digestGenerator;
+	}
 
 	/**
 	 * This method gives the size of the messages to be cached in memory.
 	 *
 	 * @return memory cache size in bytes.
 	 */
-    public int getInMemoryCacheSize() {
-        return inMemoryCacheSize;
-    }
+	public int getInMemoryCacheSize() {
+		return inMemoryCacheSize;
+	}
 
 	/**
 	 * This method sets the size of the messages to be cached in memory.
 	 *
 	 * @param inMemoryCacheSize value(number of bytes) to be set as memory cache size.
 	 */
-    public void setInMemoryCacheSize(int inMemoryCacheSize) {
-        this.inMemoryCacheSize = inMemoryCacheSize;
-    }
+	public void setInMemoryCacheSize(int inMemoryCacheSize) {
+		this.inMemoryCacheSize = inMemoryCacheSize;
+	}
 
 	/**
 	 * This method gives the size of the messages to be cached in disk.
 	 *
 	 * @return disk cache size in bytes.
 	 */
-    public int getDiskCacheSize() {
-        return diskCacheSize;
-    }
+	public int getDiskCacheSize() {
+		return diskCacheSize;
+	}
 
 	/**
 	 * This method sets the size of the messages to be cached in disk.
 	 *
 	 * @param diskCacheSize value(number of bytes) to be set as disk cache size.
 	 */
-    public void setDiskCacheSize(int diskCacheSize) {
-        this.diskCacheSize = diskCacheSize;
-    }
+	public void setDiskCacheSize(int diskCacheSize) {
+		this.diskCacheSize = diskCacheSize;
+	}
 
 	/**
 	 * This method gives the timeout period in milliseconds.
 	 *
 	 * @return timeout in milliseconds
 	 */
-    public long getTimeout() {
-        return timeout;
-    }
+	public long getTimeout() {
+		return timeout;
+	}
 
 	/**
 	 * This method sets the timeout period as milliseconds.
 	 *
 	 * @param timeout millisecond timeout period to be set.
 	 */
-    public void setTimeout(long timeout) {
-        this.timeout = timeout;
-    }
+	public void setTimeout(long timeout) {
+		this.timeout = timeout;
+	}
 
 	/**
 	 * This method gives reference to the onCacheHit sequence to be executed.
 	 *
 	 * @return reference to the onCacheHit sequence.
 	 */
-    public String getOnCacheHitRef() {
-        return onCacheHitRef;
-    }
+	public String getOnCacheHitRef() {
+		return onCacheHitRef;
+	}
 
 	/**
 	 * This method sets reference to the onCacheHit sequence to be executed.
 	 *
 	 * @param onCacheHitRef reference to the onCacheHit sequence to be set.
 	 */
-    public void setOnCacheHitRef(String onCacheHitRef) {
-        this.onCacheHitRef = onCacheHitRef;
-    }
+	public void setOnCacheHitRef(String onCacheHitRef) {
+		this.onCacheHitRef = onCacheHitRef;
+	}
 
 	/**
 	 * This method gives the maximum size of the messages to be cached in bytes.
 	 *
 	 * @return maximum size of the messages to be cached in bytes.
 	 */
-    public int getMaxMessageSize() {
-        return maxMessageSize;
-    }
+	public int getMaxMessageSize() {
+		return maxMessageSize;
+	}
 
 	/**
 	 * This method sets the maximum size of the messages to be cached in bytes.
 	 *
 	 * @param maxMessageSize maximum size of the messages to be set in bytes.
 	 */
-    public void setMaxMessageSize(int maxMessageSize) {
-        this.maxMessageSize = maxMessageSize;
-    }
+	public void setMaxMessageSize(int maxMessageSize) {
+		this.maxMessageSize = maxMessageSize;
+	}
 
 	/**
 	 * This method gives the local name of the mediator.
 	 *
 	 * @return local name of mediator.
 	 */
-    public String getTagLocalName() {
-        return "cache";
-    }
+	public String getTagLocalName() {
+		return "cache";
+	}
 
 	/**
 	 * Creates XML representation of the cache mediator as an OMElement
