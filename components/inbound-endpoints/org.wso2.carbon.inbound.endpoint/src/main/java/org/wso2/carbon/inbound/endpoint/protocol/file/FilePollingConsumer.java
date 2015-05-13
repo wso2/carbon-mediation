@@ -518,16 +518,14 @@ public class FilePollingConsumer {
                 continue;
             }
             boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child);
-            
+
             // child's file name matches the file name pattern or process all
             // files now we try to get the lock and process
             if ((strFilePattern == null || child.getName().getBaseName().matches(strFilePattern))
                     && !isFailedRecord) {
-
                 if (log.isDebugEnabled()) {
                     log.debug("Matching file : " + child.getName().getBaseName());
                 }
-
                 if ((!fileLock || (fileLock && acquireLock(fsManager, child)))) {
                     // process the file
                     boolean runPostProcess = true;
@@ -589,7 +587,7 @@ public class FilePollingConsumer {
             } else if (isFailedRecord) {
                 // it is a failed record
                 try {
-                    lastCycle = 2;
+                    lastCycle = 1;
                     moveOrDeleteAfterProcessing(child);
                 } catch (AxisFault axisFault) {
                     log.error("File object '" + child.getURL().toString()
@@ -723,36 +721,43 @@ public class FilePollingConsumer {
      * @throws AxisFault
      */
     private FileObject processFile(FileObject file) throws AxisFault {
-        try {
-            FileContent content = file.getContent();
-            String fileName = file.getName().getBaseName();
-            String filePath = file.getName().getPath();
-            String fileURI = file.getName().getURI();
-
-            if (injectHandler != null) {
-                Map<String, Object> transportHeaders = new HashMap<String, Object>();
-                transportHeaders.put(VFSConstants.FILE_PATH, filePath);
-                transportHeaders.put(VFSConstants.FILE_NAME, fileName);
-                transportHeaders.put(VFSConstants.FILE_URI, fileURI);
-
-                try {
-                    transportHeaders.put(VFSConstants.FILE_LENGTH, content.getSize());
-                    transportHeaders.put(VFSConstants.LAST_MODIFIED, content.getLastModifiedTime());
-                } catch (FileSystemException e) {
-                    log.warn("Unable to set file length or last modified date header.", e);
-                }
-
-                injectHandler.setTransportHeaders(transportHeaders);
-                // injectHandler
-                if (!injectHandler.invoke(file)) {
-                    return null;
-                }
-            }
-
-        } catch (FileSystemException e) {
-            log.error("Error reading file content or attributes : " + file, e);
+        boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, file);
+        if(isFailedRecord)
+        {
+            return file;
         }
-        return file;
+        else {
+            try {
+                FileContent content = file.getContent();
+                String fileName = file.getName().getBaseName();
+                String filePath = file.getName().getPath();
+                String fileURI = file.getName().getURI();
+
+                if (injectHandler != null) {
+                    Map<String, Object> transportHeaders = new HashMap<String, Object>();
+                    transportHeaders.put(VFSConstants.FILE_PATH, filePath);
+                    transportHeaders.put(VFSConstants.FILE_NAME, fileName);
+                    transportHeaders.put(VFSConstants.FILE_URI, fileURI);
+
+                    try {
+                        transportHeaders.put(VFSConstants.FILE_LENGTH, content.getSize());
+                        transportHeaders.put(VFSConstants.LAST_MODIFIED, content.getLastModifiedTime());
+                    } catch (FileSystemException e) {
+                        log.warn("Unable to set file length or last modified date header.", e);
+                    }
+
+                    injectHandler.setTransportHeaders(transportHeaders);
+                    // injectHandler
+                    if (!injectHandler.invoke(file)) {
+                        return null;
+                    }
+                }
+
+            } catch (FileSystemException e) {
+                log.error("Error reading file content or attributes : " + file, e);
+            }
+            return file;
+        }
     }
 
     /**
@@ -762,7 +767,6 @@ public class FilePollingConsumer {
      * @throws AxisFault
      */
     private void moveOrDeleteAfterProcessing(FileObject fileObject) throws AxisFault {
-
         String moveToDirectoryURI = null;
         try {
             switch (lastCycle) {
@@ -788,6 +792,7 @@ public class FilePollingConsumer {
                                 moveToDirectoryURI += strDateformat;
                             }
                         } catch (Exception e) {
+
                             log.warn("Error generating subfolder name with date", e);
                         }
                     }
@@ -831,7 +836,13 @@ public class FilePollingConsumer {
                 }
                 try {
                     fileObject.moveTo(dest);
+                     if (VFSUtils.isFailRecord(fsManager, fileObject)) {
+                     VFSUtils.releaseFail(fsManager, fileObject);
+                     }
                 } catch (FileSystemException e) {
+                    if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
+                        VFSUtils.markFailRecord(fsManager, fileObject);
+                    }
                     log.error("Error moving file : " + fileObject + " to " + moveToDirectoryURI, e);
                 }
             } else {
@@ -848,9 +859,6 @@ public class FilePollingConsumer {
                 } catch (FileSystemException e) {
                     log.error("Error deleting file : " + fileObject, e);
                 }
-            }
-            if (VFSUtils.isFailRecord(fsManager, fileObject)) {
-                VFSUtils.releaseFail(fsManager, fileObject);
             }
         } catch (FileSystemException e) {
             if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
