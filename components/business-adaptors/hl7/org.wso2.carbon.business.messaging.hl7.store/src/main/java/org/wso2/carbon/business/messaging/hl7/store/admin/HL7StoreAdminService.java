@@ -6,6 +6,7 @@ import ca.uhn.hl7v2.parser.DefaultXMLParser;
 import ca.uhn.hl7v2.parser.EncodingNotSupportedException;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.util.Terser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
@@ -184,7 +185,12 @@ public class HL7StoreAdminService extends AbstractServiceBusAdmin {
         String xmlMessage = null;
         String messageControlerID = null;
         boolean validationPassed = true;
+        msg = msg.replaceAll("\n", "\r\n");
         try {
+            PipeParser parser = new PipeParser();
+            if (!isTrueProxyParameter(storeName, proxyName, HL7Constants.HL7_VALIDATE_MESSAGE)) {
+                parser.setValidationContext(new NoValidation());
+            }
             hl7Message = new PipeParser().parse(msg);
             hl7MessageStr = hl7Message.encode();
             xmlMessage = new DefaultXMLParser().encode(hl7Message);

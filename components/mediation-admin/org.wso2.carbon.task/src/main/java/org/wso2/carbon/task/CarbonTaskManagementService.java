@@ -48,7 +48,7 @@ public class CarbonTaskManagementService extends AbstractAdmin {
     public CarbonTaskManagementService() {
     }
 
-    public void addTaskDescription(OMElement taskElement) throws TaskManagementException {
+    public boolean addTaskDescription(OMElement taskElement) throws TaskManagementException {
 
         if (log.isDebugEnabled()) {
             log.debug("Add TaskDescription - Get a Task configuration  :" + taskElement);
@@ -68,9 +68,10 @@ public class CarbonTaskManagementService extends AbstractAdmin {
             }
             handleException("Error creating a task : " + e.getMessage(), e);            
         }
+        return true;
     }
 
-    public void deleteTaskDescription(String s, String group) throws TaskManagementException {
+    public boolean deleteTaskDescription(String s, String group) throws TaskManagementException {
 
         validateName(s);
         if (log.isDebugEnabled()) {
@@ -83,6 +84,7 @@ public class CarbonTaskManagementService extends AbstractAdmin {
             handleException("Error deleting a task with name : " + s + " : " +
                     e.getMessage(), e);
         }
+        return true;
     }
 
     public void editTaskDescription(OMElement taskElement) throws TaskManagementException {

@@ -23,9 +23,11 @@ import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.InboundHL7Listener;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
 import org.wso2.carbon.inbound.endpoint.protocol.https.InboundHttpsListener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
+import org.wso2.carbon.inbound.endpoint.protocol.kafka.KAFKAProcessor;
 
 /**
  * Class responsible for provide  implementation of the request processor according to the port.
@@ -33,10 +35,10 @@ import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
 
-    public static enum Protocols {jms, file, http , https}
+    public static enum Protocols {jms, file, http , https, hl7, kafka}
 
     /**
-     * return underlying Request Processor Implementation according to protocol
+     * return underlying Request HL7Processor Implementation according to protocol
      *
      * @param params parameters specific to transports
      * @return InboundRequestProcessor Implementation
@@ -51,10 +53,13 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
             } else if (Protocols.file.toString().equals(protocol)) {
                 inboundRequestProcessor = new VFSProcessor(params);
             } else if (Protocols.http.toString().equals(protocol)) {
-
                 inboundRequestProcessor = new InboundHttpListener(params);
-            }else if(Protocols.https.toString().equals(protocol)){
+            } else if (Protocols.https.toString().equals(protocol)){
                 inboundRequestProcessor = new InboundHttpsListener(params);
+            } else if (Protocols.hl7.toString().equals(protocol)) {
+                inboundRequestProcessor = new InboundHL7Listener(params);
+            }else if(Protocols.kafka.toString().equals(protocol)){
+                inboundRequestProcessor = new KAFKAProcessor(params);
             }
         } else if (params.getClassImpl() != null) {
             inboundRequestProcessor = new GenericProcessor(params);

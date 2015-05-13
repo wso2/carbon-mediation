@@ -44,6 +44,8 @@ public class JMSConstants {
     public static final String DESTINATION_TYPE_TOPIC = "topic";
     public static String SESSION_TRANSACTED = "transport.jms.SessionTransacted";
     public static String SESSION_ACK = "transport.jms.SessionAcknowledgement";
+    public static String RECEIVER_TIMEOUT = "transport.jms.ReceiveTimeout";    
+    public static String CONTENT_TYPE = "transport.jms.ContentType";
     /** Namespace for JMS map payload representation */
     public static final String JMS_MAP_NS = "http://axis.apache.org/axis2/java/transports/jms/map-payload";
     /** Root element name of JMS Map message payload representation */
