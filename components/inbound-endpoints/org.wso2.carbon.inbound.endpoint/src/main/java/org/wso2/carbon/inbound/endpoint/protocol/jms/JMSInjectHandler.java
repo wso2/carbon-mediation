@@ -119,7 +119,7 @@ public class JMSInjectHandler {
             // Setting JMSXDeliveryCount header on the message context
             try {
                 int deliveryCount = msg.getIntProperty("JMSXDeliveryCount");
-                msgCtx.setProperty(JMSConstants.DELIVERY_COUNT, deliveryCount);
+                axis2MsgCtx.setProperty(JMSConstants.DELIVERY_COUNT, deliveryCount);
             } catch (NumberFormatException nfe) {
                 // when JMSXDeliveryCount it not used
                 //TODO : try catch wont be required, check for it
