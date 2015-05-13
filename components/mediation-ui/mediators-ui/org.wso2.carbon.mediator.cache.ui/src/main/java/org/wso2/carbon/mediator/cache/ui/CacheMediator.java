@@ -294,166 +294,165 @@ public class CacheMediator extends AbstractListMediator {
 	 * Creates XML representation of the cache mediator as an OMElement
 	 *
 	 * @param parent OMElement which take child as created OMElement
-	 *
 	 */
-    public OMElement serialize(OMElement parent) {
-        OMElement cache = fac.createOMElement("cache", synNS);
-        saveTracingState(cache, this);
+	public OMElement serialize(OMElement parent) {
+		OMElement cache = fac.createOMElement("cache", synNS);
+		saveTracingState(cache, this);
 
-        if (id != null) {
-            cache.addAttribute(fac.createOMAttribute("id", nullNS, id));
-        }
+		if (id != null) {
+			cache.addAttribute(fac.createOMAttribute("id", nullNS, id));
+		}
 
-        if (scope != null) {
-            cache.addAttribute(fac.createOMAttribute("scope", nullNS, scope));
-        }
+		if (scope != null) {
+			cache.addAttribute(fac.createOMAttribute("scope", nullNS, scope));
+		}
 
-        if (collector) {
-            cache.addAttribute(fac.createOMAttribute("collector", nullNS, "true"));
-        } else {
+		if (collector) {
+			cache.addAttribute(fac.createOMAttribute("collector", nullNS, "true"));
+		} else {
 
-            cache.addAttribute(fac.createOMAttribute("collector", nullNS, "false"));
+			cache.addAttribute(fac.createOMAttribute("collector", nullNS, "false"));
 
-            if (digestGenerator != null) {
-                cache.addAttribute(fac.createOMAttribute("hashGenerator", nullNS, digestGenerator));
-            }
+			if (digestGenerator != null) {
+				cache.addAttribute(fac.createOMAttribute("hashGenerator", nullNS, digestGenerator));
+			}
 
-            if (timeout != 0) {
-                cache.addAttribute(fac.createOMAttribute("timeout", nullNS, Long.toString(timeout)));
-            }
+			if (timeout != 0) {
+				cache.addAttribute(fac.createOMAttribute("timeout", nullNS, Long.toString(timeout)));
+			}
 
-            if (maxMessageSize != 0) {
-                cache.addAttribute(fac.createOMAttribute("maxMessageSize", nullNS,Integer.toString(maxMessageSize)));
-            }
+			if (maxMessageSize != 0) {
+				cache.addAttribute(fac.createOMAttribute("maxMessageSize", nullNS, Integer.toString(maxMessageSize)));
+			}
 
-            if (onCacheHitRef != null) {
-                OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
-                onCacheHit.addAttribute(fac.createOMAttribute("sequence", nullNS, onCacheHitRef));
-                cache.addChild(onCacheHit);
-            } else if (getList().size() > 0) {
-                OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
-                serializeChildren(onCacheHit, getList());
-                cache.addChild(onCacheHit);
-            }
+			if (onCacheHitRef != null) {
+				OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
+				onCacheHit.addAttribute(fac.createOMAttribute("sequence", nullNS, onCacheHitRef));
+				cache.addChild(onCacheHit);
+			} else if (getList().size() > 0) {
+				OMElement onCacheHit = fac.createOMElement("onCacheHit", synNS);
+				serializeChildren(onCacheHit, getList());
+				cache.addChild(onCacheHit);
+			}
 
-            if (inMemoryCacheSize != 0) {
-                OMElement implElem = fac.createOMElement("implementation", synNS);
-                implElem.addAttribute(fac.createOMAttribute("type", nullNS, "memory"));
-                implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS,Integer.toString(inMemoryCacheSize)));
-                cache.addChild(implElem);
-            }
+			if (inMemoryCacheSize != 0) {
+				OMElement implElem = fac.createOMElement("implementation", synNS);
+				implElem.addAttribute(fac.createOMAttribute("type", nullNS, "memory"));
+				implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS, Integer.toString(inMemoryCacheSize)));
+				cache.addChild(implElem);
+			}
 
-            if (diskCacheSize != 0) {
-                OMElement implElem = fac.createOMElement("implementation", synNS);
-                implElem.addAttribute(fac.createOMAttribute("type", nullNS, "disk"));
-                implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS,Integer.toString(diskCacheSize)));
-                cache.addChild(implElem);
-            }
-        }
+			if (diskCacheSize != 0) {
+				OMElement implElem = fac.createOMElement("implementation", synNS);
+				implElem.addAttribute(fac.createOMAttribute("type", nullNS, "disk"));
+				implElem.addAttribute(fac.createOMAttribute("maxSize", nullNS, Integer.toString(diskCacheSize)));
+				cache.addChild(implElem);
+			}
+		}
 
-        if (parent != null) {
-            parent.addChild(cache);
-        }
+		if (parent != null) {
+			parent.addChild(cache);
+		}
 
-        return cache;
-    }
+		return cache;
+	}
 
 	/**
 	 * Creates the cache mediator with given configuration XML as OMElement
 	 *
 	 * @param elem OMElement to be converted to cache mediator Object.
 	 */
-    public void build(OMElement elem) {
-        OMAttribute idAttr = elem.getAttribute(ATT_ID);
-        if (idAttr != null && idAttr.getAttributeValue() != null) {
-            this.id = idAttr.getAttributeValue();
-        }
+	public void build(OMElement elem) {
+		OMAttribute idAttr = elem.getAttribute(ATT_ID);
+		if (idAttr != null && idAttr.getAttributeValue() != null) {
+			this.id = idAttr.getAttributeValue();
+		}
 
-        OMAttribute scopeAttr = elem.getAttribute(ATT_SCOPE);
-        if (scopeAttr != null && scopeAttr.getAttributeValue() != null &&
-            isValidScope(scopeAttr.getAttributeValue(), this.id)) {
-            this.scope = scopeAttr.getAttributeValue();
-        } else {
-            this.scope = CachingConstants.SCOPE_PER_HOST;
-        }
+		OMAttribute scopeAttr = elem.getAttribute(ATT_SCOPE);
+		if (scopeAttr != null && scopeAttr.getAttributeValue() != null &&
+		    isValidScope(scopeAttr.getAttributeValue(), this.id)) {
+			this.scope = scopeAttr.getAttributeValue();
+		} else {
+			this.scope = CachingConstants.SCOPE_PER_HOST;
+		}
 
-        OMAttribute collectorAttr = elem.getAttribute(ATT_COLLECTOR);
-        if (collectorAttr != null && collectorAttr.getAttributeValue() != null &&
-            "true".equals(collectorAttr.getAttributeValue())) {
-            collector = true;
-        } else {
-            collector = false;
-            OMAttribute hashGeneratorAttr = elem.getAttribute(ATT_HASH_GENERATOR);
-            if (hashGeneratorAttr != null && hashGeneratorAttr.getAttributeValue() != null) {
-                this.digestGenerator = hashGeneratorAttr.getAttributeValue();
-            }
+		OMAttribute collectorAttr = elem.getAttribute(ATT_COLLECTOR);
+		if (collectorAttr != null && collectorAttr.getAttributeValue() != null &&
+		    "true".equals(collectorAttr.getAttributeValue())) {
+			collector = true;
+		} else {
+			collector = false;
+			OMAttribute hashGeneratorAttr = elem.getAttribute(ATT_HASH_GENERATOR);
+			if (hashGeneratorAttr != null && hashGeneratorAttr.getAttributeValue() != null) {
+				this.digestGenerator = hashGeneratorAttr.getAttributeValue();
+			}
 
-            OMAttribute timeoutAttr = elem.getAttribute(ATT_TIMEOUT);
-            if (timeoutAttr != null && timeoutAttr.getAttributeValue() != null) {
-                this.timeout = Long.parseLong(timeoutAttr.getAttributeValue());
-            } else {
-                this.timeout = DEFAULT_TIMEOUT;
-            }
+			OMAttribute timeoutAttr = elem.getAttribute(ATT_TIMEOUT);
+			if (timeoutAttr != null && timeoutAttr.getAttributeValue() != null) {
+				this.timeout = Long.parseLong(timeoutAttr.getAttributeValue());
+			} else {
+				this.timeout = DEFAULT_TIMEOUT;
+			}
 
-            OMAttribute maxMessageSizeAttr = elem.getAttribute(ATT_MAX_MSG_SIZE);
-            if (maxMessageSizeAttr != null && maxMessageSizeAttr.getAttributeValue() != null) {
-                this.maxMessageSize = Integer.parseInt(maxMessageSizeAttr.getAttributeValue());
-            }
+			OMAttribute maxMessageSizeAttr = elem.getAttribute(ATT_MAX_MSG_SIZE);
+			if (maxMessageSizeAttr != null && maxMessageSizeAttr.getAttributeValue() != null) {
+				this.maxMessageSize = Integer.parseInt(maxMessageSizeAttr.getAttributeValue());
+			}
 
-            OMElement onCacheHitElem = elem.getFirstChildWithName(ON_CACHE_HIT_Q);
-            if (onCacheHitElem != null) {
-                OMAttribute sequenceAttr = onCacheHitElem.getAttribute(ATT_SEQUENCE);
-                if (sequenceAttr != null && sequenceAttr.getAttributeValue() != null) {
-                    this.onCacheHitRef = sequenceAttr.getAttributeValue();
-                } else if (onCacheHitElem.getFirstElement() != null) {
-                    addChildren(onCacheHitElem, this);
-                }
-            }
+			OMElement onCacheHitElem = elem.getFirstChildWithName(ON_CACHE_HIT_Q);
+			if (onCacheHitElem != null) {
+				OMAttribute sequenceAttr = onCacheHitElem.getAttribute(ATT_SEQUENCE);
+				if (sequenceAttr != null && sequenceAttr.getAttributeValue() != null) {
+					this.onCacheHitRef = sequenceAttr.getAttributeValue();
+				} else if (onCacheHitElem.getFirstElement() != null) {
+					addChildren(onCacheHitElem, this);
+				}
+			}
 
-            for (Iterator itr = elem.getChildrenWithName(IMPLEMENTATION_Q); itr.hasNext();) {
-                OMElement implElem = (OMElement) itr.next();
-                OMAttribute typeAttr = implElem.getAttribute(ATT_TYPE);
-                OMAttribute sizeAttr = implElem.getAttribute(ATT_SIZE);
-                if (typeAttr != null && typeAttr.getAttributeValue() != null) {
-                    String type = typeAttr.getAttributeValue();
-                    if (CachingConstants.TYPE_MEMORY.equals(type) && sizeAttr != null &&
-                        sizeAttr.getAttributeValue() != null) {
-                        inMemoryCacheSize = Integer.parseInt(sizeAttr.getAttributeValue());
-                    } else if (CachingConstants.TYPE_DISK.equals(type)) {
-                        if (sizeAttr != null && sizeAttr.getAttributeValue() != null) {
-                            this.diskCacheSize = Integer.parseInt(sizeAttr.getAttributeValue());
-                        } else {
-                            this.diskCacheSize = DEFAULT_DISK_CACHE_SIZE;
-                        }
-                    } else {
-                        throw new MediatorException("unknown implementation type for the Cache mediator");
-                    }
-                }
-            }
-        }
-    }
+			for (Iterator itr = elem.getChildrenWithName(IMPLEMENTATION_Q); itr.hasNext(); ) {
+				OMElement implElem = (OMElement) itr.next();
+				OMAttribute typeAttr = implElem.getAttribute(ATT_TYPE);
+				OMAttribute sizeAttr = implElem.getAttribute(ATT_SIZE);
+				if (typeAttr != null && typeAttr.getAttributeValue() != null) {
+					String type = typeAttr.getAttributeValue();
+					if (CachingConstants.TYPE_MEMORY.equals(type) && sizeAttr != null &&
+					    sizeAttr.getAttributeValue() != null) {
+						inMemoryCacheSize = Integer.parseInt(sizeAttr.getAttributeValue());
+					} else if (CachingConstants.TYPE_DISK.equals(type)) {
+						if (sizeAttr != null && sizeAttr.getAttributeValue() != null) {
+							this.diskCacheSize = Integer.parseInt(sizeAttr.getAttributeValue());
+						} else {
+							this.diskCacheSize = DEFAULT_DISK_CACHE_SIZE;
+						}
+					} else {
+						throw new MediatorException("unknown implementation type for the Cache mediator");
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * Checks the validity of the provided cache scope in cache mediator configuration
 	 *
 	 * @param scope value of the scope attribute parsed in configuration
-	 * @param id value of the id attribute parsed in configuration
+	 * @param id    value of the id attribute parsed in configuration
 	 * @return boolean value whether the scope is valid or not
 	 */
-    private boolean isValidScope(String scope, String id) {
-        if (CachingConstants.SCOPE_PER_HOST.equals(scope)) {
-            return true;
-        } else if (CachingConstants.SCOPE_PER_MEDIATOR.equals(scope)) {
-            if (id != null) {
-                return true;
-            } else {
-                throw new MediatorException("Id is required for a cache wirth scope : " + scope);                
-            }
-        } else if (CachingConstants.SCOPE_DISTRIBUTED.equals(scope)) {
-	        return true;
-        } else {
-            throw new MediatorException("Unknown scope " + scope + " for the Cache mediator");
-        }
-    }
+	private boolean isValidScope(String scope, String id) {
+		if (CachingConstants.SCOPE_PER_HOST.equals(scope)) {
+			return true;
+		} else if (CachingConstants.SCOPE_PER_MEDIATOR.equals(scope)) {
+			if (id != null) {
+				return true;
+			} else {
+				throw new MediatorException("Id is required for a cache wirth scope : " + scope);
+			}
+		} else if (CachingConstants.SCOPE_DISTRIBUTED.equals(scope)) {
+			return true;
+		} else {
+			throw new MediatorException("Unknown scope " + scope + " for the Cache mediator");
+		}
+	}
 
 }

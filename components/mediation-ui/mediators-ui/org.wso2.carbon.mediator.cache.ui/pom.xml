@@ -56,7 +56,6 @@
                             org.wso2.carbon.mediator.service.*,
                             org.apache.synapse.util.xpath,
                             org.wso2.carbon.mediator.cache.*,
-                            org.wso2.carbon.mediator.cache.mediation.cache.impl.*,
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
                             *;resolution:=optional
                         </Import-Package>
