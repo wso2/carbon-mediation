@@ -19,10 +19,7 @@ package org.wso2.carbon.mediation.dependency.mgt;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Bundle;
-import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
-import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingServiceImpl;
-import org.wso2.carbon.mediation.dependency.mgt.services.ResolverRegistrationService;
-import org.wso2.carbon.mediation.dependency.mgt.services.ResolverRegistrationServiceImpl;
+import org.wso2.carbon.mediation.dependency.mgt.services.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,6 +42,8 @@ public class DependencyManagementServiceComponent {
         bndCtx = cmpCtx.getBundleContext();
         bndCtx.registerService(ResolverRegistrationService.class.getName(),
                 new ResolverRegistrationServiceImpl(), null);
+        bndCtx.registerService(DependencyManagementService.class.getName(),
+                               new DependencyManagementServiceImpl(), null);
 
         resolverListener = new CustomResolversListener(this, bndCtx);
 
