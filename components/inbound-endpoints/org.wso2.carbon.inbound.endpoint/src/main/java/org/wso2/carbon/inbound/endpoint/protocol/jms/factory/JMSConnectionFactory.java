@@ -474,7 +474,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     protected Session createSession(Connection connection) {
         try {
-            if ( "1.1".equals(jmsSpec) ) {
+            if (  "1.1".equals(jmsSpec) || "2.0".equals(jmsSpec) ) {
                 return connection.createSession(transactedSession, sessionAckMode);
             } else {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
