@@ -31,7 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
- *
+ * This class provides utility method to building soap messages.
  */
 public class SOAPMessageHelper {
 
