@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -59,7 +58,8 @@ public class InboundHttpServerWorker extends ServerWorker {
     private RESTRequestHandler restHandler;
 
     public InboundHttpServerWorker(int port, SourceRequest sourceRequest,
-                                   SourceConfiguration sourceConfiguration, OutputStream outputStream) {
+                                   SourceConfiguration sourceConfiguration,
+                                   OutputStream outputStream) {
         super(sourceRequest, sourceConfiguration, outputStream);
         this.request = sourceRequest;
         this.port = port;
@@ -70,16 +70,15 @@ public class InboundHttpServerWorker extends ServerWorker {
     public void run() {
         if (request != null) {
             try {
-                //get already created axis2 message context
+                //get already created axis2 context from ServerWorker
                 MessageContext axis2MsgContext = getRequestContext();
 
                 //create Synapse Message Context
-                org.apache.synapse.MessageContext synCtx = createSynapseMessageContext(request, axis2MsgContext);
+                org.apache.synapse.MessageContext synCtx =
+                        createSynapseMessageContext(request, axis2MsgContext);
 
-                String method =
-                        request.getRequest() != null ? request.getRequest().
-                                getRequestLine().getMethod().toUpperCase() : "";
-                processHttpRequestUri(axis2MsgContext, method);
+                String method = request.getRequest() != null ? request.getRequest().
+                        getRequestLine().getMethod().toUpperCase() : "";
 
                 String tenantDomain = getTenantDomain();
 
@@ -105,7 +104,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                                 InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_API_DISPATCHING_ENABLED);
                 if (apiDispatchingParam != null && Boolean.valueOf(apiDispatchingParam)) {
                     // Trying to dispatch to an API
-
                     processedByAPI = restHandler.process(synCtx);
                     if (log.isDebugEnabled()) {
                         log.debug("Dispatch to API state : enabled, Message is "
@@ -115,10 +113,12 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 if (!processedByAPI) {
                     //check the validity of message routing to axis2 path
-                    boolean isAxis2Path = isAllowedAxis2Path(axis2MsgContext);
+                    boolean isAxis2Path = isAllowedAxis2Path(synCtx);
 
                     if (isAxis2Path) {
-                        //create axis2 message context using request properties
+                        //create axis2 message context again to avoid settings updated above
+                        axis2MsgContext = createMessageContext(null, request);
+
                         processHttpRequestUri(axis2MsgContext, method);
 
                         //set inbound properties for axis2 context
@@ -132,6 +132,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                             }
                         }
                     } else {
+                        processHttpRequestUri(axis2MsgContext, method);
                         // setting Inbound related properties for synapse context
                         setInboundProperties(synCtx);
 
@@ -175,33 +176,6 @@ public class InboundHttpServerWorker extends ServerWorker {
         }
     }
 
-    // Create Synapse Message Context
-    private org.apache.synapse.MessageContext createSynapseMessageContext(
-            SourceRequest inboundSourceRequest) throws AxisFault {
-
-        // Create super tenant message context
-        MessageContext axis2MsgCtx = createMessageContext(null, inboundSourceRequest);
-        ServiceContext svcCtx = new ServiceContext();
-        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
-        axis2MsgCtx.setServiceContext(svcCtx);
-        axis2MsgCtx.setOperationContext(opCtx);
-
-
-        String tenantDomain = getTenantDomain();
-        // If not super tenant, assign tenant configuration context
-        if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            ConfigurationContext tenantConfigCtx =
-                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
-                                                                  axis2MsgCtx.getConfigurationContext());
-
-            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
-
-            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
-
-        }
-        return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
-    }
-
     /**
      * Set Inbound Related Properties for Synapse Message Context
      *
@@ -239,14 +213,15 @@ public class InboundHttpServerWorker extends ServerWorker {
     /**
      * Checks whether the message should be routed to Axis2 path
      *
-     * @param msgContext Message Context of incoming message
+     * @param synapseMsgContext Synapse Message Context of incoming message
      * @return true if the message should be routed, false otherwise
      */
-    private boolean isAllowedAxis2Path(MessageContext msgContext) {
+    private boolean isAllowedAxis2Path(org.apache.synapse.MessageContext synapseMsgContext) {
         boolean isProxy = false;
+
         String reqUri = request.getUri();
         String tenant = MultitenantUtils.getTenantDomainFromUrl(request.getUri());
-        String servicePath = msgContext.getConfigurationContext().getServiceContextPath();
+        String servicePath = getSourceConfiguration().getConfigurationContext().getServicePath();
 
         //for tenants, service path will be appended by tenant name
         if (!reqUri.equalsIgnoreCase(tenant)) {
@@ -259,7 +234,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                                                                 servicePath);
         //if proxy, then check whether it is deployed in the environment
         if (serviceOpPart != null) {
-            isProxy = isProxyDeployed(msgContext, serviceOpPart);
+            isProxy = isProxyDeployed(synapseMsgContext, serviceOpPart);
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("Requested Proxy Service '" + serviceOpPart + "' is not deployed");
@@ -271,22 +246,19 @@ public class InboundHttpServerWorker extends ServerWorker {
     /**
      * Checks whether the given proxy is deployed in synapse environment
      *
-     * @param msgContext    Message Context of incoming message
+     * @param synapseContext   Synapse Message Context of incoming message
      * @param serviceOpPart String name of the service operation
      * @return true if the proxy is deployed, false otherwise
      */
-    private boolean isProxyDeployed(MessageContext msgContext, String serviceOpPart) {
+    private boolean isProxyDeployed(org.apache.synapse.MessageContext synapseContext,
+                                    String serviceOpPart) {
         boolean isDeployed = false;
 
         //extract proxy name from serviceOperation, get the first portion split by '/'
         String proxyName = serviceOpPart.split("/")[0];
 
-        //get synapse configuration
-        SynapseConfiguration synapseConfiguration = (SynapseConfiguration) msgContext.getConfigurationContext().getAxisConfiguration().getParameter(
-                SynapseConstants.SYNAPSE_CONFIG).getValue();
-
         //check whether the proxy is deployed in synapse environment
-        if (synapseConfiguration.getProxyService(proxyName) != null) {
+        if (synapseContext.getConfiguration().getProxyService(proxyName) != null) {
             isDeployed = true;
         }
         return isDeployed;
@@ -296,7 +268,7 @@ public class InboundHttpServerWorker extends ServerWorker {
      * Creates synapse message context from axis2 context
      *
      * @param inboundSourceRequest Source Request of inbound
-     * @param axis2Context Axis2 message context of message
+     * @param axis2Context         Axis2 message context of message
      * @return Synapse Message Context instance
      * @throws AxisFault
      */
@@ -312,18 +284,15 @@ public class InboundHttpServerWorker extends ServerWorker {
             ConfigurationContext tenantConfigCtx =
                     TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
                                                                   axis2MsgCtx.getConfigurationContext());
-
             axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
-
             axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
-
         }
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }
 
-
     /**
      * Updates additional properties in Axis2 Message Context from Synapse Message Context
+     *
      * @param synCtx Synapse Message Context
      * @return Updated Axis2 Message Context
      * @throws AxisFault
@@ -333,6 +302,7 @@ public class InboundHttpServerWorker extends ServerWorker {
 
         ServiceContext svcCtx = new ServiceContext();
         OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
+
         ((Axis2MessageContext) synCtx).getAxis2MessageContext().setServiceContext(svcCtx);
         ((Axis2MessageContext) synCtx).getAxis2MessageContext().setOperationContext(opCtx);
 
