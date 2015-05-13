@@ -37,7 +37,7 @@ public class CallMediator extends AbstractMediator {
 
     private Endpoint endpoint = null;
 
-    private boolean blocking=false;
+    private boolean blocking = false;
 
     public Endpoint getEndpoint() {
         return endpoint;
@@ -67,8 +67,8 @@ public class CallMediator extends AbstractMediator {
         if (activeEndpoint != null) {
             call.addChild(EndpointSerializer.getElementFromEndpoint(activeEndpoint));
         }
-        if (blocking==true) {
-            call.addAttribute(fac.createOMAttribute("blocking", nullNS, Boolean.toString(getBlocking())));
+        if (blocking) {
+            call.addAttribute(fac.createOMAttribute("blocking", nullNS, "true"));
         }
 
         if (parent != null) {
