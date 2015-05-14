@@ -46,24 +46,26 @@ public class SOAPMessageHelper {
 	 */
 	public static SOAPEnvelope buildSOAPEnvelopeFromBytes(byte[] data, boolean isSoap11)
 			throws SOAPException, IOException {
-
-		MessageFactory mf = new MessageFactoryImpl();
-		if (!isSoap11) {
-
-			MimeHeaders mimeHeaders = new MimeHeaders();
-			mimeHeaders.addHeader("Content-ID", IDGenerator.generateID());
-			mimeHeaders.addHeader("content-type",
-			                      HTTPConstants.MEDIA_TYPE_APPLICATION_SOAP_XML);
-			SOAPMessage smsg = mf.createMessage(mimeHeaders, new ByteArrayInputStream(data));
-			return SAAJUtil.toOMSOAPEnvelope(smsg.getSOAPPart().getDocumentElement());
-		} else {
-
-			if (data != null) {
-				SOAPMessage smsg = mf.createMessage(new MimeHeaders(), new ByteArrayInputStream(data));
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+		try {
+			MessageFactory mf = new MessageFactoryImpl();
+			if (!isSoap11) {
+				MimeHeaders mimeHeaders = new MimeHeaders();
+				mimeHeaders.addHeader("Content-ID", IDGenerator.generateID());
+				mimeHeaders.addHeader("content-type",
+				                      HTTPConstants.MEDIA_TYPE_APPLICATION_SOAP_XML);
+				SOAPMessage smsg = mf.createMessage(mimeHeaders, byteArrayInputStream);
 				return SAAJUtil.toOMSOAPEnvelope(smsg.getSOAPPart().getDocumentElement());
 			} else {
-				return null;
+				if (data != null) {
+					SOAPMessage smsg = mf.createMessage(new MimeHeaders(), byteArrayInputStream);
+					return SAAJUtil.toOMSOAPEnvelope(smsg.getSOAPPart().getDocumentElement());
+				} else {
+					return null;
+				}
 			}
+		} finally {
+			byteArrayInputStream.close();
 		}
 	}
 }

@@ -48,6 +48,10 @@ import javax.cache.Caching;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
+import javax.management.MalformedObjectNameException;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.MBeanRegistrationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
@@ -445,11 +449,10 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 	 */
 	public void exposeData(MessageContext msgCtx) {
 		String serverPackage = "org.wso2.carbon.mediation";
+		String objectName = serverPackage + ":type=Cache,tenant=" + PrivilegedCarbonContext
+				.getThreadLocalCarbonContext().getTenantDomain() + ",manager=" + Caching.getCacheManagerFactory().
+				getCacheManager(CachingConstants.CACHE_MANAGER).getName() + ",name=" + getMediatorCache().getName();
 		try {
-			String objectName = serverPackage + ":type=Cache,tenant=" + PrivilegedCarbonContext
-					.getThreadLocalCarbonContext().getTenantDomain() + ",manager=" + Caching.getCacheManagerFactory().
-					getCacheManager(CachingConstants.CACHE_MANAGER).getName() + ",name=" + getMediatorCache().getName();
-
 			MBeanServer mserver = getMBeanServer();
 			ObjectName cacheMBeanObjName = new ObjectName(objectName);
 			Set set = mserver.queryNames(new ObjectName(objectName), null);
@@ -460,10 +463,14 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
 				mserver.registerMBean(cacheMBean, cacheMBeanObjName);
 			}
-		} catch (Exception e) {
-			String msg = "Could not register MediatorCacheInvalidator MBean";
-			log.error(msg, e);
-			throw new RuntimeException(msg, e);
+		} catch (MalformedObjectNameException e) {
+			handleException("The format of the string does not correspond to a valid ObjectName.", e, msgCtx);
+		} catch (InstanceAlreadyExistsException e) {
+			handleException("MBean with the name "+objectName+" is already registered.", e, msgCtx);
+		} catch (NotCompliantMBeanException e) {
+			handleException("MBean implementation is not compliant with JMX specification standard MBean.", e, msgCtx);
+		} catch (MBeanRegistrationException e) {
+			handleException("Could not register MediatorCacheInvalidator MBean.", e, msgCtx);
 		}
 	}
 

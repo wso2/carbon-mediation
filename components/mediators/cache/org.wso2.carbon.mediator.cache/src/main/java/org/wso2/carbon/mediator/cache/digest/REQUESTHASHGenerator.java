@@ -17,7 +17,11 @@
  */
 package org.wso2.carbon.mediator.cache.digest;
 
-import org.apache.axiom.om.*;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMText;
+import org.apache.axiom.om.OMProcessingInstruction;
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

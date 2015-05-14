@@ -425,7 +425,8 @@ public class CacheMediator extends AbstractListMediator {
 							this.diskCacheSize = DEFAULT_DISK_CACHE_SIZE;
 						}
 					} else {
-						throw new MediatorException("unknown implementation type for the Cache mediator");
+						throw new MediatorException("unknown implementation type for the Cache mediator as there is " +
+						                            "no type called" +typeAttr.getAttributeValue());
 					}
 				}
 			}

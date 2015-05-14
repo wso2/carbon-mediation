@@ -79,7 +79,7 @@ public class MediatorCacheInvalidator implements MediatorCacheInvalidatorMBean {
 			       .removeAll();
 			log.info("Total mediator cache has been invalidated.");
 		} catch (CacheException cacheException) {
-			log.error("Error occurred while invalidating mediator cache. " + cacheException);
+			throw new CacheException("Error occurred while invalidating mediator cache. " + cacheException);
 		}
 	}
 
