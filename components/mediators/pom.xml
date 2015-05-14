@@ -40,6 +40,7 @@
 				<module>smooks</module>
 				<module>entitlement</module>
 				<module>oauth</module>
+                <module>publishEvent</module>
 			</modules>
 
 </project>
