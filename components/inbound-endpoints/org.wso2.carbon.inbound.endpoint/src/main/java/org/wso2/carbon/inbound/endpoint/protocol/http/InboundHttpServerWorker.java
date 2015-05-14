@@ -76,25 +76,33 @@ public class InboundHttpServerWorker extends ServerWorker {
                 //create Synapse Message Context
                 org.apache.synapse.MessageContext synCtx =
                         createSynapseMessageContext(request, axis2MsgContext);
+                updateAxis2MessageContextForSynapse(synCtx);
 
+                setInboundProperties(synCtx);
                 String method = request.getRequest() != null ? request.getRequest().
                         getRequestLine().getMethod().toUpperCase() : "";
+                processHttpRequestUri(axis2MsgContext, method);
 
                 String tenantDomain = getTenantDomain();
-
                 String endpointName =
                         HTTPEndpointManager.getInstance().getEndpointName(port, tenantDomain);
-
                 if (endpointName == null) {
                     handleException("Endpoint not found for port : " + port + "" +
                                     " tenant domain : " + tenantDomain);
                 }
-
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
 
                 if (endpoint == null) {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
                     return;
+                }
+
+                if (!isRESTRequest(axis2MsgContext, method)) {
+                    if (request.isEntityEnclosing()) {
+                        processEntityEnclosingRequest(axis2MsgContext, false);
+                    } else {
+                        processNonEntityEnclosingRESTHandler(null, axis2MsgContext, false);
+                    }
                 }
 
                 boolean processedByAPI = false;
@@ -132,21 +140,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                             }
                         }
                     } else {
-                        processHttpRequestUri(axis2MsgContext, method);
-                        // setting Inbound related properties for synapse context
-                        setInboundProperties(synCtx);
-
-                        updateAxis2MessageContextForSynapse(synCtx);
-
-                        //If message is not dispatched to an API, dispatch into the sequence
-                        if (!isRESTRequest(axis2MsgContext, method)) {
-                            if (request.isEntityEnclosing()) {
-                                processEntityEnclosingRequest(axis2MsgContext, isAxis2Path);
-                            } else {
-                                processNonEntityEnclosingRESTHandler(null, axis2MsgContext, isAxis2Path);
-                            }
-                        }
-
                         // Get injecting sequence for synapse engine
                         SequenceMediator injectingSequence =
                                 (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
@@ -167,7 +160,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                     // send ack for client if needed
                     sendAck(axis2MsgContext);
                 }
-
             } catch (Exception e) {
                 log.error("Exception occurred when running " + InboundHttpServerWorker.class.getName(), e);
             }
