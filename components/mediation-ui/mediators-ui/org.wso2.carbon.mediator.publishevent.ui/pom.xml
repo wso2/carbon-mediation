@@ -19,7 +19,7 @@
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <artifactId>publish-event-mediator</artifactId>
+        <artifactId>mediators-ui</artifactId>
         <version>4.4.1-SNAPSHOT</version>
     </parent>
 
@@ -52,7 +52,7 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            javax.xml.namespace; version=0.0.0,
+                            javax.xml.namespace; version=${javax.xml.namespace.version},
                             org.apache.commons.logging,
                             org.osgi.framework,
                             org.wso2.carbon.mediator.service.*,
@@ -73,34 +73,23 @@
         <dependency>
             <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.databridge.commons</artifactId>
-            <version>${carbon.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
-            <version>${carbon.commons.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-pool.wso2</groupId>
             <artifactId>commons-pool</artifactId>
-            <version>${commons-pool.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.mediator.publishevent</artifactId>
-            <version>${carbon.mediation.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>
@@ -126,7 +115,10 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.event.sink</artifactId>
-            <version>${carbon.mediation.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediator.publishevent</artifactId>
         </dependency>
     </dependencies>
 </project>

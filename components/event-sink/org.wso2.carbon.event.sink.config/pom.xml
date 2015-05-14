@@ -52,8 +52,8 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            javax.xml.namespace; version=0.0.0,
-                            org.apache.axiom.om; version=0.0.0,
+                            javax.xml.namespace; version=${javax.xml.namespace.version},
+                            org.apache.axiom.om; version=${org.apache.axiom.om.version},
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
@@ -66,7 +66,6 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.event.sink</artifactId>
-            <version>4.4.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>

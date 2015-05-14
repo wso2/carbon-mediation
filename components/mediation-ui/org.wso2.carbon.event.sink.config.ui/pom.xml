@@ -49,9 +49,9 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            javax.xml.namespace; version=0.0.0,
-                            org.apache.axiom.om; version=0.0.0,
-                            org.wso2.carbon.event.sink.config.stub.*;version="${carbon.kernel.imp.pkg.version}",
+                            javax.xml.namespace; version=${javax.xml.namespace.version},
+                            org.apache.axiom.om; version=${org.apache.axiom.om.version},
+                            org.wso2.carbon.event.sink.config.stub.*;version="${carbon.mediation.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>

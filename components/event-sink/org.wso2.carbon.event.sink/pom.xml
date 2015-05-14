@@ -41,7 +41,6 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
-            <version>1.0.3</version>
             <scope>provided</scope>
             <optional>true</optional>
             <exclusions>
@@ -81,7 +80,7 @@
                             org.wso2.carbon.event.sink.internal
                         </Private-Package>
                         <Import-Package>
-                            org.apache.commons.logging.*;version="1.0.4",
+                            org.apache.commons.logging.*;version="${org.apache.commons.logging.version}",
                             org.osgi.framework,
                             *;resolution:=optional,
                         </Import-Package>
