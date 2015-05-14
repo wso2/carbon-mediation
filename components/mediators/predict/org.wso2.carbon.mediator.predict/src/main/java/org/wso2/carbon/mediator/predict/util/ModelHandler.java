@@ -46,6 +46,7 @@ public class ModelHandler {
 
     public static final String REGISTRY_STORAGE_PREFIX = "registry";
     public static final String FILE_STORAGE_PREFIX = "file";
+    public static final String PATH_TO_GOVERNANCE_REGISTRY = "/_system/governance";
 
     private static ModelHandler instance;
 
@@ -102,7 +103,11 @@ public class ModelHandler {
         String[] modelStorage = modelStorageLocation.split(":");
         String storageType = modelStorage[0];
         if(storageType.equals(REGISTRY_STORAGE_PREFIX)) {
-            modelStorageLocation = modelStorage[1];
+            if(modelStorage[1].startsWith(PATH_TO_GOVERNANCE_REGISTRY)) {
+                modelStorageLocation = modelStorage[1].substring(PATH_TO_GOVERNANCE_REGISTRY.length());
+            } else {
+                modelStorageLocation = modelStorage[1];
+            }
         }
         MLIOFactory ioFactory = new MLIOFactory(MLCoreServiceValueHolder.getInstance().getMlProperties());
         MLInputAdapter inputAdapter = ioFactory.getInputAdapter(storageType + MLConstants.IN_SUFFIX);
