@@ -649,7 +649,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                                                                                        .getExecutorService(ClusterGroupCommunicator.NTASK_P2P_COMM_EXECUTOR);
                 executorService.submitToAllMembers(callable);
             } catch (TaskException e) {
-                e.printStackTrace();
+                logger.error("Can not submit a cluster message.", e);
             }
         }
 
