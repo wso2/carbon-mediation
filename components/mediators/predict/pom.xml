@@ -15,32 +15,26 @@
  ~ limitations under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-    <parent>
-      <groupId>org.wso2.carbon.mediation</groupId>
-      <artifactId>carbon-mediation</artifactId>
-      <version>4.4.1-SNAPSHOT</version>
-      <relativePath>../../pom.xml</relativePath>
-   </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   
+	<parent>
+	<groupId>org.wso2.carbon.mediation</groupId>
+	<artifactId>mediators</artifactId>
+	<version>4.4.1-SNAPSHOT</version>
+	<relativePath>../pom.xml</relativePath>
+	</parent>
 
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>predict-mediator</artifactId>
     <version>4.4.1-SNAPSHOT</version>
-    <artifactId>mediators</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - Mediators Aggregator Module</name>
+    <name>WSO2 Carbon Predict Mediator Module</name>
     <url>http://wso2.org</url>
 
-			<modules>
-				<module>router</module>
-				<module>bam</module>
-				<module>command</module>
-				<module>event</module>
-				<module>fastXSLT</module>
-				<module>smooks</module>
-				<module>entitlement</module>
-				<module>oauth</module>
-                <module>predict</module>
-			</modules>
+    <modules>
+        <module>org.wso2.carbon.mediator.predict</module>
+    </modules>
 
 </project>

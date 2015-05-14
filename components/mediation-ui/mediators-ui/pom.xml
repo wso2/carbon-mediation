@@ -80,6 +80,7 @@
         <module>org.wso2.carbon.mediator.router.ui</module>
         <module>org.wso2.carbon.mediator.iterate.ui</module>
         <module>org.wso2.carbon.mediator.transaction.ui</module>
+        <module>org.wso2.carbon.mediator.predict.ui</module>
     </modules>
 
 </project>
