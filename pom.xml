@@ -1596,14 +1596,14 @@
             </dependency>
 
             <dependency>
-                <groupId>org.wso2.carbon</groupId>
+                <groupId>org.wso2.carbon.ml</groupId>
                 <artifactId>org.wso2.carbon.ml.core</artifactId>
-                <version>${ml.core.version}</version>
+                <version>${ml.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon</groupId>
+                <groupId>org.wso2.carbon.ml</groupId>
                 <artifactId>org.wso2.carbon.ml.commons</artifactId>
-                <version>${ml.commons.version}</version>
+                <version>${ml.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
@@ -2086,8 +2086,7 @@
         <project.scm.id>wso2-scm-server</project.scm.id>
 
         <spark.core.version>1.2.1.wso2v2</spark.core.version>
-        <ml.core.version>1.0.0-SNAPSHOT</ml.core.version>
-        <ml.commons.version>1.0.0-SNAPSHOT</ml.commons.version>
+        <ml.version>1.0.0</ml.version>
 
     </properties>
     <pluginRepositories>

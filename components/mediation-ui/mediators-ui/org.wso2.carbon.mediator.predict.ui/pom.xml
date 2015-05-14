@@ -97,11 +97,11 @@
             <artifactId>axiom</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.ml</groupId>
             <artifactId>org.wso2.carbon.ml.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon</groupId>
+            <groupId>org.wso2.carbon.ml</groupId>
             <artifactId>org.wso2.carbon.ml.commons</artifactId>
         </dependency>
         <dependency>
