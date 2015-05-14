@@ -26,6 +26,7 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
+import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 
@@ -85,7 +86,7 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
      * Register/start the schedule service
      * */
     public void start() {
-        Task task = new JMSTask(pollingConsumer);
+        InboundTask task = new JMSTask(pollingConsumer, interval);
         start(task, ENDPOINT_POSTFIX);
     }
 

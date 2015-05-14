@@ -33,7 +33,7 @@ import org.wso2.carbon.utils.CarbonUtils;
  */
 public class InboundRunner implements Runnable {
 
-    private Task task;
+    private InboundTask task;
     private long interval;
 
     private volatile boolean execute = true;
@@ -45,7 +45,7 @@ public class InboundRunner implements Runnable {
 
     private static final Log log = LogFactory.getLog(InboundRunner.class);
 
-    public InboundRunner(Task task, long interval) {
+    public InboundRunner(InboundTask task, long interval) {
         this.task = task;
         this.interval = interval;
     }
@@ -88,7 +88,7 @@ public class InboundRunner implements Runnable {
             log.debug("Executing the Inbound Endpoint.");
             lastRuntime = getTime();
             try {
-                task.execute();
+                task.taskExecute();
             } catch (Exception e) {
                 log.error("Error executing the inbound endpoint polling cycle.", e);
             }

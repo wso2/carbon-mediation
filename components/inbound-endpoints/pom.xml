@@ -31,6 +31,7 @@
     <url>http://wso2.org</url>
 
     <modules>
+        <module>org.wso2.carbon.inbound.endpoint.osgi</module>
         <module>org.wso2.carbon.inbound.endpoint.persistence</module>
         <module>org.wso2.carbon.inbound.endpoint</module>
     </modules>
@@ -55,6 +56,30 @@
     <dependency>
         <groupId>org.apache.axis2.wso2</groupId>
         <artifactId>axis2</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>ca.uhn.hapi.wso2</groupId>
+        <artifactId>hapi</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.kafka</groupId>
+        <artifactId>kafka_2.9.2</artifactId>
+        <version>0.8.1.1</version>
+        <scope>compile</scope>
+        <exclusions>
+            <exclusion>
+                <groupId>com.sun.jmx</groupId>
+                <artifactId>jmxri</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>com.sun.jdmk</groupId>
+                <artifactId>jmxtools</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>javax.jms</groupId>
+                <artifactId>jms</artifactId>
+            </exclusion>
+        </exclusions>
     </dependency>
 </dependencies>
 </project>

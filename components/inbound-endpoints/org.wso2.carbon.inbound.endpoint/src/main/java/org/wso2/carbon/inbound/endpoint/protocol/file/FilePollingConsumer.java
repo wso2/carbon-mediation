@@ -589,7 +589,7 @@ public class FilePollingConsumer {
             } else if (isFailedRecord) {
                 // it is a failed record
                 try {
-                    lastCycle = 2;
+                    lastCycle = 1;
                     moveOrDeleteAfterProcessing(child);
                 } catch (AxisFault axisFault) {
                     log.error("File object '" + child.getURL().toString()
@@ -831,7 +831,13 @@ public class FilePollingConsumer {
                 }
                 try {
                     fileObject.moveTo(dest);
+                    if (VFSUtils.isFailRecord(fsManager, fileObject)) {
+                        VFSUtils.releaseFail(fsManager, fileObject);
+                    }
                 } catch (FileSystemException e) {
+                    if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
+                        VFSUtils.markFailRecord(fsManager, fileObject);
+                    }
                     log.error("Error moving file : " + fileObject + " to " + moveToDirectoryURI, e);
                 }
             } else {
@@ -848,9 +854,6 @@ public class FilePollingConsumer {
                 } catch (FileSystemException e) {
                     log.error("Error deleting file : " + fileObject, e);
                 }
-            }
-            if (VFSUtils.isFailRecord(fsManager, fileObject)) {
-                VFSUtils.releaseFail(fsManager, fileObject);
             }
         } catch (FileSystemException e) {
             if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
