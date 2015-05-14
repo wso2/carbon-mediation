@@ -681,8 +681,9 @@
                                                                 count--;
                                                                 Mediator beforeMed = position > 0 ? sequence.getList().get(position - 1) : null;
                                                                 Mediator afterMed = position + 1 < sequence.getList().size() ? sequence.getList().get(position + 1) : null;
+                                                                Mediator secondAfterMed = position + 2 < sequence.getList().size() ? sequence.getList().get(position + 2) : null;
                                                         %>
-                                                    <%=SequenceEditorHelper.getMediatorHTML(mediator, count==0, String.valueOf(position), config, beforeMed, afterMed, request.getLocale())%>
+                                                    <%=SequenceEditorHelper.getMediatorHTML(mediator, count==0, String.valueOf(position), config, beforeMed, afterMed, request.getLocale(), secondAfterMed)%>
                                                         <%
                                                                 position++;
                                                             }

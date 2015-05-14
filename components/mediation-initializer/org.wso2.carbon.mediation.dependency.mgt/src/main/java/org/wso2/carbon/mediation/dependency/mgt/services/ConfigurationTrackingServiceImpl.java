@@ -65,4 +65,8 @@ public class ConfigurationTrackingServiceImpl implements ConfigurationTrackingSe
             }
         }
     }
+
+    public void setServiceRegistered(boolean registered){
+        serviceRegistered = registered;
+    }
 }
