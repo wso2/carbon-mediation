@@ -47,7 +47,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 
     private final Object taskQueueLock = new Object();
 
-	@Override
+    @Override
     public boolean schedule(TaskDescription taskDescription) {
 		logger.debug("#schedule Scheduling task : " + taskId(taskDescription));
 		TaskInfo taskInfo;
@@ -93,7 +93,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 		return true;
 	}
 
-	@Override
+    @Override
     public boolean reschedule(String taskName, TaskDescription taskDescription) {
 		if (!isInitialized()) {
 			return false;
