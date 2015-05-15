@@ -31,6 +31,12 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 
     private static final Log logger = LogFactory.getLog(NTaskTaskManager.class.getName());
 
+    /**
+     * TODO ClusterGroupCommunicator NTASK_P2P_COMM_EXECUTOR is private in the carbon-commons-4.4.1 release, 
+     * this should be changed to use ClusterGroupCommunicator.NTASK_P2P_COMM_EXECUTOR.
+     */
+    private static final String NTASK_P2P_COMM_EXECUTOR = "__NTASK_P2P_COMM_EXECUTOR__";
+
     private String name;
 
     private boolean initialized = false;
@@ -646,7 +652,7 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 IExecutorService executorService =
                                                    ((ClusteredTaskManager) taskManager).getClusterComm()
                                                                                        .getHazelcast()
-                                                                                       .getExecutorService(ClusterGroupCommunicator.NTASK_P2P_COMM_EXECUTOR);
+                                                                                       .getExecutorService(NTASK_P2P_COMM_EXECUTOR);
                 executorService.submitToAllMembers(callable);
             } catch (TaskException e) {
                 logger.error("Can not submit a cluster message.", e);
