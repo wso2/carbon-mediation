@@ -133,10 +133,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             try {
                 //Start Endpoint in given port
                 PassThroughInboundEndpointHandler.startEndpoint(new InetSocketAddress(port),
-                                                                inboundSourceHandler, name);
+                        inboundSourceHandler, name);
             } catch (NumberFormatException e) {
                 log.error("Exception occurred while starting listener for endpoint : "
-                          + name + " ,port " + port, e);
+                             + name + " ,port " + port, e);
             }
         } else {
             log.error("SourceConfiguration is not registered in PassThrough Transport");
@@ -202,7 +202,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             int port = (Integer) tenantInfoEntry.getKey();
 
             InboundEndpointInfoDTO inboundEndpointInfoDTO =
-                    (InboundEndpointInfoDTO) ((ArrayList) tenantInfoEntry.getValue()).get(0);
+                       (InboundEndpointInfoDTO) ((ArrayList) tenantInfoEntry.getValue()).get(0);
 
             if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTP)) {
                 startListener(port, inboundEndpointInfoDTO.getEndpointName());
