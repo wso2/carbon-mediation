@@ -65,7 +65,12 @@ public class HL7Processor implements InboundResponseSender {
 
     }
 
-    public void processRequest(final MLLPContext mllpContext) {
+    /**
+     * HL7 Request Processing logic
+     * @param mllpContext
+     * @throws Exception - catch any generic exceptions or else I/O Reactor may shutdown.
+     */
+    public void processRequest(final MLLPContext mllpContext) throws Exception {
         mllpContext.setRequestTime(System.currentTimeMillis());
 
         // Prepare Synapse Context for message injection
@@ -93,6 +98,12 @@ public class HL7Processor implements InboundResponseSender {
         addProperties(synCtx, mllpContext);
 
         SequenceMediator injectSeq = (SequenceMediator) synCtx.getEnvironment().getSynapseConfiguration().getSequence(inSequence);
+        if (injectSeq == null) {
+            log.error("Could not find inbound sequence '" + inSequence + "'.");
+            handleException(mllpContext, "Could not find inbound sequence.");
+            return;
+        }
+
         injectSeq.setErrorHandler(onErrorSequence);
 
         if (!autoAck && timeOut > 0) {
@@ -161,7 +172,8 @@ public class HL7Processor implements InboundResponseSender {
                 mllpContext.setNackMode(true);
                 mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(), nackMessage));
             } else {
-                // if HL7_APPLICATION_ACK is set then we are going to send the auto-generated ACK
+                // if HL7_APPLICATION_ACK is set then we are going to send the auto-generated ACK based on
+                // the HL7 request, so we do not set the payload contents as context HL7 Message.
                 if (messageContext.getProperty(Axis2HL7Constants.HL7_APPLICATION_ACK) != null &&
                         messageContext.getProperty(Axis2HL7Constants.HL7_APPLICATION_ACK).equals("true")) {
                     mllpContext.setApplicationAck(true);
