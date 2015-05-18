@@ -44,7 +44,14 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-nhttp-transport</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.cxf</groupId>
+            <artifactId>cxf-bundle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+            <artifactId>jetty-bundle</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -74,8 +81,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 

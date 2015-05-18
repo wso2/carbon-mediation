@@ -214,14 +214,15 @@ public class PersistenceUtils {
 
         Properties props = new Properties();
         OMElement paramsEle = endpointElement.getFirstChildWithName(PARAMS_QN);
-        Iterator parameters = paramsEle.getChildrenWithName(PARAM_QN);
-        while (parameters.hasNext()) {
-            OMElement parameter = (OMElement) parameters.next();
-            props.setProperty(parameter.getAttributeValue(PARAM_NAME_QN), parameter.getAttributeValue(PARAM_VALUE_QN));
+        if (paramsEle != null) {
+            Iterator parameters = paramsEle.getChildrenWithName(PARAM_QN);
+            while (parameters.hasNext()) {
+                OMElement parameter = (OMElement) parameters.next();
+                props.setProperty(parameter.getAttributeValue(PARAM_NAME_QN),
+                                  parameter.getAttributeValue(PARAM_VALUE_QN));
+            }
         }
-
         inboundParams.setProperties(props);
-
         return inboundParams;
     }
 
