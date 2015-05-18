@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -589,7 +590,7 @@ public class FilePollingConsumer {
             } else if (isFailedRecord) {
                 // it is a failed record
                 try {
-                    lastCycle = 2;
+                    lastCycle = 1;
                     moveOrDeleteAfterProcessing(child);
                 } catch (AxisFault axisFault) {
                     log.error("File object '" + child.getURL().toString()
@@ -774,21 +775,55 @@ public class FilePollingConsumer {
                     //Postfix the date given timestamp format
                     String strSubfoldertimestamp = vfsProperties
                             .getProperty(VFSConstants.SUBFOLDER_TIMESTAMP);
-                    if (strSubfoldertimestamp != null) {
+                    if(vfsProperties.getProperty(VFSConstants.FORCE_CREATE_FOLDER).toLowerCase().equals("true")) {
                         try {
-                            SimpleDateFormat sdf = new SimpleDateFormat(strSubfoldertimestamp);
-                            String strDateformat = sdf.format(new Date());
+                            String currentDate = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date());
+                            String[] dateElements = currentDate.split(" ");
+                            String subFolderStructure = "";
                             int iIndex = moveToDirectoryURI.indexOf("?");
+                            subFolderStructure += dateElements[3] + File.separator + dateElements[2] + File
+                                    .separator + dateElements[1] + File.separator;
                             if (iIndex > -1) {
-                                moveToDirectoryURI = moveToDirectoryURI.substring(0, iIndex)
-                                        + strDateformat
-                                        + moveToDirectoryURI.substring(iIndex,
-                                                moveToDirectoryURI.length());
-                            }else{
-                                moveToDirectoryURI += strDateformat;
+                                String endPart = moveToDirectoryURI.substring(iIndex, moveToDirectoryURI.length());
+                                moveToDirectoryURI = moveToDirectoryURI.substring(0, iIndex);
+
+                                if (!(moveToDirectoryURI.charAt(iIndex - 1) + "").equals(File.separator)) {
+                                    moveToDirectoryURI += File.separator;
+                                }
+                                moveToDirectoryURI += subFolderStructure + endPart;
+                            } else {
+                                if (!(moveToDirectoryURI.charAt(moveToDirectoryURI.length() - 1) + "").equals(File
+                                        .separator)) {
+                                    moveToDirectoryURI += File.separator;
+                                }
+                                moveToDirectoryURI += subFolderStructure;
                             }
                         } catch (Exception e) {
-                            log.warn("Error generating subfolder name with date", e);
+                            log.warn("Error generating sub-folder structure with date", e);
+                        }
+                        if (strSubfoldertimestamp != null) {
+                            try {
+                                SimpleDateFormat sdf = new SimpleDateFormat(strSubfoldertimestamp);
+                                String strDateformat = sdf.format(new Date());
+                                int iIndex = moveToDirectoryURI.indexOf("?");
+                                if (iIndex > -1) {
+                                    String endPart = moveToDirectoryURI.substring(iIndex, moveToDirectoryURI.length());
+                                    moveToDirectoryURI = moveToDirectoryURI.substring(0, iIndex);
+
+                                    if (!(moveToDirectoryURI.charAt(iIndex - 1) + "").equals(File.separator)) {
+                                        moveToDirectoryURI += File.separator;
+                                    }
+                                    moveToDirectoryURI +=  strDateformat + endPart;
+                                } else {
+                                    if (!(moveToDirectoryURI.charAt(moveToDirectoryURI.length() - 1) + "").equals(File
+                                            .separator)) {
+                                        moveToDirectoryURI += File.separator;
+                                    }
+                                    moveToDirectoryURI += strDateformat;
+                                }
+                            } catch (Exception e) {
+                                log.warn("Error generating sub-folder name with date", e);
+                            }
                         }
                     }
                 }
@@ -831,7 +866,13 @@ public class FilePollingConsumer {
                 }
                 try {
                     fileObject.moveTo(dest);
+                    if (VFSUtils.isFailRecord(fsManager, fileObject)) {
+                        VFSUtils.releaseFail(fsManager, fileObject);
+                    }
                 } catch (FileSystemException e) {
+                    if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
+                        VFSUtils.markFailRecord(fsManager, fileObject);
+                    }
                     log.error("Error moving file : " + fileObject + " to " + moveToDirectoryURI, e);
                 }
             } else {
@@ -848,9 +889,6 @@ public class FilePollingConsumer {
                 } catch (FileSystemException e) {
                     log.error("Error deleting file : " + fileObject, e);
                 }
-            }
-            if (VFSUtils.isFailRecord(fsManager, fileObject)) {
-                VFSUtils.releaseFail(fsManager, fileObject);
             }
         } catch (FileSystemException e) {
             if (!VFSUtils.isFailRecord(fsManager, fileObject)) {

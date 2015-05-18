@@ -42,12 +42,24 @@ public class JMSPollingConsumer {
     private Long lastRanTime;
     private String strUserName;
     private String strPassword;
-
+    private Integer iReceiveTimeout;
+    
     public JMSPollingConsumer(CachedJMSConnectionFactory jmsConnectionFactory,
             Properties jmsProperties, long scanInterval) {
         this.jmsConnectionFactory = jmsConnectionFactory;
         strUserName = jmsProperties.getProperty(JMSConstants.PARAM_JMS_USERNAME);
         strPassword = jmsProperties.getProperty(JMSConstants.PARAM_JMS_PASSWORD);
+        
+        String strReceiveTimeout = jmsProperties.getProperty(JMSConstants.RECEIVER_TIMEOUT);
+        if(strReceiveTimeout != null){
+            try{
+                iReceiveTimeout = Integer.parseInt(strReceiveTimeout.trim());  
+            }catch(NumberFormatException e){
+                logger.warn("Invalid value for transport.jms.ReceiveTimeout : " + strReceiveTimeout);
+                iReceiveTimeout = null;
+            }
+        }
+        
         this.scanInterval = scanInterval;
         this.lastRanTime = null;
     }
@@ -107,8 +119,8 @@ public class JMSPollingConsumer {
             }
             session = jmsConnectionFactory.getSession(connection);
             destination = jmsConnectionFactory.getDestination(connection);
-            messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);
-            Message msg = messageConsumer.receive();
+            messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);            
+            Message msg = receiveMessage(messageConsumer);         
             if (msg == null) {
                 logger.debug("Inbound JMS Endpoint. No JMS message received.");
                 return null;
@@ -179,7 +191,7 @@ public class JMSPollingConsumer {
                 } else {
                     return msg;
                 }
-                msg = messageConsumer.receive();
+                msg = receiveMessage(messageConsumer);
             }
 
         } catch (JMSException e) {
@@ -199,5 +211,17 @@ public class JMSPollingConsumer {
             }
         }
         return null;
+    }
+    
+    private Message receiveMessage(MessageConsumer messageConsumer) throws JMSException{
+        Message msg = null;
+        if(iReceiveTimeout == null){
+            msg = messageConsumer.receive(1);
+        }else if(iReceiveTimeout > 0){
+            msg = messageConsumer.receive(iReceiveTimeout);
+        }else{
+            msg = messageConsumer.receive();
+        }
+        return msg;
     }
 }

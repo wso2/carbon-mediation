@@ -22,7 +22,7 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
-import org.wso2.carbon.inbound.endpoint.protocol.http.management.EndpointListenerManager;
+import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 
 public class InboundHttpsListener extends InboundHttpListener {
 
@@ -60,7 +60,7 @@ public class InboundHttpsListener extends InboundHttpListener {
                      "hence undeploying inbound endpoint");
             this.destroy();
         } else {
-            EndpointListenerManager.getInstance().startSSLEndpoint(port, name, sslConfiguration);
+            HTTPEndpointManager.getInstance().startSSLEndpoint(port, name, sslConfiguration);
         }
 
     }

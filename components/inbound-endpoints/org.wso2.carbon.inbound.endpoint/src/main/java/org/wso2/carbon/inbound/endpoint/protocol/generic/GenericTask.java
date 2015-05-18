@@ -21,18 +21,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 
-public class GenericTask implements org.apache.synapse.task.Task, ManagedLifecycle {
+public class GenericTask extends InboundTask {
     private static final Log logger = LogFactory.getLog(GenericTask.class.getName());
 
     private GenericPollingConsumer pollingConsumer;
     
-    public GenericTask(GenericPollingConsumer pollingConsumer) {
+    public GenericTask(GenericPollingConsumer pollingConsumer, long interval) {
     	logger.debug("Generic Task initalize.");
+    	this.interval = interval;
     	this.pollingConsumer = pollingConsumer;
     }
 
-    public void execute() {
+    protected void taskExecute() {
     	logger.debug("File Task executing.");
     	pollingConsumer.poll();
     }
@@ -45,4 +47,5 @@ public class GenericTask implements org.apache.synapse.task.Task, ManagedLifecyc
     public void destroy() {
         logger.debug("Destroying Task. ");
     }
+
 }

@@ -32,6 +32,7 @@
 <%@ page import="ca.uhn.hl7v2.HL7Exception" %>
 <%@ page import="org.apache.axiom.om.OMElement" %>
 <%@ page import="org.apache.axiom.om.util.AXIOMUtil" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <%
 
@@ -59,11 +60,11 @@
     } catch (EncodingNotSupportedException e) {
         errorMessage = "Could not parse XML Encoding message into ER7. " + e.getMessage();
         object.addProperty("success", false);
-        object.addProperty("reason", errorMessage);
+        object.addProperty("reason", StringEscapeUtils.escapeXml(errorMessage));
     } catch (HL7Exception e) {
         errorMessage = "Could not parse XML Encoding message into ER7. " + e.getMessage();
         object.addProperty("success", false);
-        object.addProperty("reason", errorMessage);
+        object.addProperty("reason", StringEscapeUtils.escapeXml(errorMessage));
     }
 
     out.write(gson.toJson(object));
