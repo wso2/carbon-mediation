@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class ConfigHolder {
     private SynapseConfiguration synapseConfiguration;
     private AxisConfiguration axisConfiguration;
     private DependencyManagementService dependencyManager;
+    private CAppArtifactDataService cAppArtifactDataService;
 
     private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices =
             new HashMap<Integer, SynapseEnvironmentService>();
@@ -52,6 +54,15 @@ public class ConfigHolder {
         }
         return instance;
     }
+
+    public CAppArtifactDataService getcAppArtifactDataService() {
+        return cAppArtifactDataService;
+    }
+
+    public void setcAppArtifactDataService(CAppArtifactDataService cAppArtifactDataService) {
+        this.cAppArtifactDataService = cAppArtifactDataService;
+    }
+
 
     public SynapseConfiguration getSynapseConfiguration() throws AxisFault {
         assertNull("SynapseConfiguration", synapseConfiguration);

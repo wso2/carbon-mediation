@@ -319,6 +319,21 @@
         }
         return false;
     }
+
+    function editApi(apiName) {
+        document.location.href = "manageAPI.jsp?mode=edit&apiName="+apiName;
+    }
+
+    function editCAppApi(apiName) {
+      CARBON.showConfirmationDialog('<fmt:message key="edit.cApp.api.on.page.prompt"/>', function() {
+       $.ajax({
+               type: 'POST',
+               success: function() {
+                     document.location.href = "manageAPI.jsp?mode=edit&apiName="+apiName;
+               }
+       });
+       });
+    }
 </script>
 <%
     }
@@ -431,7 +446,13 @@
             </td>
             <td width="100px">
                 <nobr>
+                 <% if(apiData.getDeployedFromCApp()) { %>
+                    <img src="images/applications.gif">
                     <%=apiData.getName()%>
+                    <% if(apiData.getEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                 <% } else { %>
+                    <%=apiData.getName()%>
+                 <% } %>
                 </nobr>
             </td>
             <td width="100px">
@@ -441,15 +462,25 @@
             </td>
             <td width="20px" style="text-align:left;border-left:none;border-right:none;width:100px;">
                 <div class="inlineDiv">
-                    <a style="background-image:url(../admin/images/edit.gif);" class="icon-link" href="manageAPI.jsp?mode=edit&amp;apiName=<%=apiData.getName()%>">Edit</a>
+                <% if(apiData.getDeployedFromCApp()) { %>
+                    <a style="background-image:url(../admin/images/edit.gif);" class="icon-link"  onclick="editCAppApi('<%=apiData.getName()%>')">Edit</a>
+                <% } else {%>
+                    <a style="background-image:url(../admin/images/edit.gif);" class="icon-link"  onclick="editApi('<%=apiData.getName()%>')">Edit</a>
+                <% } %>
                 </div>
             </td>
             <td width="20px" style="text-align:left;border-left:none;width:100px;">
                 <div class="inlineDiv">
+                <% if(apiData.getDeployedFromCApp()) { %>
                     <a style="background-image:url(../admin/images/delete.gif);" class="icon-link" href="#"
-                    	onclick="deleteApi('<%=apiData.getName()%>')">Delete</a>
+                       onclick="#">Delete</a>
+                <% } else {%>
+                    <a style="background-image:url(../admin/images/delete.gif);" class="icon-link" href="#"
+                       onclick="deleteApi('<%=apiData.getName()%>')">Delete</a>
+                <% } %>
                 </div>
             </td>
+
         </tr>
         <%
             } // for each api

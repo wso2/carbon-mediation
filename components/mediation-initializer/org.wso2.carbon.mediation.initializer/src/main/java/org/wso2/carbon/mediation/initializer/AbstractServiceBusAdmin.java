@@ -26,6 +26,7 @@ import org.apache.synapse.ServerConfigurationInformation;
 import org.apache.synapse.ServerContextInformation;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 
@@ -128,5 +129,13 @@ public class AbstractServiceBusAdmin extends AbstractAdmin {
         if (lock != null) {
             lock.unlock();
         }
+    }
+
+    /**
+     * Helper method to get current tenant id
+     * @return tenant id
+     */
+    protected int getTenantId(){
+        return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
     }
 }

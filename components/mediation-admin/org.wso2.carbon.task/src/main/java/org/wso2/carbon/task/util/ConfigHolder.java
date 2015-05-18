@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.task.util;
 
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.task.JobMetaDataProviderServiceHandler;
 import org.wso2.carbon.task.TaskManagementServiceHandler;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -28,6 +29,8 @@ public class ConfigHolder {
     private TaskManagementServiceHandler taskManagementServiceHandler;
 
     private ConfigurationContextService configCtxSvc;
+
+    private CAppArtifactDataService cAppArtifactDataService;
 
     public static ConfigHolder getInstance() {
         return ourInstance;
@@ -61,4 +64,13 @@ public class ConfigHolder {
     public void setConfigCtxSvc(ConfigurationContextService configCtxSvc) {
         this.configCtxSvc = configCtxSvc;
     }
+
+    public CAppArtifactDataService getcAppArtifactDataService() {
+        return cAppArtifactDataService;
+    }
+
+    public void setcAppArtifactDataService(CAppArtifactDataService cAppArtifactDataService) {
+        this.cAppArtifactDataService = cAppArtifactDataService;
+    }
+
 }

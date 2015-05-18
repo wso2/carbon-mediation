@@ -43,8 +43,7 @@
                         <Private-Package>
                         </Private-Package>
                         <Export-Package>
-                            org.wso2.carbon.task.stub.*;
-                            version="${carbon.mediation.exp.pkg.version}"
+                            org.wso2.carbon.task.stub.*; version="${carbon.mediation.exp.pkg.version}"
                         </Export-Package>
                         <Import-Package>
                             !org.wso2.carbon.task.stub.*
@@ -72,7 +71,7 @@
                                     <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/TaskAdmin.wsdl -u -uw -o target/generated-code -ns2p http://org.apache.axis2/xsd=org.wso2.carbon.task.stub.types.axis2,http://task.carbon.wso2.org/xsd=org.wso2.carbon.task.stub.types.carbon,http://service.task.carbon.wso2.org=org.wso2.carbon.task.stub" />
+                                    <arg line="-uri src/main/resources/TaskAdmin.wsdl -u -uw -o target/generated-code -ns2p http://org.apache.axis2/xsd=org.wso2.carbon.task.stub.types.axis2,http://task.carbon.wso2.org/xsd=org.wso2.carbon.task.stub.types.carbon,http://service.task.carbon.wso2.org=org.wso2.carbon.task.stub,http://task.carbon.wso2.org=org.wso2.carbon.task.stub" />
                                     <classpath refid="wsdl2java.classpath" />
                                 </java>
                             </tasks>

@@ -20,7 +20,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskDescriptionRepository;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
+import org.wso2.carbon.task.util.ConfigHolder;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
+import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
+import org.apache.axis2.engine.AxisConfiguration;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -109,19 +117,28 @@ public class TaskManager {
         }
     }
 
+
     /**
      * Editing a TaskDescription
      * Delegates Editing responsibility to each 'TaskManagementService' service
      *
      * @param taskDescription TaskDescription instance
      */
-    public void editTaskDescription(TaskDescription taskDescription) {
+    public void editTaskDescription(TaskDescription taskDescription, AxisConfiguration axisCfg) {
         assetInitialized();
         String className =
                 jobMetaDataProviderServiceHandler.getTaskManagementServiceImplementer(
                         taskDescription.getTaskGroup());
+        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                getcAppArtifactDataService();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         if (className != null && !"".equals(className)) {
             taskManagementServiceHandler.editTaskDescription(taskDescription, className);
+            if (cAppArtifactDataService.isArtifactDeployedFromCApp(tenantId, ServiceBusConstants.TASK_TYPE + File.separator + taskDescription.getName())) {
+                cAppArtifactDataService.setEdited(tenantId, ServiceBusConstants.TASK_TYPE + File.separator + taskDescription.getName());
+                MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(axisCfg);
+                pm.deleteItem(taskDescription.getName(), taskDescription.getName() + ".xml", ServiceBusConstants.ITEM_TYPE_TASK);
+            }
         }
     }
 
@@ -147,6 +164,38 @@ public class TaskManager {
             log.debug("All available Task based Startup " + taskDescriptions);
         }
         return taskDescriptions;
+    }
+
+    public TaskData[] getAllTaskData() {
+        assetInitialized();
+        List<TaskData> taskDatas = new ArrayList<TaskData>();
+        if (repository == null) {
+            return null;
+        }
+        Iterator<TaskDescription> iterator = repository.getAllTaskDescriptions();
+        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                getcAppArtifactDataService();
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        while (iterator.hasNext()) {
+            TaskDescription taskDescription = iterator.next();
+            if (taskDescription != null) {
+                TaskData data = new TaskData();
+                data.setName(taskDescription.getName());
+                data.setGroup(taskDescription.getTaskGroup());
+
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(tenantId, ServiceBusConstants.TASK_TYPE + File.separator + taskDescription.getName())) {
+                    data.setDeployedFromCApp(true);
+                }
+                if (cAppArtifactDataService.isArtifactEdited(tenantId, ServiceBusConstants.TASK_TYPE + File.separator + taskDescription.getName())) {
+                    data.setEdited(true);
+                }
+                taskDatas.add(data);
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("All available Task based Startup " + taskDatas);
+        }
+        return taskDatas.toArray(new TaskData[taskDatas.size()]);
     }
 
     /**

@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.message.processor.stub.MessageProcessorAdminServiceStub;
 import org.wso2.carbon.message.processor.ui.utils.MessageProcessorData;
-
+import org.wso2.carbon.message.processor.service.xsd.MessageProcessorMetaData;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,9 +88,9 @@ public class MessageProcessorAdminServiceClient {
     public void deleteMessageProcessor(String name) throws Exception {
         try {
             if (name != null) {
-                stub.deleteMessageProcessor(name);
+                stub.deleteMessageProcessor(name.trim());
             } else {
-                handleException("Error Can't delete Message Processor " + name);
+                handleException("Error Can't delete Message Processor " + name.trim());
             }
         } catch (Exception e) {
             handleException(e);
@@ -140,6 +140,34 @@ public class MessageProcessorAdminServiceClient {
         return nameList.toArray(new String[nameList.size()]);
     }
 
+    public MessageProcessorMetaData[] getPaginatedMessageProcessorData(int pageNumber) throws Exception {
+        int numberOfPages = 0;
+
+        MessageProcessorMetaData[] messageProcessorMetaDatas = getMessageProcessorMetaData();
+        if (messageProcessorMetaDatas != null) {
+            numberOfPages = (int) Math.ceil((double) messageProcessorMetaDatas.length /
+                    MESSAGE_PROCESSORS_PER_PAGE);
+        }
+        if (pageNumber == 0) {
+            numberOfPages = 1;
+        }
+        if (pageNumber > numberOfPages - 1) {
+            pageNumber = numberOfPages - 1;
+        }
+
+        int startIndex = (pageNumber * MESSAGE_PROCESSORS_PER_PAGE);
+        int endIndex = ((pageNumber + 1) * MESSAGE_PROCESSORS_PER_PAGE);
+
+        if (messageProcessorMetaDatas == null) {
+            return null;
+        }
+        ArrayList<MessageProcessorMetaData> nameList = new ArrayList<MessageProcessorMetaData>();
+        for (int i = startIndex; i < endIndex && i < messageProcessorMetaDatas.length; i++) {
+            nameList.add(messageProcessorMetaDatas[i]);
+        }
+
+        return nameList.toArray(new MessageProcessorMetaData[nameList.size()]);
+    }
 
     public MessageProcessorData getMessageProcessor(String name) throws Exception {
         MessageProcessorData data = null;
@@ -177,12 +205,23 @@ public class MessageProcessorAdminServiceClient {
         String[] messageIds = null;
         try {
             if(name != null) {
-               messageIds = stub.getMessageIds(name);
+                messageIds = stub.getMessageIds(name);
             }
         } catch (Exception e) {
             handleException(e);
         }
         return messageIds;
+    }
+
+    public MessageProcessorMetaData[] getMessageProcessorMetaData() throws Exception {
+        MessageProcessorMetaData[] messageProcessorMetaDatas = null;
+        try {
+            messageProcessorMetaDatas = stub.getMessageProcessorDataList();
+        } catch (Exception e) {
+            handleException(e);
+        }
+
+        return messageProcessorMetaDatas;
     }
 
 
@@ -232,7 +271,7 @@ public class MessageProcessorAdminServiceClient {
     }
 
     public void resendAllMessages(String name) throws Exception {
-         try {
+        try {
             if (name != null) {
                 stub.resendAll(name);
             }
@@ -243,7 +282,7 @@ public class MessageProcessorAdminServiceClient {
 
 
     public void resendMessage(String name , String messageId) throws Exception {
-         try {
+        try {
             if (name != null) {
                 stub.resend(name, messageId);
             }
@@ -253,7 +292,7 @@ public class MessageProcessorAdminServiceClient {
     }
 
     public void resendFirstMessage(String name , String messageId) throws Exception {
-         try {
+        try {
             if (name != null) {
                 stub.resendFirstMessage(name, messageId);
             }

@@ -43,7 +43,12 @@
 
     <tr>
         <td id="edit<%=name%>">
-            <a href="#" onclick="editPS();return false;"><img src="../admin/images/edit.gif" alt="" border="0"> Edit</a>
+        <% if(pd.getDeployedFromCApp()) { %>
+                <a href="#" onclick="editCAppPS();"><img src="../admin/images/edit.gif" alt="" border="0"> Edit</a>
+        <% } else { %>
+             <a href="#" onclick="editPS();return false;"><img src="../admin/images/edit.gif" alt="" border="0"> Edit</a>
+        <% } %>
+
         </td>
         <td id="enableStat<%=name%>">
             <a href="#" onclick="statOnOffPS('<%=name%>', 'enable');return false;"><img src="../admin/images/static-icon-disabled.gif" alt="" border="0"> Enable Statistics</a>
@@ -102,6 +107,17 @@
 
     function editPS() {
         window.location.href='../proxyservices/index.jsp?header=' + '<fmt:message key="header.modify"/>' + '&serviceName=<%=name%>&startwiz=true';
+    }
+
+  function editCAppPS() {
+     CARBON.showConfirmationDialog("The changes will not persist to the CAPP after restart or redeploy. Do you want to Edit?", function() {
+       jQuery.ajax({
+                  type: 'POST',
+                  success: function() {
+                      window.location.href='../proxyservices/index.jsp?header=' + '<fmt:message key="header.modify"/>' + '&serviceName=<%=name%>&startwiz=true';
+                  }
+             });
+       });
     }
 
     function redeployPS() {

@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.sequences.common.SequenceEditorException;
 
@@ -40,6 +41,7 @@ public class ConfigHolder {
     private SynapseConfiguration synapseConfiguration;
     private AxisConfiguration axisConfiguration;
     private DependencyManagementService dependencyManager;
+    private CAppArtifactDataService cAppArtifactDataService;
 
     private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices =
             new HashMap<Integer, SynapseEnvironmentService>();
@@ -53,6 +55,15 @@ public class ConfigHolder {
         }
         return instance;
     }
+
+    public CAppArtifactDataService getcAppArtifactDataService() {
+        return cAppArtifactDataService;
+    }
+
+    public void setcAppArtifactDataService(CAppArtifactDataService cAppArtifactDataService) {
+        this.cAppArtifactDataService = cAppArtifactDataService;
+    }
+
 
     public SynapseConfiguration getSynapseConfiguration() throws SequenceEditorException {
         assertNull("SynapseConfiguration", synapseConfiguration);

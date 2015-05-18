@@ -24,6 +24,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 
@@ -40,6 +41,7 @@ public class ConfigHolder {
     private UserRegistry configRegistry;
     private UserRegistry governanceRegistry;
     private DependencyManagementService dependencyManager;
+    private CAppArtifactDataService cAppArtifactDataService;
 
     private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices =
             new HashMap<Integer, SynapseEnvironmentService>();
@@ -53,6 +55,15 @@ public class ConfigHolder {
         }
         return instance;
     }
+
+    public CAppArtifactDataService getcAppArtifactDataService() {
+        return cAppArtifactDataService;
+    }
+
+    public void setcAppArtifactDataService(CAppArtifactDataService cAppArtifactDataService) {
+        this.cAppArtifactDataService = cAppArtifactDataService;
+    }
+
 
     public SynapseConfiguration getSynapseConfiguration() throws APIException {
         assertNull("SynapseConfiguration", synapseConfiguration);

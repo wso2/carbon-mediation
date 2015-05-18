@@ -19,23 +19,45 @@
 
 package org.wso2.carbon.mediation.initializer.persistence;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Startup;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
 import org.apache.synapse.config.xml.XMLConfigurationSerializer;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.template.TemplateMediator;
+import org.apache.synapse.message.processor.MessageProcessor;
+import org.apache.synapse.message.store.MessageStore;
+import org.apache.synapse.rest.API;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.initializer.RegistryBasedSynapseConfigSerializer;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
+import org.wso2.carbon.mediation.initializer.internal.CAppArtifactWrapper;
+import org.wso2.carbon.mediation.initializer.utils.ConfigurationHolder;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages all persistence activities related to mediation configuration. Takes care
@@ -59,6 +81,7 @@ public class MediationPersistenceManager {
     private boolean flatFileMode;    
     private SynapseConfiguration synapseConfiguration;
     private String configName;
+    private int tenantId;
 
     /** Queue to hold persistence requests - Make sure all accesses are synchronized */
     private final LinkedList<PersistenceRequest> requestQueue = new LinkedList<PersistenceRequest>();
@@ -68,6 +91,23 @@ public class MediationPersistenceManager {
     private long interval = 5000L;
 
     private Map<Integer, AbstractStore> dataStores;
+
+    /**
+     * Initialize the mediation persistence manager instance with the tenant ID details
+     *
+     * @param registry             The UserRegistry instance to be used for persistence or null
+     * @param configPath           Path to the file/directory where configuration should be saved in
+     * @param synapseConfiguration synapse configuration to be used
+     * @param interval             The wait time for the mediation persistence worker thread
+     * @param configName           Name of the configuration to be used
+     * @param tenantId
+     */
+    public MediationPersistenceManager(UserRegistry registry, String configPath,
+                                       SynapseConfiguration synapseConfiguration,
+                                       long interval, String configName, int tenantId) {
+        this(registry, configPath, synapseConfiguration, interval, configName);
+        this.tenantId = tenantId;
+    }
 
     /**
      * Initialize the mediation persistence manager instance and start accepting
@@ -100,7 +140,7 @@ public class MediationPersistenceManager {
         }
 
         this.registry = registry;
-        this.configPath = configPath;        
+        this.configPath = configPath;
         this.synapseConfiguration = synapseConfiguration;
         this.configName = configName;
         if (interval > 0) {
@@ -114,7 +154,7 @@ public class MediationPersistenceManager {
         flatFileMode = file.exists() && file.isFile();
 
         initDataStores();
-        
+
         worker = new MediationPersistenceWorker();
         worker.start();
 
@@ -504,18 +544,116 @@ public class MediationPersistenceManager {
             log.debug("Serializing full mediation configuration to the file system");
         }
 
+        CAppArtifactDataService cAppArtifactDataService = ConfigurationHolder.getInstance().
+                getcAppArtifactDataService();
+
+        CAppArtifactWrapper cAppArtifactWrapper = cAppArtifactDataService.removeCAppArtifactsBeforePersist(tenantId, config);
         MultiXMLConfigurationSerializer serializer = new MultiXMLConfigurationSerializer(configPath);
-        serializer.serialize(config);
+        serializer.serialize(cAppArtifactWrapper.getNewConfig());
 
         if (registry != null) {
             if (log.isDebugEnabled()) {
-                log.debug("Serializing full mediation configuration to the registry");    
+                log.debug("Serializing full mediation configuration to the registry");
             }
 
             RegistryBasedSynapseConfigSerializer registrySerializer =
                     new RegistryBasedSynapseConfigSerializer(registry, configName);
-            registrySerializer.serializeConfiguration(config);
+            registrySerializer.serializeConfiguration(cAppArtifactWrapper.getNewConfig());
         }
+
+        addCAppArtifactsAfterPersist(cAppArtifactWrapper.getNewConfig(), cAppArtifactWrapper.getcAppArtifactConfig());
+    }
+
+    /**
+     * Add the CApp artifact configuration to the current configuration, after persist the other artifacts into the default location
+     *
+     * @param synapseConfiguration Current Configuration
+     * @param cAppConfig           CApp artifact configuration
+     */
+    public void addCAppArtifactsAfterPersist(SynapseConfiguration synapseConfiguration, SynapseConfiguration cAppConfig) {
+        final Lock lock = getLock(synapseConfiguration.getAxisConfiguration());
+
+        try {
+            lock.lock();
+            Map<String, Endpoint> endpoints = cAppConfig.getDefinedEndpoints();
+            for (String name : endpoints.keySet()) {
+                Endpoint newEndpoint = endpoints.get(name);
+                synapseConfiguration.addEndpoint(name, newEndpoint);
+            }
+            Map<String, SequenceMediator> sequences = cAppConfig.getDefinedSequences();
+            for (String name : sequences.keySet()) {
+                SequenceMediator newSequences = sequences.get(name);
+                synapseConfiguration.addSequence(name, newSequences);
+            }
+
+            Collection<ProxyService> proxyServices = cAppConfig.getProxyServices();
+            for (ProxyService proxy : proxyServices) {
+                ProxyService newProxy = proxy;
+                synapseConfiguration.addProxyService(proxy.getName(), proxy);
+                proxy.buildAxisService(synapseConfiguration, synapseConfiguration.getAxisConfiguration());
+            }
+
+            Map<String, Entry> localEntries = cAppConfig.getDefinedEntries();
+            for (String name : localEntries.keySet()) {
+                Entry newEntry = localEntries.get(name);
+                synapseConfiguration.addEntry(name, newEntry);
+            }
+
+            Collection<MessageStore> messageStores = cAppConfig.getMessageStores().values();
+            for (MessageStore store : messageStores) {
+                synapseConfiguration.addMessageStore(store.getName(), store);
+            }
+
+            Collection<MessageProcessor> messageProcessors = cAppConfig.getMessageProcessors().values();
+            for (MessageProcessor processor : messageProcessors) {
+                synapseConfiguration.addMessageProcessor(processor.getName(), processor);
+            }
+
+            Map<String, TemplateMediator> sequenceTemplates = cAppConfig.getSequenceTemplates();
+            for (String name : sequenceTemplates.keySet()) {
+                TemplateMediator newTemplate = sequenceTemplates.get(name);
+                synapseConfiguration.addSequenceTemplate(name, newTemplate);
+            }
+
+            Map<String, Template> endpointTemplates = cAppConfig.getEndpointTemplates();
+            for (String name : endpointTemplates.keySet()) {
+                Template newEndpointTemplate = endpointTemplates.get(name);
+                synapseConfiguration.addEndpointTemplate(name, newEndpointTemplate);
+            }
+
+            Collection<API> apiCollection = cAppConfig.getAPIs();
+            for (API api : apiCollection) {
+                API newApi = api;
+                synapseConfiguration.addAPI(api.getName(), api);
+                api.init((SynapseEnvironment) synapseConfiguration.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV).getValue());
+            }
+
+            Collection<Startup> tasks = cAppConfig.getStartups();
+            for (Startup task : tasks) {
+                Startup newTask = task;
+                synapseConfiguration.addStartup(task);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    protected Lock getLock(AxisConfiguration axisConfig) {
+        Parameter p = axisConfig.getParameter(ServiceBusConstants.SYNAPSE_CONFIG_LOCK);
+        if (p != null) {
+            return (Lock) p.getValue();
+        } else {
+            log.warn(ServiceBusConstants.SYNAPSE_CONFIG_LOCK + " is null, Recreating a new lock");
+            Lock lock = new ReentrantLock();
+            try {
+                axisConfig.addParameter(ServiceBusConstants.SYNAPSE_CONFIG_LOCK, lock);
+                return lock;
+            } catch (AxisFault axisFault) {
+                log.error("Error while setting " + ServiceBusConstants.SYNAPSE_CONFIG_LOCK);
+            }
+        }
+
+        return null;
     }
 
     /**

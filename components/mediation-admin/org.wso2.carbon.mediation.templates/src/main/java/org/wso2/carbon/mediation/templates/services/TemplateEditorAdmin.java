@@ -38,11 +38,14 @@ import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.templates.common.TemplateInfo;
 import org.wso2.carbon.mediation.templates.common.factory.TemplateInfoFactory;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.mediation.templates.internal.ConfigHolder;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 
@@ -80,20 +83,44 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 
             TemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArrayByTemplateMediator(templates);
             TemplateInfo[] ret;
-            if (info.length >= (templatePerPage * pageNumber + templatePerPage)) {
+
+            TemplateInfo[] infos = new TemplateInfo[info.length];
+            int position = 0;
+
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+
+            if (info != null && info.length > 0) {
+                for (TemplateInfo infoTemp : info) {
+                    TemplateInfo templateInfo = new TemplateInfo();
+                    templateInfo = infoTemp;
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE
+                            + File.separator + infoTemp.getName())) {
+                        templateInfo.setDeployedFromCApp(true);
+                    }
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator
+                            + infoTemp.getName())) {
+                        templateInfo.setEdited(true);
+                    }
+                    infos[position] = templateInfo;
+                    position++;
+                }
+            }
+
+            if (infos.length >= (templatePerPage * pageNumber + templatePerPage)) {
                 ret = new TemplateInfo[templatePerPage];
             } else {
-                ret = new TemplateInfo[info.length - (templatePerPage * pageNumber)];
+                ret = new TemplateInfo[infos.length - (templatePerPage * pageNumber)];
             }
             for (int i = 0; i < templatePerPage; ++i) {
                 if (ret.length > i) {
-                    ret[i] = info[templatePerPage * pageNumber + i];
+                    ret[i] = infos[templatePerPage * pageNumber + i];
                 }
             }
             return ret;
         } catch (Exception fault) {
             handleException("Couldn't get the Synapse Configuration to " +
-                            "get the available templates", fault);
+                    "get the available templates", fault);
         } finally {
             lock.unlock();
         }
@@ -117,7 +144,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
     @SuppressWarnings({"unchecked"})
     public TemplateInfo[] getDynamicTemplates(int pageNumber, int sequencePerPage)
             throws AxisFault {
-        
+
         org.wso2.carbon.registry.core.Registry registry;
         TemplateInfo[] ret;
         final Lock lock = getLock();
@@ -126,7 +153,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             String[] configInfo = getConfigSystemRegistry() != null?getMimeTypeResult(getConfigSystemRegistry()):new String[0];
             String[] govInfo = getGovernanceRegistry() != null?getMimeTypeResult(getGovernanceRegistry()): new String[0];
             String[] info = new String[configInfo.length + govInfo.length];
-            
+
             int ptr = 0;
             for (String aConfigInfo : configInfo) {
                 info[ptr] = "conf:" + aConfigInfo;
@@ -200,10 +227,10 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 synCfg.removeSequenceTemplate(templateName);
                 MediationPersistenceManager pm = getMediationPersistenceManager();
                 pm.deleteItem(templateName, sequence.getFileName(),
-                              ServiceBusConstants.ITEM_TYPE_TEMPLATE);
+                        ServiceBusConstants.ITEM_TYPE_TEMPLATE);
             } else {
                 handleException("No defined sequence with name " + templateName
-                                + " found to delete in the Synapse configuration");
+                        + " found to delete in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't get the Synapse Configuration to delete the sequence", fault);
@@ -234,7 +261,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                         template).serializeMediator(null, template);
             } else {
                 handleException("Template with the name "
-                                + templateName + " does not exist");
+                        + templateName + " does not exist");
             }
         } catch (SynapseException syne) {
             handleException("Unable to get the sequence : " + templateName, syne);
@@ -267,10 +294,10 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 }
                 if (config.getLocalRegistry().get(templateName) != null) {
                     handleException("The name '" + templateName +
-                                    "' is already used within the configuration");
+                            "' is already used within the configuration");
                 } else {
                     SynapseXMLConfigurationFactory.defineTemplate(config, templateElement,
-                                                                  getSynapseConfiguration().getProperties());
+                            getSynapseConfiguration().getProperties());
                     if (log.isDebugEnabled()) {
                         log.debug("Added template : " + templateName + " to the configuration");
                     }
@@ -289,7 +316,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             handleException("Error adding template : " + fault.getMessage(), fault);
         } catch (Error error) {
             throw new AxisFault("Unexpected error occured while " +
-                                              "adding the template : " + error.getMessage(), error);
+                    "adding the template : " + error.getMessage(), error);
         } finally {
             lock.unlock();
         }
@@ -337,7 +364,13 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     TemplateMediator templ = config.getSequenceTemplates().get(templateName);
                     if (templ != null) {
                         templ.init(getSynapseEnvironment());
-                        persistTemplate(templ);
+                        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                                getcAppArtifactDataService();
+                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                            cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName);
+                        } else {
+                            persistTemplate(templ);
+                        }
                     }
                 }
             } else {
@@ -356,17 +389,21 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             TemplateMediator template;
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             if (template != null) {
                 template.enableStatistics();
-                persistTemplate(template);
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
-                                + " found to enable statistics in the Synapse configuration");
+                        + " found to enable statistics in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't enable statistics of the template " + templateName
-                            + " : " + fault.getMessage(), fault);
+                    + " : " + fault.getMessage(), fault);
         } finally {
             lock.unlock();
         }
@@ -378,18 +415,22 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
         try {
             lock.lock();
             TemplateMediator template;
-            template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
+            template = getSynapseConfiguration().getSequenceTemplate(templateName);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             if (template != null) {
                 template.disableStatistics();
-                persistTemplate(template);
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
-                                + " found to disable statistics in the Synapse configuration");
+                        + " found to disable statistics in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't disable statistics of the template " + templateName
-                            + " : " + fault.getMessage(), fault);
+                    + " : " + fault.getMessage(), fault);
         } finally {
             lock.unlock();
         }
@@ -402,17 +443,21 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             TemplateMediator template;
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_ON);
-                persistTemplate(template);
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
-                                + " found to enable tracing in the Synapse configuration");
+                        + " found to enable tracing in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't enable tracing of the template " + templateName
-                            + " : " + fault.getMessage(), fault);
+                    + " : " + fault.getMessage(), fault);
         } finally {
             lock.unlock();
         }
@@ -425,17 +470,21 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             TemplateMediator template;
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_OFF);
-                persistTemplate(template);
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
-                                + " found to disable tracing in the Synapse configuration");
+                        + " found to disable tracing in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't disable tracing of the template " + templateName
-                            + " : " + fault.getMessage(), fault);
+                    + " : " + fault.getMessage(), fault);
         } finally {
             lock.unlock();
         }
@@ -670,7 +719,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 */
 
     private void persistTemplate(Mediator template) throws AxisFault {
-       if (template instanceof TemplateMediator) {
+        if (template instanceof TemplateMediator) {
             MediationPersistenceManager pm = getMediationPersistenceManager();
             pm.saveItem(((TemplateMediator) template).getName(), ServiceBusConstants.ITEM_TYPE_TEMPLATE);
         }

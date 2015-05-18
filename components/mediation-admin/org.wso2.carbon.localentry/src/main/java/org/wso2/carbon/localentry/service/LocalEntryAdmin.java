@@ -38,11 +38,13 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.io.File;
 import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -63,6 +65,8 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             Map gloabalEntiesMap = synapseConfiguration.getDefinedEntries();
             ArrayList<EntryData> globalEntryList = new ArrayList<EntryData>();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             for (Object o : gloabalEntiesMap.entrySet()) {
                 EntryData data = new EntryData();
                 Map.Entry entry = (Map.Entry) o;
@@ -108,6 +112,12 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                             data.setValue("");
                         }
                     }
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + key)) {
+                        data.setDeployedFromCApp(true);
+                    }
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + key)) {
+                        data.setEdited(true);
+                    }
 
                     globalEntryList.add(data);
                 }
@@ -133,7 +143,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
     private EntryData[] doPaging(int pageNumber, EntryData entries[]) {
         if (entries.length == 0) {
             return entries;
-        }        
+        }
 
         int itemsPerPageInt = LOCAL_ENTRIES_PER_PAGE;
         int numberOfPages = (int) Math.ceil((double) entries.length / itemsPerPageInt);
@@ -142,7 +152,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
         }
         int startIndex = (pageNumber * itemsPerPageInt);
         int endIndex = ((pageNumber + 1) * itemsPerPageInt);
-        
+
         List<EntryData> entriesList = Arrays.asList(entries);
         List<EntryData> paginatedEntriesList = new ArrayList<EntryData>();
         for (int i = startIndex; i < endIndex && i < entries.length; i++) {
@@ -180,7 +190,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
             catch (XMLStreamException e) {
                 return false;
             }
-            
+
             if (elem.getQName().getLocalPart().equals(XMLConfigConstants
                     .ENTRY_ELT.getLocalPart())) {
 
@@ -232,12 +242,12 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             OMElement elem;
             try {
-                elem = nonCoalescingStringToOm(ele);                
+                elem = nonCoalescingStringToOm(ele);
             }
             catch (XMLStreamException e) {
                 return false;
             }
-            
+
             if (elem == null) {
                 handleFault(log, "Unable to save local entry. Null definition");
             }
@@ -256,10 +266,15 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                     getSynapseConfiguration().removeEntry(key);
                     getSynapseConfiguration().addEntry(key, entry);
                     entry.setFileName(oldEntry.getFileName());
-                    MediationPersistenceManager pm
-                            = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-                    pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
-
+                    CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                            getcAppArtifactDataService();
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + key)) {
+                        cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + key);
+                    } else {
+                        MediationPersistenceManager pm
+                                = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+                        pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    }
                     if (log.isDebugEnabled()) {
                         log.debug("Added local entry : " + key + " into the configuration");
                     }
@@ -269,6 +284,8 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
             handleFault(log, "Unable to add local entry ", syne);
         } catch (OMException e) {
             handleFault(log, "Unable to add local entry.Invalid XML ", e);
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             lock.unlock();
         }

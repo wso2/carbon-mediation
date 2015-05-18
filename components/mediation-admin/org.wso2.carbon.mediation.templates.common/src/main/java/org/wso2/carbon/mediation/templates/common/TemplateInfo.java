@@ -23,6 +23,8 @@ public class TemplateInfo {
     private boolean enableStatistics;
     private boolean enableTracing;
     private String description;
+    private boolean isDeployedFromCApp = false;
+    private boolean isEdited = false;
 
     public String getName() {
         return name;
@@ -54,6 +56,37 @@ public class TemplateInfo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    /**
+     * Check whether the template is deployed from CApp
+     * @return true if v deployed from CApp, else false
+     */
+    public boolean getDeployedFromCApp() {
+        return isDeployedFromCApp;
+    }
+
+    /**
+     * Set whether the template is deployed from CApp
+     * @param isDeployedFromCApp true if template deployed from CApp, else false
+     */
+    public void setDeployedFromCApp(boolean isDeployedFromCApp) {
+        this.isDeployedFromCApp = isDeployedFromCApp;
+    }
+
+    /**
+     * Check whether the template deployed from CApp is edited through management console
+     * @return true if the template is edited, else false
+     */
+    public boolean getEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set whether the template deployed from CApp is edited through management console
+     * @param isEdited true if the template is edited, else false
+     */
+    public void setEdited(boolean isEdited) {
+        this.isEdited = isEdited;
     }
 
 }

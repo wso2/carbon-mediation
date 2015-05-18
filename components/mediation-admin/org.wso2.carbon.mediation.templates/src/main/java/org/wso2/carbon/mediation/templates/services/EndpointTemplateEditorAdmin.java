@@ -35,14 +35,17 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.mediation.templates.common.EndpointTemplateInfo;
 import org.wso2.carbon.mediation.templates.common.factory.TemplateInfoFactory;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.mediation.templates.internal.ConfigHolder;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -99,20 +102,42 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
 
             EndpointTemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArrayByTemplate(templates);
             EndpointTemplateInfo[] ret;
-            if (info.length >= (endpointTemplatesPerPage * pageNumber + endpointTemplatesPerPage)) {
+
+            EndpointTemplateInfo[] endpointTemplateInfos = new EndpointTemplateInfo[info.length];
+            int position = 0;
+
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+
+            if (info != null && info.length > 0) {
+                for (EndpointTemplateInfo infoTemp : info) {
+                    EndpointTemplateInfo templateInfo = new EndpointTemplateInfo();
+                    templateInfo = infoTemp;
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE
+                            + File.separator + infoTemp.getTemplateName())) {
+                        templateInfo.setDeployedFromCApp(true);
+                    }
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator
+                            + infoTemp.getTemplateName())) {
+                        templateInfo.setEdited(true);
+                    }
+                    endpointTemplateInfos[position++] = templateInfo;
+                }
+            }
+            if (endpointTemplateInfos.length >= (endpointTemplatesPerPage * pageNumber + endpointTemplatesPerPage)) {
                 ret = new EndpointTemplateInfo[endpointTemplatesPerPage];
             } else {
-                ret = new EndpointTemplateInfo[info.length - (endpointTemplatesPerPage * pageNumber)];
+                ret = new EndpointTemplateInfo[endpointTemplateInfos.length - (endpointTemplatesPerPage * pageNumber)];
             }
             for (int i = 0; i < endpointTemplatesPerPage; ++i) {
                 if (ret.length > i) {
-                    ret[i] = info[endpointTemplatesPerPage * pageNumber + i];
+                    ret[i] = endpointTemplateInfos[endpointTemplatesPerPage * pageNumber + i];
                 }
             }
             return ret;
         } catch (Exception fault) {
             handleException("Couldn't get the Synapse Configuration to " +
-                            "get the available templates", fault);
+                    "get the available templates", fault);
         } finally {
             lock.unlock();
         }
@@ -176,7 +201,7 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                 return new TemplateSerializer().serializeEndpointTemplate(template, parentElement);
             } else {
                 handleException("Template with the name "
-                                + templateName + " does not exist");
+                        + templateName + " does not exist");
             }
         } catch (SynapseException syne) {
             handleException("Unable to get the endpoint template : " + templateName, syne);
@@ -198,10 +223,10 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                 synCfg.removeEndpointTemplate(templateName);
                 MediationPersistenceManager pm = getMediationPersistenceManager();
                 pm.deleteItem(templateName, sequence.getFileName(),
-                              ServiceBusConstants.ITEM_TYPE_TEMPLATE_ENDPOINTS);
+                        ServiceBusConstants.ITEM_TYPE_TEMPLATE_ENDPOINTS);
             } else {
                 handleException("No defined endpoint template with name " + templateName
-                                + " found to delete in the Synapse configuration");
+                        + " found to delete in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't get the Synapse Configuration to delete the sequence", fault);
@@ -262,7 +287,14 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                     Template templ = config.getEndpointTemplates().get(templateName);
                     if (templ != null) {
 //                        templ.init(getSynapseEnvironment());
-                        persistTemplate(templ);
+                        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                                getcAppArtifactDataService();
+                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                            cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName);
+                        } else {
+                            persistTemplate(templ);
+                        }
+
                     }
                 }
             } else {
@@ -324,10 +356,10 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                 }
                 if (config.getLocalRegistry().get(templateName) != null) {
                     handleException("The name '" + templateName +
-                                    "' is already used within the configuration");
+                            "' is already used within the configuration");
                 } else {
                     SynapseXMLConfigurationFactory.defineEndpointTemplate(config, templateElement,
-                                                                          getSynapseConfiguration().getProperties());
+                            getSynapseConfiguration().getProperties());
                     if (log.isDebugEnabled()) {
                         log.debug("Added template : " + templateName + " to the configuration");
                     }
@@ -346,7 +378,7 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
             handleException("Error adding template : " + fault.getMessage(), fault);
         } catch (Error error) {
             throw new AxisFault("Unexpected error occured while " +
-                                              "adding the template : " + error.getMessage(), error);
+                    "adding the template : " + error.getMessage(), error);
         } finally {
             lock.unlock();
         }
@@ -412,7 +444,7 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
         try {
             templateElement = AXIOMUtil.stringToOM(templateElementConfig);
         }
-         catch (XMLStreamException e) {
+        catch (XMLStreamException e) {
             handleException("unable to Checking template Endpoint...invalid configuration element", e);
         }
         if (templateElement!=null) {
@@ -439,6 +471,6 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                 lock.unlock();
             }
         }
-     return false;
+        return false;
     }
 }

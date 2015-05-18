@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.mediation.initializer.configurations;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -255,7 +256,7 @@ public class ConfigurationUtils {
             MediationPersistenceManager pm = new MediationPersistenceManager(
                     ServiceBusConstants.ENABLED.equals(regPersistence) ? registry : null,
                     configurationLocation,
-                    synCfgConfiguration, intervalInMillis, name);
+                    synCfgConfiguration, intervalInMillis, name, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
             try {
                 axisConfiguration.addParameter(new Parameter(

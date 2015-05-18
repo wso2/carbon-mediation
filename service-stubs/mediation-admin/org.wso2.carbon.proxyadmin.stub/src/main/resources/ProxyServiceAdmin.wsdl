@@ -24,7 +24,9 @@
             </xs:complexType>
             <xs:complexType name="ProxyData">
                 <xs:sequence>
+                    <xs:element minOccurs="0" name="deployedFromCApp" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="edited" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="enableSecurity" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="enableStatistics" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="enableTracing" type="xs:boolean"/>
@@ -316,19 +318,19 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-        	<xs:complexType name="Exception">
-            	<xs:sequence>
-                	<xs:element minOccurs="0" name="Exception" nillable="true" type="xs:anyType" />
-	            </xs:sequence>
-    	    </xs:complexType>            
-        	<xs:element name="Exception">
-            	<xs:complexType>
-                	<xs:sequence>
-                    	<xs:element minOccurs="0" name="Exception" nillable="true" type="ns:Exception" />
-	                </xs:sequence>
-    	        </xs:complexType>
-        	</xs:element>            
-        </xs:schema>        
+            <xs:complexType name="Exception">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Exception" nillable="true" type="xs:anyType" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="Exception">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="Exception" nillable="true" type="ns:Exception" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
     </wsdl:types>
     <wsdl:message name="getAvailableTransportsRequest">
         <wsdl:part name="parameters" element="ns:getAvailableTransports"/>
@@ -437,7 +439,7 @@
     </wsdl:message>
     <wsdl:message name="Exception">
         <wsdl:part name="parameters" element="ns:Exception" />
-    </wsdl:message>    
+    </wsdl:message>
     <wsdl:portType name="ProxyServiceAdminPortType">
         <wsdl:operation name="getAvailableTransports">
             <wsdl:input message="tns:getAvailableTransportsRequest" wsaw:Action="urn:getAvailableTransports"/>
@@ -447,7 +449,7 @@
         <wsdl:operation name="addProxy">
             <wsdl:input message="tns:addProxyRequest" wsaw:Action="urn:addProxy"/>
             <wsdl:output message="tns:addProxyResponse" wsaw:Action="urn:addProxyResponse"/>
-            <wsdl:fault message="tns:Exception" name="Exception" wsaw:Action="urn:addProxyException" /> 
+            <wsdl:fault message="tns:Exception" name="Exception" wsaw:Action="urn:addProxyException" />
         </wsdl:operation>
         <wsdl:operation name="getMetaData">
             <wsdl:input message="tns:getMetaDataRequest" wsaw:Action="urn:getMetaData"/>

@@ -18,6 +18,7 @@ package org.wso2.carbon.proxyadmin.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.proxyadmin.ProxyAdminException;
 import org.wso2.carbon.proxyadmin.observer.ProxyObserver;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -30,7 +31,7 @@ public class ConfigHolder {
 
     private static ConfigHolder instance;
     private static final Log log = LogFactory.getLog(ConfigHolder.class);
-
+    private CAppArtifactDataService cAppArtifactDataService;
     private RegistryService registryService;
 
     private Map<Integer, ProxyObserver> proxyObservers = new HashMap<Integer, ProxyObserver>();
@@ -46,6 +47,15 @@ public class ConfigHolder {
         }
         return instance;
     }
+
+    public CAppArtifactDataService getcAppArtifactDataService() {
+        return cAppArtifactDataService;
+    }
+
+    public void setcAppArtifactDataService(CAppArtifactDataService cAppArtifactDataService) {
+        this.cAppArtifactDataService = cAppArtifactDataService;
+    }
+
 
     public RegistryService getRegistryService() throws ProxyAdminException {
         assertNull("Registry", registryService);

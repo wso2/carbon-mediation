@@ -30,7 +30,8 @@ import org.apache.synapse.task.TaskDescriptionFactory;
 import org.apache.synapse.task.TaskDescriptionSerializer;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.task.stub.TaskAdminStub;
-import org.wso2.carbon.task.stub.TaskManagementException;
+import org.wso2.carbon.task.stub.TaskAdminTaskManagementException;
+import org.wso2.carbon.task.stub.types.carbon.TaskData;
 import org.wso2.carbon.ui.CarbonUIUtil;
 import org.wso2.carbon.utils.ServerConstants;
 
@@ -64,7 +65,7 @@ public class TaskManagementClient {
     private TaskManagementClient(String cookie,
                                  String backendServerURL,
                                  ConfigurationContext configCtx)
-            throws AxisFault, TaskManagementException {
+            throws AxisFault, TaskAdminTaskManagementException {
 
         String serviceURL = backendServerURL + "TaskAdmin";
         stub = new TaskAdminStub(configCtx, serviceURL);
@@ -77,7 +78,7 @@ public class TaskManagementClient {
 
     public static TaskManagementClient getInstance(ServletConfig config,
                                                    HttpSession session)
-            throws TaskManagementException, AxisFault {
+            throws TaskAdminTaskManagementException, AxisFault {
 
         String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
         ConfigurationContext configContext =
@@ -181,6 +182,16 @@ public class TaskManagementClient {
             log.debug("All TasKs Descriptions :" + descriptions);
         }
         return descriptions;
+    }
+
+    public TaskData[] getAllTaskData() throws Exception {
+        TaskData[] taskData = null;
+        try {
+            taskData = stub.getAllTaskData();
+        } catch (Exception e) {
+            handleException(e.getLocalizedMessage());
+        }
+        return taskData;
     }
 
     public TaskDescription getTaskDescription(String name, String group) throws Exception {

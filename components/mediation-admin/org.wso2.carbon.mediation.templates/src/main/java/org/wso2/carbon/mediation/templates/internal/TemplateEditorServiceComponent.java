@@ -35,6 +35,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
@@ -75,6 +76,10 @@ import java.util.Set;
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
  * cardinality="1..n" policy="dynamic" bind="setSynapseRegistrationsService"
  * unbind="unsetSynapseRegistrationsService"
+ * @scr.reference name="synapse.capp.deployment.service"
+ * interface="org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService"
+ * cardinality="1..n" policy="dynamic" bind="setCAppArtifactDataService"
+ * unbind="unsetCAppArtifactDataService"
  */
 @SuppressWarnings({"UnusedDeclaration", "JavaDoc"})
 public class TemplateEditorServiceComponent extends AbstractAxis2ConfigurationContextObserver {
@@ -206,6 +211,16 @@ public class TemplateEditorServiceComponent extends AbstractAxis2ConfigurationCo
             SynapseConfigurationService synapseConfigurationService) {
 
         ConfigHolder.getInstance().setSynapseConfiguration(null);
+    }
+
+    protected void setCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigHolder.getInstance().setcAppArtifactDataService(cAppArtifactDataService);
+    }
+
+    protected void unsetCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigHolder.getInstance().setcAppArtifactDataService(null);
     }
 
     /**
