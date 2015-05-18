@@ -22,12 +22,13 @@ import java.util.Map;
 
 public class TemplateParameterContainer {
 
-    private Map<EndpointDefKey ,String> templateMappings = new HashMap<EndpointDefKey ,String>();
+    private Map<EndpointDefKey, String> templateMappings = new HashMap<EndpointDefKey, String>();
 
-    public enum EndpointDefKey{
+
+    public enum EndpointDefKey {
         address, reliableMessagingOn, addressingOn, addressingVersion, securityOn, wsRMPolicyKey,
         wsSecPolicyKey, inboundWsSecPolicyKey, outboundWsSecPolicyKey, useSeparateListener,
-        optimize, format, charSetEncoding,  retryDurationOnTimeout,
+        optimize, format, charSetEncoding, retryDurationOnTimeout,
         timeoutDuration, timeoutAction, initialSuspendDuration, suspendProgressionFactor,
         suspendMaximumDuration, suspendErrorCodes, timeoutErrorCodes, retriesOnTimeoutBeforeSuspend,
         separateListener, policy, retryDisabledErrorCodes
@@ -41,7 +42,7 @@ public class TemplateParameterContainer {
         return templateMappings.get(key);
     }
 
-    public boolean contains(EndpointDefKey key){
+    public boolean contains(EndpointDefKey key) {
         return templateMappings.containsKey(key);
     }
 }

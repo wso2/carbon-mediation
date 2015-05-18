@@ -22,6 +22,7 @@ import org.apache.synapse.endpoints.Template;
 import org.wso2.carbon.endpoint.ui.endpoints.Endpoint;
 import org.wso2.carbon.endpoint.ui.util.EndpointConfigurationHelper;
 
+import java.util.ArrayList;
 import java.util.Properties;
 
 public class AddressEndpoint extends Endpoint {
@@ -224,7 +225,7 @@ public class AddressEndpoint extends Endpoint {
     }
 
     public void setAddress(String address) {
-        this.address = address.replaceAll("&amp;","&");
+        this.address = address.replaceAll("&amp;", "&");
     }
 
     public String getMaxSusDuration() {
@@ -411,6 +412,7 @@ public class AddressEndpoint extends Endpoint {
             retryConfig.addChild(enabledErrorCodes);
             addressElement.addChild(retryConfig);
         }
+
         // time out configuration
         String timeOutConfiguration;
         if (((timeoutAction != null && !"".equals(timeoutAction)) || (timeoutActionDuration != null && !"".equals(timeoutActionDuration)))
@@ -461,6 +463,7 @@ public class AddressEndpoint extends Endpoint {
             }
 
         }
+
         endpoint.addChild(addressElement);
 
         // Properties
@@ -541,9 +544,12 @@ public class AddressEndpoint extends Endpoint {
             setMaxSusDuration(String.valueOf(addressEndpoint.getDefinition().getSuspendMaximumDuration()));
         }
         setSusProgFactor(String.valueOf(addressEndpoint.getDefinition().getSuspendProgressionFactor()));
+
+
         setErrorCodes(EndpointConfigurationHelper.errorCodeListBuilder(addressEndpoint.getDefinition().getSuspendErrorCodes()).trim());
         setRetryDisabledErrorCodes(EndpointConfigurationHelper.errorCodeListBuilder(addressEndpoint.getDefinition().
                 getRetryDisabledErrorCodes()).trim());
+
         setRetryEnabledErrorCodes(EndpointConfigurationHelper.errorCodeListBuilder(addressEndpoint.getDefinition().getRetryEnableErrorCodes()).trim());
         setTimedOutErrorCodes(EndpointConfigurationHelper.errorCodeListBuilder(addressEndpoint.getDefinition().getTimeoutErrorCodes()));
         setRetryTimeout(String.valueOf(addressEndpoint.getDefinition().getRetriesOnTimeoutBeforeSuspend()));

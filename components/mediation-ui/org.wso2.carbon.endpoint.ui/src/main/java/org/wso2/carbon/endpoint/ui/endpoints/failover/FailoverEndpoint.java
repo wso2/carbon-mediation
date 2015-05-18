@@ -16,6 +16,7 @@
 package org.wso2.carbon.endpoint.ui.endpoints.failover;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.endpoints.DefinitionFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.endpoints.AbstractEndpoint;
@@ -31,6 +32,15 @@ public class FailoverEndpoint extends ListEndpoint {
 
     private String properties = null;
     private String name;
+    private String failoverHttpStatusCodes;
+
+    public void setFailoverHttpStatusCodes(String failoverHttpStatusCodes){
+        this.failoverHttpStatusCodes = failoverHttpStatusCodes;
+    }
+
+    public String getFailoverHttpStatusCodes(){
+        return failoverHttpStatusCodes;
+    }
 
     public String getTagLocalName() {
         return "failover";
@@ -75,6 +85,13 @@ public class FailoverEndpoint extends ListEndpoint {
                 property.addAttribute(fac.createOMAttribute("scope", nullNS, elements[2]));
                 endpoint.addChild(property);
             }
+        }
+
+        //Failover http status codes
+        if(failoverHttpStatusCodes!=null){
+            OMElement statusCodeElement = fac.createOMElement("failoverHttpStatusCodes", synNS);
+            statusCodeElement.setText(failoverHttpStatusCodes);
+            failover.addChild(statusCodeElement);
         }
 
         endpoint.addChild(failover);
@@ -122,4 +139,6 @@ public class FailoverEndpoint extends ListEndpoint {
     public boolean isRetryAvailable() {
         return true;
     }
+
+
 }

@@ -25,11 +25,16 @@
 
         String name = request.getParameter("listEndpointName");
         String properties = request.getParameter("endpointProperties");
+        String failoverHttpStatusCodes = request.getParameter("failoverHttpStatusCodes");
+
         if (name != null) {
             endpoint.setName(name);
         }
         if (properties != null) {
             endpoint.setProperties(properties);
+        }
+        if(failoverHttpStatusCodes!=null){
+            endpoint.setFailoverHttpStatusCodes(failoverHttpStatusCodes);
         }
 
         OMElement endpointElement = endpoint.serialize(null);

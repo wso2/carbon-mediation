@@ -79,6 +79,7 @@
     }
 
     //this factory will be used to populate/extract template specific parameters starting with '$'
+
     TemplateDefinitionFactory templateDefinitionFactory = new TemplateDefinitionFactory();
     TemplateParameterContainer templateMappings = templateDefinitionFactory.getParameterContainer();
 
@@ -126,9 +127,12 @@
         CarbonUIMessage.sendCarbonUIMessage(msg, CarbonUIMessage.ERROR, request);
     }
 } else if (origin != null && !"".equals(origin)) {
+
     String epString = (String) session.getAttribute("endpointConfiguration");
     epString = epString.replaceAll("\\s\\s+|\\n|\\r", ""); // remove the pretty printing from the string
+
     OMElement endpointElement = AXIOMUtil.stringToOM(epString);
+
 
     if (isFromTemplateEditor) {
         templateObj = new TemplateFactory().createEndpointTemplate(endpointElement, new Properties());
@@ -136,11 +140,15 @@
             params = templateObj.getParameters().toArray(params);
             templateName = templateObj.getName();
         }
+
         endpoint = new AddressEndpoint();
         endpoint.build(templateObj, templateDefinitionFactory);
+
     } else {
+
         endpoint = new AddressEndpoint();
         endpoint.build(endpointElement, isAnonymous);
+
     }
 
 } else if (isAnonymous && !isTemplateAdd) {
@@ -429,7 +437,6 @@
     }
 
 </script>
-
 <table class="normal-nopadding">
     <tbody>
     <%
@@ -550,6 +557,7 @@
 <div id="_advancedForm" style="display:none">
 <table class="normal-nopadding">
 <tbody>
+
 <tr>
     <td colspan="2" class="sub-header"><fmt:message key="message.content"/></td>
 </tr>
@@ -662,6 +670,7 @@
                value="<%=retryTimeOut==0?EndpointConfigurationHelper.getMappingFrom(templateMappings, TemplateParameterContainer.EndpointDefKey.retriesOnTimeoutBeforeSuspend):retryTimeOut%>"/>
     </td>
 </tr>
+
 <tr>
     <td><fmt:message key="retry.delay.millis"/></td>
     <td><input type="text" id="retryDelay" name="retryDelay"
