@@ -1930,6 +1930,11 @@
                 <artifactId>org.apache.aries.util</artifactId>
                 <version>${aries.version}</version>
             </dependency>
+            <dependency>
+                <groupId>xerces.wso2</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xercesImpl.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
