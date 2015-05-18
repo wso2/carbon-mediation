@@ -46,6 +46,30 @@
             <groupId>ca.uhn.hapi.wso2</groupId>
             <artifactId>hapi</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.cxf</groupId>
+            <artifactId>cxf-bundle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+            <artifactId>jetty-bundle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.aries.blueprint</groupId>
+            <artifactId>org.apache.aries.blueprint</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.aries.proxy</groupId>
+            <artifactId>org.apache.aries.proxy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.aries</groupId>
+            <artifactId>org.apache.aries.util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>stax2-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -75,6 +99,12 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.persistence</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.osgi</bundleDef>
                                 <bundleDef>ca.uhn.hapi.wso2:hapi</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.cxf:cxf-bundle</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.eclipse.jetty:jetty-bundle</bundleDef>
+                                <bundleDef>org.apache.aries.blueprint:org.apache.aries.blueprint</bundleDef>
+                                <bundleDef>org.apache.aries.proxy:org.apache.aries.proxy</bundleDef>
+                                <bundleDef>org.apache.aries:org.apache.aries.util</bundleDef>
+                                <bundleDef>org.codehaus.woodstox:stax2-api</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
