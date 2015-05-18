@@ -15,8 +15,11 @@
  */
 package org.wso2.carbon.inbound.endpoint;
 
+import org.wso2.carbon.inbound.endpoint.inboundfactory.InboundRequestProcessorFactoryImpl;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
+import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointManager;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 
@@ -60,8 +63,13 @@ public class EndpointListenerLoader {
                 HTTPEndpointManager.getInstance().
                            startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(),
                                          inboundEndpointInfoDTO.getSslConfiguration());
+            } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.Protocols.hl7.toString())) {
+                HL7EndpointManager.getInstance().
+                        startListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getInboundParams());
+            } else if (inboundEndpointInfoDTO.getProtocol().equals(
+                    InboundRequestProcessorFactoryImpl.Protocols.cxf_ws_rm.toString())) {
+                CXFEndpointManager.getInstance().startCXFEndpoint(port, inboundEndpointInfoDTO);
             }
-
         }
     }
 

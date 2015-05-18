@@ -26,6 +26,7 @@
 <%@ page import="com.google.gson.JsonObject" %>
 <%@ page import="com.google.gson.GsonBuilder" %>
 <%@ page import="javax.xml.stream.XMLStreamException" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <%
 
@@ -43,7 +44,7 @@
 
     String storeName = request.getParameter("store").trim();
     String proxyName = request.getParameter("proxy").trim();
-    String message = request.getParameter("er7").trim();
+    String message = StringEscapeUtils.unescapeXml(request.getParameter("er7").trim());
 
     try {
         HL7StoreAdminServiceClient client = new HL7StoreAdminServiceClient(cookie, url, configContext);
@@ -62,7 +63,7 @@
         object.addProperty("success", true);
     } else {
         object.addProperty("success", false);
-        object.addProperty("reason", errorMsg);
+        object.addProperty("reason", StringEscapeUtils.escapeXml(errorMsg));
     }
 
     // Convert the object to a JSON string

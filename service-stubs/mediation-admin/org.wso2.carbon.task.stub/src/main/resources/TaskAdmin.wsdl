@@ -495,13 +495,13 @@
     </wsdl:binding>
     <wsdl:service name="TaskAdmin">
         <wsdl:port name="TaskAdminHttpsSoap11Endpoint" binding="tns:TaskAdminSoap11Binding">
-            <soap:address location="https://localhost:8243/services/TaskAdmin.TaskAdminHttpsSoap11Endpoint"/>
+            <soap:address location="https://priyakishok-ThinkPad-T540p:8243/services/TaskAdmin.TaskAdminHttpsSoap11Endpoint"/>
         </wsdl:port>
         <wsdl:port name="TaskAdminHttpsSoap12Endpoint" binding="tns:TaskAdminSoap12Binding">
-            <soap12:address location="https://localhost:8243/services/TaskAdmin.TaskAdminHttpsSoap12Endpoint"/>
+            <soap12:address location="https://priyakishok-ThinkPad-T540p:8243/services/TaskAdmin.TaskAdminHttpsSoap12Endpoint"/>
         </wsdl:port>
         <wsdl:port name="TaskAdminHttpsEndpoint" binding="tns:TaskAdminHttpBinding">
-            <http:address location="https://localhost:8243/services/TaskAdmin.TaskAdminHttpsEndpoint"/>
+            <http:address location="https://priyakishok-ThinkPad-T540p:8243/services/TaskAdmin.TaskAdminHttpsEndpoint"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>

@@ -49,8 +49,9 @@ public class InboundEndpointDTO {
             int i = 0;
             for (String strKey : mParams.keySet()) {
                 ParameterDTO parameterDTO = new ParameterDTO();
-                parameterDTO.setName(strKey);
-                parameterDTO.setValue(mParams.get(strKey));
+                parameterDTO.setName(strKey);              	 
+              	 parameterDTO.setValue(mParams.get(strKey));
+              	 parameterDTO.setKey(inboundEndpoint.getParameterKey(strKey));
                 parameters[i++] = parameterDTO;
             }
         }

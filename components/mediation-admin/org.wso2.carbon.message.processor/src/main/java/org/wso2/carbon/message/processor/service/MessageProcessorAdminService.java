@@ -17,6 +17,13 @@
 */
 package org.wso2.carbon.message.processor.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
@@ -38,13 +45,8 @@ import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceMan
 import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.message.processor.util.ConfigHolder;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 
 @SuppressWarnings({"UnusedDeclaration"})
@@ -559,6 +561,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
+
                         if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.MESSAGE_PROCESSOR_TYPE
                                 + File.separator + processorName)) {
                             getMediationPersistenceManager()
@@ -573,11 +576,13 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((SamplingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
+
                         if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.MESSAGE_PROCESSOR_TYPE
                                 + File.separator + processorName)) {
                             getMediationPersistenceManager()
                                     .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                         }
+
                     } else {
                         log.warn("Sampling Processor is already active");
                     }
@@ -608,11 +613,13 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if (view.isActive()) {
                         view.deactivate();
+
                         if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.MESSAGE_PROCESSOR_TYPE
                                 + File.separator + processorName)) {
                             getMediationPersistenceManager()
                                     .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                         }
+
                     } else {
                         log.warn("Scheduled Message Forwarding Processor - already deActive");
                     }
@@ -620,11 +627,13 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     SamplingProcessorView view = ((SamplingProcessor) processor).getView();
                     if (view.isActive()) {
                         view.deactivate();
+
                         if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.MESSAGE_PROCESSOR_TYPE
                                 + File.separator + processorName)) {
                             getMediationPersistenceManager()
                                     .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                         }
+
                     } else {
                         log.warn("Sampling Message Processor - already in the deactivated state");
                     }

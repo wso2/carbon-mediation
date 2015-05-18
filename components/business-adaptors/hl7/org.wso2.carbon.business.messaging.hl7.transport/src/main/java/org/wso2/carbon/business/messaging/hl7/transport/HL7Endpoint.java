@@ -58,9 +58,12 @@ public class HL7Endpoint extends ProtocolEndpoint {
             	return false;
             }
 
-            this.corePoolSize = ParamUtils.getOptionalParamInt(params, HL7Constants.HL7_CORE_POOL_SIZE, 100);
-            this.maxPoolSize = ParamUtils.getOptionalParamInt(params, HL7Constants.HL7_MAX_POOL_SIZE, 200);
-            this.idleThreadKeepAlive = ParamUtils.getOptionalParamInt(params, HL7Constants.HL7_IDLE_THREAD_KEEPALIVE, 10000);
+            this.corePoolSize = ParamUtils.getOptionalParamInt(params, HL7Constants.HL7_CORE_POOL_SIZE,
+                    HL7Constants.HL7_DEFAULT_CORE_POOL_SIZE);
+            this.maxPoolSize = ParamUtils.getOptionalParamInt(params, HL7Constants.HL7_MAX_POOL_SIZE,
+                    HL7Constants.HL7_DEFAULT_MAX_POOL_SIZE);
+            this.idleThreadKeepAlive = ParamUtils.getOptionalParamInt(params, HL7Constants.HL7_IDLE_THREAD_KEEPALIVE,
+                    HL7Constants.HL7_DEFAULT_IDLE_THREAD_KEEPALIVE);
 
             this.processingContext = this.createProcessingContext(params);
             setTransportLevelParams(processingContext);

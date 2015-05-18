@@ -43,8 +43,8 @@ import org.wso2.carbon.application.deployer.service.ApplicationManagerService;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.core.ServerShutdownHandler;
 import org.wso2.carbon.event.core.EventBroker;
+import org.wso2.carbon.inbound.endpoint.EndpointListenerLoader;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService;
-import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.initializer.multitenancy.TenantServiceBusInitializer;
@@ -259,8 +259,8 @@ public class ServiceBusInitializer {
             configCtxSvc.getServerConfigContext().setProperty(
                     ConfigurationManager.CONFIGURATION_MANAGER, configurationManager);
 
-            // Start Http Inbound Endpoint Listeners
-            HTTPEndpointManager.getInstance().loadEndpointListeners();
+            // Start Inbound Endpoint Listeners
+            EndpointListenerLoader.loadListeners();
 
 			registerInboundDeployer(configCtxSvc.getServerConfigContext()
 					.getAxisConfiguration(),
