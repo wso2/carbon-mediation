@@ -81,5 +81,13 @@
             </exclusion>
         </exclusions>
     </dependency>
+    <dependency>
+        <groupId>org.wso2.orbit.org.apache.cxf</groupId>
+        <artifactId>cxf-bundle</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+        <artifactId>jetty-bundle</artifactId>
+    </dependency>
 </dependencies>
 </project>

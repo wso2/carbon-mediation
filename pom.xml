@@ -70,6 +70,7 @@
                 <module>features/mediation-clustering</module>
                 <module>features/application-deployers</module>
                 <module>features/application-mgt</module>
+		        <module>components/mediation-message-processor</module>
             </modules>
         </profile>
     </profiles>
@@ -913,6 +914,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediation.message.processor</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.message.store</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -1277,6 +1283,12 @@
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.foreach.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediator.throttle.ui</artifactId>
                 <version>${carbon.mediation.version}</version>
@@ -1910,6 +1922,36 @@
                 <artifactId>org.wso2.carbon.mediator.publishevent</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.cxf</groupId>
+                <artifactId>cxf-bundle</artifactId>
+                <version>${cxf.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+                <artifactId>jetty-bundle</artifactId>
+                <version>${jetty.wso2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.aries.blueprint</groupId>
+                <artifactId>org.apache.aries.blueprint</artifactId>
+                <version>${aries.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.aries.proxy</groupId>
+                <artifactId>org.apache.aries.proxy</artifactId>
+                <version>${aries.proxy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.aries</groupId>
+                <artifactId>org.apache.aries.util</artifactId>
+                <version>${aries.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces.wso2</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xercesImpl.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1926,7 +1968,7 @@
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.4.0</carbon.commons.version>
+        <carbon.commons.version>4.4.1</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.4.0, 4.5.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
@@ -1937,7 +1979,7 @@
         <carbon.registry.imp.pkg.version>[4.4.0, 4.5.0)</carbon.registry.imp.pkg.version>
 
         <!-- Carbon Identity version-->
-        <carbon.identity.version>4.4.0</carbon.identity.version>
+        <carbon.identity.version>4.4.1</carbon.identity.version>
         <carbon.identity.imp.pkg.version>[4.4.0, 4.5.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->
@@ -1945,7 +1987,7 @@
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.3-wso2v4-SNAPSHOT</synapse.version>
+        <synapse.version>2.1.3-wso2v4</synapse.version>
 
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1.wso2v12</orbit.version.axis2>
@@ -2023,7 +2065,7 @@
         <jaxen.version>1.1.1</jaxen.version>
         <orbit.version.infinispan>5.1.2.wso2v1</orbit.version.infinispan>
         <orbit.version.h2.engine>1.2.140.wso2v3</orbit.version.h2.engine>
-        <orbit.version.spring>3.1.0.wso2v1</orbit.version.spring>
+        <orbit.version.spring>3.2.9.wso2v1</orbit.version.spring>
         <orbit.version.commons.fileuploader>1.2.0.wso2v1</orbit.version.commons.fileuploader>
         <orbit.version.woden>1.0.0.M8-wso2v1</orbit.version.woden>
         <libthrift.wso2.version>0.8.0.wso2v1</libthrift.wso2.version>
@@ -2034,16 +2076,18 @@
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xmlsec.version>1.5.5</xmlsec.version>
         <xml.resolver.version>1.2</xml.resolver.version>
-        <stax2.version>3.1.1</stax2.version>
+        <stax2.version>3.1.4</stax2.version>
         <woodstox.core.version>4.2.0</woodstox.core.version>
         <jaxb.xjc.version>2.1.13</jaxb.xjc.version>
         <jaxb.impl.version>2.1.13</jaxb.impl.version>
         <javax.ws.rs.version>2.0-m10</javax.ws.rs.version>
         <ehcache.core.version>2.5.1</ehcache.core.version>
-        <cxf.version>2.6.2</cxf.version>
+        <cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
+        <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
+        <aries.proxy.version>1.0.1</aries.proxy.version>
+        <aries.version>1.1.0</aries.version>
         <velocity.version>1.7</velocity.version>
         <commons.lang.version>2.6</commons.lang.version>
-
         <myfaces.version>2.1.11</myfaces.version>
         <jpa-commons-pool.version>1.5.4</jpa-commons-pool.version>
         <commons-xmlschema.version>1.4.7</commons-xmlschema.version>
@@ -2064,10 +2108,13 @@
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
         <project.scm.id>wso2-scm-server</project.scm.id>
+
         <!-- publishEvent mediator versions -->
         <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
         <org.apache.axiom.om.version>0.0.0</org.apache.axiom.om.version>
         <org.apache.felix.framework.version>1.0.3</org.apache.felix.framework.version>
+        <xercesImpl.version>2.8.1.wso2v2</xercesImpl.version>
+
     </properties>
     <pluginRepositories>
         <pluginRepository>

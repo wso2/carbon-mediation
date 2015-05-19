@@ -421,7 +421,7 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 	 * @param status
 	 * @throws AxisFault
 	 */
-	public void updateStatus(String libQName, String libName, String packageName, String status)
+	public boolean updateStatus(String libQName, String libName, String packageName, String status)
 	                                                                                            throws AxisFault {
 		try {
 			SynapseConfiguration configuration = getSynapseConfiguration();
@@ -453,6 +453,7 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 			String message = "Unable to update status for :  " + libQName;
 			handleException(log, message, e);
 		}
+        return true;
 	}
     
 	/**
