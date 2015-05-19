@@ -801,30 +801,6 @@ public class FilePollingConsumer {
                         } catch (Exception e) {
                             log.warn("Error generating sub-folder structure with date", e);
                         }
-                        if (strSubfoldertimestamp != null) {
-                            try {
-                                SimpleDateFormat sdf = new SimpleDateFormat(strSubfoldertimestamp);
-                                String strDateformat = sdf.format(new Date());
-                                int iIndex = moveToDirectoryURI.indexOf("?");
-                                if (iIndex > -1) {
-                                    String endPart = moveToDirectoryURI.substring(iIndex, moveToDirectoryURI.length());
-                                    moveToDirectoryURI = moveToDirectoryURI.substring(0, iIndex);
-
-                                    if (!(moveToDirectoryURI.charAt(iIndex - 1) + "").equals(File.separator)) {
-                                        moveToDirectoryURI += File.separator;
-                                    }
-                                    moveToDirectoryURI +=  strDateformat + endPart;
-                                } else {
-                                    if (!(moveToDirectoryURI.charAt(moveToDirectoryURI.length() - 1) + "").equals(File
-                                            .separator)) {
-                                        moveToDirectoryURI += File.separator;
-                                    }
-                                    moveToDirectoryURI += strDateformat;
-                                }
-                            } catch (Exception e) {
-                                log.warn("Error generating sub-folder name with date", e);
-                            }
-                        }
                     }
                 }
                 break;
