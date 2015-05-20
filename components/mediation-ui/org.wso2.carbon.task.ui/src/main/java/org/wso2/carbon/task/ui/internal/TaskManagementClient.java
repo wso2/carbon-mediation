@@ -153,7 +153,7 @@ public class TaskManagementClient {
 
     public List<TaskDescription> getAllTaskDescriptions() throws Exception {
 
-        OMElement element = (OMElement) stub.getAllTaskDescriptions();
+        OMElement element = stub.getAllTaskDescriptions(null);
         if (log.isDebugEnabled()) {
             log.debug("All TasKs configurations :" + element);
         }
@@ -191,7 +191,7 @@ public class TaskManagementClient {
             log.debug("Going to retrieve a Task Description for give name :" + name);
         }
 
-        OMElement returnElement = (OMElement) stub.getTaskDescription(name, group);
+        OMElement returnElement = stub.getTaskDescription(name, group);
         validateTaskElement(returnElement);
 
         OMElement taskElement = returnElement.getFirstElement();

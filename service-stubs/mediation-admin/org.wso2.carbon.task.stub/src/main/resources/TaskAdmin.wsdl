@@ -38,7 +38,8 @@
             <xs:element name="editTaskDescription">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="taskElement" nillable="true" type="xs:anyType"/>
+                        <!--xs:element minOccurs="0" name="taskElement" nillable="true" type="xs:anyType"/-->
+			            <xs:any/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -68,7 +69,8 @@
             <xs:element name="loadTaskClassPropertiesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
+                        <!--xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/-->
+			            <xs:any/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -87,7 +89,8 @@
             <xs:element name="addTaskDescription">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="taskElement" nillable="true" type="xs:anyType"/>
+                        <!--xs:element minOccurs="0" name="taskElement" nillable="true" type="xs:anyType"/-->
+			            <xs:any/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -102,19 +105,23 @@
             <xs:element name="getTaskDescriptionResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
+                        <!--xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/-->
+			            <xs:any/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="getAllTaskDescriptions">
                 <xs:complexType>
-                    <xs:sequence/>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
+		            </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="getAllTaskDescriptionsResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
+                        <!--xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/-->
+			            <xs:any/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
