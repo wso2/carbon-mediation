@@ -50,6 +50,7 @@
                 <module>components/mediation-admin</module>
                 <!--module>components/mediation-connector</module-->
                 <module>components/mediators</module>
+		<module>components/event-sink</module>
                 <module>components/mediation-ui</module>
                 <module>components/mediation-ntask</module>
                 <module>components/inbound-endpoints</module>
@@ -1972,14 +1973,14 @@
         <carbon.commons.imp.pkg.version>[4.4.0, 4.5.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
-        <carbon.deployment.version>4.4.0</carbon.deployment.version>
+        <carbon.deployment.version>4.4.1-SNAPSHOT</carbon.deployment.version>
 
         <!-- Carbon Registry version-->
         <carbon.registry.version>4.4.0</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.4.0, 4.5.0)</carbon.registry.imp.pkg.version>
 
         <!-- Carbon Identity version-->
-        <carbon.identity.version>4.4.1</carbon.identity.version>
+        <carbon.identity.version>4.4.2-SNAPSHOT</carbon.identity.version>
         <carbon.identity.imp.pkg.version>[4.4.0, 4.5.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->
