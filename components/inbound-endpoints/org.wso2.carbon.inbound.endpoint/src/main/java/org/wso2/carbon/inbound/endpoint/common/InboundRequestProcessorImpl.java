@@ -24,6 +24,10 @@ import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.startup.quartz.StartUpController;
 import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskDescription;
+import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 
 /**
  * 
@@ -41,8 +45,13 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
     private InboundRunner inboundRunner;
     private Thread runningThread;
     private static final Log log = LogFactory.getLog(InboundRequestProcessorImpl.class);
+    private InboundEndpointsDataStore dataStore;
     
     protected final static String COMMON_ENDPOINT_POSTFIX = "--SYNAPSE_INBOUND_ENDPOINT";
+    
+    public InboundRequestProcessorImpl(){
+   	 dataStore = InboundEndpointsDataStore.getInstance();
+    }
     
     /**
      * 
@@ -76,18 +85,29 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
                         + ". Unable to schedule the task. " + e.getLocalizedMessage(), e);
             }
         } else {
+            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            int tenantId = carbonContext.getTenantId();
+			   if (tenantId != MultitenantConstants.SUPER_TENANT_ID &&
+			        !dataStore.isPollingEndpointRegistered(carbonContext.getTenantDomain(), name)) {
+				    dataStore.registerPollingingEndpoint(carbonContext.getTenantDomain(), name);
+			   }       
             inboundRunner = new InboundRunner(task, interval);
             runningThread = new Thread(inboundRunner);
             runningThread.start();
         }
     }
-
+    
     /**
      * Stop the inbound polling processor This will be called when inbound is
      * undeployed/redeployed or when server stop
      */
     public void destroy() {
         log.info("Inbound endpoint " + name + " stopping.");
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        int tenantId = carbonContext.getTenantId();
+        if(tenantId != MultitenantConstants.SUPER_TENANT_ID){                      
+            dataStore.unregisterPollingEndpoint(carbonContext.getTenantDomain(), name);
+        }         
         if (startUpController != null) {
             startUpController.destroy();
         } else if (runningThread != null) {
