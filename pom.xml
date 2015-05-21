@@ -2060,7 +2060,7 @@
 
         <!-- Carbon Identity version-->
         <carbon.identity.version>4.5.0</carbon.identity.version>
-        <carbon.identity.imp.pkg.version>[4.4.0, 4.5.0)</carbon.identity.imp.pkg.version>
+        <carbon.identity.imp.pkg.version>[4.5.0, 4.6.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->
         <carbon.rule.version>4.4.0</carbon.rule.version>
