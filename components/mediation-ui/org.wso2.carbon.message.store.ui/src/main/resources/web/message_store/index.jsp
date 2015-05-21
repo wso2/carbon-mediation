@@ -100,6 +100,8 @@
         var content = cell.firstChild.innerHTML;
         if (storeType == "org.apache.synapse.message.store.impl.jms.JmsStore") {
             document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + content;
+        } else if (storeType == "org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore") {
+            document.location.href = "rabbitmqMessageStore.jsp?" + "messageStoreName=" + content;
         } else if (storeType == "org.apache.synapse.message.store.impl.memory.InMemoryStore") {
             document.location.href = "inMemoryMessageStore.jsp?" + "messageStoreName=" + content;
         } else if (storeType == "org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore") {
@@ -228,7 +230,7 @@
                         </td>
                         <td><%= type%>
                         </td>
-                        <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                        <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
                         <td><%= size%>
                         </td>
                         <%} else {%>
@@ -293,6 +295,18 @@
                         </td>
                         <td>
                             <fmt:message key="jms.message.store.desc"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a class="icon-link"
+                               href="rabbitmqMessageStore.jsp"
+                               style="background-image: url(../admin/images/add.gif);">
+                                <fmt:message key="rabbitmq.message.store"/>
+                            </a>
+                        </td>
+                        <td>
+                            <fmt:message key="rabbitmq.message.store.desc"/>
                         </td>
                     </tr>
                     <tr>
