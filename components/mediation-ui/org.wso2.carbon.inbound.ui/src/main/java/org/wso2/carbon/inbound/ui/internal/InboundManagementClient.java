@@ -286,7 +286,7 @@ public class InboundManagementClient {
     private List<ParamDTO> validateParameterList(List<ParamDTO> paramDTOList) {
         List<ParamDTO> paramDTOs = new ArrayList<ParamDTO>();
         for (ParamDTO paramDTO : paramDTOList) {
-            if (paramDTO.getValue() != null && paramDTO.getValue().trim() != "") {
+            if (paramDTO.getValue() != null && paramDTO.getValue().trim().length() > 0) {
                 paramDTOs.add(paramDTO);
             }
 
