@@ -31,6 +31,7 @@
     <url>http://wso2.org</url>
 
     <modules>
+	<module>publishEvent-mediator</module>
         <module>smooks-mediator-feature</module>
         <module>bam-mediator</module>
 	    <module>oauth-mediator-feature</module>
