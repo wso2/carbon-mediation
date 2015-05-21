@@ -57,6 +57,7 @@
                 <module>components/mediation-clustering</module>
                 <module>components/application-deployers</module>
                 <module>components/application-mgt</module>
+		<module>features/event-sink</module>
                 <module>features/scheduled-tasks</module>
                 <module>features/business-adaptors</module>
                 <module>features/mediation-config-admin-features</module>
@@ -2058,7 +2059,7 @@
         <carbon.registry.imp.pkg.version>[4.4.0, 4.5.0)</carbon.registry.imp.pkg.version>
 
         <!-- Carbon Identity version-->
-        <carbon.identity.version>4.4.2-SNAPSHOT</carbon.identity.version>
+        <carbon.identity.version>4.5.0</carbon.identity.version>
         <carbon.identity.imp.pkg.version>[4.4.0, 4.5.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->
@@ -2066,7 +2067,7 @@
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.3-wso2v4</synapse.version>
+        <synapse.version>2.1.3-wso2v5</synapse.version>
 
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1.wso2v12</orbit.version.axis2>
