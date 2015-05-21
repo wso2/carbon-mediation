@@ -87,11 +87,13 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
         } else {
             PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
             int tenantId = carbonContext.getTenantId();
+            String tenantDomain = null;
 			   if (tenantId != MultitenantConstants.SUPER_TENANT_ID &&
 			        !dataStore.isPollingEndpointRegistered(carbonContext.getTenantDomain(), name)) {
-				    dataStore.registerPollingingEndpoint(carbonContext.getTenantDomain(), name);
+			   	 tenantDomain = carbonContext.getTenantDomain();
+				    dataStore.registerPollingingEndpoint(tenantDomain, name);
 			   }       
-            inboundRunner = new InboundRunner(task, interval);
+            inboundRunner = new InboundRunner(task, interval, tenantDomain);
             runningThread = new Thread(inboundRunner);
             runningThread.start();
         }

@@ -48,12 +48,14 @@ public class InboundRunner implements Runnable {
     private long lastRuntime;
     private long currentRuntime;
     private long cycleInterval;
+    private String tenantDomain;
 
     private static final Log log = LogFactory.getLog(InboundRunner.class);
 
-    public InboundRunner(InboundTask task, long interval) {
+    public InboundRunner(InboundTask task, long interval, String tenantDomain) {
         this.task = task;
         this.interval = interval;
+        this.tenantDomain = tenantDomain;
     }
 
     /**
@@ -109,13 +111,11 @@ public class InboundRunner implements Runnable {
                 }
             }
             //Keep the tenant loaded
-            /*PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-            int tenantId = carbonContext.getTenantId();
-    		   if (tenantId != MultitenantConstants.SUPER_TENANT_ID ) {
+    		   if (tenantDomain != null) {
     		        ConfigurationContextService configurationContext = InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
     		        ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
-    		        TenantAxisUtils.getTenantConfigurationContext(carbonContext.getTenantDomain(), mainConfigCtx);
-    		   } */           
+    		        TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+    		   }           
         }
         log.debug("Exit the Inbound Endpoint running loop.");
     }
