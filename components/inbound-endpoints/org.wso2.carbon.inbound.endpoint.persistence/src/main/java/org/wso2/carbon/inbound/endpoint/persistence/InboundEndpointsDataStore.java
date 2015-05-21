@@ -45,7 +45,7 @@ public class InboundEndpointsDataStore {
     //Store polling endpoints with <TenantId<Endpoint_Name>> format
     private Map<String,Set<String>> endpointPollingInfo;
     private Registry registry = null;
-    private final String rootPath = "conf:" + RegistryResources.ROOT + "inbound-endpoints/";
+    private final String rootPath = RegistryResources.ROOT + "esb/inbound/inbound-endpoints/";
 
     private static InboundEndpointsDataStore instance = new InboundEndpointsDataStore();
 
