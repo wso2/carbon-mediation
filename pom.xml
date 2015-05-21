@@ -50,7 +50,7 @@
                 <module>components/mediation-admin</module>
                 <!--module>components/mediation-connector</module-->
                 <module>components/mediators</module>
-		<module>components/event-sink</module>
+                <module>components/event-sink</module>
                 <module>components/mediation-ui</module>
                 <module>components/mediation-ntask</module>
                 <module>components/inbound-endpoints</module>
@@ -71,7 +71,7 @@
                 <module>features/mediation-clustering</module>
                 <module>features/application-deployers</module>
                 <module>features/application-mgt</module>
-		        <module>components/mediation-message-processor</module>
+                <module>components/mediation-message-processor</module>
             </modules>
         </profile>
     </profiles>
@@ -811,6 +811,16 @@
                 <artifactId>org.wso2.carbon.application.mgt.synapse.stub</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
 
             <!--10.2 Components-->
             <dependency>
@@ -1429,6 +1439,21 @@
                 <artifactId>org.wso2.carbon.identity.entitlement.mediator</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
 
             <!--10.3 Features -->
             <dependency>
@@ -1576,6 +1601,54 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.apache.synapse.wso2.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.publishevent.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.publishevent.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.publishevent.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.apache.synapse.wso2.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config.ui.feature</artifactId>
                 <version>${carbon.mediation.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1921,6 +1994,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediator.publishevent</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.publishevent.ui</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
