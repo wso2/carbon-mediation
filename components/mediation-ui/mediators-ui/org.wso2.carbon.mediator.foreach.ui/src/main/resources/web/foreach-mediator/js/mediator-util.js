@@ -52,7 +52,13 @@ function hideSeqRegistryOption(){
     hideElem('mediator.foreach.seq.reg.link_1');
     hideElem('mediator.foreach.seq.reg.link_2');
     setSeqValueType('anonymous');
-    disableEnableEndPointOnSequencRef('');
+}
+
+function hideSeqRegistryOptionNone(){
+    hideElem('mediator.foreach.seq.reg');
+    hideElem('mediator.foreach.seq.reg.link_1');
+    hideElem('mediator.foreach.seq.reg.link_2');
+    setSeqValueType('none');
 }
 
 function showSeqRegistryOption(){
@@ -70,10 +76,6 @@ function hideElem(objid) {
 function showElem(objid) {
     var theObj = document.getElementById(objid);
     theObj.style.display = "";
-}
-
-function seqNoneClicked(){
-    setSeqValueType('none');
 }
 
 function setSeqValueType(type){

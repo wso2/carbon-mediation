@@ -34,7 +34,7 @@
     }
     ForEachMediator foreachMediator = (ForEachMediator) mediator;
 
-    String whichSeq = "None";
+    String whichSeq = "none";
 
     String inRegKey = "";
 
@@ -132,8 +132,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input id="mediator.foreach.seq.radio.none" name="mediator.foreach.seq.radio"  type="radio" value="none"
-                                      onclick="hideSeqRegistryOption(); seqNoneClicked();"/>
+                                <input id="mediator.foreach.seq.radio.none" name="mediator.foreach.seq.radio"  type="radio"
+                                      onclick="hideSeqRegistryOptionNone();"/>
                                       None
                             </td>
                         </tr>
