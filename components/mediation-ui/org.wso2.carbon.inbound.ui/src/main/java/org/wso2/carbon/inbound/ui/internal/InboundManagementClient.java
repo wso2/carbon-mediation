@@ -131,6 +131,7 @@ public class InboundManagementClient {
     public boolean addInboundEndpoint(String name, String sequence, String onError,
                                       String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
         try {
+            lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
             int i = 0;
             for (ParamDTO parameter : lParameters) {
@@ -248,6 +249,7 @@ public class InboundManagementClient {
     public boolean updteInboundEndpoint(String name, String sequence, String onError,
             String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
         try {
+            lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
             int i = 0;
             for (ParamDTO parameter : lParameters) {
@@ -279,6 +281,17 @@ public class InboundManagementClient {
             return false;
         }
         return false;
+    }
+
+    private List<ParamDTO> validateParameterList(List<ParamDTO> paramDTOList){
+        List<ParamDTO> paramDTOs = new ArrayList<ParamDTO>();
+        for(ParamDTO paramDTO:paramDTOList){
+            if(paramDTO.getValue() != null && paramDTO.getValue().trim() != ""){
+                paramDTOs.add(paramDTO);
+            }
+
+        }
+        return paramDTOs;
     }
 
 }
