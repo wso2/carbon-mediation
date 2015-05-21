@@ -149,7 +149,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
      * @param name  endpoint name
      */
     public void startSSLListener(int port, String name, SSLConfiguration sslConfiguration) {
-
+        if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
+            log.info("Listener is already started for port : " + port);
+            return;
+        }
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSSLSourceConfiguration();
