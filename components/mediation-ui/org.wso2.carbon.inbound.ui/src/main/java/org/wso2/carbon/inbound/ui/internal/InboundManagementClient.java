@@ -289,9 +289,7 @@ public class InboundManagementClient {
             if (paramDTO.getValue() != null && paramDTO.getValue().trim().length() > 0) {
                 paramDTOs.add(paramDTO);
             }
-
         }
         return paramDTOs;
     }
-
 }
