@@ -49,10 +49,6 @@
             <groupId>slf4j.wso2</groupId>
             <artifactId>slf4j</artifactId>
         </dependency>
-        <dependency>
-            <groupId>xerces.wso2</groupId>
-            <artifactId>xercesImpl</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -82,7 +78,6 @@
                                 <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.entitlement.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon:org.wso2.carbon.authenticator.stub</bundleDef>
                                 <bundleDef>slf4j.wso2:slf4j</bundleDef>
-                                <bundleDef>xerces.wso2:xercesImpl</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
