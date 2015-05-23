@@ -64,18 +64,11 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.event.sink.config.stub</artifactId>
-            <version>${wso2carbon.version.event-sink-config-stub}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.event.sink.config</artifactId>
-            <version>${wso2carbon.version.event-sink-config}</version>
         </dependency>
     </dependencies>
-
-    <properties>
-        <wso2carbon.version.event-sink-config-stub>${carbon.mediation.version}</wso2carbon.version.event-sink-config-stub>
-        <wso2carbon.version.event-sink-config>${carbon.mediation.version}</wso2carbon.version.event-sink-config>
-    </properties>
 
 </project>
