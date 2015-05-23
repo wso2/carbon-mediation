@@ -2052,7 +2052,7 @@
         <carbon.commons.imp.pkg.version>[4.4.0, 4.5.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
-        <carbon.deployment.version>4.4.1-SNAPSHOT</carbon.deployment.version>
+        <carbon.deployment.version>4.4.1</carbon.deployment.version>
 
         <!-- Carbon Registry version-->
         <carbon.registry.version>4.4.0</carbon.registry.version>
