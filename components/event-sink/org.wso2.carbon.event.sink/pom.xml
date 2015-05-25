@@ -14,19 +14,17 @@
 # limitations under the License.
   -->
 <!--suppress MavenModelInspection -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>event-sink</artifactId>
-        <version>4.4.1-SNAPSHOT</version>
+        <version>4.4.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.event.sink</artifactId>
     <packaging>bundle</packaging>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.2-SNAPSHOT</version>
     <name>WSO2 Carbon - Event Sink manager</name>
 
     <dependencies>
