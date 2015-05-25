@@ -2027,6 +2027,11 @@
                 <artifactId>xercesImpl</artifactId>
                 <version>${xercesImpl.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.ws.security.wso2</groupId>
+                <artifactId>wss4j</artifactId>
+                <version>${wss4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2083,6 +2088,7 @@
         <rampart.mar.version>1.6.1-wso2v12</rampart.mar.version>
         <neethi.version>3.0.2</neethi.version>
         <neethi.osgi.version>2.0.4.wso2v4</neethi.osgi.version>
+        <wss4j.version>1.5.11.wso2v10</wss4j.version>
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>1.6.1.wso2v12</rampart.wso2.version>
