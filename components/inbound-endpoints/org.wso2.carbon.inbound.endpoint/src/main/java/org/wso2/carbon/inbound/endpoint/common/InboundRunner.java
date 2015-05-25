@@ -19,11 +19,17 @@ package org.wso2.carbon.inbound.endpoint.common;
 
 import java.util.Date;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.Task;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
 import org.wso2.carbon.mediation.clustering.ClusteringAgentUtil;
 import org.wso2.carbon.utils.CarbonUtils;
+import org.wso2.carbon.utils.ConfigurationContextService;
 
 /**
  * 
@@ -42,12 +48,14 @@ public class InboundRunner implements Runnable {
     private long lastRuntime;
     private long currentRuntime;
     private long cycleInterval;
+    private String tenantDomain;
 
     private static final Log log = LogFactory.getLog(InboundRunner.class);
 
-    public InboundRunner(InboundTask task, long interval) {
+    public InboundRunner(InboundTask task, long interval, String tenantDomain) {
         this.task = task;
         this.interval = interval;
+        this.tenantDomain = tenantDomain;
     }
 
     /**
@@ -76,9 +84,9 @@ public class InboundRunner implements Runnable {
             try {
                 Thread.sleep(interval);
             } catch (InterruptedException e) {
-                log.warn(
-                        "Unable to sleep the inbound thread for interval of : " + interval + "ms.",
-                        e);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to sleep the inbound thread for interval of : " + interval + "ms.");
+                }
             }
         }
 
@@ -98,10 +106,18 @@ public class InboundRunner implements Runnable {
                 try {
                     Thread.sleep(interval);
                 } catch (InterruptedException e) {
-                    log.warn("Unable to sleep the inbound thread for interval of : " + interval
-                            + "ms.", e);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Unable to sleep the inbound thread for interval of : " + interval + "ms.");
+                    }
                 }
             }
+            //Keep the tenant loaded
+    		   if (tenantDomain != null) {
+                ConfigurationContextService configurationContext =
+				                                           InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
+                ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+                TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+    		   }
         }
         log.debug("Exit the Inbound Endpoint running loop.");
     }

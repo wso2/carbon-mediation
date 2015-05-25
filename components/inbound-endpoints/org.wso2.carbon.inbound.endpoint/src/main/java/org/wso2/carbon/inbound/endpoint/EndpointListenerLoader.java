@@ -15,17 +15,22 @@
  */
 package org.wso2.carbon.inbound.endpoint;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.inboundfactory.InboundRequestProcessorFactoryImpl;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
+import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
+import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is responsible for starting Listeners( like HTTP, HTTPS, HL7) on server startup for
@@ -48,7 +53,7 @@ public class EndpointListenerLoader {
     public static void loadListeners() {
 
         Map<Integer, List<InboundEndpointInfoDTO>> tenantData =
-                InboundEndpointsDataStore.getInstance().getAllEndpointData();
+                InboundEndpointsDataStore.getInstance().getAllListeningEndpointData();
 
         for (Map.Entry tenantInfoEntry : tenantData.entrySet()) {
             int port = (Integer) tenantInfoEntry.getKey();
@@ -71,6 +76,15 @@ public class EndpointListenerLoader {
                 CXFEndpointManager.getInstance().startCXFEndpoint(port, inboundEndpointInfoDTO);
             }
         }
+        
+        //Load tenats required for polling inbound protocols
+        Map<String, Set<String>> mPollingEndpoints =
+		                                  InboundEndpointsDataStore.getInstance().getAllPollingingEndpointData();
+        ConfigurationContextService configurationContext = 
+      	                               InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
+        ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+        for (String tenantDomain : mPollingEndpoints.keySet()) {
+            TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+        }
     }
-
 }
