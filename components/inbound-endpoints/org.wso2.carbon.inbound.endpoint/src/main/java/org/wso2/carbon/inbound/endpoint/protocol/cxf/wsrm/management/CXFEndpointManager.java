@@ -60,7 +60,7 @@ public class CXFEndpointManager extends AbstractInboundEndpointManager {
 
 		PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
 		String tenantDomain = carbonContext.getTenantDomain();
-		String epName = dataStore.getEndpointName(port, tenantDomain);
+		String epName = dataStore.getListeningEndpointName(port, tenantDomain);
 
 		if (epName != null) {
 			if (epName.equalsIgnoreCase(name)) {
@@ -79,7 +79,7 @@ public class CXFEndpointManager extends AbstractInboundEndpointManager {
 				throw new SynapseException(msg);
 			}
 		} else {
-			dataStore.registerEndpoint(port, tenantDomain,
+			dataStore.registerListeningEndpoint(port, tenantDomain,
 			                           InboundRequestProcessorFactoryImpl.Protocols.cxf_ws_rm.toString(), name, params);
 			return true;
 		}
@@ -93,7 +93,7 @@ public class CXFEndpointManager extends AbstractInboundEndpointManager {
 		cxfInboundEndpointMap.remove(port);
 		PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
 		String tenantDomain = cc.getTenantDomain();
-		dataStore.unregisterEndpoint(port, tenantDomain);
+		dataStore.unregisterListeningEndpoint(port, tenantDomain);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class CXFEndpointManager extends AbstractInboundEndpointManager {
 		if (tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
 			return new InboundRMHttpListener(params);
 		} else {
-			String epName = dataStore.getEndpointName(port, tenantDomain);
+			String epName = dataStore.getListeningEndpointName(port, tenantDomain);
 			if (epName != null) {
 				if (epName.equalsIgnoreCase(name)) {
 					//For tenants, if that tenant has a server running on the requested port, it is returned.

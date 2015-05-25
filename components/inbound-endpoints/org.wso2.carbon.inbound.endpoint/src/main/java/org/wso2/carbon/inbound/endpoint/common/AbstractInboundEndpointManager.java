@@ -32,7 +32,7 @@ public abstract class AbstractInboundEndpointManager implements InboundEndpointM
 
     @Override
     public String getEndpointName(int port, String domain) {
-        return dataStore.getEndpointName(port, domain);
+        return dataStore.getListeningEndpointName(port, domain);
     }
 
 }
