@@ -19,11 +19,11 @@
     <parent>
         <artifactId>inbound-endpoints-feature</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.4.1-SNAPSHOT</version>
+        <version>4.4.2-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.2-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.inbound.endpoints.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Inbound Endpoint Server Feature</name>
@@ -37,6 +37,38 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.inbound.endpoint.osgi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ca.uhn.hapi.wso2</groupId>
+            <artifactId>hapi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.cxf</groupId>
+            <artifactId>cxf-bundle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+            <artifactId>jetty-bundle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.aries.blueprint</groupId>
+            <artifactId>org.apache.aries.blueprint</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.aries.proxy</groupId>
+            <artifactId>org.apache.aries.proxy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.aries</groupId>
+            <artifactId>org.apache.aries.util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>stax2-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -65,6 +97,14 @@
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.persistence</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.osgi</bundleDef>
+                                <bundleDef>ca.uhn.hapi.wso2:hapi</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.cxf:cxf-bundle</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.eclipse.jetty:jetty-bundle</bundleDef>
+                                <bundleDef>org.apache.aries.blueprint:org.apache.aries.blueprint</bundleDef>
+                                <bundleDef>org.apache.aries.proxy:org.apache.aries.proxy</bundleDef>
+                                <bundleDef>org.apache.aries:org.apache.aries.util</bundleDef>
+                                <bundleDef>org.codehaus.woodstox:stax2-api</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>

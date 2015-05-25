@@ -24,42 +24,34 @@ import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandl
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpSourceHandler;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manager which handles Http Listeners activities for Inbound Endpoints, coordinating
  * with Pass-through APIs and registry etc. This is the central place to mange Http Listeners
  * for Inbound endpoints
  */
-public class EndpointListenerManager {
+public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
-    private static EndpointListenerManager instance = new EndpointListenerManager();
+    private static HTTPEndpointManager instance = new HTTPEndpointManager();
 
-    private InboundEndpointsDataStore dataStore;
+    private static final Logger log = Logger.getLogger(HTTPEndpointManager.class);
 
-    private static final Logger log = Logger.getLogger(EndpointListenerManager.class);
-
-
-    private EndpointListenerManager() {
-        dataStore = new InboundEndpointsDataStore();
+    private HTTPEndpointManager() {
+        super();
     }
 
-    public static EndpointListenerManager getInstance() {
+    public static HTTPEndpointManager getInstance() {
         return instance;
-    }
-
-    public String getEndpointName(int port, String domain) {
-        return dataStore.getEndpointName(port, domain);
     }
 
     /**
@@ -82,7 +74,7 @@ public class EndpointListenerManager {
                 throw new SynapseException(msg);
             }
         } else {
-            dataStore.registerEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name);
+            dataStore.registerEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name, null);
             startListener(port, name);
         }
 
@@ -123,7 +115,7 @@ public class EndpointListenerManager {
      * @param port  port
      * @param name  endpoint name
      */
-    private void startListener(int port, String name) {
+    public void startListener(int port, String name) {
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener is already started for port : " + port);
             return;
@@ -156,8 +148,11 @@ public class EndpointListenerManager {
      * @param port  port
      * @param name  endpoint name
      */
-    private void startSSLListener(int port, String name ,SSLConfiguration sslConfiguration ) {
-
+    public void startSSLListener(int port, String name, SSLConfiguration sslConfiguration) {
+        if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
+            log.info("Listener is already started for port : " + port);
+            return;
+        }
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSSLSourceConfiguration();
@@ -215,7 +210,7 @@ public class EndpointListenerManager {
             if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTP)) {
                 startListener(port, inboundEndpointInfoDTO.getEndpointName());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTPS)) {
-                startSSLEndpoint(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getSslConfiguration());
+                startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getSslConfiguration());
             }
 
         }

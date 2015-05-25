@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+~  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+~
+~  Licensed to the Apache Software Foundation (ASF) under one or more
+~  contributor license agreements.  See the NOTICE file distributed with
+~  this work for additional information regarding copyright ownership.
+~
+~  The ASF licenses this file to You under the Apache License, Version 2.0
+~
+~  (the "License"); you may not use this file except in compliance with
+~  the License.  You may obtain a copy of the License at
+~       http://www.apache.org/licenses/LICENSE-2.0
+~  Unless required by applicable law or agreed to in writing, software
+~  distributed under the License is distributed on an "AS IS" BASIS,
+~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~  See the License for the specific language governing permissions and
+~  limitations under the License.
+-->
+
+<html>
+<head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>Configuring Event Sinks - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+<body>
+<h1>Configuring Event Sinks</h1>
+
+<p>Event sinks contain information about transport endpoints provided by other systems. Events can be published to these endpoints.
+ Endpoint transport and authentication URLs and credentials are captured in event sinks.</p>
+<ul>
+    <li>To go to the configuration of Event Sinks go to&nbsp;ESB management console <strong>Configure&rarr;Event
+        Sinks</strong>
+        menu.<br/><br/></li>
+    <li>If there are no existing Event Sinks (in the very first time) click <strong>Add
+        Event Sink</strong> to
+        add a new Event Sink.<br/><br/></li>
+    <li>New event sinks can be added by clicking <strong>Add Event Sink</strong> button. Already existing event sinks
+        can be modified by clicking on their <strong>Edit</strong> link. If
+        there are unnecessary Event Sink they can be deleted by clicking on their <strong>
+            delete</strong>
+        link.<br/><br/></li>
+</ul>
+<img src="images/with_event_sinks.png" class="confluence-embedded-image"/><br/>
+<strong>Figure1: Event Sink management UI</strong>
+
+<br/><br/>
+<h3><strong>Creating a new event sink</strong></h3>
+<img src="images/filled_event_sink.png" class="confluence-embedded-image"/></body><br/>
+<strong>Figure2: Create new event sink form</strong>
+<ul>
+    <li>Enter a name for Event Sink in <strong>Name</strong>.<br/><br/></li>
+    <li>Enter Credentials of the data-bridge endpoint in <strong>Username</strong> and
+        <strong>Password</strong>.<br/><br/></li>
+    <li>Enter URL of the data-bridge endpoint in <strong>Receiver URL</strong>. Multiple endpoints can be specified for
+        load balancing and multiple receiver mode by using correct URL set format<br/><br/></li>
+    <li>Enter Secure data-bridge endpoint URL which should be used for authentication in <strong>Authenticator
+        URL</strong>. If a URL set is specified for <strong>Receiver URL</strong>, <strong>Authenticator URL</strong>
+        should also be a matching URL set.
+    </li>
+</ul>
+
+</body>
+
+</html>

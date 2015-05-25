@@ -18,9 +18,9 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-admin-features</artifactId>
-      <version>4.4.1-SNAPSHOT</version>
+      <version>4.4.2-SNAPSHOT</version>
    </parent>
-   <version>4.4.1-SNAPSHOT</version>
+   <version>4.4.2-SNAPSHOT</version>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>org.wso2.carbon.mediation.admin.feature</artifactId>
    <packaging>pom</packaging>
@@ -124,6 +124,10 @@
          <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.inbound</artifactId>
       </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon.mediation</groupId>
+         <artifactId>org.wso2.carbon.mediation.message.processor</artifactId>
+      </dependency>
    </dependencies>
    <build>
       <plugins>
@@ -140,7 +144,7 @@
                   </goals>
                   <configuration>
                      <id>org.wso2.carbon.mediation.admin</id>
-                     <propertiesFile>../../../etc/feature.properties</propertiesFile>
+                     <propertiesFile>../../etc/feature.properties</propertiesFile>
                      <adviceFile>
                         <properties>
                            <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
@@ -172,6 +176,7 @@
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.ntask</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.ntaskadmin</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound</bundleDef>
+                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.message.processor</bundleDef>
                      </bundles>
                       <importFeatures>
                           <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>

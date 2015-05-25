@@ -23,13 +23,11 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 
 import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PersistenceUtils {
@@ -39,6 +37,12 @@ public class PersistenceUtils {
     private static final String PORT_ATT = "port";
     private static final String DOMAIN_ATT = "domain";
     private static final String PROTOCOL_ATT = "protocol";
+    private static final String INJECT_SEQ_ATT = "injectingSeq";
+    private static final String ONERROR_SEQ_ATT = "onErrorSeq";
+    private static final String CLASS_IMPL_ATT = "classImpl";
+    private static final String PARAM_NAME_ATT = "paramName";
+    private static final String PARAM_VALUE_ATT = "paramValue";
+
     private static final String KEYSTORE_ATT = "keystore";
     private static final String TRUSTSTORE_ATT = "truststore";
     private static final String CLIENTAUTH_ATT ="SSLVerifyClient";
@@ -50,11 +54,18 @@ public class PersistenceUtils {
     private static final QName INBOUND_ENDPOINTS_QN = new QName("inboundEndpoints");
     private static final QName INBOUND_ENDPOINT_LISTENER_QN = new QName("inboundEndpointListener");
     private static final QName ENDPOINT_QN = new QName("endpoint");
+    private static final QName PARAMS_QN = new QName("inboundParameters");
+    private static final QName PARAM_QN = new QName("inboundParameter");
 
     private static final QName NAME_QN = new QName(NAME_ATT);
     private static final QName PORT_QN = new QName(PORT_ATT);
     private static final QName DOMAIN_QN = new QName(DOMAIN_ATT);
     private static final QName PROTOCOL_QN = new QName(PROTOCOL_ATT);
+    private static final QName INJECT_SEQ_QN = new QName(INJECT_SEQ_ATT);
+    private static final QName ONERROR_SEQ_QN = new QName(ONERROR_SEQ_ATT);
+    private static final QName CLASS_IMPL_QN = new QName(CLASS_IMPL_ATT);
+    private static final QName PARAM_NAME_QN = new QName(PARAM_NAME_ATT);
+    private static final QName PARAM_VALUE_QN = new QName(PARAM_VALUE_ATT);
     private static final QName KEYSTORE_QN = new QName(KEYSTORE_ATT);
     private static final QName TRUSTORE_QN = new QName(TRUSTSTORE_ATT);
     private static final QName CLIENTAUTH_QN = new QName(CLIENTAUTH_ATT);
@@ -90,6 +101,35 @@ public class PersistenceUtils {
                 endpointElem.addAttribute(NAME_ATT, inboundEndpointInfoDTO.getEndpointName(), nullNS);
                 endpointElem.addAttribute(DOMAIN_ATT, inboundEndpointInfoDTO.getTenantDomain(), nullNS);
                 endpointElem.addAttribute(PROTOCOL_ATT, inboundEndpointInfoDTO.getProtocol(), nullNS);
+
+                OMElement paramsElem = fac.createOMElement(PARAMS_QN, endpointElem);
+                if (inboundEndpointInfoDTO.getInboundParams() != null) {
+
+                    if (inboundEndpointInfoDTO.getInboundParams().getInjectingSeq() != null) {
+                        endpointElem.addAttribute(INJECT_SEQ_ATT,
+                            inboundEndpointInfoDTO.getInboundParams().getInjectingSeq(), nullNS);
+                    }
+
+                    if (inboundEndpointInfoDTO.getInboundParams().getOnErrorSeq()    != null) {
+                        endpointElem.addAttribute(ONERROR_SEQ_ATT,
+                            inboundEndpointInfoDTO.getInboundParams().getOnErrorSeq(), nullNS);
+                    }
+
+                    if (inboundEndpointInfoDTO.getInboundParams().getClassImpl() != null) {
+                        endpointElem.addAttribute(CLASS_IMPL_ATT,
+                                inboundEndpointInfoDTO.getInboundParams().getClassImpl(), nullNS);
+                    }
+
+                    for (Map.Entry<Object, Object> e :
+                            inboundEndpointInfoDTO.getInboundParams().getProperties().entrySet()) {
+                        OMElement paramElem = fac.createOMElement(PARAM_QN, paramsElem);
+
+                        paramElem.addAttribute(PARAM_NAME_ATT, (String) e.getKey(), nullNS);
+                        paramElem.addAttribute(PARAM_VALUE_ATT, (String) e.getValue(), nullNS);
+                    }
+                }
+
+
                 if (inboundEndpointInfoDTO.getSslConfiguration() != null) {
                     if (inboundEndpointInfoDTO.getSslConfiguration().getKeyStore() != null) {
                         endpointElem.addAttribute(KEYSTORE_ATT, inboundEndpointInfoDTO.getSslConfiguration().getKeyStore(), nullNS);
@@ -138,10 +178,12 @@ public class PersistenceUtils {
             Iterator endpointsItr = listenerElement.getChildrenWithName(ENDPOINT_QN);
             while (endpointsItr.hasNext()) {
                 OMElement endpointElement = (OMElement) endpointsItr.next();
+
+                InboundProcessorParams params = deserializeInboundParameters(endpointElement);
                 InboundEndpointInfoDTO inboundEndpointInfoDTO =
                         new InboundEndpointInfoDTO(endpointElement.getAttributeValue(DOMAIN_QN),
                                           endpointElement.getAttributeValue(PROTOCOL_QN),
-                                          endpointElement.getAttributeValue(NAME_QN));
+                                          endpointElement.getAttributeValue(NAME_QN), params);
                 if (endpointElement.getAttributeValue(PROTOCOL_QN).equals("https")) {
                     SSLConfiguration sslConfiguration =
                                new SSLConfiguration(endpointElement.getAttributeValue(KEYSTORE_QN),
@@ -159,6 +201,29 @@ public class PersistenceUtils {
             endpointInfo.put(port, tenantList);
         }
         return endpointInfo;
+    }
+
+    private static InboundProcessorParams deserializeInboundParameters(OMElement endpointElement) {
+        InboundProcessorParams inboundParams = new InboundProcessorParams();
+
+        inboundParams.setName(endpointElement.getAttributeValue(NAME_QN));
+        inboundParams.setProtocol(endpointElement.getAttributeValue(PROTOCOL_QN));
+        inboundParams.setInjectingSeq(endpointElement.getAttributeValue(INJECT_SEQ_QN));
+        inboundParams.setOnErrorSeq(endpointElement.getAttributeValue(ONERROR_SEQ_QN));
+        inboundParams.setClassImpl(endpointElement.getAttributeValue(CLASS_IMPL_QN));
+
+        Properties props = new Properties();
+        OMElement paramsEle = endpointElement.getFirstChildWithName(PARAMS_QN);
+        if (paramsEle != null) {
+            Iterator parameters = paramsEle.getChildrenWithName(PARAM_QN);
+            while (parameters.hasNext()) {
+                OMElement parameter = (OMElement) parameters.next();
+                props.setProperty(parameter.getAttributeValue(PARAM_NAME_QN),
+                                  parameter.getAttributeValue(PARAM_VALUE_QN));
+            }
+        }
+        inboundParams.setProperties(props);
+        return inboundParams;
     }
 
 }

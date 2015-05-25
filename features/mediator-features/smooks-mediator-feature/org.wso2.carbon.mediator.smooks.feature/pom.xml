@@ -20,11 +20,11 @@
    <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>smooks-mediator-feature</artifactId>
-              <version>4.4.1-SNAPSHOT</version>
+              <version>4.4.2-SNAPSHOT</version>
     </parent>
 
      <modelVersion>4.0.0</modelVersion>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.2-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.smooks.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Smooks Mediator Aggregated Feature</name>
@@ -59,7 +59,7 @@
                         </goals>
                         <configuration>
                             <id>org.wso2.carbon.smooks</id>
-                            <propertiesFile>../../../../etc/feature.properties</propertiesFile>
+                            <propertiesFile>../../../etc/feature.properties</propertiesFile>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.mediation.initializer</importFeatureDef>                                
                             </importFeatures>

@@ -233,6 +233,11 @@
                         displayMessageInDetail = false;
                     }
 
+                    // Hide messages in details div when RabbitMQ is used
+                    if(client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")){
+                        displayMessageInDetail = false;
+                    }
+
                     messageInfos = client.getPaginatedMessages(messageStoreName, pageNumberInt);
                     numberOfPages = (int) Math.ceil((double)
                             client.getSize(messageStoreName) / MessageStoreAdminServiceClient.
@@ -266,7 +271,7 @@
                 <tr>
                     <th><fmt:message key="messageStore.name"/></th>
                     <th><fmt:message key="type"/></th>
-                    <%if (!client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                    <%if (!client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
                         <th><fmt:message key="size"/></th>
                     <%}%>
                 </tr>
@@ -289,7 +294,7 @@
                     </td>
                     <td><%= type%>
                     </td>
-                    <%if (!client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                    <%if (!client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !client.getClassName(messageStoreName).trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
                     <td><%= size%>
                     </td>
                     <%}%>

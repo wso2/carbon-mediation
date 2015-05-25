@@ -28,6 +28,7 @@
 <%@ page import="com.google.gson.JsonArray" %>
 <%@ page import="com.google.gson.GsonBuilder" %>
 <%@ page import="org.wso2.carbon.business.messaging.hl7.store.admin.HL7StoreAdminService" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <%
 
@@ -63,10 +64,10 @@
 
             actions = "<a class=\"editLink\" href=\"edit.jsp?store=" + message.getStoreName() + "&uuid=" + message.getMessageId() + "\">Resend</a>";
 
-            object.addProperty("id", message.getId());
-            object.addProperty("messageId", message.getMessageId());
-            object.addProperty("controlId", message.getControlId());
-            object.addProperty("rawMessage", message.getRawMessage());
+            object.addProperty("id", StringEscapeUtils.escapeXml(message.getId()));
+            object.addProperty("messageId", StringEscapeUtils.escapeXml(message.getMessageId()));
+            object.addProperty("controlId", StringEscapeUtils.escapeXml(message.getControlId()));
+            object.addProperty("rawMessage", StringEscapeUtils.escapeXml(message.getRawMessage()));
             object.addProperty("actions", actions);
             object.addProperty("date", message.getDate());
             object.addProperty("timestamp", message.getTimestamp());
@@ -83,7 +84,7 @@
     } catch (Exception e) {
         errorMsg = "Search failed. " + e.getMessage();
         responseObject.addProperty("success", false);
-        responseObject.addProperty("reason", errorMsg);
+        responseObject.addProperty("reason", StringEscapeUtils.escapeXml(errorMsg));
         size = client.getSize(name);
         responseObject.addProperty("resultsSize", size);
     }

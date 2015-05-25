@@ -20,6 +20,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.wso2.carbon.mediator.service.MediatorService;
 import org.wso2.carbon.mediator.service.MediatorStore;
+import org.wso2.carbon.mediator.service.builtin.CommentMediator;
 import org.wso2.carbon.mediator.service.builtin.SequenceMediator;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
 import org.wso2.carbon.mediator.service.ui.Mediator;
@@ -28,7 +29,6 @@ import org.wso2.carbon.sequences.ui.client.EditorUIClient;
 import org.wso2.carbon.sequences.ui.factory.EditorUIClientFactory;
 import org.wso2.carbon.sequences.ui.factory.impl.SequenceEditorClientFactory;
 import org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar;
-import org.wso2.carbon.utils.xml.XMLPrettyPrinter;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -107,7 +107,7 @@ public class SequenceEditorHelper {
         ByteArrayInputStream byteArrayInputStream
                 = new ByteArrayInputStream(parseSequenceToString(sequence).getBytes());
         XMLPrettyPrinter printer = new XMLPrettyPrinter(byteArrayInputStream);
-        return printer.xmlFormat();
+        return printer.xmlFormatWithComments();
     }
 
     public static OMElement parseAnonSequenceToOM(SequenceMediator seqMediator) {
@@ -129,13 +129,13 @@ public class SequenceEditorHelper {
         elem.setLocalName(targetSeqName + "Sequence");
         ByteArrayInputStream stream = new ByteArrayInputStream(elem.toString().getBytes());
         XMLPrettyPrinter printer = new XMLPrettyPrinter(stream);
-        return printer.xmlFormat();
+        return printer.xmlFormatWithComments();
     }
     public static String parseAnonSequenceToPrettyfiedString(SequenceMediator seqMediator) {
         OMElement elem = parseAnonSequenceToOM(seqMediator);
         ByteArrayInputStream stream = new ByteArrayInputStream(elem.toString().getBytes());
         XMLPrettyPrinter printer = new XMLPrettyPrinter(stream);
-        return printer.xmlFormat();
+        return printer.xmlFormatWithComments();
     }
 
    public static Mediator getMediatorAt(AbstractListMediator sequence, String position) {
@@ -208,22 +208,39 @@ public class SequenceEditorHelper {
                 + mediatorService.getUIFolderName() + "-mediator/images/mediator-icon.gif");
     }
 
+
     public static String getMediatorHTML(Mediator mediator, boolean last, String position,
                                          ServletConfig config, Mediator before, Mediator after,
                                          Locale locale) {
+
+        return getMediatorHTML(mediator, last, position, config, before, after, locale, null);
+    }
+
+    public static String getMediatorHTML(Mediator mediator, boolean last, String position,
+                                         ServletConfig config, Mediator before, Mediator after,
+                                         Locale locale, Mediator secondAfter) {
         ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE, locale);
+
+        boolean isNextVerticalLineRequired;
+
+        //Bypass mediators which should not to be shown in UI
+        if (!isValidMediatorForUI(mediator)) {
+            return "";
+        }
+
+        isNextVerticalLineRequired = isVerticalLineRequired(before, after, secondAfter);
 
         MediatorService mediatorInfo
                 = MediatorStore.getInstance().getMediatorService(mediator.getTagLocalName());
         String mediatorName = mediatorInfo != null ?
-                mediatorInfo.getDisplayName() : mediator.getTagLocalName();
-        String url = "../"  + mediatorInfo.getUIFolderName() + "-mediator/images/mediator-icon.gif";
+                              mediatorInfo.getDisplayName() : mediator.getTagLocalName();
+        String url = "../" + mediatorInfo.getUIFolderName() + "-mediator/images/mediator-icon.gif";
 
         String mediatorIconURL = mediatorInfo != null && isIconAvailable(mediatorInfo, config) ?
-                url : "./images/node-normal.gif";
+                                 url : "./images/node-normal.gif";
         String html = "<div class=\"minus-icon\" onclick=\"treeColapse(this)\"></div>";
         if (!(mediator instanceof AbstractListMediator) ||
-                ((AbstractListMediator) mediator).getList().isEmpty()) {
+            ((AbstractListMediator) mediator).getList().isEmpty()) {
             html = "<div class=\"dot-icon\"></div>";
         }
         html += "<div class=\"mediators\" style=\"background-image: url(" + mediatorIconURL
@@ -266,7 +283,11 @@ public class SequenceEditorHelper {
                 if (last) {
                     html = "<li>" + html;
                 } else {
-                    html = "<li class=\"vertical-line\">" + html;
+                    if (isNextVerticalLineRequired) {
+                        html = "<li class=\"vertical-line\">" + html;
+                    } else {
+                        html = "<li>" + html;
+                    }
                 }
                 html += "<div class=\"branch-node\"></div>";
                 html += "<ul class=\"child-list\">";
@@ -275,16 +296,18 @@ public class SequenceEditorHelper {
                 for (Mediator med : listMediator.getList()) {
                     count--;
                     Mediator beforeMed = mediatorPosition > 0 ?
-                            listMediator.getList().get(mediatorPosition - 1) : null;
+                                         listMediator.getList().get(mediatorPosition - 1) : null;
                     Mediator afterMed = mediatorPosition + 1 < listMediator.getList().size() ?
-                            listMediator.getList().get(mediatorPosition + 1) : null;
-                    html += getMediatorHTML(med, count==0, position + "."
-                            + mediatorPosition, config, beforeMed, afterMed, locale);
+                                        listMediator.getList().get(mediatorPosition + 1) : null;
+                    Mediator secondAfterMed = mediatorPosition + 2 < listMediator.getList().size() ?
+                                              listMediator.getList().get(mediatorPosition + 2) : null;
+                    html += getMediatorHTML(med, count == 0, position + "."
+                                                             + mediatorPosition, config, beforeMed, afterMed, locale, secondAfterMed);
                     mediatorPosition++;
                 }
                 html += "</ul>";
             } else {
-                if (!last) {
+                if (!last && isNextVerticalLineRequired) {
                     html = "<li>" + html + "<div class=\"vertical-line-alone\"/>";
                 } else {
                     html = "<li>" + html;
@@ -316,7 +339,7 @@ public class SequenceEditorHelper {
 
             html += "</div></div>";
 
-            if (!last) {
+            if (!last && isNextVerticalLineRequired) {
                 html = "<li>" + html + "<div class=\"vertical-line-alone\"/>";
             } else {
                 html = "<li>" + html;
@@ -333,7 +356,7 @@ public class SequenceEditorHelper {
             return mediatorInfo.getMediator();
         } else {
             throw new RuntimeException("Couldn't find the mediator information in the " +
-                    "mediator store for the mediator with logical name " + mediatorName);
+                                       "mediator store for the mediator with logical name " + mediatorName);
         }
     }
 
@@ -401,7 +424,7 @@ public class SequenceEditorHelper {
             ByteArrayInputStream byteArrayInputStream
                 = new ByteArrayInputStream(ele.toString().getBytes());
             XMLPrettyPrinter printer = new XMLPrettyPrinter(byteArrayInputStream);
-            return printer.xmlFormat();
+            return printer.xmlFormatWithComments();
         }
         return null;
     }
@@ -460,4 +483,44 @@ public class SequenceEditorHelper {
     public static String getEditorMode(HttpSession session) {
         return getEditorMode(getFactoryFrom(session));
     }
+
+    /**
+     * Check the validity of a given mediator to be shown in UI
+     *
+     * @param mediator AbstractListMediator instance to be checked
+     * @return true if valid, false otherwise
+     */
+    private static boolean isValidMediatorForUI(Mediator mediator) {
+        boolean validity = true;
+
+        //Mediator List which should not be shown in UI
+        if (mediator instanceof CommentMediator) {
+            validity = false;
+        }
+
+        return validity;
+    }
+
+    /**
+     * Check whether the vertical line required after the current mediator in UI. This required when
+     * there is a comment mediator after the current mediator since comment mediator is hidden from
+     * UI. Therefore it is required to check next mediator and after the next mediator entries to
+     * decide whether to put a line or not.
+     *
+     * @param before      Mediator before the current mediator
+     * @param after       Mediator after the current mediator
+     * @param secondAfter Mediator after the next mediator
+     * @return True if vertical line is required, False otherwise
+     */
+    private static boolean isVerticalLineRequired(Mediator before, Mediator after,
+                                                  Mediator secondAfter) {
+        boolean validity = true;
+
+        if (!isValidMediatorForUI(after) && secondAfter == null) {
+            validity = false;
+        }
+
+        return validity;
+    }
 }
+
