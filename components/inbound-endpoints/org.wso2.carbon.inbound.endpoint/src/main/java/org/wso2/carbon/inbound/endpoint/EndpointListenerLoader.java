@@ -77,15 +77,14 @@ public class EndpointListenerLoader {
             }
         }
         
-		Map<String, Set<String>> mPollingEndpoints =
-		                                             InboundEndpointsDataStore.getInstance()
-		                                                                      .getAllPollingingEndpointData();
-		ConfigurationContextService configurationContext =
-		                                                   InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
-		ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
-		for (String tenantDomain : mPollingEndpoints.keySet()) {
-			TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
-		}
+        //Load tenats required for polling inbound protocols
+        Map<String, Set<String>> mPollingEndpoints =
+		                                  InboundEndpointsDataStore.getInstance().getAllPollingingEndpointData();
+        ConfigurationContextService configurationContext = 
+      	                               InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
+        ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+        for (String tenantDomain : mPollingEndpoints.keySet()) {
+            TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+        }
     }
-
 }

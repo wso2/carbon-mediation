@@ -85,7 +85,8 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
                         + ". Unable to schedule the task. " + e.getLocalizedMessage(), e);
             }
         } else {
-            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+            PrivilegedCarbonContext carbonContext =
+			                                        PrivilegedCarbonContext.getThreadLocalCarbonContext();
             int tenantId = carbonContext.getTenantId();
             String tenantDomain = null;
 			   if (tenantId != MultitenantConstants.SUPER_TENANT_ID) {			   	

@@ -84,9 +84,9 @@ public class InboundRunner implements Runnable {
             try {
                 Thread.sleep(interval);
             } catch (InterruptedException e) {
-                log.warn(
-                        "Unable to sleep the inbound thread for interval of : " + interval + "ms.",
-                        e);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to sleep the inbound thread for interval of : " + interval + "ms.");
+                }
             }
         }
 
@@ -106,16 +106,18 @@ public class InboundRunner implements Runnable {
                 try {
                     Thread.sleep(interval);
                 } catch (InterruptedException e) {
-                    log.warn("Unable to sleep the inbound thread for interval of : " + interval
-                            + "ms.", e);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Unable to sleep the inbound thread for interval of : " + interval + "ms.");
+                    }
                 }
             }
             //Keep the tenant loaded
     		   if (tenantDomain != null) {
-    		        ConfigurationContextService configurationContext = InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
-    		        ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
-    		        TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
-    		   }           
+                ConfigurationContextService configurationContext =
+				                                           InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
+                ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+                TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+    		   }
         }
         log.debug("Exit the Inbound Endpoint running loop.");
     }

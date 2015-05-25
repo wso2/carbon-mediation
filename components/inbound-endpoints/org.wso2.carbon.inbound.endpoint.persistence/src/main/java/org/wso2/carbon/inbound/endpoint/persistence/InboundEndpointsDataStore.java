@@ -226,9 +226,9 @@ public class InboundEndpointsDataStore {
     }    
 
     /**
-     * Check an endpoint from data store
+     * Check polling endpoint from data store
      *
-     * @param tenantId       
+     * @param tenantDomain      
      * @param name 
      */
     public boolean isPollingEndpointRegistered(String tenantDomain, String name) {
