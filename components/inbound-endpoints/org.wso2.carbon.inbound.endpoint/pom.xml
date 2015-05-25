@@ -20,12 +20,12 @@
     <parent>
         <artifactId>inbound-endpoints</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.4.1-SNAPSHOT</version>
+        <version>4.4.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
     <packaging>bundle</packaging>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.2-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -49,6 +49,17 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-nhttp-transport</artifactId>
         </dependency>
+<<<<<<< HEAD
+=======
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.cxf</groupId>
+            <artifactId>cxf-bundle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+            <artifactId>jetty-bundle</artifactId>
+        </dependency>
+>>>>>>> 7ce307007f884938c55ee3235c6045f4abc9c955
     </dependencies>
 
     <build>
@@ -78,8 +89,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 

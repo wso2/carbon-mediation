@@ -110,7 +110,8 @@ public class InboundManagementClient {
         List<String> rtnList = new ArrayList<String>();
         if (!strType.equals(InboundClientConstants.TYPE_HTTP)
                 && !strType.equals(InboundClientConstants.TYPE_HTTPS)
-                && !strType.equals(InboundClientConstants.TYPE_HL7)) {
+                && !strType.equals(InboundClientConstants.TYPE_HL7)
+                && !strType.equals(InboundClientConstants.TYPE_CXF_WS_RM)) {
             rtnList.addAll(getList("common", true));
         }
         if (!strType.equals(InboundClientConstants.TYPE_CLASS)) {
@@ -130,6 +131,7 @@ public class InboundManagementClient {
     public boolean addInboundEndpoint(String name, String sequence, String onError,
                                       String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
         try {
+            lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
             int i = 0;
             for (ParamDTO parameter : lParameters) {
@@ -247,6 +249,7 @@ public class InboundManagementClient {
     public boolean updteInboundEndpoint(String name, String sequence, String onError,
             String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
         try {
+            lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
             int i = 0;
             for (ParamDTO parameter : lParameters) {
@@ -280,4 +283,13 @@ public class InboundManagementClient {
         return false;
     }
 
+    private List<ParamDTO> validateParameterList(List<ParamDTO> paramDTOList) {
+        List<ParamDTO> paramDTOs = new ArrayList<ParamDTO>();
+        for (ParamDTO paramDTO : paramDTOList) {
+            if (paramDTO.getValue() != null && paramDTO.getValue().trim().length() > 0) {
+                paramDTOs.add(paramDTO);
+            }
+        }
+        return paramDTOs;
+    }
 }
