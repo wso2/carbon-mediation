@@ -115,8 +115,10 @@ public class InboundRunner implements Runnable {
     		   if (tenantDomain != null) {
                 ConfigurationContextService configurationContext =
 				                                           InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
-                ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
-                TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+                if(configurationContext != null){
+                    ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+                }
     		   }
         }
         log.debug("Exit the Inbound Endpoint running loop.");
