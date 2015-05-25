@@ -127,8 +127,9 @@ public class JMSInjectHandler {
                 int deliveryCount = msg.getIntProperty("JMSXDeliveryCount");
                 axis2MsgCtx.setProperty(JMSConstants.DELIVERY_COUNT, deliveryCount);
             } catch (NumberFormatException nfe) {
-                // when JMSXDeliveryCount it not used
-                //TODO : try catch wont be required, check for it
+                if (log.isDebugEnabled()) {
+                    log.debug("JMSXDeliveryCount is not set in the received message");
+                }
             }
 
             // Inject the message to the sequence.
