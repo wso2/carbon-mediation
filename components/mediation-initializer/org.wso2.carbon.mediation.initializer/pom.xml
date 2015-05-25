@@ -92,6 +92,10 @@
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.ws.security.wso2</groupId>
+            <artifactId>wss4j</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

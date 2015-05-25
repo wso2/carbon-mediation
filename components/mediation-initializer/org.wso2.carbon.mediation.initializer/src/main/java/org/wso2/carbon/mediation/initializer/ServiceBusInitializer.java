@@ -47,6 +47,7 @@ import org.wso2.carbon.inbound.endpoint.EndpointListenerLoader;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService;
 import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
+import org.wso2.carbon.mediation.initializer.handler.SynapseExternalPropertyConfigurator;
 import org.wso2.carbon.mediation.initializer.multitenancy.TenantServiceBusInitializer;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.*;
@@ -226,14 +227,16 @@ public class ServiceBusInitializer {
                         "SynapseConfiguration not found");
             }
 
-            if (contextInfo.getSynapseEnvironment() != null) {
+            SynapseEnvironment synapseEnvironment = contextInfo.getSynapseEnvironment();
+            if (synapseEnvironment != null) {
 
                 //Properties props = new Properties();
                 SynapseEnvironmentService synEnvSvc
-                        = new SynapseEnvironmentServiceImpl(contextInfo.getSynapseEnvironment(),
+                        = new SynapseEnvironmentServiceImpl(synapseEnvironment,
                         MultitenantConstants.SUPER_TENANT_ID, configCtxSvc.getServerConfigContext());
                 synEnvRegistration = bndCtx.registerService(
                         SynapseEnvironmentService.class.getName(), synEnvSvc, null);
+                synapseEnvironment.registerSynapseHandler(new SynapseExternalPropertyConfigurator());
 
                 if (log.isDebugEnabled()) {
                     log.debug("SynapseEnvironmentService Registered");
