@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.wso2.carbon.mediation.ntask;
 
 import java.util.ArrayList;
@@ -533,88 +548,88 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         return "[NTaskTaskManager::" + getCurrentTenantId() + " ::" + this.hashCode() + "]";
     }
 
-	@Override
-	public void addObserver(TaskManagerObserver o) {
-		if (observers.contains(o)) {
-			return;
-		}
-		observers.add(o);
-	}
+    @Override
+    public void addObserver(TaskManagerObserver o) {
+        if (observers.contains(o)) {
+            return;
+        }
+        observers.add(o);
+    }
 
-	@Override
-	public boolean isTaskDeactivated(String taskName) {
-		if (!isInitialized()) {
-			return false;
-		}
-		synchronized (lock) {
-			if (taskManager == null) {
-				logger.warn("#isTaskRunning Could not determine the state of the task [" +
-				            taskName + "]. Task manager is not available.");
-				return false;
-			}
-			try {
-				return taskManager.getTaskState(taskName)
-				                  .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.PAUSED);
-			} catch (Exception e) {
-				logger.error("Cannot return task status [" + taskName + "]. Error: " +
-				                     e.getLocalizedMessage(), e);
-			}
-		}
-		return false;
-	}
+    @Override
+    public boolean isTaskDeactivated(String taskName) {
+        if (!isInitialized()) {
+            return false;
+        }
+        synchronized (lock) {
+            if (taskManager == null) {
+                logger.warn("#isTaskRunning Could not determine the state of the task [" +
+                            taskName + "]. Task manager is not available.");
+                return false;
+            }
+            try {
+                return taskManager.getTaskState(taskName)
+                                  .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.PAUSED);
+            } catch (Exception e) {
+                logger.error("Cannot return task status [" + taskName + "]. Error: " +
+                                     e.getLocalizedMessage(), e);
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public boolean isTaskBlocked(String taskName) {
-		if (!isInitialized()) {
-			return false;
-		}
-		synchronized (lock) {
-			if (taskManager == null) {
-				logger.warn("#isTaskRunning Could not determine the state of the task [" +
-				            taskName + "]. Task manager is not available.");
-				return false;
-			}
-			try {
-				return taskManager.getTaskState(taskName)
-				                  .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.BLOCKED);
-			} catch (Exception e) {
-				logger.error("Cannot return task status [" + taskName + "]. Error: " +
-				                     e.getLocalizedMessage(), e);
-			}
-		}
-		return false;
-	}
+    @Override
+    public boolean isTaskBlocked(String taskName) {
+        if (!isInitialized()) {
+            return false;
+        }
+        synchronized (lock) {
+            if (taskManager == null) {
+                logger.warn("#isTaskRunning Could not determine the state of the task [" +
+                            taskName + "]. Task manager is not available.");
+                return false;
+            }
+            try {
+                return taskManager.getTaskState(taskName)
+                                  .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.BLOCKED);
+            } catch (Exception e) {
+                logger.error("Cannot return task status [" + taskName + "]. Error: " +
+                                     e.getLocalizedMessage(), e);
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public boolean isTaskRunning(String taskName) {
-		if (!isInitialized()) {
-			return false;
-		}
-		synchronized (lock) {
-			if (taskManager == null) {
-				logger.warn("#isTaskRunning Could not determine the state of the task [" +
-				            taskName + "]. Task manager is not available.");
-				return false;
-			}
-			try {
-				return taskManager.getTaskState(taskName)
-				                  .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL);
-			} catch (Exception e) {
-				logger.error("Cannot return task status [" + taskName + "]. Error: " +
-				                     e.getLocalizedMessage(), e);
-			}
-		}
-		return false;
-	}
+    @Override
+    public boolean isTaskRunning(String taskName) {
+        if (!isInitialized()) {
+            return false;
+        }
+        synchronized (lock) {
+            if (taskManager == null) {
+                logger.warn("#isTaskRunning Could not determine the state of the task [" +
+                            taskName + "]. Task manager is not available.");
+                return false;
+            }
+            try {
+                return taskManager.getTaskState(taskName)
+                                  .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NORMAL);
+            } catch (Exception e) {
+                logger.error("Cannot return task status [" + taskName + "]. Error: " +
+                                     e.getLocalizedMessage(), e);
+            }
+        }
+        return false;
+    }
 
-	private void updateAndCleanupObservers() {
-		Iterator<TaskManagerObserver> i = observers.iterator();
-		while (i.hasNext()) {
-			TaskManagerObserver observer = i.next();
-			observer.update();
-			i.remove();
-		}
-	}
+    private void updateAndCleanupObservers() {
+        Iterator<TaskManagerObserver> i = observers.iterator();
+        while (i.hasNext()) {
+            TaskManagerObserver observer = i.next();
+            observer.update();
+            i.remove();
+        }
+    }
 
     private boolean queueTask(TaskDescription description) {
         synchronized (taskQueueLock) {
