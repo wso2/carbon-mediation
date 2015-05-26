@@ -18,24 +18,29 @@
 
 package org.wso2.carbon.inbound.endpoint.persistence.service;
 
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.inbound.endpoint.persistence.ServiceReferenceHolder;
 import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.utils.ConfigurationContextService;
 
 /**
  * @scr.component name="inbound.endpoint.persistence.service" immediate="true"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService" cardinality="1..1"
  * policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
+ * @scr.reference name="config.context.service"
+ * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
+ * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
  */
 public class InboundEndpointPersistenceServiceDSComponent {
 
     private static final Log log = LogFactory.getLog(InboundEndpointPersistenceServiceDSComponent.class);
 
+    private static ConfigurationContextService configContextService = null;
+    
     protected void activate(ComponentContext ctx) throws Exception {
         if (log.isDebugEnabled()) {
             log.debug("Activating Inbound Endpoint Persistence service....!");
@@ -63,4 +68,16 @@ public class InboundEndpointPersistenceServiceDSComponent {
         ServiceReferenceHolder.getInstance().setRegistrySvc(null);
     }
 
+    protected void setConfigurationContextService(ConfigurationContextService contextService) {
+        configContextService = contextService;
+    }
+
+    protected void unsetConfigurationContextService(ConfigurationContextService contextService) {        
+        configContextService = null;
+    }    
+    
+    public static ConfigurationContextService getConfigContextService(){
+   	 return configContextService;
+    }
+    
 }
