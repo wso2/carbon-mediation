@@ -75,7 +75,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             }
         } else {
             dataStore.registerEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name, null);
-            startListener(port, name);
+            boolean start =  startListener(port, name);
+            if(!start){
+                dataStore.unregisterEndpoint(port,tenantDomain);
+            }
         }
 
     }
@@ -104,7 +107,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             }else{
                 dataStore.registerSSLEndpoint(port, tenantDomain, InboundHttpConstants.HTTPS, name, sslConfiguration);
             }
-            startSSLListener(port, name, sslConfiguration);
+            boolean start = startSSLListener(port, name, sslConfiguration);
+            if (!start) {
+               dataStore.unregisterEndpoint(port,tenantDomain);
+            }
         }
     }
 
@@ -115,17 +121,18 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
      * @param port  port
      * @param name  endpoint name
      */
-    public void startListener(int port, String name) {
+    public boolean startListener(int port, String name) {
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener is already started for port : " + port);
-            return;
+            return true;
         }
 
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
         } catch (Exception e) {
-            log.error("Cannot get PassThroughSourceConfiguration ", e);
+            log.warn("Cannot get PassThroughSourceConfiguration ", e);
+            return false;
         }
         if (sourceConfiguration != null) {
             //Create Handler for handle Http Requests
@@ -139,8 +146,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                              + name + " ,port " + port, e);
             }
         } else {
-            log.error("SourceConfiguration is not registered in PassThrough Transport");
+            log.warn("SourceConfiguration is not registered in PassThrough Transport hence not start inbound endpoint " + name);
+            return false;
         }
+        return true;
     }
 
     /**
@@ -148,16 +157,17 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
      * @param port  port
      * @param name  endpoint name
      */
-    public void startSSLListener(int port, String name, SSLConfiguration sslConfiguration) {
+    public boolean startSSLListener(int port, String name, SSLConfiguration sslConfiguration) {
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener is already started for port : " + port);
-            return;
+            return true;
         }
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSSLSourceConfiguration();
         } catch (Exception e) {
-            log.error("Cannot get PassThroughSSLSourceConfiguration ", e);
+            log.warn("Cannot get PassThroughSSLSourceConfiguration ", e);
+            return false;
         }
         if (sourceConfiguration != null) {
             //Create Handler for handle Http Requests
@@ -169,10 +179,13 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             } catch (NumberFormatException e) {
                 log.error("Exception occurred while starting listener for endpoint : "
                           + name + " ,port " + port, e);
+                return false;
             }
         } else {
-            log.error("SourceConfiguration is not registered in PassThrough Transport");
+            log.warn("SourceConfiguration is not registered in PassThrough Transport hence not start inbound endpoint " + name);
+            return false;
         }
+        return true;
     }
 
     /**
