@@ -147,7 +147,9 @@ public class CXFEndpointManager extends AbstractInboundEndpointManager {
 		}
 	}
 
-	@Override public void startListener(int port, String name) {
+	@Override
+	public boolean startListener(int port, String name) {
+		return true;
 	}
 
 	@Override public void startEndpoint(int port, String name) {
