@@ -19,6 +19,8 @@ package org.wso2.carbon.mediator.bam.config;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediator.bam.config.internal.RegistryManagementComponent;
 import org.wso2.carbon.mediator.bam.config.services.utils.ServiceHolder;
 import org.wso2.carbon.registry.common.services.RegistryAbstractAdmin;
@@ -45,7 +47,8 @@ public class RegistryManager extends RegistryAbstractAdmin {
         //registry = getConfigSystemRegistry();
         try {
             RegistryService registryService = ServiceHolder.getRegistryService();
-            registry = registryService.getConfigSystemRegistry(MultitenantUtils.getTenantId(super.getConfigContext()));
+            int tenantId = CarbonContext.getThreadLocalCarbonContext().getTenantId();
+            registry = registryService.getConfigSystemRegistry(tenantId);
         } catch (RegistryException e) {
             String errorMsg = "Error while getting the Registry Service. " + e.getMessage();
             log.error(errorMsg, e);

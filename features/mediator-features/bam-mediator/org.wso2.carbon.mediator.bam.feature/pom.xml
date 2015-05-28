@@ -18,34 +18,38 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>bam-mediator-feature</artifactId>
-      <version>4.4.2-SNAPSHOT</version>
+      <version>4.2.1-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>org.wso2.carbon.mediator.bam.feature</artifactId>
-   <version>4.4.2-SNAPSHOT</version>
+   <version>4.2.1-SNAPSHOT</version>
    <packaging>pom</packaging>
    <name>WSO2 Carbon - BAM Mediator Aggregate Feature</name>
    <url>http://wso2.org</url>
    <description>This feature contains the bundles required for BAM Mediator functionality</description>
    <dependencies>
       <dependency>
-         <groupId>org.wso2.carbon.mediation</groupId>
+         <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.mediator.bam.server.feature</artifactId>
+         <version>4.2.0</version>
          <type>zip</type>
       </dependency>
       <dependency>
-         <groupId>org.wso2.carbon.mediation</groupId>
+         <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.mediator.bam.ui.feature</artifactId>
+         <version>4.2.0</version>
          <type>zip</type>
       </dependency>
       <dependency>
          <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.mediator.bam.config.server.feature</artifactId>
+         <version>4.2.1-SNAPSHOT</version>
          <type>zip</type>
       </dependency>
       <dependency>
-         <groupId>org.wso2.carbon.mediation</groupId>
+         <groupId>org.wso2.carbon</groupId>
          <artifactId>org.wso2.carbon.mediator.bam.config.ui.feature</artifactId>
+         <version>4.2.0</version>
          <type>zip</type>
       </dependency>
    </dependencies>
@@ -70,10 +74,10 @@
                         <importFeatureDef>org.wso2.carbon.databridge.datapublisher:${carbon.commons.version}</importFeatureDef>
                      </importFeatures>
                      <includedFeatures>
-                        <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.bam.server.feature</includedFeatureDef>
-                        <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.bam.ui.feature</includedFeatureDef>
+                        <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.mediator.bam.server.feature:4.2.0</includedFeatureDef>
+                        <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.mediator.bam.ui.feature:4.2.0</includedFeatureDef>
                         <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.bam.config.server.feature</includedFeatureDef>
-                        <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.bam.config.ui.feature</includedFeatureDef>
+                        <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.mediator.bam.config.ui.feature:4.2.0</includedFeatureDef>
                      </includedFeatures>
                   </configuration>
                </execution>

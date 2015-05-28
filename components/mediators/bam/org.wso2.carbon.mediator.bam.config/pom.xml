@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>bam-mediator</artifactId>
-        <version>4.4.2-SNAPSHOT</version>
+        <version>4.2.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediator.bam.config</artifactId>
-    <version>4.4.2-SNAPSHOT</version>
+    <version>4.2.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - BAM Mediator Configuration</name>
     <url>http://wso2.org</url>
@@ -34,6 +34,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-scr-plugin</artifactId>
+                <version>1.7.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -53,7 +54,7 @@
                         <Import-Package>
                             !javax.xml.namespace,
                             javax.xml.namespace; version=0.0.0,
-                            org.apache.axiom.om; version="${axiom.osgi.version.range}",
+                            org.apache.axiom.om; version=0.0.0,
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
@@ -64,34 +65,50 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.synapse</groupId>
-            <artifactId>synapse-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.axis2</groupId>
-                    <artifactId>axis2-codegen</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>        
-        <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
+            <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediator.service</artifactId>
+            <version>4.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.logging</artifactId>
+        <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.ui</artifactId>
+        <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.governance.api</artifactId>
+            <version>4.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.core</artifactId>
+            <version>4.2.0</version>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.registry</groupId>
+            <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.registry.common</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+        <dependency>
+           <groupId>org.wso2.carbon</groupId>
+           <artifactId>org.wso2.carbon.core</artifactId>
+           <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>1.6.1.wso2v10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2-client</artifactId>
+            <version>1.6.1.wso2v10</version>
         </dependency>
     </dependencies>
+
 </project>

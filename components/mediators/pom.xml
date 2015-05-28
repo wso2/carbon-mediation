@@ -20,27 +20,19 @@
     <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>carbon-mediation</artifactId>
-      <version>4.4.2-SNAPSHOT</version>
+      <version>4.2.1-SNAPSHOT</version>
       <relativePath>../../pom.xml</relativePath>
    </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.4.2-SNAPSHOT</version>
+    <version>4.2.1-SNAPSHOT</version>
     <artifactId>mediators</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediators Aggregator Module</name>
     <url>http://wso2.org</url>
 
-			<modules>
-				<module>router</module>
-				<module>bam</module>
-				<module>command</module>
-				<module>event</module>
-				<module>fastXSLT</module>
-				<module>smooks</module>
-				<module>entitlement</module>
-				<module>oauth</module>
-                <module>publishEvent</module>
-			</modules>
+		<modules>
+			<module>bam</module>
+		</modules>
 
 </project>

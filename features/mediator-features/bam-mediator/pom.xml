@@ -18,19 +18,16 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediator-features</artifactId>
-      <version>4.4.2-SNAPSHOT</version>
+      <version>4.2.1-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
-   <version>4.4.2-SNAPSHOT</version>
+   <version>4.2.1-SNAPSHOT</version>
    <artifactId>bam-mediator-feature</artifactId>
    <packaging>pom</packaging>
    <name>WSO2 Carbon - BAM Mediator Feature Aggregator Module</name>
    <url>http://wso2.org</url>
    <modules>
       <module>org.wso2.carbon.mediator.bam.config.server.feature</module>
-      <module>org.wso2.carbon.mediator.bam.config.ui.feature</module>
-      <module>org.wso2.carbon.mediator.bam.server.feature</module>
-      <module>org.wso2.carbon.mediator.bam.ui.feature</module>
       <module>org.wso2.carbon.mediator.bam.feature</module>
    </modules>
 </project>
