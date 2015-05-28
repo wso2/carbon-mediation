@@ -175,21 +175,9 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
             if (action != null && action.getText() != null) {
                 String actionString = action.getText();
                 if ("discard".equalsIgnoreCase(actionString.trim())) {
-
                     definition.setTimeoutAction(SynapseConstants.DISCARD);
-
-                    // set timeout duration to 30 seconds, if it is not set explicitly
-                    if (definition.getTimeoutDuration() == 0) {
-                        definition.setTimeoutDuration(30000);
-                    }
                 } else if ("fault".equalsIgnoreCase(actionString.trim())) {
-
                     definition.setTimeoutAction(SynapseConstants.DISCARD_AND_FAULT);
-
-                    // set timeout duration to 30 seconds, if it is not set explicitly
-                    if (definition.getTimeoutDuration() == 0) {
-                        definition.setTimeoutDuration(30000);
-                    }
                 //if value is not even a template mapping handle as exception
                 } else if(!TemplateMappingsPopulator.populateMapping(instance, TemplateParameterContainer.EndpointDefKey.timeoutAction, actionString)) {
                     handleException("Invalid timeout action, action : "
