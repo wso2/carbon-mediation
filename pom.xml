@@ -1941,7 +1941,7 @@
                 <version>${org.wso2.throttle.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
+                <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
                 <artifactId>com.jayway.jsonpath</artifactId>
                 <version>${jsonpath.version}</version>
             </dependency>
