@@ -167,7 +167,8 @@ var requiredParams = null;
 	                                   onclick="deleteRow('tblInput');"/>                                                                 
                         </td>
                     </tr>                     
-                     <%}else{ %>
+                     <%}else{
+                     if(!advParams.isEmpty()){%>
 				    <tr>
 				        <td><span id="_adv" style="float: left; position: relative;">
 				            <a class="icon-link" onclick="javascript:showAdvancedOptions('');"
@@ -176,7 +177,7 @@ var requiredParams = null;
 				        </span>
 				        </td>
 				    </tr> 
-				    <%} %>
+				    <%} }%>
 				    <tr>
 					    <td colspan="3">
 						    <div id="_advancedForm" style="display:none">
