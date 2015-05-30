@@ -112,9 +112,9 @@ public class JMSConstants {
     /**
      *  JMS 2.0 Parameters
      */
-    public static final String PARAM_IS_SHARED_SUBSCRIPTION = "transport.jms.shared.subscription";
+    public static final String PARAM_IS_SHARED_SUBSCRIPTION = "transport.jms.SharedSubscription";
 
-    public static final String PARAM_SUBSCRIPTION_NAME = "transport.jms.subscription.name";
+    public static final String PARAM_SUBSCRIPTION_NAME = "transport.jms.SubscriptionName";
 
     public static final String DELIVERY_COUNT = "jms.message.delivery.count";
 }
