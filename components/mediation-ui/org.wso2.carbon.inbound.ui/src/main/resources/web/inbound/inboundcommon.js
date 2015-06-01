@@ -79,7 +79,7 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
-    	    if (document.getElementById(requiredParams[i]).value == '') {
+    	    if (document.getElementById(requiredParams[i]).value.trim() == '') {
     	        CARBON.showWarningDialog(msg5);
     	        return false;
     	    }    		
@@ -106,7 +106,7 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
     
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
-    	    if (document.getElementById(requiredParams[i]).value == '') {
+    	    if (document.getElementById(requiredParams[i]).value.trim() == '') {
     	        CARBON.showWarningDialog(msg5);
     	        return false;
     	    }    		
