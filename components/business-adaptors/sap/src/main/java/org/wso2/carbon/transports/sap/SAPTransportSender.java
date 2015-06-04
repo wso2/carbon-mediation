@@ -279,14 +279,19 @@ public class SAPTransportSender extends AbstractTransportSender {
     private void sendFault(MessageContext msgContext, Exception e , int errorCode) {
         //TODO Fix this properly
         try {
-                MessageContext faultContext = MessageContextBuilder.createFaultMessageContext(
-                        msgContext, e);
-                faultContext.setProperty(ERROR_CODE,errorCode);
-                faultContext.setProperty("ERROR_MESSAGE",e.getMessage());
-                faultContext.setProperty("SENDING_FAULT", Boolean.TRUE);
+            MessageContext faultContext = MessageContextBuilder.createFaultMessageContext(
+                    msgContext, e);
+            faultContext.setProperty(ERROR_CODE,errorCode);
+            faultContext.setProperty("ERROR_MESSAGE",e.getMessage());
+            faultContext.setProperty("SENDING_FAULT", Boolean.TRUE);
+            if (msgContext.getAxisOperation() != null &&
+                    msgContext.getAxisOperation().getMessageReceiver() != null) {
                 msgContext.getAxisOperation().getMessageReceiver().receive(faultContext);
-            } catch (AxisFault axisFault) {
-                log.fatal("Cloud not create the fault message.", axisFault);
+            } else {
+                log.error("Could not create the fault message.", e);
             }
+        } catch (AxisFault axisFault) {
+            log.fatal("Cloud not create the fault message.", axisFault);
+        }
     }
 }
