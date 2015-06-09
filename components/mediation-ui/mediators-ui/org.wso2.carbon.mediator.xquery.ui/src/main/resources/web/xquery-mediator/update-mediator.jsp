@@ -62,9 +62,12 @@
         }
 
         String target = request.getParameter("mediator.xquery.target");
-
-        xqueryMediator.setTarget(
+        if (target != null && !"".equals(target)) {
+            xqueryMediator.setTarget(
                     xPathFactory.createSynapseXPath("mediator.xquery.target", target.trim(), session));
+        }else {
+            xqueryMediator.setTarget(null);
+        }
 
 
         String variableCountParameter = request.getParameter("variableCount");
