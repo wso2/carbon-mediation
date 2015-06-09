@@ -155,6 +155,19 @@ public class ParserTest extends TestCase {
         assertTrue(template.matches("/sanjeewa/", var));
         assertTrue(template.matches("/sanjeewa", var));
 
+        template = new URITemplate("/{sanjeewa}/*");
+        assertTrue(template.matches("/sanjeewa/admin?test=done", var));
+        assertTrue(template.matches("/sanjeewa/?test=done", var));
+        assertTrue(template.matches("/sanjeewa/test", var));
+        assertTrue(template.matches("/sanjeewa/", var));
+
+        template = new URITemplate("/dictionary/{char}/{word}");
+        assertTrue(template.matches("/dictionary/d/dog/", var));
+        assertTrue(template.matches("/dictionary/d/dog", var));
+
+        template = new URITemplate("/test{format}*");
+        assertTrue(template.matches("/test.json?test", var));
+        assertTrue(template.matches("/test.json?test=val", var));
 
         template = new URITemplate("/sanjeewa/~{test}?*");
         var.put("test","tester");
