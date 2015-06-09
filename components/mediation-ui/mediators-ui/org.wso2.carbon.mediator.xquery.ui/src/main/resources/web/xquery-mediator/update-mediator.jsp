@@ -69,7 +69,6 @@
             xqueryMediator.setTarget(null);
         }
 
-
         String variableCountParameter = request.getParameter("variableCount");
         if (variableCountParameter != null && !"".equals(variableCountParameter)) {
             int variableCount = 0;
