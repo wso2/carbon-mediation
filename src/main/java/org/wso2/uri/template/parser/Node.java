@@ -55,6 +55,9 @@ public abstract class Node {
                 // We have more content in the URI to match
                 // But there aren't any nodes left to match against
                 // return -1;
+                if(uriFragment.endsWith("/")){
+                    matchLength = matchLength +1;
+                }
                 return matchLength;
             }
         } else if (matchLength == uriFragment.length() && next != null) {
