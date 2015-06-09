@@ -40,9 +40,9 @@ public class URITemplate {
     }
 
     public boolean matches(String uri, Map<String,String> variables) {
-         if (uri.endsWith("/") && uri.length() > 1) {
+        /* if (uri.endsWith("/") && uri.length() > 1) {
             uri = uri.substring(0, uri.length() - 1);
-        }
+        } */
         return syntaxTree.matchAll(uri, variables) == uri.length();
     }
 }
