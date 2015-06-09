@@ -86,6 +86,7 @@ var existingInbounds = null;
                                 <option value="<%=InboundClientConstants.TYPE_HL7%>">HL7</option>
                                 <option value="<%=InboundClientConstants.TYPE_KAFKA%>">KAFKA</option>
                                 <option value="<%=InboundClientConstants.TYPE_CXF_WS_RM%>">CXF_WS_RM</option>
+                                <option value="<%=InboundClientConstants.TYPE_MQTT%>">MQTT</option>
                                 <option value="<%=InboundClientConstants.TYPE_CLASS%>">Custom</option>
                             </select>
                         </td>

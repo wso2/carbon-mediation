@@ -80,6 +80,11 @@
                    if(strVal != null && !strVal.equals("")){
                       sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
                    }
+                }else if(strKey.startsWith("mqtt.")|| strKey.startsWith("content.type")){
+                   String strVal = request.getParameter(strKey);
+                   if(strVal != null && !strVal.equals("")){
+                      sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                   }
                 }
            }
 		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl,request.getParameter("inboundSuspend"), sParams);
