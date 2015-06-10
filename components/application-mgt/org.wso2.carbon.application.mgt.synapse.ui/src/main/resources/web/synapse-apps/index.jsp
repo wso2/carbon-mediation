@@ -250,7 +250,31 @@
 
 <%
     }
+    String[] apis = synapseMetadata.getApis();
+        if (apis != null && apis.length > 0) {
+%>
+<p>&nbsp;&nbsp;</p>
+<table class="styledLeft" id="APITable" width="40%">
+    <thead>
+    <tr>
+        <th><img src="../api/images/api-icon.png" alt="" style="vertical-align:middle;">&nbsp;<fmt:message key="carbonapps.apis"/></th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+        for (String api : apis) {
+    %>
+    <tr>
+         <td><a href="../api/manageAPI.jsp?mode=edit&apiName=<%= api%>"><%= api%></a></td>
+    </tr>
+    <%
     }
 %>
+    </tbody>
+</table>
+<%
+    }
 
+    }
+%>
 </fmt:bundle>
