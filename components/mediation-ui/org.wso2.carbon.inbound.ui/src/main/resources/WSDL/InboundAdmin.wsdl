@@ -323,13 +323,13 @@
    </wsdl:binding>
    <wsdl:service name="InboundAdmin">
       <wsdl:port name="InboundAdminHttpsSoap11Endpoint" binding="tns:InboundAdminSoap11Binding">
-         <soap:address location="https://malaka-notebook:8243/services/InboundAdmin.InboundAdminHttpsSoap11Endpoint"/>
+         <soap:address location="https://localhost:8243/services/InboundAdmin.InboundAdminHttpsSoap11Endpoint"/>
       </wsdl:port>
       <wsdl:port name="InboundAdminHttpsSoap12Endpoint" binding="tns:InboundAdminSoap12Binding">
-         <soap12:address location="https://malaka-notebook:8243/services/InboundAdmin.InboundAdminHttpsSoap12Endpoint"/>
+         <soap12:address location="https://localhost:8243/services/InboundAdmin.InboundAdminHttpsSoap12Endpoint"/>
       </wsdl:port>
       <wsdl:port name="InboundAdminHttpsEndpoint" binding="tns:InboundAdminHttpBinding">
-         <http:address location="https://malaka-notebook:8243/services/InboundAdmin.InboundAdminHttpsEndpoint"/>
+         <http:address location="https://localhost:8243/services/InboundAdmin.InboundAdminHttpsEndpoint"/>
       </wsdl:port>
    </wsdl:service>
 </wsdl:definitions>
