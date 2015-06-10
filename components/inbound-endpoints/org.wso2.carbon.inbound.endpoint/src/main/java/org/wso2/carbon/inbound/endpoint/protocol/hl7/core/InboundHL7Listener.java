@@ -53,8 +53,6 @@ public class InboundHL7Listener implements InboundRequestProcessor {
     }
 
     public void start() {
-        log.info("Starting HL7 Inbound Endpoint on port " + this.port);
-
         try {
             this.port = Integer.parseInt(params.getProperties().getProperty(MLLPConstants.PARAM_HL7_PORT));
         } catch (NumberFormatException e) {
