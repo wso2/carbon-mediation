@@ -1,4 +1,4 @@
-package org.wso2.carbon.inbound.endpoint.protocol.hl7.core;
+package org.wso2.carbon.inbound.endpoint.protocol.hl7.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -158,7 +158,7 @@ public class HL7Configuration {
             try {
                 in = new FileInputStream(System.getProperty(CONF_LOCATION) + File.separator + filePath);
             } catch (FileNotFoundException e) {
-                String msg = "Error loading properties from a file at from the System defined location: " + filePath;
+                String msg = "Error loading properties from file: " + filePath;
                 log.warn(msg);
             }
         }

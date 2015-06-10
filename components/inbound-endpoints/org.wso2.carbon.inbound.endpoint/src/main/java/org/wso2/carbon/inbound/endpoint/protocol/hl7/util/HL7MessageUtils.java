@@ -47,7 +47,6 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
-import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.HL7Configuration;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLPConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLProtocolException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
