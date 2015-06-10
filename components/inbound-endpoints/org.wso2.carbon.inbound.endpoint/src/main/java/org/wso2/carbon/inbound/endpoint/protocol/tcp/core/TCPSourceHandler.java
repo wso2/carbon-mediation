@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * per connection/session IO event handler
+ * IO event handler
  */
 
 public class TCPSourceHandler implements IOEventDispatch {
