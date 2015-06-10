@@ -25,6 +25,7 @@ import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.reactor.IOReactorStatus;
 import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.nio.reactor.ListeningIOReactor;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.HL7Configuration;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
