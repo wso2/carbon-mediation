@@ -82,7 +82,7 @@
                    }
                 }
            }
-		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
+		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl,request.getParameter("inboundSuspend"), sParams);
 			if(!added){
             		%>
             		<script type="text/javascript">

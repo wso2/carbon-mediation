@@ -129,7 +129,7 @@ public class InboundManagementClient {
     }
 
     public boolean addInboundEndpoint(String name, String sequence, String onError,
-                                      String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
+                                      String protocol, String suspended, String classImpl, List<ParamDTO> lParameters) throws Exception {
         try {
             lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
@@ -145,7 +145,7 @@ public class InboundManagementClient {
                 parameterDTOs[i++] = parameterDTO;
             }
             if (canAdd(name, protocol, parameterDTOs)) {
-                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, suspended, parameterDTOs);
                 return true;
             }else {
                 log.warn("Cannot add Inbound endpoint " + name + " may be duplicate inbound already exists");
@@ -247,7 +247,7 @@ public class InboundManagementClient {
     }
 
     public boolean updteInboundEndpoint(String name, String sequence, String onError,
-            String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
+            String protocol, String classImpl, String suspended, List<ParamDTO> lParameters) throws Exception {
         try {
             lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
@@ -268,12 +268,12 @@ public class InboundManagementClient {
                 stub.removeInboundEndpoint(name);
             }
             if(canAdd(name,protocol,parameterDTOs)) {
-                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, suspended, parameterDTOs);
                 return true;
             }else if(inboundEndpointDTO != null){
                 stub.addInboundEndpoint(inboundEndpointDTO.getName(), inboundEndpointDTO.getInjectingSeq(),
                                         inboundEndpointDTO.getOnErrorSeq(), inboundEndpointDTO.getProtocol(),
-                                        inboundEndpointDTO.getClassImpl(), inboundEndpointDTO.getParameters());
+                                        inboundEndpointDTO.getClassImpl(), suspended, inboundEndpointDTO.getParameters());
                 return false;
             }
         } catch (Exception e) {
