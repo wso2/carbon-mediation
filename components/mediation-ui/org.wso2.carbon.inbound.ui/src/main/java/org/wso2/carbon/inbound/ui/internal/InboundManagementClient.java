@@ -129,7 +129,7 @@ public class InboundManagementClient {
     }
 
     public boolean addInboundEndpoint(String name, String sequence, String onError,
-                                      String protocol, String suspended, String classImpl, List<ParamDTO> lParameters) throws Exception {
+                                      String protocol, String classImpl, String suspended, List<ParamDTO> lParameters) throws Exception {
         try {
             lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
@@ -208,7 +208,7 @@ public class InboundManagementClient {
                     if (inboundEndpointDTO.getName().equals(name)) {
                         return false;
                     }
-                    if (protocol.equals("http") || protocol.equals("https")) {
+                    if ("http".equals(protocol) || "https".equals(protocol)) {
                         ParameterDTO[] existparameterDTOs = inboundEndpointDTO.getParameters();
                         for (ParameterDTO parameterDTO : existparameterDTOs) {
                             if (parameterDTO.getName().equals("inbound.http.port")) {
@@ -217,7 +217,7 @@ public class InboundManagementClient {
                         }
                     }
                 }
-                if (protocol.equals("http") || protocol.equals("https")) {
+                if ("http".equals(protocol) || "https".equals(protocol)) {
                     for (ParameterDTO parameterDTO : parameterDTOs) {
                         if (parameterDTO.getName().equals("inbound.http.port") && parameterDTO.getValue().equals(port)) {
                             log.warn("Already used port " + port + "by another endpoint may be inbound endpoint " + name + " deployment failed");
