@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.ui.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -33,6 +34,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.inbound.stub.InboundAdminInboundManagementException;
 import org.wso2.carbon.inbound.stub.InboundAdminStub;
 import org.wso2.carbon.inbound.stub.types.carbon.InboundEndpointDTO;
 import org.wso2.carbon.inbound.stub.types.carbon.ParameterDTO;
@@ -291,5 +293,23 @@ public class InboundManagementClient {
             }
         }
         return paramDTOs;
+    }
+
+    public String[] getAllInboundNames() {
+        String[] inboundNameList = null;
+        try {
+            InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
+             inboundNameList = new String[inboundEndpointDTOs.length];
+            if (inboundEndpointDTOs != null) {
+                for (int i=0; i < inboundEndpointDTOs.length; i++) {
+                    inboundNameList[i] = inboundEndpointDTOs[i].getName();
+                }
+            }
+        } catch (RemoteException e) {
+            log.error(e);
+        } catch (InboundAdminInboundManagementException e) {
+            log.error(e);
+        }
+        return inboundNameList;
     }
 }

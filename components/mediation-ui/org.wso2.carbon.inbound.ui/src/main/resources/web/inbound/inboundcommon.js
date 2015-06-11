@@ -40,6 +40,7 @@ function isNumber(numberstring) {
     }
 }
 
+
 function forward(destinationJSP) {
     location.href = destinationJSP;
 }
@@ -50,11 +51,21 @@ function addParam(form){
     return false;	
 }
 
-function inboundsave1(namemsg, typemsg, form){
+function inboundsave1(namemsg, typemsg, form , existingList){
+  var name;
     if (!isNameValid(document.getElementById('inboundName').value)) {
         CARBON.showWarningDialog(namemsg);
         return false;
     }
+     name = document.getElementById('inboundName').value;
+         if(existingInbounds != null ){
+         for(var i=0; i< existingInbounds.length;i++){
+              if(name == existingInbounds[i]){
+              CARBON.showErrorDialog("Inbound endpoint already exists please use separate name");
+              return false;
+              }
+             }
+            }
     if (document.getElementById('inboundType').value == '') {
         CARBON.showWarningDialog(typemsg);
         return false;
