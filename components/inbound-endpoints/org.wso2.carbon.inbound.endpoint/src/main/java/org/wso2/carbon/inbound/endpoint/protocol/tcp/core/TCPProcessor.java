@@ -23,7 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundResponseSender;
@@ -47,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 public class TCPProcessor implements InboundResponseSender {
     private static final Log log = LogFactory.getLog(TCPProcessor.class);
 
-    private ScheduledExecutorService executorService ;
+    private ScheduledExecutorService executorService;
 
     private Map<String, Object> parameters;
     private InboundProcessorParams params;
@@ -58,6 +57,11 @@ public class TCPProcessor implements InboundResponseSender {
     private byte[] trailer;
     private String tag;
     private int msgLength;
+    private boolean oneWayMessaging = false;
+
+    public boolean isOneWayMessaging() {
+        return oneWayMessaging;
+    }
 
     public int getDecodeMode() {
         return decodeMode;
@@ -82,7 +86,6 @@ public class TCPProcessor implements InboundResponseSender {
     private String inSequence;
     private String onErrorSequence;
 
-
     private int timeOut;
 
     public TCPProcessor(Map<String, Object> parameters) {
@@ -98,6 +101,10 @@ public class TCPProcessor implements InboundResponseSender {
 
     private void decideDecodeMode(InboundProcessorParams params) {
 
+        if (Boolean.parseBoolean(params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_ONE_WAY))) {
+            this.oneWayMessaging = true;
+        }
+
         //log.info("Deciding Decoding mode...");
         //we have to decide the decode Mode which are (DECODE_BY_HEADER_TRAILER/DECODE_BY_TAG/DECODE_BY_LENGTH)
         if (decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
@@ -106,7 +113,7 @@ public class TCPProcessor implements InboundResponseSender {
             String t1 = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_TRAILER_BYTE1);
             String t2 = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_TRAILER_BYTE2);
 
-            if(!h.isEmpty() && !t1.isEmpty() && !t2.isEmpty()) {
+            if (!h.isEmpty() && !t1.isEmpty() && !t2.isEmpty()) {
                 header = new BigInteger(h, 16).toByteArray();
                 byte[] trailer1 = new BigInteger(t1, 16).toByteArray();
                 byte[] trailer2 = new BigInteger(t2, 16).toByteArray();
@@ -121,16 +128,15 @@ public class TCPProcessor implements InboundResponseSender {
             }
             //tag mode
             tag = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_TAG);
-            if(!tag.isEmpty() && decodeMode==InboundTCPConstants.NOT_DECIDED_YET){
+            if (!tag.isEmpty() && decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
                 decodeMode = InboundTCPConstants.DECODE_BY_TAG;
-                log.info("decode by enclosure tag : "+tag);
+                log.info("decode by enclosure tag : " + tag);
             }
 
             //length mode
             try {
-                msgLength = Integer.parseInt(
-                        params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_LENGTH));
-                if(msgLength>0 && decodeMode==InboundTCPConstants.NOT_DECIDED_YET){
+                msgLength = Integer.parseInt(params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_LENGTH));
+                if (msgLength > 0 && decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
                     decodeMode = InboundTCPConstants.DECODE_BY_LENGTH;
                     log.info("decode by message length");
                 }
@@ -139,7 +145,7 @@ public class TCPProcessor implements InboundResponseSender {
             }
 
             //decide the decoding mode from the config
-            if (decodeMode==InboundTCPConstants.NOT_DECIDED_YET) {
+            if (decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
                 log.error("Message decode mode not specified property in the TCP inbound point config file");
             }
         }
@@ -164,15 +170,18 @@ public class TCPProcessor implements InboundResponseSender {
 
         tcpContext.setMessageId(synCtx.getMessageID());
         synCtx.setProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID, synCtx.getMessageID());
-        log.info("TCP inbound message ID : "+synCtx.getProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID));
-
+        log.info("TCP inbound message ID : " + synCtx.getProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID));
 
         //We need response invocation through this processor. set tcpContext and inbound response worker
         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
-        synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
-        synCtx.setProperty(InboundTCPConstants.TCP_CONTEXT, tcpContext);
 
-        addProperties(synCtx, tcpContext);
+        if (!oneWayMessaging) {
+            log.info("one way messaging : "+oneWayMessaging);
+            synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
+            synCtx.setProperty(InboundTCPConstants.TCP_CONTEXT, tcpContext);
+        }
+
+        //addProperties(synCtx, tcpContext);
 
         SequenceMediator injectSeq =
                 (SequenceMediator) synCtx.getEnvironment().getSynapseConfiguration().getSequence(inSequence);
@@ -180,7 +189,7 @@ public class TCPProcessor implements InboundResponseSender {
 
         executorService = TCPExecutorServiceFactory.getExecutorService();
 
-        if (timeOut > 0) {
+        if (timeOut > 0 && !oneWayMessaging) {
             executorService
                     .schedule(new TimeoutHandler(tcpContext, synCtx.getMessageID()), timeOut, TimeUnit.MILLISECONDS);
         }

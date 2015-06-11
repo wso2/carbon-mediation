@@ -82,6 +82,7 @@ public class TCPSourceHandler implements IOEventDispatch {
 
         TCPContext tcpContext = (TCPContext) session.getAttribute(InboundTCPConstants.TCP_CONTEXT);
         log.info("input ready. position : " + inputBuffer.position() + " limit : " + inputBuffer.limit());
+
 /*
         if(inputBuffer.position()==0){
             inputBuffer.clear();
@@ -89,6 +90,7 @@ public class TCPSourceHandler implements IOEventDispatch {
             inputBuffer.compact();
         }
 */
+
         try {
             // how many number of Bytes reads from the channel
             int read;
@@ -99,6 +101,7 @@ public class TCPSourceHandler implements IOEventDispatch {
                 log.info("position : " + inputBuffer.position() + " limit : " + inputBuffer.limit());
                 inputBuffer.flip();
                 log.info("position : " + inputBuffer.position() + " limit : " + inputBuffer.limit());
+
                 try {
                     //here we send the input byte buffer, tcpContext, inboundPoint parameters to decode the message
                     int status = tcpContext.getCodec().decode(inputBuffer, tcpContext);
@@ -126,11 +129,16 @@ public class TCPSourceHandler implements IOEventDispatch {
                 tcpProcessor.processRequest(tcpContext);
             }
 
+            if(tcpProcessor.isOneWayMessaging()){
+                tcpContext.reset();
+            }
+
             log.info("read : " + read);
             if (read <= 0) {
 
                 bufferFactory.release(inputBuffer);
                 inputBuffer = bufferFactory.getBuffer();
+                //TODO better to wait some time to close the session
                 session.close();
                 log.info("session closed...");
             }

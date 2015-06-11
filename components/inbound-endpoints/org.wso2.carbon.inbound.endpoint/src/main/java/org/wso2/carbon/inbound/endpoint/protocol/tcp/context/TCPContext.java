@@ -31,6 +31,7 @@ import org.apache.synapse.transport.passthru.util.BufferFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.codec.TCPCodec;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.core.InboundTCPConstants;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.CharsetDecoder;
 
 public class TCPContext {
@@ -41,6 +42,8 @@ public class TCPContext {
     private IOSession session;
     private StringBuffer requestBuffer;
     private StringBuffer responseBuffer;
+
+    private ByteArrayOutputStream baos;
 
     private String tcpMessage;
 
@@ -56,14 +59,20 @@ public class TCPContext {
 
     private BufferFactory bufferFactory;
 
-    public TCPContext(IOSession session, CharsetDecoder decoder, BufferFactory bufferFactory,InboundProcessorParams params) {
+    public TCPContext(IOSession session, CharsetDecoder decoder, BufferFactory bufferFactory,
+                      InboundProcessorParams params) {
         this.session = session;
         this.codec = new TCPCodec(decoder);
         this.bufferFactory = bufferFactory;
         this.expiry = InboundTCPConstants.DEFAULT_TCP_TIMEOUT;
         this.requestBuffer = new StringBuffer();
         this.responseBuffer = new StringBuffer();
-        this.params=params;
+        this.baos = new ByteArrayOutputStream();
+        this.params = params;
+    }
+
+    public ByteArrayOutputStream getBaos() {
+        return baos;
     }
 
     public InboundProcessorParams getParams() {
@@ -90,7 +99,7 @@ public class TCPContext {
         return this.tcpMessage;
     }
 
-    public void setTCPMessage(String  tcpMessage) {
+    public void setTCPMessage(String tcpMessage) {
         this.tcpMessage = tcpMessage;
     }
 
@@ -106,12 +115,10 @@ public class TCPContext {
         session.setEvent(EventMask.READ);
     }
 
-    public void clearEventMaskRead(){
+    public void clearEventMaskRead() {
         log.info("no event mask");
         session.clearEvent(EventMask.READ);
     }
-
-
 
     public void setRequestTime(long timeStamp) {
         this.requestTime = timeStamp;
@@ -157,6 +164,7 @@ public class TCPContext {
 
     public void reset() {
         // Resets TCP Context and TCPCodec to default states.
+        this.getBaos().reset();
         this.responseBuffer.setLength(0);
         this.getCodec().setState(TCPCodec.READ_HEADER);
     }

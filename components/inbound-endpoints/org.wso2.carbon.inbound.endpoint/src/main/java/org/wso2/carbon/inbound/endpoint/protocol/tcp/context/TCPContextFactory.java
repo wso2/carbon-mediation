@@ -48,16 +48,19 @@ public class TCPContextFactory {
         TCPContext tcpContext = new TCPContext(session, decoder, bufferFactory, params);
 
         //setting the TCP decoding mode parameters loaded at the startup
+        tcpContext.getCodec().setOneWayMessaging(processor.isOneWayMessaging());
         tcpContext.getCodec().setDecodeMode(processor.getDecodeMode());
-        switch (processor.getDecodeMode()){
-            case InboundTCPConstants.DECODE_BY_HEADER_TRAILER:{
+        switch (processor.getDecodeMode()) {
+            case InboundTCPConstants.DECODE_BY_HEADER_TRAILER: {
                 tcpContext.getCodec().setHeader(processor.getHeader());
                 tcpContext.getCodec().setTrailer(processor.getTrailer());
             }
-            case InboundTCPConstants.DECODE_BY_TAG:{
+            case InboundTCPConstants.DECODE_BY_TAG: {
+                byte[] delimiterTag = processor.getTag().getBytes(decoder.charset());
                 tcpContext.getCodec().setTag(processor.getTag());
+                tcpContext.getCodec().setDelimiterTag(delimiterTag);
             }
-            case InboundTCPConstants.DECODE_BY_LENGTH:{
+            case InboundTCPConstants.DECODE_BY_LENGTH: {
                 tcpContext.getCodec().setMsgLength(processor.getMsgLength());
             }
         }

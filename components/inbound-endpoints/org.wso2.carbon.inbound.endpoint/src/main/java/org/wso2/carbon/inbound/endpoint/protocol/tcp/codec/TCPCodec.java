@@ -25,7 +25,6 @@ import org.wso2.carbon.inbound.endpoint.protocol.tcp.core.InboundTCPConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.core.TCPContextException;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharsetDecoder;
 
@@ -57,9 +56,10 @@ public class TCPCodec {
     private int decodeMode;
     private byte[] header;
     private byte[] trailer;
-//    private byte[] tag;
     private String tag;
+    private byte[] delimiterTag;
     private int msgLength;
+    private boolean oneWayMessaging = false;
 
     private int currentPosition = 0;
     private int initialBufferLimit;
@@ -77,57 +77,9 @@ public class TCPCodec {
     //here we decode the byte stream
     public int decode(ByteBuffer dst, TCPContext context) throws IOException, TCPContextException {
 
-/*
-        //we have to decide the decode Mode which are (DECODE_BY_HEADER_TRAILER/DECODE_BY_TAG/DECODE_BY_LENGTH)
-        if (decodeMode == NOT_DECIDED_YET) {
-            //header trailer mode
-            String h = context.getParams().getProperties().getProperty(InboundTCPConstants.TCP_MSG_HEADER);
-            String t1 = context.getParams().getProperties().getProperty(InboundTCPConstants.TCP_MSG_TRAILER_BYTE1);
-            String t2 = context.getParams().getProperties().getProperty(InboundTCPConstants.TCP_MSG_TRAILER_BYTE2);
-
-            if(!h.isEmpty() && !t1.isEmpty() && !t2.isEmpty()) {
-                header = new BigInteger(h, 16).toByteArray();
-                trailer1 = new BigInteger(t1, 16).toByteArray();
-                trailer2 = new BigInteger(t2, 16).toByteArray();
-                trailer = new byte[2];
-                trailer[0] = trailer1[0];
-                trailer[1] = trailer2[0];
-
-                if (header[0] > 0 && trailer1[0] > 0 && trailer2[0] > 0) {
-                    decodeMode = DECODE_BY_HEADER_TRAILER;
-                    //log.info("decode by header & trailer");
-                }
-            }
-            //tag mode
-            tag = context.getParams().getProperties().getProperty(InboundTCPConstants.TCP_MSG_TAG);
-            if(!tag.isEmpty() && decodeMode==NOT_DECIDED_YET){
-                    decodeMode = DECODE_BY_TAG;
-                    //log.info("decode by enclosure tag : "+tag);
-            }
-
-            //length mode
-            try {
-                msgLength = Integer.parseInt(
-                        context.getParams().getProperties().getProperty(InboundTCPConstants.TCP_MSG_LENGTH));
-                if(msgLength>0 && decodeMode==NOT_DECIDED_YET){
-                    decodeMode = DECODE_BY_LENGTH;
-                    log.info("decode by message length");
-                }
-            } catch (NumberFormatException e) {
-                msgLength = -1;
-            }
-
-            //decide the decoding mode from the config
-            if (decodeMode==NOT_DECIDED_YET) {
-                log.error("Message decode mode not specified property in the TCP inbound point config file");
-            }
-
-        }
-*/
-
         initialBufferLimit = dst.limit();
-        log.info("Initial buffer limit : "+initialBufferLimit);
-        log.info("position : "+dst.position()+" limit : "+dst.limit());
+        log.info("Initial buffer limit : " + initialBufferLimit);
+        log.info("position : " + dst.position() + " limit : " + dst.limit());
 
         switch (decodeMode) {
 
@@ -154,13 +106,19 @@ public class TCPCodec {
                         dst.limit(trailerIndex);
                         this.state = READ_TRAILER;
                     }
-                    //TODO do not covert the byte stream to String. try to pass it as a byte stream
-                    //TODO use two threads to read byte by byte and pass it as a stream to the builder
-                    context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
 
+                    if (dst.hasArray()) {
+                        byte[] ar = new byte[dst.remaining()];
+                        dst.get(ar, 0, ar.length);
+                        context.getBaos().write(ar);
+                        log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
+                        log.info("bytes " + ar[0] + " " + ar[1]);
+                    }
+
+                    //context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
                     //set the buffer position and limit for the rest of the buffer
                     dst.limit(initialBufferLimit);
-                    dst.position(trailerIndex+2);
+                    dst.position(trailerIndex + 2);
                     dst.compact();
                 }
 
@@ -168,56 +126,121 @@ public class TCPCodec {
                     this.state = READ_COMPLETE;
 
                     //here we have the TCP message as a sting buffer we store the message in TCP message context.
-                    context.setTCPMessage(context.getRequestBuffer().toString());
-                    context.getRequestBuffer().setLength(0);
+                    //context.setTCPMessage(context.getRequestBuffer().toString());
+                    //context.getRequestBuffer().setLength(0);
+                    //context.setTCPMessage(new String(context.getBaos().toByteArray(), charsetDecoder.charset()));
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
 
             }
-            case InboundTCPConstants.DECODE_BY_TAG:{
+            case InboundTCPConstants.DECODE_BY_TAG: {
+                //
+                byte[] input = new byte[dst.remaining()];
+                dst.get(input, 0, input.length);
 
                 //decode the first message of the buffer
-                String byteString = charsetDecoder.decode(dst).toString();
-                log.info("string length : "+byteString.length());
+                log.info("input length : " + input.length);
 
                 if (this.state >= READ_COMPLETE || dst.position() < 0) {
                     return -1;
                 }
 
                 if (this.state == READ_HEADER) {
-                   // log.info(byteString);
+                    // log.info(byteString);
 
-                    int headerIndex = byteString.indexOf(tag);
-                    log.info("header index : "+headerIndex);
+                    int headerIndex = findTagIndex(input, delimiterTag, 0);
+                    log.info("header index : " + headerIndex);
 
-                    if(headerIndex>0){
-                        dst.position(headerIndex+tag.length()+1);
+                    if (headerIndex > 0) {
+                        dst.position(headerIndex - 1);
                         this.state = READ_CONTENT;
-                    }
-                    else {
+                    } else {
                         throw new TCPContextException("Could not find header tag in incoming message.");
                     }
                 }
 
                 if (this.state == READ_CONTENT) {
 
-                    int trailerIndex = byteString.indexOf(tag,tag.length());
-                    log.info("Trailer index : "+trailerIndex);
+                    int trailerIndex = findTagIndex(input, delimiterTag, dst.position() + delimiterTag.length);
+                    log.info("Trailer index : " + trailerIndex);
 
                     if (trailerIndex > -1) {
-                        dst.limit(trailerIndex-2);
+                        dst.limit(trailerIndex + delimiterTag.length + 1);
+                        this.state = READ_TRAILER;
+                    }
+
+                    if (dst.hasArray()) {
+                        byte[] ar = new byte[dst.remaining()];
+                        dst.get(ar, 0, ar.length);
+                        context.getBaos().write(ar);
+                        log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
+                        log.info("bytes " + ar[0] + " " + ar[1]);
+                    }
+
+                    //set the buffer position and limit for the rest of the buffer
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    dst.limit(initialBufferLimit);
+                    dst.position(trailerIndex + tag.length() + 1);
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    dst.compact();
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+
+                }
+
+                if (this.state == READ_TRAILER) {
+                    this.state = READ_COMPLETE;
+
+                    //here we have the TCP message as a sting buffer we store the message in TCP message context.
+                    //context.setTCPMessage(context.getRequestBuffer().toString());
+                    // log.info(context.getTCPMessage());
+                    //context.getRequestBuffer().setLength(0);
+                    context.setTCPMessage(new String(context.getBaos().toByteArray(), charsetDecoder.charset()));
+                    return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
+                }
+
+                //
+/*
+                //decode the first message of the buffer
+                String byteString = charsetDecoder.decode(dst).toString();
+                log.info("string length : " + byteString.length());
+
+                if (this.state >= READ_COMPLETE || dst.position() < 0) {
+                    return -1;
+                }
+
+                if (this.state == READ_HEADER) {
+                    // log.info(byteString);
+
+                    int headerIndex = byteString.indexOf(tag);
+                    log.info("header index : " + headerIndex);
+
+                    if (headerIndex > 0) {
+                        dst.position(headerIndex + tag.length() + 1);
+                        this.state = READ_CONTENT;
+                    } else {
+                        throw new TCPContextException("Could not find header tag in incoming message.");
+                    }
+                }
+
+                if (this.state == READ_CONTENT) {
+
+                    int trailerIndex = byteString.indexOf(tag, tag.length());
+                    log.info("Trailer index : " + trailerIndex);
+
+                    if (trailerIndex > -1) {
+                        dst.limit(trailerIndex - 2);
                         this.state = READ_TRAILER;
                     }
 
                     context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
 
                     //set the buffer position and limit for the rest of the buffer
-                    log.info("position : "+dst.position()+" limit : "+dst.limit());
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.limit(initialBufferLimit);
-                    dst.position(trailerIndex+tag.length()+1);
-                    log.info("position : "+dst.position()+" limit : "+dst.limit());
+                    dst.position(trailerIndex + tag.length() + 1);
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.compact();
-                    log.info("position : "+dst.position()+" limit : "+dst.limit());
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
 
                 }
 
@@ -226,10 +249,11 @@ public class TCPCodec {
 
                     //here we have the TCP message as a sting buffer we store the message in TCP message context.
                     context.setTCPMessage(context.getRequestBuffer().toString());
-                   // log.info(context.getTCPMessage());
+                    // log.info(context.getTCPMessage());
                     context.getRequestBuffer().setLength(0);
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
+*/
             }
             case InboundTCPConstants.DECODE_BY_LENGTH: {
 
@@ -272,19 +296,34 @@ public class TCPCodec {
         return -1;
     }
 
+    private int findTagIndex(byte[] largeBuffer, byte[] searchTag, int offset) {
+        for (int i = offset; i < largeBuffer.length - searchTag.length + 1; i++) {
+            boolean found = true;
+            for (int j = 0; j < searchTag.length; j++) {
+                if (largeBuffer[i + j] != searchTag[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found)
+                return i;
+        }
+        return -1;
+    }
+
     //get the message from TCP context and convert it byte stream to send
     public int encode(ByteBuffer outBuf, TCPContext context) {
-        log.info("state : "+this.state);
+        log.info("state : " + this.state);
 
         if (this.state < READ_COMPLETE) {
             return 0;
         }
 
         if (this.state == READ_COMPLETE) {
-            if(decodeMode!=InboundTCPConstants.DECODE_BY_TAG) {
+            if (decodeMode != InboundTCPConstants.DECODE_BY_TAG) {
                 responseBytes = context.getTCPMessage().getBytes(charsetDecoder.charset());
-            }else {
-                String taggedResponse = "<"+tag+">"+context.getTCPMessage()+"</"+tag+">";
+            } else {
+                String taggedResponse = "<" + tag + ">" + context.getTCPMessage() + "</" + tag + ">";
                 responseBytes = taggedResponse.getBytes(charsetDecoder.charset());
             }
             this.state = WRITE_HEADER;
@@ -339,7 +378,7 @@ public class TCPCodec {
                     this.state = WRITE_COMPLETE;
                 }
             }
-            case InboundTCPConstants.DECODE_BY_TAG:{
+            case InboundTCPConstants.DECODE_BY_TAG: {
                 if (this.state == WRITE_HEADER) {
                     byteBuffer.put(responseBytes);
                     this.state = WRITE_COMPLETE;
@@ -357,6 +396,11 @@ public class TCPCodec {
 
         byteBuffer.flip();
         return count;
+    }
+
+    public void resetState(){
+        this.state = READ_HEADER;
+
     }
 
     public boolean isReadComplete() {
@@ -415,7 +459,15 @@ public class TCPCodec {
         this.tag = tag;
     }
 
+    public void setDelimiterTag(byte[] delimiterTag) {
+        this.delimiterTag = delimiterTag;
+    }
+
     public void setMsgLength(int msgLength) {
         this.msgLength = msgLength;
+    }
+
+    public void setOneWayMessaging(boolean oneWayMessaging) {
+        this.oneWayMessaging = oneWayMessaging;
     }
 }

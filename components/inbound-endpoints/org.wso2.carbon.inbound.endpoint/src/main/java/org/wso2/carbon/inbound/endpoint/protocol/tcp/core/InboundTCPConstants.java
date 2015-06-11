@@ -25,27 +25,28 @@ import java.nio.charset.Charset;
  */
 public class InboundTCPConstants {
 
-    public static final byte[] CR          = {0x0D};
-    public static final byte[] TCP_HEADER  = {0x0B};
-    public static final byte[] TCP_TRAILER = {0x1C,CR[0]};
+    public static final byte[] CR = { 0x0D };
+    public static final byte[] TCP_HEADER = { 0x0B };
+    public static final byte[] TCP_TRAILER = { 0x1C, CR[0] };
 
     //variables from the input config file
     public final static String INBOUND_TCP_PORT = "inbound.tcp.Port";
 
     public final static String PARAM_TCP_CHARSET = "inbound.tcp.CharSet";
 
-    public final static String TCP_MSG_CONTENT_TYPE="inbound.tcp.ContentType";
+    public final static String TCP_MSG_CONTENT_TYPE = "inbound.tcp.ContentType";
 
-    public final static String TCP_MSG_HEADER="inbound.tcp.Header";
+    public final static String TCP_MSG_HEADER = "inbound.tcp.Header";
 
-    public final static String TCP_MSG_TRAILER_BYTE1="inbound.tcp.Trailer.byte1";
+    public final static String TCP_MSG_TRAILER_BYTE1 = "inbound.tcp.Trailer.byte1";
 
-    public final static String TCP_MSG_TRAILER_BYTE2="inbound.tcp.Trailer.byte2";
+    public final static String TCP_MSG_TRAILER_BYTE2 = "inbound.tcp.Trailer.byte2";
 
-    public final static String TCP_MSG_LENGTH="inbound.tcp.msg.Length";
+    public final static String TCP_MSG_LENGTH = "inbound.tcp.msg.Length";
 
-    public final static String TCP_MSG_TAG="inbound.tcp.enclosure.tag";
+    public final static String TCP_MSG_TAG = "inbound.tcp.enclosure.tag";
 
+    public final static String TCP_MSG_ONE_WAY = "inbound.tcp.sendOnly";
 
     public final static String TCP_CONTEXT = "TCP_CONTEXT";
 
@@ -70,13 +71,13 @@ public class InboundTCPConstants {
     public final static String TCP_INBOUND_MSG_ID = "TCP_INBOUND_MSG_ID";
 
     //TCP message decoding mode
-    public final static int NOT_DECIDED_YET=0;
+    public final static int NOT_DECIDED_YET = 0;
 
-    public final static int DECODE_BY_HEADER_TRAILER=1;
+    public final static int DECODE_BY_HEADER_TRAILER = 1;
 
-    public final static int DECODE_BY_TAG=2;
+    public final static int DECODE_BY_TAG = 2;
 
-    public final static int DECODE_BY_LENGTH=3;
+    public final static int DECODE_BY_LENGTH = 3;
 
     //tcp level constants
     public static class TCPConstants {
@@ -85,9 +86,11 @@ public class InboundTCPConstants {
 
         public final static String CONNECT_TIMEOUT = "connect_timeout";
 
-        public final static String TCP_NO_DELAY = "tcp_no_delay";//Whether to send available data immediately rather than buffering it
+        public final static String TCP_NO_DELAY = "tcp_no_delay";
+        //Whether to send available data immediately rather than buffering it
 
-        public final static String SO_KEEP_ALIVE = "so_keep_alive";//How long to keep the socket open to allow pending sends to complete
+        public final static String SO_KEEP_ALIVE = "so_keep_alive";
+        //How long to keep the socket open to allow pending sends to complete
 
         public final static String SO_TIMEOUT = "so_timeout";//The timeout for blocking socket operations.
 
