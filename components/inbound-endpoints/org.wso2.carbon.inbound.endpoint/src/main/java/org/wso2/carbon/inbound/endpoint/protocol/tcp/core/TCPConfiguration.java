@@ -34,17 +34,17 @@ public class TCPConfiguration {
     private static TCPConfiguration instance = new TCPConfiguration();
     private Properties props;
 
-    private TCPConfiguration(){
+    private TCPConfiguration() {
         try {
             props = loadProperties("tcp.properties");
             //log.info("so_timeout : "+getIntProperty(InboundTCPConstants.TCPConstants.SO_TIMEOUT));
-        }catch (Exception e){
+        } catch (Exception e) {
             log.info("could not load the properties from tcp.properties file...");
             //Customer can set manual location for configuration file. If it is not found we ignore it
         }
     }
 
-    public static TCPConfiguration getInstance(){
+    public static TCPConfiguration getInstance() {
         return instance;
     }
 
@@ -89,7 +89,6 @@ public class TCPConfiguration {
     public Integer getIntProperty(String name) {
         return getIntProperty(name, null);
     }
-
 
     /**
      * Get a boolean property that tunes TCP transport. Prefer system properties
@@ -140,7 +139,6 @@ public class TCPConfiguration {
         return val == null ? def : val;
     }
 
-
     /**
      * Loads the properties from a given property file path
      *
@@ -156,7 +154,7 @@ public class TCPConfiguration {
             log.debug("Loading the TCP config file '" + filePath + "' from classpath");
         }
 
-        InputStream in  = null;
+        InputStream in = null;
 
         //if we reach to this assume that the we may have to looking to the customer provided external location for the
         //given properties
@@ -170,7 +168,6 @@ public class TCPConfiguration {
                 log.warn(msg);
             }
         }
-
 
         if (in == null) {
             in = cl.getResourceAsStream(filePath);

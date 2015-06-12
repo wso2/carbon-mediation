@@ -26,7 +26,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *per connection/session IO event handler
+ * per connection/session IO event handler
  */
 
 public class TCPMultiIOHandler extends TCPSourceHandler {
@@ -89,5 +89,4 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
         handlers.remove(handler);
 
     }
-
 }

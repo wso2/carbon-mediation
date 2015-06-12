@@ -147,7 +147,7 @@ public class TCPMessageUtils {
         //CharsetDecoder charsetDecoder = Charset.forName("UTF-8").newDecoder();
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
-        //        InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(message.getBytes(charsetDecoder.charset()
+        //InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(message.getBytes(charsetDecoder.charset()
         //        )));
         //        documentElement = builder.processDocument(bais, contentType, axis2MsgCtx);
 

@@ -176,7 +176,7 @@ public class TCPProcessor implements InboundResponseSender {
         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
 
         if (!oneWayMessaging) {
-            log.info("one way messaging : "+oneWayMessaging);
+            log.info("one way messaging : " + oneWayMessaging);
             synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
             synCtx.setProperty(InboundTCPConstants.TCP_CONTEXT, tcpContext);
         }

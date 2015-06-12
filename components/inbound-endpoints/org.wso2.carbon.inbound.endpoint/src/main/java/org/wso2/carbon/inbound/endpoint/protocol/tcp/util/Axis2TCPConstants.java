@@ -27,5 +27,4 @@ public class Axis2TCPConstants {
     public static final String TCP_MESSAGE_CHARSET = "TCP_MESSAGE_CHARSET";
 
     public static final String TCP_MESSAGE_ELEMENT_NAME = "message";
-
 }
