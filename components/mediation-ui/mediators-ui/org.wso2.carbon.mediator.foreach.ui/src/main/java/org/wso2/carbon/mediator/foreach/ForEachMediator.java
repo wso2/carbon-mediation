@@ -82,9 +82,7 @@ public class ForEachMediator extends AbstractListMediator {
 
         if (sequenceRef != null) {
             forEachElem.addAttribute("sequence", sequenceRef, nullNS);
-        }
-
-        if (getList() != null && getList().size() > 0) {
+        } else if (getList() != null && getList().size() > 0) {
             List<Mediator> list = getList();
             org.wso2.carbon.mediator.service.builtin.SequenceMediator
                     seq = new org.wso2.carbon.mediator.service.builtin.SequenceMediator();
@@ -131,13 +129,12 @@ public class ForEachMediator extends AbstractListMediator {
 
         OMAttribute sequenceAttr = elem.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence"));
+        OMElement sequence;
+
         if (sequenceAttr != null && sequenceAttr.getAttributeValue() != null) {
             sequenceRef = sequenceAttr.getAttributeValue();
-        }
-
-        OMElement sequence = elem.getFirstChildWithName(
-                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence"));
-        if (sequence != null) {
+        } else if ((sequence = elem.getFirstChildWithName(
+                new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence"))) != null) {
             org.wso2.carbon.mediator.service.builtin.SequenceMediator
                     seq = new org.wso2.carbon.mediator.service.builtin.SequenceMediator();
             seq.setAnonymous(true);
