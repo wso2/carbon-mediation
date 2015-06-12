@@ -124,10 +124,6 @@ public class TCPCodec {
 
                 if (this.state == READ_TRAILER) {
                     this.state = READ_COMPLETE;
-
-                    //here we have the TCP message as a sting buffer we store the message in TCP message context.
-                    //context.setTCPMessage(context.getRequestBuffer().toString());
-                    //context.getRequestBuffer().setLength(0);
                     //context.setTCPMessage(new String(context.getBaos().toByteArray(), charsetDecoder.charset()));
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
@@ -189,91 +185,54 @@ public class TCPCodec {
 
                 if (this.state == READ_TRAILER) {
                     this.state = READ_COMPLETE;
-
-                    //here we have the TCP message as a sting buffer we store the message in TCP message context.
-                    //context.setTCPMessage(context.getRequestBuffer().toString());
-                    // log.info(context.getTCPMessage());
-                    //context.getRequestBuffer().setLength(0);
-                    context.setTCPMessage(new String(context.getBaos().toByteArray(), charsetDecoder.charset()));
+                    //context.setTCPMessage(new String(context.getBaos().toByteArray(), charsetDecoder.charset()));
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
 
-                //
-/*
-                //decode the first message of the buffer
-                String byteString = charsetDecoder.decode(dst).toString();
-                log.info("string length : " + byteString.length());
-
-                if (this.state >= READ_COMPLETE || dst.position() < 0) {
-                    return -1;
-                }
-
-                if (this.state == READ_HEADER) {
-                    // log.info(byteString);
-
-                    int headerIndex = byteString.indexOf(tag);
-                    log.info("header index : " + headerIndex);
-
-                    if (headerIndex > 0) {
-                        dst.position(headerIndex + tag.length() + 1);
-                        this.state = READ_CONTENT;
-                    } else {
-                        throw new TCPContextException("Could not find header tag in incoming message.");
-                    }
-                }
-
-                if (this.state == READ_CONTENT) {
-
-                    int trailerIndex = byteString.indexOf(tag, tag.length());
-                    log.info("Trailer index : " + trailerIndex);
-
-                    if (trailerIndex > -1) {
-                        dst.limit(trailerIndex - 2);
-                        this.state = READ_TRAILER;
-                    }
-
-                    context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
-
-                    //set the buffer position and limit for the rest of the buffer
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
-                    dst.limit(initialBufferLimit);
-                    dst.position(trailerIndex + tag.length() + 1);
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
-                    dst.compact();
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
-
-                }
-
-                if (this.state == READ_TRAILER) {
-                    this.state = READ_COMPLETE;
-
-                    //here we have the TCP message as a sting buffer we store the message in TCP message context.
-                    context.setTCPMessage(context.getRequestBuffer().toString());
-                    // log.info(context.getTCPMessage());
-                    context.getRequestBuffer().setLength(0);
-                    return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
-                }
-*/
             }
             case InboundTCPConstants.DECODE_BY_LENGTH: {
-
+                //This method must check
                 if (this.state >= READ_COMPLETE || dst.position() < 0) {
                     return -1;
                 }
 
                 if ((msgLength - currentPosition) > dst.capacity()) {
                     currentPosition += dst.capacity();
-                    context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
+                    if (dst.hasArray()) {
+                        byte[] ar = new byte[dst.remaining()];
+                        dst.get(ar, 0, ar.length);
+                        context.getBaos().write(ar);
+                        log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
+                        log.info("bytes " + ar[0] + " " + ar[1]);
+                    }
+                    //set the buffer position and limit for the rest of the buffer
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    dst.limit(initialBufferLimit);
+                    dst.position(msgLength + 1);
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    dst.compact();
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    //context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
                     this.state = READ_CONTENT;
                 } else {
                     dst.limit((msgLength - currentPosition) + 1);
-                    context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
+
+                    if (dst.hasArray()) {
+                        byte[] ar = new byte[dst.remaining()];
+                        dst.get(ar, 0, ar.length);
+                        context.getBaos().write(ar);
+                        log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
+                        log.info("bytes " + ar[0] + " " + ar[1]);
+                    }
+
                     this.state = READ_COMPLETE;
 
-                    context.setTCPMessage(context.getRequestBuffer().toString());
-                    context.getRequestBuffer().setLength(0);
-
-                    //need to set the position and limit
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    dst.limit(initialBufferLimit);
+                    dst.position(msgLength + 1);
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    dst.compact();
+                    log.info("position : " + dst.position() + " limit : " + dst.limit());
 
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
@@ -398,7 +357,7 @@ public class TCPCodec {
         return count;
     }
 
-    public void resetState(){
+    public void resetState() {
         this.state = READ_HEADER;
 
     }

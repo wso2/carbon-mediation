@@ -229,10 +229,9 @@ public class TCPProcessor implements InboundResponseSender {
         //log.info(tcpContext.getTCPMessage());
 
         tcpContext.requestOutput();
-
     }
 
-    //if we need to send a message about request timeout
+    //request timeout while waiting for response
     private class TimeoutHandler implements Runnable {
         private TCPContext context;
         private String messageId;
@@ -244,13 +243,7 @@ public class TCPProcessor implements InboundResponseSender {
 
         public void run() {
             if (messageId.equals(context.getMessageId())) {
-
                 log.warn("Timed out while waiting for TCP Response to be generated.");
-/*
-                context.setTCPMessage("");
-                context.setMessageId("TIMEOUT");
-                context.requestOutput();
-*/
             }
         }
     }

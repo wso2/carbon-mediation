@@ -151,23 +151,28 @@ public class InboundTCPIOReactor {
     private static IOReactorConfig getDefaultReactorConfig() {
         IOReactorConfig.Builder builder = IOReactorConfig.custom();
 
-        return builder.setSelectInterval(
-                TCPConfiguration.getInstance().getIntProperty(InboundTCPConstants.TCPConstants.SELECT_INTERVAL, 1000))
-                      .setShutdownGracePeriod(TCPConfiguration.getInstance().getIntProperty(
-                              InboundTCPConstants.TCPConstants.SHUTDOWN_GRACE_PERIOD, 5000)).setIoThreadCount(
-                        TCPConfiguration.getInstance().getIntProperty(InboundTCPConstants.TCPConstants.IO_THREAD_COUNT,
-                                                                      Runtime.getRuntime().availableProcessors()))
-                      .setSoTimeout(TCPConfiguration.getInstance()
-                                                    .getIntProperty(InboundTCPConstants.TCPConstants.SO_TIMEOUT, 0))
-                      .setSoKeepAlive(TCPConfiguration.getInstance().getBooleanProperty(
-                              InboundTCPConstants.TCPConstants.SO_KEEP_ALIVE, true)).setTcpNoDelay(
-                        TCPConfiguration.getInstance()
-                                        .getBooleanProperty(InboundTCPConstants.TCPConstants.TCP_NO_DELAY, true))
-                      .setConnectTimeout(TCPConfiguration.getInstance().getIntProperty(
-                              InboundTCPConstants.TCPConstants.CONNECT_TIMEOUT, 0)).setRcvBufSize(
-                        TCPConfiguration.getInstance().getIntProperty(InboundTCPConstants.TCPConstants.SO_RCVBUF, 0))
-                      .setSndBufSize(TCPConfiguration.getInstance()
-                                                     .getIntProperty(InboundTCPConstants.TCPConstants.SO_SNDBUF, 0))
-                      .setInterestOpQueued(false).setSoReuseAddress(true).setSoLinger(-1).build();
+        return builder
+                .setSelectInterval(TCPConfiguration.getInstance().getIntProperty(
+                        InboundTCPConstants.TCPConstants.SELECT_INTERVAL, 1000))
+                .setShutdownGracePeriod(TCPConfiguration.getInstance().getIntProperty(
+                        InboundTCPConstants.TCPConstants.SHUTDOWN_GRACE_PERIOD, 500))
+                .setIoThreadCount(TCPConfiguration.getInstance().getIntProperty(
+                        InboundTCPConstants.TCPConstants.IO_THREAD_COUNT, Runtime.getRuntime().availableProcessors()))
+                .setSoTimeout(TCPConfiguration.getInstance().getIntProperty(
+                        InboundTCPConstants.TCPConstants.SO_TIMEOUT, 0))
+                .setSoKeepAlive(TCPConfiguration.getInstance().getBooleanProperty(
+                        InboundTCPConstants.TCPConstants.SO_KEEP_ALIVE, true))
+                .setTcpNoDelay(TCPConfiguration.getInstance().getBooleanProperty(
+                        InboundTCPConstants.TCPConstants.TCP_NO_DELAY, true))
+                .setConnectTimeout(TCPConfiguration.getInstance().getIntProperty(
+                        InboundTCPConstants.TCPConstants.CONNECT_TIMEOUT, 0))
+                .setRcvBufSize(TCPConfiguration.getInstance().getIntProperty(
+                        InboundTCPConstants.TCPConstants.SO_RCVBUF, 0))
+                .setSndBufSize(TCPConfiguration.getInstance().getIntProperty(
+                        InboundTCPConstants.TCPConstants.SO_SNDBUF, 0))
+                .setInterestOpQueued(false)
+                .setSoReuseAddress(false)
+                .setSoLinger(-1)
+                .build();
     }
 }

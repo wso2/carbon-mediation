@@ -37,7 +37,9 @@ public class TCPConfiguration {
     private TCPConfiguration(){
         try {
             props = loadProperties("tcp.properties");
+            //log.info("so_timeout : "+getIntProperty(InboundTCPConstants.TCPConstants.SO_TIMEOUT));
         }catch (Exception e){
+            log.info("could not load the properties from tcp.properties file...");
             //Customer can set manual location for configuration file. If it is not found we ignore it
         }
     }
@@ -149,7 +151,7 @@ public class TCPConfiguration {
 
         Properties properties = new Properties();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
+        log.info("Loading the TCP config file '" + filePath + "' from classpath");
         if (log.isDebugEnabled()) {
             log.debug("Loading the TCP config file '" + filePath + "' from classpath");
         }

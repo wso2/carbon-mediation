@@ -163,7 +163,7 @@ public class TCPContext {
     }
 
     public void reset() {
-        // Resets TCP Context and TCPCodec to default states.
+        //Resets TCP Context and TCPCodec to default states.
         this.getBaos().reset();
         this.responseBuffer.setLength(0);
         this.getCodec().setState(TCPCodec.READ_HEADER);

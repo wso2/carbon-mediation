@@ -69,7 +69,7 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
     }
 
     @Override public void timeout(IOSession session) {
-
+        //log.info("Time out method called...");
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.timeout(session);
@@ -78,6 +78,7 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
     }
 
     @Override public void disconnected(IOSession session) {
+        //log.info("Disconnected method called...");
 
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         if (isa == null) {
