@@ -178,13 +178,17 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
                 if(nameSpace == null){
                     simpleDecision = decisionElement.getFirstChildWithName(new QName("Result")).
                                                              getFirstChildWithName(new QName("Decision")).getText();
-                    obligations = decisionElement.getFirstChildWithName(new QName("Obligations"));
-                    advice = decisionElement.getFirstChildWithName(new QName("AdviceExpressions"));
+                    obligations = decisionElement.getFirstChildWithName(new QName("Result")).
+                            getFirstChildWithName(new QName("Obligations"));
+                    advice = decisionElement.getFirstChildWithName(new QName("Result")).
+                            getFirstChildWithName(new QName("AssociatedAdvice"));
                 } else {
                     simpleDecision = decisionElement.getFirstChildWithName(new QName(nameSpace,"Result")).
                                                    getFirstChildWithName(new QName(nameSpace,"Decision")).getText();
-                    obligations = decisionElement.getFirstChildWithName(new QName(nameSpace,"Obligations"));
-                    advice = decisionElement.getFirstChildWithName(new QName(nameSpace,"AdviceExpressions"));
+                    obligations = decisionElement.getFirstChildWithName(new QName(nameSpace,"Result")).
+                            getFirstChildWithName(new QName(nameSpace, "Obligations"));
+                    advice = decisionElement.getFirstChildWithName(new QName(nameSpace,"Result")).
+                            getFirstChildWithName(new QName(nameSpace, "AssociatedAdvice"));
                 }
                 if(log.isDebugEnabled()){
                     log.debug("Entitlement Decision is : " + simpleDecision);
