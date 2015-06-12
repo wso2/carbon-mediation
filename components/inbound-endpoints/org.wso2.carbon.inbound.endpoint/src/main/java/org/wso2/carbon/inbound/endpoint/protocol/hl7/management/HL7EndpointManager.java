@@ -86,7 +86,7 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
 
         params.getProperties().setProperty(MLLPConstants.HL7_INBOUND_TENANT_DOMAIN, tenantDomain);
 
-        String epName = dataStore.getEndpointName(port, tenantDomain);
+        String epName = dataStore.getListeningEndpointName(port, tenantDomain);
         if (epName != null) {
             if (epName.equalsIgnoreCase(name)) {
                 log.info(epName + " Endpoint is already started in port : " + port);
@@ -96,7 +96,7 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
                 throw new SynapseException(msg);
             }
         } else {
-            dataStore.registerEndpoint(port, tenantDomain,
+            dataStore.registerListeningEndpoint(port, tenantDomain,
                     InboundRequestProcessorFactoryImpl.Protocols.hl7.toString(), name, params);
             startListener(port, name, params);
         }
@@ -112,7 +112,7 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
     public void closeEndpoint(int port) {
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = cc.getTenantDomain();
-        dataStore.unregisterEndpoint(port, tenantDomain);
+        dataStore.unregisterListeningEndpoint(port, tenantDomain);
 
         if (!InboundHL7IOReactor.isEndpointRunning(port)) {
             log.info("Listener Endpoint is not started");

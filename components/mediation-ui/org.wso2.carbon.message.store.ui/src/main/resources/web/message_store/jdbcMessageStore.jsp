@@ -123,6 +123,21 @@
             form.Name.focus();
             return false;
         }
+        if (IsEmpty(form.driver)) {
+            CARBON.showWarningDialog('<fmt:message key="driver.field.cannot.be.empty"/>')
+            form.Name.focus();
+            return false;
+        }
+        if (IsEmpty(form.url)) {
+            CARBON.showWarningDialog('<fmt:message key="url.field.cannot.be.empty"/>')
+            form.Name.focus();
+            return false;
+        }
+        if (IsEmpty(form.user)) {
+            CARBON.showWarningDialog('<fmt:message key="user.field.cannot.be.empty"/>')
+            form.Name.focus();
+            return false;
+        }
 
         return true;
     }
