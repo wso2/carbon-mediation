@@ -24,7 +24,6 @@
       <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>4.2.5-SNAPSHOT</version>
     <artifactId>mediator-features</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediators Feature Aggregator Module</name>

@@ -167,7 +167,6 @@
         <carbon.p2.plugin.version>1.5.3</carbon.p2.plugin.version>
         <axis2.wso2.version>1.6.1.wso2v10</axis2.wso2.version>
         <bam.server.feature.version>4.2.0</bam.server.feature.version>
-        <bam.config.version>4.2.5-SNAPSHOT</bam.config.version>
         <synapse.core.version>2.1.2.wso2v7</synapse.core.version>
         <mediation.initializer.version>4.2.3</mediation.initializer.version>
 
