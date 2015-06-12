@@ -168,13 +168,64 @@
         <axis2.wso2.version>1.6.1.wso2v10</axis2.wso2.version>
         <bam.server.feature.version>4.2.0</bam.server.feature.version>
         <bam.config.version>4.2.5-SNAPSHOT</bam.config.version>
-        <synapse.core.version>2.1.2.wso2v7_SNAPSHOT</synapse.core.version>
+        <synapse.core.version>2.1.2.wso2v7</synapse.core.version>
         <mediation.initializer.version>4.2.3</mediation.initializer.version>
 
         <!-- Carbon Commons version-->
         <carbon.commons.version>4.2.0</carbon.commons.version>
 
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediator.service</artifactId>
+            <version>${mediator.service.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.logging</artifactId>
+            <version>${carbon.kernel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.ui</artifactId>
+            <version>${carbon.kernel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.governance.api</artifactId>
+            <version>${carbon.kernel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.registry.core</artifactId>
+            <version>${carbon.kernel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.registry.common</artifactId>
+            <version>${carbon.kernel.version}</version>
+        </dependency>
+        <dependency>
+           <groupId>org.wso2.carbon</groupId>
+           <artifactId>org.wso2.carbon.core</artifactId>
+           <version>${carbon.kernel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2</artifactId>
+            <version>${axis2.wso2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2-client</artifactId>
+            <version>${axis2.wso2.version}</version>
+        </dependency>
+    </dependencies>
+    </dependencyManagement>
+
     <pluginRepositories>
         <pluginRepository>
             <id>wso2.releases</id>
