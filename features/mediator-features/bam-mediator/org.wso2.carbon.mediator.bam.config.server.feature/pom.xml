@@ -25,8 +25,6 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediator.bam.config.server.feature</artifactId>
-   
-    <version>4.2.5-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - BAM Mediator Configuration Feature</name>
     <url>http://wso2.org</url>
@@ -36,7 +34,7 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.bam.config</artifactId>
-            <version>${bam.config.version}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -63,7 +61,7 @@
                                 </properties>
                             </adviceFile>
                             <bundles>
-                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.bam.config:${bam.config.version}</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.bam.config:${project.version}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${synapse.core.version}</importFeatureDef>
