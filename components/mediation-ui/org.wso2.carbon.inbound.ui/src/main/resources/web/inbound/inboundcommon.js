@@ -40,6 +40,7 @@ function isNumber(numberstring) {
     }
 }
 
+
 function forward(destinationJSP) {
     location.href = destinationJSP;
 }
@@ -50,11 +51,21 @@ function addParam(form){
     return false;	
 }
 
-function inboundsave1(namemsg, typemsg, form){
+function inboundsave1(namemsg, typemsg, form , existingList){
+  var name;
     if (!isNameValid(document.getElementById('inboundName').value)) {
         CARBON.showWarningDialog(namemsg);
         return false;
     }
+     name = document.getElementById('inboundName').value;
+         if(existingInbounds != null ){
+         for(var i=0; i< existingInbounds.length;i++){
+              if(name == existingInbounds[i]){
+              CARBON.showErrorDialog("Inbound endpoint already exists please use separate name");
+              return false;
+              }
+             }
+            }
     if (document.getElementById('inboundType').value == '') {
         CARBON.showWarningDialog(typemsg);
         return false;
@@ -79,7 +90,7 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
-    	    if (document.getElementById(requiredParams[i]).value == '') {
+    	    if (document.getElementById(requiredParams[i]).value.trim() == '') {
     	        CARBON.showWarningDialog(msg5);
     	        return false;
     	    }    		
@@ -106,7 +117,7 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
     
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
-    	    if (document.getElementById(requiredParams[i]).value == '') {
+    	    if (document.getElementById(requiredParams[i]).value.trim() == '') {
     	        CARBON.showWarningDialog(msg5);
     	        return false;
     	    }    		

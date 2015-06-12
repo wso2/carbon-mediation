@@ -30,14 +30,21 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.ContinuationState;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.SynapseLog;
+import org.apache.synapse.continuation.ContinuationStackManager;
+import org.apache.synapse.continuation.ReliantContinuationState;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
+import org.apache.synapse.mediators.FlowContinuableMediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.util.AXIOMUtils;
 import org.apache.synapse.util.MessageHelper;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.core.util.CryptoException;
@@ -56,7 +63,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class EntitlementMediator extends AbstractMediator implements ManagedLifecycle {
+public class EntitlementMediator extends AbstractMediator implements ManagedLifecycle,
+                                                                     FlowContinuableMediator {
 
     private static final Log log = LogFactory.getLog(EntitlementMediator.class);
 
@@ -90,6 +98,8 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
     private Mediator adviceMediator = null;
     private PEPProxy pepProxy;
 
+    private final String ORIGINAL_ENTITLEMENT_PAYLOAD = "ORIGINAL_ENTITLEMENT_PAYLOAD";
+    private final String ENTITLEMENT_DECISION = "ENTITLEMENT_DECISION";
 
     /**
      * {@inheritDoc}
@@ -178,13 +188,17 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
                 if(nameSpace == null){
                     simpleDecision = decisionElement.getFirstChildWithName(new QName("Result")).
                                                              getFirstChildWithName(new QName("Decision")).getText();
-                    obligations = decisionElement.getFirstChildWithName(new QName("Obligations"));
-                    advice = decisionElement.getFirstChildWithName(new QName("AdviceExpressions"));
+                    obligations = decisionElement.getFirstChildWithName(new QName("Result")).
+                            getFirstChildWithName(new QName("Obligations"));
+                    advice = decisionElement.getFirstChildWithName(new QName("Result")).
+                            getFirstChildWithName(new QName("AssociatedAdvice"));
                 } else {
                     simpleDecision = decisionElement.getFirstChildWithName(new QName(nameSpace,"Result")).
                                                    getFirstChildWithName(new QName(nameSpace,"Decision")).getText();
-                    obligations = decisionElement.getFirstChildWithName(new QName(nameSpace,"Obligations"));
-                    advice = decisionElement.getFirstChildWithName(new QName(nameSpace,"AdviceExpressions"));
+                    obligations = decisionElement.getFirstChildWithName(new QName(nameSpace,"Result")).
+                            getFirstChildWithName(new QName(nameSpace, "Obligations"));
+                    advice = decisionElement.getFirstChildWithName(new QName(nameSpace,"Result")).
+                            getFirstChildWithName(new QName(nameSpace, "AssociatedAdvice"));
                 }
                 if(log.isDebugEnabled()){
                     log.debug("Entitlement Decision is : " + simpleDecision);
@@ -193,6 +207,9 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
                 //undefined decision;
                 throw new SynapseException("Undefined Decision is received");
             }
+
+            synCtx.setProperty(ORIGINAL_ENTITLEMENT_PAYLOAD, synCtx.getEnvelope());
+            synCtx.setProperty(ENTITLEMENT_DECISION, simpleDecision);
 
             // assume entitlement mediator always acts as base PEP
             // then behavior for not-applicable and indeterminate results are undefined
@@ -206,66 +223,60 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
                     adviceSynCtx = getOMElementInserted(advice,getClonedMessageContext(synCtx));
                     if(adviceSeqKey != null){
                         SequenceMediator sequence = (SequenceMediator) adviceSynCtx.getSequence(adviceSeqKey);
-                        adviceSynCtx.getEnvironment().injectAsync(adviceSynCtx,sequence);
+                        // Clear the continuation stack. So adviceSynCtx will not flow through the
+                        // rest of the mediators place in this flow
+                        ContinuationStackManager.clearStack(adviceSynCtx);
+                        adviceSynCtx.getEnvironment().injectAsync(adviceSynCtx, sequence);
                     } else if(adviceMediator != null) {
-                        adviceSynCtx.getEnvironment().injectAsync(adviceSynCtx,(SequenceMediator)adviceMediator);
+                        ContinuationStackManager.
+                                addReliantContinuationState(adviceSynCtx, 0, getMediatorPosition());
+                        adviceSynCtx.getEnvironment().injectAsync(adviceSynCtx, (SequenceMediator) adviceMediator);
                     }
                 }
 
                 if(obligations != null){
                     obligationsSynCtx = getOMElementInserted(obligations,getClonedMessageContext(synCtx));
-                    Mediator localObligationsMediator;
-                    if(obligationsSeqKey != null){
-                        localObligationsMediator = obligationsSynCtx.getSequence(obligationsSeqKey);
+                    boolean result;
+                    if (obligationsSeqKey != null) {
+                        ContinuationStackManager.
+                                addReliantContinuationState(obligationsSynCtx, 1, getMediatorPosition());
+                        obligationsSynCtx.setProperty(ContinuationStackManager.SKIP_CONTINUATION_STATE, true);
+                        result = obligationsSynCtx.getSequence(obligationsSeqKey).
+                                mediate(obligationsSynCtx);
+                        Boolean isContinuationCall =
+                                (Boolean) obligationsSynCtx.getProperty(SynapseConstants.CONTINUATION_CALL);
+                        if (result) {
+                            ContinuationStackManager.removeReliantContinuationState(obligationsSynCtx);
+                        } else if (!result && isContinuationCall != null && isContinuationCall) {
+                            // If result is false due to presence of a Call mediator, stop the flow
+                            return false;
+                        }
                     } else {
-                        localObligationsMediator = obligationsMediator;
+                        ContinuationStackManager.
+                                addReliantContinuationState(obligationsSynCtx, 2, getMediatorPosition());
+                        result = obligationsMediator.mediate(obligationsSynCtx);
+                        Boolean isContinuationCall =
+                                (Boolean) obligationsSynCtx.getProperty(SynapseConstants.CONTINUATION_CALL);
+                        if (result) {
+                            ContinuationStackManager.removeReliantContinuationState(obligationsSynCtx);
+                        } else if (!result && isContinuationCall != null && isContinuationCall) {
+                            // If result is false due to presence of a Call mediator, stop the flow
+                            return false;
+                        }
                     }
 
-                    boolean  areObligationsDone = localObligationsMediator.mediate(obligationsSynCtx);
-                    if(!areObligationsDone){
+                    if (!result) {
                         // if return false, obligations are not correctly performed.
                         // So message is mediated through the OnReject sequence
-                        log.debug("Obligations are not correctly performed");
+                        if (log.isDebugEnabled()) {
+                            log.debug("Obligations are not correctly performed");
+                        }
                         simpleDecision = "Deny";
                     }
                 }
             }
 
-            if ("Permit".equals(simpleDecision)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("User is authorized to perform the action");
-                }
-                Mediator localOnAcceptMediator;
-                if(onAcceptSeqKey != null){
-                    localOnAcceptMediator = synCtx.getSequence(onAcceptSeqKey);
-                } else if (onAcceptMediator != null){
-                    localOnAcceptMediator = onAcceptMediator;
-                } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("OnAccept sequence is not defined.");
-                    }
-                    return true;
-                }
-                localOnAcceptMediator.mediate(synCtx);
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("User is not authorized to perform the action");
-                }
-                Mediator localOnRejectMediator;
-                if(onRejectSeqKey != null){
-                    localOnRejectMediator = synCtx.getSequence(onRejectSeqKey);
-                } else if (onRejectMediator != null) {
-                    localOnRejectMediator = onRejectMediator;
-                } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("OnReject sequence is not defined.");
-                    }
-                    throw new SynapseException("User is not authorized to perform the action");
-                }
-                localOnRejectMediator.mediate(synCtx);
-            }
-
-            return true;
+            return executeDecisionMessageFlow(synCtx, simpleDecision);
         } catch (SynapseException e){
             log.error(e);
             throw e;
@@ -274,6 +285,143 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
             throw new SynapseException("Error occurred while evaluating the policy");
         }
 
+    }
+
+    private boolean executeDecisionMessageFlow(MessageContext synCtx, String simpleDecision) {
+        if ("Permit".equals(simpleDecision)) {
+            if (log.isDebugEnabled()) {
+                log.debug("User is authorized to perform the action");
+            }
+            if (onAcceptSeqKey != null) {
+                ContinuationStackManager.updateSeqContinuationState(synCtx, getMediatorPosition());
+                return synCtx.getSequence(onAcceptSeqKey).mediate(synCtx);
+            } else if (onAcceptMediator != null) {
+                ContinuationStackManager.addReliantContinuationState(synCtx, 3, getMediatorPosition());
+                boolean result = onAcceptMediator.mediate(synCtx);
+                if (result) {
+                    ContinuationStackManager.removeReliantContinuationState(synCtx);
+                }
+                return result;
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("OnAccept sequence is not defined.");
+                }
+                return true;
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("User is not authorized to perform the action");
+            }
+            if (onRejectSeqKey != null) {
+                ContinuationStackManager.updateSeqContinuationState(synCtx, getMediatorPosition());
+                return synCtx.getSequence(onRejectSeqKey).mediate(synCtx);
+            } else if (onRejectMediator != null) {
+                ContinuationStackManager.addReliantContinuationState(synCtx, 4, getMediatorPosition());
+                boolean result = onRejectMediator.mediate(synCtx);
+                if (result) {
+                    ContinuationStackManager.removeReliantContinuationState(synCtx);
+                }
+                return result;
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("OnReject sequence is not defined.");
+                }
+                throw new SynapseException("User is not authorized to perform the action");
+            }
+        }
+    }
+
+    public boolean mediate(MessageContext synCtx,
+                           ContinuationState continuationState) {
+        SynapseLog synLog = getLog(synCtx);
+
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Entitlement mediator : Mediating from ContinuationState");
+        }
+
+        boolean result = false;
+        int subBranch = ((ReliantContinuationState) continuationState).getSubBranch();
+        if (subBranch == 0) {   // For Advice mediator
+            if (!continuationState.hasChild()) {
+                result = ((SequenceMediator) adviceMediator).mediate(synCtx, continuationState.getPosition() + 1);
+                if (result) {
+                    // Stop the flow after executing all the mediators
+                    ContinuationStackManager.clearStack(synCtx);
+                    return false;
+                }
+            } else {
+                FlowContinuableMediator mediator =
+                        (FlowContinuableMediator)
+                                ((SequenceMediator) adviceMediator).getChild(continuationState.getPosition());
+                result = mediator.mediate(synCtx, continuationState.getChildContState());
+            }
+        } else if (subBranch == 1 || subBranch == 2) {    // For Obligation
+
+            SequenceMediator sequenceMediator;
+            if (subBranch == 1) {
+                sequenceMediator = (SequenceMediator) synCtx.getSequence(obligationsSeqKey);
+            } else {
+                sequenceMediator = (SequenceMediator) obligationsMediator;
+            }
+
+            if (!continuationState.hasChild()) {
+
+                result = sequenceMediator.mediate(synCtx, continuationState.getPosition() + 1);
+                Boolean isContinuationCall =
+                        (Boolean) synCtx.getProperty(SynapseConstants.CONTINUATION_CALL);
+
+                if (!result && isContinuationCall != null && isContinuationCall) {
+                    // If result is false due to presence of a Call mediator, stop the flow
+                    return false;
+                } else {
+                    ContinuationStackManager.removeReliantContinuationState(synCtx);
+
+                    String decision = (String) synCtx.getProperty(ENTITLEMENT_DECISION);
+                    if (!result) {
+                        decision = "Deny";
+                    }
+
+                    // Set back the original payload
+                    OMElement originalEnv =
+                            (OMElement) synCtx.getProperty(ORIGINAL_ENTITLEMENT_PAYLOAD);
+                    try {
+                        synCtx.setEnvelope(AXIOMUtils.getSOAPEnvFromOM(originalEnv));
+                    } catch (AxisFault axisFault) {
+                        handleException("Error while setting the original envelope back", synCtx);
+                    }
+
+                    result = executeDecisionMessageFlow(synCtx, decision);
+                    if (result) {
+                        // Just adding a dummy state back, which will be removed at the Sequence when returning.
+                        ContinuationStackManager.addReliantContinuationState(synCtx, 1,
+                                                                             getMediatorPosition());
+                    }
+                }
+            } else {
+                FlowContinuableMediator mediator =
+                        (FlowContinuableMediator) sequenceMediator.getChild(continuationState.getPosition());
+                result = mediator.mediate(synCtx, continuationState.getChildContState());
+            }
+        } else if (subBranch == 3) {    // For onAcceptMediator
+            if (!continuationState.hasChild()) {
+                result = ((SequenceMediator) onAcceptMediator).mediate(synCtx, continuationState.getPosition() + 1);
+            } else {
+                FlowContinuableMediator mediator =
+                        (FlowContinuableMediator)
+                                ((SequenceMediator) onAcceptMediator).getChild(continuationState.getPosition());
+                result = mediator.mediate(synCtx, continuationState.getChildContState());
+            }
+        } else if (subBranch == 4) {    // For onReject Mediator
+            if (!continuationState.hasChild()) {
+                result = ((SequenceMediator) onRejectMediator).mediate(synCtx, continuationState.getPosition() + 1);
+            } else {
+                FlowContinuableMediator mediator =
+                        (FlowContinuableMediator)
+                                ((SequenceMediator) onRejectMediator).getChild(continuationState.getPosition());
+                result = mediator.mediate(synCtx, continuationState.getChildContState());
+            }
+        }
+        return result;
     }
 
   /**

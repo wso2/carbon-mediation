@@ -147,7 +147,7 @@ public class InboundEndpointsDataStore {
      * @param protocol     protocol
      * @param name         endpoint name
      */
-    public void registerSSLEndpoint(int port, String tenantDomain, String protocol, String name,SSLConfiguration sslConfiguration) {
+    public void registerSSLListeningEndpoint(int port, String tenantDomain, String protocol, String name,SSLConfiguration sslConfiguration) {
 
         List<InboundEndpointInfoDTO> tenantList = endpointListeningInfo.get(port);
         if (tenantList == null) {

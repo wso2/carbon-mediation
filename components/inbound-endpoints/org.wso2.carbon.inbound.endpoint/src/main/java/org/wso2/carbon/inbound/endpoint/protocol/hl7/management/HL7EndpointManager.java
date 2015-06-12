@@ -55,8 +55,8 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
     }
 
     @Override
-    public void startListener(int port, String name) {
-        return;
+    public boolean startListener(int port, String name) {
+        return true;
     }
 
     public void startListener(int port, String name, InboundProcessorParams params) {

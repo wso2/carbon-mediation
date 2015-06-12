@@ -44,6 +44,8 @@ import org.apache.synapse.commons.vfs.FileObjectDataSource;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 public class FileInjectHandler {
 
@@ -180,9 +182,12 @@ public class FileInjectHandler {
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setMessageID(UUIDGenerator.getUUID());
         axis2MsgCtx.setProperty(MessageContext.TRANSPORT_HEADERS, transportHeaders);
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, carbonContext.getTenantDomain());
         // There is a discrepency in what I thought, Axis2 spawns a nes threads to
         // send a message is this is TRUE - and I want it to be the other way
         msgCtx.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, true);
+       
         return msgCtx;
     }
     

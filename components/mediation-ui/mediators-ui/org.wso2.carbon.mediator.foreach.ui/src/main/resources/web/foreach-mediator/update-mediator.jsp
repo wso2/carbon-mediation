@@ -36,12 +36,9 @@
     foreachMediator.setSequenceRef(null);
 
     String seqValueType = request.getParameter("mediator.foreach.seq.type");
-    if(seqValueType.equals("none")){
-        foreachMediator.getList().clear();
+    if (seqValueType.equals("anon")) {
         foreachMediator.setSequenceRef(null);
-    } else if(seqValueType.equals("anonymous")){
-        foreachMediator.setSequenceRef("anon");
-    } else if(seqValueType.equals("pickFromRegistry")){
+    } else if (seqValueType.equals("pickFromRegistry")) {
         foreachMediator.getList().clear();
         foreachMediator.setSequenceRef(request.getParameter("mediator.foreach.seq.reg"));
     }

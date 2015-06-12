@@ -110,7 +110,17 @@ var requiredParams = null;
 	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
 	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
                         </td>                        
-                    </tr>                   
+                    </tr>
+                    <tr>
+                        <td style="width:150px"><fmt:message key="inbound.error.suspend"/><span
+                                class="required">*</span></td>
+                        <td align="left">
+                            <select id="inboundSuspend" name="inboundSuspend" class="longInput">                                
+                                <option value="true">true</option>     
+                                <option value="false" selected>false</option>           
+                            </select>                            
+                        </td>                      
+                    </tr>                                        
                     <% if(InboundClientConstants.TYPE_CLASS.equals(request.getParameter("inboundType"))){ %>
 					<script type="text/javascript">classRequired = true;</script>                    
                     <tr>
@@ -167,7 +177,8 @@ var requiredParams = null;
 	                                   onclick="deleteRow('tblInput');"/>                                                                 
                         </td>
                     </tr>                     
-                     <%}else{ %>
+                     <%}else{
+                     if(!advParams.isEmpty()){%>
 				    <tr>
 				        <td><span id="_adv" style="float: left; position: relative;">
 				            <a class="icon-link" onclick="javascript:showAdvancedOptions('');"
@@ -176,7 +187,7 @@ var requiredParams = null;
 				        </span>
 				        </td>
 				    </tr> 
-				    <%} %>
+				    <%} }%>
 				    <tr>
 					    <td colspan="3">
 						    <div id="_advancedForm" style="display:none">
