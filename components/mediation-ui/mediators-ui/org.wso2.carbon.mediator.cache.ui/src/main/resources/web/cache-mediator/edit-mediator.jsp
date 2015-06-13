@@ -116,7 +116,7 @@
                 <tr>
                     <td><div id="hasGen"><fmt:message key="mediator.cache.hashgenerator"/></div></td>
                     <td><div id="hasGehVal"><input type="text" name="hashGen"
-                               value="org.wso2.caching.digest.DOMHASHGenerator" readonly="readonly"
+                               value="org.wso2.carbon.mediator.cache.digest.DOMHASHGenerator" readonly="readonly"
                                size="40"/></div></td>
                 </tr>
                 <%if (cacheMediator.getTimeout() > 0) {%>

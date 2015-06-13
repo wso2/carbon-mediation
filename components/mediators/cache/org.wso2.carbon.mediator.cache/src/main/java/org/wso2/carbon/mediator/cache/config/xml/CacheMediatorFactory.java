@@ -165,7 +165,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
 					} else {
 						handleException("Specified class for the hashGenerator is not a " +
 						                "DigestGenerator. It *must* implement " +
-						                "org.wso2.caching.digest.DigestGenerator interface");
+						                "org.wso2.carbon.mediator.cache.digest.DigestGenerator interface");
 					}
 				} catch (ClassNotFoundException e) {
 					handleException("Unable to load the hash generator class", e);
