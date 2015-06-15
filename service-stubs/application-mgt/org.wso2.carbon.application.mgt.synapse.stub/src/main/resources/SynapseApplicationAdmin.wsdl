@@ -135,13 +135,13 @@
     </wsdl:binding>
     <wsdl:service name="SynapseApplicationAdmin">
         <wsdl:port name="SynapseApplicationAdminHttpsSoap11Endpoint" binding="ns:SynapseApplicationAdminSoap11Binding">
-            <soap:address location="https://priyakishok-ThinkPad-T540p:8243/services/SynapseApplicationAdmin.SynapseApplicationAdminHttpsSoap11Endpoint"/>
+            <soap:address location="https://localhost:8243/services/SynapseApplicationAdmin.SynapseApplicationAdminHttpsSoap11Endpoint"/>
         </wsdl:port>
         <wsdl:port name="SynapseApplicationAdminHttpsSoap12Endpoint" binding="ns:SynapseApplicationAdminSoap12Binding">
-            <soap12:address location="https://priyakishok-ThinkPad-T540p:8243/services/SynapseApplicationAdmin.SynapseApplicationAdminHttpsSoap12Endpoint"/>
+            <soap12:address location="https://localhost:8243/services/SynapseApplicationAdmin.SynapseApplicationAdminHttpsSoap12Endpoint"/>
         </wsdl:port>
         <wsdl:port name="SynapseApplicationAdminHttpsEndpoint" binding="ns:SynapseApplicationAdminHttpBinding">
-            <http:address location="https://priyakishok-ThinkPad-T540p:8243/services/SynapseApplicationAdmin.SynapseApplicationAdminHttpsEndpoint"/>
+            <http:address location="https://localhost:8243/services/SynapseApplicationAdmin.SynapseApplicationAdminHttpsEndpoint"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
