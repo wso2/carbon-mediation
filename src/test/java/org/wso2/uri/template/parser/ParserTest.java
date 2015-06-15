@@ -167,7 +167,15 @@ public class ParserTest extends TestCase {
 
         template = new URITemplate("/test{format}*");
         assertTrue(template.matches("/test.json?test", var));
-        assertTrue(template.matches("/test.json?test=val", var));
+        assertTrue(template.matches("/test.json/", var));
+        assertTrue(template.matches("/test.json", var));
+
+
+        template = new URITemplate("/test{format}/*");
+        assertTrue(template.matches("/test.json/test", var));
+        assertTrue(template.matches("/test.json/", var));
+        assertTrue(template.matches("/test.json", var));
+
 
         template = new URITemplate("/sanjeewa/~{test}?*");
         var.put("test","tester");

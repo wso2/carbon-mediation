@@ -61,10 +61,19 @@ public abstract class Node {
                 return matchLength;
             }
         } else if (matchLength == uriFragment.length() && next != null) {
+            if(next.getToken().equalsIgnoreCase("*"))
+            {
+                return matchLength;
+            }
+            if(next.getToken().equalsIgnoreCase("/*"))
+            {
+                return matchLength;
+            }
             // We have matched all the characters in the URI
             // But there are some nodes left to be matched against
             return -1;
-        } else {
+        }
+        else {
             return matchLength;
         }
     }
