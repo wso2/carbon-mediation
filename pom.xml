@@ -169,6 +169,11 @@
         <bam.server.feature.version>4.2.0</bam.server.feature.version>
         <synapse.core.version>2.1.2.wso2v7</synapse.core.version>
         <mediation.initializer.version>4.2.3</mediation.initializer.version>
+        <commons-pool.version>1.5.0.wso2v1</commons-pool.version>
+        <databridge.thrift.version>4.2.4</databridge.thrift.version>
+        <sl4j.version>1.6.1</sl4j.version>
+        <sl4j.lo4j.version>1.6.1</sl4j.lo4j.version>
+        <mediation.initializer.feature.version>4.2.3</mediation.initializer.feature.version>
 
         <!-- Carbon Commons version-->
         <carbon.commons.version>4.2.0</carbon.commons.version>
@@ -177,6 +182,51 @@
 
     <dependencyManagement>
         <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.mediator.bam.config.stub</artifactId>
+            <version>${carbon.kernel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediator.bam.config</artifactId>
+            <version>${project.version}</version>
+        </dependency>    
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
+            <version>${carbon.kernel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.user.api</artifactId>
+            <version>${carbon.kernel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${sl4j.lo4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${sl4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-pool.wso2</groupId>
+            <artifactId>commons-pool</artifactId>
+            <version>${commons-pool.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
+            <version>${databridge.thrift.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.databridge.commons</artifactId>
+            <version>${carbon.kernel.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.mediator.service</artifactId>

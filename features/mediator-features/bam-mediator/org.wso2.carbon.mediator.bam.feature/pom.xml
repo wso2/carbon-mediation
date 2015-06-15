@@ -28,9 +28,9 @@
    <description>This feature contains the bundles required for BAM Mediator functionality</description>
    <dependencies>
       <dependency>
-         <groupId>org.wso2.carbon</groupId>
+         <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.mediator.bam.server.feature</artifactId>
-         <version>${bam.server.feature.version}</version>
+         <version>${project.version}</version>
          <type>zip</type>
       </dependency>
       <dependency>
@@ -73,7 +73,7 @@
                         <importFeatureDef>org.wso2.carbon.databridge.datapublisher:${carbon.commons.version}</importFeatureDef>
                      </importFeatures>
                      <includedFeatures>
-                        <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.mediator.bam.server.feature:${bam.server.feature.version}</includedFeatureDef>
+                        <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.bam.server.feature</includedFeatureDef>
                         <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.mediator.bam.ui.feature:${bam.server.feature.version}</includedFeatureDef>
                         <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.bam.config.server.feature</includedFeatureDef>
                         <includedFeatureDef>org.wso2.carbon:org.wso2.carbon.mediator.bam.config.ui.feature:${bam.server.feature.version}</includedFeatureDef>
