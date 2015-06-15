@@ -306,15 +306,13 @@ public class InboundHttpServerWorker extends ServerWorker {
      * @throws AxisFault
      */
     private org.apache.synapse.MessageContext updateAxis2MessageContextForSynapse(
-            org.apache.synapse.MessageContext synCtx) throws AxisFault {
+               org.apache.synapse.MessageContext synCtx) throws AxisFault {
 
         ServiceContext svcCtx = new ServiceContext();
         OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
-        AxisService axisService = new AxisService();
 
-                   ((Axis2MessageContext) synCtx).getAxis2MessageContext().setServiceContext(svcCtx);
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setServiceContext(svcCtx);
         ((Axis2MessageContext) synCtx).getAxis2MessageContext().setOperationContext(opCtx);
-        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisService(axisService);
 
         return synCtx;
     }
