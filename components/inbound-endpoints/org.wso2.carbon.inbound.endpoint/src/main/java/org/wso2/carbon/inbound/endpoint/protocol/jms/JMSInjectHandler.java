@@ -43,8 +43,11 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
  * 
@@ -59,6 +62,7 @@ public class JMSInjectHandler {
     private String onErrorSeq;
     private boolean sequential;
     private SynapseEnvironment synapseEnvironment;
+    private Properties jmsProperties;
 
     public JMSInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
             SynapseEnvironment synapseEnvironment, Properties jmsProperties) {
@@ -66,6 +70,7 @@ public class JMSInjectHandler {
         this.onErrorSeq = onErrorSeq;
         this.sequential = sequential;
         this.synapseEnvironment = synapseEnvironment;
+        this.jmsProperties = jmsProperties;
     }
 
     public boolean invoke(Object object) throws SynapseException{
@@ -74,6 +79,9 @@ public class JMSInjectHandler {
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
             String contentType = msg.getJMSType();
+            if(contentType == null || contentType.trim().equals("")){
+                contentType = jmsProperties.getProperty(JMSConstants.CONTENT_TYPE);
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Processed JMS Message of Content-type : " + contentType);
             }
@@ -123,12 +131,12 @@ public class JMSInjectHandler {
                 return false;
             }
             SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration()
-                    .getSequence(injectingSeq);
-            seq.setErrorHandler(onErrorSeq);
+                    .getSequence(injectingSeq);           
             if (seq != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("injecting message to sequence : " + injectingSeq);
                 }
+                seq.setErrorHandler(onErrorSeq);
                 if (!synapseEnvironment.injectInbound(msgCtx, seq, sequential)) {
                     return false;
                 }
@@ -186,6 +194,8 @@ public class JMSInjectHandler {
                 .getAxis2MessageContext();
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setMessageID(UUIDGenerator.getUUID());
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, carbonContext.getTenantDomain());
         // There is a discrepency in what I thought, Axis2 spawns a nes threads
         // to
         // send a message is this is TRUE - and I want it to be the other way

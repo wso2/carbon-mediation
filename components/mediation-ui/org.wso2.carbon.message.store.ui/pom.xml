@@ -20,11 +20,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-ui</artifactId>
-        <version>4.3.3-SNAPSHOT</version>
+        <version>4.4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.3.3-SNAPSHOT</version>
+    <version>4.4.3-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.message.store.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Message Store Admin UI</name>
@@ -63,7 +63,8 @@
                             org.wso2.carbon.message.store.stub.*; version="${carbon.mediation.imp.pkg.version}",
                             !javax.xml.namespace,
                             javax.xml.namespace;version="0.0.0",
-                            *;resolution:=optional
+                            *;resolution:=optional,
+                            org.wso2.carbon.ndatasource.ui.stub.*
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
@@ -100,6 +101,14 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.message.store.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.ndatasource.common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.commons</groupId>
+            <artifactId>org.wso2.carbon.ndatasource.stub</artifactId>
         </dependency>
     </dependencies>
 </project>

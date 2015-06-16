@@ -142,8 +142,12 @@
 
         if (provider.equals("org.apache.synapse.message.store.impl.jms.JmsStore")) {
             designViewUrl = "jmsMessageStore.jsp?origin=source";
+        } else if (provider.equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) {
+            designViewUrl = "rabbitmqMessageStore.jsp?origin=source";
         } else if (provider.equals("org.apache.synapse.message.store.impl.memory.InMemoryStore")) {
             designViewUrl = "inMemoryMessageStore.jsp?origin=source";
+        } else if (provider.equals("org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore")) {
+            designViewUrl = "jdbcMessageStore.jsp?origin=source";
         } else {
             designViewUrl = "customMessageStore.jsp?origin=source";
         }

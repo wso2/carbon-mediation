@@ -47,7 +47,7 @@
 			List<ParamDTO>sParams = new ArrayList<ParamDTO>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
-				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.")){
+				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.") || strKey.startsWith("api.")){
 					String strVal = request.getParameter(strKey);
 					if(strVal != null && !strVal.equals("")){
 						sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
@@ -55,15 +55,49 @@
 				}else if(strKey.startsWith("paramkey")){
 					String paramKey = request.getParameter("paramkey" + strKey.replaceAll("paramkey",""));
 					if(paramKey != null && !paramKey.trim().equals("")){
-						sParams.add((new ParamDTO(paramKey, request.getParameter("paramval" + strKey.replaceAll("paramkey","")))));	
-					}	
+						sParams.add((new ParamDTO(paramKey, request.getParameter("paramval" + strKey.replaceAll("paramkey","")))));
+					}
 				}else if(strKey.startsWith("interval")){
 				    sParams.add((new ParamDTO("interval",request.getParameter("interval"))));
 				}else if(strKey.startsWith("sequential")){
-				    sParams.add((new ParamDTO("sequential",request.getParameter("sequential"))));				    
-				}	
+				    sParams.add((new ParamDTO("sequential",request.getParameter("sequential"))));
+				}else if(strKey.startsWith("keystore")){
+                 	sParams.add((new ParamDTO("keystore",request.getParameter(strKey))));
+                }else if(strKey.startsWith("truststore")){
+                 	sParams.add((new ParamDTO("truststore",request.getParameter(strKey))));
+                }else if(strKey.startsWith("SSLVerifyClient")){
+                    sParams.add((new ParamDTO("SSLVerifyClient",request.getParameter(strKey))));
+                }else if(strKey.startsWith("HttpsProtocols")){
+                    sParams.add((new ParamDTO("HttpsProtocols",request.getParameter(strKey))));
+                }else if(strKey.startsWith("SSLProtocol")){
+                    sParams.add((new ParamDTO("SSLProtocol",request.getParameter(strKey))));
+                }else if(strKey.startsWith("CertificateRevocationVerifier")){
+                    sParams.add((new ParamDTO("CertificateRevocationVerifier",request.getParameter(strKey))));
+                }else if(strKey.startsWith("coordination")){
+		    sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));
+                }else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")|| strKey.startsWith("topic.filter.")|| strKey.startsWith("topics")||strKey.startsWith("filter.from.")||strKey.startsWith("consumer.type")|| strKey.startsWith("thread.count")|| strKey.startsWith("simple.")|| strKey.startsWith("content.type")){
+                  String strVal = request.getParameter(strKey);
+                  if(strVal != null && !strVal.equals("")){
+                     sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                  }
+                }
 			}
-			client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
+		boolean added =	client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, request.getParameter("inboundSuspend"), sParams);
+		if(!added){
+		%>
+		<script type="text/javascript">
+            jQuery(document).ready(function() {
+                CARBON.showErrorDialog('Cannot add inbound endpoint may be name or port already consumed', function() {
+        				goBackOnePage();
+        			}, function() {
+        				goBackOnePage();
+        			});
+        		});
+        	</script>
+
+
+		<%
+		}
 	%>
 	<script type="text/javascript">
     forward("index.jsp");

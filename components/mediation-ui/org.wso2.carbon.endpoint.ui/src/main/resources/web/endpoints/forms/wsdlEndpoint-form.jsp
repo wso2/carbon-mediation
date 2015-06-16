@@ -281,16 +281,19 @@
         if (endpoint.getTimeoutAct() != null) {
             if (endpoint.getTimeoutAct().equals("discard")) {
                 isDiscardMessage = true;
-                actionDuration = Integer.parseInt(endpoint.getTimeoutActionDuration());
             } else if (endpoint.getTimeoutAct().equals("fault")) {
                 isFaultSequence = true;
-                actionDuration = Integer.parseInt(endpoint.getTimeoutActionDuration());
             } else {
                 isNeverTimeout = true;
             }
         } else {
             isNeverTimeout = true;
         }
+
+        if (endpoint.getTimeoutActionDuration() != null ) {
+            actionDuration = Integer.parseInt(endpoint.getTimeoutActionDuration());
+        }
+
         // Enable WS-Addressing?
         if (endpoint.isWsadd()) {
             isEnableAddressing = true;

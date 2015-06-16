@@ -197,6 +197,27 @@
                             </td>
                         </tr>
                     </table>
+                    <br>
+                     <label><fmt:message key="enable.blocking.calls"/></label>
+                     <table id="blockingOptionTable">
+                         <tr>
+                             <td><fmt:message key="blocking"/></td>
+                             <td>
+                                <select id="mediator.call.blocking" name="mediator.call.blocking">
+                                    <option value="false"
+                                            <%=!callMediator.getBlocking() ?
+                                               "selected=\"selected\"" :
+                                               ""%>><fmt:message key="blocking.category.false"/>
+                                    </option>
+                                    <option value="true"
+                                            <%=callMediator.getBlocking() ?
+                                               "selected=\"selected\"" :
+                                               ""%>><fmt:message key="blocking.category.true"/>
+                                    </option>
+                                </select>
+                             </td>
+                         </tr>
+                     </table>
 
                 </td>
             </tr>

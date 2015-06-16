@@ -20,7 +20,7 @@
     <parent>
        <artifactId>synapse-features</artifactId>
        <groupId>org.wso2.carbon.mediation</groupId>
-       <version>4.3.3-SNAPSHOT</version>
+       <version>4.4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -72,7 +72,7 @@
            <artifactId>wso2throttle-core</artifactId>
        </dependency>
         <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
+            <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
             <artifactId>com.jayway.jsonpath</artifactId>
         </dependency>
       	<dependency>
@@ -105,6 +105,7 @@
                                     <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
                                 </properties>
                             </adviceFile>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
                             <bundles>
                                 <bundleDef>org.apache.synapse:synapse-samples</bundleDef>
                                 <bundleDef>org.apache.synapse:synapse-core</bundleDef>
@@ -118,7 +119,7 @@
                                 <bundleDef>org.wso2.caching:wso2caching-core</bundleDef>
                                 <bundleDef>org.wso2.throttle:wso2throttle-core</bundleDef>
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
-                                <bundleDef>com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
                                 <bundleDef>org.wso2.staxon:staxon-core</bundleDef>
                             </bundles>
                         </configuration>

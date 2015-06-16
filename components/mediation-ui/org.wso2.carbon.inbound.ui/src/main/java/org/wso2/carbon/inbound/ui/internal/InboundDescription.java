@@ -28,12 +28,13 @@ public class InboundDescription {
 	private String name;
 	private String type;
 	private String classImpl;
-    private long interval;
-    private boolean suspend;
-    private String injectingSeq;
-    private String onErrorSeq;
-    private Map<String, String> parameters;
-    private String fileName;
+   private long interval;
+   private boolean suspend;
+   private String injectingSeq;
+   private String onErrorSeq;
+   private Map<String, String> parameters;
+   private String fileName;
+   public static final String REGISTRY_KEY_PREFIX = "key:";
     
 	public InboundDescription(InboundEndpointDTO inboundEndpoint){
 		this.name = inboundEndpoint.getName();
@@ -45,14 +46,16 @@ public class InboundDescription {
 			this.type = InboundClientConstants.TYPE_CLASS;
 			this.classImpl = inboundEndpoint.getClassImpl();	
 		}
-		this.suspend = inboundEndpoint.isSuspendSpecified();
+		this.suspend = inboundEndpoint.getSuspend();
 		this.injectingSeq = inboundEndpoint.getInjectingSeq();
 		this.onErrorSeq = inboundEndpoint.getOnErrorSeq();
 		this.fileName = inboundEndpoint.getFileName();
 		this.parameters = new HashMap<String, String>();
 		if(inboundEndpoint.getParameters() != null){
 			for(ParameterDTO parameterDTO :inboundEndpoint.getParameters()){
-				if(parameterDTO.getValue() != null){
+				if(parameterDTO.getKey() != null){
+					this.parameters.put(parameterDTO.getName(), REGISTRY_KEY_PREFIX + parameterDTO.getKey());
+				}else	if(parameterDTO.getValue() != null){
 					this.parameters.put(parameterDTO.getName(), parameterDTO.getValue());
 				}else{
 					this.parameters.put(parameterDTO.getName(), "");

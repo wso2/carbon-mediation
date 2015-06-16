@@ -1,0 +1,350 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax2116="http://lb.thrift.agent.databridge.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ax2114="http://sink.event.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://services.config.sink.event.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://services.config.sink.event.carbon.wso2.org">
+    <wsdl:documentation>PublishEventMediatorConfigAdmin</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax2115="http://sink.event.carbon.wso2.org/xsd" xmlns:ns="http://org.apache.axis2/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
+            <xs:import namespace="http://sink.event.carbon.wso2.org/xsd"/>
+            <xs:element name="PublishEventMediatorConfigAdminEventSinkException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="EventSinkException" nillable="true" type="ax2115:EventSinkException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="writeEventSink">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="username" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="receiverUrl" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="authenticatorUrl" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="writeEventSinkResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllEventSinks">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllEventSinksResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2115:EventSink"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEventSinkFromName">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEventSinkFromNameResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax2115:EventSink"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteEventSink">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteEventSinkResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateEventSink">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="username" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="receiverUrl" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="authenticatorUrl" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateEventSinkResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema xmlns:ax2117="http://lb.thrift.agent.databridge.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://sink.event.carbon.wso2.org/xsd">
+            <xs:import namespace="http://lb.thrift.agent.databridge.carbon.wso2.org/xsd"/>
+            <xs:complexType name="EventSinkException">
+                <xs:sequence/>
+            </xs:complexType>
+            <xs:complexType name="EventSink">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="authenticationUrlSet" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="dataPublisher" nillable="true" type="ax2116:LoadBalancingDataPublisher"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="receiverUrlSet" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="username" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://lb.thrift.agent.databridge.carbon.wso2.org/xsd">
+            <xs:complexType name="LoadBalancingDataPublisher">
+                <xs:sequence/>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getAllEventSinksRequest">
+        <wsdl:part name="parameters" element="ns1:getAllEventSinks"/>
+    </wsdl:message>
+    <wsdl:message name="getAllEventSinksResponse">
+        <wsdl:part name="parameters" element="ns1:getAllEventSinksResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getEventSinkFromNameRequest">
+        <wsdl:part name="parameters" element="ns1:getEventSinkFromName"/>
+    </wsdl:message>
+    <wsdl:message name="getEventSinkFromNameResponse">
+        <wsdl:part name="parameters" element="ns1:getEventSinkFromNameResponse"/>
+    </wsdl:message>
+    <wsdl:message name="PublishEventMediatorConfigAdminEventSinkException">
+        <wsdl:part name="parameters" element="ns1:PublishEventMediatorConfigAdminEventSinkException"/>
+    </wsdl:message>
+    <wsdl:message name="deleteEventSinkRequest">
+        <wsdl:part name="parameters" element="ns1:deleteEventSink"/>
+    </wsdl:message>
+    <wsdl:message name="deleteEventSinkResponse">
+        <wsdl:part name="parameters" element="ns1:deleteEventSinkResponse"/>
+    </wsdl:message>
+    <wsdl:message name="writeEventSinkRequest">
+        <wsdl:part name="parameters" element="ns1:writeEventSink"/>
+    </wsdl:message>
+    <wsdl:message name="writeEventSinkResponse">
+        <wsdl:part name="parameters" element="ns1:writeEventSinkResponse"/>
+    </wsdl:message>
+    <wsdl:message name="updateEventSinkRequest">
+        <wsdl:part name="parameters" element="ns1:updateEventSink"/>
+    </wsdl:message>
+    <wsdl:message name="updateEventSinkResponse">
+        <wsdl:part name="parameters" element="ns1:updateEventSinkResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="PublishEventMediatorConfigAdminPortType">
+        <wsdl:operation name="getAllEventSinks">
+            <wsdl:input message="tns:getAllEventSinksRequest" wsaw:Action="urn:getAllEventSinks"/>
+            <wsdl:output message="tns:getAllEventSinksResponse" wsaw:Action="urn:getAllEventSinksResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getEventSinkFromName">
+            <wsdl:input message="tns:getEventSinkFromNameRequest" wsaw:Action="urn:getEventSinkFromName"/>
+            <wsdl:output message="tns:getEventSinkFromNameResponse" wsaw:Action="urn:getEventSinkFromNameResponse"/>
+            <wsdl:fault message="tns:PublishEventMediatorConfigAdminEventSinkException" name="PublishEventMediatorConfigAdminEventSinkException" wsaw:Action="urn:getEventSinkFromNamePublishEventMediatorConfigAdminEventSinkException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteEventSink">
+            <wsdl:input message="tns:deleteEventSinkRequest" wsaw:Action="urn:deleteEventSink"/>
+            <wsdl:output message="tns:deleteEventSinkResponse" wsaw:Action="urn:deleteEventSinkResponse"/>
+            <wsdl:fault message="tns:PublishEventMediatorConfigAdminEventSinkException" name="PublishEventMediatorConfigAdminEventSinkException" wsaw:Action="urn:deleteEventSinkPublishEventMediatorConfigAdminEventSinkException"/>
+        </wsdl:operation>
+        <wsdl:operation name="writeEventSink">
+            <wsdl:input message="tns:writeEventSinkRequest" wsaw:Action="urn:writeEventSink"/>
+            <wsdl:output message="tns:writeEventSinkResponse" wsaw:Action="urn:writeEventSinkResponse"/>
+            <wsdl:fault message="tns:PublishEventMediatorConfigAdminEventSinkException" name="PublishEventMediatorConfigAdminEventSinkException" wsaw:Action="urn:writeEventSinkPublishEventMediatorConfigAdminEventSinkException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateEventSink">
+            <wsdl:input message="tns:updateEventSinkRequest" wsaw:Action="urn:updateEventSink"/>
+            <wsdl:output message="tns:updateEventSinkResponse" wsaw:Action="urn:updateEventSinkResponse"/>
+            <wsdl:fault message="tns:PublishEventMediatorConfigAdminEventSinkException" name="PublishEventMediatorConfigAdminEventSinkException" wsaw:Action="urn:updateEventSinkPublishEventMediatorConfigAdminEventSinkException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="PublishEventMediatorConfigAdminSoap11Binding" type="tns:PublishEventMediatorConfigAdminPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getAllEventSinks">
+            <soap:operation soapAction="urn:getAllEventSinks" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventSinkFromName">
+            <soap:operation soapAction="urn:getEventSinkFromName" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PublishEventMediatorConfigAdminEventSinkException">
+                <soap:fault use="literal" name="PublishEventMediatorConfigAdminEventSinkException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteEventSink">
+            <soap:operation soapAction="urn:deleteEventSink" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PublishEventMediatorConfigAdminEventSinkException">
+                <soap:fault use="literal" name="PublishEventMediatorConfigAdminEventSinkException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="writeEventSink">
+            <soap:operation soapAction="urn:writeEventSink" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PublishEventMediatorConfigAdminEventSinkException">
+                <soap:fault use="literal" name="PublishEventMediatorConfigAdminEventSinkException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateEventSink">
+            <soap:operation soapAction="urn:updateEventSink" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PublishEventMediatorConfigAdminEventSinkException">
+                <soap:fault use="literal" name="PublishEventMediatorConfigAdminEventSinkException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="PublishEventMediatorConfigAdminSoap12Binding" type="tns:PublishEventMediatorConfigAdminPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getAllEventSinks">
+            <soap12:operation soapAction="urn:getAllEventSinks" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventSinkFromName">
+            <soap12:operation soapAction="urn:getEventSinkFromName" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PublishEventMediatorConfigAdminEventSinkException">
+                <soap12:fault use="literal" name="PublishEventMediatorConfigAdminEventSinkException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteEventSink">
+            <soap12:operation soapAction="urn:deleteEventSink" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PublishEventMediatorConfigAdminEventSinkException">
+                <soap12:fault use="literal" name="PublishEventMediatorConfigAdminEventSinkException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="writeEventSink">
+            <soap12:operation soapAction="urn:writeEventSink" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PublishEventMediatorConfigAdminEventSinkException">
+                <soap12:fault use="literal" name="PublishEventMediatorConfigAdminEventSinkException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateEventSink">
+            <soap12:operation soapAction="urn:updateEventSink" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="PublishEventMediatorConfigAdminEventSinkException">
+                <soap12:fault use="literal" name="PublishEventMediatorConfigAdminEventSinkException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="PublishEventMediatorConfigAdminHttpBinding" type="tns:PublishEventMediatorConfigAdminPortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="getAllEventSinks">
+            <http:operation location="getAllEventSinks"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventSinkFromName">
+            <http:operation location="getEventSinkFromName"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="deleteEventSink">
+            <http:operation location="deleteEventSink"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="writeEventSink">
+            <http:operation location="writeEventSink"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="updateEventSink">
+            <http:operation location="updateEventSink"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="PublishEventMediatorConfigAdmin">
+        <wsdl:port name="PublishEventMediatorConfigAdminHttpsSoap11Endpoint" binding="tns:PublishEventMediatorConfigAdminSoap11Binding">
+            <soap:address location="https://Vijithas-MacBook-Pro.local:8243/services/PublishEventMediatorConfigAdmin.PublishEventMediatorConfigAdminHttpsSoap11Endpoint"/>
+        </wsdl:port>
+        <wsdl:port name="PublishEventMediatorConfigAdminHttpsSoap12Endpoint" binding="tns:PublishEventMediatorConfigAdminSoap12Binding">
+            <soap12:address location="https://Vijithas-MacBook-Pro.local:8243/services/PublishEventMediatorConfigAdmin.PublishEventMediatorConfigAdminHttpsSoap12Endpoint"/>
+        </wsdl:port>
+        <wsdl:port name="PublishEventMediatorConfigAdminHttpsEndpoint" binding="tns:PublishEventMediatorConfigAdminHttpBinding">
+            <http:address location="https://Vijithas-MacBook-Pro.local:8243/services/PublishEventMediatorConfigAdmin.PublishEventMediatorConfigAdminHttpsEndpoint"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

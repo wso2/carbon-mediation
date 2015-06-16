@@ -20,12 +20,12 @@
     <parent>
         <artifactId>inbound-endpoints</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.3.3-SNAPSHOT</version>
+        <version>4.4.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
     <packaging>bundle</packaging>
-    <version>4.3.3-SNAPSHOT</version>
+    <version>4.4.3-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -34,12 +34,23 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.inbound.endpoint.osgi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.clustering</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <scope>compile</scope>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-nhttp-transport</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.cxf</groupId>
+            <artifactId>cxf-bundle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+            <artifactId>jetty-bundle</artifactId>
         </dependency>
     </dependencies>
 
@@ -54,20 +65,22 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-
                             org.wso2.carbon.inbound.endpoint.protocol.http.management,
-                            org.wso2.carbon.inbound.endpoint.protocol.generic
+                            org.wso2.carbon.inbound.endpoint.protocol.http.multitenancy,
+                            org.wso2.carbon.inbound.endpoint.protocol.generic,
+                            org.wso2.carbon.inbound.endpoint
                         </Export-Package>
                         <Import-Package>
-                            org.wso2.carbon.inbound.endpoint.persistence;
+                            org.wso2.carbon.inbound.endpoint.persistence,
+                            org.wso2.carbon.inbound.endpoint.osgi.service;
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Fragment-Host>synapse-core</Fragment-Host>
+                        <Fragment-Host>
+                            synapse-core
+                        </Fragment-Host>
                     </instructions>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 

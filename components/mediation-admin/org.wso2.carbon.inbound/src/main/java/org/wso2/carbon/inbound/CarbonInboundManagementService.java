@@ -90,7 +90,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
      * @param sParams
      * @throws InboundManagementException
      */
-    public void addInboundEndpoint(String name, String sequence, String onError, String protocol, String classImpl, ParameterDTO[]lParameterDTOs) throws InboundManagementException {
+    public void addInboundEndpoint(String name, String sequence, String onError, String protocol, String classImpl, String suspend, ParameterDTO[]lParameterDTOs) throws InboundManagementException {
         SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
@@ -98,6 +98,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         elem.addAttribute(fac.createOMAttribute("name", null, name));
         elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
         elem.addAttribute(fac.createOMAttribute("onError", null, onError));
+        elem.addAttribute(fac.createOMAttribute("suspend", null, suspend));
         if (protocol != null) {
             elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
         } else {
@@ -107,7 +108,9 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         for (ParameterDTO parameterDTO : lParameterDTOs) {
             OMElement param = fac.createOMElement("parameter", omNs);
             param.addAttribute(fac.createOMAttribute("name", null, parameterDTO.getName()));
-            if (parameterDTO.getValue() != null) {
+            if (parameterDTO.getKey() != null) {
+            	 param.addAttribute(fac.createOMAttribute("key", null, parameterDTO.getKey()));
+            }else if (parameterDTO.getValue() != null) {
                 param.setText(parameterDTO.getValue());
             }
             params.addChild(param);
@@ -159,13 +162,14 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
      * @param lParameterDTOs
      * @throws InboundManagementException
      */
-    public void updateInboundEndpoint(String name, String sequence, String onError, String protocol, String classImpl, ParameterDTO[]lParameterDTOs) throws InboundManagementException {
+    public void updateInboundEndpoint(String name, String sequence, String onError, String protocol, String classImpl, String suspend, ParameterDTO[]lParameterDTOs) throws InboundManagementException {
         SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
         OMFactory fac = OMAbstractFactory.getOMFactory();
         OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
         OMElement elem = fac.createOMElement("inboundEndpoint", omNs);
         elem.addAttribute(fac.createOMAttribute("name", null, name));
         elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
+        elem.addAttribute(fac.createOMAttribute("suspend", null, sequence));
         elem.addAttribute(fac.createOMAttribute("onError", null, onError));
         if (protocol != null) {
             elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
@@ -175,10 +179,12 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         OMElement params = fac.createOMElement("parameters", omNs);
         for (ParameterDTO lParameterDTO : lParameterDTOs) {
             OMElement param = fac.createOMElement("parameter", omNs);
-            param.addAttribute(fac.createOMAttribute("name", null, lParameterDTO.getName()));
-            if (lParameterDTO.getValue() != null) {
+            param.addAttribute(fac.createOMAttribute("name", null, lParameterDTO.getName()));            
+            if (lParameterDTO.getKey() != null) {
+           	    param.addAttribute(fac.createOMAttribute("key", null, lParameterDTO.getKey()));
+            }else if (lParameterDTO.getValue() != null) {
                 param.setText(lParameterDTO.getValue());
-            }
+            }            
             params.addChild(param);
         }
         elem.addChild(params);

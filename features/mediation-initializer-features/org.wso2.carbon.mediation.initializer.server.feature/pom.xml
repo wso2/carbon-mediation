@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer-features</artifactId>
-        <version>4.3.3-SNAPSHOT</version>
+        <version>4.4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.3.3-SNAPSHOT</version>
+    <version>4.4.3-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.initializer.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Initializer Server Feature</name>
@@ -89,7 +89,7 @@
                                 <!--TODO use ndatasource-->
                                 <!--<importFeatureDef>org.wso2.carbon.datasource.server:${carbon.datastore.version}</importFeatureDef>-->
                                 <importFeatureDef>org.wso2.carbon.task.server</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.event.server</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.event.server:${carbon.commons.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

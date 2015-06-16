@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+~  Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+~
+~  Licensed to the Apache Software Foundation (ASF) under one or more
+~  contributor license agreements.  See the NOTICE file distributed with
+~  this work for additional information regarding copyright ownership.
+~
+~  The ASF licenses this file to You under the Apache License, Version 2.0
+~
+~  (the "License"); you may not use this file except in compliance with
+~  the License.  You may obtain a copy of the License at
+~       http://www.apache.org/licenses/LICENSE-2.0
+~  Unless required by applicable law or agreed to in writing, software
+~  distributed under the License is distributed on an "AS IS" BASIS,
+~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+~  See the License for the specific language governing permissions and
+~  limitations under the License.
+-->
+<html>
+<head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>Publish Event Mediator - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+
+<body>
+<h1>Publish Event Mediator</h1>
+
+<p>
+    publishEvent mediator can be used to construct an event and publish the event to a different system such as BAM or CEP.
+    An event consists of three separate sections of data attributes, namely meta, correlation and payload.
+    Event can be constructed with desired data attributes. Values for data attributes can be extracted from message and message context. XPaths and XPath extension function get-property() can be used for extracting data from message and message context.
+</p>
+
+<img src="images/publish_event_mediator.png"/> <br />
+<strong>Figure1: publishEvent Mediator</strong>
+
+<h3><strong>Configuring publishEvent mediator</strong></h3>
+<ul>
+    <li><strong>Stream Name:</strong> Name of the stream to be used for sending data.</li>
+    <li><strong>Stream Version:</strong> Version of the stream to be used for sending data.</li>
+    <li><strong>Event Sink:</strong> Name of the event sink to which events should be published. To manage event sinks, go to <strong>Configure -> Event Sinks</strong>.</li>
+    <li><strong>Meta Attributes:</strong> List of attributes which goes in meta section of event.</li>
+    <li><strong>Correlation Attributes:</strong> List of attributes which goes in correlation section of event.</li>
+    <li><strong>Payload Attributes:</strong> List of attributes which goes in payload section of event.</li>
+</ul>
+
+<h3><strong>Adding attributes</strong></h3>
+<p>
+You can add new attributes to meta, correlation and payload sections using the "Add Attribute" button in each section. Attribute configuration is similar to the configuration of property mediator.
+</p>
+<ul>
+    <li><strong>Attribute Name:</strong> Name of the stream attribute.</li>
+    <li><strong>Attribute Value:</strong> Specifies whether value is an expression or a constant.</li>
+    <li><strong>Value/Expression:</strong> If "Expression" is selected for Attribute Value, an XPath expression should be specified. get-property() XPath extension function is supported in expressions. If "Value" is selected for Attribute Value, plain text value should be entered.</li>
+    <li><strong>Namespace Editor:</strong> Namespaces used in the XPath expression should be specified in Namespace Editor.</li>
+    <li><strong>Type:</strong> Data type of the attribute.</li>
+</ul>
+<p>Note: If a new attribute is added, existing attribute is deleted or a change to any attribute is made (Value/Expression changes are not considered), either Stream Name or Stream Version should also be changed</p>
+</body>
+</html>

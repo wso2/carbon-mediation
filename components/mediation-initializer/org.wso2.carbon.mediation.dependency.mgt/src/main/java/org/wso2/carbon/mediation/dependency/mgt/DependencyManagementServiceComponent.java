@@ -19,10 +19,7 @@ package org.wso2.carbon.mediation.dependency.mgt;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Bundle;
-import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
-import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingServiceImpl;
-import org.wso2.carbon.mediation.dependency.mgt.services.ResolverRegistrationService;
-import org.wso2.carbon.mediation.dependency.mgt.services.ResolverRegistrationServiceImpl;
+import org.wso2.carbon.mediation.dependency.mgt.services.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,12 +36,20 @@ public class DependencyManagementServiceComponent {
     private CustomResolversListener resolverListener;
     private BundleContext bndCtx;
     private Timer timer = new Timer();
+    private ConfigurationTrackingServiceImpl configurationTrackingService;
 
     protected void activate(ComponentContext cmpCtx) {
 
         bndCtx = cmpCtx.getBundleContext();
         bndCtx.registerService(ResolverRegistrationService.class.getName(),
                 new ResolverRegistrationServiceImpl(), null);
+
+        configurationTrackingService = new ConfigurationTrackingServiceImpl(bndCtx);
+
+        bndCtx.registerService(DependencyManagementService.class.getName(),
+                               new DependencyManagementServiceImpl(), null);
+        
+        configurationTrackingService.setServiceRegistered(true);
 
         resolverListener = new CustomResolversListener(this, bndCtx);
 
@@ -89,9 +94,10 @@ public class DependencyManagementServiceComponent {
     private void finishInitialization() {
         resolverListener.unregisterBundleListener();
         timer.cancel();
+
         bndCtx.registerService(ConfigurationTrackingService.class.getName(),
-                new ConfigurationTrackingServiceImpl(bndCtx),
-                null);
+                               (configurationTrackingService != null) ? configurationTrackingService :
+                               new ConfigurationTrackingServiceImpl(bndCtx), null);
 
         if (log.isDebugEnabled()) {
             log.debug("Configuration tracking service initialized");

@@ -153,7 +153,7 @@ public class TaskManagementClient {
 
     public List<TaskDescription> getAllTaskDescriptions() throws Exception {
 
-        OMElement element = stub.getAllTaskDescriptions();
+        OMElement element = stub.getAllTaskDescriptions(null);
         if (log.isDebugEnabled()) {
             log.debug("All TasKs configurations :" + element);
         }
@@ -231,7 +231,7 @@ public class TaskManagementClient {
         }
         ResponseInformation responseInformation = new ResponseInformation();
         try {
-            OMElement returnElement = stub.loadTaskClassProperties(className.trim(), group);
+            OMElement returnElement = (OMElement) stub.loadTaskClassProperties(className.trim(), group);
             if (log.isDebugEnabled()) {
                 log.debug("Loaded class properties as XML : " + returnElement);
             }

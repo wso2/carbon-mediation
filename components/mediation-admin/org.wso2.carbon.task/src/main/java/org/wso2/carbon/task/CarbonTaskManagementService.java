@@ -40,13 +40,15 @@ public class CarbonTaskManagementService extends AbstractAdmin {
 
     private static final OMFactory FACTORY = OMAbstractFactory.getOMFactory();
 
+    private final static String COMMON_ENDPOINT_POSTFIX = "--SYNAPSE_INBOUND_ENDPOINT";
+    
     private static final OMNamespace TASK_OM_NAMESPACE = FACTORY.createOMNamespace(
             TASK_EXTENSION_NS, "task");
 
     public CarbonTaskManagementService() {
     }
 
-    public void addTaskDescription(OMElement taskElement) throws TaskManagementException {
+    public boolean addTaskDescription(OMElement taskElement) throws TaskManagementException {
 
         if (log.isDebugEnabled()) {
             log.debug("Add TaskDescription - Get a Task configuration  :" + taskElement);
@@ -66,9 +68,10 @@ public class CarbonTaskManagementService extends AbstractAdmin {
             }
             handleException("Error creating a task : " + e.getMessage(), e);            
         }
+        return true;
     }
 
-    public void deleteTaskDescription(String s, String group) throws TaskManagementException {
+    public boolean deleteTaskDescription(String s, String group) throws TaskManagementException {
 
         validateName(s);
         if (log.isDebugEnabled()) {
@@ -81,6 +84,7 @@ public class CarbonTaskManagementService extends AbstractAdmin {
             handleException("Error deleting a task with name : " + s + " : " +
                     e.getMessage(), e);
         }
+        return true;
     }
 
     public void editTaskDescription(OMElement taskElement) throws TaskManagementException {
@@ -103,7 +107,8 @@ public class CarbonTaskManagementService extends AbstractAdmin {
         try {
             List<TaskDescription> descriptions = getTaskManager().getAllTaskDescriptions();
             for (TaskDescription taskDescription : descriptions) {
-                if (taskDescription != null) {
+                if (taskDescription != null && taskDescription.getName() != null
+                        && !taskDescription.getName().endsWith(COMMON_ENDPOINT_POSTFIX)) {
                     OMElement taskElement =
                             TaskDescriptionSerializer.serializeTaskDescription(TASK_OM_NAMESPACE,
                                     taskDescription);
@@ -248,3 +253,4 @@ public class CarbonTaskManagementService extends AbstractAdmin {
                 TaskManager.CARBON_TASK_MANAGER);
     }
 }
+

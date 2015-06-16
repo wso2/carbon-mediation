@@ -31,6 +31,7 @@ public class SynapseAppDeployerConstants {
     public static final String MEDIATOR_TYPE = "lib/synapse/mediator";
     public static final String API_TYPE = "synapse/api";
     public static final String TEMPLATE_TYPE = "synapse/template";
+    public static final String INBOUND_ENDPOINT_TYPE = "synapse/inbound-endpoint";
 
     // Deployment folders for synapse artifacts
     public static final String SEQUENCES_FOLDER = "sequences";
@@ -44,6 +45,7 @@ public class SynapseAppDeployerConstants {
     public static final String APIS_FOLDER = "api";
     public static final String TEMPLATES_FOLDER = "templates";
     public static final String MEDIATORS_FOLDER = "class-mediators";
+    public static final String INBOUND_ENDPOINT_FOLDER = "inbound-endpoints";
 
     // Synapse config path
     public static final String SYNAPSE_CONFIGS = "synapse-configs";
