@@ -705,9 +705,6 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
         return "";
     }
 
-    /* No longer used by the client as cannot execute two registry operations one
-     after the other as user information is removed after one operation.
-     To set the user information need to go through the tomcat extension value again */
     public void updateDynamicSequence(String key, OMElement omElement)
             throws SequenceEditorException {
         final Lock lock = getLock();
