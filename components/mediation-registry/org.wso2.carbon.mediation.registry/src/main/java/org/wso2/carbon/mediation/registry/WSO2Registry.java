@@ -718,9 +718,14 @@ public class WSO2Registry extends AbstractRegistry {
      *  Carbon Kernel mandates to set Threadlocal before calling anything in kernel
      */
     private void setTenantInfo() {
-    	PrivilegedCarbonContext.destroyCurrentContext();
+        // Preserve user name
+        String username = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+        PrivilegedCarbonContext.destroyCurrentContext();
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         cc.setTenantDomain(domain);
         cc.setTenantId(tenantId);
+        if (username != null) {         // Set back the user name
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(username);
+        }
     }
 }
