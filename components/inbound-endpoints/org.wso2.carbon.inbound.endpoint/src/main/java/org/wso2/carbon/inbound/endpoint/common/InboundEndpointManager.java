@@ -35,7 +35,7 @@ public interface InboundEndpointManager {
      * @param port  port
      * @param name  endpoint name
      */
-    public void startEndpoint(int port, String name);
+    public boolean startEndpoint(int port, String name);
 
     /**
      * Stop Inbound Endpoint

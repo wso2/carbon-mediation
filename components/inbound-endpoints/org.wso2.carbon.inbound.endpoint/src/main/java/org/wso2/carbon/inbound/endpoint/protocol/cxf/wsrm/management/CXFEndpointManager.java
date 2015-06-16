@@ -152,7 +152,8 @@ public class CXFEndpointManager extends AbstractInboundEndpointManager {
 		return true;
 	}
 
-	@Override public void startEndpoint(int port, String name) {
+	@Override public boolean startEndpoint(int port, String name) {
+		return true;
 	}
 
 	@Override public void closeEndpoint(int port) {
