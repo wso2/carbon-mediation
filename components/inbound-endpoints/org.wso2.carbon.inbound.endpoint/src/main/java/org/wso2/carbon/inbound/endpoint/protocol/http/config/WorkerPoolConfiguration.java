@@ -39,24 +39,24 @@ public class WorkerPoolConfiguration {
                                    String workerPoolQueuLength ,String threadGroupID, String threadID) {
 
         try {
-            if (workerPoolCoreSize != null) {
+            if (workerPoolCoreSize != null && workerPoolCoreSize.trim() != "") {
                 this.workerPoolCoreSize = Integer.parseInt(workerPoolCoreSize);
             }
-            if (workerPoolSizeMax != null) {
+            if (workerPoolSizeMax != null && workerPoolSizeMax.trim() != "") {
                 this.workerPoolSizeMax = Integer.parseInt(workerPoolSizeMax);
             }
-            if (workerPoolThreadKeepAliveSec != null) {
+            if (workerPoolThreadKeepAliveSec != null && workerPoolThreadKeepAliveSec.trim() != "") {
                 this.workerPoolThreadKeepAliveSec = Integer.parseInt(workerPoolThreadKeepAliveSec);
             }
-            if (workerPoolQueuLength != null) {
+            if (workerPoolQueuLength != null && workerPoolQueuLength.trim() != "" ) {
                 this.workerPoolQueuLength = Integer.parseInt(workerPoolQueuLength);
             }
-            if(threadGroupID != null){
+            if(threadGroupID != null && threadGroupID.trim() != ""){
                 this.threadGroupID = threadGroupID;
             }else {
-                this.threadGroupID = "PassThroughInboundWorkerThreadGroup";
+                this.threadGroupID = "Pass-Through Inbound WorkerThread Group";
             }
-            if(threadID != null){
+            if(threadID != null && threadID.trim() != ""){
                 this.threadID = threadID;
             }else {
                 this.threadID = "PassThroughInboundWorkerThread";
