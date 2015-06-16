@@ -281,7 +281,8 @@ public class SequenceAdminClient implements EditorUIClient {
             throws SequenceEditorException {
         try {
             OMElement sequenceElem = sequence.serialize(null);
-            sequenceAdminStub.updateDynamicSequence(key, sequenceElem);
+            sequenceAdminStub.deleteDynamicSequence(key);
+            sequenceAdminStub.addDynamicSequence(key, sequenceElem);
         } catch (Exception e) {
             handleException("Couldn't update sequence with key '" + key + "'", e);
         }
