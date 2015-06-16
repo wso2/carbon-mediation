@@ -343,6 +343,10 @@ public class WSO2Registry extends AbstractRegistry {
             Resource resource;
             if (isDirectory) {
                 resource = registry.newCollection();
+
+                if (!propertyName.equals("")) {
+                    resource.setProperty(propertyName, content);
+                }
             } else {
                 resource = registry.newResource();
 
