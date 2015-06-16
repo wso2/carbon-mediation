@@ -64,7 +64,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
 
-        String epName = dataStore.getEndpointName(port, tenantDomain);
+        String epName = dataStore.getListeningEndpointName(port, tenantDomain);
         if (epName != null) {
             if (epName.equalsIgnoreCase(name)) {
                 log.info(epName + " Endpoint is already started in port : " + port);
@@ -74,10 +74,12 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                 throw new SynapseException(msg);
             }
         } else {
-            dataStore.registerEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name, null);
-            startListener(port, name);
+            dataStore.registerListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name, null);
+            boolean start = startListener(port, name);
+            if (!start) {
+                dataStore.unregisterListeningEndpoint(port, tenantDomain);
+            }
         }
-
     }
 
     /**
@@ -88,7 +90,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
     public void startSSLEndpoint(int port , String name, SSLConfiguration sslConfiguration){
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
-        String epName = dataStore.getEndpointName(port, tenantDomain);
+        String epName = dataStore.getListeningEndpointName(port, tenantDomain);
 
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             if(epName != null && epName.equalsIgnoreCase(name) ){
@@ -102,9 +104,12 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             if(epName != null && epName.equalsIgnoreCase(name)){
                 log.info(epName + " Endpoint is already registered in registry");
             }else{
-                dataStore.registerSSLEndpoint(port, tenantDomain, InboundHttpConstants.HTTPS, name, sslConfiguration);
+                dataStore.registerSSLListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTPS, name, sslConfiguration);
             }
-            startSSLListener(port, name, sslConfiguration);
+            boolean start = startSSLListener(port, name, sslConfiguration);
+            if (!start) {
+               dataStore.unregisterListeningEndpoint(port, tenantDomain);
+            }
         }
     }
 
@@ -115,17 +120,18 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
      * @param port  port
      * @param name  endpoint name
      */
-    public void startListener(int port, String name) {
+    public boolean startListener(int port, String name) {
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener is already started for port : " + port);
-            return;
+            return true;
         }
 
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
         } catch (Exception e) {
-            log.error("Cannot get PassThroughSourceConfiguration ", e);
+            log.warn("Cannot get PassThroughSourceConfiguration ", e);
+            return false;
         }
         if (sourceConfiguration != null) {
             //Create Handler for handle Http Requests
@@ -139,8 +145,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                              + name + " ,port " + port, e);
             }
         } else {
-            log.error("SourceConfiguration is not registered in PassThrough Transport");
+            log.warn("SourceConfiguration is not registered in PassThrough Transport hence not start inbound endpoint " + name);
+            return false;
         }
+        return true;
     }
 
     /**
@@ -148,16 +156,17 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
      * @param port  port
      * @param name  endpoint name
      */
-    public void startSSLListener(int port, String name, SSLConfiguration sslConfiguration) {
+    public boolean startSSLListener(int port, String name, SSLConfiguration sslConfiguration) {
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener is already started for port : " + port);
-            return;
+            return true;
         }
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSSLSourceConfiguration();
         } catch (Exception e) {
-            log.error("Cannot get PassThroughSSLSourceConfiguration ", e);
+            log.warn("Cannot get PassThroughSSLSourceConfiguration ", e);
+            return false;
         }
         if (sourceConfiguration != null) {
             //Create Handler for handle Http Requests
@@ -169,10 +178,13 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             } catch (NumberFormatException e) {
                 log.error("Exception occurred while starting listener for endpoint : "
                           + name + " ,port " + port, e);
+                return false;
             }
         } else {
-            log.error("SourceConfiguration is not registered in PassThrough Transport");
+            log.warn("SourceConfiguration is not registered in PassThrough Transport hence not start inbound endpoint " + name);
+            return false;
         }
+        return true;
     }
 
     /**
@@ -183,7 +195,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = cc.getTenantDomain();
-        dataStore.unregisterEndpoint(port, tenantDomain);
+        dataStore.unregisterListeningEndpoint(port, tenantDomain);
 
         if (!PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener Endpoint is not started");
@@ -200,7 +212,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
      * server startup to load all the required listeners for endpoints in all tenants
      */
     public void loadEndpointListeners() {
-        Map<Integer, List<InboundEndpointInfoDTO>> tenantData = dataStore.getAllEndpointData();
+        Map<Integer, List<InboundEndpointInfoDTO>> tenantData = dataStore.getAllListeningEndpointData();
         for (Map.Entry tenantInfoEntry : tenantData.entrySet()) {
             int port = (Integer) tenantInfoEntry.getKey();
 

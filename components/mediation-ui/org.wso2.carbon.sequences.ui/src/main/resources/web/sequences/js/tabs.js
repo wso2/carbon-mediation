@@ -16,87 +16,86 @@
 
 function showDesign(thisVar) {
 
-    var options = {
-        beforeSubmit:  addCustomParam,  // pre-submit callback
-        success:       executeShowDesign  // post-submit callback
-    };
-    editAreaLoader.delete_instance("mediatorSrc");
-    document.getElementById("mediatorSrc").value = editAreaLoader.getValue("mediatorSrc");
-    jQuery('#mediator-source-form').ajaxForm(options);
-    jQuery('#mediator-source-form').submit();
-}
+     var options = {
+         beforeSubmit:  addCustomParam,  // pre-submit callback
+         success:       executeShowDesign  // post-submit callback
+     };
+     document.getElementById("mediatorSrc").value = editAreaLoader.getValue("mediatorSrc");
+     jQuery('#mediator-source-form').ajaxForm(options);
+     jQuery('#mediator-source-form').submit();
+ }
 
-function executeShowDesign() {
-    document.getElementById("mediatorDesign").innerHTML = "";
-    var url = 'mediator-edit-ajaxprocessor.jsp';
-    jQuery("#mediatorDesign").load(url, null, function (responseText, status, XMLHttpRequest) {
-        if (status != "success") {
-            CARBON.showErrorDialog(jsi18n["mediator.design.load.error"]);
+ function executeShowDesign() {
+     document.getElementById("mediatorDesign").innerHTML = "";
+     var url = 'mediator-edit-ajaxprocessor.jsp';
+     jQuery("#mediatorDesign").load(url, null, function (responseText, status, XMLHttpRequest) {
+         if (status != "success") {
+             CARBON.showErrorDialog(jsi18n["mediator.design.load.error"]);
+         }
+     });
+
+     hide("mediator-sourceview-header");
+     showObj("mediator-designview-header");
+     showObj("mediator-edit-tab");
+     showObj("mediatorDesign");
+     hide("mediatorSource");
+ }
+
+function showSource() {
+
+        var options = {
+            beforeSubmit:  addCustomParam,  // pre-submit callback
+            success:       executeShowSource  // post-submit callback
+        };
+
+        var funcName = currentMedTLN + "MediatorValidate";
+        if (eval("typeof " + funcName + " == 'function'")) {
+            if (eval(funcName + "()")) {
+                jQuery('#mediator-editor-form').ajaxForm(options);
+            } else {
+                return;
+            }
+        } else {
+            jQuery('#mediator-editor-form').ajaxForm(options);
         }
-    });
+        jQuery('#mediator-editor-form').submit();
+    }
 
-    hide("mediator-sourceview-header");
-    showObj("mediator-designview-header");
-    showObj("mediator-edit-tab");
-    showObj("mediatorDesign");
-    hide("mediatorSource");
-}
+function executeShowSource() {
+        var url = 'mediator-source-ajaxprocessor.jsp';
+       jQuery("#mediatorSource").load(url, null, function (responseText, status, XMLHttpRequest) {
+               if (status != "success") {
+                   CARBON.showErrorDialog(jsi18n["mediator.source.load.error"]);
+               } else {
+                   var ele = document.getElementById("mediatorSource");
+                   if (ele != null && ele != undefined) {
+                       ele.innerHTML = responseText;
+                   }
+               }
+           });
+
+           hide("mediator-designview-header");
+           showObj("mediator-sourceview-header");
+           showObj("mediator-edit-tab");
+           showObj("mediatorSource");
+           hide("mediatorDesign");
+
+        var ele = document.getElementById("mediatorSource");
+        if (ele != null && ele != undefined) {
+             jQuery(document).ready(function(){
+                     editAreaLoader.init({
+                            id : "mediatorSrc"
+                            ,syntax: "xml"
+                            ,start_highlight: true
+                      });
+             });
+        }
+    }
 
 function addCustomParam(formData, jqForm, options) {
     formData[formData.length] = {name : "followupAction", value : "source"};
 }
 
-function showSource() {
-
-    var options = {
-        beforeSubmit:  addCustomParam,  // pre-submit callback
-        success:       executeShowSource  // post-submit callback 
-    };
-
-    var funcName = currentMedTLN + "MediatorValidate";
-    if (eval("typeof " + funcName + " == 'function'")) {
-        if (eval(funcName + "()")) {
-            jQuery('#mediator-editor-form').ajaxForm(options);
-        } else {
-            return;
-        }
-    } else {
-        jQuery('#mediator-editor-form').ajaxForm(options);
-    }
-    jQuery('#mediator-editor-form').submit();
-}
-
-function executeShowSource() {
-    var url = 'mediator-source-ajaxprocessor.jsp';
-    var xmlData = "";
-    jQuery.ajax({
-      url: url,
-      async:false,
-      success: function(data,status) {
-        if (status != "success") {
-            CARBON.showErrorDialog(jsi18n["mediator.source.load.error"]);
-        } else {
-            jQuery("#mediatorSource").html(data);
-            hide("mediator-designview-header");
-            showObj("mediator-sourceview-header");
-            showObj("mediator-edit-tab");
-            showObj("mediatorSource");
-            hide("mediatorDesign");
-            xmlData = data;
-        }
-      }
-    });
-    var ele = document.getElementById("mediatorSource");
-    if (ele != null && ele != undefined) {
-         jQuery(document).ready(function(){
-                 editAreaLoader.init({
-                        id : "mediatorSrc"
-                        ,syntax: "xml"
-                        ,start_highlight: true
-                  });
-         });
-    }
-}
 
 function hide(objid) {
     var theObj = document.getElementById(objid);

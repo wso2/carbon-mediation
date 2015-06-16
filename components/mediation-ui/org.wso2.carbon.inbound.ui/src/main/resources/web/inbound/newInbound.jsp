@@ -25,6 +25,9 @@
 <link href="css/task.css" rel="stylesheet" type="text/css" media="all"/>
 <script type="text/javascript" src="global-params.js"></script>
 <script type="text/javascript" src="inboundcommon.js"></script>
+<script type="text/javascript">
+var existingInbounds = null;
+</script>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
     <carbon:breadcrumb label="inbound.header.new"
                        resourceBundle="org.wso2.carbon.inbound.ui.i18n.Resources"
@@ -33,6 +36,21 @@
     <% InboundManagementClient client;
         try {
             client = InboundManagementClient.getInstance(config, session);
+            String[] msg = client.getAllInboundNames();
+            int length =0 ;
+            if(msg != null){
+             length = msg.length;
+             %>
+              <script type="text/javascript">var existingInbounds = new Array(<%=length%>);</script>
+
+         <%
+            for(int i=0;i< length;i++){
+               String nameOfInboundEndpoint = msg[i];
+               %>
+             <script type="text/javascript">existingInbounds[<%=i%>]='<%=nameOfInboundEndpoint%>';</script>
+            <%
+            }
+            }
     %>
     <form method="post" name="inboundcreationform" id="inboundcreationform"
           action="newInbound1.jsp">

@@ -19,6 +19,7 @@
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map"%>
 <%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
 <%@ page import="org.apache.synapse.mediators.Value" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.util.MediatorProperty" %>
@@ -99,7 +100,7 @@
 
                                         if (schemaKey != null) {
                                             showValue = schemaKey.getKeyValue();
-                                            synapseXPath = schemaKey.getExpression();
+                                            synapseXPath = (SynapseXPath)schemaKey.getExpression();
 
                                             isStaticKey = showValue != null && !"".equals(showValue);
 

@@ -17,15 +17,19 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.http;
 
+import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.AxisOperation;
+import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -103,6 +107,14 @@ public class InboundHttpServerWorker extends ServerWorker {
                     } else {
                         processNonEntityEnclosingRESTHandler(null, axis2MsgContext, false);
                     }
+                } else {
+                    AxisOperation axisOperation = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getAxisOperation();
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(null);
+                    String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+                    SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
+                    processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgContext, false);
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(axisOperation);
+
                 }
 
                 boolean processedByAPI = false;
@@ -138,6 +150,10 @@ public class InboundHttpServerWorker extends ServerWorker {
                             } else {
                                 processNonEntityEnclosingRESTHandler(null, axis2MsgContext, isAxis2Path);
                             }
+                        }else {
+                            String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+                            SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
+                            processNonEntityEnclosingRESTHandler(soapEnvelope,axis2MsgContext,true);
                         }
                     } else {
                         // Get injecting sequence for synapse engine
@@ -290,7 +306,7 @@ public class InboundHttpServerWorker extends ServerWorker {
      * @throws AxisFault
      */
     private org.apache.synapse.MessageContext updateAxis2MessageContextForSynapse(
-            org.apache.synapse.MessageContext synCtx) throws AxisFault {
+               org.apache.synapse.MessageContext synCtx) throws AxisFault {
 
         ServiceContext svcCtx = new ServiceContext();
         OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);

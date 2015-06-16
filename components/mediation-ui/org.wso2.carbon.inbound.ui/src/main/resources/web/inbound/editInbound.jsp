@@ -119,7 +119,21 @@ var requiredParams = null;
 	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
                         </td>
                     </tr>
-                    
+                    <tr>
+                        <td style="width:150px"><fmt:message key="inbound.error.suspend"/><span
+                                class="required">*</span></td>
+                        <td align="left">
+                            <select id="inboundSuspend" name="inboundSuspend" class="longInput">
+                               <%if(inboundDescription.isSuspend()){%>                                
+                                <option value="true" selected>true</option>  
+                                <option value="false">false</option>
+                                <%} else {%>
+                                <option value="true">true</option>  
+                                <option value="false" selected>false</option>                                
+                                <%}%>              
+                            </select>                            
+                        </td>                      
+                    </tr>                     
                     <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
                     <script type="text/javascript">classRequired = true;</script>       
                     <tr>
@@ -198,7 +212,8 @@ var requiredParams = null;
                      <% } %> 
                      <% } %> 
                      <script type="text/javascript">iParamCount=<%=i%>;iParamMax=<%=i%>;</script>
-                     <%}else{ %>
+                     <%}else{
+                     if(!advParams.isEmpty()){%>
 				    <tr>
 				        <td><span id="_adv" style="float: left; position: relative;">
 				            <a class="icon-link" onclick="javascript:showAdvancedOptions('');"
@@ -207,7 +222,7 @@ var requiredParams = null;
 				        </span>
 				        </td>
 				    </tr> 
-				    <%} %>                     
+				    <%} }%>
 				    <tr>
 					    <td colspan="3">
 						    <div id="_advancedForm" style="display:none">

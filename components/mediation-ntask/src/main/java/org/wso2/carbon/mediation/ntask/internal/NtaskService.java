@@ -152,13 +152,15 @@ public class NtaskService {
                 logger.debug("Unable to load tenants with scheduled tasks. Required services are not loaded.");
             }
             return;
-        }
+        }       
         
         try {          
             ConfigurationContext mainConfigCtx = configContextService.getServerConfigContext();
-            String tenantDomain = realmService.getTenantManager().getDomain(tenantId);
-            logger.info("Loading the tenant. Id : " + tenantId + " Domain : " + tenantDomain);                 
+            String tenantDomain = realmService.getTenantManager().getDomain(tenantId);           
             TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+            if(logger.isDebugEnabled()){
+           	  logger.info("Load the tenant. Id : " + tenantId + " Domain : " + tenantDomain);       	  
+             }             
         } catch (Exception e) {
             logger.error("Error when loading tenant before executing the task.", e);
         }
