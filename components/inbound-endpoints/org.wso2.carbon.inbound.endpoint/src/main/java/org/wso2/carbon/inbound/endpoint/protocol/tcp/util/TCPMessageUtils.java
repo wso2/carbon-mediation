@@ -169,7 +169,7 @@ public class TCPMessageUtils {
         return Integer.valueOf(params.getProperties().getProperty(key));
     }
 
-    public static String payloadToTCPMessage(MessageContext messageContext, InboundProcessorParams params) {
+    public static byte [] payloadToTCPMessage(MessageContext messageContext, InboundProcessorParams params) {
         // public byte[] getBytes(MessageContext msgCtxt, OMOutputFormat format) method is used to to get the for
         //get the msg content type get a new formatter.
         String contentType = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_CONTENT_TYPE);
@@ -196,7 +196,7 @@ public class TCPMessageUtils {
             axisFault.printStackTrace();
         }
 
-        return new String(message_bytes);
+        return message_bytes;
 
     }
 }

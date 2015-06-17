@@ -224,7 +224,8 @@ public class TCPProcessor implements InboundResponseSender {
             return;
         }
 
-        tcpContext.setTCPMessage(TCPMessageUtils.payloadToTCPMessage(messageContext, params));
+        //tcpContext.setTCPMessage(TCPMessageUtils.payloadToTCPMessage(messageContext, params));
+        tcpContext.setTcpResponseMsg(TCPMessageUtils.payloadToTCPMessage(messageContext, params));
 
         //log.info(tcpContext.getTCPMessage());
 

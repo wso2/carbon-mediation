@@ -47,6 +47,8 @@ public class TCPContext {
 
     private String tcpMessage;
 
+    private byte [] tcpResponseMsg;
+
     private volatile TCPCodec codec;
 
     private long requestTime;
@@ -69,6 +71,14 @@ public class TCPContext {
         this.responseBuffer = new StringBuffer();
         this.baos = new ByteArrayOutputStream();
         this.params = params;
+    }
+
+    public byte[] getTcpResponseMsg() {
+        return tcpResponseMsg;
+    }
+
+    public void setTcpResponseMsg(byte[] tcpResponseMsg) {
+        this.tcpResponseMsg = tcpResponseMsg;
     }
 
     public ByteArrayOutputStream getBaos() {

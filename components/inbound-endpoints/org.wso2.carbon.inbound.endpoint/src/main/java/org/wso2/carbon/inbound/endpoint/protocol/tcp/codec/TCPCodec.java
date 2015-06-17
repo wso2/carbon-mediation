@@ -279,12 +279,15 @@ public class TCPCodec {
         }
 
         if (this.state == READ_COMPLETE) {
+            responseBytes = context.getTcpResponseMsg();
+/*
             if (decodeMode != InboundTCPConstants.DECODE_BY_TAG) {
                 responseBytes = context.getTCPMessage().getBytes(charsetDecoder.charset());
             } else {
                 String taggedResponse = "<" + tag + ">" + context.getTCPMessage() + "</" + tag + ">";
                 responseBytes = taggedResponse.getBytes(charsetDecoder.charset());
             }
+*/
             this.state = WRITE_HEADER;
         }
 
