@@ -1,12 +1,12 @@
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:tns="http://inbound.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax2268="http://inbound.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://inbound.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:tns="http://inbound.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax2265="http://inbound.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://inbound.carbon.wso2.org">
    <wsdl:documentation>InboundAdmin</wsdl:documentation>
    <wsdl:types>
-      <xs:schema xmlns:ns="http://org.apache.axis2/xsd" xmlns:ax2269="http://inbound.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
+      <xs:schema xmlns:ns="http://org.apache.axis2/xsd" xmlns:ax2266="http://inbound.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
          <xs:import namespace="http://inbound.carbon.wso2.org/xsd"/>
          <xs:element name="InboundAdminInboundManagementException">
             <xs:complexType>
                <xs:sequence>
-                  <xs:element minOccurs="0" name="InboundManagementException" nillable="true" type="ax2268:InboundManagementException"/>
+                  <xs:element minOccurs="0" name="InboundManagementException" nillable="true" type="ax2265:InboundManagementException"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -18,7 +18,7 @@
          <xs:element name="getAllInboundEndpointNamesResponse">
             <xs:complexType>
                <xs:sequence>
-                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2268:InboundEndpointDTO"/>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2265:InboundEndpointDTO"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -32,7 +32,7 @@
          <xs:element name="getInboundEndpointbyNameResponse">
             <xs:complexType>
                <xs:sequence>
-                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2268:InboundEndpointDTO"/>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2265:InboundEndpointDTO"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -44,7 +44,8 @@
                   <xs:element minOccurs="0" name="onError" nillable="true" type="xs:string"/>
                   <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"/>
                   <xs:element minOccurs="0" name="classImpl" nillable="true" type="xs:string"/>
-                  <xs:element maxOccurs="unbounded" minOccurs="0" name="lParameterDTOs" nillable="true" type="ax2268:ParameterDTO"/>
+                  <xs:element minOccurs="0" name="suspend" nillable="true" type="xs:string"/>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="lParameterDTOs" nillable="true" type="ax2265:ParameterDTO"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -63,7 +64,8 @@
                   <xs:element minOccurs="0" name="onError" nillable="true" type="xs:string"/>
                   <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"/>
                   <xs:element minOccurs="0" name="classImpl" nillable="true" type="xs:string"/>
-                  <xs:element maxOccurs="unbounded" minOccurs="0" name="lParameterDTOs" nillable="true" type="ax2268:ParameterDTO"/>
+                  <xs:element minOccurs="0" name="suspend" nillable="true" type="xs:string"/>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="lParameterDTOs" nillable="true" type="ax2265:ParameterDTO"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -86,7 +88,7 @@
                <xs:element minOccurs="0" name="injectingSeq" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="onErrorSeq" nillable="true" type="xs:string"/>
-               <xs:element maxOccurs="unbounded" minOccurs="0" name="parameters" nillable="true" type="ax2268:ParameterDTO"/>
+               <xs:element maxOccurs="unbounded" minOccurs="0" name="parameters" nillable="true" type="ax2265:ParameterDTO"/>
                <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="suspend" type="xs:boolean"/>
             </xs:sequence>
