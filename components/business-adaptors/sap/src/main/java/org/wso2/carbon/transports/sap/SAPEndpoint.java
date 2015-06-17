@@ -32,6 +32,7 @@ import com.sap.conn.jco.server.JCoServerErrorListener;
 import com.sap.conn.jco.server.JCoServerExceptionListener;
 import com.sap.conn.jco.server.JCoServerTIDHandler;
 import com.sap.conn.jco.server.JCoServer;
+import com.sap.conn.jco.server.JCoServerState;
 
 /**
  * <code>SAPEndpoint </code> describes a SAP addresible endpoint, the properties decscribe by the
@@ -77,6 +78,10 @@ public abstract class SAPEndpoint extends ProtocolEndpoint {
      */
     protected String customTIDHandler;
 
+    /**
+     * Max timeout to allow server to stop
+     */
+    protected static int serverStopTimeout = 30000;
 
     public SAPEndpoint() {
         log = LogFactory.getLog(getClass());
@@ -172,6 +177,28 @@ public abstract class SAPEndpoint extends ProtocolEndpoint {
         if (customTIDHandler != null) {
             Class clazz = this.getClass().getClassLoader().loadClass(customTIDHandler);
             server.setTIDHandler((JCoServerTIDHandler) clazz.newInstance());
+        }
+    }
+
+    /**
+     * Block until server state is stopped or maximum timeout reached.
+     * @param server
+     * @return true | false if server state is JCoServerState.STOPPED in case timeout is exceeded
+     */
+    protected boolean waitForServerStop(JCoServer server) {
+        long timeStamp = System.currentTimeMillis();
+        do {
+            // This is to ensure a startEndpoint called right after a stopEndpoint (proxy redeploy) would not
+            // cause the server.start() to be called until the server state is STOPPED.
+            if (log.isDebugEnabled()) {
+                log.debug("Waiting for server to stop...");
+            }
+        } while (server.getState() != JCoServerState.STOPPED && timeStamp + serverStopTimeout > System.currentTimeMillis());
+
+        if (server.getState() == JCoServerState.STOPPED) {
+            return true;
+        } else {
+            return false;
         }
     }
 
