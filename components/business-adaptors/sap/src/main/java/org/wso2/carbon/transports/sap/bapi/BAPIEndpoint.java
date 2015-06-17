@@ -67,8 +67,8 @@ public class BAPIEndpoint extends SAPEndpoint {
 
         if (!waitForServerStop(server)) {
             log.warn("JCo server : " + serverName + " is taking an unusually long time to stop.");
+        } else {
+            log.info("JCo server : " + serverName + " stopped");
         }
-
-        log.info("JCo server : " + serverName + " stopped");    
     }
 }
