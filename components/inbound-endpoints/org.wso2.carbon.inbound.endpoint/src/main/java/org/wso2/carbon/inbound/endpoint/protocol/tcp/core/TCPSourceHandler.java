@@ -31,7 +31,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * IO event handler
@@ -43,14 +42,9 @@ public class TCPSourceHandler implements IOEventDispatch {
     private Map<String, String> sessionIdToPort;
     private volatile TCPProcessor tcpProcessor;
 
-    private final ByteBuffer tcpTrailerBuf = ByteBuffer.wrap(InboundTCPConstants.TCP_TRAILER);
     private BufferFactory bufferFactory;
     private ByteBuffer inputBuffer;
     private ByteBuffer outputBuffer;
-
-    private String currentMsgID = "";
-    private String previousMsgID = "";
-    private ScheduledExecutorService executorService;
 
     public TCPSourceHandler() {
     }
@@ -79,8 +73,7 @@ public class TCPSourceHandler implements IOEventDispatch {
 
         inputBuffer = bufferFactory.getBuffer();
         outputBuffer = bufferFactory.getBuffer();
-        log.info("connected ...");
-        log.info("socket timeout : " + session.getSocketTimeout());
+
     }
 
     @Override public void inputReady(IOSession session) {
@@ -96,32 +89,25 @@ public class TCPSourceHandler implements IOEventDispatch {
             //buffer size = 8192
             //here we read data from the channel and write in to the inputBuffer+there can be existing data in buffer
             while ((read = ch.read(inputBuffer)) > 0 || inputBuffer.position() > 0) {
-                log.info("position : " + inputBuffer.position() + " limit : " + inputBuffer.limit());
+
                 inputBuffer.flip();
-                log.info("position : " + inputBuffer.position() + " limit : " + inputBuffer.limit());
 
                 try {
                     //here we send the input byte buffer, tcpContext, inboundPoint parameters to decode the message
                     int status = tcpContext.getCodec().decode(inputBuffer, tcpContext);
 
                     if (status == InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED) {
-                        log.info("one message is decoded : " + tcpContext.getMessageId() + " : " +
-                                 tcpContext.getTCPMessage());
-                        //                        break;
 
                         //now we have the byte stream of a decoded TCP message
                         if (tcpContext.getCodec().isReadComplete()) {
-                            //log.info("Clear Event Mask READ : now there is no event mask");
-                            //tcpContext.clearEventMask();
                             tcpProcessor.processRequest(tcpContext);
                         }
 
                         if (tcpProcessor.isOneWayMessaging()) {
                             tcpContext.reset();
                         }
-
                     }
-                    //log.info("Received TCP message : "+tcpContext.getTCPMessage());
+
                 } catch (TCPContextException e) {
                     shutdownConnection(session, tcpContext, e);
                 } catch (IOException e) {
@@ -141,7 +127,7 @@ public class TCPSourceHandler implements IOEventDispatch {
     }
 
     @Override public void outputReady(IOSession session) {
-        log.info("output ready called");
+
         TCPContext tcpContext = (TCPContext) session.getAttribute(InboundTCPConstants.TCP_CONTEXT);
         writeOut(session, tcpContext);
     }
@@ -170,9 +156,7 @@ public class TCPSourceHandler implements IOEventDispatch {
         }
 
         if (tcpContext.getCodec().isWriteComplete()) {
-            log.info("input buffer position : " + inputBuffer.position());
             if (tcpContext.isMarkForClose()) {
-                log.info("TCP Connection shutdown...");
                 shutdownConnection(session, tcpContext, null);
             } else {
                 bufferFactory.release(outputBuffer);
@@ -180,19 +164,18 @@ public class TCPSourceHandler implements IOEventDispatch {
                 tcpContext.setMessageId("RESPONDED");
                 tcpContext.reset();
                 tcpContext.requestInput();
-                log.info("request input set");
             }
         }
     }
 
     @Override public void timeout(IOSession session) {
-        log.info("timeout ...");
+
         TCPContext tcpContext = (TCPContext) session.getAttribute(InboundTCPConstants.TCP_CONTEXT);
         shutdownConnection(session, tcpContext, null);
     }
 
     @Override public void disconnected(IOSession session) {
-        log.info("disconnected...");
+
         TCPContext tcpContext = (TCPContext) session.getAttribute(InboundTCPConstants.TCP_CONTEXT);
         shutdownConnection(session, tcpContext, null);
     }
@@ -204,7 +187,6 @@ public class TCPSourceHandler implements IOEventDispatch {
         bufferFactory.release(inputBuffer);
         bufferFactory.release(outputBuffer);
         session.close();
-        log.info("Session Closed...");
     }
 
     private void handleException(IOSession session, TCPContext tcpContext, Exception e) {

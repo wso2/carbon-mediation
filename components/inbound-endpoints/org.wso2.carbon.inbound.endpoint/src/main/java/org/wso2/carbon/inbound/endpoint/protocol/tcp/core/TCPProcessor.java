@@ -105,7 +105,6 @@ public class TCPProcessor implements InboundResponseSender {
             this.oneWayMessaging = true;
         }
 
-        //log.info("Deciding Decoding mode...");
         //we have to decide the decode Mode which are (DECODE_BY_HEADER_TRAILER/DECODE_BY_TAG/DECODE_BY_LENGTH)
         if (decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
             //header trailer mode
@@ -170,13 +169,11 @@ public class TCPProcessor implements InboundResponseSender {
 
         tcpContext.setMessageId(synCtx.getMessageID());
         synCtx.setProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID, synCtx.getMessageID());
-        log.info("TCP inbound message ID : " + synCtx.getProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID));
 
         //We need response invocation through this processor. set tcpContext and inbound response worker
         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
 
         if (!oneWayMessaging) {
-            log.info("one way messaging : " + oneWayMessaging);
             synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
             synCtx.setProperty(InboundTCPConstants.TCP_CONTEXT, tcpContext);
         }
@@ -195,7 +192,6 @@ public class TCPProcessor implements InboundResponseSender {
         }
 
         CallableTaskTCP task = new CallableTaskTCP(synCtx, injectSeq);
-        log.info("message submitted to the inject sequence");
         executorService.submit(task);
 
     }
@@ -216,7 +212,7 @@ public class TCPProcessor implements InboundResponseSender {
 
     @Override public void sendBack(MessageContext messageContext) {
         TCPContext tcpContext = (TCPContext) messageContext.getProperty(InboundTCPConstants.TCP_CONTEXT);
-        log.info("send Back method was called");
+
 
         if (messageContext.getProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID) != null &&
             !tcpContext.getMessageId().equals(messageContext.getProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID))) {
@@ -224,11 +220,7 @@ public class TCPProcessor implements InboundResponseSender {
             return;
         }
 
-        //tcpContext.setTCPMessage(TCPMessageUtils.payloadToTCPMessage(messageContext, params));
         tcpContext.setTcpResponseMsg(TCPMessageUtils.payloadToTCPMessage(messageContext, params));
-
-        //log.info(tcpContext.getTCPMessage());
-
         tcpContext.requestOutput();
     }
 

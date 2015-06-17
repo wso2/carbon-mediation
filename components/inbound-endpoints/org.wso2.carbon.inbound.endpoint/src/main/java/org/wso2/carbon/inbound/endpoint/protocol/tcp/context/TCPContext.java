@@ -114,19 +114,16 @@ public class TCPContext {
     }
 
     public void requestOutput() {
-        log.info("event mask write");
         session.clearEvent(EventMask.READ);
         session.setEvent(EventMask.WRITE);
     }
 
     public void requestInput() {
-        log.info("event mask read");
         session.clearEvent(EventMask.WRITE);
         session.setEvent(EventMask.READ);
     }
 
     public void clearEventMaskRead() {
-        log.info("no event mask");
         session.clearEvent(EventMask.READ);
     }
 
@@ -178,5 +175,4 @@ public class TCPContext {
         this.responseBuffer.setLength(0);
         this.getCodec().setState(TCPCodec.READ_HEADER);
     }
-
 }

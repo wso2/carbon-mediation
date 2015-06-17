@@ -65,8 +65,6 @@ public class TCPMessageUtils {
             throws AxisFault {
         MessageContext synCtx = createSynapseMessageContext(
                 params.getProperties().getProperty(InboundTCPConstants.TCP_INBOUND_TENANT_DOMAIN));
-
-        //synCtx.setEnvelope(createEnvelope(synCtx, tcpContext.getTCPMessage(), params));
         synCtx.setEnvelope(createEnvelope(synCtx, tcpContext.getBaos(), params));
 
         return synCtx;
@@ -114,15 +112,12 @@ public class TCPMessageUtils {
     //creating soap envelop and set message body.
     private static SOAPEnvelope createEnvelope(MessageContext synCtx, ByteArrayOutputStream baos,
                                                InboundProcessorParams params) throws AxisFault {
-        //SOAPEnvelope envelope = fac.getDefaultEnvelope();
 
         String contentType = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_CONTENT_TYPE);
 
         if (log.isDebugEnabled()) {
             log.debug("Starting TCP Message Building, message content type : " + contentType);
         }
-
-        //log.info("Starting TCP Message Building, message content type : " + contentType);
 
         org.apache.axis2.context.MessageContext axis2MsgCtx =
                 ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx).getAxis2MessageContext();
@@ -137,21 +132,10 @@ public class TCPMessageUtils {
             builder = new ApplicationXMLBuilder();
         }
 
-        //log.info(message);
-
         OMElement documentElement = null;
 
-        log.info("baos length :" + baos.toByteArray().length);
-        log.info("baos bytes " + baos.toByteArray()[0] + " " + baos.toByteArray()[1] + " " + baos.toByteArray()[19] +
-                 " " + baos.toByteArray()[20]);
-        //CharsetDecoder charsetDecoder = Charset.forName("UTF-8").newDecoder();
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
-        //InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(message.getBytes(charsetDecoder.charset()
-        //        )));
-        //        documentElement = builder.processDocument(bais, contentType, axis2MsgCtx);
-
-        //        SOAPEnvelope envelope = TransportUtils.createSOAPEnvelope(documentElement);
         SOAPEnvelope envelope = null;
         try {
             envelope = TransportUtils.createSOAPMessage(axis2MsgCtx, bais, contentType);
@@ -159,9 +143,6 @@ public class TCPMessageUtils {
             log.error(e);
         }
 
-        //log.info(documentElement.getText());
-        //envelope.getBody().addChild(documentElement);
-        //log.info(envelope.getText());
         return envelope;
     }
 
@@ -170,7 +151,7 @@ public class TCPMessageUtils {
     }
 
     public static byte [] payloadToTCPMessage(MessageContext messageContext, InboundProcessorParams params) {
-        // public byte[] getBytes(MessageContext msgCtxt, OMOutputFormat format) method is used to to get the for
+        // public byte[] getBytes(MessageContext msgCtxt, OMOutputFormat format) method is used to
         //get the msg content type get a new formatter.
         String contentType = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_CONTENT_TYPE);
 

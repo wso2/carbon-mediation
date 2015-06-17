@@ -78,8 +78,6 @@ public class TCPCodec {
     public int decode(ByteBuffer dst, TCPContext context) throws IOException, TCPContextException {
 
         initialBufferLimit = dst.limit();
-        log.info("Initial buffer limit : " + initialBufferLimit);
-        log.info("position : " + dst.position() + " limit : " + dst.limit());
 
         switch (decodeMode) {
 
@@ -111,11 +109,8 @@ public class TCPCodec {
                         byte[] ar = new byte[dst.remaining()];
                         dst.get(ar, 0, ar.length);
                         context.getBaos().write(ar);
-                        log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
-                        log.info("bytes " + ar[0] + " " + ar[1]);
                     }
 
-                    //context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
                     //set the buffer position and limit for the rest of the buffer
                     dst.limit(initialBufferLimit);
                     dst.position(trailerIndex + 2);
@@ -124,28 +119,24 @@ public class TCPCodec {
 
                 if (this.state == READ_TRAILER) {
                     this.state = READ_COMPLETE;
-                    //context.setTCPMessage(new String(context.getBaos().toByteArray(), charsetDecoder.charset()));
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
 
             }
             case InboundTCPConstants.DECODE_BY_TAG: {
-                //
+
                 byte[] input = new byte[dst.remaining()];
                 dst.get(input, 0, input.length);
 
                 //decode the first message of the buffer
-                log.info("input length : " + input.length);
 
                 if (this.state >= READ_COMPLETE || dst.position() < 0) {
                     return -1;
                 }
 
                 if (this.state == READ_HEADER) {
-                    // log.info(byteString);
 
                     int headerIndex = findTagIndex(input, delimiterTag, 0);
-                    log.info("header index : " + headerIndex);
 
                     if (headerIndex > 0) {
                         dst.position(headerIndex - 1);
@@ -158,7 +149,6 @@ public class TCPCodec {
                 if (this.state == READ_CONTENT) {
 
                     int trailerIndex = findTagIndex(input, delimiterTag, dst.position() + delimiterTag.length);
-                    log.info("Trailer index : " + trailerIndex);
 
                     if (trailerIndex > -1) {
                         dst.limit(trailerIndex + delimiterTag.length + 1);
@@ -169,29 +159,23 @@ public class TCPCodec {
                         byte[] ar = new byte[dst.remaining()];
                         dst.get(ar, 0, ar.length);
                         context.getBaos().write(ar);
-                        log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
-                        log.info("bytes " + ar[0] + " " + ar[1]);
                     }
 
                     //set the buffer position and limit for the rest of the buffer
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.limit(initialBufferLimit);
                     dst.position(trailerIndex + tag.length() + 1);
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.compact();
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
 
                 }
 
                 if (this.state == READ_TRAILER) {
                     this.state = READ_COMPLETE;
-                    //context.setTCPMessage(new String(context.getBaos().toByteArray(), charsetDecoder.charset()));
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
 
             }
             case InboundTCPConstants.DECODE_BY_LENGTH: {
-                //This method must check
+                //This method must test
                 if (this.state >= READ_COMPLETE || dst.position() < 0) {
                     return -1;
                 }
@@ -202,16 +186,16 @@ public class TCPCodec {
                         byte[] ar = new byte[dst.remaining()];
                         dst.get(ar, 0, ar.length);
                         context.getBaos().write(ar);
-                        log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
-                        log.info("bytes " + ar[0] + " " + ar[1]);
+                        //log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
+                        //log.info("bytes " + ar[0] + " " + ar[1]);
                     }
                     //set the buffer position and limit for the rest of the buffer
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.limit(initialBufferLimit);
                     dst.position(msgLength + 1);
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.compact();
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
                     //context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
                     this.state = READ_CONTENT;
                 } else {
@@ -221,18 +205,18 @@ public class TCPCodec {
                         byte[] ar = new byte[dst.remaining()];
                         dst.get(ar, 0, ar.length);
                         context.getBaos().write(ar);
-                        log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
-                        log.info("bytes " + ar[0] + " " + ar[1]);
+                        //log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
+                        //log.info("bytes " + ar[0] + " " + ar[1]);
                     }
 
                     this.state = READ_COMPLETE;
 
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.limit(initialBufferLimit);
                     dst.position(msgLength + 1);
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.compact();
-                    log.info("position : " + dst.position() + " limit : " + dst.limit());
+                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
 
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
@@ -272,7 +256,6 @@ public class TCPCodec {
 
     //get the message from TCP context and convert it byte stream to send
     public int encode(ByteBuffer outBuf, TCPContext context) {
-        log.info("state : " + this.state);
 
         if (this.state < READ_COMPLETE) {
             return 0;
@@ -280,14 +263,7 @@ public class TCPCodec {
 
         if (this.state == READ_COMPLETE) {
             responseBytes = context.getTcpResponseMsg();
-/*
-            if (decodeMode != InboundTCPConstants.DECODE_BY_TAG) {
-                responseBytes = context.getTCPMessage().getBytes(charsetDecoder.charset());
-            } else {
-                String taggedResponse = "<" + tag + ">" + context.getTCPMessage() + "</" + tag + ">";
-                responseBytes = taggedResponse.getBytes(charsetDecoder.charset());
-            }
-*/
+
             this.state = WRITE_HEADER;
         }
 
@@ -344,7 +320,6 @@ public class TCPCodec {
                 if (this.state == WRITE_HEADER) {
                     byteBuffer.put(responseBytes);
                     this.state = WRITE_COMPLETE;
-                    log.info("state = write complete");
                 }
             }
             case InboundTCPConstants.DECODE_BY_LENGTH: {
