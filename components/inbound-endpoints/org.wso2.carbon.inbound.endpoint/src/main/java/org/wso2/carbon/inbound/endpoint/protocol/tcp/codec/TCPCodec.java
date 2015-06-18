@@ -175,7 +175,7 @@ public class TCPCodec {
 
             }
             case InboundTCPConstants.DECODE_BY_LENGTH: {
-                //This method must test
+
                 if (this.state >= READ_COMPLETE || dst.position() < 0) {
                     return -1;
                 }
@@ -186,17 +186,11 @@ public class TCPCodec {
                         byte[] ar = new byte[dst.remaining()];
                         dst.get(ar, 0, ar.length);
                         context.getBaos().write(ar);
-                        //log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
-                        //log.info("bytes " + ar[0] + " " + ar[1]);
                     }
                     //set the buffer position and limit for the rest of the buffer
-                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.limit(initialBufferLimit);
                     dst.position(msgLength + 1);
-                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.compact();
-                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
-                    //context.getRequestBuffer().append(charsetDecoder.decode(dst).toString());
                     this.state = READ_CONTENT;
                 } else {
                     dst.limit((msgLength - currentPosition) + 1);
@@ -205,19 +199,13 @@ public class TCPCodec {
                         byte[] ar = new byte[dst.remaining()];
                         dst.get(ar, 0, ar.length);
                         context.getBaos().write(ar);
-                        //log.info("length of the byte array is : " + context.getBaos().toByteArray().length);
-                        //log.info("bytes " + ar[0] + " " + ar[1]);
                     }
 
                     this.state = READ_COMPLETE;
 
-                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.limit(initialBufferLimit);
                     dst.position(msgLength + 1);
-                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
                     dst.compact();
-                    //log.info("position : " + dst.position() + " limit : " + dst.limit());
-
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
             }
