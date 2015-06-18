@@ -27,6 +27,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v22.message.ACK;
 import ca.uhn.hl7v2.parser.*;
 import ca.uhn.hl7v2.util.idgenerator.UUIDGenerator;
+import ca.uhn.hl7v2.validation.impl.DefaultValidation;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.dom.factory.OMDOMFactory;
@@ -67,6 +68,7 @@ public class HL7MessageUtils {
 
     static {
         noValidationContext.setValidationContext(new NoValidation());
+        validationContext.setValidationContext(new DefaultValidation());
     }
 
     private static PipeParser noValidationPipeParser = new PipeParser(noValidationContext);
