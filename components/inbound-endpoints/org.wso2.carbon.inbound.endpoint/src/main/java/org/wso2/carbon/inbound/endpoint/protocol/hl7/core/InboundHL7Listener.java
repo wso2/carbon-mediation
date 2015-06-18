@@ -60,7 +60,6 @@ public class InboundHL7Listener implements InboundRequestProcessor {
             return;
         }
         HL7EndpointManager.getInstance().startEndpoint(port, params.getName(), params);
-
     }
 
     @Override

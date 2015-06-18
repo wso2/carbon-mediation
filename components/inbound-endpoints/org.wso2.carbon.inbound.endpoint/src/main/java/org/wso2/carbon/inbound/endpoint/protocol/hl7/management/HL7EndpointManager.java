@@ -60,6 +60,7 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
     }
 
     public void startListener(int port, String name, InboundProcessorParams params) {
+        log.info("Starting HL7 Inbound Endpoint on port " + port);
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
         if (params.getProperties().getProperty(MLLPConstants.HL7_INBOUND_TENANT_DOMAIN) == null) {
@@ -79,8 +80,6 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
     }
 
     public void startEndpoint(int port, String name, InboundProcessorParams params) {
-        log.info("Starting HL7 Inbound Endpoint on port " + port);
-
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
 
@@ -100,7 +99,6 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
                     InboundRequestProcessorFactoryImpl.Protocols.hl7.toString(), name, params);
             startListener(port, name, params);
         }
-
     }
 
     @Override
