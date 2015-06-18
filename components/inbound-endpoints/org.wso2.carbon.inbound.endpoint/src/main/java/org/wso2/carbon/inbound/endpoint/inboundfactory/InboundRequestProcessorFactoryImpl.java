@@ -35,7 +35,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.kafka.KAFKAProcessor;
  */
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
-    public static enum Protocols {jms, file, http , https, hl7, kafka, cxf_ws_rm}
+    public static enum Protocols {jms, file, http , https, hl7, kafka, cxf_ws_rm, tcp}
 
     /**
      * return underlying Request Processor Implementation according to protocol
