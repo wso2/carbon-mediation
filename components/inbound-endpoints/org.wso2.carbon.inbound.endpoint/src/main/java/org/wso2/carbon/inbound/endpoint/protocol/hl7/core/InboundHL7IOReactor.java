@@ -95,6 +95,8 @@ public class InboundHL7IOReactor {
     }
 
     public static boolean bind(int port, HL7Processor processor) {
+        checkReactor();
+
         if (!isPortAvailable(port)) {
             log.error("A service is already listening on port " +
                     port + ". Please select a different port for this endpoint.");
@@ -137,6 +139,21 @@ public class InboundHL7IOReactor {
         ep.close();
 
         return true;
+    }
+
+    /**
+     * In certain cases, reactor is not started prior to a bind() (e.g. if HL7EndpointManager triggers a bind() i.e.
+     * via tenant loader and at that time no InboundListeners were initialized). If the reactor is not started, this
+     * method will start it.
+     */
+    protected static void checkReactor() {
+        if (reactor == null) {
+            try {
+                start();
+            } catch (IOException e) {
+                log.error("Reactor failed to start.");
+            }
+        }
     }
 
     public static boolean isEndpointRunning(int port) {
