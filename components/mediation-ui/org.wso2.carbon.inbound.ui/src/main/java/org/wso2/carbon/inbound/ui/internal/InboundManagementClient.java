@@ -323,10 +323,12 @@ public class InboundManagementClient {
         String[] inboundNameList = null;
         try {
             InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
-             inboundNameList = new String[inboundEndpointDTOs.length];
             if (inboundEndpointDTOs != null) {
-                for (int i=0; i < inboundEndpointDTOs.length; i++) {
-                    inboundNameList[i] = inboundEndpointDTOs[i].getName();
+                inboundNameList = new String[inboundEndpointDTOs.length];
+                if (inboundEndpointDTOs != null) {
+                    for (int i = 0; i < inboundEndpointDTOs.length; i++) {
+                        inboundNameList[i] = inboundEndpointDTOs[i].getName();
+                    }
                 }
             }
         } catch (RemoteException e) {
