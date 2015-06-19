@@ -210,20 +210,16 @@ public class InboundManagementClient {
                     if (inboundEndpointDTO.getName().equals(name)) {
                         return false;
                     }
-                    if ("http".equals(protocol) || "https".equals(protocol)) {
-                        ParameterDTO[] existparameterDTOs = inboundEndpointDTO.getParameters();
-                        for (ParameterDTO parameterDTO : existparameterDTOs) {
-                            if (parameterDTO.getName().equals("inbound.http.port")) {
+                    if (isListener(protocol)) {
+                        ParameterDTO[] existingParameterDTOs = inboundEndpointDTO.getParameters();
+                        for (ParameterDTO parameterDTO : existingParameterDTOs) {
+                            if (isListenerPortParam(parameterDTO.getName())) {
                                 port = parameterDTO.getValue();
+                                if (isListenerPortInUse(port, parameterDTOs)) {
+                                    log.warn("Port " + port + " already in use by another endpoint. Inbound endpoint " + name + " deployment failed");
+                                    return false;
+                                }
                             }
-                        }
-                    }
-                }
-                if ("http".equals(protocol) || "https".equals(protocol)) {
-                    for (ParameterDTO parameterDTO : parameterDTOs) {
-                        if (parameterDTO.getName().equals("inbound.http.port") && parameterDTO.getValue().equals(port)) {
-                            log.warn("Already used port " + port + "by another endpoint may be inbound endpoint " + name + " deployment failed");
-                            return false;
                         }
                     }
                 }
@@ -235,7 +231,35 @@ public class InboundManagementClient {
         return true;
     }
 
+    private boolean isListenerPortInUse(String port, ParameterDTO[] parameterDTOs) {
+        for (ParameterDTO parameterDTO : parameterDTOs) {
+            if (isListenerPortParam(parameterDTO.getName()) && parameterDTO.getValue().equals(port)) {
+                return true;
+            }
+        }
 
+        return false;
+    }
+
+    private boolean isListener(String protocolName) {
+        for (String listener : InboundClientConstants.LISTENER_TYPES) {
+            if (protocolName.equals(listener)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isListenerPortParam(String portParam) {
+        for (String listenerPortParam : InboundClientConstants.LISTENER_PORT_PARAMS) {
+            if (portParam.equals(listenerPortParam)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 
     public InboundDescription getInboundDescription(String name) {
