@@ -87,21 +87,22 @@
 		%>
 		<script type="text/javascript">
             jQuery(document).ready(function() {
-                CARBON.showErrorDialog('Cannot add inbound endpoint may be name or port already consumed', function() {
-        				goBackOnePage();
+                CARBON.showErrorDialog('Cannot add inbound endpoint. Maybe name or port is already in use.', function() {
+        				forward("index.jsp");
         			}, function() {
-        				goBackOnePage();
+                        forward("index.jsp");
         			});
         		});
         	</script>
 
 
 		<%
-		}
+		} else {
 	%>
 	<script type="text/javascript">
     forward("index.jsp");
 </script>
+    <% } %>
 	<%
 			} catch (Exception e) {
 	%>

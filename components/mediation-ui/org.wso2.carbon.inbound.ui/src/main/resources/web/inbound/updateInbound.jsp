@@ -88,20 +88,21 @@
             		<script type="text/javascript">
                         jQuery(document).ready(function() {
                             CARBON.showErrorDialog('Cannot update inbound endpoint may be name or port already consumed ', function() {
-                    				goBackOnePage();
+                                    forward("index.jsp");
                     			}, function() {
-                    				goBackOnePage();
+                                    forward("index.jsp");
                     			});
                     		});
                     	</script>
 
 
             		<%
-            		}
+            } else {
 	%>
 	<script type="text/javascript">
     forward("index.jsp");
 </script>
+    <% } %>
 	<%
 			} catch (Exception e) {
 	%>
