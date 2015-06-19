@@ -24,6 +24,7 @@ import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
+import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 
 import java.io.IOException;
@@ -62,7 +63,20 @@ public class InboundHttpListener implements InboundRequestProcessor {
                      "hence undeploying inbound endpoint");
             this.destroy();
         } else {
-            HTTPEndpointManager.getInstance().startEndpoint(port, name);
+            String coresize = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_POOL_SIZE_CORE);
+            String maxSize = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_POOL_SIZE_MAX);
+            String keepAlive = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_THREAD_KEEP_ALIVE_SEC);
+            String queueLength = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_POOL_QUEUE_LENGTH);
+            String threadGroup = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_THREAD_GROUP_ID);
+            String threadID = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_THREAD_ID);
+            if (coresize == null && maxSize == null && keepAlive == null && queueLength == null) {
+                HTTPEndpointManager.getInstance().startEndpoint(port, name);
+            } else {
+                WorkerPoolConfiguration workerPoolConfiguration = new WorkerPoolConfiguration(coresize, maxSize,
+                                                                                              keepAlive, queueLength,
+                                                                                              threadGroup, threadID);
+                HTTPEndpointManager.getInstance().startEndpoint(port, name, workerPoolConfiguration);
+            }
         }
     }
 
