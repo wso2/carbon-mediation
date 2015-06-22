@@ -48,27 +48,16 @@ public class MqttConnectionFactory {
 			               passedInParameter.getProperty(MqttConstants.MQTT_TOPIC_NAME));
 			parameters.put(MqttConstants.MQTT_SERVER_PORT,
 			               passedInParameter.getProperty(MqttConstants.MQTT_SERVER_PORT));
-            if(passedInParameter.getProperty(MqttConstants.MQTT_QOS)!=null) {
-                parameters.put(MqttConstants.MQTT_QOS,
-                        passedInParameter.getProperty(MqttConstants.MQTT_QOS));
-            }
-            if(passedInParameter.getProperty(MqttConstants.MQTT_SESSION_CLEAN)!=null) {
-                parameters.put(MqttConstants.MQTT_SESSION_CLEAN,
-                        passedInParameter.getProperty(MqttConstants.MQTT_SESSION_CLEAN));
-            }
-            if(passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE)!=null) {
-                parameters.put(MqttConstants.MQTT_SSL_ENABLE,
-                        passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE));
-            }
-            if(passedInParameter.getProperty(MqttConstants.MQTT_BLOCKING_SENDER)!=null) {
-                parameters.put(MqttConstants.MQTT_BLOCKING_SENDER,
-                        passedInParameter.getProperty(MqttConstants.MQTT_BLOCKING_SENDER));
-            }
-            if(passedInParameter.getProperty(MqttConstants.MQTT_TEMP_STORE)!=null)
-            {
-                parameters.put(MqttConstants.MQTT_TEMP_STORE,
-                        passedInParameter.getProperty(MqttConstants.MQTT_TEMP_STORE));
-            }
+			parameters.put(MqttConstants.MQTT_QOS,
+			               passedInParameter.getProperty(MqttConstants.MQTT_QOS));
+			parameters.put(MqttConstants.MQTT_SESSION_CLEAN,
+			               passedInParameter.getProperty(MqttConstants.MQTT_SESSION_CLEAN));
+			parameters.put(MqttConstants.MQTT_SSL_ENABLE,
+			               passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE));
+			parameters.put(MqttConstants.MQTT_BLOCKING_SENDER,
+			               passedInParameter.getProperty(MqttConstants.MQTT_BLOCKING_SENDER));
+			parameters.put(MqttConstants.MQTT_TEMP_STORE,
+			               passedInParameter.getProperty(MqttConstants.MQTT_TEMP_STORE));
             parameters.put(MqttConstants.CONTENT_TYPE,
                     passedInParameter.getProperty(MqttConstants.CONTENT_TYPE));
 			
