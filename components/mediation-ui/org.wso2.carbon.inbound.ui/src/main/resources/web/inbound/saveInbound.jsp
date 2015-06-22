@@ -85,17 +85,15 @@
 		boolean added =	client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, request.getParameter("inboundSuspend"), sParams);
 		if(!added){
 		%>
-		<script type="text/javascript">
-            jQuery(document).ready(function() {
-                CARBON.showErrorDialog('Cannot add inbound endpoint. Maybe name or port is already in use.', function() {
-        				forward("index.jsp");
-        			}, function() {
-                        forward("index.jsp");
-        			});
-        		});
-        	</script>
-
-
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            CARBON.showErrorDialog('Cannot add inbound endpoint. Maybe name or port is already in use.', function () {
+                goBackOnePage();
+            }, function () {
+                goBackOnePage();
+            });
+        });
+    </script>
 		<%
 		} else {
 	%>
@@ -108,8 +106,7 @@
 	%>
 	<script type="text/javascript">
     jQuery(document).ready(function() {
-        CARBON.showErrorDialog('<%=e.getMessage()%>
-		', function() {
+        CARBON.showErrorDialog('<%=e.getMessage()%>', function() {
 				goBackOnePage();
 			}, function() {
 				goBackOnePage();
