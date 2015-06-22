@@ -91,35 +91,42 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
      * @throws InboundManagementException
      */
     public void addInboundEndpoint(String name, String sequence, String onError, String protocol, String classImpl, String suspend, ParameterDTO[]lParameterDTOs) throws InboundManagementException {
-        SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-        OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
-        OMElement elem = fac.createOMElement("inboundEndpoint", omNs);
-        elem.addAttribute(fac.createOMAttribute("name", null, name));
-        elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
-        elem.addAttribute(fac.createOMAttribute("onError", null, onError));
-        elem.addAttribute(fac.createOMAttribute("suspend", null, suspend));
-        if (protocol != null) {
-            elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
-        } else {
-            elem.addAttribute(fac.createOMAttribute("class", null, classImpl));
-        }
-        OMElement params = fac.createOMElement("parameters", omNs);
-        for (ParameterDTO parameterDTO : lParameterDTOs) {
-            OMElement param = fac.createOMElement("parameter", omNs);
-            param.addAttribute(fac.createOMAttribute("name", null, parameterDTO.getName()));
-            if (parameterDTO.getKey() != null) {
-            	 param.addAttribute(fac.createOMAttribute("key", null, parameterDTO.getKey()));
-            }else if (parameterDTO.getValue() != null) {
-                param.setText(parameterDTO.getValue());
+
+        try {
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            OMFactory fac = OMAbstractFactory.getOMFactory();
+            OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
+            OMElement elem = fac.createOMElement("inboundEndpoint", omNs);
+            elem.addAttribute(fac.createOMAttribute("name", null, name));
+            elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
+            elem.addAttribute(fac.createOMAttribute("onError", null, onError));
+            elem.addAttribute(fac.createOMAttribute("suspend", null, suspend));
+            if (protocol != null) {
+                elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
+            } else {
+                elem.addAttribute(fac.createOMAttribute("class", null, classImpl));
             }
-            params.addChild(param);
+            OMElement params = fac.createOMElement("parameters", omNs);
+            for (ParameterDTO parameterDTO : lParameterDTOs) {
+                OMElement param = fac.createOMElement("parameter", omNs);
+                param.addAttribute(fac.createOMAttribute("name", null, parameterDTO.getName()));
+                if (parameterDTO.getKey() != null) {
+                    param.addAttribute(fac.createOMAttribute("key", null, parameterDTO.getKey()));
+                } else if (parameterDTO.getValue() != null) {
+                    param.setText(parameterDTO.getValue());
+                }
+                params.addChild(param);
+            }
+            elem.addChild(params);
+            SynapseXMLConfigurationFactory.defineInboundEndpoint(synapseConfiguration, elem, synapseConfiguration.getProperties());
+            InboundEndpoint inboundEndpoint = getInboundEndpoint(name);
+            persistInboundEndpoint(inboundEndpoint);
+            inboundEndpoint.init(getSynapseEnvironment());
+        } catch (Exception ex) {
+            log.error("Error adding inbound Endpoint", ex);
+            removeInboundEndpoint(name);
+            throw ex;
         }
-        elem.addChild(params);
-        SynapseXMLConfigurationFactory.defineInboundEndpoint(synapseConfiguration, elem, synapseConfiguration.getProperties());
-        InboundEndpoint inboundEndpoint = getInboundEndpoint(name);
-        persistInboundEndpoint(inboundEndpoint);
-        inboundEndpoint.init(getSynapseEnvironment());
     }
 
     /**

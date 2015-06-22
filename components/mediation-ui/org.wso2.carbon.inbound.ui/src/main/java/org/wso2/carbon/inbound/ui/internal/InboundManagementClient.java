@@ -151,12 +151,12 @@ public class InboundManagementClient {
                 return true;
             }else {
                 log.warn("Cannot add Inbound endpoint " + name + " may be duplicate inbound already exists");
+                return false;
             }
         } catch (Exception e) {
             log.error(e);
-            return false;
+            throw e;
         }
-        return false;
     }
 
     private List<String> getList(String strProtocol, boolean mandatory) {
@@ -210,7 +210,7 @@ public class InboundManagementClient {
                     if (inboundEndpointDTO.getName().equals(name)) {
                         return false;
                     }
-                    if (isListener(protocol)) {
+                    if (protocol != null && isListener(protocol)) {
                         ParameterDTO[] existingParameterDTOs = inboundEndpointDTO.getParameters();
                         for (ParameterDTO parameterDTO : existingParameterDTOs) {
                             if (isListenerPortParam(parameterDTO.getName())) {
@@ -304,7 +304,7 @@ public class InboundManagementClient {
             }
         } catch (Exception e) {
             log.error(e);
-            return false;
+            throw e;
         }
         return false;
     }
