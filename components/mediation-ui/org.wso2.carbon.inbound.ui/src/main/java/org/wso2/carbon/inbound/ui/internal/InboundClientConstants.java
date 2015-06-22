@@ -27,7 +27,8 @@ public class InboundClientConstants {
     public static final String TYPE_KAFKA = "kafka";
 	public static final String TYPE_CLASS = "class";
 	public static final String TYPE_CXF_WS_RM = "cxf_ws_rm";
-	public static final String EXCEPTION = "INBOUND_EXCEPTION";
+    public static final String TYPE_MQTT = "mqtt";
+    public static final String EXCEPTION = "INBOUND_EXCEPTION";
 	public static final String STRING_SPLITTER = " ~:~ ";
 
     public static final String[] LISTENER_TYPES = {TYPE_HTTP, TYPE_HTTPS, TYPE_HL7};
