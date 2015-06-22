@@ -43,6 +43,8 @@ public class InboundHL7IOReactor {
 
     private static ConcurrentHashMap<Integer, HL7Processor> processorMap = new ConcurrentHashMap<Integer, HL7Processor>();
 
+    private static MultiIOHandler multiIOHandler;
+
     private static volatile boolean isStarted = false;
 
     public static void start() throws IOException {
@@ -60,8 +62,9 @@ public class InboundHL7IOReactor {
             public void run() {
                 try {
                     isStarted = true;
+                    multiIOHandler = new MultiIOHandler(processorMap);
                     log.info("MLLP Transport IO Reactor Started");
-                    reactor.execute(new MultiIOHandler(processorMap));
+                    reactor.execute(multiIOHandler);
                 } catch (IOException e) {
                     isStarted = false;
                     log.error("Error while starting the MLLP Transport IO Reactor.", e);
@@ -131,6 +134,7 @@ public class InboundHL7IOReactor {
 
         endpointMap.remove(port);
         processorMap.remove(port);
+        multiIOHandler.disconnectSessions(port);
 
         if (ep == null) {
             return false;

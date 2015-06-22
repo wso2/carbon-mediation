@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.IOSession;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MultiIOHandler extends MLLPSourceHandler {
@@ -32,6 +33,8 @@ public class MultiIOHandler extends MLLPSourceHandler {
     public ConcurrentHashMap<Integer, MLLPSourceHandler> handlers = new ConcurrentHashMap<Integer, MLLPSourceHandler>();
 
     private ConcurrentHashMap<Integer, HL7Processor> processorMap;
+
+    private ConcurrentHashMap<String, IOSession> endpointSessions = new ConcurrentHashMap<String, IOSession>();
 
     public MultiIOHandler(ConcurrentHashMap<Integer, HL7Processor> processorMap) {
         super();
@@ -46,6 +49,7 @@ public class MultiIOHandler extends MLLPSourceHandler {
 
         MLLPSourceHandler handler = new MLLPSourceHandler(processorMap.get(localIsa.getPort()));
         handlers.put(remoteIsa.getPort(), handler);
+        endpointSessions.put(localIsa.getPort() + "-" + remoteIsa.getPort(), session);
 
         handler.connected(session);
 
@@ -73,9 +77,11 @@ public class MultiIOHandler extends MLLPSourceHandler {
     public void timeout(IOSession session) {
 
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
+        InetSocketAddress localIsa = (InetSocketAddress) session.getLocalAddress();
         MLLPSourceHandler handler = handlers.get(isa.getPort());
         handler.timeout(session);
         handlers.remove(handler);
+        endpointSessions.remove(localIsa.getPort() + "-" + isa.getPort());
 
     }
 
@@ -83,13 +89,23 @@ public class MultiIOHandler extends MLLPSourceHandler {
     public void disconnected(IOSession session) {
 
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
+        InetSocketAddress localIsa = (InetSocketAddress) session.getLocalAddress();
         if (isa == null) {
             return;
         }
         MLLPSourceHandler handler = handlers.get(isa.getPort());
         handler.disconnected(session);
         handlers.remove(handler);
+        endpointSessions.remove(localIsa.getPort() + "-" + isa.getPort());
 
     }
 
+    public void disconnectSessions(int localPort) {
+        for (Map.Entry<String, IOSession> entry: endpointSessions.entrySet()) {
+            if (entry.getKey().startsWith(String.valueOf(localPort))) {
+                IOSession session = entry.getValue();
+                disconnected(session);
+            }
+        }
+    }
 }
