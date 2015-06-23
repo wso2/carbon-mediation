@@ -81,7 +81,7 @@
         String param;
         for (int i = 0; i < params.length; i++) {
             param = params[i];
-            pair = param.split(",");
+            pair = param.split("#");
             entries[i] = new Entry();
             entries[i].setKey(pair[0]);
             entries[i].setValue(pair[1]);
