@@ -98,9 +98,13 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
             OMElement elem = fac.createOMElement("inboundEndpoint", omNs);
             elem.addAttribute(fac.createOMAttribute("name", null, name));
-            elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
-            elem.addAttribute(fac.createOMAttribute("onError", null, onError));
+            if (sequence != null && sequence != "") {
+                elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
+            }
             elem.addAttribute(fac.createOMAttribute("suspend", null, suspend));
+            if (onError != null && onError != "") {
+                elem.addAttribute(fac.createOMAttribute("onError", null, onError));
+            }
             if (protocol != null) {
                 elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
             } else {
@@ -175,9 +179,13 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         OMNamespace omNs = fac.createOMNamespace("http://ws.apache.org/ns/synapse", "syn");
         OMElement elem = fac.createOMElement("inboundEndpoint", omNs);
         elem.addAttribute(fac.createOMAttribute("name", null, name));
-        elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
-        elem.addAttribute(fac.createOMAttribute("suspend", null, sequence));
-        elem.addAttribute(fac.createOMAttribute("onError", null, onError));
+        if (sequence != null && sequence != "") {
+            elem.addAttribute(fac.createOMAttribute("sequence", null, sequence));
+        }
+        elem.addAttribute(fac.createOMAttribute("suspend", null, suspend));
+        if (onError != null && onError != "") {
+            elem.addAttribute(fac.createOMAttribute("onError", null, onError));
+        }
         if (protocol != null) {
             elem.addAttribute(fac.createOMAttribute("protocol", null, protocol));
         } else {

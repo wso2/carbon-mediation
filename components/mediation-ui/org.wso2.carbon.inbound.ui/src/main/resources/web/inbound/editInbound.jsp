@@ -49,6 +49,8 @@
 var iParamCount = 0;
 var iParamMax = 0;
 var classRequired = false;
+var sequenceRequired=false;
+var onErrorRequired=false;
 var requiredParams = null;
 </script>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
@@ -97,6 +99,11 @@ var requiredParams = null;
                         </td>
                         <td></td>
                     </tr>
+
+                   <%
+                   if(!(InboundClientConstants.TYPE_HTTP.equals(inboundDescription.getType()) || InboundClientConstants.TYPE_HTTPS.equals(inboundDescription.getType())) ) { %>
+                    <script type="text/javascript">sequenceRequired = true;</script>
+                    <script type="text/javascript">onErrorRequired = true;</script>
                     <tr>
                         <td style="width:150px"><fmt:message key="inbound.sequence"/><span
                                 class="required">*</span></td>
@@ -133,7 +140,29 @@ var requiredParams = null;
                                 <%}%>              
                             </select>                            
                         </td>                      
-                    </tr>                     
+                    </tr>
+                     <% } else { %>
+                   <tr>
+                        <td style="width:150px"><fmt:message key="inbound.sequence"/></td>
+                        <td align="left">
+                        <input id="inboundSequence" name="inboundSequence" class="longInput" type="text" value="<%=inboundDescription.getInjectingSeq()!= null ? inboundDescription.getInjectingSeq():"" %>"/>
+                        </td>
+                         <td align="left">
+                         <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
+                         <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
+                         </td>
+                   </tr>
+                   <tr>
+                       <td style="width:150px"><fmt:message key="inbound.error.sequence"/></td>
+                       <td align="left">
+                       <input id="inboundErrorSequence" name="inboundErrorSequence" class="longInput" type="text" value="<%=inboundDescription.getOnErrorSeq() != null ? inboundDescription.getOnErrorSeq():""%>"/>
+                       </td>
+                       <td align="left">
+                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
+                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
+                        </td>
+                   </tr>
+                   <% } %>
                     <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
                     <script type="text/javascript">classRequired = true;</script>       
                     <tr>

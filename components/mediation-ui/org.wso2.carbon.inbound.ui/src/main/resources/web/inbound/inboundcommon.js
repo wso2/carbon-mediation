@@ -75,11 +75,11 @@ function inboundsave1(namemsg, typemsg, form , existingList){
 }
 
 function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
-    if (document.getElementById('inboundSequence').value == '') {
+    if (sequenceRequired && document.getElementById('inboundSequence').value == '') {
         CARBON.showWarningDialog(msg1);
         return false;
     }	
-    if (document.getElementById('inboundErrorSequence').value == '') {
+    if (onErrorRequired && document.getElementById('inboundErrorSequence').value == '') {
         CARBON.showWarningDialog(msg2);
         return false;
     }        
@@ -102,11 +102,11 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
 }
 
 function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
-    if (document.getElementById('inboundSequence').value == '') {
+    if (sequenceRequired && document.getElementById('inboundSequence').value == '') {
         CARBON.showWarningDialog(msg1);
         return false;
     }	
-    if (document.getElementById('inboundErrorSequence').value == '') {
+    if (onErrorRequired && document.getElementById('inboundErrorSequence').value == '') {
         CARBON.showWarningDialog(msg2);
         return false;
     }         
