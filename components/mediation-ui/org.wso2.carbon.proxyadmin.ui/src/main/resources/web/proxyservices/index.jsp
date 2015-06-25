@@ -295,10 +295,10 @@
     Entry[] entries;
     String givenParams = "";
     if (pd != null && (entries = pd.getServiceParams()) != null && entries.length > 0 && entries[0] != null) {
-        givenParams = entries[0].getKey() + "," + entries[0].getValue().replace("\n","");
+        givenParams = entries[0].getKey() + "#" + entries[0].getValue().replace("\n","");
         for (int i = 1; i < entries.length; i++) {
             if (entries[i] != null) {
-                givenParams += "::" + entries[i].getKey() + "," + entries[i].getValue();
+                givenParams += "::" + entries[i].getKey() + "#" + entries[i].getValue();
             }
         }
     }
@@ -722,9 +722,9 @@
                 return;
             }
             if (j == 1) {
-                str += parmName + ',' + parmValue;
+                str += parmName + '#' + parmValue;
             }else{
-                str += '::' + parmName + ',' + parmValue;                
+                str += '::' + parmName + '#' + parmValue;
             }
         }
 
@@ -738,7 +738,7 @@
             params = str.split("::");
             var i, param;
             for (i = 0; i < params.length; i++) {
-                param = params[i].split(",");
+                param = params[i].split("#");
                 addServiceParamRow(param[0], param[1]);
             }
         }
