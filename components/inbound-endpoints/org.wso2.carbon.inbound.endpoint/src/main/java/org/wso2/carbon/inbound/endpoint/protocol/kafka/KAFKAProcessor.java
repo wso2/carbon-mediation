@@ -109,7 +109,7 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
     }
 
     public void update() {
-        start();
+        // This will not be called for inbound endpoints
     }
 
     public String getName() {
@@ -118,5 +118,22 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public void destroy() {
+       log.info("Inbound endpoint " + name + " stopping.");
+       try {
+            if (pollingConsumer.messageListener!=null) {
+                pollingConsumer.messageListener.consumerConnector.shutdown();
+                log.info("Shutdown the kafka consumer connector");
+            }
+            if (startUpController != null) {
+                startUpController.destroy();
+                log.info("Destroyed the startUpController");
+            }
+        }catch (Exception e) {
+            log.error("Error while shutdown the consumer connector or destroy the startup controller");
+        }
     }
 }
