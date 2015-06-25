@@ -204,6 +204,13 @@ public class InboundManagementClient {
     private boolean canAdd(String name, String protocol, ParameterDTO[] parameterDTOs) {
         try {
             String port = null;
+            if(protocol != null && isListener(protocol)){
+                for(ParameterDTO paramDTO: parameterDTOs){
+                    if(isListenerPortParam(paramDTO.getName())){
+                        Integer.parseInt(paramDTO.getValue());
+                    }
+                }
+            }
             InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
             if(inboundEndpointDTOs != null) {
                 for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
