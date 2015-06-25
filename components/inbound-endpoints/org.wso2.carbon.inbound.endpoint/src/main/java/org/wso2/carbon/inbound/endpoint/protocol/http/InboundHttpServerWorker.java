@@ -119,16 +119,11 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 boolean processedByAPI = false;
 
-                String apiDispatchingParam =
-                        (String) endpoint.getParameter(
-                                InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_API_DISPATCHING_ENABLED);
-                if (apiDispatchingParam != null && Boolean.valueOf(apiDispatchingParam)) {
-                    // Trying to dispatch to an API
-                    processedByAPI = restHandler.process(synCtx);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Dispatch to API state : enabled, Message is "
-                                  + (!processedByAPI ? "NOT" : "") + "processed by an API");
-                    }
+                // Trying to dispatch to an API
+                processedByAPI = restHandler.process(synCtx);
+                if (log.isDebugEnabled()) {
+                    log.debug("Dispatch to API state : enabled, Message is "
+                              + (!processedByAPI ? "NOT" : "") + "processed by an API");
                 }
 
                 if (!processedByAPI) {
@@ -157,14 +152,26 @@ public class InboundHttpServerWorker extends ServerWorker {
                         }
                     } else {
                         // Get injecting sequence for synapse engine
-                        SequenceMediator injectingSequence =
-                                (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
-                        if (endpoint.getOnErrorSeq() != null) {
-                            SequenceMediator faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
+                        SequenceMediator injectingSequence = null;
+                        if (endpoint.getInjectingSeq() != null) {
 
-                            MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
-                            synCtx.pushFaultHandler(mediatorFaultHandler);
+                            injectingSequence = (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
                         }
+
+                        if (injectingSequence == null) {
+                            injectingSequence = (SequenceMediator) synCtx.getMainSequence();
+                        }
+                        SequenceMediator faultSequence = null;
+                        if (endpoint.getOnErrorSeq() != null) {
+                            faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
+                        }
+
+                        if (faultSequence != null) {
+                            faultSequence = (SequenceMediator) synCtx.getFaultSequence();
+                        }
+
+                        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
+                        synCtx.pushFaultHandler(mediatorFaultHandler);
 
                         /* handover synapse message context to synapse environment for inject it to given sequence in
                         synchronous manner*/
