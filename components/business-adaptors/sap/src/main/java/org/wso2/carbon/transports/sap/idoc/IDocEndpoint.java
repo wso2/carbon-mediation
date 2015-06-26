@@ -64,6 +64,11 @@ public class IDocEndpoint extends SAPEndpoint {
 
         server.stop();
         server.release();
-        log.info("IDoc server : " + serverName + " stopped");
+
+        if (!waitForServerStop(server)) {
+            log.warn("IDoc server : " + serverName + " is taking an unusually long time to stop.");
+        } else {
+            log.info("IDoc server : " + serverName + " stopped");
+        }
     }
 }

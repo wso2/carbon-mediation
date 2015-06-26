@@ -37,9 +37,6 @@ public class ProxyServiceParameterObserver implements ParameterObserver{
     private AxisService service;
     private int tanentId;
 
-    public static final String SERVICE_RESPONSE_TIME = "wso2statistics.service.response.time";
-    public static final String AXIS_SERVICE = "org.apache.axis2.context.externalize.AxisServiceName";
-    
     private static final Log log = LogFactory.getLog(ProxyServiceParameterObserver.class);
 
     public ProxyServiceParameterObserver(AxisService service) {
@@ -71,16 +68,8 @@ public class ProxyServiceParameterObserver implements ParameterObserver{
                 //if  this is a parameter remove 
                 proxy.getParameterMap().remove(name);
             }
-			if (!SERVICE_RESPONSE_TIME.equals(name) && !AXIS_SERVICE.equals(name)) {
-				/**
-				 * ESBJAVA-2573
-				 * Proxy services redeployed every time when a call is made when using custom axis module. 
-				 */
-            	/**
-            	 * [ESBJAVA-2464]  storing service response time as a parameter of the service. 
-            	 * After the changes related to ESBJAVA-1683, service information get persisted 
-            	 * for every request. So avoiding service response time get persisted for each req.
-            	 */
+
+			if (!isSkipPersistenceForParam(name)) {
             	try {
                     new ProxyServiceAdmin().persistProxyService(proxy);
                 } catch (ProxyAdminException e) {
@@ -91,5 +80,33 @@ public class ProxyServiceParameterObserver implements ParameterObserver{
             log.error("Proxy Service " +name + " does not exist ");
         }
     }
+
+    private boolean isSkipPersistenceForParam(String name) {
+
+        /**
+         * org.apache.axis2.context.externalize.AxisServiceName
+         * [ESBJAVA-2573]
+         * Proxy services redeployed every time when a call is made when using custom axis module.
+         *
+         * wso2statistics.service.response.time
+         * [ESBJAVA-2464] storing service response time as a parameter of the service.
+         * After the changes related to ESBJAVA-1683, service information get persisted
+         * for every request. So avoiding service response time get persisted for each req.
+         *
+         * lastUsedTime
+         * [ESBJAVA-3729]
+         *
+         */
+        for (String param : skipParams) {
+            if (param.equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String[] skipParams = {"wso2statistics.service.response.time",
+                                          "org.apache.axis2.context.externalize.AxisServiceName",
+                                          "lastUsedTime"};
 
 }

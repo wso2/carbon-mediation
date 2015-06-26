@@ -27,6 +27,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v22.message.ACK;
 import ca.uhn.hl7v2.parser.*;
 import ca.uhn.hl7v2.util.idgenerator.UUIDGenerator;
+import ca.uhn.hl7v2.validation.impl.DefaultValidation;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.dom.factory.OMDOMFactory;
@@ -47,7 +48,6 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
-import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.HL7Configuration;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLPConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLProtocolException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -68,6 +68,7 @@ public class HL7MessageUtils {
 
     static {
         noValidationContext.setValidationContext(new NoValidation());
+        validationContext.setValidationContext(new DefaultValidation());
     }
 
     private static PipeParser noValidationPipeParser = new PipeParser(noValidationContext);

@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.inbound.endpoint.common;
 
-import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 
 public interface InboundEndpointManager {
 
@@ -27,7 +27,7 @@ public interface InboundEndpointManager {
      * @param port  port
      * @param name  endpoint name
      */
-    public void startListener(int port, String name);
+    public boolean startListener(int port, String name);
 
 
     /**
@@ -35,7 +35,7 @@ public interface InboundEndpointManager {
      * @param port  port
      * @param name  endpoint name
      */
-    public void startEndpoint(int port, String name);
+    public boolean startEndpoint(int port, String name);
 
     /**
      * Stop Inbound Endpoint

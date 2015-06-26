@@ -82,33 +82,33 @@
                    }
                 }
            }
-		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
+		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl,request.getParameter("inboundSuspend"), sParams);
 			if(!added){
             		%>
             		<script type="text/javascript">
                         jQuery(document).ready(function() {
                             CARBON.showErrorDialog('Cannot update inbound endpoint may be name or port already consumed ', function() {
-                    				goBackOnePage();
+                                goBackOnePage();
                     			}, function() {
-                    				goBackOnePage();
+                                goBackOnePage();
                     			});
                     		});
                     	</script>
 
 
             		<%
-            		}
+            } else {
 	%>
 	<script type="text/javascript">
     forward("index.jsp");
 </script>
+    <% } %>
 	<%
 			} catch (Exception e) {
 	%>
 	<script type="text/javascript">
     jQuery(document).ready(function() {
-        CARBON.showErrorDialog('<%=e.getMessage()%>
-		', function() {
+        CARBON.showErrorDialog('<%=e.getMessage()%>', function() {
 				goBackOnePage();
 			}, function() {
 				goBackOnePage();

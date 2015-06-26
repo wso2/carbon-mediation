@@ -34,7 +34,7 @@
     }
     ForEachMediator foreachMediator = (ForEachMediator) mediator;
 
-    String whichSeq = "none";
+    String whichSeq = "anon";
 
     String inRegKey = "";
 
@@ -44,11 +44,9 @@
         sequenceStr = "";
     }
 
-    if(foreachMediator.getList().isEmpty() && foreachMediator.getSequenceRef() == null){
-        whichSeq = "none";
-    } else if(foreachMediator.getSequenceRef() != null && !"anon".equals(foreachMediator.getSequenceRef())) {
+    if(foreachMediator.getSequenceRef() != null) {
         whichSeq = "reg";
-    } else if(foreachMediator.getSequenceRef() != null && "anon".equals(foreachMediator.getSequenceRef())){
+    } else {
         whichSeq = "anon";
         //if the sequence is anonymous we have to clear the sequence string
         //in order to avoid it displaying in the registry textbox
@@ -127,14 +125,7 @@
                             <td>
                                 <h3 class="mediator">Sequence</h3>
                                 <input type="hidden" name="mediator.foreach.seq.type"
-                                       id="mediator.foreach.seq.type" value="none"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input id="mediator.foreach.seq.radio.none" name="mediator.foreach.seq.radio"  type="radio"
-                                      onclick="hideSeqRegistryOptionNone();"/>
-                                      None
+                                       id="mediator.foreach.seq.type" value="anon"/>
                             </td>
                         </tr>
                         <tr>

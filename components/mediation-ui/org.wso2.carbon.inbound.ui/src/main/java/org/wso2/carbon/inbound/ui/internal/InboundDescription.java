@@ -46,7 +46,7 @@ public class InboundDescription {
 			this.type = InboundClientConstants.TYPE_CLASS;
 			this.classImpl = inboundEndpoint.getClassImpl();	
 		}
-		this.suspend = inboundEndpoint.isSuspendSpecified();
+		this.suspend = inboundEndpoint.getSuspend();
 		this.injectingSeq = inboundEndpoint.getInjectingSeq();
 		this.onErrorSeq = inboundEndpoint.getOnErrorSeq();
 		this.fileName = inboundEndpoint.getFileName();

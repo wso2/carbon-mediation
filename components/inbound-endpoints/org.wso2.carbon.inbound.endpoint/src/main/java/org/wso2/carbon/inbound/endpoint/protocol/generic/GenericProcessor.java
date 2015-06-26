@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.startup.quartz.StartUpController;
@@ -81,25 +82,26 @@ public class GenericProcessor extends InboundRequestProcessorImpl implements Tas
     }
 
     public void init() {
-    	log.info("Inbound listener " + name + " for class " + classImpl + " starting ...");
-		try{
-			Class c = Class.forName(classImpl);
-			Constructor cons = c.getConstructor(Properties.class, String.class, SynapseEnvironment.class, long.class, String.class, String.class, boolean.class, boolean.class);
-			pollingConsumer = (GenericPollingConsumer)cons.newInstance(properties, name, synapseEnvironment, interval, injectingSeq, onErrorSeq, coordination, sequential);
-		}catch(ClassNotFoundException e){
-			log.error("Class " + classImpl + " not found. Please check the required class is added to the classpath.");
-			log.error(e);
-		}catch(NoSuchMethodException e){
-			log.error("Required constructor is not implemented.");
-			log.error(e);
-		}catch(InvocationTargetException e){
-			log.error("Unable to create the consumer");
-			log.error(e);
-		}catch(Exception e){
-			log.error("Unable to create the consumer");
-			log.error(e);					
-		}    	
-    	start();
+        log.info("Inbound listener " + name + " for class " + classImpl + " starting ...");
+        try {
+            Class c = Class.forName(classImpl);
+            Constructor cons = c.getConstructor(Properties.class, String.class, SynapseEnvironment.class, long.class, String.class, String.class, boolean.class, boolean.class);
+            pollingConsumer = (GenericPollingConsumer) cons.newInstance(properties, name, synapseEnvironment, interval, injectingSeq, onErrorSeq, coordination, sequential);
+        } catch (ClassNotFoundException e) {
+            handleException("Class " + classImpl + " not found. Please check the required class is added to the classpath.", e);
+        } catch (NoSuchMethodException e) {
+            handleException("Required constructor is not implemented.", e);
+        } catch (InvocationTargetException e) {
+            handleException("Unable to create the consumer", e);
+        } catch (Exception e) {
+            handleException("Unable to create the consumer", e);
+        }
+        start();
+    }
+
+    private void handleException(String msg, Exception ex) {
+        log.error(msg, ex);
+        throw new SynapseException(ex);
     }
          
     
