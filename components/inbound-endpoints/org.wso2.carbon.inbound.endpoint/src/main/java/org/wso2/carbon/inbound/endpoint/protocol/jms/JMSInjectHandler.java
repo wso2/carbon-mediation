@@ -154,7 +154,8 @@ public class JMSInjectHandler {
         } catch (SynapseException se) {
             throw se;            
         } catch (Exception e) {
-            log.error("Error while processing the JMS Message");
+            log.error("Error while processing the JMS Message", e);
+            throw new SynapseException("Error while processing the JMS Message", e);            
         }
         return true;
     }
