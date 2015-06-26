@@ -83,6 +83,7 @@ public class SynapseApplicationAdmin extends AbstractAdmin {
         List<String> mediatorList = new ArrayList<String>();
         List<TaskMetadata> taskList = new ArrayList<TaskMetadata>();
         List<String> apiList = new ArrayList<String>();
+        List<String> inboundEPList = new ArrayList<String>();
 
         List<Artifact.Dependency> dependencies = currentApplication.getAppConfig().
                 getApplicationArtifact().getDependencies();
@@ -116,6 +117,8 @@ public class SynapseApplicationAdmin extends AbstractAdmin {
                 mediatorList.add(instanceName);
             } else if (SynapseAppDeployerConstants.API_TYPE.equals(type)) {
                 apiList.add(instanceName);
+            } else if (SynapseAppDeployerConstants.INBOUND_ENDPOINT_TYPE.equals(type)) {
+                inboundEPList.add(instanceName);
             } else if (SynapseAppDeployerConstants.TASK_TYPE.equals(type)) {
                 TaskMetadata taskMetadata = synapseConfigAdmin.getTaskMetaData(instanceName);
                 if(taskMetadata != null){
@@ -133,6 +136,7 @@ public class SynapseApplicationAdmin extends AbstractAdmin {
         data.setMediators(mediatorList.toArray(new String[mediatorList.size()]));
         data.setTasks(taskList.toArray(new TaskMetadata[taskList.size()]));
         data.setApis(apiList.toArray(new String[apiList.size()]));
+        data.setInboundEPs(inboundEPList.toArray(new String[inboundEPList.size()]));
         return data;
     }
 

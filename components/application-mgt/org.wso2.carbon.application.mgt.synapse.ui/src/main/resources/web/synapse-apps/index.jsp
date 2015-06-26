@@ -250,6 +250,32 @@
 
 <%
     }
+
+    String[] inboundEps = synapseMetadata.getInboundEPs();
+    if (inboundEps != null && inboundEps.length > 0) {
+%>
+<p>&nbsp;&nbsp;</p>
+<table class="styledLeft" id="InboundEPTable" width="40%">
+    <thead>
+    <tr>
+        <th><img src="../inbound/images/inbound-icon.gif" alt="" style="vertical-align:middle;">&nbsp;<fmt:message key="carbonapps.inboundEndpoints"/></th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+        for (String inboundEp : inboundEps) {
+    %>
+    <tr>
+        <td><a href="../inbound/editInbound.jsp?name=<%= inboundEp%>"><%= inboundEp%></a></td>
+    </tr>
+    <%
+        }
+    %>
+    </tbody>
+</table>
+
+<%
+    }
     String[] apis = synapseMetadata.getApis();
         if (apis != null && apis.length > 0) {
 %>
