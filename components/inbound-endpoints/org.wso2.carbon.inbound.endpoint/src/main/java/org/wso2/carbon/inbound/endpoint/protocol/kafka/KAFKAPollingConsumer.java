@@ -35,7 +35,7 @@ public class KAFKAPollingConsumer {
     private Properties kafkaProperties;
     private int threadCount;
     private List<String> topics;
-    private AbstractKafkaMessageListener messageListener;
+    protected AbstractKafkaMessageListener messageListener;
     private long scanInterval;
     private Long lastRanTime;
 
@@ -160,12 +160,5 @@ public class KAFKAPollingConsumer {
                     + e.getMessage());
         }
         return null;
-    }
-
-    /**
-     * Stop to consume the messages
-     */
-    public void destroy() throws Exception {
-        messageListener.destroy();
     }
 }

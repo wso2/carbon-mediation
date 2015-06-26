@@ -46,6 +46,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
  * 
@@ -122,6 +124,16 @@ public class JMSInjectHandler {
                 documentElement = convertJMSMapToXML((MapMessage) msg);
             }
 
+            // Setting JMSXDeliveryCount header on the message context
+            try {
+                int deliveryCount = msg.getIntProperty("JMSXDeliveryCount");
+                axis2MsgCtx.setProperty(JMSConstants.DELIVERY_COUNT, deliveryCount);
+            } catch (NumberFormatException nfe) {
+                if (log.isDebugEnabled()) {
+                    log.debug("JMSXDeliveryCount is not set in the received message");
+                }
+            }
+
             // Inject the message to the sequence.
             msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
             if (injectingSeq == null || injectingSeq.equals("")) {
@@ -192,6 +204,8 @@ public class JMSInjectHandler {
                 .getAxis2MessageContext();
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setMessageID(UUIDGenerator.getUUID());
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, carbonContext.getTenantDomain());
         // There is a discrepency in what I thought, Axis2 spawns a nes threads
         // to
         // send a message is this is TRUE - and I want it to be the other way

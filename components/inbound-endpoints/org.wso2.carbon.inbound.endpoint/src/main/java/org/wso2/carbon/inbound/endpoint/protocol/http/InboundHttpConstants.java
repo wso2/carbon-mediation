@@ -38,6 +38,32 @@ public class InboundHttpConstants {
     public static final String CLIENT_REVOCATION = "CertificateRevocationVerifier";
     public static final String HTTP = "http";
     public static final String HTTPS = "https";
+    /**
+     * Defines the core size (number of threads) of the worker thread pool.
+     */
+    public static  final String INBOUND_WORKER_POOL_SIZE_CORE = "inbound.worker.pool.size.core";
+
+    /**
+     * Defines the maximum size (number of threads) of the worker thread pool.
+     */
+    public static final String INBOUND_WORKER_POOL_SIZE_MAX = "inbound.worker.pool.size.max";
+
+    /**
+     * Defines the keep-alive time for extra threads in the worker pool.
+     */
+    public static final String INBOUND_WORKER_THREAD_KEEP_ALIVE_SEC = "inbound.worker.thread.keep.alive.sec";
+
+    /**
+     * Defines the length of the queue that is used to hold Runnable tasks to be executed by the
+     * worker pool.
+     */
+    public static final String INBOUND_WORKER_POOL_QUEUE_LENGTH = "inbound.worker.pool.queue.length";
+
+    public static final String INBOUND_THREAD_GROUP_ID = "inbound.thread.group.id";
+
+    public static final String INBOUND_THREAD_ID = "inbound.thread.id";
+
+
 
 
 }

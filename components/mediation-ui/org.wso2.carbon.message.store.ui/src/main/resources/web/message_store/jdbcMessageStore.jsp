@@ -118,25 +118,29 @@
     }
 
     function ValidateTextForm(form) {
+        var isPool = document.getElementById('radio_pool').checked;
+
         if (IsEmpty(form.Name)) {
             CARBON.showWarningDialog('<fmt:message key="name.field.cannot.be.empty"/>')
             form.Name.focus();
             return false;
         }
-        if (IsEmpty(form.driver)) {
-            CARBON.showWarningDialog('<fmt:message key="driver.field.cannot.be.empty"/>')
-            form.Name.focus();
-            return false;
-        }
-        if (IsEmpty(form.url)) {
-            CARBON.showWarningDialog('<fmt:message key="url.field.cannot.be.empty"/>')
-            form.Name.focus();
-            return false;
-        }
-        if (IsEmpty(form.user)) {
-            CARBON.showWarningDialog('<fmt:message key="user.field.cannot.be.empty"/>')
-            form.Name.focus();
-            return false;
+        if(isPool){
+            if (IsEmpty(form.driver)) {
+                CARBON.showWarningDialog('<fmt:message key="driver.field.cannot.be.empty"/>')
+                form.Name.focus();
+                return false;
+            }
+            if (IsEmpty(form.url)) {
+                CARBON.showWarningDialog('<fmt:message key="url.field.cannot.be.empty"/>')
+                form.Name.focus();
+                return false;
+            }
+            if (IsEmpty(form.user)) {
+                CARBON.showWarningDialog('<fmt:message key="user.field.cannot.be.empty"/>')
+                form.Name.focus();
+                return false;
+            }
         }
 
         return true;

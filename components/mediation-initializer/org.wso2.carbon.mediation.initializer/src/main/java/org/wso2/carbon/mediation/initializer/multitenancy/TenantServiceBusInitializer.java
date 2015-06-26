@@ -62,6 +62,7 @@ import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusInitializer;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
+import org.wso2.carbon.mediation.initializer.handler.SynapseExternalPropertyConfigurator;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
 import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationServiceImpl;
@@ -170,13 +171,15 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                     ConfigurationHolder.getInstance().getBundleContext().registerService(
                         SynapseConfigurationService.class.getName(), synCfgSvc, null);
 
+            SynapseEnvironment synapseEnvironment = contextInfo.getSynapseEnvironment();
             //props = new Properties();
             SynapseEnvironmentService synEnvSvc
-                        = new SynapseEnvironmentServiceImpl(contextInfo.getSynapseEnvironment(),
+                        = new SynapseEnvironmentServiceImpl(synapseEnvironment,
                         tenantId, configurationContext);
             ServiceRegistration envRegistration =
                     ConfigurationHolder.getInstance().getBundleContext().registerService(
                         SynapseEnvironmentService.class.getName(), synEnvSvc, null);
+            synapseEnvironment.registerSynapseHandler(new SynapseExternalPropertyConfigurator());
 
             //props = new Properties();
             SynapseRegistrationsService synRegistrationsSvc
@@ -186,7 +189,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                     ConfigurationHolder.getInstance().getBundleContext().registerService(
                     SynapseRegistrationsService.class.getName(),
                     synRegistrationsSvc, null);
-            
+
             //creating secure-vault specific location
             if (!isRepoExists(registry)) {
     			org.wso2.carbon.registry.core.Collection secureVaultCollection = registry

@@ -405,6 +405,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             return SynapseAppDeployerConstants.APIS_FOLDER;
         } else if (SynapseAppDeployerConstants.TEMPLATE_TYPE.endsWith(artifactType)) {
             return SynapseAppDeployerConstants.TEMPLATES_FOLDER;
+        } else if (SynapseAppDeployerConstants.INBOUND_ENDPOINT_TYPE.endsWith(artifactType)) {
+           return SynapseAppDeployerConstants.INBOUND_ENDPOINT_FOLDER;            
         }
         return null;
     }
