@@ -555,11 +555,11 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     }
 
     @Override
-    public void addObserver(TaskManagerObserver o) {
-        if (observers.contains(o)) {
+    public void addObserver(TaskManagerObserver observer) {
+        if (observers.contains(observer)) {
             return;
         }
-        observers.add(o);
+        observers.add(observer);
     }
 
     @Override
@@ -629,11 +629,11 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
     }
 
     private void updateAndCleanupObservers() {
-        Iterator<TaskManagerObserver> i = observers.iterator();
-        while (i.hasNext()) {
-            TaskManagerObserver observer = i.next();
+        Iterator<TaskManagerObserver> iter = observers.iterator();
+        while (iter.hasNext()) {
+            TaskManagerObserver observer = iter.next();
             observer.update();
-            i.remove();
+            iter.remove();
         }
     }
 
