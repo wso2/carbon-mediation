@@ -17,6 +17,7 @@
  */
 package org.wso2.carbon.mediator.cache;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -137,13 +138,14 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 	/**
 	 * This holds whether the global cache already initialized or not.
 	 */
-	private static boolean mediatorCacheInit = false;
+	private static AtomicBoolean mediatorCacheInit = new AtomicBoolean(false);
 
 	@Override
 	public void init(SynapseEnvironment se) {
 		if (onCacheHitSequence != null) {
 			onCacheHitSequence.init(se);
 		}
+		exposeData(se.createMessageContext());
 	}
 
 	@Override
@@ -182,9 +184,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 				return true;
 			} finally {
 				try {
-					if (fbaos != null) {
-						fbaos.close();
-					}
+					fbaos.close();
 				} catch (IOException e) {
 					handleException("Error occurred while closing the FixedByteArrayOutputStream ", e, synCtx);
 				}
@@ -194,8 +194,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 		ConfigurationContext cfgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getConfigurationContext();
 
 		if (cfgCtx == null) {
-			handleException("Unable to perform caching, "
-			                + " ConfigurationContext cannot be found", synCtx);
+			handleException("Unable to perform caching,  ConfigurationContext cannot be found", synCtx);
 			return false; // never executes.. but keeps IDE happy
 		}
 
@@ -218,8 +217,6 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 		}
 
 		synLog.traceOrDebug("End : Cache mediator");
-
-		exposeData(synCtx);
 
 		return result;
 	}
@@ -495,13 +492,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 	 * @return global cache
 	 */
 	public static Cache<String, CachableResponse> getMediatorCache() {
-		if (mediatorCacheInit) {
+		if (mediatorCacheInit.get()) {
 			return Caching.getCacheManagerFactory().getCacheManager(CachingConstants.CACHE_MANAGER)
 			              .getCache(CachingConstants.MEDIATOR_CACHE);
 		} else {
 			CacheManager cacheManager =
 					Caching.getCacheManagerFactory().getCacheManager(CachingConstants.CACHE_MANAGER);
-			mediatorCacheInit = true;
+			mediatorCacheInit.set(true);
 
 			return cacheManager.<String, CachableResponse>createCacheBuilder(CachingConstants.MEDIATOR_CACHE).
 					setExpiry(CacheConfiguration.ExpiryType.MODIFIED, new CacheConfiguration.Duration(TimeUnit.SECONDS,
