@@ -83,9 +83,7 @@ public class InboundHttpListener implements InboundRequestProcessor {
     @Override
     public void destroy() {
         HTTPEndpointManager.getInstance().closeEndpoint(port);
-        //Fix ESBJAVA-3841
-        //This is not needed since it'll be called by synapse
-        //destoryInbound();
+        destoryInbound();
     }
 
     protected void handleException(String msg, Exception e) {
