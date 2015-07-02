@@ -1946,7 +1946,7 @@
                 <version>${jsonpath.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.minidev.wso2</groupId>
+                <groupId>org.wso2.orbit.net.minidev</groupId>
                 <artifactId>json-smart</artifactId>
                 <version>${json.smart.version}</version>
             </dependency>
@@ -2183,7 +2183,7 @@
         <geronimo-jta.version>1.1.1</geronimo-jta.version>
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
         <jsonpath.version>0.8.1.wso2v1</jsonpath.version>
-        <json.smart.version>2.1.0.wso2v1</json.smart.version>
+        <json.smart.version>1.1.1.wso2v1</json.smart.version>
         <damnhandy.version>1.1.7.wso2v1</damnhandy.version>
         <staxon.version>1.2.0.wso2v2</staxon.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>

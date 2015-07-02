@@ -76,7 +76,7 @@
             <artifactId>com.jayway.jsonpath</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.minidev.wso2</groupId>
+            <groupId>org.wso2.orbit.net.minidev</groupId>
             <artifactId>json-smart</artifactId>
         </dependency>
       	<dependency>
@@ -124,7 +124,7 @@
                                 <bundleDef>org.wso2.throttle:wso2throttle-core</bundleDef>
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
-                                <bundleDef>net.minidev.wso2:json-smart</bundleDef>
+                                <bundleDef>org.wso2.orbit.net.minidev:json-smart</bundleDef>
                                 <bundleDef>org.wso2.staxon:staxon-core</bundleDef>
                             </bundles>
                         </configuration>
