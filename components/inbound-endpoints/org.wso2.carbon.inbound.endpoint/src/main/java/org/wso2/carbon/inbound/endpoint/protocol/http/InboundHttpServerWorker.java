@@ -48,6 +48,8 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.OutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Create SynapseMessageContext from HTTP Request and inject it to the sequence in a synchronous manner
@@ -60,15 +62,18 @@ public class InboundHttpServerWorker extends ServerWorker {
     private SourceRequest request = null;
     private int port;
     private RESTRequestHandler restHandler;
+    private Pattern dispatchPattern;
+    private Matcher patternMatcher;
 
     public InboundHttpServerWorker(int port, SourceRequest sourceRequest,
                                    SourceConfiguration sourceConfiguration,
-                                   OutputStream outputStream) {
+                                   OutputStream outputStream,
+                                   Pattern dispatchPattern) {
         super(sourceRequest, sourceConfiguration, outputStream);
         this.request = sourceRequest;
         this.port = port;
         restHandler = new RESTRequestHandler();
-
+        this.dispatchPattern = dispatchPattern;
     }
 
     public void run() {
@@ -95,6 +100,18 @@ public class InboundHttpServerWorker extends ServerWorker {
                                     " tenant domain : " + tenantDomain);
                 }
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
+
+                //TODO test out dispatchPattern filtering
+                if (dispatchPattern != null) {
+                    patternMatcher = dispatchPattern.matcher(request.getUri()); // TODO handle tenant case
+                    if (!patternMatcher.matches()) {
+                        // TODO: should we send back a 404 here?
+                        if (log.isDebugEnabled()) {
+                            log.debug("Requested URI does not match given dispatch regular expression.");
+                        }
+                        return;
+                    }
+                }
 
                 if (endpoint == null) {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");

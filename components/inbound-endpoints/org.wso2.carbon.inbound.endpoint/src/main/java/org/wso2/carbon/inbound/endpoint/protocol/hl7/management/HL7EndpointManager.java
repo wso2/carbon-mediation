@@ -55,11 +55,7 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
     }
 
     @Override
-    public boolean startListener(int port, String name) {
-        return true;
-    }
-
-    public void startListener(int port, String name, InboundProcessorParams params) {
+    public boolean startListener(int port, String name, InboundProcessorParams params) {
         log.info("Starting HL7 Inbound Endpoint on port " + port);
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
@@ -76,10 +72,11 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
         HL7Processor hl7Processor = new HL7Processor(parameters);
         parameters.put(MLLPConstants.HL7_REQ_PROC, hl7Processor);
 
-        InboundHL7IOReactor.bind(port, hl7Processor);
+        return InboundHL7IOReactor.bind(port, hl7Processor);
     }
 
-    public void startEndpoint(int port, String name, InboundProcessorParams params) {
+    @Override
+    public boolean startEndpoint(int port, String name, InboundProcessorParams params) {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
 
@@ -97,13 +94,10 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
         } else {
             dataStore.registerListeningEndpoint(port, tenantDomain,
                     InboundRequestProcessorFactoryImpl.Protocols.hl7.toString(), name, params);
-            startListener(port, name, params);
+            return startListener(port, name, params);
         }
-    }
 
-    @Override
-    public boolean startEndpoint(int port, String name) {
-        return true;
+        return false;
     }
 
     @Override

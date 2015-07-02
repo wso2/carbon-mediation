@@ -63,21 +63,7 @@ public class InboundHttpsListener extends InboundHttpListener {
                      "hence undeploying inbound endpoint");
             this.destroy();
         } else {
-            String coresize = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_POOL_SIZE_CORE);
-            String maxSize = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_POOL_SIZE_MAX);
-            String keepAlive = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_THREAD_KEEP_ALIVE_SEC);
-            String queueLength = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_POOL_QUEUE_LENGTH);
-            String threadGroup = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_THREAD_GROUP_ID);
-            String threadID = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_THREAD_ID);
-            if (coresize == null && maxSize == null && keepAlive == null && queueLength == null) {
-                HTTPEndpointManager.getInstance().startSSLEndpoint(port, name, sslConfiguration);
-            } else {
-                WorkerPoolConfiguration workerPoolConfiguration = new WorkerPoolConfiguration(coresize, maxSize,
-                                                                                              keepAlive, queueLength,
-                                                                                              threadGroup, threadID);
-                HTTPEndpointManager.getInstance().startSSLEndpoint(port, name, sslConfiguration, workerPoolConfiguration);
-            }
-
+            HTTPEndpointManager.getInstance().startSSLEndpoint(port, name, sslConfiguration, processorParams);
         }
 
     }
