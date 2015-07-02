@@ -151,12 +151,12 @@ public class InboundManagementClient {
                 return true;
             }else {
                 log.warn("Cannot add Inbound endpoint " + name + " may be duplicate inbound already exists");
+                return false;
             }
         } catch (Exception e) {
             log.error(e);
-            return false;
+            throw e;
         }
-        return false;
     }
 
     private List<String> getList(String strProtocol, boolean mandatory) {
@@ -204,13 +204,20 @@ public class InboundManagementClient {
     private boolean canAdd(String name, String protocol, ParameterDTO[] parameterDTOs) {
         try {
             String port = null;
+            if(protocol != null && isListener(protocol)){
+                for(ParameterDTO paramDTO: parameterDTOs){
+                    if(isListenerPortParam(paramDTO.getName())){
+                        Integer.parseInt(paramDTO.getValue());
+                    }
+                }
+            }
             InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
             if(inboundEndpointDTOs != null) {
                 for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
                     if (inboundEndpointDTO.getName().equals(name)) {
                         return false;
                     }
-                    if (isListener(protocol)) {
+                    if (protocol != null && isListener(protocol)) {
                         ParameterDTO[] existingParameterDTOs = inboundEndpointDTO.getParameters();
                         for (ParameterDTO parameterDTO : existingParameterDTOs) {
                             if (isListenerPortParam(parameterDTO.getName())) {
@@ -304,7 +311,7 @@ public class InboundManagementClient {
             }
         } catch (Exception e) {
             log.error(e);
-            return false;
+            throw e;
         }
         return false;
     }
@@ -323,10 +330,12 @@ public class InboundManagementClient {
         String[] inboundNameList = null;
         try {
             InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
-             inboundNameList = new String[inboundEndpointDTOs.length];
             if (inboundEndpointDTOs != null) {
-                for (int i=0; i < inboundEndpointDTOs.length; i++) {
-                    inboundNameList[i] = inboundEndpointDTOs[i].getName();
+                inboundNameList = new String[inboundEndpointDTOs.length];
+                if (inboundEndpointDTOs != null) {
+                    for (int i = 0; i < inboundEndpointDTOs.length; i++) {
+                        inboundNameList[i] = inboundEndpointDTOs[i].getName();
+                    }
                 }
             }
         } catch (RemoteException e) {

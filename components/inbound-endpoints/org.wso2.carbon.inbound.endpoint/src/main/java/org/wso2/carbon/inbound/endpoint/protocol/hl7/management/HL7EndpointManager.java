@@ -102,8 +102,8 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
     }
 
     @Override
-    public void startEndpoint(int port, String name) {
-        return;
+    public boolean startEndpoint(int port, String name) {
+        return true;
     }
 
     @Override
@@ -114,7 +114,7 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
 
         if (!InboundHL7IOReactor.isEndpointRunning(port)) {
             log.info("Listener Endpoint is not started");
-            return;
+            return ;
         } else if (dataStore.isEndpointRegistryEmpty(port)) {
             // if no other endpoint is working on this port. close the listening endpoint
             InboundHL7IOReactor.unbind(port);
