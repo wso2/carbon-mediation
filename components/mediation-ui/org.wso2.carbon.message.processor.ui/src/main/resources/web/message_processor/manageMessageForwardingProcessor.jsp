@@ -149,6 +149,7 @@
         addServiceParameter("axis2.config", document.getElementById('axis2_config').value);
         addServiceParameter("message.processor.reply.sequence", document.getElementById('message_processor_reply_sequence').value);
         addServiceParameter("message.processor.fault.sequence", document.getElementById('message_processor_fault_sequence').value);
+        addServiceParameter("message.processor.deactivate.sequence", document.getElementById('message_processor_deactivate_sequence').value);
         addServiceParameter("quartz.conf", document.getElementById('quartz_conf').value);
         addServiceParameter("cronExpression", document.getElementById('cron_expression').value);
         addServiceParameter("pinnedServers", document.getElementById('pinnedServers').value);
@@ -506,6 +507,19 @@
                        		<a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('message_processor_fault_sequence','/_system/governance')"><fmt:message key="processor.gov.registry.browser"/></a>
                          </td>
                
+                    </tr>
+                    <tr>
+                        <td><fmt:message key="message.processor.deactivate.sequence"/></td>
+                        <td><input type="text" id="message_processor_deactivate_sequence"
+                                    name="message_processor_deactivate_sequence" style="float: left; position: relative;"
+                                    value="<%=((null!=processorData)&& processorData.getParams() != null
+                                         && !processorData.getParams().isEmpty()&&(processorData.getParams().get("message.processor.deactivate.sequence")!=null))?processorData.getParams().get("message.processor.deactivate.sequence"):""%>"
+                                    />
+
+                              <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('message_processor_deactivate_sequence','/_system/config')"><fmt:message key="processor.conf.registry.browser"/></a>
+                              <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('message_processor_deactivate_sequence','/_system/governance')"><fmt:message key="processor.gov.registry.browser"/></a>
+                          </td>
+
                     </tr>
                     <tr>
                         <td><fmt:message key="quartz.conf"/></td>
