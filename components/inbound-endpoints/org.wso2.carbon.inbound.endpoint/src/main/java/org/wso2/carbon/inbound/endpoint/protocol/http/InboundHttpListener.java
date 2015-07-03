@@ -61,7 +61,7 @@ public class InboundHttpListener implements InboundRequestProcessor {
         if (isPortUsedByAnotherApplication(port)) {
             log.warn("Port " + port + " used by inbound endpoint " + name + " is already used by another application " +
                      "hence undeploying inbound endpoint");
-            this.destroy();
+            destoryInbound();
         } else {
             String coresize = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_POOL_SIZE_CORE);
             String maxSize = processorParams.getProperties().getProperty(InboundHttpConstants.INBOUND_WORKER_POOL_SIZE_MAX);
@@ -83,7 +83,6 @@ public class InboundHttpListener implements InboundRequestProcessor {
     @Override
     public void destroy() {
         HTTPEndpointManager.getInstance().closeEndpoint(port);
-        destoryInbound();
     }
 
     protected void handleException(String msg, Exception e) {
