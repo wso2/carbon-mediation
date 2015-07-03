@@ -65,6 +65,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(EndpointAdmin.class);
     public static final String WSO2_ENDPOINT_MEDIA_TYPE = "application/vnd.wso2.esb.endpoint";
+    private static final String artifactType = ServiceBusConstants.ENDPOINT_TYPE;
 
     /**
      * Set Endpoint status to Active
@@ -82,7 +83,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             ep.getContext().switchOn();
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + ep.getName())) {
+            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, endpointName))) {
                 persistEndpoint(ep);
             }
 
@@ -113,7 +114,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             ep.getContext().switchOff();
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + endpointName)) {
+            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, endpointName))) {
                 persistEndpoint(ep);
             }
 
@@ -240,7 +241,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             for(String endpointName : endpointNames){
                 assertNameNotEmpty(endpointName);
                 endpointName = endpointName.trim();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + endpointName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, endpointName))) {
                     if (log.isDebugEnabled()) {
                         log.debug("Deleting endpoint : " + endpointName + " from the configuration");
                     }
@@ -283,7 +284,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                 for (String endpointName : namedEndpointCollection) {
                     assertNameNotEmpty(endpointName);
                     endpointName = endpointName.trim();
-                    if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + endpointName)) {
+                    if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, endpointName))) {
                         if (log.isDebugEnabled()) {
                             log.debug("Deleting endpoint : " + endpointName + " from the configuration");
                         }
@@ -394,10 +395,10 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                 data.setName(ep.getName());
                 data.setDescription(ep.getDescription());
 
-                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + ep.getName())) {
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, ep.getName()))) {
                     data.setDeployedFromCApp(true);
                 }
-                if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + ep.getName())) {
+                if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, ep.getName()))) {
                     data.setEdited(true);
                 }
                 // Statistics
@@ -443,7 +444,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
 
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + endpointName)) {
+            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, endpointName))) {
                 persistEndpoint(ep);
             }
             if (log.isDebugEnabled()) {
@@ -472,7 +473,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             ((AbstractEndpoint) ep).getDefinition().disableStatistics();
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + endpointName)) {
+            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, endpointName))) {
                 persistEndpoint(ep);
             }
             if (log.isDebugEnabled()) {
@@ -542,6 +543,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                 Endpoint previousEndpoint = getSynapseConfiguration().getEndpoint(
                         endpointName.trim());
 
+                String artifactName = getArtifactName(artifactType, previousEndpoint.getName());
                 if (previousEndpoint == null) {
                     addEndpoint(epString);
                 }
@@ -582,8 +584,8 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                 getSynapseConfiguration().removeEndpoint(endpointName);
                 getSynapseConfiguration().addEndpoint(endpointName, endpoint);
 
-                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + previousEndpoint.getName())) {
-                    cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.ENDPOINT_TYPE + File.separator + previousEndpoint.getName());
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                    cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                 } else {
                     persistEndpoint(endpoint);
                 }
@@ -598,7 +600,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
         } catch (SynapseException syne) {
             handleFault("Unable to edit Endpoint ", syne);
         } catch (Exception e) {
-            e.printStackTrace();
+            handleFault("Unable to edit Endpoint ", e);
         } finally {
             lock.unlock();
         }

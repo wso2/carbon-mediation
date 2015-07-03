@@ -56,6 +56,7 @@ public class TaskManager {
     private TaskManagementServiceHandler taskManagementServiceHandler;
     private boolean initialized = false;
     private TaskDescriptionRepository repository;
+    private static final String artifactType = ServiceBusConstants.TASK_TYPE;
 
     public TaskManager() {
     }
@@ -132,10 +133,11 @@ public class TaskManager {
         CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                 getcAppArtifactDataService();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        String artifactName = getArtifactName(artifactType, taskDescription.getName());
         if (className != null && !"".equals(className)) {
             taskManagementServiceHandler.editTaskDescription(taskDescription, className);
-            if (cAppArtifactDataService.isArtifactDeployedFromCApp(tenantId, ServiceBusConstants.TASK_TYPE + File.separator + taskDescription.getName())) {
-                cAppArtifactDataService.setEdited(tenantId, ServiceBusConstants.TASK_TYPE + File.separator + taskDescription.getName());
+            if (cAppArtifactDataService.isArtifactDeployedFromCApp(tenantId, artifactName)) {
+                cAppArtifactDataService.setEdited(tenantId, artifactName);
                 MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(axisCfg);
                 pm.deleteItem(taskDescription.getName(), taskDescription.getName() + ".xml", ServiceBusConstants.ITEM_TYPE_TASK);
             }
@@ -183,10 +185,10 @@ public class TaskManager {
                 data.setName(taskDescription.getName());
                 data.setGroup(taskDescription.getTaskGroup());
 
-                if (cAppArtifactDataService.isArtifactDeployedFromCApp(tenantId, ServiceBusConstants.TASK_TYPE + File.separator + taskDescription.getName())) {
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(tenantId, getArtifactName(artifactType, taskDescription.getName()))) {
                     data.setDeployedFromCApp(true);
                 }
-                if (cAppArtifactDataService.isArtifactEdited(tenantId, ServiceBusConstants.TASK_TYPE + File.separator + taskDescription.getName())) {
+                if (cAppArtifactDataService.isArtifactEdited(tenantId, getArtifactName(artifactType, taskDescription.getName()))) {
                     data.setEdited(true);
                 }
                 taskDatas.add(data);
@@ -268,5 +270,9 @@ public class TaskManager {
             log.error(msg);
             throw new IllegalStateException(msg);
         }
+    }
+
+    private String getArtifactName(String artifactType, String name) {
+        return artifactType + File.separator + name;
     }
 }

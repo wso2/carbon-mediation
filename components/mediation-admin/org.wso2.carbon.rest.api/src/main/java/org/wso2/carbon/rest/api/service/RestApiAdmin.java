@@ -53,6 +53,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
     private static Log log = LogFactory.getLog(RestApiAdmin.class);
     private static final String TENANT_DELIMITER = "/t/";
+    private static final String artifactType = ServiceBusConstants.API_TYPE;
 
 	public boolean addApi(APIData apiData) throws APIException{
 		final Lock lock = getLock();
@@ -131,9 +132,10 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
+            String artifactName = getArtifactName(artifactType, apiName);
 
-            if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.API_TYPE + File.separator + apiName)) {
-                cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.API_TYPE + File.separator + apiName);
+            if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                cAppArtifactDataService.setEdited(getTenantId(), artifactName);
             } else {
                 MediationPersistenceManager pm = getMediationPersistenceManager();
             String fileName = api.getFileName();
@@ -142,7 +144,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            handleException(log, "Could not update API ", e);
             return false;
         } finally {
             lock.unlock();
@@ -181,9 +183,10 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
+            String artifactName = getArtifactName(artifactType, apiName);
 
-            if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.API_TYPE + File.separator + apiName)) {
-                cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.API_TYPE + File.separator + apiName);
+            if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                cAppArtifactDataService.setEdited(getTenantId(), artifactName);
             } else {
                 MediationPersistenceManager pm = getMediationPersistenceManager();
             String fileName = api.getFileName();
@@ -196,7 +199,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 			handleException(log, "Could not parse String to OMElement", e);
 			return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            handleException(log, "Unable to update API ", e);
             return false;
 		} finally {
             lock.unlock();
@@ -234,48 +237,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             lock.lock();
             assertNameNotEmpty(apiName);
             apiName = apiName.trim();
-            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
-                    getcAppArtifactDataService();
-            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.API_TYPE + File.separator + apiName)) {
-            if (log.isDebugEnabled()) {
-                log.debug("Deleting API : " + apiName + " from the configuration");
-            }
-
-            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-            API api = synapseConfiguration.getAPI(apiName);
-            api.destroy();
-            synapseConfiguration.removeAPI(apiName);
-
-            MediationPersistenceManager pm = getMediationPersistenceManager();
-            String fileName = api.getFileName();
-            pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
-
-            if (log.isDebugEnabled()) {
-                log.debug("Api : " + apiName + " removed from the configuration");
-            }
-            }
-        } finally {
-            lock.unlock();
-        }
-        return true;
-	}
-
-    /**
-     * Delete Selected API
-     * @param apiNames
-     * @return
-     * @throws APIException
-     */
-    public void deleteSelectedApi(String[] apiNames) throws APIException{
-        final Lock lock = getLock();
-        try {
-            lock.lock();
-            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
-                    getcAppArtifactDataService();
-            for (String apiName :apiNames ) {
-                assertNameNotEmpty(apiName);
-                apiName = apiName.trim();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.API_TYPE + File.separator + apiName)) {
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
+            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
                 if (log.isDebugEnabled()) {
                     log.debug("Deleting API : " + apiName + " from the configuration");
                 }
@@ -293,6 +256,44 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     log.debug("Api : " + apiName + " removed from the configuration");
                 }
             }
+        } finally {
+            lock.unlock();
+        }
+        return true;
+	}
+
+    /**
+     * Delete Selected API
+     * @param apiNames
+     * @return
+     * @throws APIException
+     */
+    public void deleteSelectedApi(String[] apiNames) throws APIException {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
+            for (String apiName : apiNames) {
+                assertNameNotEmpty(apiName);
+                apiName = apiName.trim();
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Deleting API : " + apiName + " from the configuration");
+                    }
+
+                    SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+                    API api = synapseConfiguration.getAPI(apiName);
+                    api.destroy();
+                    synapseConfiguration.removeAPI(apiName);
+
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    String fileName = api.getFileName();
+                    pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Api : " + apiName + " removed from the configuration");
+                    }
+                }
             }
         } finally {
             lock.unlock();
@@ -352,10 +353,10 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     APIData apiData = new APIData();
                     apiData.setName(api.getName());
                     apiData.setContext(api.getContext());
-                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.API_TYPE + File.separator + api.getName())) {
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, api.getName()))) {
                         apiData.setDeployedFromCApp(true);
                     }
-                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.API_TYPE + File.separator + api.getName())) {
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, api.getName()))) {
                         apiData.setEdited(true);
                     }
 

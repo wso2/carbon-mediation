@@ -71,7 +71,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 
     //TODO: Move WSO2_TEMPLATE_MEDIA_TYPE to registry
     public static final String WSO2_TEMPLATE_MEDIA_TYPE = "application/vnd.wso2.template";
-
+    private static final String artifactType = ServiceBusConstants.TEMPLATE_TYPE;
 
     public TemplateInfo[] getTemplates(int pageNumber, int templatePerPage)
             throws AxisFault {
@@ -94,12 +94,10 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 for (TemplateInfo infoTemp : info) {
                     TemplateInfo templateInfo = new TemplateInfo();
                     templateInfo = infoTemp;
-                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE
-                            + File.separator + infoTemp.getName())) {
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
                         templateInfo.setDeployedFromCApp(true);
                     }
-                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator
-                            + infoTemp.getName())) {
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
                         templateInfo.setEdited(true);
                     }
                     infos[position] = templateInfo;
@@ -362,12 +360,13 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     log.debug("Saved template : " + templateName + " to the configuration");
 
                     TemplateMediator templ = config.getSequenceTemplates().get(templateName);
+                    String artifactName = getArtifactName(artifactType, templateName);
                     if (templ != null) {
                         templ.init(getSynapseEnvironment());
                         CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                                 getcAppArtifactDataService();
-                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
-                            cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName);
+                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                         } else {
                             persistTemplate(templ);
                         }
@@ -393,7 +392,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     getcAppArtifactDataService();
             if (template != null) {
                 template.enableStatistics();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
                     persistTemplate(template);
                 }
                 return templateName;
@@ -420,7 +419,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     getcAppArtifactDataService();
             if (template != null) {
                 template.disableStatistics();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
                     persistTemplate(template);
                 }
                 return templateName;
@@ -447,7 +446,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     getcAppArtifactDataService();
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_ON);
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
                     persistTemplate(template);
                 }
                 return templateName;
@@ -474,7 +473,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     getcAppArtifactDataService();
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_OFF);
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.TEMPLATE_TYPE + File.separator + templateName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
                     persistTemplate(template);
                 }
                 return templateName;

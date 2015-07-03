@@ -37,7 +37,6 @@ import java.util.Map;
 public class ConfigHolder {
 
     private static ConfigHolder instance = new ConfigHolder();
-    ;
     private static final Log log = LogFactory.getLog(ConfigHolder.class);
 
     private SynapseConfiguration synapseConfiguration;

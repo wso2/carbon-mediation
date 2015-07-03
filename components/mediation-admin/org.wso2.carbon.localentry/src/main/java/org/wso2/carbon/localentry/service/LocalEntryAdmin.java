@@ -57,6 +57,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(LocalEntryAdmin.class);
     public static final int LOCAL_ENTRIES_PER_PAGE = 10;
+    private static final String artifactType = ServiceBusConstants.LOCAL_ENTRY_TYPE;
 
     public EntryData[] entryData() throws LocalEntryAdminException {
         final Lock lock = getLock();
@@ -71,6 +72,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                 EntryData data = new EntryData();
                 Map.Entry entry = (Map.Entry) o;
                 String key = (String) entry.getKey();
+                String artifactName = getArtifactName(artifactType, key);
                 if (SynapseConstants.SERVER_IP.equals(key)
                         || SynapseConstants.SERVER_HOST.equals(key)) {
                     continue;
@@ -112,10 +114,10 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                             data.setValue("");
                         }
                     }
-                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + key)) {
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
                         data.setDeployedFromCApp(true);
                     }
-                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + key)) {
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), artifactName)) {
                         data.setEdited(true);
                     }
 
@@ -258,6 +260,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                 key = key.trim();
                 Entry oldEntry = getSynapseConfiguration().
                         getDefinedEntries().get(key);
+                String artifactName = getArtifactName(artifactType, key);
                 if (oldEntry == null) {
                     handleFault(log, "Unable to update local entry. Non existent");
                 } else {
@@ -268,8 +271,8 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                     entry.setFileName(oldEntry.getFileName());
                     CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                             getcAppArtifactDataService();
-                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + key)) {
-                        cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + key);
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                        cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                     } else {
                         MediationPersistenceManager pm
                                 = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
@@ -285,7 +288,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
         } catch (OMException e) {
             handleFault(log, "Unable to add local entry.Invalid XML ", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            handleFault(log, "Unable to add local entry  ", e);
         } finally {
             lock.unlock();
         }

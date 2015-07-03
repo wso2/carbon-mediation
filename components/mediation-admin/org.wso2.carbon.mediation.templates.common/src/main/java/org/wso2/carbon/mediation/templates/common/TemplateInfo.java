@@ -23,8 +23,8 @@ public class TemplateInfo {
     private boolean enableStatistics;
     private boolean enableTracing;
     private String description;
-    private boolean isDeployedFromCApp = false;
-    private boolean isEdited = false;
+    private boolean isDeployedFromCApp;
+    private boolean isEdited;
 
     public String getName() {
         return name;

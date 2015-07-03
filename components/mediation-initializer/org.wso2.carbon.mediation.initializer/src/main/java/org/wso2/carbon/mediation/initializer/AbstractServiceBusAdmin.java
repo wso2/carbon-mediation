@@ -30,6 +30,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 
+import java.io.File;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -137,5 +138,17 @@ public class AbstractServiceBusAdmin extends AbstractAdmin {
      */
     protected int getTenantId(){
         return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+    }
+
+    /**
+     * Helper method to get artifact name with artifact type
+     * ex : synapse/endpoint/endpoint_name
+     *
+     * @param artifactType Type of the artifact ex : synapse/endpoint
+     * @param name         Name of the artifact
+     * @return artifactType + name
+     */
+    protected String getArtifactName(String artifactType, String name) {
+        return artifactType + File.separator + name;
     }
 }

@@ -29,9 +29,8 @@ public class EndpointTemplateInfo {
 
     private String endpointType;
 
-    private boolean isDeployedFromCApp = false;
-
-    private boolean isEdited = false;
+    private boolean isDeployedFromCApp;
+    private boolean isEdited;
 
 
     private ArrayList<String> params = new ArrayList<String>();

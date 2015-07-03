@@ -47,7 +47,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
 
     private static Log log = LogFactory.getLog(MessageStoreAdminService.class);
 
-
+    private static final String artifactType = ServiceBusConstants.MESSAGE_STORE_TYPE;
     public static final int MSGS_PER_PAGE = 10;
 
     /**
@@ -123,11 +123,9 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
                 messageStore.setFileName(fileName);
                 messageStore.init(getSynapseEnvironment());
                 configuration.addMessageStore(messageStore.getName(), messageStore);
-
-                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.MESSAGE_STORE_TYPE
-                        + File.separator + messageStore.getName())) {
-                    cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.MESSAGE_STORE_TYPE + File.separator
-                            + messageStore.getName());
+                String artifactName = getArtifactName(artifactType, messageStore.getName());
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                    cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                 } else {
                     MediationPersistenceManager mp = getMediationPersistenceManager();
                     mp.saveItem(messageStore.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
@@ -144,7 +142,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
             String message = "Unable to Modify Message Store ";
             handleException(log, message, e);
         } catch (Exception e) {
-            e.printStackTrace();
+            handleException(log, "Unable to Modify Message Store ", e);
         }
     }
 
@@ -226,10 +224,10 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
             for (String storeName : names) {
                 MessageStoreMetaData data = new MessageStoreMetaData();
                 data.setName(storeName);
-                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.MESSAGE_STORE_TYPE + File.separator + storeName)) {
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, storeName))) {
                     data.setDeployedFromCApp(true);
                 }
-                if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.MESSAGE_STORE_TYPE + File.separator + storeName)) {
+                if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, storeName))) {
                     data.setEdited(true);
                 }
                 metaDatas.add(data);

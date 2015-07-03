@@ -66,6 +66,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
     private static String SUCCESSFUL = "successful";
     private static String FAILED = "failed";
     private static Log log = LogFactory.getLog(ProxyServiceAdmin.class);
+    private static final String artifactType = ServiceBusConstants.PROXY_SERVICE_TYPE;
 
     /**
      * Enables statistics for the specified proxy service
@@ -90,7 +91,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 }
                 CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                         getcAppArtifactDataService();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator + proxyName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(),getArtifactName(artifactType, proxyName))) {
                     persistProxyService(proxy);
                 }
 
@@ -134,7 +135,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 }
                 CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                         getcAppArtifactDataService();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator + proxyName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, proxyName))) {
                     persistProxyService(proxy);
                 }
             } else {
@@ -170,7 +171,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
             proxy.setTraceState(SynapseConstants.TRACING_ON);
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator + proxyName)) {
+            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, proxyName))) {
                 persistProxyService(proxy);
             }
             if(log.isDebugEnabled()) {
@@ -201,7 +202,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
             proxy.setTraceState(SynapseConstants.TRACING_OFF);
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator + proxyName)) {
+            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, proxyName))) {
                 persistProxyService(proxy);
             }
             if(log.isDebugEnabled()) {
@@ -249,6 +250,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                         }
                     }
 
+                    String artifactName = getArtifactName(artifactType, proxyName);
                     try {
                         getSynapseConfiguration().addProxyService(
                                 proxy.getName(), proxy);
@@ -279,10 +281,8 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                         CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                                 getcAppArtifactDataService();
 
-                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE
-                                + File.separator + proxyName)) {
-                            cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator
-                                    + proxyName);
+                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                         } else {
                             persistProxyService(proxy);
                         }
@@ -379,10 +379,9 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
 
                         try {
                             synapseConfig.addProxyService(proxyName, currentProxy);
-                            if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE
-                                    + File.separator + proxyName)) {
-                                cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator
-                                        + proxyName);
+                            String artifactName = getArtifactName(artifactType, proxyName);
+                            if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                                cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                             } else {
                                 persistProxyService(currentProxy);
                             }
@@ -757,13 +756,14 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
             pd.setStartOnLoad(false);
         }
 
+        String artifactName = getArtifactName(artifactType, ps.getName());
         CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                 getcAppArtifactDataService();
 
-        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator + ps.getName())) {
+        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
             pd.setDeployedFromCApp(true);
         }
-        if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator + ps.getName())) {
+        if (cAppArtifactDataService.isArtifactEdited(getTenantId(), artifactName)) {
             pd.setEdited(true);
         }
 

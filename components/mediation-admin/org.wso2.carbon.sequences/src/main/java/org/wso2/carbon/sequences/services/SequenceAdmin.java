@@ -80,6 +80,7 @@ import java.util.regex.Pattern;
 public class SequenceAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(SequenceAdmin.class);
+    private static final String artifactType = ServiceBusConstants.SEQUENCE_TYPE;
 
     //TODO: Move WSO2_SEQUENCE_MEDIA_TYPE to registry
     public static final String WSO2_SEQUENCE_MEDIA_TYPE ="application/vnd.wso2.sequence";
@@ -105,10 +106,10 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     SequenceInfo seqInfo = new SequenceInfo();
                     seqInfo = infoTemp;
 
-                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE + File.separator + infoTemp.getName())) {
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
                         seqInfo.setDeployedFromCApp(true);
                     }
-                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE + File.separator + infoTemp.getName())) {
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
                         seqInfo.setEdited(true);
                     }
 
@@ -286,8 +287,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     getcAppArtifactDataService();
             for (String sequenceName : sequenceNames) {
                 SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
-                if (sequence != null && (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE
-                        + File.separator + sequenceName))) {
+                if (sequence != null && (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName)))) {
                     synCfg.removeSequence(sequenceName);
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     pm.deleteItem(sequenceName, sequence.getFileName(),
@@ -319,8 +319,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             for (SequenceMediator sequence : sequences) {
                 if (sequence != null) {
                     if ((!sequence.getName().equals("main")) && (!sequence.getName().equals("fault")) &&
-                            (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE
-                                    + File.separator + sequence.getName()))) {
+                            (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequence.getName())))) {
                         synCfg.removeSequence(sequence.getName());
                         MediationPersistenceManager pm = getMediationPersistenceManager();
                         pm.deleteItem(sequence.getName(), sequence.getFileName(),
@@ -532,13 +531,12 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     log.debug("Saved sequence : " + sequenceName + " to the configuration");
 
                     SequenceMediator seq = config.getDefinedSequences().get(sequenceName);
+                    String artifactName = getArtifactName(artifactType, sequenceName);
                     if (seq != null) {
                         seq.init(getSynapseEnvironment());
 
-                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE
-                                + File.separator + sequenceName)) {
-                            cAppArtifactDataService.setEdited(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE
-                                    + File.separator + sequenceName);
+                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                         } else {
                             persistSequence(seq);
                         }
@@ -565,8 +563,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                 sequence.enableStatistics();
                 CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                         getcAppArtifactDataService();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE
-                        + File.separator + sequenceName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName))) {
                     persistSequence(sequence);
                 }
                 return sequenceName;
@@ -593,8 +590,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                 sequence.disableStatistics();
                 CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                         getcAppArtifactDataService();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE
-                        + File.separator + sequenceName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName))) {
                     persistSequence(sequence);
                 }
                 return sequenceName;
@@ -621,8 +617,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                 sequence.setTraceState(SynapseConstants.TRACING_ON);
                 CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                         getcAppArtifactDataService();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE
-                        + File.separator + sequenceName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName))) {
                     persistSequence(sequence);
                 }
                 return sequenceName;
@@ -649,8 +644,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                 sequence.setTraceState(SynapseConstants.TRACING_OFF);
                 CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                         getcAppArtifactDataService();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), ServiceBusConstants.SEQUENCE_TYPE
-                        + File.separator + sequenceName)) {
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName))) {
                     persistSequence(sequence);
                 }
                 return sequenceName;
