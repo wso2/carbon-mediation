@@ -190,6 +190,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 	connection = ((TopicConnectionFactory) (this.connectionFactory))
                             .createTopicConnection();
                 }
+	            return connection;
             } else {
                 QueueConnectionFactory qConFac = null;
                 TopicConnectionFactory tConFac = null;                
