@@ -88,12 +88,13 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             this.destinationType = JMSConstants.JMSDestinationType.QUEUE;
         }
 
-        if(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER) == null || "1.1".equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
-        	jmsSpec = "1.1";
-        }else if("2.0".equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
-            jmsSpec = "2.0";
+        if(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER) == null || JMSConstants.JMS_SPEC_VERSION_1_1.equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
+        	jmsSpec = JMSConstants.JMS_SPEC_VERSION_1_1;
+        }else if(JMSConstants.JMS_SPEC_VERSION_2_0.equals(
+                properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
+            jmsSpec = JMSConstants.JMS_SPEC_VERSION_2_0;
         }else{
-            jmsSpec = "1.0";
+            jmsSpec = JMSConstants.JMS_SPEC_VERSION_1_0;
         }
 
         if( "true".equalsIgnoreCase(properties.getProperty(JMSConstants.PARAM_IS_SHARED_SUBSCRIPTION))){
@@ -255,7 +256,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     public Connection createConnection(String userName, String password) {
         Connection connection = null;
         try {
-            if ( "1.1".equals(jmsSpec) ) {
+            if ( JMSConstants.JMS_SPEC_VERSION_1_1.equals(jmsSpec) ) {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                     connection = ((QueueConnectionFactory) (this.connectionFactory))
                             .createQueueConnection(userName, password);
@@ -357,14 +358,15 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     public MessageConsumer createMessageConsumer(Session session, Destination destination) {
         try {
-            if ( "2.0".equals(jmsSpec) && isSharedSubscription ){
+            if ( JMSConstants.JMS_SPEC_VERSION_2_0.equals(jmsSpec) && isSharedSubscription ){
                 if (isDurable) {
                     return session.createSharedDurableConsumer((Topic) destination,
                                                                subscriptionName, messageSelector);
                 } else {
                     return session.createSharedConsumer((Topic) destination, subscriptionName, messageSelector);
                 }
-            } else if( ("1.1".equals(jmsSpec)) || ( "2.0".equals(jmsSpec) && !isSharedSubscription ) ){
+            } else if( (JMSConstants.JMS_SPEC_VERSION_1_1.equals(jmsSpec)) || ( JMSConstants.JMS_SPEC_VERSION_2_0.equals(
+                    jmsSpec) && !isSharedSubscription ) ){
                 if (isDurable) {
                     return session.createDurableSubscriber((Topic) destination, subscriptionName,
                                                            messageSelector, noPubSubLocal);
@@ -474,7 +476,8 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     protected Session createSession(Connection connection) {
         try {
-            if (  "1.1".equals(jmsSpec) || "2.0".equals(jmsSpec) ) {
+            if ( JMSConstants.JMS_SPEC_VERSION_1_1.equals(jmsSpec) || JMSConstants.JMS_SPEC_VERSION_2_0.equals(
+                    jmsSpec) ) {
                 return connection.createSession(transactedSession, sessionAckMode);
             } else {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
