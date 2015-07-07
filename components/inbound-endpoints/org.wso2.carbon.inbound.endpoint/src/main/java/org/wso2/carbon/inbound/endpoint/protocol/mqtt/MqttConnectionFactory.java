@@ -182,7 +182,10 @@ public class MqttConnectionFactory {
             while ((mqttClient == null) && ((retryCount == -1) || (retryC < retryCount))) {
                 retryC++;
                 log.info("Attempting to create mqtt client" + " in " + retryInterval + " ms");
-
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ignore) {
+                }
                 try {
                     if (dataStore != null) {
                         mqttClient = new MqttClient(mqttEndpointURL, uniqueClientId, dataStore);
@@ -202,7 +205,7 @@ public class MqttConnectionFactory {
                 log.info("Successfully created to mqtt client");
             }
 
-        }//TODO -retry the connection
+        }
 
         return mqttClient;
     }
@@ -227,7 +230,7 @@ public class MqttConnectionFactory {
             if (tmpDir != null) {
                 dataStore = new MqttDefaultFilePersistence(tmpDir);
             } else {
-                tmpDir = System.getProperty("java.io.tmpdir");//TODO when qos not needed?
+                tmpDir = System.getProperty("java.io.tmpdir");
                 dataStore = new MqttDefaultFilePersistence(tmpDir);
             }
         } else {
@@ -254,10 +257,13 @@ public class MqttConnectionFactory {
             log.info("Successfully created to mqtt client");
         } catch (MqttException e1) {
             int retryC = 0;
-            while ((mqttClient == null) && ((retryCount == -1) || (retryC < retryCount))) {
+            while (retryC < retryCount) {
                 retryC++;
                 log.info("Attempting to create mqtt client" + " in " + retryInterval + " ms");
-
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ignore) {
+                }
                 try {
                     if (dataStore != null) {
                         mqttClient = new MqttAsyncClient(mqttEndpointURL, uniqueClientId, dataStore);
@@ -276,7 +282,7 @@ public class MqttConnectionFactory {
                 log.info("Successfully created to mqtt asynchronous client");
             }
 
-        }//TODO -retry the connection
+        }
         return mqttClient;
     }
 
