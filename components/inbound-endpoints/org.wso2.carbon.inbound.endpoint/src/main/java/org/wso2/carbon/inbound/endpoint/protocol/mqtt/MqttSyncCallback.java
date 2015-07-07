@@ -41,7 +41,6 @@ public class MqttSyncCallback implements MqttCallback {
     MqttListener listener;
     private MqttMessage msg;
 
-
     public MqttSyncCallback(MqttInjectHandler injectHandler) {
         this.injectHandler = injectHandler;
     }
@@ -51,14 +50,13 @@ public class MqttSyncCallback implements MqttCallback {
      *
      * @param throwable Throwable connection lost
      */
-
     @Override
     public void connectionLost(Throwable throwable) { //TODO retry do in a single clas and use it.
 
         connect();
         log.info("Connection reconnected.");
 
-    }// TODO ok
+    }
 
     private void pause() {
         try {
@@ -73,8 +71,6 @@ public class MqttSyncCallback implements MqttCallback {
         while (tryConnecting) {
             try {
                 MqttClient mqttClient = confac.getMqttClient();
-
-
                 mqttClient.connect();
                 setParams(params);
                 setMsg(msg);
@@ -98,7 +94,6 @@ public class MqttSyncCallback implements MqttCallback {
             }
         }
     }
-
 
     public void messageArrived(String topic, MqttMessage mqttMessage) throws MqttException {//TODO GIVE REASONABLE NAME S Give mqtt exceptn
         if (log.isDebugEnabled()) {
