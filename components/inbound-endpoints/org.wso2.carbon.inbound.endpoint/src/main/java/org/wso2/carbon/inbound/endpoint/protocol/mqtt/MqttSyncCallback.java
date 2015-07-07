@@ -51,11 +51,9 @@ public class MqttSyncCallback implements MqttCallback {
      * @param throwable Throwable connection lost
      */
     @Override
-    public void connectionLost(Throwable throwable) { //TODO retry do in a single clas and use it.
-
+    public void connectionLost(Throwable throwable) { 
         connect();
         log.info("Connection reconnected.");
-
     }
 
     private void pause() {
@@ -95,7 +93,7 @@ public class MqttSyncCallback implements MqttCallback {
         }
     }
 
-    public void messageArrived(String topic, MqttMessage mqttMessage) throws MqttException {//TODO GIVE REASONABLE NAME S Give mqtt exceptn
+    public void messageArrived(String topic, MqttMessage mqttMessage) throws MqttException {
         if (log.isDebugEnabled()) {
             log.debug("Received Message: Topic:" + topic + "  Message: " + mqttMessage);
         }
