@@ -57,7 +57,7 @@ public class MqttConnectionFactory {
                 log.error("Specify the topic name to be subscribed !");
             }
 
-            if (passedInParameter.getProperty(MqttConstants.MQTT_SERVER_PORT) != null) {//TODO verify all parametrs
+            if (passedInParameter.getProperty(MqttConstants.MQTT_SERVER_PORT) != null) {
                 parameters.put(MqttConstants.MQTT_SERVER_PORT,
                         passedInParameter.getProperty(MqttConstants.MQTT_SERVER_PORT));
             } else {
@@ -151,7 +151,7 @@ public class MqttConnectionFactory {
             if (tmpDir != null) {
                 dataStore = new MqttDefaultFilePersistence(tmpDir);
             } else {
-                tmpDir = System.getProperty("java.io.tmpdir");//TODO when qos not needed?
+                tmpDir = System.getProperty("java.io.tmpdir");
                 dataStore = new MqttDefaultFilePersistence(tmpDir);
             }
         } else {
