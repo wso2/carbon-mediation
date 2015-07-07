@@ -131,7 +131,6 @@ public class MqttConnectionFactory {
         return parameters.get(MqttConstants.CONTENT_TYPE);
     }
 
-
     /**
      * @return a synchronous MQTT client
      */
@@ -179,7 +178,7 @@ public class MqttConnectionFactory {
             log.info("Successfully created to mqtt client");
         } catch (MqttException e1) {
             int retryC = 0;
-            while ((mqttClient == null) && ((retryCount == -1) || (retryC < retryCount))) {
+            while (retryC < retryCount) {
                 retryC++;
                 log.info("Attempting to create mqtt client" + " in " + retryInterval + " ms");
                 try {
