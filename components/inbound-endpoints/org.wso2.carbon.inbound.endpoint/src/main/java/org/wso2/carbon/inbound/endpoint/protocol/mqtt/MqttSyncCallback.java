@@ -56,8 +56,6 @@ public class MqttSyncCallback implements MqttCallback {
     public void connectionLost(Throwable throwable) { //TODO retry do in a single clas and use it.
 
         connect();
-        log.info("Client : " + mqttClient.getClientId());
-        log.info("Connection lost - attempting reconnect.");
         log.info("Connection reconnected.");
 
     }// TODO ok
