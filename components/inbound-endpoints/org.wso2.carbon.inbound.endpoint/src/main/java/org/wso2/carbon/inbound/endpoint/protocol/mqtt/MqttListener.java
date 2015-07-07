@@ -133,10 +133,12 @@ public class MqttListener implements InboundRequestProcessor {
 
         log.info("MQTT inbound endpoint: " + name + " initializing ...");
 
-        if (mqttBlockingSenderEnable)
+        if (mqttBlockingSenderEnable){
             initSyncClient();
-        else
+        }
+        else{
             initAsyncClient();
+        }
     }
 
     /**
