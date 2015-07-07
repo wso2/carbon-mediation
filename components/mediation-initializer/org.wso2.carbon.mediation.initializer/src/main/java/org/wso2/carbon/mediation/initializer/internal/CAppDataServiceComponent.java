@@ -39,5 +39,4 @@ public class CAppDataServiceComponent {
         ctxt.getBundleContext().registerService(CAppArtifactDataService.class.getName(),
                 new CAppArtifactDataServiceImpl(), null);
     }
-
 }

@@ -94,25 +94,20 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             sequences = getSynapseConfiguration().getDefinedSequences().values();
             SequenceInfo[] info = SequenceInfoFactory.getSortedSequenceInfoArray(sequences);
             SequenceInfo[] ret;
-
             SequenceInfo[] sequenceInfos = new SequenceInfo[info.length];
             int key = 0;
-
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-
             if (info != null && info.length > 0) {
                 for (SequenceInfo infoTemp : info) {
                     SequenceInfo seqInfo = new SequenceInfo();
                     seqInfo = infoTemp;
-
                     if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
                         seqInfo.setDeployedFromCApp(true);
                     }
                     if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
                         seqInfo.setEdited(true);
                     }
-
                     sequenceInfos[key] = seqInfo;
                     key++;
                 }
@@ -500,10 +495,8 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                         *Remove the sequence element from its parent to avoid inheritance of unwanted namespaces (ex: namespace of
                         *the admin service operation)*/
             sequenceElement.detach();
-
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-
             if (sequenceElement != null && sequenceElement.getLocalName().equals(
                     XMLConfigConstants.SEQUENCE_ELT.getLocalPart())) {
                 String sequenceName = sequenceElement.getAttributeValue(new QName("name"));
@@ -534,13 +527,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     String artifactName = getArtifactName(artifactType, sequenceName);
                     if (seq != null) {
                         seq.init(getSynapseEnvironment());
-
                         if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
                             cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                         } else {
                             persistSequence(seq);
                         }
-
                 }
                 }
             } else {

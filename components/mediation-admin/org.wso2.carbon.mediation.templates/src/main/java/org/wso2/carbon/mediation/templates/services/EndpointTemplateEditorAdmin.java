@@ -103,7 +103,6 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
 
             EndpointTemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArrayByTemplate(templates);
             EndpointTemplateInfo[] ret;
-
             EndpointTemplateInfo[] endpointTemplateInfos = new EndpointTemplateInfo[info.length];
             int position = 0;
 
@@ -293,7 +292,6 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                         } else {
                             persistTemplate(templ);
                         }
-
                     }
                 }
             } else {

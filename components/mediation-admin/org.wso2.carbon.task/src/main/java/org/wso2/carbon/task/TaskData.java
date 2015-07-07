@@ -25,6 +25,9 @@ public class TaskData {
 //    private TaskDescription taskDescription;
     private boolean isDeployedFromCApp = false;
     private boolean isEdited = false;
+    private String name;
+    private String group;
+
 
     public String getName() {
         return name;
@@ -41,9 +44,6 @@ public class TaskData {
     public void setGroup(String group) {
         this.group = group;
     }
-
-    private String name;
-    private String group;
 
     /**
      * Check whether the task is deployed from CApp

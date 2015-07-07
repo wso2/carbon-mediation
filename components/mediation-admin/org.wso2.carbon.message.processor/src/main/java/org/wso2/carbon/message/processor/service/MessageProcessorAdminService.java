@@ -44,7 +44,6 @@ import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.message.processor.util.ConfigHolder;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.locks.Lock;
@@ -78,7 +77,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                         messageProcessor);
                 MediationPersistenceManager mp = getMediationPersistenceManager();
                 mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
-
             } else {
                 String message = "Unable to create Message Processor ";
                 handleException(log, message, null);
@@ -580,7 +578,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             getMediationPersistenceManager()
                                     .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                         }
-
                     } else {
                         log.warn("Sampling Processor is already active");
                     }
@@ -617,7 +614,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             getMediationPersistenceManager()
                                     .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                         }
-
                     } else {
                         log.warn("Scheduled Message Forwarding Processor - already deActive");
                     }
@@ -630,7 +626,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             getMediationPersistenceManager()
                                     .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                         }
-
                     } else {
                         log.warn("Sampling Message Processor - already in the deactivated state");
                     }

@@ -71,7 +71,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
         CAppArtifactDataService cAppArtifactDataService = DataHolder.getInstance().
                 getcAppArtifactDataService();
-
         deployClassMediators(artifacts, axisConfig);
         int tenantId = Integer.parseInt(AppDeployerUtils.getTenantIdString(axisConfig));
         CAppArtifactsMap cAppArtifacts = new CAppArtifactsMap();
@@ -81,10 +80,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
             // Create CAppArtifactData to hold artifact details deployed with this CApp
             CAppArtifactData cAppArtifactData = new CAppArtifactData(artifact.getName(), artifact.getType(), true);
-
             // Put Artifact details to CApp Artifact Map
             cAppArtifacts.setcAppArtifactDataMap(artifact.getType() + File.separator + artifact.getName(), cAppArtifactData);
-
             if (!validateArtifact(artifact)) {
                 continue;
             }

@@ -249,7 +249,6 @@ public class MessageProcessorServiceComponent extends AbstractAxis2Configuration
         ConfigHolder.getInstance().setcAppArtifactDataService(null);
     }
 
-
     protected void unsetRegistryService(RegistryService regService) {
         if (log.isDebugEnabled()) {
             log.debug("RegistryService unbound from the ESB environment");

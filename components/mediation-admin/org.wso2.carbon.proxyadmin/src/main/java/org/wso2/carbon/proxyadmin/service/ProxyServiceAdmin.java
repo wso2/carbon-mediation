@@ -94,7 +94,6 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(),getArtifactName(artifactType, proxyName))) {
                     persistProxyService(proxy);
                 }
-
             } else {
                 log.error("Couldn't find the proxy service with name "
                         + proxyName + " to enable statistics");
@@ -385,7 +384,6 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                             } else {
                                 persistProxyService(currentProxy);
                             }
-
                             currentProxy.buildAxisService(synapseConfig, getAxisConfig());
                             addParameterObserver(currentProxy.getName());
 
@@ -759,14 +757,12 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
         String artifactName = getArtifactName(artifactType, ps.getName());
         CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                 getcAppArtifactDataService();
-
         if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
             pd.setDeployedFromCApp(true);
         }
         if (cAppArtifactDataService.isArtifactEdited(getTenantId(), artifactName)) {
             pd.setEdited(true);
         }
-
         // sets transports
         List list;
         if ((list = ps.getTransports()) != null && !list.isEmpty()) {

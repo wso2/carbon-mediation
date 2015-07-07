@@ -86,10 +86,8 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 
             TemplateInfo[] infos = new TemplateInfo[info.length];
             int position = 0;
-
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-
             if (info != null && info.length > 0) {
                 for (TemplateInfo infoTemp : info) {
                     TemplateInfo templateInfo = new TemplateInfo();
@@ -104,7 +102,6 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     position++;
                 }
             }
-
             if (infos.length >= (templatePerPage * pageNumber + templatePerPage)) {
                 ret = new TemplateInfo[templatePerPage];
             } else {

@@ -86,7 +86,6 @@ public class ConfigHolder {
         this.cAppArtifactDataService = cAppArtifactDataService;
     }
 
-
     public AxisConfiguration getAxisConfiguration() throws Exception {
         assertNull("AxisConfiguration", axisConfiguration);
         return axisConfiguration;

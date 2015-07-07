@@ -56,7 +56,6 @@ public class ConfigHolder {
         this.cAppArtifactDataService = cAppArtifactDataService;
     }
 
-
     public RegistryService getRegistryService() throws ProxyAdminException {
         assertNull("Registry", registryService);
         return registryService;

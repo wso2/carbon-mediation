@@ -130,7 +130,6 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
                     MediationPersistenceManager mp = getMediationPersistenceManager();
                     mp.saveItem(messageStore.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
                 }
-
             } else {
                 assert false;
                 String message = "Unexpected Error!!! Message store with name "
@@ -237,7 +236,6 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
             lock.unlock();
         }
     }
-
 
     /**
      * Get the number of messages in the Message store with given name

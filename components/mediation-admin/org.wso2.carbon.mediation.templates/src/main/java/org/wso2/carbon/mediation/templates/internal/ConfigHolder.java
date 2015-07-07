@@ -63,7 +63,6 @@ public class ConfigHolder {
         this.cAppArtifactDataService = cAppArtifactDataService;
     }
 
-
     public SynapseConfiguration getSynapseConfiguration() throws AxisFault {
         assertNull("SynapseConfiguration", synapseConfiguration);
         return synapseConfiguration;

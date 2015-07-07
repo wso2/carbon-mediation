@@ -78,7 +78,6 @@ public class ConfigHolder {
         this.cAppArtifactDataService = cAppArtifactDataService;
     }
 
-
     /**
      * Set the Synapse Configuration instance in the ConfigHolder
      *

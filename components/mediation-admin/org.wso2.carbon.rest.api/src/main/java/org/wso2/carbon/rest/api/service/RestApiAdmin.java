@@ -280,16 +280,13 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     if (log.isDebugEnabled()) {
                         log.debug("Deleting API : " + apiName + " from the configuration");
                     }
-
                     SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
                     API api = synapseConfiguration.getAPI(apiName);
                     api.destroy();
                     synapseConfiguration.removeAPI(apiName);
-
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     String fileName = api.getFileName();
                     pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
-
                     if (log.isDebugEnabled()) {
                         log.debug("Api : " + apiName + " removed from the configuration");
                     }
@@ -333,7 +330,6 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 			PrivilegedCarbonContext.endTenantFlow();
 		}
 	}
-
 
     public APIData[] getAPIsForListing(int pageNumber, int itemsPerPage){
         final Lock lock = getLock();

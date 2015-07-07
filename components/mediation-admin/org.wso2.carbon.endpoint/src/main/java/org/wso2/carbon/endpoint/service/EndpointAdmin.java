@@ -253,7 +253,6 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                     if (endpoint instanceof AbstractEndpoint) {
                         fileName = endpoint.getFileName();
                     }
-
                     pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
 
                     if (log.isDebugEnabled()) {
@@ -295,7 +294,6 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                         if (endpoint instanceof AbstractEndpoint) {
                             fileName = endpoint.getFileName();
                         }
-
                         pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
 
                         if (log.isDebugEnabled()) {
@@ -388,7 +386,6 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
 
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-
             List<EndpointMetaData> metaDatas = new ArrayList<EndpointMetaData>();
             for (Endpoint ep : epList) {
                 EndpointMetaData data = new EndpointMetaData();
@@ -529,7 +526,6 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
 
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
                     getcAppArtifactDataService();
-
             if (endpointElement.getQName().getLocalPart()
                     .equals(XMLConfigConstants.ENDPOINT_ELT.getLocalPart())) {
 
@@ -583,13 +579,11 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                 endpointName = endpointName.trim();
                 getSynapseConfiguration().removeEndpoint(endpointName);
                 getSynapseConfiguration().addEndpoint(endpointName, endpoint);
-
                 if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
                     cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                 } else {
                     persistEndpoint(endpoint);
                 }
-
                 if (log.isDebugEnabled()) {
                     log.debug("Updated the definition of the endpoint : " + endpointName);
                 }

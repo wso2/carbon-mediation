@@ -24,14 +24,11 @@ package org.wso2.carbon.message.store.service;
 public class MessageStoreMetaData {
 
     private String name;
-
     private boolean isDeployedFromCApp = false;
-
     private boolean isEdited = false;
 
     /**
      * Get the name of the store
-     *
      * @return store name
      */
     public String getName() {
@@ -40,7 +37,6 @@ public class MessageStoreMetaData {
 
     /**
      * Set the store name as a metadata
-     *
      * @param name store name
      */
     public void setName(String name) {
@@ -49,7 +45,6 @@ public class MessageStoreMetaData {
 
     /**
      * Check whether the store is deployed from CApp
-     *
      * @return true if store deployed from CApp, else false
      */
     public boolean getDeployedFromCApp() {
@@ -58,7 +53,6 @@ public class MessageStoreMetaData {
 
     /**
      * Set whether the store is deployed from CApp
-     *
      * @param isDeployedFromCApp true if store deployed from CApp, else false
      */
     public void setDeployedFromCApp(boolean isDeployedFromCApp) {
@@ -67,7 +61,6 @@ public class MessageStoreMetaData {
 
     /**
      * Check whether the store deployed from CApp is edited through management console
-     *
      * @return true if the store is edited, else false
      */
     public boolean getEdited() {
@@ -76,7 +69,6 @@ public class MessageStoreMetaData {
 
     /**
      * Set whether the store deployed from CApp is edited through management console
-     *
      * @param isEdited true if the store is edited, else false
      */
     public void setEdited(boolean isEdited) {

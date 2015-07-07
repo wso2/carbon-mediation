@@ -23,9 +23,7 @@ package org.wso2.carbon.message.processor.service;
 public class MessageProcessorMetaData {
 
     private String name;
-
     private boolean isDeployedFromCApp = false;
-
     private boolean isEdited = false;
 
     /**

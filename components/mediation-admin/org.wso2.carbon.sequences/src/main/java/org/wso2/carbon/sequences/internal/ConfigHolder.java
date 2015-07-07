@@ -64,7 +64,6 @@ public class ConfigHolder {
         this.cAppArtifactDataService = cAppArtifactDataService;
     }
 
-
     public SynapseConfiguration getSynapseConfiguration() throws SequenceEditorException {
         assertNull("SynapseConfiguration", synapseConfiguration);
         return synapseConfiguration;

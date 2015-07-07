@@ -157,10 +157,10 @@ public class CarbonTaskManagementService extends AbstractAdmin {
     }
 
     public TaskData[] getAllTaskData() throws TaskManagementException {
-
         TaskData[] taskData = null;
-        if(getTaskManager().getAllTaskData()!=null)
+        if (getTaskManager().getAllTaskData() != null) {
             taskData = getTaskManager().getAllTaskData();
+        }
         return taskData;
     }
 
