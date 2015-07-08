@@ -20,6 +20,7 @@ package org.wso2.carbon.mediator.cache;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This object holds the cached response and the related properties of the cache
@@ -46,7 +47,7 @@ public class CachableResponse implements Serializable {
 	 * Upon cache hit, cached object will set inUse as true and set inUse as false after response
 	 * is served by cached object
 	 */
-	private boolean inUse;
+	private AtomicBoolean inUse = new AtomicBoolean(false);
 
 	/**
 	 * This holds the hash value of the request payload which is calculated form
@@ -211,17 +212,15 @@ public class CachableResponse implements Serializable {
 	 *
 	 * @param inUse - boolean value inUse to be set
 	 */
-	public synchronized void setInUse(boolean inUse) {
-		this.inUse = inUse;
-	}
+	public void setInUse(boolean inUse) { this.inUse.getAndSet(inUse); }
 
 	/**
 	 * This method gives the referred cache object is in used or not
 	 *
 	 * @return inUse status as a boolean value
 	 */
-	public synchronized boolean isInUse() {
-		return inUse;
+	public boolean isInUse() {
+		return inUse.get();
 	}
 
 	/**

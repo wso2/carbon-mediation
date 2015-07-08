@@ -204,7 +204,6 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
 		boolean result = true;
 		try {
-
 			if (synCtx.isResponse()) {
 				processResponseMessage(synCtx, cfgCtx, synLog);
 
@@ -498,7 +497,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 		} else {
 			CacheManager cacheManager =
 					Caching.getCacheManagerFactory().getCacheManager(CachingConstants.CACHE_MANAGER);
-			mediatorCacheInit.set(true);
+			mediatorCacheInit.getAndSet(true);
 
 			return cacheManager.<String, CachableResponse>createCacheBuilder(CachingConstants.MEDIATOR_CACHE).
 					setExpiry(CacheConfiguration.ExpiryType.MODIFIED, new CacheConfiguration.Duration(TimeUnit.SECONDS,

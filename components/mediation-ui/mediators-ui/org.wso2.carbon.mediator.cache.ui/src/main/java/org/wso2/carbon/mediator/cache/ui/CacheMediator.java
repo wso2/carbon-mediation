@@ -447,7 +447,7 @@ public class CacheMediator extends AbstractListMediator {
 			if (id != null) {
 				return true;
 			} else {
-				throw new MediatorException("Id is required for a cache wirth scope : " + scope);
+				throw new MediatorException("Id is required for a cache with scope : " + scope);
 			}
 		} else if (CachingConstants.SCOPE_DISTRIBUTED.equals(scope)) {
 			return true;
