@@ -15,8 +15,8 @@
   ~  limitations under the License.
   --%>
 
-<%@ page import="org.wso2.caching.digest.DOMHASHGenerator" %>
-<%@ page import="org.wso2.carbon.mediator.cache.CacheMediator" %>
+<%@ page import="org.wso2.carbon.mediator.cache.digest.DOMHASHGenerator" %>
+<%@ page import="org.wso2.carbon.mediator.cache.ui.CacheMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 
