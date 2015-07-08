@@ -25,6 +25,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.deployers.AbstractSynapseArtifactDeployer;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
 import org.wso2.carbon.application.deployer.CarbonApplication;
@@ -97,6 +98,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                 } else {
                     try {
+                                ((AbstractSynapseArtifactDeployer) deployer).setCustom_log(carbonApp.getAppName(),
+                                        AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
                         deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                     } catch (DeploymentException e) {
@@ -154,6 +157,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
                 try {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
+
+                        ((AbstractSynapseArtifactDeployer) deployer).setCustom_log(carbonApplication.getAppName(),
+                                AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
+
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(artifact.getType())
                                && handleMainFaultSeqUndeployment(artifact, axisConfig)) {
