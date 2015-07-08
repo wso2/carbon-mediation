@@ -77,11 +77,16 @@ public class MLLPSourceHandler implements IOEventDispatch {
                 try {
                     mllpContext.getCodec().decode(inputBuffer, mllpContext);
                 } catch (MLLProtocolException e) {
-                    shutdownConnection(session, mllpContext, e);
+                    handleException(session, mllpContext, e);
+                    clearInputBuffers(mllpContext);
+                    return;
                 } catch (HL7Exception e) {
-                    shutdownConnection(session, mllpContext, e);
+                    handleException(session, mllpContext, e);
+                    clearInputBuffers(mllpContext);
+                    return;
                 } catch (IOException e) {
                     shutdownConnection(session, mllpContext, e);
+                    return;
                 }
             }
 
@@ -99,8 +104,7 @@ public class MLLPSourceHandler implements IOEventDispatch {
             }
 
             if (read < 0) {
-                bufferFactory.release(inputBuffer);
-                inputBuffer = bufferFactory.getBuffer();
+                clearInputBuffers(mllpContext);
                 session.close();
             }
 
@@ -108,6 +112,12 @@ public class MLLPSourceHandler implements IOEventDispatch {
             shutdownConnection(session, mllpContext, e);
         }
 
+    }
+
+    private void clearInputBuffers(MLLPContext context) {
+        bufferFactory.release(inputBuffer);
+        inputBuffer = bufferFactory.getBuffer();
+        context.reset();
     }
 
     @Override
