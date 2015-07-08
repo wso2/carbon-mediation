@@ -170,12 +170,12 @@ public class InboundHttpServerWorker extends ServerWorker {
                         } else {
                             injectToSequence(synCtx, endpoint);
                         }
-                    } else if (continueDispatch == true && dispatchPattern == null) {
-                        injectToSequence(synCtx, endpoint);
-                    } else {
-                        SequenceMediator faultSequence = getFaultSequence(synCtx, endpoint);
-                        synCtx.getEnvironment().injectMessage(synCtx, faultSequence);
                     }
+                } else if (continueDispatch == true && dispatchPattern == null) {
+                    injectToSequence(synCtx, endpoint);
+                } else {
+                    SequenceMediator faultSequence = getFaultSequence(synCtx, endpoint);
+                    synCtx.getEnvironment().injectMessage(synCtx, faultSequence);
                 }
                 // send ack for client if needed
                 sendAck(axis2MsgContext);
