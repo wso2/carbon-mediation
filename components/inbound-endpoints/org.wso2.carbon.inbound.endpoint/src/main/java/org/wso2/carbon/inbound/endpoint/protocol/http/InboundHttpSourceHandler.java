@@ -33,6 +33,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointMan
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.regex.Pattern;
 
 /**
  * Handler Class for process HTTP Requests
@@ -45,12 +46,18 @@ public class InboundHttpSourceHandler extends SourceHandler {
     private int port;
     private String tenantDomain;
     private WorkerPool workerPool;
+    private Pattern dispatchPattern = null;
 
-    public InboundHttpSourceHandler(int port, SourceConfiguration sourceConfiguration , String tenantDomain) {
+    public InboundHttpSourceHandler(int port, SourceConfiguration sourceConfiguration , String tenantDomain,
+                                    String dispatchPattern) {
         super(sourceConfiguration);
         this.sourceConfiguration = sourceConfiguration;
         this.port = port;
         this.tenantDomain = tenantDomain;
+
+        if (dispatchPattern != null) {
+            this.dispatchPattern = Pattern.compile(dispatchPattern, Pattern.COMMENTS | Pattern.DOTALL);
+        }
     }
 
     @Override
@@ -82,7 +89,7 @@ public class InboundHttpSourceHandler extends SourceHandler {
                 workerPool = sourceConfiguration.getWorkerPool();
             }
             workerPool.execute
-                       (new InboundHttpServerWorker(port, request, sourceConfiguration, os));
+                    (new InboundHttpServerWorker(port, request, sourceConfiguration, os, dispatchPattern));
         } catch (HttpException e) {
             log.error("HttpException occurred when creating Source Request", e);
             informReaderError(conn);

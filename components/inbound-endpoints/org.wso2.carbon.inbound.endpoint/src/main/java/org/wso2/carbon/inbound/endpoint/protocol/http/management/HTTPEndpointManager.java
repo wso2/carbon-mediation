@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.http.management;
 
 import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.SourceHandler;
 import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
@@ -27,6 +28,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
+import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpSourceHandler;
 import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
@@ -63,11 +65,12 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
      * Start Http Inbound endpoint in a particular port
      * @param port  port
      * @param name  endpoint name
+     * @param params inbound endpoint params
      */
-    public boolean startEndpoint(int port, String name) {
-
+    public boolean startEndpoint(int port, String name, InboundProcessorParams params) {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
+        InboundHttpConfiguration config = buildConfiguration(port, name, params);
 
         String epName = dataStore.getListeningEndpointName(port, tenantDomain);
         if (epName != null) {
@@ -80,43 +83,28 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             }
         } else {
             dataStore.registerListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name, null);
-            boolean start = startListener(port, name);
-            if (!start) {
+            boolean start = startListener(port, name, params);
+
+            if (start) {
+                if (config.getCoresize() != null && config.getMaxSize() != null && config.getKeepAlive() != null
+                        && config.getQueueLength() != null) {
+                    WorkerPoolConfiguration workerPoolConfiguration = new WorkerPoolConfiguration(
+                            config.getCoresize(),
+                            config.getMaxSize(),
+                            config.getKeepAlive(),
+                            config.getQueueLength(),
+                            config.getThreadGroup(),
+                            config.getThreadID());
+
+                    addWorkerPool(tenantDomain, port, workerPoolConfiguration);
+                }
+            } else {
                 dataStore.unregisterListeningEndpoint(port, tenantDomain);
                 return false;
             }
         }
-       return true;
-    }
+        return true;
 
-    /**
-     * Start Inbound Endpoint and use new worker pool with given configs
-     * @param port port
-     * @param name name
-     * @param workerPoolConfiguration workerPoolConfigs
-     */
-    public void startEndpoint(int port, String name, WorkerPoolConfiguration workerPoolConfiguration) {
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        String tenantDomain = carbonContext.getTenantDomain();
-        if (startEndpoint(port, name)) {
-            addWorkerPool(tenantDomain, port, workerPoolConfiguration);
-        }
-    }
-
-    /**
-     * Start Inbound Endpoint and use new worker pool with given configs
-     * @param port port
-     * @param name name
-     * @param sslConfiguration sslConfiguration
-     * @param workerPoolConfiguration workerPoolConfiguration
-     */
-    public void startSSLEndpoint(int port, String name, SSLConfiguration sslConfiguration,
-                                 WorkerPoolConfiguration workerPoolConfiguration) {
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        String tenantDomain = carbonContext.getTenantDomain();
-        if (startSSLEndpoint(port, name, sslConfiguration)) {
-            addWorkerPool(tenantDomain, port, workerPoolConfiguration);
-        }
     }
 
 
@@ -125,9 +113,11 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
      * @param port  port
      * @param name  endpoint name
      */
-    public boolean startSSLEndpoint(int port , String name, SSLConfiguration sslConfiguration){
+    public boolean startSSLEndpoint(int port , String name, SSLConfiguration sslConfiguration, InboundProcessorParams params) {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
+        InboundHttpConfiguration config = buildConfiguration(port, name, params);
+
         String epName = dataStore.getListeningEndpointName(port, tenantDomain);
 
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
@@ -144,9 +134,20 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             }else{
                 dataStore.registerSSLListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTPS, name, sslConfiguration);
             }
-            boolean start = startSSLListener(port, name, sslConfiguration);
-            if (!start) {
-               dataStore.unregisterListeningEndpoint(port, tenantDomain);
+            boolean start = startSSLListener(port, name, sslConfiguration, params);
+            if (start) {
+                if (config.getCoresize() == null && config.getMaxSize() == null && config.getKeepAlive() == null
+                        && config.getQueueLength() == null) {
+                    WorkerPoolConfiguration workerPoolConfiguration = new WorkerPoolConfiguration(config.getCoresize(),
+                            config.getMaxSize(),
+                            config.getKeepAlive(),
+                            config.getQueueLength(),
+                            config.getThreadGroup(),
+                            config.getThreadID());
+                    addWorkerPool(tenantDomain, port, workerPoolConfiguration);
+                }
+            } else {
+                dataStore.unregisterListeningEndpoint(port, tenantDomain);
                 return false;
             }
         }
@@ -154,18 +155,18 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
     }
 
 
-
     /**
      * Start Http Listener in a particular port
      * @param port  port
      * @param name  endpoint name
+     * @param params inbound endpoint params
      */
-    public boolean startListener(int port, String name) {
+    public boolean startListener(int port, String name, InboundProcessorParams params) {
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener is already started for port : " + port);
             return true;
         }
-
+        InboundHttpConfiguration config = buildConfiguration(port, name, params);
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
@@ -177,7 +178,8 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
             String tenantDomain = carbonContext.getTenantDomain();
             //Create Handler for handle Http Requests
-            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(port, sourceConfiguration, tenantDomain);
+            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(port, sourceConfiguration, tenantDomain,
+                    config.getDispatchPattern());
             try {
                 //Start Endpoint in given port
                 PassThroughInboundEndpointHandler.startEndpoint(new InetSocketAddress(port),
@@ -198,11 +200,12 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
      * @param port  port
      * @param name  endpoint name
      */
-    public boolean startSSLListener(int port, String name, SSLConfiguration sslConfiguration) {
+    public boolean startSSLListener(int port, String name, SSLConfiguration sslConfiguration, InboundProcessorParams params) {
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener is already started for port : " + port);
             return true;
         }
+        InboundHttpConfiguration config = buildConfiguration(port, name, params);
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSSLSourceConfiguration();
@@ -214,7 +217,8 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
             String tenantDomain = carbonContext.getTenantDomain();
             //Create Handler for handle Http Requests
-            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(port, sourceConfiguration ,tenantDomain);
+            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(port, sourceConfiguration ,tenantDomain,
+                    config.getDispatchPattern());
             try {
                 //Start Endpoint in given port
                 PassThroughInboundEndpointHandler.startSSLEndpoint(new InetSocketAddress(port),
@@ -252,6 +256,25 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
     }
 
+    public InboundHttpConfiguration buildConfiguration(int port, String name, InboundProcessorParams params) {
+        return new InboundHttpConfiguration.InboundHttpConfigurationBuilder(port, name)
+                .workerPoolCoreSize(params.getProperties().getProperty(
+                        InboundHttpConstants.INBOUND_WORKER_POOL_SIZE_CORE))
+                .workerPoolMaxSize(params.getProperties().getProperty(
+                        InboundHttpConstants.INBOUND_WORKER_POOL_SIZE_MAX))
+                .workerPoolKeepAlive(params.getProperties().getProperty(
+                        InboundHttpConstants.INBOUND_WORKER_THREAD_KEEP_ALIVE_SEC))
+                .workerPoolQueueLength(params.getProperties().getProperty(
+                        InboundHttpConstants.INBOUND_WORKER_POOL_QUEUE_LENGTH))
+                .workerPoolThreadGroup(params.getProperties().getProperty(
+                        InboundHttpConstants.INBOUND_THREAD_GROUP_ID))
+                .workerPoolThreadId(params.getProperties().getProperty(
+                        InboundHttpConstants.INBOUND_THREAD_ID))
+                .dispatchPattern(params.getProperties().getProperty(
+                        InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN))
+                .build();
+    }
+
     /**
      * Start Http listeners for all the Inbound Endpoints. This should be called in the
      * server startup to load all the required listeners for endpoints in all tenants
@@ -265,9 +288,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                        (InboundEndpointInfoDTO) ((ArrayList) tenantInfoEntry.getValue()).get(0);
 
             if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTP)) {
-                startListener(port, inboundEndpointInfoDTO.getEndpointName());
+                startListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getInboundParams());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTPS)) {
-                startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getSslConfiguration());
+                startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getSslConfiguration(),
+                        inboundEndpointInfoDTO.getInboundParams());
             }
 
         }

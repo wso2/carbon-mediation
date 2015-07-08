@@ -148,11 +148,11 @@ public class CXFEndpointManager extends AbstractInboundEndpointManager {
 	}
 
 	@Override
-	public boolean startListener(int port, String name) {
+	public boolean startListener(int port, String name, InboundProcessorParams params) {
 		return true;
 	}
 
-	@Override public boolean startEndpoint(int port, String name) {
+	@Override public boolean startEndpoint(int port, String name, InboundProcessorParams params) {
 		return true;
 	}
 

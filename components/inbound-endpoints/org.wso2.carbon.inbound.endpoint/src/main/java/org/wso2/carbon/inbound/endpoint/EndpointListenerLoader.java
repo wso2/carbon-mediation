@@ -63,14 +63,16 @@ public class EndpointListenerLoader {
 
             if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTP)) {
                 HTTPEndpointManager.getInstance().
-                        startListener(port, inboundEndpointInfoDTO.getEndpointName());
+                        startListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                inboundEndpointInfoDTO.getInboundParams());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTPS)) {
                 HTTPEndpointManager.getInstance().
                            startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(),
-                                         inboundEndpointInfoDTO.getSslConfiguration());
+                                         inboundEndpointInfoDTO.getSslConfiguration(), inboundEndpointInfoDTO.getInboundParams());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.Protocols.hl7.toString())) {
                 HL7EndpointManager.getInstance().
-                        startListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getInboundParams());
+                        startListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                inboundEndpointInfoDTO.getInboundParams());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(
                     InboundRequestProcessorFactoryImpl.Protocols.cxf_ws_rm.toString())) {
                 CXFEndpointManager.getInstance().startCXFEndpoint(port, inboundEndpointInfoDTO);

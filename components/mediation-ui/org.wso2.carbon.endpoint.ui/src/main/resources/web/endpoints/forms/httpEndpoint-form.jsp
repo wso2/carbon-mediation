@@ -211,7 +211,11 @@
         }
         // Endpoint Address
         if (endpoint.getUriTemplate() != null) {
-            endpointUriTemplate = endpoint.getUriTemplate();
+            if (endpoint.isLegacy()) {
+                endpointUriTemplate = HttpEndpoint.legacyPrefix + endpoint.getUriTemplate();
+            } else {
+                endpointUriTemplate = endpoint.getUriTemplate();
+            }
             validAddressURL = EndpointConfigurationHelper.getValidXMLString(endpointUriTemplate);
         }
         // Description
