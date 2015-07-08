@@ -180,19 +180,20 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             logger.error("Connection cannot bb establish to the broke. Plese check the broker libs provided.");
             return null;
         }
+        Connection connection = null;
         try {
             if (jmsSpec11) {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-                    return ((QueueConnectionFactory) (this.connectionFactory))
+                	connection = ((QueueConnectionFactory) (this.connectionFactory))
                             .createQueueConnection();
                 } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-                    return ((TopicConnectionFactory) (this.connectionFactory))
+                	connection = ((TopicConnectionFactory) (this.connectionFactory))
                             .createTopicConnection();
                 }
+	            return connection;
             } else {
                 QueueConnectionFactory qConFac = null;
-                TopicConnectionFactory tConFac = null;
-                Connection connection = null;
+                TopicConnectionFactory tConFac = null;                
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                     qConFac = (QueueConnectionFactory) this.connectionFactory;
                 } else {
@@ -209,8 +210,15 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 return connection;
             }
         } catch (JMSException e) {
-            logger.error("JMS Exception while creating connection through factory '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+			logger.error("JMS Exception while creating connection through factory '" +
+			             this.connectionFactoryString + "' " + e.getMessage());
+			// Need to close the connection in the case if durable subscriptions
+			if (connection != null) {
+				try {
+					connection.close();
+				} catch (Exception ex) {
+				}
+			}
         }
 
         return null;

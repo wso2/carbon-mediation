@@ -31,22 +31,23 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
+import org.wso2.carbon.message.store.util.ConfigHolder;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.locks.Lock;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public class MessageStoreAdminService extends AbstractServiceBusAdmin {
 
     private static Log log = LogFactory.getLog(MessageStoreAdminService.class);
 
-
+    private static final String artifactType = ServiceBusConstants.MESSAGE_STORE_TYPE;
     public static final int MSGS_PER_PAGE = 10;
 
     /**
@@ -89,6 +90,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
      * Modify and Existing Message store based on the given XML that is passed from the FE
      * This this case user may change the message store implementation/ change parameters
      * So we add and init new message store and then remove and destroy old.
+     *
      * @param xml XML configuration for the changed Message store
      * @throws AxisFault if Some thing goes wrong when modifying the
      *                   Message store
@@ -99,15 +101,17 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
             MessageStore messageStore =
                     MessageStoreFactory.createMessageStore(msElem, new Properties());
 
-            if(messageStore == null) {
+            if (messageStore == null) {
                 String message = "Unable to edit the message Store. Error in the configuration";
-                handleException(log,message,null);
+                handleException(log, message, null);
             }
 
 
             SynapseConfiguration configuration = getSynapseConfiguration();
             MessageStore oldMessageStore = configuration.getMessageStore(messageStore.getName());
-            if(oldMessageStore != null) {
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+            if (oldMessageStore != null) {
                 // this means there is an existing message store
 
                 //1st we clean up the old
@@ -118,19 +122,26 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
                 String fileName = oldMessageStore.getFileName();
                 messageStore.setFileName(fileName);
                 messageStore.init(getSynapseEnvironment());
-                configuration.addMessageStore(messageStore.getName(),messageStore);
-                MediationPersistenceManager mp = getMediationPersistenceManager();
-                mp.saveItem(messageStore.getName(),ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                configuration.addMessageStore(messageStore.getName(), messageStore);
+                String artifactName = getArtifactName(artifactType, messageStore.getName());
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                    cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+                } else {
+                    MediationPersistenceManager mp = getMediationPersistenceManager();
+                    mp.saveItem(messageStore.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                }
             } else {
                 assert false;
                 String message = "Unexpected Error!!! Message store with name "
                         + messageStore.getName() + " does not exist";
-                handleException(log,message,null);
+                handleException(log, message, null);
             }
 
         } catch (XMLStreamException e) {
             String message = "Unable to Modify Message Store ";
             handleException(log, message, e);
+        } catch (Exception e) {
+            handleException(log, "Unable to Modify Message Store ", e);
         }
     }
 
@@ -169,7 +180,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
 
             MediationPersistenceManager pm = getMediationPersistenceManager();
             pm.deleteItem(removedMessageStore.getName(),
-                    fileName,ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                    fileName, ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
 
         } else {
             handleException(log, "Message Store " + name + " does not exist", null);
@@ -190,6 +201,41 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
         return names.toArray(new String[names.size()]);
     }
 
+    /**
+     * Get all the Current Message store details defined in the configuration
+     *
+     * @return array of Message Store Meta Data that contains MessageStore names
+     * @throws AxisFault
+     */
+    public MessageStoreMetaData[] getMessageStoreData() throws AxisFault {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration configuration = getSynapseConfiguration();
+
+            assert configuration != null;
+            Collection<String> names = configuration.getMessageStores().keySet();
+            List<MessageStoreMetaData> metaDatas = new ArrayList<MessageStoreMetaData>();
+
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+
+            for (String storeName : names) {
+                MessageStoreMetaData data = new MessageStoreMetaData();
+                data.setName(storeName);
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, storeName))) {
+                    data.setDeployedFromCApp(true);
+                }
+                if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, storeName))) {
+                    data.setEdited(true);
+                }
+                metaDatas.add(data);
+            }
+            return metaDatas.toArray(new MessageStoreMetaData[metaDatas.size()]);
+        } finally {
+            lock.unlock();
+        }
+    }
 
     /**
      * Get the number of messages in the Message store with given name
@@ -249,6 +295,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
 
             for (MessageContext mc : messageContexts) {
                 MessageInfo info = createMessageInfo(mc);
+
                 if (info != null) {
                     messageInfoList.add(info);
                 }
@@ -276,7 +323,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
             int itemsPerPageInt = MSGS_PER_PAGE;
             int numberOfPages = (int) Math.ceil((double) store.size() / itemsPerPageInt);
 
-            if(numberOfPages == 0) {
+            if (numberOfPages == 0) {
                 numberOfPages = 1;
             }
             if (pageNumber > numberOfPages - 1) {
@@ -415,19 +462,18 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
      *
      * @param str the XML string
      * @return the <code>OMElement</code> representation of the given string
-     * @throws javax.xml.stream.XMLStreamException
-     *          if building the <code>OmElement</code> is unsuccessful
+     * @throws javax.xml.stream.XMLStreamException if building the <code>OmElement</code> is unsuccessful
      */
     private OMElement createElement(String str) throws XMLStreamException {
-		byte[] bytes = null;
-		try {
-			bytes = str.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			log.error("Unable to extract bytes in UTF-8 encoding. "
-					+ "Extracting bytes in the system default encoding"
-					+ e.getMessage());
-			bytes = str.getBytes();
-		}
+        byte[] bytes = null;
+        try {
+            bytes = str.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Unable to extract bytes in UTF-8 encoding. "
+                    + "Extracting bytes in the system default encoding"
+                    + e.getMessage());
+            bytes = str.getBytes();
+        }
 
         InputStream in = new ByteArrayInputStream(bytes);
         return new StAXOMBuilder(in).getDocumentElement();

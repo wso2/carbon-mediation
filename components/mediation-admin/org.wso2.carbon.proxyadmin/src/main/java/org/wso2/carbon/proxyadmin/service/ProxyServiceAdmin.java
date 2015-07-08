@@ -33,12 +33,12 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.util.PolicyInfo;
 import org.wso2.carbon.CarbonConstants;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.RegistryResources;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.proxyadmin.*;
 import org.wso2.carbon.proxyadmin.observer.ProxyServiceParameterObserver;
 import org.wso2.carbon.proxyadmin.util.ConfigHolder;
@@ -49,6 +49,7 @@ import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 
 import javax.xml.namespace.QName;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -65,6 +66,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
     private static String SUCCESSFUL = "successful";
     private static String FAILED = "failed";
     private static Log log = LogFactory.getLog(ProxyServiceAdmin.class);
+    private static final String artifactType = ServiceBusConstants.PROXY_SERVICE_TYPE;
 
     /**
      * Enables statistics for the specified proxy service
@@ -87,7 +89,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 } else {
                     proxy.getAspectConfiguration().enableStatistics();
                 }
-                persistProxyService(proxy);
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(),getArtifactName(artifactType, proxyName))) {
+                    persistProxyService(proxy);
+                }
             } else {
                 log.error("Couldn't find the proxy service with name "
                         + proxyName + " to enable statistics");
@@ -126,7 +132,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 } else {
                     proxy.getAspectConfiguration().disableStatistics();
                 }
-                persistProxyService(proxy);
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, proxyName))) {
+                    persistProxyService(proxy);
+                }
             } else {
                 log.error("Couldn't find the proxy service with name "
                         + proxyName + " to disable statistics");
@@ -158,7 +168,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
 
             ProxyService proxy = getSynapseConfiguration().getProxyService(proxyName);
             proxy.setTraceState(SynapseConstants.TRACING_ON);
-            persistProxyService(proxy);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, proxyName))) {
+                persistProxyService(proxy);
+            }
             if(log.isDebugEnabled()) {
                 log.debug("Enabled tracing on proxy service : " + proxyName);
             }
@@ -185,7 +199,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
 
             ProxyService proxy = getSynapseConfiguration().getProxyService(proxyName);
             proxy.setTraceState(SynapseConstants.TRACING_OFF);
-            persistProxyService(proxy);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, proxyName))) {
+                persistProxyService(proxy);
+            }
             if(log.isDebugEnabled()) {
                 log.debug("Disabled tracing on proxy service : " + proxyName);
             }
@@ -214,8 +232,8 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 String proxyName = proxyServiceElement.getAttributeValue(new QName("name"));
 
                 if (getSynapseConfiguration().getProxyService(proxyName) != null ||
-                    getSynapseConfiguration().getAxisConfiguration().getService(
-                        proxyName) != null) {
+                        getSynapseConfiguration().getAxisConfiguration().getService(
+                                proxyName) != null) {
                     handleException(log, "A service named " + proxyName + " already exists", null);
                 } else {
                     ProxyService proxy = ProxyServiceFactory.createProxy(proxyServiceElement,
@@ -231,6 +249,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                         }
                     }
 
+                    String artifactName = getArtifactName(artifactType, proxyName);
                     try {
                         getSynapseConfiguration().addProxyService(
                                 proxy.getName(), proxy);
@@ -258,7 +277,14 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                             proxy.getTargetInLineEndpoint().init(getSynapseEnvironment());
                         }
 
-                        persistProxyService(proxy);
+                        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                                getcAppArtifactDataService();
+
+                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+                        } else {
+                            persistProxyService(proxy);
+                        }
 
                     } catch (Exception e) {
                         getSynapseConfiguration().removeProxyService(proxyName);
@@ -305,6 +331,8 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                     log.debug("Deleting existing proxy service : " + proxyName);
                     AxisService axisService = synapseConfig.getAxisConfiguration().
                             getService(proxyName);
+                    CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                            getcAppArtifactDataService();
                     if (axisService != null) {
                         wasRunning = axisService.isActive();
                         axisService.getParent().addParameter(
@@ -350,7 +378,12 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
 
                         try {
                             synapseConfig.addProxyService(proxyName, currentProxy);
-                            persistProxyService(currentProxy);
+                            String artifactName = getArtifactName(artifactType, proxyName);
+                            if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                                cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+                            } else {
+                                persistProxyService(currentProxy);
+                            }
                             currentProxy.buildAxisService(synapseConfig, getAxisConfig());
                             addParameterObserver(currentProxy.getName());
 
@@ -394,6 +427,8 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
             }
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             ProxyService proxy = synapseConfiguration.getProxyService(proxyName);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             if (proxy != null) {
                 synapseConfiguration.removeProxyService(proxyName);
                 MediationPersistenceManager pm = getMediationPersistenceManager();
@@ -719,6 +754,15 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
             pd.setStartOnLoad(false);
         }
 
+        String artifactName = getArtifactName(artifactType, ps.getName());
+        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                getcAppArtifactDataService();
+        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+            pd.setDeployedFromCApp(true);
+        }
+        if (cAppArtifactDataService.isArtifactEdited(getTenantId(), artifactName)) {
+            pd.setEdited(true);
+        }
         // sets transports
         List list;
         if ((list = ps.getTransports()) != null && !list.isEmpty()) {
@@ -898,7 +942,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                   RegistryConstants.PATH_SEPARATOR + "services" +
                   RegistryConstants.PATH_SEPARATOR + axisService.getName();
 
-          String serviceParametersPath = servicePath + RegistryConstants.PATH_SEPARATOR + "parameters";
+        String serviceParametersPath = servicePath + RegistryConstants.PATH_SEPARATOR + "parameters";
 
         Registry registry = null;
         try {

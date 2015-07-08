@@ -30,8 +30,6 @@ import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContextFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MLLPSourceHandler implements IOEventDispatch {
     private static final Log log = LogFactory.getLog(MLLPSourceHandler.class);

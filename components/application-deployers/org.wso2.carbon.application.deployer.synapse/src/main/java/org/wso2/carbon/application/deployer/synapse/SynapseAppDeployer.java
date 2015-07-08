@@ -36,6 +36,9 @@ import org.wso2.carbon.application.deployer.synapse.internal.SynapseAppDeployerD
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
+import org.wso2.carbon.mediation.initializer.utils.CAppArtifactData;
+import org.wso2.carbon.mediation.initializer.utils.CAppArtifactsMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,11 +69,19 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
         List<Artifact.Dependency> artifacts = carbonApp.getAppConfig().getApplicationArtifact()
                 .getDependencies();
 
+        CAppArtifactDataService cAppArtifactDataService = DataHolder.getInstance().
+                getcAppArtifactDataService();
         deployClassMediators(artifacts, axisConfig);
+        int tenantId = Integer.parseInt(AppDeployerUtils.getTenantIdString(axisConfig));
+        CAppArtifactsMap cAppArtifacts = new CAppArtifactsMap();
 
         for (Artifact.Dependency dep : artifacts) {
             Artifact artifact = dep.getArtifact();
 
+            // Create CAppArtifactData to hold artifact details deployed with this CApp
+            CAppArtifactData cAppArtifactData = new CAppArtifactData(artifact.getName(), artifact.getType(), true);
+            // Put Artifact details to CApp Artifact Map
+            cAppArtifacts.setcAppArtifactDataMap(artifact.getType() + File.separator + artifact.getName(), cAppArtifactData);
             if (!validateArtifact(artifact)) {
                 continue;
             }
@@ -90,10 +101,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 File artifactInRepo = new File(artifactDir + File.separator + fileName);
 
                 if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(artifact.getType()) &&
-                    handleMainFaultSeqDeployment(artifact, axisConfig)) {
+                        handleMainFaultSeqDeployment(artifact, axisConfig)) {
                 } else if (artifactInRepo.exists()) {
                     log.warn("Artifact " + fileName + " already found in " + artifactInRepo.getAbsolutePath() +
-                    ". Ignoring CAPP's artifact");
+                            ". Ignoring CAPP's artifact");
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                 } else {
                     try {
@@ -106,6 +117,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 }
             }
         }
+        // Add the CApp artifacts details for specific tenant
+        cAppArtifactDataService.addCAppArtifactData(tenantId, cAppArtifacts);
     }
 
     /**
@@ -120,6 +133,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
         List<Artifact.Dependency> artifacts = carbonApplication.getAppConfig()
                 .getApplicationArtifact().getDependencies();
+        int tenantId = Integer.parseInt(AppDeployerUtils.getTenantIdString(axisConfig));
+
+        CAppArtifactDataService cAppArtifactDataService = DataHolder.getInstance().
+                getcAppArtifactDataService();
 
         for (Artifact.Dependency dep : artifacts) {
 
@@ -145,7 +162,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             }
 
             if (deployer != null && AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.
-                                            equals(artifact.getDeploymentStatus())) {
+                    equals(artifact.getDeploymentStatus())) {
 
                 String fileName = artifact.getFiles().get(0).getName();
                 String artifactName = artifact.getName();
@@ -156,7 +173,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(artifact.getType())
-                               && handleMainFaultSeqUndeployment(artifact, axisConfig)) {
+                            && handleMainFaultSeqUndeployment(artifact, axisConfig)) {
                     } else if (artifactInRepo.exists()) {
                         log.info("Deleting artifact at " + artifactInRepo.getAbsolutePath());
                         if (!artifactInRepo.delete()) {
@@ -182,6 +199,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 }
             }
         }
+        // Remove Artifact details from CAppArtifactData
+        cAppArtifactDataService.removeCappArtifactData(tenantId);
     }
 
     /**
@@ -192,7 +211,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * @throws DeploymentException if something goes wrong while deployment
      */
     private void deployClassMediators(List<Artifact.Dependency> artifacts,
-                                     AxisConfiguration axisConfig) throws DeploymentException {
+                                      AxisConfiguration axisConfig) throws DeploymentException {
         for (Artifact.Dependency dependency : artifacts) {
 
             Artifact artifact = dependency.getArtifact();
@@ -405,6 +424,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             return SynapseAppDeployerConstants.APIS_FOLDER;
         } else if (SynapseAppDeployerConstants.TEMPLATE_TYPE.endsWith(artifactType)) {
             return SynapseAppDeployerConstants.TEMPLATES_FOLDER;
+        } else if (SynapseAppDeployerConstants.INBOUND_ENDPOINT_TYPE.endsWith(artifactType)) {
+           return SynapseAppDeployerConstants.INBOUND_ENDPOINT_FOLDER;            
         }
         return null;
     }

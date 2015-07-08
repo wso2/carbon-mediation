@@ -46,6 +46,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
  * 
@@ -152,7 +154,8 @@ public class JMSInjectHandler {
         } catch (SynapseException se) {
             throw se;            
         } catch (Exception e) {
-            log.error("Error while processing the JMS Message");
+            log.error("Error while processing the JMS Message", e);
+            throw new SynapseException("Error while processing the JMS Message", e);            
         }
         return true;
     }
@@ -192,6 +195,8 @@ public class JMSInjectHandler {
                 .getAxis2MessageContext();
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setMessageID(UUIDGenerator.getUUID());
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, carbonContext.getTenantDomain());
         // There is a discrepency in what I thought, Axis2 spawns a nes threads
         // to
         // send a message is this is TRUE - and I want it to be the other way

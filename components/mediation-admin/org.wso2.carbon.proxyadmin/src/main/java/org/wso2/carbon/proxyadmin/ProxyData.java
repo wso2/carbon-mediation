@@ -78,6 +78,10 @@ public class ProxyData {
     private String serviceGroup;
 
     private String description;
+    // Check whether the artifact is deployed from CApp
+    private boolean isDeployedFromCApp = false;
+    // Check whether thw CApp artifact is edited through management console
+    private boolean isEdited = false;
 
     public String getDescription() {
         return description;
@@ -343,7 +347,7 @@ public class ProxyData {
                 log.error(msg + e.getMessage());
                 throw new ProxyAdminException(msg, e);
             }
-        } 
+        }
 
         if (outSeqKey != null) {
             element.addAttribute("outSequence", outSeqKey, nullNS);
@@ -436,7 +440,7 @@ public class ProxyData {
 	                    	try {
 								 bytes = value.getBytes("UTF8");
 							} catch (UnsupportedEncodingException e) {
-								log.error("Unable to extract bytes in UTF-8 encoding. " + 
+								log.error("Unable to extract bytes in UTF-8 encoding. " +
 										"Extracting bytes in the system default encoding" + e.getMessage());
 								bytes = value.getBytes();
 							}
@@ -499,12 +503,44 @@ public class ProxyData {
     	try {
 			bytes = str.getBytes("UTF8");
 		} catch (UnsupportedEncodingException e) {
-			log.error("Unable to extract bytes in UTF-8 encoding. " + 
+			log.error("Unable to extract bytes in UTF-8 encoding. " +
 					"Extracting bytes in the system default encoding" + e.getMessage());
 			bytes = str.getBytes();
 		}
-    	
+
         InputStream in = new ByteArrayInputStream(bytes);
         return new StAXOMBuilder(in).getDocumentElement();
+    }
+
+    /**
+     * Check whether the proxy is deployed from CApp
+     * @return true if proxy deployed from CApp, else false
+     */
+    public boolean getDeployedFromCApp() {
+        return isDeployedFromCApp;
+    }
+
+    /**
+     * Set whether the proxy is deployed from CApp
+     * @param isDeployedFromCApp true if proxy deployed from CApp, else false
+     */
+    public void setDeployedFromCApp(boolean isDeployedFromCApp) {
+        this.isDeployedFromCApp = isDeployedFromCApp;
+    }
+
+    /**
+     * Check whether the proxy deployed from CApp is edited through management console
+     * @return true if the proxy is edited, else false
+     */
+    public boolean getEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set whether the proxy deployed from CApp is edited through management console
+     * @param isEdited true if the proxy is edited, else false
+     */
+    public void setEdited(boolean isEdited) {
+        this.isEdited = isEdited;
     }
 }

@@ -25,6 +25,7 @@ import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.reactor.IOReactorStatus;
 import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.nio.reactor.ListeningIOReactor;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.HL7Configuration;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -41,6 +42,8 @@ public class InboundHL7IOReactor {
     private static ConcurrentHashMap<Integer, ListenerEndpoint> endpointMap = new ConcurrentHashMap<Integer, ListenerEndpoint>();
 
     private static ConcurrentHashMap<Integer, HL7Processor> processorMap = new ConcurrentHashMap<Integer, HL7Processor>();
+
+    private static MultiIOHandler multiIOHandler;
 
     private static volatile boolean isStarted = false;
 
@@ -59,8 +62,9 @@ public class InboundHL7IOReactor {
             public void run() {
                 try {
                     isStarted = true;
+                    multiIOHandler = new MultiIOHandler(processorMap);
                     log.info("MLLP Transport IO Reactor Started");
-                    reactor.execute(new MultiIOHandler(processorMap));
+                    reactor.execute(multiIOHandler);
                 } catch (IOException e) {
                     isStarted = false;
                     log.error("Error while starting the MLLP Transport IO Reactor.", e);
@@ -94,6 +98,8 @@ public class InboundHL7IOReactor {
     }
 
     public static boolean bind(int port, HL7Processor processor) {
+        checkReactor();
+
         if (!isPortAvailable(port)) {
             log.error("A service is already listening on port " +
                     port + ". Please select a different port for this endpoint.");
@@ -128,6 +134,7 @@ public class InboundHL7IOReactor {
 
         endpointMap.remove(port);
         processorMap.remove(port);
+        multiIOHandler.disconnectSessions(port);
 
         if (ep == null) {
             return false;
@@ -136,6 +143,21 @@ public class InboundHL7IOReactor {
         ep.close();
 
         return true;
+    }
+
+    /**
+     * In certain cases, reactor is not started prior to a bind() (e.g. if HL7EndpointManager triggers a bind() i.e.
+     * via tenant loader and at that time no InboundListeners were initialized). If the reactor is not started, this
+     * method will start it.
+     */
+    protected static void checkReactor() {
+        if (reactor == null) {
+            try {
+                start();
+            } catch (IOException e) {
+                log.error("Reactor failed to start.");
+            }
+        }
     }
 
     public static boolean isEndpointRunning(int port) {

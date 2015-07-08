@@ -22,7 +22,11 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.wso2.carbon.mediator.bam.config.BamMediatorException;
+import org.wso2.carbon.mediator.bam.config.stream.Property;
+import org.wso2.carbon.mediator.bam.config.stream.StreamConfiguration;
+import org.wso2.carbon.mediator.bam.config.stream.StreamEntry;
 
+import java.util.List;
 
 /**
  * Extracts the current message payload/header data according to the given configuration.
@@ -35,13 +39,48 @@ public class BamMediator extends AbstractMediator {
 
     private String serverProfile = "";
     private Stream stream = new Stream();
+    private boolean isContentAware = false;
+
+    public void setContentAwareness(StreamConfiguration streamConfiguration) {
+        List<StreamEntry> streamEntryList = streamConfiguration.getEntries();
+        for (StreamEntry streamEntry : streamEntryList) {
+            if ("$SOAPBody".equals(streamEntry.getValue())) { // Check if Dump Message Body was selected in UI
+                this.isContentAware = true;
+                return;
+            }
+        }
+        List<Property> properties = streamConfiguration.getProperties();
+        for (Property property : properties) {
+            if (property.isExpression() && property.getValue() != null) {
+                if (isContentAwareExpression(property.getValue())) {
+                    this.isContentAware = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    private boolean isContentAwareExpression(String xpathString) {
+
+        // For message body and xpath expressions on message body
+        if (xpathString.contains("/") || xpathString.contains("$body")) {
+            return true;
+        }
+
+        // For special property access
+        if (xpathString.contains("get-property('From')") || xpathString.contains("get-property('FAULT')")) {
+            return true;
+        }
+
+        return false;
+    }
 
     public BamMediator() {
 
     }
 
     public boolean isContentAware() {
-        return true;
+        return this.isContentAware;
     }
 
     public boolean mediate(MessageContext messageContext) {

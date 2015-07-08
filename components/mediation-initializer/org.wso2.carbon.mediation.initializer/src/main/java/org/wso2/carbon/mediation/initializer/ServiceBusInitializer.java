@@ -47,6 +47,7 @@ import org.wso2.carbon.inbound.endpoint.EndpointListenerLoader;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService;
 import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
+import org.wso2.carbon.mediation.initializer.handler.SynapseExternalPropertyConfigurator;
 import org.wso2.carbon.mediation.initializer.multitenancy.TenantServiceBusInitializer;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.*;
@@ -67,6 +68,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.securevault.SecurityConstants;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 
 import java.io.File;
 import java.io.IOException;
@@ -121,6 +123,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * interface="org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService"
  * cardinality="1..1" policy="dynamic"
  * bind="setInboundPersistenceService" unbind="unsetInboundPersistenceService"
+ * @scr.reference name="synapse.capp.deployment.service"
+ * interface="org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService"
+ * cardinality="1..n" policy="dynamic" bind="setCAppArtifactDataService"
+ * unbind="unsetCAppArtifactDataService"
  */
 @SuppressWarnings({"JavaDoc", "UnusedDeclaration"})
 public class ServiceBusInitializer {
@@ -226,14 +232,16 @@ public class ServiceBusInitializer {
                         "SynapseConfiguration not found");
             }
 
-            if (contextInfo.getSynapseEnvironment() != null) {
+            SynapseEnvironment synapseEnvironment = contextInfo.getSynapseEnvironment();
+            if (synapseEnvironment != null) {
 
                 //Properties props = new Properties();
                 SynapseEnvironmentService synEnvSvc
-                        = new SynapseEnvironmentServiceImpl(contextInfo.getSynapseEnvironment(),
+                        = new SynapseEnvironmentServiceImpl(synapseEnvironment,
                         MultitenantConstants.SUPER_TENANT_ID, configCtxSvc.getServerConfigContext());
                 synEnvRegistration = bndCtx.registerService(
                         SynapseEnvironmentService.class.getName(), synEnvSvc, null);
+                synapseEnvironment.registerSynapseHandler(new SynapseExternalPropertyConfigurator());
 
                 if (log.isDebugEnabled()) {
                     log.debug("SynapseEnvironmentService Registered");
@@ -586,6 +594,16 @@ public class ServiceBusInitializer {
     //        }
     //        this.dataSourceInformationRepositoryService = null;
     //    }
+
+    protected void setCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigurationHolder.getInstance().setcAppArtifactDataService(cAppArtifactDataService);
+    }
+
+    protected void unsetCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigurationHolder.getInstance().setcAppArtifactDataService(null);
+    }
 
     protected void setTaskDescriptionRepositoryService(
             TaskDescriptionRepositoryService repositoryService) {

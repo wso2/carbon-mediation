@@ -37,6 +37,7 @@ import org.wso2.carbon.application.deployer.synapse.SynapseAppDeployerConstants;
 import org.wso2.carbon.application.deployer.synapse.service.SynapseAppDeployerService;
 import org.wso2.carbon.application.deployer.synapse.service.SynapseAppDeployerServiceImpl;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -52,6 +53,10 @@ import java.util.TimerTask;
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService"
  * cardinality="1..n" policy="dynamic" bind="setSynapseEnvironmentService"
  * unbind="unsetSynapseEnvironmentService"
+ * @scr.reference name="synapse.capp.deployment.service"
+ * interface="org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService"
+ * cardinality="0..n" policy="dynamic" bind="setCAppArtifactDataService"
+ * unbind="unsetCAppArtifactDataService"
  */
 public class SynapseAppDeployerDSComponent implements ServiceListener {
 
@@ -210,6 +215,16 @@ public class SynapseAppDeployerDSComponent implements ServiceListener {
         if (log.isDebugEnabled()) {
             log.debug("Synapse Application deployer activated");
         }
+    }
+
+    protected void setCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        DataHolder.getInstance().setcAppArtifactDataService(cAppArtifactDataService);
+    }
+
+    protected void unsetCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        DataHolder.getInstance().setcAppArtifactDataService(null);
     }
 
 }

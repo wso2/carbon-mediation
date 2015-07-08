@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.service.TaskManagementService;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.task.JobMetaDataProviderServiceHandler;
 import org.wso2.carbon.task.service.TaskDeployerService;
 import org.wso2.carbon.task.service.TaskDeployerServiceImpl;
@@ -48,6 +49,10 @@ import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
  * interface="org.wso2.carbon.utils.ConfigurationContextService"
  * cardinality="1..1" policy="dynamic"
  * bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
+ * @scr.reference name="synapse.capp.deployment.service"
+ * interface="org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService"
+ * cardinality="1..n" policy="dynamic" bind="setCAppArtifactDataService"
+ * unbind="unsetCAppArtifactDataService"
  */
 
 
@@ -169,6 +174,16 @@ public class TaskManagementServiceComponent {
         }
         this.configCtxSvc = null;
         ConfigHolder.getInstance().setConfigCtxSvc(null);
+    }
+
+    protected void setCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigHolder.getInstance().setcAppArtifactDataService(cAppArtifactDataService);
+    }
+
+    protected void unsetCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigHolder.getInstance().setcAppArtifactDataService(null);
     }
 
 }

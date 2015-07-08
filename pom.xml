@@ -27,7 +27,7 @@
 
     <groupId>org.wso2.carbon.mediation</groupId>
 	<artifactId>carbon-mediation</artifactId>
- 	<version>4.4.2-SNAPSHOT</version>
+ 	<version>4.4.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -1941,9 +1941,14 @@
                 <version>${org.wso2.throttle.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
+                <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
                 <artifactId>com.jayway.jsonpath</artifactId>
                 <version>${jsonpath.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${json.smart.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.damnhandy.wso2</groupId>
@@ -1961,7 +1966,7 @@
                 <version>${quickfixj.wso2.version}</version>
             </dependency>
             <dependency>
-                <groupId>commons-net.wso2</groupId>
+                <groupId>org.wso2.orbit.commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${commons.net.wso2.version}</version>
             </dependency>
@@ -2027,13 +2032,18 @@
                 <artifactId>xercesImpl</artifactId>
                 <version>${xercesImpl.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.ws.security.wso2</groupId>
+                <artifactId>wss4j</artifactId>
+                <version>${wss4j.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
 
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.4.2-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.4.3-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 4.5.0)</carbon.mediation.imp.pkg.version>
 
@@ -2050,7 +2060,7 @@
         <carbon.deployment.version>4.4.1</carbon.deployment.version>
 
         <!-- Carbon Registry version-->
-        <carbon.registry.version>4.4.0</carbon.registry.version>
+        <carbon.registry.version>4.4.3</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.4.0, 4.5.0)</carbon.registry.imp.pkg.version>
 
         <!-- Carbon Identity version-->
@@ -2062,7 +2072,7 @@
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.3-wso2v5</synapse.version>
+        <synapse.version>2.1.3-wso2v6-SNAPSHOT</synapse.version>
 
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1.wso2v12</orbit.version.axis2>
@@ -2083,12 +2093,13 @@
         <rampart.mar.version>1.6.1-wso2v12</rampart.mar.version>
         <neethi.version>3.0.2</neethi.version>
         <neethi.osgi.version>2.0.4.wso2v4</neethi.osgi.version>
+        <wss4j.version>1.5.11.wso2v10</wss4j.version>
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>1.6.1.wso2v12</rampart.wso2.version>
         <httpcore.wso2.version>4.3.3.wso2v1</httpcore.wso2.version>
         <httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>
-        <org.apache.commons.wso2.version>2.0.wso2v8</org.apache.commons.wso2.version>
+        <org.apache.commons.wso2.version>2.0-wso2v11-SNAPSHOT</org.apache.commons.wso2.version>
         <httpcore.nio.version>4.3.3</httpcore.nio.version>
         <httpcore.version>4.3.3</httpcore.version>
         <httpclient.version>4.2.5</httpclient.version>
@@ -2108,7 +2119,7 @@
         <ca.uhn.hapi.wso2.version>2.1.0.wso2v1</ca.uhn.hapi.wso2.version>
         <org.wso2.securevault.version>1.0.0-wso2v2</org.wso2.securevault.version>
         <jsch.wso2.version>0.1.49.wso2v1</jsch.wso2.version>
-        <commons.net.wso2.version>2.0.wso2v1</commons.net.wso2.version>
+        <commons.net.wso2.version>3.3.wso2v1</commons.net.wso2.version>
         <jcifs.wso2.version>1.3.17.wso2v1</jcifs.wso2.version>
         <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
 
@@ -2172,6 +2183,7 @@
         <geronimo-jta.version>1.1.1</geronimo-jta.version>
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
         <jsonpath.version>0.8.1.wso2v1</jsonpath.version>
+        <json.smart.version>1.2</json.smart.version>
         <damnhandy.version>1.1.7.wso2v1</damnhandy.version>
         <staxon.version>1.2.0.wso2v2</staxon.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>

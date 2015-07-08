@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-ui</artifactId>
-        <version>4.4.2-SNAPSHOT</version>
+        <version>4.4.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.4.2-SNAPSHOT</version>
+    <version>4.4.3-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.task.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Task UI</name>
@@ -42,7 +42,7 @@
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Import-Package>
                             org.wso2.carbon.task.stub.*;
-                            version="${carbon.mediation.imp.pkg.version}",
+                            version="${carbon.mediation.version}",
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
                             org.apache.axiom.*; version="${axiom.osgi.version.range}",
                             org.apache.synapse.task.*,

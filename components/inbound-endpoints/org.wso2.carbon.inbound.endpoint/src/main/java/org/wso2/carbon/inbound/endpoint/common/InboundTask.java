@@ -54,7 +54,7 @@ public abstract class InboundTask implements org.apache.synapse.task.Task, Manag
                     try {
                         Thread.sleep(lRequiredSleep);
                     } catch (InterruptedException e) {
-                        logger.warn("Unable to sleep the inbound thread", e);
+                        logger.debug("Unable to sleep the inbound thread less than 1 second");
                     }
                 }                
                 lCurrentTime = (new Date()).getTime();

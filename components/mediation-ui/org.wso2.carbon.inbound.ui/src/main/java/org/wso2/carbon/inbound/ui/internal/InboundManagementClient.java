@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.ui.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -33,6 +34,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.inbound.stub.InboundAdminInboundManagementException;
 import org.wso2.carbon.inbound.stub.InboundAdminStub;
 import org.wso2.carbon.inbound.stub.types.carbon.InboundEndpointDTO;
 import org.wso2.carbon.inbound.stub.types.carbon.ParameterDTO;
@@ -129,7 +131,7 @@ public class InboundManagementClient {
     }
 
     public boolean addInboundEndpoint(String name, String sequence, String onError,
-                                      String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
+                                      String protocol, String classImpl, String suspended, List<ParamDTO> lParameters) throws Exception {
         try {
             lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
@@ -145,16 +147,16 @@ public class InboundManagementClient {
                 parameterDTOs[i++] = parameterDTO;
             }
             if (canAdd(name, protocol, parameterDTOs)) {
-                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, suspended, parameterDTOs);
                 return true;
             }else {
                 log.warn("Cannot add Inbound endpoint " + name + " may be duplicate inbound already exists");
+                return false;
             }
         } catch (Exception e) {
             log.error(e);
-            return false;
+            throw e;
         }
-        return false;
     }
 
     private List<String> getList(String strProtocol, boolean mandatory) {
@@ -202,26 +204,29 @@ public class InboundManagementClient {
     private boolean canAdd(String name, String protocol, ParameterDTO[] parameterDTOs) {
         try {
             String port = null;
+            if(protocol != null && isListener(protocol)){
+                for(ParameterDTO paramDTO: parameterDTOs){
+                    if(isListenerPortParam(paramDTO.getName())){
+                        Integer.parseInt(paramDTO.getValue());
+                    }
+                }
+            }
             InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
             if(inboundEndpointDTOs != null) {
                 for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
                     if (inboundEndpointDTO.getName().equals(name)) {
                         return false;
                     }
-                    if (protocol.equals("http") || protocol.equals("https")) {
-                        ParameterDTO[] existparameterDTOs = inboundEndpointDTO.getParameters();
-                        for (ParameterDTO parameterDTO : existparameterDTOs) {
-                            if (parameterDTO.getName().equals("inbound.http.port")) {
+                    if (protocol != null && isListener(protocol)) {
+                        ParameterDTO[] existingParameterDTOs = inboundEndpointDTO.getParameters();
+                        for (ParameterDTO parameterDTO : existingParameterDTOs) {
+                            if (isListenerPortParam(parameterDTO.getName())) {
                                 port = parameterDTO.getValue();
+                                if (isListenerPortInUse(port, parameterDTOs)) {
+                                    log.warn("Port " + port + " already in use by another endpoint. Inbound endpoint " + name + " deployment failed");
+                                    return false;
+                                }
                             }
-                        }
-                    }
-                }
-                if (protocol.equals("http") || protocol.equals("https")) {
-                    for (ParameterDTO parameterDTO : parameterDTOs) {
-                        if (parameterDTO.getName().equals("inbound.http.port") && parameterDTO.getValue().equals(port)) {
-                            log.warn("Already used port " + port + "by another endpoint may be inbound endpoint " + name + " deployment failed");
-                            return false;
                         }
                     }
                 }
@@ -233,7 +238,35 @@ public class InboundManagementClient {
         return true;
     }
 
+    private boolean isListenerPortInUse(String port, ParameterDTO[] parameterDTOs) {
+        for (ParameterDTO parameterDTO : parameterDTOs) {
+            if (isListenerPortParam(parameterDTO.getName()) && parameterDTO.getValue().equals(port)) {
+                return true;
+            }
+        }
 
+        return false;
+    }
+
+    private boolean isListener(String protocolName) {
+        for (String listener : InboundClientConstants.LISTENER_TYPES) {
+            if (protocolName.equals(listener)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isListenerPortParam(String portParam) {
+        for (String listenerPortParam : InboundClientConstants.LISTENER_PORT_PARAMS) {
+            if (portParam.equals(listenerPortParam)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 
     public InboundDescription getInboundDescription(String name) {
@@ -247,7 +280,7 @@ public class InboundManagementClient {
     }
 
     public boolean updteInboundEndpoint(String name, String sequence, String onError,
-            String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
+            String protocol, String classImpl, String suspended, List<ParamDTO> lParameters) throws Exception {
         try {
             lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
@@ -268,17 +301,17 @@ public class InboundManagementClient {
                 stub.removeInboundEndpoint(name);
             }
             if(canAdd(name,protocol,parameterDTOs)) {
-                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, suspended, parameterDTOs);
                 return true;
             }else if(inboundEndpointDTO != null){
                 stub.addInboundEndpoint(inboundEndpointDTO.getName(), inboundEndpointDTO.getInjectingSeq(),
                                         inboundEndpointDTO.getOnErrorSeq(), inboundEndpointDTO.getProtocol(),
-                                        inboundEndpointDTO.getClassImpl(), inboundEndpointDTO.getParameters());
+                                        inboundEndpointDTO.getClassImpl(), suspended, inboundEndpointDTO.getParameters());
                 return false;
             }
         } catch (Exception e) {
             log.error(e);
-            return false;
+            throw e;
         }
         return false;
     }
@@ -291,5 +324,25 @@ public class InboundManagementClient {
             }
         }
         return paramDTOs;
+    }
+
+    public String[] getAllInboundNames() {
+        String[] inboundNameList = null;
+        try {
+            InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
+            if (inboundEndpointDTOs != null) {
+                inboundNameList = new String[inboundEndpointDTOs.length];
+                if (inboundEndpointDTOs != null) {
+                    for (int i = 0; i < inboundEndpointDTOs.length; i++) {
+                        inboundNameList[i] = inboundEndpointDTOs[i].getName();
+                    }
+                }
+            }
+        } catch (RemoteException e) {
+            log.error(e);
+        } catch (InboundAdminInboundManagementException e) {
+            log.error(e);
+        }
+        return inboundNameList;
     }
 }

@@ -31,6 +31,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.proxyadmin.observer.ProxyObserver;
@@ -68,6 +69,10 @@ import java.util.Set;
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
  * cardinality="1..n" policy="dynamic" bind="setSynapseRegistrationsService"
  * unbind="unsetSynapseRegistrationsService"
+ * @scr.reference name="synapse.capp.deployment.service"
+ * interface="org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService"
+ * cardinality="1..n" policy="dynamic" bind="setCAppArtifactDataService"
+ * unbind="unsetCAppArtifactDataService"
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class ProxyAdminServiceComponent extends AbstractAxis2ConfigurationContextObserver{
@@ -240,6 +245,16 @@ public class ProxyAdminServiceComponent extends AbstractAxis2ConfigurationContex
     protected void setSynapseRegistrationsService(
             SynapseRegistrationsService synapseRegistrationsService) {
         
+    }
+
+    protected void setCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigHolder.getInstance().setcAppArtifactDataService(cAppArtifactDataService);
+    }
+
+    protected void unsetCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigHolder.getInstance().setcAppArtifactDataService(null);
     }
 
     protected void unsetSynapseRegistrationsService(

@@ -274,6 +274,17 @@ function editEndpoint(endpointType, endPointName) {
     document.location.href = endpointType + 'Endpoint.jsp?endpointName=' + endPointName + '&endpointAction=edit';
 }
 
+function editCAppEndpoint(endpointType, endPointName) {
+  CARBON.showConfirmationDialog("The changes will not persist to the CAPP after restart or redeploy. Do you want to Edit?", function() {
+   $.ajax({
+             type: 'POST',
+             success: function() {
+                  document.location.href = endpointType + 'Endpoint.jsp?endpointName=' + endPointName + '&endpointAction=edit';
+             }
+          });
+   });
+}
+
 function editDynamicEndpoint(key) {
     if (key != null && key != undefined && key != "") {
         location.href = "dynamicEndpoint.jsp?anonEpAction=edit&key=" + key;
@@ -586,16 +597,26 @@ function resetVars() {
                 &nbsp;
             </td>
             <td><% if (endpoint.getDescription() != null) { %>
-                    <span href="#">
-                          <%= endpoint.getName()%>
-                    </span>
-                <%
-                } else {
-                %>
-                <span href="#"><%= endpoint.getName()%></span>
-                <%
-                    }
-                %>
+                   <% if (endpoint.getDeployedFromCApp()) { %>
+                         <span href="#">
+                              <img src="images/applications.gif">
+                              <%= endpoint.getName()%>
+                              <% if(endpoint.getEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                         </span>
+                   <% } else { %>
+                          span href="#"><%= endpoint.getName()%></span>
+                   <% } %>
+                <% } else { %>
+                   <% if (endpoint.getDeployedFromCApp()) { %>
+                          <span href="#">
+                                <img src="images/applications.gif">
+                                <%= endpoint.getName()%>
+                                 <% if(endpoint.getEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                          </span>
+                   <% } else { %>
+                           <span href="#"><%= endpoint.getName()%></span>
+                     <% } %>
+                <% } %>
             </td>
             <td>
                 <%
@@ -675,15 +696,40 @@ function resetVars() {
             <%
                 }
             %>
+            <% if(endpoint.getDeployedFromCApp()) { %>
             <td style="border-left:none;border-right:none;width:100px">
                 <div class="inlineDiv">
                     <a href="#"
                        class="icon-link"
-                       onclick="editEndpoint('<%=ePService.getUIPageName()%>','<%= endpoint.getName() %>')"
+                       onclick="editCAppEndpoint('<%=ePService.getUIPageName()%>','<%= endpoint.getName() %>')"
                        style="background-image:url(../admin/images/edit.gif);"><fmt:message
                             key="edit"/></a>
                 </div>
             </td>
+            <% } else { %>
+            <td style="border-left:none;border-right:none;width:100px">
+                  <div class="inlineDiv">
+                      <a href="#"
+                         class="icon-link"
+                         onclick="editEndpoint('<%=ePService.getUIPageName()%>','<%= endpoint.getName() %>')"
+                         style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                         key="edit"/>
+                      </a>
+                  </div>
+            </td>
+            <% } %>
+            <% if(endpoint.getDeployedFromCApp()) { %>
+            <td style="border-left:none;width:100px">
+                   <div class="inlineDiv">
+                        <a href="#"
+                           onclick="#"
+                           class="icon-link"
+                           style="color:grey;"><fmt:message
+                           key="delete"/>
+                        </a>
+                   </div>
+            </td>
+            <% } else { %>
             <td style="border-left:none;width:100px">
                 <div class="inlineDiv">
                     <a href="#"
@@ -693,6 +739,7 @@ function resetVars() {
                             key="delete"/></a>
                 </div>
             </td>
+            <% } %>
         </tr>
         <%}%>
         </tbody>

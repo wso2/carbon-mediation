@@ -43,6 +43,7 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.sequences.common.SequenceEditorException;
@@ -54,6 +55,7 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
@@ -78,6 +80,7 @@ import java.util.regex.Pattern;
 public class SequenceAdmin extends AbstractServiceBusAdmin {
 
     private static final Log log = LogFactory.getLog(SequenceAdmin.class);
+    private static final String artifactType = ServiceBusConstants.SEQUENCE_TYPE;
 
     //TODO: Move WSO2_SEQUENCE_MEDIA_TYPE to registry
     public static final String WSO2_SEQUENCE_MEDIA_TYPE ="application/vnd.wso2.sequence";
@@ -89,10 +92,27 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
         try {
             lock.lock();
             sequences = getSynapseConfiguration().getDefinedSequences().values();
-
             SequenceInfo[] info = SequenceInfoFactory.getSortedSequenceInfoArray(sequences);
             SequenceInfo[] ret;
-            if (info.length >= (sequencePerPage * pageNumber + sequencePerPage)) {
+            SequenceInfo[] sequenceInfos = new SequenceInfo[info.length];
+            int key = 0;
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+            if (info != null && info.length > 0) {
+                for (SequenceInfo infoTemp : info) {
+                    SequenceInfo seqInfo = new SequenceInfo();
+                    seqInfo = infoTemp;
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
+                        seqInfo.setDeployedFromCApp(true);
+                    }
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
+                        seqInfo.setEdited(true);
+                    }
+                    sequenceInfos[key] = seqInfo;
+                    key++;
+                }
+            }
+            if (sequenceInfos.length >= (sequencePerPage * pageNumber + sequencePerPage)) {
                 ret = new SequenceInfo[sequencePerPage];
             } else {
                 ret = new SequenceInfo[info.length - (sequencePerPage * pageNumber)];
@@ -123,11 +143,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
         }
         return 0;
     }
-    
+
     @SuppressWarnings({"unchecked"})
     public SequenceInfo[] getDynamicSequences(int pageNumber, int sequencePerPage)
             throws SequenceEditorException {
-        
+
         org.wso2.carbon.registry.core.Registry registry;
         SequenceInfo[] ret;
         final Lock lock = getLock();
@@ -136,7 +156,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             String[] configInfo = getConfigSystemRegistry() !=null?getMimeTypeResult(getConfigSystemRegistry()):new String[0];
             String[] govInfo = getGovernanceRegistry() != null ?getMimeTypeResult(getGovernanceRegistry()):new String[0];
             String[] info = new String[(configInfo != null?configInfo.length:0) + (govInfo !=null?govInfo.length:0)];
-            
+
             int ptr = 0;
             for (String aConfigInfo : configInfo) {
                 info[ptr] = "conf:" + aConfigInfo;
@@ -226,7 +246,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
 	 *
      * @param sequenceName
      * @param tenantDomain
-     * @throws SequenceEditorException 
+     * @throws SequenceEditorException
      */
     public void deleteSequenceForTenant(String sequenceName, String tenantDomain) throws SequenceEditorException{
 
@@ -258,9 +278,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             list.remove("main");
             list.remove("fault");
             sequenceNames = list.toArray(new String[list.size()]);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             for (String sequenceName : sequenceNames) {
                 SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
-                if (sequence != null) {
+                if (sequence != null && (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName)))) {
                     synCfg.removeSequence(sequenceName);
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     pm.deleteItem(sequenceName, sequence.getFileName(),
@@ -287,9 +309,12 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             sequences = getSynapseConfiguration().getDefinedSequences().values();
 
             SynapseConfiguration synCfg = getSynapseConfiguration();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             for (SequenceMediator sequence : sequences) {
                 if (sequence != null) {
-                    if ((!sequence.getName().equals("main")) && (!sequence.getName().equals("fault"))) {
+                    if ((!sequence.getName().equals("main")) && (!sequence.getName().equals("fault")) &&
+                            (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequence.getName())))) {
                         synCfg.removeSequence(sequence.getName());
                         MediationPersistenceManager pm = getMediationPersistenceManager();
                         pm.deleteItem(sequence.getName(), sequence.getFileName(),
@@ -344,8 +369,8 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
 	 *
      * @param sequenceName
      * @param tenantDomain
-     * @throws SequenceEditorException 
-     * 
+     * @throws SequenceEditorException
+     *
      */
     public OMElement getSequenceForTenant(String sequenceName, String tenantDomain) throws SequenceEditorException{
 
@@ -377,8 +402,8 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     XMLConfigConstants.SEQUENCE_ELT.getLocalPart())) {
                 String sequenceName = sequenceElement.getAttributeValue(new QName("name"));
                 if("".equals(sequenceName) || null == sequenceName) {
-                    handleException("sequence name is required.");   
-                }                 
+                    handleException("sequence name is required.");
+                }
                 SynapseConfiguration config = getSynapseConfiguration();
                 if(log.isDebugEnabled()) {
                     log.debug("Adding sequence : " + sequenceName + " to the configuration");
@@ -392,7 +417,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     if(log.isDebugEnabled()) {
                         log.debug("Added sequence : " + sequenceName + " to the configuration");
                     }
-                    
+
                     SequenceMediator seq = config.getDefinedSequences().get(sequenceName);
                     seq.setFileName(ServiceBusUtils.generateFileName(sequenceName));
                     seq.init(getSynapseEnvironment());
@@ -420,7 +445,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
 	 *
      * @param sequenceElement
      * @param tenantDomain
-     * @throws SequenceEditorException 
+     * @throws SequenceEditorException
      */
     public void addSequenceForTenant(OMElement sequenceElement, String tenantDomain) throws SequenceEditorException{
 
@@ -429,7 +454,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
 			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
 			                                                                      true);
 			addSequence(sequenceElement);
-		
+
 		} catch (Exception e) {
 			  handleException("Issue in deploying the sequence definition");
         } finally {
@@ -470,7 +495,8 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                         *Remove the sequence element from its parent to avoid inheritance of unwanted namespaces (ex: namespace of
                         *the admin service operation)*/
             sequenceElement.detach();
-
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             if (sequenceElement != null && sequenceElement.getLocalName().equals(
                     XMLConfigConstants.SEQUENCE_ELT.getLocalPart())) {
                 String sequenceName = sequenceElement.getAttributeValue(new QName("name"));
@@ -498,10 +524,15 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     log.debug("Saved sequence : " + sequenceName + " to the configuration");
 
                     SequenceMediator seq = config.getDefinedSequences().get(sequenceName);
+                    String artifactName = getArtifactName(artifactType, sequenceName);
                     if (seq != null) {
                         seq.init(getSynapseEnvironment());
-                        persistSequence(seq);
-                    }
+                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+                        } else {
+                            persistSequence(seq);
+                        }
+                }
                 }
             } else {
                 handleException("Unable to save sequence. Invalid definition");
@@ -521,7 +552,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
                 sequence.enableStatistics();
-                persistSequence(sequence);
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName))) {
+                    persistSequence(sequence);
+                }
                 return sequenceName;
             } else {
                 handleException("No defined sequence with name " + sequenceName
@@ -544,7 +579,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
                 sequence.disableStatistics();
-                persistSequence(sequence);
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName))) {
+                    persistSequence(sequence);
+                }
                 return sequenceName;
             } else {
                 handleException("No defined sequence with name " + sequenceName
@@ -567,7 +606,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
                 sequence.setTraceState(SynapseConstants.TRACING_ON);
-                persistSequence(sequence);
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName))) {
+                    persistSequence(sequence);
+                }
                 return sequenceName;
             } else {
                 handleException("No defined sequence with name " + sequenceName
@@ -590,7 +633,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
                 sequence.setTraceState(SynapseConstants.TRACING_OFF);
-                persistSequence(sequence);
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, sequenceName))) {
+                    persistSequence(sequence);
+                }
                 return sequenceName;
             } else {
                 handleException("No defined sequence with name " + sequenceName
@@ -643,7 +690,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     }
                 } else if (entryValue instanceof Entry) {
                     Entry entry = (Entry) entryValue;
-                    
+
                     if (!entry.isDynamic() && !entry.isRemote()) { // only care pre-defined local entries
                         String key = entry.getKey();
                         if (SynapseConstants.SERVER_IP.equals(key)
@@ -816,7 +863,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     if (tempDependents[i].getType() !=
                             org.wso2.carbon.mediation.dependency.mgt.ConfigurationObject.TYPE_UNKNOWN) {
                         dependents.add(new ConfigurationObject(tempDependents[i].getType(),
-                            tempDependents[i].getId()));
+                                tempDependents[i].getId()));
                     }
                 }
 
@@ -836,13 +883,13 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
         }
         pm.saveItem(sequence.getName(), ServiceBusConstants.ITEM_TYPE_SEQUENCE);
     }
-    
+
     /**
  	 * Override the AbstarctAdmin.java's getAxisConfig() to create the CarbonContext from ThreadLoaclContext.
  	 * We do this to support, publishing APIs as a supertenant but want to deploy that in tenant space.
  	 * (This model is needed for APIManager)
  	 */
- 	
+
  	protected AxisConfiguration getAxisConfig() {
  		return (axisConfig != null) ? axisConfig : getConfigContext().getAxisConfiguration();
  	}
@@ -851,7 +898,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
  		if (configurationContext != null) {
  			return configurationContext;
  		}
- 		
+
  		MessageContext msgContext = MessageContext.getCurrentMessageContext();
  		if (msgContext != null) {
  			ConfigurationContext mainConfigContext = msgContext.getConfigurationContext();
