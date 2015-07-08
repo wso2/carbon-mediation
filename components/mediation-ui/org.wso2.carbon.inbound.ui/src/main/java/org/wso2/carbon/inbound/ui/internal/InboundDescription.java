@@ -34,7 +34,7 @@ public class InboundDescription {
    private String onErrorSeq;
    private Map<String, String> parameters;
    private String fileName;
-   public static final String REGISTRY_KEY_PREFIX = "key:";
+   public static final String REGISTRY_KEY_PREFIX = "$registry:";
     
 	public InboundDescription(InboundEndpointDTO inboundEndpoint){
 		this.name = inboundEndpoint.getName();
@@ -46,7 +46,7 @@ public class InboundDescription {
 			this.type = InboundClientConstants.TYPE_CLASS;
 			this.classImpl = inboundEndpoint.getClassImpl();	
 		}
-		this.suspend = inboundEndpoint.isSuspendSpecified();
+		this.suspend = inboundEndpoint.getSuspend();
 		this.injectingSeq = inboundEndpoint.getInjectingSeq();
 		this.onErrorSeq = inboundEndpoint.getOnErrorSeq();
 		this.fileName = inboundEndpoint.getFileName();

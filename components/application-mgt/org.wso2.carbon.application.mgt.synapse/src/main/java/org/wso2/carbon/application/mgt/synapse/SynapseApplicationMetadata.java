@@ -30,7 +30,8 @@ public class SynapseApplicationMetadata {
     private String[] events;
     private String[] mediators;
     private TaskMetadata[] tasks;
-
+    private String[] apis;
+    private String[] inboundEPs;
 
     public String getAppName() {
         return appName;
@@ -95,4 +96,17 @@ public class SynapseApplicationMetadata {
     public void setTasks(TaskMetadata[] tasks) {
         this.tasks = tasks;
     }
+
+    public String[] getApis() { return apis; }
+
+    public void setApis(String[] apis) { this.apis = apis; }
+
+    public String[] getInboundEPs() {
+        return inboundEPs;
+    }
+
+    public void setInboundEPs(String[] inboundEPs) {
+        this.inboundEPs = inboundEPs;
+    }
+
 }

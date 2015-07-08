@@ -52,7 +52,10 @@ public class PersistenceUtils {
 
     // QNames
     private static final QName INBOUND_ENDPOINTS_QN = new QName("inboundEndpoints");
+    private static final QName INBOUND_LISTENING_ENDPOINTS_QN = new QName("inboundListeningEndpoints");
+    private static final QName INBOUND_POLLING_ENDPOINTS_QN = new QName("inboundPollingingEndpoints");
     private static final QName INBOUND_ENDPOINT_LISTENER_QN = new QName("inboundEndpointListener");
+    private static final QName INBOUND_ENDPOINT_POLL_QN = new QName("inboundEndpointPoll");
     private static final QName ENDPOINT_QN = new QName("endpoint");
     private static final QName PARAMS_QN = new QName("inboundParameters");
     private static final QName PARAM_QN = new QName("inboundParameter");
@@ -84,10 +87,10 @@ public class PersistenceUtils {
      * @return equivalent OMElement for EndpointInfo
      */
     public static OMElement convertEndpointInfoToOM(
-               Map<Integer, List<InboundEndpointInfoDTO>> endpointInfo) {
+               Map<Integer, List<InboundEndpointInfoDTO>> endpointInfo, Map<String,Set<String>> endpointPollingInfo) {
 
-        OMElement parentElement = fac.createOMElement(INBOUND_ENDPOINTS_QN);
-
+        OMElement rootElement = fac.createOMElement(INBOUND_ENDPOINTS_QN);
+        OMElement parentElement = fac.createOMElement(INBOUND_LISTENING_ENDPOINTS_QN, rootElement);
         for (Map.Entry<Integer, List<InboundEndpointInfoDTO>> mapEntry : endpointInfo.entrySet()) {
             int port = mapEntry.getKey();
 
@@ -152,7 +155,21 @@ public class PersistenceUtils {
                 }
             }
         }
-        return parentElement;
+        
+        parentElement = fac.createOMElement(INBOUND_POLLING_ENDPOINTS_QN, rootElement);
+        for (Map.Entry<String, Set<String>> mapEntry : endpointPollingInfo.entrySet()) {
+            String tenantDomain = mapEntry.getKey();
+
+            OMElement listenerElem = fac.createOMElement(INBOUND_ENDPOINT_POLL_QN, parentElement);
+
+            Set<String> lNames = mapEntry.getValue();
+            for (String strName : lNames) {
+                OMElement endpointElem = fac.createOMElement(ENDPOINT_QN, listenerElem);
+                endpointElem.addAttribute(NAME_ATT, strName, nullNS);
+                endpointElem.addAttribute(DOMAIN_ATT, tenantDomain, nullNS);
+            }
+        }        
+        return rootElement;
     }
 
     /**
@@ -161,14 +178,21 @@ public class PersistenceUtils {
      * @param endpointInfoOM OMElement containing endpoint information
      * @return equivalent EndpointInfo for OMElement
      */
-    public static Map<Integer,List<InboundEndpointInfoDTO>> convertOMToEndpointInfo(
+    public static Map<Integer,List<InboundEndpointInfoDTO>> convertOMToEndpointListeningInfo(
             OMElement endpointInfoOM) {
 
         Map<Integer, List<InboundEndpointInfoDTO>> endpointInfo =
                 new ConcurrentHashMap<Integer, List<InboundEndpointInfoDTO>>();
 
+        Iterator rootElementsItr =
+           endpointInfoOM.getChildrenWithName(INBOUND_LISTENING_ENDPOINTS_QN);
+        
+        if(!rootElementsItr.hasNext()){
+      	  return endpointInfo;
+        }
+                    
         Iterator listenerElementsItr =
-                endpointInfoOM.getChildrenWithName(INBOUND_ENDPOINT_LISTENER_QN);
+      	  ((OMElement)rootElementsItr.next()).getChildrenWithName(INBOUND_ENDPOINT_LISTENER_QN);
         while (listenerElementsItr.hasNext()) {
 
             List<InboundEndpointInfoDTO> tenantList = new ArrayList<InboundEndpointInfoDTO>();
@@ -203,6 +227,48 @@ public class PersistenceUtils {
         return endpointInfo;
     }
 
+    /**
+     * Create EndpointInfo from OMElement
+     *
+     * @param endpointInfoOM OMElement containing endpoint information
+     * @return equivalent EndpointInfo for OMElement
+     */
+    public static Map<String,Set<String>> convertOMToEndpointPollingInfo(
+            OMElement endpointInfoOM) {
+
+        Map<String,Set<String>> endpointInfo =
+                new ConcurrentHashMap<String,Set<String>>();
+        
+        Iterator rootElementsItr =
+           endpointInfoOM.getChildrenWithName(INBOUND_POLLING_ENDPOINTS_QN);
+        
+        if(!rootElementsItr.hasNext()){
+      	  return endpointInfo;
+        }
+        
+        Iterator pollElementsItr =
+      	  ((OMElement)rootElementsItr.next()).getChildrenWithName(INBOUND_ENDPOINT_POLL_QN);
+        while (pollElementsItr.hasNext()) {
+
+            List<InboundEndpointInfoDTO> tenantList = new ArrayList<InboundEndpointInfoDTO>();
+            OMElement pollElement = (OMElement) pollElementsItr.next();
+
+            Iterator endpointsItr = pollElement.getChildrenWithName(ENDPOINT_QN);
+            while (endpointsItr.hasNext()) {
+                OMElement endpointElement = (OMElement) endpointsItr.next();
+                String iTenantDomain = endpointElement.getAttributeValue(DOMAIN_QN);
+                String strEndpointName = endpointElement.getAttributeValue(NAME_QN);
+                Set lNames = endpointInfo.get(iTenantDomain);
+                if(lNames == null){
+               	 lNames = new HashSet<String>();
+                }
+                lNames.add(strEndpointName);
+                endpointInfo.put(iTenantDomain, lNames);
+            }
+        }
+        return endpointInfo;
+    }    
+    
     private static InboundProcessorParams deserializeInboundParameters(OMElement endpointElement) {
         InboundProcessorParams inboundParams = new InboundProcessorParams();
 

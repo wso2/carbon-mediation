@@ -307,6 +307,10 @@
                         onclick="showHideCustomInput(false)">
                     JMS Message Store
                 </option>
+                <option value="org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore"
+                        onclick="showHideCustomInput(false)">
+                    RabbitMQ Message Store
+                </option>
                 <option value="custom.store" onclick="showHideCustomInput(true)">
                     Custom
                 </option>

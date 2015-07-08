@@ -141,7 +141,7 @@ public class BamMediatorFactory extends AbstractMediatorFactory {
         StreamConfiguration streamConfiguration = bamServerConfig.getAUniqueStreamConfiguration(streamName, streamVersion);
         bamMediator.getStream().setBamServerConfig(bamServerConfig);
         bamMediator.getStream().setStreamConfiguration(streamConfiguration);
-
+        bamMediator.setContentAwareness(streamConfiguration);
     }
 
     private boolean isNotNullOrEmpty(String string){

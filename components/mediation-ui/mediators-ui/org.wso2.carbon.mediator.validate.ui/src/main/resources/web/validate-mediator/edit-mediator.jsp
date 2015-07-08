@@ -99,7 +99,7 @@
 
                                         if (schemaKey != null) {
                                             showValue = schemaKey.getKeyValue();
-                                            synapseXPath = schemaKey.getExpression();
+                                            synapseXPath = (SynapseXPath) schemaKey.getExpression();
 
                                             isStaticKey = showValue != null && !"".equals(showValue);
 

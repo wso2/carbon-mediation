@@ -19,7 +19,7 @@
 
    <parent>
        <artifactId>synapse-features</artifactId>
-       <version>4.4.1-SNAPSHOT</version>
+       <version>4.4.3-SNAPSHOT</version>
        <groupId>org.wso2.carbon.mediation</groupId>
     </parent>
 
@@ -45,7 +45,7 @@
             <artifactId>commons-vfs2</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-net.wso2</groupId>
+            <groupId>org.wso2.orbit.commons-net</groupId>
             <artifactId>commons-net</artifactId>
         </dependency>
         <dependency>
@@ -79,7 +79,7 @@
                                 <importBundleDef>org.apache.synapse:synapse-commons</importBundleDef>
                                 <importBundleDef>org.apache.synapse:synapse-vfs-transport</importBundleDef>
                                 <importBundleDef>org.apache.commons.wso2:commons-vfs2</importBundleDef>
-                                <importBundleDef>commons-net.wso2:commons-net</importBundleDef>
+                                <importBundleDef>org.wso2.orbit.commons-net:commons-net</importBundleDef>
                                 <importBundleDef>com.jcraft:jsch</importBundleDef>
                             </importBundles>
                         </configuration>

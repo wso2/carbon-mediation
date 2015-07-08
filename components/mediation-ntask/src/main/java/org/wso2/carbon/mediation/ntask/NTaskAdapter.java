@@ -75,6 +75,9 @@ public class NTaskAdapter extends AbstractTask {
             logger.debug("#execute Executing NTaskAdapter: " + getProperties()
                 + " Worker-node[" + CarbonUtils.isWorkerNode() + "]" );
         }
+        //needs to keep the tenant loaded
+        Map<String, String> properties = getProperties();
+        checkLoadTenant(properties.get(TaskInfo.TENANT_ID_PROP));
         synapseTask.execute();
     }
     /**

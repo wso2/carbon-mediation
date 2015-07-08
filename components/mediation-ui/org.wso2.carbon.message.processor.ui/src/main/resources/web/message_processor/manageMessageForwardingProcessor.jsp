@@ -394,9 +394,10 @@
                         <td><fmt:message key="message.processor.state"/><span class="required"> *</span></td>
                         <td>
                             <select id="mp_state" name="mp_state">
-                                <% if (null!=processorData && processorData.getParams() != null) {
-                                     if (!processorData.getParams().isEmpty()&&(processorData.getParams().get("is.active")!=null)
-                                             && Boolean.valueOf(processorData.getParams().get("is.active"))) { %>
+                                <% if (null != processorData && processorData.getParams() != null &&
+                                       !processorData.getParams().isEmpty() &&
+                                       (processorData.getParams().get("is.active") != null)) {
+                                     if (Boolean.valueOf(processorData.getParams().get("is.active"))) { %>
                                         <option value="false">Deactivate</option>
                                         <option value="true" selected>Activate</option>
                                      <% } else { %>
