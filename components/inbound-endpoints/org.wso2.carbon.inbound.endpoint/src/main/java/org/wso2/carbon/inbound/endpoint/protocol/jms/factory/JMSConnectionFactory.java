@@ -263,9 +263,9 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 try {
                     connection.close();
                 } catch (Exception ex) {
-                }                        
+                }
+            }
         }
-
         return null;
     }
 
