@@ -190,6 +190,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 	connection = ((TopicConnectionFactory) (this.connectionFactory))
                             .createTopicConnection();
                 }
+                return connection;
             } else {
                 QueueConnectionFactory qConFac = null;
                 TopicConnectionFactory tConFac = null;                
@@ -224,19 +225,21 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     }
 
     public Connection createConnection(String userName, String password) {
+        Connection connection = null;
         try {
             if (jmsSpec11) {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-                    return ((QueueConnectionFactory) (this.connectionFactory))
+                    connection = ((QueueConnectionFactory) (this.connectionFactory))
                             .createQueueConnection(userName, password);
                 } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-                    return ((TopicConnectionFactory) (this.connectionFactory))
+                    connection = ((TopicConnectionFactory) (this.connectionFactory))
                             .createTopicConnection(userName, password);
                 }
+                return connection;
             } else {
                 QueueConnectionFactory qConFac = null;
                 TopicConnectionFactory tConFac = null;
-                Connection connection = null;
+                
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                     qConFac = (QueueConnectionFactory) this.connectionFactory;
                 } else {
@@ -255,6 +258,12 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         } catch (JMSException e) {
             logger.error("JMS Exception while creating connection through factory '"
                     + this.connectionFactoryString + "' " + e.getMessage());
+            // Need to close the connection in the case if durable subscriptions
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (Exception ex) {
+                }                        
         }
 
         return null;
