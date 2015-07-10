@@ -22,6 +22,7 @@ import org.apache.axis2.transport.base.threads.WorkerPool;
 import org.apache.http.HttpException;
 import org.apache.http.nio.NHttpServerConnection;
 import org.apache.log4j.Logger;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.transport.passthru.ProtocolState;
 import org.apache.synapse.transport.passthru.SourceContext;
 import org.apache.synapse.transport.passthru.SourceHandler;
@@ -34,6 +35,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointMan
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Handler Class for process HTTP Requests
@@ -55,8 +57,13 @@ public class InboundHttpSourceHandler extends SourceHandler {
         this.port = port;
         this.tenantDomain = tenantDomain;
 
-        if (dispatchPattern != null) {
-            this.dispatchPattern = Pattern.compile(dispatchPattern, Pattern.COMMENTS | Pattern.DOTALL);
+        try {
+            if (dispatchPattern != null) {
+                this.dispatchPattern = Pattern.compile(dispatchPattern, Pattern.COMMENTS | Pattern.DOTALL);
+            }
+        } catch (PatternSyntaxException e) {
+            log.error("Dispatch pattern " + dispatchPattern + " is an invalid pattern");
+            throw new SynapseException(e);
         }
     }
 
