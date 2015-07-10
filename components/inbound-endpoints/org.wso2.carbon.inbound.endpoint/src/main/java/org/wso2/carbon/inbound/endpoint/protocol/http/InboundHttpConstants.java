@@ -64,7 +64,7 @@ public class InboundHttpConstants {
 
     public static final String INBOUND_THREAD_ID = "inbound.thread.id";
 
-
+    public static final String KEY_DELIMITER = "-";
 
 
 }
