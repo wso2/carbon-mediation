@@ -661,31 +661,8 @@ public class WSO2Registry extends AbstractRegistry {
         }
 
         if (resource != null) {
-
-            if (resource.getMediaType() != null) {
-                if (resource.getMediaType().equals("text/plain")) {
-                    // for non-xml text content
-                    return OMAbstractFactory.getOMFactory().createOMText(
-                            new String((byte[]) resource.getContent()));
-                }
-            } else {
-                ByteArrayInputStream inputStream = new ByteArrayInputStream(
-                        (byte[]) resource.getContent());
-                try {
-                    OMFactory omFactory = OMAbstractFactory.getOMFactory();
-                    return omFactory.createOMText(
-                            new DataHandler(new SynapseBinaryDataSource(inputStream,
-                                    resource.getMediaType())), true);
-                } catch (IOException e) {
-                    handleException("Error while getting a stream from resource content ", e);
-                } finally {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        log.error("Error while closing the input stream", e);
-                    }
-                }
-            }
+            return OMAbstractFactory.getOMFactory().createOMText(
+                    new String((byte[]) resource.getContent()));
         }
         return null;
     }
