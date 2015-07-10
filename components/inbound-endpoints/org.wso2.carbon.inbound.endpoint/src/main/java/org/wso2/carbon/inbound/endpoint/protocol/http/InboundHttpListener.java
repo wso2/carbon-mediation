@@ -61,7 +61,7 @@ public class InboundHttpListener implements InboundRequestProcessor {
         if (isPortUsedByAnotherApplication(port)) {
             log.warn("Port " + port + " used by inbound endpoint " + name + " is already used by another application " +
                      "hence undeploying inbound endpoint");
-            this.destroy();
+            destoryInbound();
         } else {
             HTTPEndpointManager.getInstance().startEndpoint(port, name, processorParams);
         }
@@ -70,7 +70,6 @@ public class InboundHttpListener implements InboundRequestProcessor {
     @Override
     public void destroy() {
         HTTPEndpointManager.getInstance().closeEndpoint(port);
-        destoryInbound();
     }
 
     protected void handleException(String msg, Exception e) {

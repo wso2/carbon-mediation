@@ -88,9 +88,9 @@
     <script type="text/javascript">
         jQuery(document).ready(function () {
             CARBON.showErrorDialog('Cannot add inbound endpoint. Maybe name or port is already in use.', function () {
-                goBackOnePage();
+                goBackTwoPages();
             }, function () {
-                goBackOnePage();
+                goBackTwoPages();
             });
         });
     </script>
@@ -107,9 +107,9 @@
 	<script type="text/javascript">
     jQuery(document).ready(function() {
         CARBON.showErrorDialog('<%=e.getMessage()%>', function() {
-				goBackOnePage();
+                goBackTwoPages();
 			}, function() {
-				goBackOnePage();
+                goBackTwoPages();
 			});
 		});
 	</script>

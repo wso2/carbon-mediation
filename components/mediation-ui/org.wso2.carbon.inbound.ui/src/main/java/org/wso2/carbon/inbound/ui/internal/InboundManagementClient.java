@@ -146,7 +146,7 @@ public class InboundManagementClient {
                 parameterDTO.setValue(strValue);
                 parameterDTOs[i++] = parameterDTO;
             }
-            if (canAdd(name, protocol, parameterDTOs)) {
+            if (canAdd(name, protocol, parameterDTOs, true)) {
                 stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, suspended, parameterDTOs);
                 return true;
             }else {
@@ -201,41 +201,65 @@ public class InboundManagementClient {
         }
     }
 
-    private boolean canAdd(String name, String protocol, ParameterDTO[] parameterDTOs) {
+    /**
+     * We can add an endpoint on following criteria:
+     * - Protocol can be polling or listener:
+     *      - If two endpoints have the same name do not allow.
+     * - If protocol is listener:
+     *      - If two endpoints have same protocol do no allow.
+     * these.
+     * @param name
+     * @param protocol
+     * @param parameterDTOs
+     * @param addMode Use when new endpoint is being added (not update).
+     * @return boolean on whether endpoint can be added.
+     */
+    private boolean canAdd(String name, String protocol, ParameterDTO[] parameterDTOs, boolean addMode) {
         try {
             String port = null;
-            if(protocol != null && isListener(protocol)){
-                for(ParameterDTO paramDTO: parameterDTOs){
-                    if(isListenerPortParam(paramDTO.getName())){
+            if (protocol != null && (isListener(protocol))) {
+                for(ParameterDTO paramDTO: parameterDTOs) {
+                    if(isListenerPortParam(paramDTO.getName())) {
                         Integer.parseInt(paramDTO.getValue());
                     }
                 }
             }
+
             InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
             if(inboundEndpointDTOs != null) {
                 for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
-                    if (inboundEndpointDTO.getName().equals(name)) {
+                    if (addMode && inboundEndpointDTO.getName().equals(name)) {  // if two names are same, we can't add.
                         return false;
                     }
-                    if (protocol != null && isListener(protocol)) {
+
+                    if (!addMode && inboundEndpointDTO.getName().equals(name)
+                            && inboundEndpointDTO.getProtocol().equals(protocol)) { // an update on existing
+                        return true;
+                    }
+
+                    if (protocol != null && isListener(protocol)) {   // if listener, only allow if no other endpoint has port in use
                         ParameterDTO[] existingParameterDTOs = inboundEndpointDTO.getParameters();
                         for (ParameterDTO parameterDTO : existingParameterDTOs) {
                             if (isListenerPortParam(parameterDTO.getName())) {
                                 port = parameterDTO.getValue();
                                 if (isListenerPortInUse(port, parameterDTOs)) {
-                                    log.warn("Port " + port + " already in use by another endpoint. Inbound endpoint " + name + " deployment failed");
+                                    log.warn("Port " + port + " already in use by another endpoint. Inbound endpoint "
+                                            + name + " deployment failed");
                                     return false;
                                 }
                             }
                         }
+
+                        return true;
                     }
                 }
             }
+
+            return true;
         } catch (Exception e) {
             log.error(e);
             return false;
         }
-        return true;
     }
 
     private boolean isListenerPortInUse(String port, ParameterDTO[] parameterDTOs) {
@@ -296,24 +320,16 @@ public class InboundManagementClient {
                 parameterDTOs[i++] = parameterDTO;
             }
 
-            InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
-            if(inboundEndpointDTO != null){
-                stub.removeInboundEndpoint(name);
-            }
-            if(canAdd(name,protocol,parameterDTOs)) {
-                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, suspended, parameterDTOs);
+            if (canAdd(name,protocol,parameterDTOs, false)) {
+                stub.updateInboundEndpoint(name, sequence, onError, protocol, classImpl, suspended, parameterDTOs);
                 return true;
-            }else if(inboundEndpointDTO != null){
-                stub.addInboundEndpoint(inboundEndpointDTO.getName(), inboundEndpointDTO.getInjectingSeq(),
-                                        inboundEndpointDTO.getOnErrorSeq(), inboundEndpointDTO.getProtocol(),
-                                        inboundEndpointDTO.getClassImpl(), suspended, inboundEndpointDTO.getParameters());
+            } else {
                 return false;
             }
         } catch (Exception e) {
             log.error(e);
             throw e;
         }
-        return false;
     }
 
     private List<ParamDTO> validateParameterList(List<ParamDTO> paramDTOList) {

@@ -202,6 +202,10 @@ function goBackOnePage() {
     history.go(-1);
 }
 
+function goBackTwoPages() {
+    history.go(-2);
+}
+
 function autoredioselect() {
     settrigger(document.getElementById("taskTrigger_hidden").value);
 }
