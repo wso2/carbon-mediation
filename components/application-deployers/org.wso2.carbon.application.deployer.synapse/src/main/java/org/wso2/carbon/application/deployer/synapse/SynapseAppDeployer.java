@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.application.deployer.synapse;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentEngine;
 import org.apache.axis2.deployment.DeploymentException;
@@ -25,6 +26,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.deployers.LibraryArtifactDeployer;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
 import org.wso2.carbon.application.deployer.CarbonApplication;
@@ -36,6 +38,8 @@ import org.wso2.carbon.application.deployer.synapse.internal.SynapseAppDeployerD
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+import org.wso2.carbon.mediation.library.service.LibraryInfo;
+import org.wso2.carbon.mediation.library.service.MediationLibraryAdminService;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +71,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 .getDependencies();
 
         deployClassMediators(artifacts, axisConfig);
-
+        deploySynapseLibrary(artifacts, axisConfig);
         for (Artifact.Dependency dep : artifacts) {
             Artifact artifact = dep.getArtifact();
 
@@ -134,6 +138,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
             if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
                 deployer = getClassMediatorDeployer(axisConfig);
+            } else if(SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifact.getType())) {
+                deployer = getSynapseLibraryDeployer(axisConfig);
             } else {
                 String artifactDirName = getArtifactDirName(artifact);
                 if (artifactDirName == null) {
@@ -154,6 +160,9 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
                 try {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
+                        deployer.undeploy(artifactPath);
+                    } else if (SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifact.getType())){
+                        new File(artifactPath).delete();
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(artifact.getType())
                                && handleMainFaultSeqUndeployment(artifact, axisConfig)) {
@@ -212,6 +221,60 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     try {
                         deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
+                    } catch (DeploymentException e) {
+                        artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
+                        throw e;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Deploy synapse libraries contains in the CApp
+     *
+     * @param artifacts  List of Artifacts contains in the capp
+     * @param axisConfig AxisConfiguration of the current tenant
+     * @throws DeploymentException if something goes wrong while deployment
+     */
+    private void deploySynapseLibrary(List<Artifact.Dependency> artifacts,
+                                      AxisConfiguration axisConfig) throws DeploymentException {
+        for (Artifact.Dependency dependency : artifacts) {
+
+            Artifact artifact = dependency.getArtifact();
+            if (!validateArtifact(artifact)) {
+                continue;
+            }
+
+            if (SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifact.getType())) {
+
+                Deployer deployer = getSynapseLibraryDeployer(axisConfig);
+
+                if (deployer != null) {
+                    artifact.setRuntimeObjectName(artifact.getName());
+                    String fileName = artifact.getFiles().get(0).getName();
+                    String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
+
+                    try {
+                        deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
+                        DeploymentFileData dfd = new DeploymentFileData(new File(artifactPath), deployer);
+                        artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
+                        MediationLibraryAdminService mediationLibraryAdminService = new MediationLibraryAdminService();
+                        try {
+                            LibraryInfo[] libInfo = mediationLibraryAdminService.getAllLibraryInfo();
+                            String libName = "";
+                            for (int l=0; l < libInfo.length; l++) {
+                                if (fileName.startsWith(libInfo[l].getLibName()) && libInfo[l].isStatus() == false) {
+                                    libName = libInfo[l].getLibName();
+                                    break;
+                                }
+                            }
+                            mediationLibraryAdminService.addImport(libName, SynapseAppDeployerConstants.SYNAPSE_LIBRARY_PACKAGE);
+                            mediationLibraryAdminService.updateStatus("{"+SynapseAppDeployerConstants.SYNAPSE_LIBRARY_PACKAGE+"}"+libName, libName, SynapseAppDeployerConstants.SYNAPSE_LIBRARY_PACKAGE, ServiceBusConstants.ENABLED);
+                        } catch (AxisFault axisFault) {
+                            axisFault.printStackTrace();
+                        }
+
                     } catch (DeploymentException e) {
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
                         throw e;
@@ -377,6 +440,22 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
     }
 
     /**
+     * Get the deployer for the Synapse Library
+     *
+     * @param axisConfig AxisConfiguration instance
+     * @return Deployer instance
+     */
+    private Deployer getSynapseLibraryDeployer(AxisConfiguration axisConfig) {
+        String synapseLibraryPath = axisConfig.getRepository().getPath() +
+                SynapseAppDeployerConstants.SYNAPSE_LIBS;
+        DeploymentEngine deploymentEngine = (DeploymentEngine) axisConfig.getConfigurator();
+        deploymentEngine.addDeployer(new LibraryArtifactDeployer(), synapseLibraryPath, ServiceBusConstants.SYNAPSE_LIBRARY_EXTENSION);
+
+        return deploymentEngine.
+                getDeployer(synapseLibraryPath, ServiceBusConstants.SYNAPSE_LIBRARY_EXTENSION);
+    }
+
+    /**
      * Get the artifact directory name for the artifact type
      *
      * @param artifact  synapse artifact
@@ -407,6 +486,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             return SynapseAppDeployerConstants.TEMPLATES_FOLDER;
         } else if (SynapseAppDeployerConstants.INBOUND_ENDPOINT_TYPE.endsWith(artifactType)) {
            return SynapseAppDeployerConstants.INBOUND_ENDPOINT_FOLDER;            
+        } else if (SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifactType)) {
+            return SynapseAppDeployerConstants.SYNAPSE_LIBS;
         }
         return null;
     }
@@ -419,10 +500,15 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * @return absolute path of artifact directory
      */
     private String getArtifactDirPath(AxisConfiguration axisConfiguration, String artifactDirName) {
-        return axisConfiguration.getRepository().getPath() +
-               SynapseAppDeployerConstants.SYNAPSE_CONFIGS +
-               File.separator + SynapseAppDeployerConstants.DEFAULT_DIR +
-               File.separator + artifactDirName;
+        if (artifactDirName.equals(SynapseAppDeployerConstants.SYNAPSE_LIBS)) {
+            return axisConfiguration.getRepository().getPath() +
+                    SynapseAppDeployerConstants.SYNAPSE_LIBS;
+        } else {
+            return axisConfiguration.getRepository().getPath() +
+                    SynapseAppDeployerConstants.SYNAPSE_CONFIGS +
+                    File.separator + SynapseAppDeployerConstants.DEFAULT_DIR +
+                    File.separator + artifactDirName;
+        }
     }
 
     private String getMainXmlPath(AxisConfiguration axisConfig) {

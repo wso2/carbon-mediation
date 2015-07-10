@@ -71,6 +71,7 @@ public final class ServiceBusConstants {
 
     public static final String ARTIFACT_EXTENSION = "xml";
     public static final String CLASS_MEDIATOR_EXTENSION = "jar";
+    public static final String SYNAPSE_LIBRARY_EXTENSION = "zip";
     public static final String PERSISTENCE_MANAGER = "PERSISTENCE_MANAGER";
     public static final String SYNAPSE_CURRENT_CONFIGURATION = "SYNAPSE_CURRENT_CONFIGURATION";
     public static final String CARBON_TASK_SCHEDULER = "CARBON_TASK_SCHEDULER";
