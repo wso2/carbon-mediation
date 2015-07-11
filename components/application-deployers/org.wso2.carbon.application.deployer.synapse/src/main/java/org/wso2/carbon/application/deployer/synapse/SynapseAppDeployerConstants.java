@@ -51,7 +51,6 @@ public class SynapseAppDeployerConstants {
     // Synapse config path
     public static final String SYNAPSE_CONFIGS = "synapse-configs";
     public static final String SYNAPSE_LIBS = "synapse-libs";
-    public static final String SYNAPSE_LIBRARY_PACKAGE = "org.wso2.carbon.connector";
     public static final String DEFAULT_DIR = "default";
 
     public static final String MAIN_SEQ_FILE = "main.xml";

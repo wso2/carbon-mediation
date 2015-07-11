@@ -261,16 +261,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                         MediationLibraryAdminService mediationLibraryAdminService = new MediationLibraryAdminService();
                         try {
-                            LibraryInfo[] libInfo = mediationLibraryAdminService.getAllLibraryInfo();
-                            String libName = "";
-                            for (int l=0; l < libInfo.length; l++) {
-                                if (fileName.startsWith(libInfo[l].getLibName()) && libInfo[l].isStatus() == false) {
-                                    libName = libInfo[l].getLibName();
-                                    break;
-                                }
-                            }
-                            mediationLibraryAdminService.addImport(libName, SynapseAppDeployerConstants.SYNAPSE_LIBRARY_PACKAGE);
-                            mediationLibraryAdminService.updateStatus("{"+SynapseAppDeployerConstants.SYNAPSE_LIBRARY_PACKAGE+"}"+libName, libName, SynapseAppDeployerConstants.SYNAPSE_LIBRARY_PACKAGE, ServiceBusConstants.ENABLED);
+                            String artifactName = mediationLibraryAdminService.getArtifactName(artifactPath);
+                            String libName = artifactName.substring(artifactName.lastIndexOf("}")+1);
+                            String libraryPackage = artifactName.substring(1, artifactName.lastIndexOf("}"));
+                            mediationLibraryAdminService.updateStatus(artifactName, libName, libraryPackage, ServiceBusConstants.ENABLED);
                         } catch (AxisFault axisFault) {
                             axisFault.printStackTrace();
                         }
