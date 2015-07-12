@@ -30,6 +30,7 @@
                request="<%=request%>" i18nObjectName="messageStorei18n"/>
 <script src="../editarea/edit_area_full.js" type="text/javascript"></script>
 <script type="text/javascript" src="localentrycommons.js"></script>
+<script type="text/javascript" src="js/message-store-params.js"></script>
 
 <carbon:breadcrumb
         label="jms.message.store"
@@ -84,7 +85,16 @@
 
     function submitTextContent(value) {
         addServiceParams();
+        addFailoverConfigurationParams();
         return true;
+    }
+
+    function addFailoverConfigurationParams() {
+
+        if (document.getElementById('failoverMessageStoreProperties') != null) {
+            document.getElementById('failoverMessageStoreProperties').value = document.getElementById('failoverMessageStoreProperties').value + populateParams("headerTable");
+        }
+
     }
 
     function addServiceParams() {
@@ -95,6 +105,8 @@
         addServiceParameter("store.jms.username", document.getElementById('jms_username').value);
         addServiceParameter("store.jms.password", document.getElementById('jms_password').value);
         addServiceParameter("store.jms.JMSSpecVersion", document.getElementById('jms_spec_version').options[document.getElementById('jms_spec_version').selectedIndex].value);
+        addServiceParameter("store.producer.guaranteed.delivery.enable", document.getElementById('enable_guaranteed_delivery').options[document.getElementById('enable_guaranteed_delivery').selectedIndex].value);
+        addServiceParameter("store.failover.message.store.type", document.getElementById('failover_message_store_type').options[document.getElementById('failover_message_store_type').selectedIndex].value);
     }
 
     function addServiceParameter(parameter, value) {
@@ -122,6 +134,19 @@
         }
     }
 
+    function showGuaranteedDeliveryOptions(id) {
+            var formElem = document.getElementById(id + '_guaranteedDeliveryForm');
+            if (formElem.style.display == 'none') {
+                formElem.style.display = '';
+                document.getElementById(id + '_adv_gur_delivery').innerHTML = '<a class="icon-link" ' +
+                        'onclick="javascript:showGuaranteedDeliveryOptions(\'' + id + '\');" style="background-image: url(images/up.gif);">' + "<fmt:message key="hide.guaranteed.delivery.parameters"/>" + '</a>';
+            } else {
+                formElem.style.display = 'none';
+                document.getElementById(id + '_adv_gur_delivery').innerHTML = '<a class="icon-link" ' +
+                        'onclick="javascript:showGuaranteedDeliveryOptions(\'' + id + '\');" style="background-image: url(images/down.gif);">' + "<fmt:message key="show.guaranteed.delivery.parameters"/>" + '</a>';
+            }
+        }
+
     function switchToSource() {
         if (!ValidateTextForm(document.Submit)) {
             return false;
@@ -137,7 +162,6 @@
             }
         });
     }
-
 
 </script>
 
@@ -261,6 +285,17 @@
                                 </span>
                     </td>
                 </tr>
+
+                <tr>
+                    <td>
+                        <span id="_adv_gur_delivery" style="float: left; position: relative;">
+                        <a class="icon-link" onclick="javascript:showGuaranteedDeliveryOptions('');"
+                        style="background-image: url(images/down.gif);">
+                        <fmt:message key="show.guaranteed.delivery.parameters"/></a>
+                        </span>
+                    </td>
+                </tr>
+
                 </tbody>
             </table>
 
@@ -316,6 +351,60 @@
                                 <%}%>
                             </select>
                         </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+          <div id="_guaranteedDeliveryForm" style="display:none">
+
+                <table class="normal-nopadding">
+                    <tbody>
+                    <tr>
+                        <td colspan="2" class="sub-header"><fmt:message key="failover.configuration.parameters"/></td>
+                    </tr>
+                    <tr>
+                        <td><fmt:message key="store.producer.guaranteed.enable"/></td>
+                        <td>
+                            <select id="enable_guaranteed_delivery">
+                                <option value="true">True</option>
+                                <option selected="selected" value="false">False</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                       <td><fmt:message key="store.failover.messagestore.type"/></td>
+                           <td>
+                               <select id="failover_message_store_type">
+                                    <option value="jms">JMS</option>
+                                    <option selected="selected" value="jdbc">JDBC</option>
+                                </select>
+                            </td>
+                    </tr>
+                    <tr>
+                       <td colspan="2">
+                                <a onclick="addParams('headerTable')"
+                                   style="background-image: url('images/add.gif');" class="icon-link">Add
+                                                                                                               Property</a><input
+                                    type="hidden" name="failoverMessageStoreProperties" id="failoverMessageStoreProperties" value="PARAMS:|"/>
+                       </td>
+                    </tr>
+                    <tr>
+                       <td>
+                        <table cellpadding="0" cellspacing="0" border="0" class="styledLeft"
+                                id="headerTable"
+                                style="display:none;">
+                            <thead>
+                                <tr>
+                                    <th style="width:25%"><fmt:message key="param.name"/></th>
+                                    <th style="width:25%"><fmt:message key="param.value"/></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                       </td>
                     </tr>
                     </tbody>
                 </table>
