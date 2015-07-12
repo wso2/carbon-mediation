@@ -274,9 +274,10 @@
     private String getFailoverEndPointXML()  {
 
         return "<endpoint xmlns=\"http://ws.apache.org/ns/synapse\" name=\"" + failoverEndpointName + "\">\n" +
-                          "<address uri=\"jms:/"+req.getParameter("Name").trim()+"?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;" +
+                          "<address uri=\"jms:/" + req.getParameter("Name").trim() + "_Queue?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;" +
                           "java.naming.factory.initial=" + factoryInitializer + "&amp;" +
-                          "java.naming.provider.url=" + providerUrl + "</address>\n" +
+                          "java.naming.provider.url=" + providerUrl + "&amp;transport.jms.DestinationType=queue\">\n" +
+                          "</address>\n" +
                           "</endpoint>";
 
     }
