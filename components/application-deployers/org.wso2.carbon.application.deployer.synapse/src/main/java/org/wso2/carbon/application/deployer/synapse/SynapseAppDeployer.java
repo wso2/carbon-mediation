@@ -162,7 +162,9 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifact.getType())){
-                        new File(artifactPath).delete();
+                        MediationLibraryAdminService mediationLibraryAdminService = new MediationLibraryAdminService();
+                        String libQName = mediationLibraryAdminService.getArtifactName(artifactPath);
+                        mediationLibraryAdminService.deleteImport(libQName);
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(artifact.getType())
                                && handleMainFaultSeqUndeployment(artifact, axisConfig)) {
