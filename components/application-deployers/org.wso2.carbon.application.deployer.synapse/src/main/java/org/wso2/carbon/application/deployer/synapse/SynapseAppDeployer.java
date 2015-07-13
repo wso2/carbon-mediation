@@ -98,7 +98,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                 } else {
                     try {
-                                ((AbstractSynapseArtifactDeployer) deployer).setCustom_log(carbonApp.getAppName(),
+                                ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApp.getAppName(),
                                         AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
                         deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
@@ -158,7 +158,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 try {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
 
-                        ((AbstractSynapseArtifactDeployer) deployer).setCustom_log(carbonApplication.getAppName(),
+                        ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApplication.getAppName(),
                                 AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
 
                         deployer.undeploy(artifactPath);
