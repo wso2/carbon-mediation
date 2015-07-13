@@ -323,11 +323,18 @@ public class InboundHttpServerWorker extends ServerWorker {
 
         // If not super tenant, assign tenant configuration context
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            ConfigurationContext tenantConfigCtx =
+            try {
+                ConfigurationContext tenantConfigCtx =
                     TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
                                                                   axis2MsgCtx.getConfigurationContext());
-            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
-            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+                axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+                axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+            } catch (Exception e) {
+                log.warn("Could not get tenant configuration context for tenant " + tenantDomain + ". " +
+                        "Tenant may not exist. Message will be dispatched to super tenant.");
+                tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+                dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
+            }
         }
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }
