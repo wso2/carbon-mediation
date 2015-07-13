@@ -26,7 +26,6 @@ import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
-import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
@@ -38,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Manager which handles Http Listeners activities for Inbound Endpoints, coordinating
@@ -52,6 +53,9 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
     private ConcurrentHashMap<String,ConcurrentHashMap<Integer, WorkerPoolConfiguration>> workerPoolMap =
                                   new ConcurrentHashMap<String, ConcurrentHashMap<Integer, WorkerPoolConfiguration>>();
+
+    private ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>> dispatchPatternMap =
+            new ConcurrentHashMap<String, ConcurrentHashMap<Integer, Pattern>>();
 
     private HTTPEndpointManager() {
         super();
@@ -97,6 +101,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                             config.getThreadID());
 
                     addWorkerPool(tenantDomain, port, workerPoolConfiguration);
+                }
+                if (config.getDispatchPattern() != null) {
+                    Pattern pattern = compilePattern(config.getDispatchPattern());
+                    addDispatchPattern(tenantDomain, port, pattern);
                 }
             } else {
                 dataStore.unregisterListeningEndpoint(port, tenantDomain);
@@ -146,6 +154,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                             config.getThreadID());
                     addWorkerPool(tenantDomain, port, workerPoolConfiguration);
                 }
+                if (config.getDispatchPattern() != null) {
+                    Pattern pattern = compilePattern(config.getDispatchPattern());
+                    addDispatchPattern(tenantDomain, port, pattern);
+                }
             } else {
                 dataStore.unregisterListeningEndpoint(port, tenantDomain);
                 return false;
@@ -166,7 +178,6 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             log.info("Listener is already started for port : " + port);
             return true;
         }
-        InboundHttpConfiguration config = buildConfiguration(port, name, params);
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
@@ -174,12 +185,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             log.warn("Cannot get PassThroughSourceConfiguration ", e);
             return false;
         }
+
         if (sourceConfiguration != null) {
-            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-            String tenantDomain = carbonContext.getTenantDomain();
             //Create Handler for handle Http Requests
-            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(port, sourceConfiguration, tenantDomain,
-                    config.getDispatchPattern());
+            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(port, sourceConfiguration);
             try {
                 //Start Endpoint in given port
                 PassThroughInboundEndpointHandler.startEndpoint(new InetSocketAddress(port),
@@ -205,7 +214,6 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             log.info("Listener is already started for port : " + port);
             return true;
         }
-        InboundHttpConfiguration config = buildConfiguration(port, name, params);
         SourceConfiguration sourceConfiguration = null;
         try {
             sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSSLSourceConfiguration();
@@ -213,12 +221,10 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             log.warn("Cannot get PassThroughSSLSourceConfiguration ", e);
             return false;
         }
+
         if (sourceConfiguration != null) {
-            PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-            String tenantDomain = carbonContext.getTenantDomain();
             //Create Handler for handle Http Requests
-            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(port, sourceConfiguration ,tenantDomain,
-                    config.getDispatchPattern());
+            SourceHandler inboundSourceHandler = new InboundHttpSourceHandler(port, sourceConfiguration);
             try {
                 //Start Endpoint in given port
                 PassThroughInboundEndpointHandler.startSSLEndpoint(new InetSocketAddress(port),
@@ -245,6 +251,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         String tenantDomain = cc.getTenantDomain();
         dataStore.unregisterListeningEndpoint(port, tenantDomain);
         removeWorkerPoolConfiguration(tenantDomain, port);
+        removeDispatchPattern(tenantDomain, port);
 
         if (!PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             log.info("Listener Endpoint is not started");
@@ -344,4 +351,61 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
            }
         }
     }
+
+    /**
+     * Adds a dispatch pattern to pattern map.
+     * @param tenantDomain
+     * @param port
+     */
+    public void addDispatchPattern(String tenantDomain, int port, Pattern pattern) {
+        ConcurrentHashMap concurrentHashMap = dispatchPatternMap.get(tenantDomain);
+        if(concurrentHashMap == null){
+            concurrentHashMap = new ConcurrentHashMap<Integer, Pattern>();
+            concurrentHashMap.put(port, pattern);
+            dispatchPatternMap.put(tenantDomain, concurrentHashMap);
+        } else {
+            concurrentHashMap.put(port, pattern);
+        }
+    }
+
+    /**
+     * Removes a dispatch pattern from pattern map.
+     * @param tenantDomain
+     * @param port
+     */
+    public void removeDispatchPattern(String tenantDomain, int port) {
+        ConcurrentHashMap concurrentHashMap = dispatchPatternMap.get(tenantDomain);
+        if(concurrentHashMap != null){
+            if(concurrentHashMap.containsKey(port)){
+                concurrentHashMap.remove(port);
+            }
+        }
+    }
+
+    /**
+     * Method to get pattern for tenant and port.
+     * @param tenantDomain
+     * @param port
+     * @return
+     */
+    public Pattern getPattern(String tenantDomain, int port){
+        ConcurrentHashMap concurrentHashMap = dispatchPatternMap.get(tenantDomain);
+        if(concurrentHashMap != null){
+            Object val = concurrentHashMap.get(port);
+            if(val instanceof Pattern){
+                return (Pattern) val;
+            }
+        }
+        return  null;
+    }
+
+    protected Pattern compilePattern(String dispatchPattern) {
+        try {
+            return Pattern.compile(dispatchPattern, Pattern.COMMENTS | Pattern.DOTALL);
+        } catch (PatternSyntaxException e) {
+            log.error("Dispatch pattern " + dispatchPattern + " is an invalid pattern.");
+            throw new SynapseException(e);
+        }
+    }
+
 }

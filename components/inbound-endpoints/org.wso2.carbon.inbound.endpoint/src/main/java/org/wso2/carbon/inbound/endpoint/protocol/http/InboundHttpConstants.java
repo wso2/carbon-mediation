@@ -64,7 +64,4 @@ public class InboundHttpConstants {
 
     public static final String INBOUND_THREAD_ID = "inbound.thread.id";
 
-
-
-
 }
