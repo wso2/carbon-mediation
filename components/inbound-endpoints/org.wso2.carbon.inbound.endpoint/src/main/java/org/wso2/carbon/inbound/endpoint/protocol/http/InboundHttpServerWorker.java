@@ -107,7 +107,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                     return;
                 }
 
-                    boolean continueDispatch = true;
+                boolean continueDispatch = true;
                 if (dispatchPattern != null) {
                     patternMatcher = dispatchPattern.matcher(request.getUri());
                     if (!patternMatcher.matches()) {
