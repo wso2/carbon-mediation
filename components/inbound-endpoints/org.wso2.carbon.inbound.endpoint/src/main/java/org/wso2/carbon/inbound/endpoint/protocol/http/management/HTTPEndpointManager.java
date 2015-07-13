@@ -79,6 +79,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         String epName = dataStore.getListeningEndpointName(port, tenantDomain);
         if (epName != null) {
             if (epName.equalsIgnoreCase(name)) {
+                applyConfiguration(config, tenantDomain, port);
                 log.info(epName + " Endpoint is already started in port : " + port);
             } else {
                 String msg = "Another endpoint named : " + epName + " is currently using this port: " + port;
@@ -86,26 +87,11 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
                 throw new SynapseException(msg);
             }
         } else {
-            dataStore.registerListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name, null);
+            dataStore.registerListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTP, name, params);
             boolean start = startListener(port, name, params);
 
             if (start) {
-                if (config.getCoresize() != null && config.getMaxSize() != null && config.getKeepAlive() != null
-                        && config.getQueueLength() != null) {
-                    WorkerPoolConfiguration workerPoolConfiguration = new WorkerPoolConfiguration(
-                            config.getCoresize(),
-                            config.getMaxSize(),
-                            config.getKeepAlive(),
-                            config.getQueueLength(),
-                            config.getThreadGroup(),
-                            config.getThreadID());
-
-                    addWorkerPool(tenantDomain, port, workerPoolConfiguration);
-                }
-                if (config.getDispatchPattern() != null) {
-                    Pattern pattern = compilePattern(config.getDispatchPattern());
-                    addDispatchPattern(tenantDomain, port, pattern);
-                }
+                applyConfiguration(config, tenantDomain, port);
             } else {
                 dataStore.unregisterListeningEndpoint(port, tenantDomain);
                 return false;
@@ -130,6 +116,7 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
 
         if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
             if(epName != null && epName.equalsIgnoreCase(name) ){
+                applyConfiguration(config, tenantDomain, port);
                 log.info(epName + " Endpoint is already started in port : " + port);
             }else{
                 String msg = "Cannot Start Endpoint "+ name+ " Already occupied port " + port + " by another Endpoint ";
@@ -140,24 +127,12 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
             if(epName != null && epName.equalsIgnoreCase(name)){
                 log.info(epName + " Endpoint is already registered in registry");
             }else{
-                dataStore.registerSSLListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTPS, name, sslConfiguration);
+                dataStore.registerSSLListeningEndpoint(port, tenantDomain, InboundHttpConstants.HTTPS, name,
+                        sslConfiguration, params);
             }
             boolean start = startSSLListener(port, name, sslConfiguration, params);
             if (start) {
-                if (config.getCoresize() == null && config.getMaxSize() == null && config.getKeepAlive() == null
-                        && config.getQueueLength() == null) {
-                    WorkerPoolConfiguration workerPoolConfiguration = new WorkerPoolConfiguration(config.getCoresize(),
-                            config.getMaxSize(),
-                            config.getKeepAlive(),
-                            config.getQueueLength(),
-                            config.getThreadGroup(),
-                            config.getThreadID());
-                    addWorkerPool(tenantDomain, port, workerPoolConfiguration);
-                }
-                if (config.getDispatchPattern() != null) {
-                    Pattern pattern = compilePattern(config.getDispatchPattern());
-                    addDispatchPattern(tenantDomain, port, pattern);
-                }
+                applyConfiguration(config, tenantDomain, port);
             } else {
                 dataStore.unregisterListeningEndpoint(port, tenantDomain);
                 return false;
@@ -166,6 +141,31 @@ public class HTTPEndpointManager extends AbstractInboundEndpointManager {
         return true;
     }
 
+    /**
+     * Applies worker pool and dispatch patterns to respective maps. This is to be called when a new endpoint is added
+     * regardless of whether listener (i.e. port) in use is the same.
+     * @param config
+     * @param tenantDomain
+     * @param port
+     */
+    private void applyConfiguration(InboundHttpConfiguration config, String tenantDomain, int port) {
+        if (config.getCoresize() != null && config.getMaxSize() != null && config.getKeepAlive() != null
+                && config.getQueueLength() != null) {
+            WorkerPoolConfiguration workerPoolConfiguration = new WorkerPoolConfiguration(
+                    config.getCoresize(),
+                    config.getMaxSize(),
+                    config.getKeepAlive(),
+                    config.getQueueLength(),
+                    config.getThreadGroup(),
+                    config.getThreadID());
+
+            addWorkerPool(tenantDomain, port, workerPoolConfiguration);
+        }
+        if (config.getDispatchPattern() != null) {
+            Pattern pattern = compilePattern(config.getDispatchPattern());
+            addDispatchPattern(tenantDomain, port, pattern);
+        }
+    }
 
     /**
      * Start Http Listener in a particular port
