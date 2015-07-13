@@ -68,14 +68,12 @@ public class InboundHttpServerWorker extends ServerWorker {
     public InboundHttpServerWorker(int port, String tenantDomain,
                                    SourceRequest sourceRequest,
                                    SourceConfiguration sourceConfiguration,
-                                   OutputStream outputStream,
-                                   Pattern dispatchPattern) {
+                                   OutputStream outputStream) {
         super(sourceRequest, sourceConfiguration, outputStream);
         this.request = sourceRequest;
         this.port = port;
         this.tenantDomain = tenantDomain;
         restHandler = new RESTRequestHandler();
-        this.dispatchPattern = dispatchPattern;
     }
 
     public void run() {
@@ -106,6 +104,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
                     return;
                 }
+
+                dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
 
                 boolean continueDispatch = true;
                 if (dispatchPattern != null) {
@@ -333,7 +333,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                 log.warn("Could not get tenant configuration context for tenant " + tenantDomain + ". " +
                         "Tenant may not exist. Message will be dispatched to super tenant.");
                 tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-                dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
             }
         }
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);

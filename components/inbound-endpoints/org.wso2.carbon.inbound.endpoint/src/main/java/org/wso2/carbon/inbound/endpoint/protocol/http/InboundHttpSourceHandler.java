@@ -81,14 +81,12 @@ public class InboundHttpSourceHandler extends SourceHandler {
                                                                    workerPoolConfiguration.getThreadGroupID(),
                                                                    workerPoolConfiguration.getThreadID());
                 }
-
-                dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
             }
             if (workerPool == null) {
                 workerPool = sourceConfiguration.getWorkerPool();
             }
             workerPool.execute
-                    (new InboundHttpServerWorker(port, tenantDomain, request, sourceConfiguration, os, dispatchPattern));
+                    (new InboundHttpServerWorker(port, tenantDomain, request, sourceConfiguration, os));
         } catch (HttpException e) {
             log.error("HttpException occurred when creating Source Request", e);
             informReaderError(conn);
