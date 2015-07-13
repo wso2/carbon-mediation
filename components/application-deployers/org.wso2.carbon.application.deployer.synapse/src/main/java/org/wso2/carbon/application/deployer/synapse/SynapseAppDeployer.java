@@ -17,16 +17,32 @@
 */
 package org.wso2.carbon.application.deployer.synapse;
 
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.deployment.Deployer;
 import org.apache.axis2.deployment.DeploymentEngine;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.deployment.repository.util.DeploymentFileData;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.xml.EntryFactory;
+import org.apache.synapse.config.xml.SynapseImportFactory;
+import org.apache.synapse.config.xml.SynapseImportSerializer;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.deployers.LibraryArtifactDeployer;
+import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
+import org.apache.synapse.libraries.imports.SynapseImport;
+import org.apache.synapse.libraries.model.Library;
+import org.apache.synapse.libraries.util.LibDeployerUtils;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
 import org.wso2.carbon.application.deployer.CarbonApplication;
@@ -37,15 +53,23 @@ import org.wso2.carbon.application.deployer.synapse.internal.DataHolder;
 import org.wso2.carbon.application.deployer.synapse.internal.SynapseAppDeployerDSComponent;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
+import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.library.service.LibraryInfo;
 import org.wso2.carbon.mediation.library.service.MediationLibraryAdminService;
+import org.wso2.carbon.mediation.library.util.LocalEntryUtil;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SynapseAppDeployer implements AppDeploymentHandler {
 
@@ -57,6 +81,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
     private static String FAULT_XML="<sequence xmlns=\"http://ws.apache.org/ns/synapse\" name=\"fault\"/>";
     private static String MAIN_SEQ_REGEX = "main-\\d+\\.\\d+\\.\\d+\\.xml";
     private static String FAULT_SEQ_REGEX = "fault-\\d+\\.\\d+\\.\\d+\\.xml";
+    AxisConfiguration axisConfig;
 
     /**
      * Deploy the artifacts which can be deployed through this deployer (endpoints, sequences,
@@ -71,6 +96,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 .getDependencies();
 
         deployClassMediators(artifacts, axisConfig);
+        this.axisConfig = axisConfig;
         deploySynapseLibrary(artifacts, axisConfig);
         for (Artifact.Dependency dep : artifacts) {
             Artifact artifact = dep.getArtifact();
@@ -162,9 +188,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifact.getType())){
-                        MediationLibraryAdminService mediationLibraryAdminService = new MediationLibraryAdminService();
-                        String libQName = mediationLibraryAdminService.getArtifactName(artifactPath);
-                        mediationLibraryAdminService.deleteImport(libQName);
+                        String libQName = getArtifactName(artifactPath);
+                        deleteImport(libQName);
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(artifact.getType())
                                && handleMainFaultSeqUndeployment(artifact, axisConfig)) {
@@ -261,12 +286,11 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                         deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
                         DeploymentFileData dfd = new DeploymentFileData(new File(artifactPath), deployer);
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
-                        MediationLibraryAdminService mediationLibraryAdminService = new MediationLibraryAdminService();
                         try {
-                            String artifactName = mediationLibraryAdminService.getArtifactName(artifactPath);
+                            String artifactName = getArtifactName(artifactPath);
                             String libName = artifactName.substring(artifactName.lastIndexOf("}")+1);
                             String libraryPackage = artifactName.substring(1, artifactName.lastIndexOf("}"));
-                            mediationLibraryAdminService.updateStatus(artifactName, libName, libraryPackage, ServiceBusConstants.ENABLED);
+                            updateStatus(artifactName, libName, libraryPackage, ServiceBusConstants.ENABLED);
                         } catch (AxisFault axisFault) {
                             axisFault.printStackTrace();
                         }
@@ -278,6 +302,362 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 }
             }
         }
+    }
+
+    /**
+     *
+     * Get the library artifact name
+     *
+     * */
+    public String getArtifactName(String filePath) throws DeploymentException {
+        SynapseArtifactDeploymentStore deploymentStore;
+        deploymentStore = getSynapseConfiguration(axisConfig).getArtifactDeploymentStore();
+        return deploymentStore.getArtifactNameForFile(filePath);
+    }
+
+    /**
+     * Helper method to retrieve the Synapse configuration from the relevant axis configuration
+     *
+     * @return extracted SynapseConfiguration from the relevant AxisConfiguration
+     */
+    protected SynapseConfiguration getSynapseConfiguration(AxisConfiguration axisConfig) {
+        return (SynapseConfiguration) axisConfig.getParameter(
+                SynapseConstants.SYNAPSE_CONFIG).getValue();
+    }
+
+    /**
+     * Performing the action of enabling/disabling the given meidation library
+     *
+     * @param libName
+     * @param packageName
+     * @param status
+     * @throws AxisFault
+     */
+    public boolean updateStatus(String libQName, String libName, String packageName, String status)
+            throws AxisFault {
+        try {
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration(axisConfig);
+            SynapseImport synapseImport = synapseConfiguration.getSynapseImports().get(libQName);
+            if (synapseImport == null && libName != null && packageName != null) {
+                addImport(libName, packageName);
+                synapseImport = synapseConfiguration.getSynapseImports().get(libQName);
+            }
+            Library synLib = synapseConfiguration.getSynapseLibraries().get(libQName);
+            if (libQName != null && synLib != null) {
+                if (ServiceBusConstants.ENABLED.equals(status)) {
+                    synapseImport.setStatus(true);
+                    synLib.setLibStatus(true);
+                    synLib.loadLibrary();
+                    deployingLocalEntries(synLib, synapseConfiguration);
+                } else {
+                    synapseImport.setStatus(false);
+                    synLib.setLibStatus(false);
+                    synLib.unLoadLibrary();
+                    undeployingLocalEntries(synLib, synapseConfiguration);
+                }
+
+                // update synapse configuration.
+                MediationPersistenceManager mp = getMediationPersistenceManager(axisConfig);
+                mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
+            }
+
+        } catch (Exception e) {
+            String message = "Unable to update status for :  " + libQName;
+            handleException(log, message, e);
+        }
+        return true;
+    }
+
+    public void addImport(String libName, String packageName) throws AxisFault {
+        SynapseImport synImport = new SynapseImport();
+        synImport.setLibName(libName);
+        synImport.setLibPackage(packageName);
+        OMElement impEl = SynapseImportSerializer.serializeImport(synImport);
+        if (impEl != null) {
+            try {
+                addImport(impEl.toString());
+            } catch (AxisFault axisFault) {
+                handleException(log, "Could not add Synapse Import", axisFault);
+            }
+        } else {
+            handleException(log,
+                    "Could not add Synapse Import. Invalid import params for libName : " +
+                            libName + " packageName : " + packageName, null);
+        }
+    }
+
+    /**
+     *
+     * Undeploy the local entries deployed from the lib
+     *
+     * */
+    private void undeployingLocalEntries(Library library, SynapseConfiguration config) {
+        if (log.isDebugEnabled()) {
+            log.debug("Start : Removing Local registry entries from the configuration");
+        }
+        for (Map.Entry<String, Object> libararyEntryMap : library.getLocalEntryArtifacts()
+                .entrySet()) {
+            File localEntryFileObj = (File) libararyEntryMap.getValue();
+            OMElement document = LocalEntryUtil.getOMElement(localEntryFileObj);
+            deleteEntry(document.toString());
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("End : Removing Local registry entries from the configuration");
+        }
+    }
+
+    /**
+     * Get an XML configuration element for a message processor from the FE and
+     * creates and add the MessageStore to the synapse configuration.
+     *
+     * @param xml
+     *            string that contain the message processor configuration.
+     * @throws AxisFault
+     *             if some thing goes wrong when creating a MessageProcessor
+     *             with the given xml.
+     */
+    private void addImport(String xml) throws AxisFault {
+        try {
+            OMElement imprtElem = createElement(xml);
+            SynapseImport synapseImport = SynapseImportFactory.createImport(imprtElem, null);
+            if (synapseImport != null && synapseImport.getName() != null) {
+                SynapseConfiguration synapseConfiguration = getSynapseConfiguration(axisConfig);
+                String fileName = ServiceBusUtils.generateFileName(synapseImport.getName());
+                synapseImport.setFileName(fileName);
+                synapseConfiguration.addSynapseImport(synapseImport.getName(), synapseImport);
+                String synImportQualfiedName = LibDeployerUtils.getQualifiedName(synapseImport);
+                Library synLib =
+                        synapseConfiguration.getSynapseLibraries()
+                                .get(synImportQualfiedName);
+                if (synLib != null) {
+                    LibDeployerUtils.loadLibArtifacts(synapseImport, synLib);
+                }
+                MediationPersistenceManager mp = getMediationPersistenceManager(axisConfig);
+                mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
+
+            } else {
+                String message = "Unable to create a Synapse Import for :  " + xml;
+                handleException(log, message, null);
+            }
+
+        } catch (XMLStreamException e) {
+            String message = "Unable to create a Synapse Import for :  " + xml;
+            handleException(log, message, e);
+        }
+
+    }
+
+    /**
+     * Creates an <code>OMElement</code> from the given string
+     *
+     * @param str
+     *            the XML string
+     * @return the <code>OMElement</code> representation of the given string
+     * @throws javax.xml.stream.XMLStreamException
+     *             if building the <code>OmElement</code> is unsuccessful
+     */
+    private OMElement createElement(String str) throws XMLStreamException {
+        InputStream in = new ByteArrayInputStream(str.getBytes());
+        return new StAXOMBuilder(in).getDocumentElement();
+    }
+
+    private void handleException(Log log, String message, Exception e) throws AxisFault {
+
+        if (e == null) {
+
+            AxisFault exception = new AxisFault(message);
+            log.error(message, exception);
+            throw exception;
+
+        } else {
+            message = message + " :: " + e.getMessage();
+            log.error(message, e);
+            throw new AxisFault(message, e);
+        }
+    }
+
+    /**
+     * Helper method to get the persistence manger
+     * @return persistence manager for this configuration context
+     */
+    protected MediationPersistenceManager getMediationPersistenceManager(AxisConfiguration axisConfig) {
+        return ServiceBusUtils.getMediationPersistenceManager(axisConfig);
+    }
+
+    /**
+     * Deploy the local entries from lib
+     *
+     * */
+    private void deployingLocalEntries(Library library, SynapseConfiguration config) {
+        if (log.isDebugEnabled()) {
+            log.debug("Start : Adding Local registry entries to the configuration");
+        }
+        for (Map.Entry<String, Object> libararyEntryMap : library.getLocalEntryArtifacts()
+                .entrySet()) {
+            File localEntryFileObj = (File) libararyEntryMap.getValue();
+            OMElement document = LocalEntryUtil.getOMElement(localEntryFileObj);
+            addEntry(document.toString());
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("End : Adding Local registry entries to the configuration");
+        }
+    }
+    /**
+     * Add the local entry
+     *
+     * */
+    private boolean addEntry(String ele) {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            OMElement elem;
+            try {
+                elem = LocalEntryUtil.nonCoalescingStringToOm(ele);
+            } catch (XMLStreamException e) {
+                log.error("Error while converting the file content : " + e.getMessage());
+                return false;
+            }
+
+            if (elem.getQName().getLocalPart().equals(XMLConfigConstants.ENTRY_ELT.getLocalPart())) {
+
+                String entryKey = elem.getAttributeValue(new QName("key"));
+                entryKey = entryKey.trim();
+                SynapseConfiguration synapseConfiguration = getSynapseConfiguration(axisConfig);
+                if (log.isDebugEnabled()) {
+                    log.debug("Adding local entry with key : " + entryKey);
+                }
+                if (synapseConfiguration.getLocalRegistry().containsKey(entryKey)) {
+                    log.error("An Entry with key " + entryKey +
+                            " is already used within the configuration");
+                } else {
+                    Entry entry =
+                            EntryFactory.createEntry(elem,
+                                    synapseConfiguration.getProperties());
+                    entry.setFileName(ServiceBusUtils.generateFileName(entry.getKey()));
+                    synapseConfiguration.addEntry(entryKey, entry);
+                    MediationPersistenceManager pm =
+                            ServiceBusUtils.getMediationPersistenceManager(axisConfig);
+                    pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("Local registry entry : " + entryKey + " added to the configuration");
+                }
+                return true;
+            } else {
+                log.warn("Error adding local entry. Invalid definition");
+            }
+        } catch (SynapseException syne) {
+            log.error("Unable to add local entry ", syne);
+        } catch (OMException e) {
+            log.error("Unable to add local entry. Invalid XML ", e);
+        } catch (Exception e) {
+            log.error("Unable to add local entry. Invalid XML ", e);
+        } finally {
+            lock.unlock();
+        }
+        return false;
+    }
+
+    /**
+     * Remove the local entry
+     * */
+    public boolean deleteEntry(String ele) {
+
+        final Lock lock = getLock();
+        String entryKey = null;
+        try {
+            lock.lock();
+            OMElement elem;
+            try {
+                elem = LocalEntryUtil.nonCoalescingStringToOm(ele);
+            } catch (XMLStreamException e) {
+                log.error("Error while converting the file content : " + e.getMessage());
+                return false;
+            }
+
+            if (elem.getQName().getLocalPart().equals(XMLConfigConstants.ENTRY_ELT.getLocalPart())) {
+
+                entryKey = elem.getAttributeValue(new QName("key"));
+                entryKey = entryKey.trim();
+                log.debug("Adding local entry with key : " + entryKey);
+
+                SynapseConfiguration synapseConfiguration = getSynapseConfiguration(axisConfig);
+                Entry entry = synapseConfiguration.getDefinedEntries().get(entryKey);
+                if (entry != null) {
+                    synapseConfiguration.removeEntry(entryKey);
+                    MediationPersistenceManager pm =
+                            ServiceBusUtils.getMediationPersistenceManager(axisConfig);
+                    pm.deleteItem(entryKey, entry.getFileName(),
+                            ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Deleted local entry with key : " + entryKey);
+                    }
+                    return true;
+                } else {
+                    log.warn("No entry exists by the key : " + entryKey);
+                    return false;
+                }
+            }
+        } catch (SynapseException syne) {
+            log.error("Unable to delete the local entry : " + entryKey, syne);
+        } catch (Exception e) {
+            log.error("Unable to delete the local entry : " + entryKey, e);
+        } finally {
+            lock.unlock();
+        }
+        return false;
+    }
+
+    protected Lock getLock() {
+        Parameter p = axisConfig.getParameter(ServiceBusConstants.SYNAPSE_CONFIG_LOCK);
+        if (p != null) {
+            return (Lock) p.getValue();
+        } else {
+            log.warn(ServiceBusConstants.SYNAPSE_CONFIG_LOCK + " is null, Recreating a new lock");
+            Lock lock = new ReentrantLock();
+            try {
+                axisConfig.addParameter(ServiceBusConstants.SYNAPSE_CONFIG_LOCK, lock);
+                return lock;
+            } catch (AxisFault axisFault) {
+                log.error("Error while setting " + ServiceBusConstants.SYNAPSE_CONFIG_LOCK);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Delete the SynapseImport instance with given importQualifiedName in the
+     * synapse configuration
+     *
+     * @param importQualifiedName
+     *            of the MessageProcessor to be deleted
+     * @throws AxisFault
+     *             if Message processor does not exist
+     */
+    public void deleteImport(String importQualifiedName) throws AxisFault {
+        SynapseConfiguration configuration = getSynapseConfiguration(axisConfig);
+
+        assert configuration != null;
+        if (configuration.getSynapseImports().containsKey(importQualifiedName)) {
+            SynapseImport synapseImport = configuration.removeSynapseImport(importQualifiedName);
+            String fileName = synapseImport.getFileName();
+            // get corresponding library for un-loading this import
+            Library synLib =
+                    configuration.getSynapseLibraries()
+                            .get(importQualifiedName);
+            if (synLib != null) {
+                // this is a important step -> we need to unload what ever the
+                // components loaded thru this import
+                synLib.unLoadLibrary();
+                undeployingLocalEntries(synLib, configuration);
+            }
+
+            MediationPersistenceManager pm = getMediationPersistenceManager(axisConfig);
+            pm.deleteItem(synapseImport.getName(), fileName, ServiceBusConstants.ITEM_TYPE_IMPORT);
+
+        }
+
     }
 
     /**

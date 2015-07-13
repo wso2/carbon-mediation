@@ -601,15 +601,4 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 		}
 		return false;
 	}
-
-	/**
-	 *
-	 * Get the library artifact name
-	 *
-	 * */
-	public String getArtifactName(String filePath) throws DeploymentException {
-		SynapseArtifactDeploymentStore deploymentStore = new SynapseArtifactDeploymentStore();
-		deploymentStore = getSynapseConfiguration().getArtifactDeploymentStore();
-		return deploymentStore.getArtifactNameForFile(filePath);
-	}
 }
