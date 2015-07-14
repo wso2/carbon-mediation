@@ -2105,7 +2105,7 @@
         <carbon.deployment.version>4.4.1</carbon.deployment.version>
 
         <!-- Carbon Registry version-->
-        <carbon.registry.version>4.4.3</carbon.registry.version>
+        <carbon.registry.version>4.4.4</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.4.0, 4.5.0)</carbon.registry.imp.pkg.version>
 
         <!-- Carbon Identity version-->
