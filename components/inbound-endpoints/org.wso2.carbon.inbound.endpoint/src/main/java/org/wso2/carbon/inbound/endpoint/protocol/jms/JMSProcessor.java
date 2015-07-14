@@ -74,14 +74,20 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
      * This will be called at the time of synapse artifact deployment.
      */
     public void init() {
-        log.info("Initializing inbound JMS listener for inbound endpoint " + name);
-        CachedJMSConnectionFactory jmsConnectionFactory = new CachedJMSConnectionFactory(this.jmsProperties);
-        pollingConsumer = new JMSPollingConsumer(jmsConnectionFactory, jmsProperties, interval);
+        log.info("Initializing inbound JMS listener for inbound endpoint " + name);        
+        pollingConsumer = new JMSPollingConsumer( jmsProperties, interval);
         pollingConsumer.registerHandler(new JMSInjectHandler(injectingSeq, onErrorSeq, sequential,
                 synapseEnvironment, jmsProperties));
         start();
     }
-
+    /**
+     * Stop the inbound polling processor This will be called when inbound is
+     * undeployed/redeployed or when server stop
+     */
+    public void destroy() {
+        pollingConsumer.destroy();
+        super.destroy();
+    }
     /**
      * Register/start the schedule service
      * */
