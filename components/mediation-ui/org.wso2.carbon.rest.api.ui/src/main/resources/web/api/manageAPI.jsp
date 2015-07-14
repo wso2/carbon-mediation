@@ -139,8 +139,8 @@
                                 CarbonUIMessage.ERROR, request);
                     }
                 }
-
 			}
+
         apiContext = apiData.getContext();
         //If api context contains a preceeding '/'
         if (apiContext.startsWith("/")) {
