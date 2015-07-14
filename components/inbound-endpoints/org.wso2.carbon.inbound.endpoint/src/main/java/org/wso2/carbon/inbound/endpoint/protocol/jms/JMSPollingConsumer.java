@@ -43,10 +43,16 @@ public class JMSPollingConsumer {
     private String strUserName;
     private String strPassword;
     private Integer iReceiveTimeout;
+    private String replyDestinationName;
     
-    public JMSPollingConsumer(CachedJMSConnectionFactory jmsConnectionFactory,
-            Properties jmsProperties, long scanInterval) {
-        this.jmsConnectionFactory = jmsConnectionFactory;
+    private Connection connection = null;
+    private Session session = null;
+    private Destination destination = null;
+    private MessageConsumer messageConsumer = null;
+    private Destination replyDestination = null;
+    
+    public JMSPollingConsumer( Properties jmsProperties, long scanInterval) {
+        this.jmsConnectionFactory = new CachedJMSConnectionFactory(jmsProperties);
         strUserName = jmsProperties.getProperty(JMSConstants.PARAM_JMS_USERNAME);
         strPassword = jmsProperties.getProperty(JMSConstants.PARAM_JMS_PASSWORD);
         
@@ -59,7 +65,7 @@ public class JMSPollingConsumer {
                 iReceiveTimeout = null;
             }
         }
-        
+        this.replyDestinationName = jmsProperties.getProperty(JMSConstants.PARAM_REPLY_DESTINATION);
         this.scanInterval = scanInterval;
         this.lastRanTime = null;
     }
@@ -105,12 +111,7 @@ public class JMSPollingConsumer {
      */
     public Message poll() {
         logger.debug("Polling JMS messages.");
-
-        Connection connection = null;
-        Session session = null;
-        Destination destination = null;
-        MessageConsumer messageConsumer = null;
-
+       
         try {
             connection = jmsConnectionFactory.getConnection(strUserName, strPassword);
             if (connection == null) {
@@ -119,6 +120,15 @@ public class JMSPollingConsumer {
             }
             session = jmsConnectionFactory.getSession(connection);
             destination = jmsConnectionFactory.getDestination(connection);
+            if (replyDestinationName != null && !replyDestinationName.trim().equals("")) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Using the reply destnation as " + replyDestinationName +
+                                 " in inbound endpoint.");
+                }
+                replyDestination =
+                                   jmsConnectionFactory.createDestination(connection,
+                                                                          replyDestinationName);
+            }
             messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);            
             Message msg = receiveMessage(messageConsumer);         
             if (msg == null) {
@@ -135,6 +145,11 @@ public class JMSPollingConsumer {
                 if (injectHandler != null) {
 
                     boolean commitOrAck = true;
+                    // Set the reply destination and connection
+                    if (replyDestination != null) {
+                        injectHandler.setReplyDestination(replyDestination);
+                    }
+                    injectHandler.setConnection(connection);
                     commitOrAck = injectHandler.invoke(msg);
                     // if client acknowledgement is selected, and processing
                     // requested ACK
@@ -196,7 +211,6 @@ public class JMSPollingConsumer {
 
         } catch (JMSException e) {
             logger.error("Error while receiving JMS message. " + e.getMessage(), e);
-            e.printStackTrace();
         } catch (Exception e) {
             logger.error("Error while receiving JMS message. " + e.getMessage(), e);
         } finally {
@@ -211,6 +225,18 @@ public class JMSPollingConsumer {
             }
         }
         return null;
+    }
+    
+    public void destroy(){
+        if (messageConsumer != null) {
+            jmsConnectionFactory.closeConsumer(messageConsumer, true);
+        }
+        if (session != null) {
+            jmsConnectionFactory.closeSession(session, true);
+        }
+        if (connection != null) {
+            jmsConnectionFactory.closeConnection(connection, true);
+        }
     }
     
     private Message receiveMessage(MessageConsumer messageConsumer) throws JMSException{

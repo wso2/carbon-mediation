@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.jms;
 
 import javax.xml.namespace.QName;
 
+
 /**
  * 
  * Common constants used by inbound JMS protocol
@@ -46,6 +47,7 @@ public class JMSConstants {
     public static String SESSION_ACK = "transport.jms.SessionAcknowledgement";
     public static String RECEIVER_TIMEOUT = "transport.jms.ReceiveTimeout";    
     public static String CONTENT_TYPE = "transport.jms.ContentType";
+    public static String CONTENT_TYPE_PROPERTY = "transport.jms.ContentTypeProperty";
     /** Namespace for JMS map payload representation */
     public static final String JMS_MAP_NS = "http://axis.apache.org/axis2/java/transports/jms/map-payload";
     /** Root element name of JMS Map message payload representation */
@@ -54,7 +56,32 @@ public class JMSConstants {
     public static final QName JMS_MAP_QNAME = new QName(JMS_MAP_NS, JMS_MAP_ELEMENT_NAME, "");
 
     public static final String PARAM_CACHE_LEVEL = "transport.jms.CacheLevel";
-
+    /**
+     * A MessageContext property or client Option indicating the JMS message type
+     */
+    public static final String JMS_MESSAGE_TYPE = "JMS_MESSAGE_TYPE";    
+    /**
+     * A MessageContext property or client Option indicating the JMS correlation id
+     */
+    public static final String JMS_COORELATION_ID = "JMS_COORELATION_ID";
+    /**
+     * The message type indicating a MapMessage. See {@link JMS_MESSAGE_TYPE}
+     */
+    public static final String JMS_MAP_MESSAGE = "JMS_MAP_MESSAGE";
+    /**
+     * The Service level Parameter name indicating the [default] response destination of a service
+     */
+    public static final String PARAM_REPLY_DESTINATION = "transport.jms.ReplyDestination";
+    
+    /**
+     * The message type indicating a BytesMessage. See {@link JMS_MESSAGE_TYPE}
+     */
+    public static final String JMS_BYTE_MESSAGE = "JMS_BYTE_MESSAGE";
+    /**
+     * The message type indicating a TextMessage. See {@link JMS_MESSAGE_TYPE}
+     */
+    public static final String JMS_TEXT_MESSAGE = "JMS_TEXT_MESSAGE";    
+    
     public static final String PARAM_JMS_USERNAME = "transport.jms.UserName";
     /** The password to use when obtaining a JMS Connection */
     public static final String PARAM_JMS_PASSWORD = "transport.jms.Password";
@@ -77,7 +104,8 @@ public class JMSConstants {
 
     /** A message selector to be used when messages are sought for this service */
     public static final String PARAM_MSG_SELECTOR = "transport.jms.MessageSelector";
-
+    /** Should a pub-sub connection receive messages published by itself? */
+    public static final String PARAM_PUBSUB_NO_LOCAL = "transport.jms.PubSubNoLocal";    
     /**
      * Do not cache any JMS resources between tasks (when sending) or JMS CF's
      * (when sending)
@@ -108,5 +136,49 @@ public class JMSConstants {
      * transaction strategy)
      */
     public static final int CACHE_AUTO = 5;
+    /** The prefix that denotes JMSX properties */
+    public static final String JMSX_PREFIX = "JMSX";
+    /** The JMSXGroupID property */
+    public static final String JMSX_GROUP_ID = "JMSXGroupID";
+    /**
+     * A MessageContext property or client Option indicating the JMS delivery mode as an Integer or String
+     * Value 1 - javax.jms.DeliveryMode.NON_PERSISTENT
+     * Value 2 - javax.jms.DeliveryMode.PERSISTENT
+     */
+    public static final String JMS_DELIVERY_MODE = "JMS_DELIVERY_MODE";
+    /** The JMSXGroupSeq property */
+    public static final String JMSX_GROUP_SEQ = "JMSXGroupSeq";
+    /**
+     * A MessageContext property or client Option indicating the JMS message expiration - a Long value
+     * specified as a String
+     */
+    public static final String JMS_EXPIRATION = "JMS_EXPIRATION";
+    /**
+     * A MessageContext property or client Option indicating the JMS message id
+     */
+    public static final String JMS_MESSAGE_ID = "JMS_MESSAGE_ID";
+    /**
+     * A MessageContext property or client Option indicating the JMS priority
+     */
+    public static final String JMS_PRIORITY = "JMS_PRIORITY";
+    /**
+     * A MessageContext property or client Option indicating the JMS timestamp (Long specified as String)
+     */
+    public static final String JMS_TIMESTAMP = "JMS_TIMESTAMP";
+    
+    /**
+     * Does the JMS broker support hyphen in JMS message property names.
+     */
+    public static final String PARAM_JMS_HYPHEN_MODE = "transport.jms.MessagePropertyHyphens";
+
+    public static final String HYPHEN_MODE_NONE = "none";
+
+    public static final String HYPHEN_MODE_REPLACE = "replace";
+
+    public static final String HYPHEN_MODE_DELETE = "delete";
+
+    public static final String HYPHEN_REPLACEMENT_STR = "_DASHED_";
+
+    public static final String DEFAULT_HYPHEN_SUPPORT = HYPHEN_MODE_NONE;     
 
 }

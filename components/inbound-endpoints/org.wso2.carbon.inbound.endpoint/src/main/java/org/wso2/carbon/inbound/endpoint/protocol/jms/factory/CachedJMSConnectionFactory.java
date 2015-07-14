@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSConstants;
 
 import javax.jms.*;
+
 import java.util.Properties;
 
 public class CachedJMSConnectionFactory extends JMSConnectionFactory {
@@ -35,6 +36,16 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
     
     public CachedJMSConnectionFactory(Properties properties) {
         super(properties);
+        setValues(properties);
+    }
+
+    public CachedJMSConnectionFactory(Properties properties, Connection cachedConnection) {
+        super(properties);
+        this.cachedConnection = cachedConnection;
+        setValues(properties);
+    }
+    
+    private void setValues(Properties properties){
         String cacheLevel = properties.getProperty(JMSConstants.PARAM_CACHE_LEVEL);
         if(null != cacheLevel && !"".equals(cacheLevel)) {
             this.cacheLevel = Integer.parseInt(cacheLevel);
@@ -42,7 +53,7 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
             this.cacheLevel = JMSConstants.CACHE_NONE;
         }
     }
-
+    
     @Override
     public ConnectionFactory getConnectionFactory() {
         return super.getConnectionFactory();
@@ -93,9 +104,7 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
     @Override
     protected Session createSession(Connection connection) {
         Session session = super.createSession(connection);
-        //When ack messages JMS will ack for the session not for messages
-        //If cached it will not work for individual messages
-        if(this.cacheLevel >= JMSConstants.CACHE_SESSION && sessionAckMode <= 1){
+        if(this.cacheLevel >= JMSConstants.CACHE_SESSION){
         	cachedSession = session;
         }
         return session;
@@ -113,11 +122,26 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
 
     public MessageConsumer createMessageConsumer(Session session, Destination destination) { 
     	MessageConsumer  messageConsumer = super.createMessageConsumer(session, destination);
-        if(this.cacheLevel >= JMSConstants.CACHE_CONSUMER && sessionAckMode <= 1){
+        if(this.cacheLevel >= JMSConstants.CACHE_CONSUMER){
         	cachedMessageConsumer = messageConsumer;
         }
         return messageConsumer;
     } 
+    
+    /**
+     * This is a JMS spec independent method to create a MessageProducer. Please be cautious when
+     * making any changes
+     *
+     * @param session JMS session
+     * @param destination the Destination
+     * @param isQueue is the Destination a queue?
+     * @param jmsSpec11 should we use JMS 1.1 API ?
+     * @return a MessageProducer to send messages to the given Destination
+     * @throws JMSException on errors, to be handled and logged by the caller
+     */
+    public MessageProducer createProducer(Session session, Destination destination, Boolean isQueue) throws JMSException {
+       return super.createProducer(session, destination, isQueue);
+    }    
     
     public boolean closeConnection() {
         try {
@@ -132,8 +156,20 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
     }
 
     public boolean closeConnection(Connection connection) {
+        return closeConnection(connection, false);
+    }    
+
+    public boolean closeConsumer(MessageConsumer messageConsumer) {
+        return closeConsumer(messageConsumer, false);
+    }     
+
+    public boolean closeSession(Session session) {
+        return closeSession(session, false);
+    }
+    
+    public boolean closeConnection(Connection connection, boolean forcefully) {
         try {
-            if(this.cacheLevel < JMSConstants.CACHE_CONNECTION){
+            if(this.cacheLevel < JMSConstants.CACHE_CONNECTION || forcefully){
             	connection.close();
             }
         } catch (JMSException e) {
@@ -142,9 +178,9 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
         return false;
     }    
 
-    public boolean closeConsumer(MessageConsumer messageConsumer) {
+    public boolean closeConsumer(MessageConsumer messageConsumer, boolean forcefully) {
         try {
-            if(this.cacheLevel < JMSConstants.CACHE_CONSUMER){
+            if(this.cacheLevel < JMSConstants.CACHE_CONSUMER || forcefully){
             	messageConsumer.close();
             }
         } catch (JMSException e) {
@@ -153,9 +189,9 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
         return false;
     }     
 
-    public boolean closeSession(Session session) {
+    public boolean closeSession(Session session, boolean forcefully) {
         try {
-            if(this.cacheLevel < JMSConstants.CACHE_SESSION){
+            if(this.cacheLevel < JMSConstants.CACHE_SESSION || forcefully){
             	session.close();
             }
         } catch (JMSException e) {
