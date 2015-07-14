@@ -74,12 +74,13 @@ public class JMSReplySender implements InboundResponseSender {
      * */
     public void sendBack(MessageContext synCtx) {
         log.debug("Begin sending reply to the destination queue.");
-        MessageProducer producer = null;;
+        MessageProducer producer = null;
+        Session session = null;
         try {
             Connection connection =
                                     cachedJMSConnectionFactory.getConnection(strUserName,
                                                                              strPassword);
-            Session session = cachedJMSConnectionFactory.getSession(connection);
+            session = cachedJMSConnectionFactory.getSession(connection);
             producer = cachedJMSConnectionFactory.createProducer(session, replyTo, true);
             Message message = createJMSMessage(synCtx, session, null);
             producer.send(message);
@@ -90,9 +91,14 @@ public class JMSReplySender implements InboundResponseSender {
         } finally {
             try {
                 producer.close();
-            } catch (JMSException e) {
+            } catch (Exception e) {
                 log.debug("ERROR: Unable to close the producer");
             }
+            try {
+                session.close();
+            } catch (Exception e) {
+                log.debug("ERROR: Unable to close the session");
+            }            
         }
     }
 
