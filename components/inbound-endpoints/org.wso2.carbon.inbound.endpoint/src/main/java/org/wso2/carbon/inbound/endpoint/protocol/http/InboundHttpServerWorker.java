@@ -60,19 +60,20 @@ public class InboundHttpServerWorker extends ServerWorker {
 
     private SourceRequest request = null;
     private int port;
+    private String tenantDomain;
     private RESTRequestHandler restHandler;
     private Pattern dispatchPattern;
     private Matcher patternMatcher;
 
-    public InboundHttpServerWorker(int port, SourceRequest sourceRequest,
+    public InboundHttpServerWorker(int port, String tenantDomain,
+                                   SourceRequest sourceRequest,
                                    SourceConfiguration sourceConfiguration,
-                                   OutputStream outputStream,
-                                   Pattern dispatchPattern) {
+                                   OutputStream outputStream) {
         super(sourceRequest, sourceConfiguration, outputStream);
         this.request = sourceRequest;
         this.port = port;
+        this.tenantDomain = tenantDomain;
         restHandler = new RESTRequestHandler();
-        this.dispatchPattern = dispatchPattern;
     }
 
     public void run() {
@@ -91,7 +92,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                         getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axis2MsgContext, method);
 
-                String tenantDomain = getTenantDomain();
                 String endpointName =
                         HTTPEndpointManager.getInstance().getEndpointName(port, tenantDomain);
                 if (endpointName == null) {
@@ -104,6 +104,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
                     return;
                 }
+
+                dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
 
                 boolean continueDispatch = true;
                 if (dispatchPattern != null) {
@@ -172,10 +174,10 @@ public class InboundHttpServerWorker extends ServerWorker {
                         }
                     }
                 } else if (continueDispatch == true && dispatchPattern == null) {
+                    // else if for clarity compiler will optimize
                     injectToSequence(synCtx, endpoint);
                 } else {
-                    SequenceMediator faultSequence = getFaultSequence(synCtx, endpoint);
-                    synCtx.getEnvironment().injectMessage(synCtx, faultSequence);
+                    injectToSequence(synCtx, endpoint);
                 }
                 // send ack for client if needed
                 sendAck(axis2MsgContext);
@@ -244,14 +246,6 @@ public class InboundHttpServerWorker extends ServerWorker {
      */
     private void setInboundProperties(MessageContext axis2Context) {
         axis2Context.setProperty(SynapseConstants.IS_INBOUND, true);
-    }
-
-    private String getTenantDomain() {
-        String tenant = MultitenantUtils.getTenantDomainFromUrl(request.getUri());
-        if (tenant.equals(request.getUri())) {
-            return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        }
-        return tenant;
     }
 
     protected void handleException(String msg) {
@@ -327,14 +321,19 @@ public class InboundHttpServerWorker extends ServerWorker {
         // Create super tenant message context
         MessageContext axis2MsgCtx = axis2Context;
 
-        String tenantDomain = getTenantDomain();
         // If not super tenant, assign tenant configuration context
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            ConfigurationContext tenantConfigCtx =
+            try {
+                ConfigurationContext tenantConfigCtx =
                     TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
                                                                   axis2MsgCtx.getConfigurationContext());
-            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
-            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+                axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+                axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+            } catch (Exception e) {
+                log.warn("Could not get tenant configuration context for tenant " + tenantDomain + ". " +
+                        "Tenant may not exist. Message will be dispatched to super tenant.");
+                tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+            }
         }
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }

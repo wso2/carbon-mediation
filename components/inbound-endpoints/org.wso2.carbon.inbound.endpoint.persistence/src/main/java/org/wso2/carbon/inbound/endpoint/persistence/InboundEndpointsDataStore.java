@@ -123,9 +123,7 @@ public class InboundEndpointsDataStore {
     /**
      * Register endpoint in the InboundEndpointsDataStore
      *
-     * @param port         listener port
      * @param tenantDomain tenant domain
-     * @param protocol     protocol
      * @param name         endpoint name
      */
     public void registerPollingingEndpoint(String tenantDomain, String name) {
@@ -147,7 +145,8 @@ public class InboundEndpointsDataStore {
      * @param protocol     protocol
      * @param name         endpoint name
      */
-    public void registerSSLListeningEndpoint(int port, String tenantDomain, String protocol, String name,SSLConfiguration sslConfiguration) {
+    public void registerSSLListeningEndpoint(int port, String tenantDomain, String protocol, String name,
+                                             SSLConfiguration sslConfiguration, InboundProcessorParams params) {
 
         List<InboundEndpointInfoDTO> tenantList = endpointListeningInfo.get(port);
         if (tenantList == null) {
@@ -155,7 +154,7 @@ public class InboundEndpointsDataStore {
             tenantList = new ArrayList<InboundEndpointInfoDTO>();
             endpointListeningInfo.put(port, tenantList);
         }
-        InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name, null);
+        InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name, params);
         inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
         tenantList.add(inboundEndpointInfoDTO);
 
