@@ -130,15 +130,15 @@
 				apiName = apiData.getName();
 				//if page loaded from API List view, new APIData should be loaded again.
 				if(!fromSourceView && !fromResourceSourceView){
-                    try {
-                        apiData = client.getApiByNane(apiName);
-                    } catch (Exception e) {
-                        String msg = "Unable to get API data: "
-                                + e.getMessage();
-                        CarbonUIMessage.sendCarbonUIMessage(msg,
-                                CarbonUIMessage.ERROR, request);
-                    }
-                }
+                            try {
+                                apiData = client.getApiByNane(apiName);
+                            } catch (Exception e) {
+                                String msg = "Unable to get API data: "
+                                        + e.getMessage();
+                                CarbonUIMessage.sendCarbonUIMessage(msg,
+                                        CarbonUIMessage.ERROR, request);
+                            }
+                        }
 			}
 
         apiContext = apiData.getContext();
