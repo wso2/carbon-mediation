@@ -81,7 +81,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
     private static String FAULT_XML="<sequence xmlns=\"http://ws.apache.org/ns/synapse\" name=\"fault\"/>";
     private static String MAIN_SEQ_REGEX = "main-\\d+\\.\\d+\\.\\d+\\.xml";
     private static String FAULT_SEQ_REGEX = "fault-\\d+\\.\\d+\\.\\d+\\.xml";
-    AxisConfiguration axisConfig;
 
     /**
      * Deploy the artifacts which can be deployed through this deployer (endpoints, sequences,
@@ -96,7 +95,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 .getDependencies();
 
         deployClassMediators(artifacts, axisConfig);
-        this.axisConfig = axisConfig;
         deploySynapseLibrary(artifacts, axisConfig);
         for (Artifact.Dependency dep : artifacts) {
             Artifact artifact = dep.getArtifact();
@@ -188,8 +186,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifact.getType())){
-                        String libQName = getArtifactName(artifactPath);
-                        deleteImport(libQName);
+                        String libQName = getArtifactName(artifactPath, axisConfig);
+                        deleteImport(libQName, axisConfig);
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(artifact.getType())
                                && handleMainFaultSeqUndeployment(artifact, axisConfig)) {
@@ -287,10 +285,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                         DeploymentFileData dfd = new DeploymentFileData(new File(artifactPath), deployer);
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                         try {
-                            String artifactName = getArtifactName(artifactPath);
+                            String artifactName = getArtifactName(artifactPath, axisConfig);
                             String libName = artifactName.substring(artifactName.lastIndexOf("}")+1);
                             String libraryPackage = artifactName.substring(1, artifactName.lastIndexOf("}"));
-                            updateStatus(artifactName, libName, libraryPackage, ServiceBusConstants.ENABLED);
+                            updateStatus(artifactName, libName, libraryPackage, ServiceBusConstants.ENABLED, axisConfig);
                         } catch (AxisFault axisFault) {
                             axisFault.printStackTrace();
                         }
@@ -309,7 +307,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * Get the library artifact name
      *
      * */
-    public String getArtifactName(String filePath) throws DeploymentException {
+    public String getArtifactName(String filePath, AxisConfiguration axisConfig) throws DeploymentException {
         SynapseArtifactDeploymentStore deploymentStore;
         deploymentStore = getSynapseConfiguration(axisConfig).getArtifactDeploymentStore();
         return deploymentStore.getArtifactNameForFile(filePath);
@@ -333,13 +331,13 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * @param status
      * @throws AxisFault
      */
-    public boolean updateStatus(String libQName, String libName, String packageName, String status)
+    public boolean updateStatus(String libQName, String libName, String packageName, String status, AxisConfiguration axisConfig)
             throws AxisFault {
         try {
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration(axisConfig);
             SynapseImport synapseImport = synapseConfiguration.getSynapseImports().get(libQName);
             if (synapseImport == null && libName != null && packageName != null) {
-                addImport(libName, packageName);
+                addImport(libName, packageName, axisConfig);
                 synapseImport = synapseConfiguration.getSynapseImports().get(libQName);
             }
             Library synLib = synapseConfiguration.getSynapseLibraries().get(libQName);
@@ -348,12 +346,12 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     synapseImport.setStatus(true);
                     synLib.setLibStatus(true);
                     synLib.loadLibrary();
-                    deployingLocalEntries(synLib, synapseConfiguration);
+                    deployingLocalEntries(synLib, synapseConfiguration, axisConfig);
                 } else {
                     synapseImport.setStatus(false);
                     synLib.setLibStatus(false);
                     synLib.unLoadLibrary();
-                    undeployingLocalEntries(synLib, synapseConfiguration);
+                    undeployingLocalEntries(synLib, synapseConfiguration, axisConfig);
                 }
 
                 // update synapse configuration.
@@ -368,14 +366,14 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
         return true;
     }
 
-    public void addImport(String libName, String packageName) throws AxisFault {
+    public void addImport(String libName, String packageName, AxisConfiguration axisConfig) throws AxisFault {
         SynapseImport synImport = new SynapseImport();
         synImport.setLibName(libName);
         synImport.setLibPackage(packageName);
         OMElement impEl = SynapseImportSerializer.serializeImport(synImport);
         if (impEl != null) {
             try {
-                addImport(impEl.toString());
+                addImport(impEl.toString(), axisConfig);
             } catch (AxisFault axisFault) {
                 handleException(log, "Could not add Synapse Import", axisFault);
             }
@@ -391,7 +389,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * Undeploy the local entries deployed from the lib
      *
      * */
-    private void undeployingLocalEntries(Library library, SynapseConfiguration config) {
+    private void undeployingLocalEntries(Library library, SynapseConfiguration config, AxisConfiguration axisConfig) {
         if (log.isDebugEnabled()) {
             log.debug("Start : Removing Local registry entries from the configuration");
         }
@@ -399,7 +397,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 .entrySet()) {
             File localEntryFileObj = (File) libararyEntryMap.getValue();
             OMElement document = LocalEntryUtil.getOMElement(localEntryFileObj);
-            deleteEntry(document.toString());
+            deleteEntry(document.toString(), axisConfig);
         }
         if (log.isDebugEnabled()) {
             log.debug("End : Removing Local registry entries from the configuration");
@@ -416,7 +414,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      *             if some thing goes wrong when creating a MessageProcessor
      *             with the given xml.
      */
-    private void addImport(String xml) throws AxisFault {
+    private void addImport(String xml, AxisConfiguration axisConfig) throws AxisFault {
         try {
             OMElement imprtElem = createElement(xml);
             SynapseImport synapseImport = SynapseImportFactory.createImport(imprtElem, null);
@@ -488,7 +486,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * Deploy the local entries from lib
      *
      * */
-    private void deployingLocalEntries(Library library, SynapseConfiguration config) {
+    private void deployingLocalEntries(Library library, SynapseConfiguration config, AxisConfiguration axisConfig) {
         if (log.isDebugEnabled()) {
             log.debug("Start : Adding Local registry entries to the configuration");
         }
@@ -496,18 +494,19 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 .entrySet()) {
             File localEntryFileObj = (File) libararyEntryMap.getValue();
             OMElement document = LocalEntryUtil.getOMElement(localEntryFileObj);
-            addEntry(document.toString());
+            addEntry(document.toString(), axisConfig);
         }
         if (log.isDebugEnabled()) {
             log.debug("End : Adding Local registry entries to the configuration");
         }
     }
+
     /**
      * Add the local entry
      *
      * */
-    private boolean addEntry(String ele) {
-        final Lock lock = getLock();
+    private boolean addEntry(String ele, AxisConfiguration axisConfig) {
+        final Lock lock = getLock(axisConfig);
         try {
             lock.lock();
             OMElement elem;
@@ -561,9 +560,9 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
     /**
      * Remove the local entry
      * */
-    public boolean deleteEntry(String ele) {
+    public boolean deleteEntry(String ele, AxisConfiguration axisConfig) {
 
-        final Lock lock = getLock();
+        final Lock lock = getLock(axisConfig);
         String entryKey = null;
         try {
             lock.lock();
@@ -608,7 +607,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
         return false;
     }
 
-    protected Lock getLock() {
+    protected Lock getLock(AxisConfiguration axisConfig) {
         Parameter p = axisConfig.getParameter(ServiceBusConstants.SYNAPSE_CONFIG_LOCK);
         if (p != null) {
             return (Lock) p.getValue();
@@ -635,7 +634,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * @throws AxisFault
      *             if Message processor does not exist
      */
-    public void deleteImport(String importQualifiedName) throws AxisFault {
+    public void deleteImport(String importQualifiedName, AxisConfiguration axisConfig) throws AxisFault {
         SynapseConfiguration configuration = getSynapseConfiguration(axisConfig);
 
         assert configuration != null;
@@ -650,7 +649,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 // this is a important step -> we need to unload what ever the
                 // components loaded thru this import
                 synLib.unLoadLibrary();
-                undeployingLocalEntries(synLib, configuration);
+                undeployingLocalEntries(synLib, configuration, axisConfig);
             }
 
             MediationPersistenceManager pm = getMediationPersistenceManager(axisConfig);
