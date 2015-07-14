@@ -171,6 +171,58 @@
 
 <%
     }
+
+    String[] msgStores = synapseMetadata.getMessageStores();
+    if (msgStores != null && msgStores.length > 0) {
+%>
+<p>&nbsp;&nbsp;</p>
+<table class="styledLeft" id="MessageStoreTable" width="40%">
+    <thead>
+    <tr>
+        <th><img src="../message_store/images/message_store.gif" alt="" style="vertical-align:middle;">&nbsp;<fmt:message key="carbonapps.message.stores"/></th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+        for (String msgStore : msgStores) {
+    %>
+    <tr>
+        <td><a href="../message_store/viewMessageStore.jsp?messageStoreName=<%= msgStore%>"><%= msgStore%></a></td>
+    </tr>
+    <%
+        }
+    %>
+    </tbody>
+</table>
+
+<%
+    }
+
+    String[] msgProcessors = synapseMetadata.getMessageProcessors();
+    if (msgProcessors != null && msgProcessors.length > 0) {
+%>
+<p>&nbsp;&nbsp;</p>
+<table class="styledLeft" id="MessageProcessorTable" width="40%">
+    <thead>
+    <tr>
+        <th><img src="../message_processor/images/message-processor.gif" alt="" style="vertical-align:middle;">&nbsp;<fmt:message key="carbonapps.message.processors"/></th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+        for (String msgProcessor : msgProcessors) {
+    %>
+    <tr>
+        <td><a href="../message_processor/manageMessageForwardingProcessor.jsp?messageProcessorName=<%= msgProcessor%>"><%= msgProcessor%></a></td>
+    </tr>
+    <%
+        }
+    %>
+    </tbody>
+</table>
+
+<%
+    }
     String[] events = synapseMetadata.getEvents();
     if (events != null && events.length > 0) {
 %>
