@@ -108,7 +108,7 @@
 					CarbonUIMessage.sendCarbonUIMessage(msg,
 							CarbonUIMessage.ERROR, request);
 				}
-			// restrict previous API data load for new API request 	
+			// restrict previous API data load for new API request
 			} else if (apiData.getName() == null || !apiData.getName().equals(
 					request.getParameter("apiName"))) {
 
@@ -128,6 +128,17 @@
 
 			} else {
 				apiName = apiData.getName();
+				//if page loaded from API List view, new APIData should be loaded again.
+                if(!fromSourceView && !fromResourceSourceView){
+                    try {
+                        apiData = client.getApiByNane(apiName);
+                    } catch (Exception e) {
+                        String msg = "Unable to get API data: "
+                                + e.getMessage();
+                        CarbonUIMessage.sendCarbonUIMessage(msg,
+                                CarbonUIMessage.ERROR, request);
+                    }
+                }
 
 			}
         apiContext = apiData.getContext();
