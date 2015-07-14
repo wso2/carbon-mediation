@@ -129,7 +129,7 @@
 			} else {
 				apiName = apiData.getName();
 				//if page loaded from API List view, new APIData should be loaded again.
-                if(!fromSourceView && !fromResourceSourceView){
+				if(!fromSourceView && !fromResourceSourceView){
                     try {
                         apiData = client.getApiByNane(apiName);
                     } catch (Exception e) {
