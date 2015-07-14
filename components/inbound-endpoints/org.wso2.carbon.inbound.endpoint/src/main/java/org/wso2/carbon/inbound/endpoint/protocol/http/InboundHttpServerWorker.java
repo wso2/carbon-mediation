@@ -105,6 +105,22 @@ public class InboundHttpServerWorker extends ServerWorker {
                     return;
                 }
 
+                if (!isRESTRequest(axis2MsgContext, method)) {
+                    if (request.isEntityEnclosing()) {
+                        processEntityEnclosingRequest(axis2MsgContext, false);
+                    } else {
+                        processNonEntityEnclosingRESTHandler(null, axis2MsgContext, false);
+                    }
+                } else {
+                    AxisOperation axisOperation = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getAxisOperation();
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(null);
+                    String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+                    SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
+                    processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgContext, false);
+                    ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(axisOperation);
+
+                }
+
                 dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
 
                 boolean continueDispatch = true;
@@ -119,22 +135,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                 }
 
                 if (continueDispatch && dispatchPattern != null) {
-
-                    if (!isRESTRequest(axis2MsgContext, method)) {
-                        if (request.isEntityEnclosing()) {
-                            processEntityEnclosingRequest(axis2MsgContext, false);
-                        } else {
-                            processNonEntityEnclosingRESTHandler(null, axis2MsgContext, false);
-                        }
-                    } else {
-                        AxisOperation axisOperation = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getAxisOperation();
-                        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(null);
-                        String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
-                        SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
-                        processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgContext, false);
-                        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(axisOperation);
-
-                    }
 
                     boolean processedByAPI = false;
 
@@ -173,7 +173,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                             injectToSequence(synCtx, endpoint);
                         }
                     }
-                } else if (continueDispatch == true && dispatchPattern == null) {
+                } else if (continueDispatch && dispatchPattern == null) {
                     // else if for clarity compiler will optimize
                     injectToSequence(synCtx, endpoint);
                 } else {
