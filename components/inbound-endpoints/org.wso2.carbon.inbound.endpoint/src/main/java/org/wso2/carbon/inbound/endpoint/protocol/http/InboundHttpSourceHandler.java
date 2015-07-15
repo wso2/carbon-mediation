@@ -27,12 +27,14 @@ import org.apache.synapse.transport.passthru.SourceContext;
 import org.apache.synapse.transport.passthru.SourceHandler;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.regex.Pattern;
 
 /**
  * Handler Class for process HTTP Requests
@@ -43,14 +45,12 @@ public class InboundHttpSourceHandler extends SourceHandler {
 
     private final SourceConfiguration sourceConfiguration;
     private int port;
-    private String tenantDomain;
     private WorkerPool workerPool;
 
-    public InboundHttpSourceHandler(int port, SourceConfiguration sourceConfiguration , String tenantDomain) {
+    public InboundHttpSourceHandler(int port, SourceConfiguration sourceConfiguration) {
         super(sourceConfiguration);
         this.sourceConfiguration = sourceConfiguration;
         this.port = port;
-        this.tenantDomain = tenantDomain;
     }
 
     @Override
@@ -65,6 +65,10 @@ public class InboundHttpSourceHandler extends SourceHandler {
             //Get output Stream for write response for HTTP GET and HEAD methods
             OutputStream os = getOutputStream(method, request);
             // Handover Request to Worker Pool
+
+            Pattern dispatchPattern = null;
+
+            String tenantDomain = getTenantDomain(request);
 
             if (tenantDomain != null) {
                 WorkerPoolConfiguration workerPoolConfiguration =
@@ -82,7 +86,7 @@ public class InboundHttpSourceHandler extends SourceHandler {
                 workerPool = sourceConfiguration.getWorkerPool();
             }
             workerPool.execute
-                       (new InboundHttpServerWorker(port, request, sourceConfiguration, os));
+                    (new InboundHttpServerWorker(port, tenantDomain, request, sourceConfiguration, os));
         } catch (HttpException e) {
             log.error("HttpException occurred when creating Source Request", e);
             informReaderError(conn);
@@ -94,5 +98,13 @@ public class InboundHttpSourceHandler extends SourceHandler {
             SourceContext.updateState(conn, ProtocolState.CLOSED);
             sourceConfiguration.getSourceConnections().shutDownConnection(conn, true);
         }
+    }
+
+    private String getTenantDomain(SourceRequest request) {
+        String tenant = MultitenantUtils.getTenantDomainFromUrl(request.getUri());
+        if (tenant.equals(request.getUri())) {
+            return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        }
+        return tenant;
     }
 }

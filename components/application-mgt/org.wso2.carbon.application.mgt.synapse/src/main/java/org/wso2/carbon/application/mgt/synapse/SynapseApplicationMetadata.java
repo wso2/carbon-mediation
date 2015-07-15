@@ -32,6 +32,8 @@ public class SynapseApplicationMetadata {
     private TaskMetadata[] tasks;
     private String[] apis;
     private String[] inboundEPs;
+    private String[] messageProcessors;
+    private String[] messageStores;
 
     public String getAppName() {
         return appName;
@@ -109,4 +111,19 @@ public class SynapseApplicationMetadata {
         this.inboundEPs = inboundEPs;
     }
 
+    public String[] getMessageProcessors() {
+        return messageProcessors;
+    }
+
+    public void setMessageProcessors(String[] messageProcessors) {
+        this.messageProcessors = messageProcessors;
+    }
+
+    public String[] getMessageStores() {
+        return messageStores;
+    }
+
+    public void setMessageStores(String[] messageStores) {
+        this.messageStores = messageStores;
+    }
 }

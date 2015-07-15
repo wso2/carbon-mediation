@@ -47,7 +47,7 @@
 			List<ParamDTO>sParams = new ArrayList<ParamDTO>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
-				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.") || strKey.startsWith("api.")){
+				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.") || strKey.startsWith("api.") || strKey.startsWith("dispatch.filter.")){
 					String strVal = request.getParameter(strKey);
 					if(strVal != null && !strVal.equals("")){
 						sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
@@ -80,7 +80,12 @@
                   if(strVal != null && !strVal.equals("")){
                      sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
                   }
-                }
+                }else if(strKey.startsWith("mqtt.")|| strKey.startsWith("content.type")){
+                                   String strVal = request.getParameter(strKey);
+                                   if(strVal != null && !strVal.equals("")){
+                                      sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                                      }
+                                 }
 			}
 		boolean added =	client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, request.getParameter("inboundSuspend"), sParams);
 		if(!added){
@@ -88,9 +93,9 @@
     <script type="text/javascript">
         jQuery(document).ready(function () {
             CARBON.showErrorDialog('Cannot add inbound endpoint. Maybe name or port is already in use.', function () {
-                goBackOnePage();
+                goBackTwoPages();
             }, function () {
-                goBackOnePage();
+                goBackTwoPages();
             });
         });
     </script>
@@ -107,9 +112,9 @@
 	<script type="text/javascript">
     jQuery(document).ready(function() {
         CARBON.showErrorDialog('<%=e.getMessage()%>', function() {
-				goBackOnePage();
+                goBackTwoPages();
 			}, function() {
-				goBackOnePage();
+                goBackTwoPages();
 			});
 		});
 	</script>

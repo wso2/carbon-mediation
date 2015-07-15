@@ -109,7 +109,7 @@
 							CarbonUIMessage.ERROR, request);
 				}
 			// restrict previous API data load for new API request 	
-			} else if (!apiData.getName().equals(
+			} else if (apiData.getName() == null || !apiData.getName().equals(
 					request.getParameter("apiName"))) {
 
 				apiName = request.getParameter("apiName");

@@ -18,6 +18,7 @@ package org.wso2.carbon.endpoint.ui.endpoints.http;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.endpoints.DefinitionFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.endpoints.HTTPEndpoint;
 import org.apache.synapse.endpoints.Template;
 import org.wso2.carbon.endpoint.ui.endpoints.Endpoint;
 import org.wso2.carbon.endpoint.ui.util.EndpointConfigurationHelper;
@@ -58,6 +59,10 @@ public class HttpEndpoint extends Endpoint {
     
     private String description = "";
     private String properties;
+
+    private boolean legacySupport = false;
+
+    public static String legacyPrefix = HTTPEndpoint.legacyPrefix;
 
     public String getUriTemplate() {
     	return uriTemplate; 
@@ -271,6 +276,14 @@ public class HttpEndpoint extends Endpoint {
         this.properties = properties;
     }
 
+    public void setLegacy(boolean legacySupport) {
+        this.legacySupport = legacySupport;
+    }
+
+    public boolean isLegacy() {
+        return legacySupport;
+    }
+
     public OMElement serialize(OMElement parent) {
 
         // top element
@@ -283,7 +296,11 @@ public class HttpEndpoint extends Endpoint {
         // http element]
         OMElement httpElement = fac.createOMElement("http",synNS);
         if (uriTemplate != null && !"".equals(uriTemplate)) {
-        	httpElement.addAttribute(fac.createOMAttribute("uri-template", nullNS, uriTemplate));
+            if (isLegacy()) {
+        	    httpElement.addAttribute(fac.createOMAttribute("uri-template", nullNS, HTTPEndpoint.legacyPrefix + uriTemplate));
+            } else {
+                httpElement.addAttribute(fac.createOMAttribute("uri-template", nullNS, uriTemplate));
+            }
         }       
         
         // method
@@ -440,6 +457,8 @@ public class HttpEndpoint extends Endpoint {
         setMethod(httpEndpoint.getHttpMethod());
         setUriTemplate(httpEndpoint.getUriTemplate().getTemplate());
         setDescription(httpEndpoint.getDescription());
+
+        setLegacy(httpEndpoint.isLegacySupport());
                 
         if (httpEndpoint.getDefinition().getInitialSuspendDuration() != -1) {
             setSuspendDurationOnFailure(String.valueOf(httpEndpoint.getDefinition().getInitialSuspendDuration()));

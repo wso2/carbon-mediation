@@ -263,6 +263,11 @@
         <div id="divHead" style="display:inline;">
             <fmt:message key="methods.head.label"/>
         </div>
+        <input type="checkbox" name="methods" value="PATCH"
+               style="display:inline; vertical-align: middle"/>
+        <div id="divPatch" style="display:inline;">
+            <fmt:message key="methods.patch.label"/>
+        </div>
     </td>
 </tr>
 <!-- URL Style-->

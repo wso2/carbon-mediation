@@ -47,7 +47,7 @@
 			List<org.wso2.carbon.inbound.ui.internal.ParamDTO>sParams = new ArrayList<org.wso2.carbon.inbound.ui.internal.ParamDTO>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
-				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.") || strKey.startsWith("api.")){
+				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.") || strKey.startsWith("api.") || strKey.startsWith("dispatch.filter.")){
 					String strVal = request.getParameter(strKey);
 					if(strVal != null && !strVal.equals("")){
 						sParams.add(new org.wso2.carbon.inbound.ui.internal.ParamDTO(strKey, request.getParameter(strKey)));
@@ -80,7 +80,12 @@
                    if(strVal != null && !strVal.equals("")){
                       sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
                    }
-                }
+                }else if(strKey.startsWith("mqtt.")|| strKey.startsWith("content.type")){
+                                    String strVal = request.getParameter(strKey);
+                                    if(strVal != null && !strVal.equals("")){
+                                       sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                                    }
+                                 }
            }
 		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl,request.getParameter("inboundSuspend"), sParams);
 			if(!added){

@@ -193,6 +193,7 @@ public class MLLPContext {
     public void reset() {
         // Resets MLLP Context and HL7Codec to default states.
         this.responseBuffer.setLength(0);
+        this.requestBuffer.setLength(0);
         this.getCodec().setState(HL7Codec.READ_HEADER);
         this.setNackMode(false);
     }

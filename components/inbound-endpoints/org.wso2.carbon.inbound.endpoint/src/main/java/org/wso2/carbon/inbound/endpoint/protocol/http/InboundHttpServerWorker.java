@@ -24,7 +24,6 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.AxisOperation;
-import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
@@ -49,6 +48,8 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
 import java.io.OutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Create SynapseMessageContext from HTTP Request and inject it to the sequence in a synchronous manner
@@ -60,16 +61,20 @@ public class InboundHttpServerWorker extends ServerWorker {
 
     private SourceRequest request = null;
     private int port;
+    private String tenantDomain;
     private RESTRequestHandler restHandler;
+    private Pattern dispatchPattern;
+    private Matcher patternMatcher;
 
-    public InboundHttpServerWorker(int port, SourceRequest sourceRequest,
+    public InboundHttpServerWorker(int port, String tenantDomain,
+                                   SourceRequest sourceRequest,
                                    SourceConfiguration sourceConfiguration,
                                    OutputStream outputStream) {
         super(sourceRequest, sourceConfiguration, outputStream);
         this.request = sourceRequest;
         this.port = port;
+        this.tenantDomain = tenantDomain;
         restHandler = new RESTRequestHandler();
-
     }
 
     public void run() {
@@ -88,7 +93,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                         getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axis2MsgContext, method);
 
-                String tenantDomain = getTenantDomain();
                 String endpointName =
                         HTTPEndpointManager.getInstance().getEndpointName(port, tenantDomain);
                 if (endpointName == null) {
@@ -120,78 +124,110 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                 }
 
-                boolean processedByAPI = false;
+                dispatchPattern = HTTPEndpointManager.getInstance().getPattern(tenantDomain, port);
 
-                // Trying to dispatch to an API
-                processedByAPI = restHandler.process(synCtx);
-                if (log.isDebugEnabled()) {
-                    log.debug("Dispatch to API state : enabled, Message is "
-                              + (!processedByAPI ? "NOT" : "") + "processed by an API");
-                }
-
-                if (!processedByAPI) {
-                    //check the validity of message routing to axis2 path
-                    boolean isAxis2Path = isAllowedAxis2Path(synCtx);
-
-                    if (isAxis2Path) {
-                        //create axis2 message context again to avoid settings updated above
-                        axis2MsgContext = createMessageContext(null, request);
-
-                        processHttpRequestUri(axis2MsgContext, method);
-
-                        //set inbound properties for axis2 context
-                        setInboundProperties(axis2MsgContext);
-
-                        if (!isRESTRequest(axis2MsgContext, method)) {
-                            if (request.isEntityEnclosing()) {
-                                processEntityEnclosingRequest(axis2MsgContext, isAxis2Path);
-                            } else {
-                                processNonEntityEnclosingRESTHandler(null, axis2MsgContext, isAxis2Path);
-                            }
-                        }else {
-                            String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
-                            SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
-                            processNonEntityEnclosingRESTHandler(soapEnvelope,axis2MsgContext,true);
-                        }
-                    } else {
-                        // Get injecting sequence for synapse engine
-                        SequenceMediator injectingSequence = null;
-                        if (endpoint.getInjectingSeq() != null) {
-
-                            injectingSequence = (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
-                        }
-
-                        if (injectingSequence == null) {
-                            injectingSequence = (SequenceMediator) synCtx.getMainSequence();
-                        }
-                        SequenceMediator faultSequence = null;
-                        if (endpoint.getOnErrorSeq() != null) {
-                            faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
-                        }
-
-                        if (faultSequence != null) {
-                            faultSequence = (SequenceMediator) synCtx.getFaultSequence();
-                        }
-
-                        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
-                        synCtx.pushFaultHandler(mediatorFaultHandler);
-
-                        /* handover synapse message context to synapse environment for inject it to given sequence in
-                        synchronous manner*/
+                boolean continueDispatch = true;
+                if (dispatchPattern != null) {
+                    patternMatcher = dispatchPattern.matcher(request.getUri());
+                    if (!patternMatcher.matches()) {
                         if (log.isDebugEnabled()) {
-                            log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
+                            log.debug("Requested URI does not match given dispatch regular expression.");
                         }
-                        synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
+                        continueDispatch = false;
                     }
-                    // send ack for client if needed
-                    sendAck(axis2MsgContext);
                 }
+
+                if (continueDispatch && dispatchPattern != null) {
+
+                    boolean processedByAPI = false;
+
+                    // Trying to dispatch to an API
+                    processedByAPI = restHandler.process(synCtx);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Dispatch to API state : enabled, Message is "
+                                  + (!processedByAPI ? "NOT" : "") + "processed by an API");
+                    }
+
+                    if (!processedByAPI) {
+                        //check the validity of message routing to axis2 path
+                        boolean isAxis2Path = isAllowedAxis2Path(synCtx);
+
+                        if (isAxis2Path) {
+                            //create axis2 message context again to avoid settings updated above
+                            axis2MsgContext = createMessageContext(null, request);
+
+                            processHttpRequestUri(axis2MsgContext, method);
+
+                            //set inbound properties for axis2 context
+                            setInboundProperties(axis2MsgContext);
+
+                            if (!isRESTRequest(axis2MsgContext, method)) {
+                                if (request.isEntityEnclosing()) {
+                                    processEntityEnclosingRequest(axis2MsgContext, isAxis2Path);
+                                } else {
+                                    processNonEntityEnclosingRESTHandler(null, axis2MsgContext, isAxis2Path);
+                                }
+                            }else {
+                                String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+                                SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
+                                processNonEntityEnclosingRESTHandler(soapEnvelope,axis2MsgContext,true);
+                            }
+                        } else {
+                            injectToSequence(synCtx, endpoint);
+                        }
+                    }
+                } else if (continueDispatch && dispatchPattern == null) {
+                    // else if for clarity compiler will optimize
+                    injectToSequence(synCtx, endpoint);
+                } else {
+                    injectToSequence(synCtx, endpoint);
+                }
+                // send ack for client if needed
+                sendAck(axis2MsgContext);
             } catch (Exception e) {
                 log.error("Exception occurred when running " + InboundHttpServerWorker.class.getName(), e);
             }
         } else {
             log.error("InboundSourceRequest cannot be null");
         }
+    }
+
+    private void injectToSequence(org.apache.synapse.MessageContext synCtx, InboundEndpoint endpoint) {
+        // Get injecting sequence for synapse engine
+        SequenceMediator injectingSequence = null;
+        if (endpoint.getInjectingSeq() != null) {
+
+            injectingSequence = (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
+        }
+
+        if (injectingSequence == null) {
+            injectingSequence = (SequenceMediator) synCtx.getMainSequence();
+        }
+
+        SequenceMediator faultSequence = getFaultSequence(synCtx, endpoint);
+
+        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
+        synCtx.pushFaultHandler(mediatorFaultHandler);
+
+        /* handover synapse message context to synapse environment for inject it to given sequence in
+        synchronous manner*/
+        if (log.isDebugEnabled()) {
+            log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
+        }
+        synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
+    }
+
+    private SequenceMediator getFaultSequence(org.apache.synapse.MessageContext synCtx, InboundEndpoint endpoint) {
+        SequenceMediator faultSequence = null;
+        if (endpoint.getOnErrorSeq() != null) {
+            faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
+        }
+
+        if (faultSequence == null) {
+            faultSequence = (SequenceMediator) synCtx.getFaultSequence();
+        }
+
+        return faultSequence;
     }
 
     /**
@@ -213,14 +249,6 @@ public class InboundHttpServerWorker extends ServerWorker {
      */
     private void setInboundProperties(MessageContext axis2Context) {
         axis2Context.setProperty(SynapseConstants.IS_INBOUND, true);
-    }
-
-    private String getTenantDomain() {
-        String tenant = MultitenantUtils.getTenantDomainFromUrl(request.getUri());
-        if (tenant.equals(request.getUri())) {
-            return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        }
-        return tenant;
     }
 
     protected void handleException(String msg) {
@@ -296,14 +324,19 @@ public class InboundHttpServerWorker extends ServerWorker {
         // Create super tenant message context
         MessageContext axis2MsgCtx = axis2Context;
 
-        String tenantDomain = getTenantDomain();
         // If not super tenant, assign tenant configuration context
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            ConfigurationContext tenantConfigCtx =
+            try {
+                ConfigurationContext tenantConfigCtx =
                     TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
                                                                   axis2MsgCtx.getConfigurationContext());
-            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
-            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+                axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+                axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+            } catch (Exception e) {
+                log.warn("Could not get tenant configuration context for tenant " + tenantDomain + ". " +
+                        "Tenant may not exist. Message will be dispatched to super tenant.");
+                tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+            }
         }
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }

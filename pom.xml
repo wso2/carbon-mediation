@@ -1648,6 +1648,24 @@
                 <version>${carbon.mediation.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.cache.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.cache.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.cache.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
 
             <!--11 Previous version components -->
             <!--TODO use ndatasources-->
@@ -1946,14 +1964,14 @@
                 <version>${jsonpath.version}</version>
             </dependency>
             <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${json.smart.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.damnhandy.wso2</groupId>
                 <artifactId>handy-uri-templates</artifactId>
                 <version>${damnhandy.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.staxon</groupId>
-                <artifactId>staxon-core</artifactId>
-                <version>${staxon.version}</version>
             </dependency>
             <dependency>
                 <groupId>quickfixj.wso2</groupId>
@@ -1974,6 +1992,33 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+
+            <!-- Cache mediatoer dependencies -->
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-saaj</artifactId>
+                <version>${axis2-saaj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>javax.cache.wso2</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-saaj_1.3_spec</artifactId>
+                <version>${org.apache.geronimo.specs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xmlunit</groupId>
+                <artifactId>xmlunit</artifactId>
+                <version>${xmlunit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.cache</artifactId>
+                <version>${carbon.mediation.version}</version>
             </dependency>
 
             <!-- publishEvent mediator dependencies -->
@@ -2055,7 +2100,7 @@
         <carbon.deployment.version>4.4.1</carbon.deployment.version>
 
         <!-- Carbon Registry version-->
-        <carbon.registry.version>4.4.3</carbon.registry.version>
+        <carbon.registry.version>4.4.4</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.4.0, 4.5.0)</carbon.registry.imp.pkg.version>
 
         <!-- Carbon Identity version-->
@@ -2178,8 +2223,8 @@
         <geronimo-jta.version>1.1.1</geronimo-jta.version>
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
         <jsonpath.version>0.8.1.wso2v1</jsonpath.version>
+        <json.smart.version>1.2</json.smart.version>
         <damnhandy.version>1.1.7.wso2v1</damnhandy.version>
-        <staxon.version>1.2.0.wso2v2</staxon.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
         <netty.version>4.0.0.Final</netty.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
@@ -2189,6 +2234,12 @@
         <!--<org.apache.commons.logging.version>[1.1.0, 1.2.0)</org.apache.commons.logging.version>-->
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
         <project.scm.id>wso2-scm-server</project.scm.id>
+
+        <!-- Cache mediator dependency versions -->
+        <axis2-saaj.version>1.6.1-wso2v11</axis2-saaj.version>
+        <org.apache.geronimo.specs.version>1.0.0</org.apache.geronimo.specs.version>
+        <xmlunit.version>1.1</xmlunit.version>
+        <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
 
         <!-- publishEvent mediator versions -->
         <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>

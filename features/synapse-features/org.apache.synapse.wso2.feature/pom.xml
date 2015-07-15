@@ -56,10 +56,6 @@
             <artifactId>quartz</artifactId>
         </dependency>
         <dependency>
-	    <groupId>org.wso2.uri.template</groupId>
-	    <artifactId>wso2-uri-templates</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
@@ -75,14 +71,14 @@
             <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
             <artifactId>com.jayway.jsonpath</artifactId>
         </dependency>
-      	<dependency>
-		    <groupId>com.damnhandy.wso2</groupId>
-		    <artifactId>handy-uri-templates</artifactId>
-	    </dependency>
         <dependency>
-		    <groupId>org.wso2.staxon</groupId>
-		    <artifactId>staxon-core</artifactId>
-	    </dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+        </dependency>
+      	<dependency>
+	    <groupId>com.damnhandy.wso2</groupId>
+	    <artifactId>handy-uri-templates</artifactId>
+	</dependency>        
     </dependencies>
 
     <build>
@@ -114,13 +110,12 @@
                                 <bundleDef>org.apache.synapse:synapse-tasks</bundleDef>
                                 <bundleDef>net.sf.saxon.wso2:saxon</bundleDef>
                                 <bundleDef>org.quartz-scheduler.wso2:quartz</bundleDef>
-                                <bundleDef>org.wso2.uri.template:wso2-uri-templates</bundleDef>
                                 <bundleDef>com.google.code.gson:gson:${gson.version}</bundleDef>
                                 <bundleDef>org.wso2.caching:wso2caching-core</bundleDef>
                                 <bundleDef>org.wso2.throttle:wso2throttle-core</bundleDef>
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
-                                <bundleDef>org.wso2.staxon:staxon-core</bundleDef>
+                                <bundleDef>net.minidev:json-smart</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
