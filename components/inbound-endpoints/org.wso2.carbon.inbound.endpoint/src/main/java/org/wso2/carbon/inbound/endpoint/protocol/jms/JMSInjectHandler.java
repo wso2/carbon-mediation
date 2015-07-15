@@ -84,11 +84,12 @@ public class JMSInjectHandler {
     /**
      * Invoke the mediation logic for the passed message
      * */
-    public boolean invoke(Object object) throws SynapseException{
+    public boolean invoke(Object object, String name) throws SynapseException{
 
         Message msg = (Message) object;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
+            msgCtx.setProperty("car.deployed.name", name);
             String contentType = msg.getJMSType();
             
             if (contentType == null || contentType.trim().equals("")) {

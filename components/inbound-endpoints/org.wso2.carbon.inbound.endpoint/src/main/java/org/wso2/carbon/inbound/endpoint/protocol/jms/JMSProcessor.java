@@ -75,7 +75,7 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
      */
     public void init() {
         log.info("Initializing inbound JMS listener for inbound endpoint " + name);        
-        pollingConsumer = new JMSPollingConsumer( jmsProperties, interval);
+        pollingConsumer = new JMSPollingConsumer( jmsProperties, interval, name);
         pollingConsumer.registerHandler(new JMSInjectHandler(injectingSeq, onErrorSeq, sequential,
                 synapseEnvironment, jmsProperties));
         start();
