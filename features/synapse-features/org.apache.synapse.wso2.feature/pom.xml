@@ -76,13 +76,9 @@
             <artifactId>json-smart</artifactId>
         </dependency>
       	<dependency>
-		    <groupId>com.damnhandy.wso2</groupId>
-		    <artifactId>handy-uri-templates</artifactId>
-	    </dependency>
-        <dependency>
-		    <groupId>org.wso2.staxon</groupId>
-		    <artifactId>staxon-core</artifactId>
-	    </dependency>
+	    <groupId>com.damnhandy.wso2</groupId>
+	    <artifactId>handy-uri-templates</artifactId>
+	</dependency>        
     </dependencies>
 
     <build>
@@ -120,7 +116,6 @@
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
                                 <bundleDef>net.minidev:json-smart</bundleDef>
-                                <bundleDef>org.wso2.staxon:staxon-core</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
