@@ -30,6 +30,7 @@ import org.apache.axis2.util.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
+import org.apache.synapse.CustomLogSetter;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
@@ -100,6 +101,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
                     return;
                 }
+
+                CustomLogSetter.getInstance().setLogAppender(endpoint.getCarName());
 
                 if (!isRESTRequest(axis2MsgContext, method)) {
                     if (request.isEntityEnclosing()) {

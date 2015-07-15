@@ -39,6 +39,7 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs2.FileObject;
+import org.apache.synapse.CustomLogSetter;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.vfs.FileObjectDataSource;
 import org.apache.synapse.commons.vfs.VFSConstants;
@@ -68,12 +69,14 @@ public class FileInjectHandler {
 	/**
 	 * Inject the message to the sequence
 	 * */
-	public boolean invoke(Object object)throws SynapseException{
+	public boolean invoke(Object object, String name)throws SynapseException{
 		
 		ManagedDataSource dataSource = null;;
 		FileObject file = (FileObject)object;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
+            msgCtx.setProperty("car.deployed.name", name);
+            CustomLogSetter.getInstance().setLogAppender(name);
             String contentType = vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_CONTENT_TYPE);
             if (contentType == null || contentType.trim().equals("")) {
                 if (file.getName().getExtension().toLowerCase().endsWith("xml")) {

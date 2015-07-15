@@ -744,7 +744,7 @@ public class FilePollingConsumer {
 
                 injectHandler.setTransportHeaders(transportHeaders);
                 // injectHandler
-                if (!injectHandler.invoke(file)) {
+                if (!injectHandler.invoke(file, name)) {
                     return null;
                 }
             }
