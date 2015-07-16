@@ -86,6 +86,7 @@ public class HL7Processor implements InboundResponseSender {
         }
 
         mllpContext.setMessageId(synCtx.getMessageID());
+        synCtx.setProperty("car.deployed.name", params.getName());
         synCtx.setProperty(MLLPConstants.HL7_INBOUND_MSG_ID, synCtx.getMessageID());
 
         // If not AUTO ACK, we need response invocation through this processor
