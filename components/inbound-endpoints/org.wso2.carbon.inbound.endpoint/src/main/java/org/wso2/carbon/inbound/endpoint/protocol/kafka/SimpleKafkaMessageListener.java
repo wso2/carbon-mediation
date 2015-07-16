@@ -135,7 +135,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
     }
 
     @Override
-    public void injectMessageToESB() {
+    public void injectMessageToESB(String name) {
 
         logger.debug("Fetch the messages until maximum message is zero");
         if (maxReads > 0) {
@@ -187,7 +187,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                         if (logger.isDebugEnabled()) {
                             logger.debug("Start : Add to injectHandler to invoke");
                         }
-                        injectHandler.invoke(bytes);
+                        injectHandler.invoke(bytes, name);
                         if (logger.isDebugEnabled()) {
                             logger.debug("End : Add the injectHandler to invoke");
                         }

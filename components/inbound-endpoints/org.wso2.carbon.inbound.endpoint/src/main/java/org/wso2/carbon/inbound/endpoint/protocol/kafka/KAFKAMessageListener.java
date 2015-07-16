@@ -144,9 +144,9 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
     }
 
     @Override
-    public void injectMessageToESB() {
+    public void injectMessageToESB(String name) {
         byte[] msg = consumerIte.next().message();
-        injectHandler.invoke(msg);
+        injectHandler.invoke(msg, name);
     }
 
     @Override

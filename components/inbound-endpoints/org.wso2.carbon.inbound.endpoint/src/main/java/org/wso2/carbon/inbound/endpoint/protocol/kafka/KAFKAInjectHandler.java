@@ -60,10 +60,11 @@ public class KAFKAInjectHandler implements InjectHandler {
      * Determine the message builder to use, set the message payload to the message context and
      * inject the message to the sequence
      */
-    public boolean invoke(Object object) {
+    public boolean invoke(Object object, String name) {
         byte[] msg = (byte[]) object;
 
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
+        msgCtx.setProperty("car.deployed.name", name);
         log.debug("Processed Kafka Message ");
         MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
                 .getAxis2MessageContext();

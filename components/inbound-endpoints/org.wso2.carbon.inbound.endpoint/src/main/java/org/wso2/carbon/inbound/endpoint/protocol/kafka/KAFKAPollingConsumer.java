@@ -38,14 +38,16 @@ public class KAFKAPollingConsumer {
     protected AbstractKafkaMessageListener messageListener;
     private long scanInterval;
     private Long lastRanTime;
+    private String name;
 
     /**
      * Initialize the kafka properties and the polling interval
      */
-    public KAFKAPollingConsumer(Properties kafkaProperties, long interval) throws Exception {
+    public KAFKAPollingConsumer(Properties kafkaProperties, long interval, String name) throws Exception {
 
         this.kafkaProperties = kafkaProperties;
         this.scanInterval = interval;
+        this.name = name;
         try {
             if (kafkaProperties.getProperty(KAFKAConstants.THREAD_COUNT) == null
                     || kafkaProperties.getProperty(KAFKAConstants.THREAD_COUNT)
@@ -150,7 +152,7 @@ public class KAFKAPollingConsumer {
         //Inject the messages to the sequence
         try {
             if (injectHandler != null && messageListener.hasNext()) {
-                messageListener.injectMessageToESB();
+                messageListener.injectMessageToESB(name);
             } else {
                 return null;
             }

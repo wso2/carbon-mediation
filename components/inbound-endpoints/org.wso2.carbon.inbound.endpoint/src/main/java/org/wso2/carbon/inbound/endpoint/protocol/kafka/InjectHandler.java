@@ -20,6 +20,6 @@ package org.wso2.carbon.inbound.endpoint.protocol.kafka;
 
 public interface InjectHandler {
 
-    public boolean invoke(Object object);
+    public boolean invoke(Object object, String name);
 
 }
