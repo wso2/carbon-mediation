@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.tools.ant.filters.StringInputStream;
 
 /**
  * This class populates XML events from the OMElement and write to an OutputStream.
@@ -42,6 +43,8 @@ public class IOElementPipe {
     private final int MAX_EVENT_COUNT = 10;
     /** Writer used to write XML events. */
     private XMLEventWriter xmlWriter;
+    
+    private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
        
     /**
      * Constructor which create IOElementPipe object with an OMElement object.
@@ -50,7 +53,7 @@ public class IOElementPipe {
      * @throws FactoryConfigurationError
      */
     public IOElementPipe(OMElement element) throws XMLStreamException, FactoryConfigurationError {
-    	XMLStreamReader xmlReader = element.getXMLStreamReaderWithoutCaching();
+    	XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(new StringInputStream(element.toString()));
     	this.eventReader = XMLInputFactory.newInstance().createXMLEventReader(xmlReader);
 		this.outputStream = new ElementOutputStream();
 		this.xmlWriter = XMLOutputFactory.newInstance().createXMLEventWriter(this.outputStream);
