@@ -59,6 +59,8 @@ var requiredParams = null;
             client = InboundManagementClient.getInstance(config, session);
             List<String>defaultParams = client.getDefaultParameters(request.getParameter("inboundType"));            
             List<String>advParams = client.getAdvParameters(request.getParameter("inboundType"));
+            String specialParams = client.getKAFKASpecialParameters();
+            String firstSpecialParam = "";
     %>
     <form method="post" name="inboundcreationform" id="inboundcreationform"
           action="saveInbound.jsp">
@@ -177,7 +179,13 @@ var requiredParams = null;
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
 	                        <td align="left">
 	                        <%if(arrParamOri.length > 2){%>
-	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+	                            <%if(InboundClientConstants.TYPE_KAFKA.equals(request.getParameter("inboundType"))){
+                                    firstSpecialParam = arrParamOri[1].trim();
+                                %>
+                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>" onchange="javascript:showSpecialFields('<%=specialParams%>');">
+                                <%} else{%>
+                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+                                <%}%>
 	                            <%for(int i = 1;i<arrParamOri.length;i++){%>
 	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
 	                            <%}%>                                
@@ -195,6 +203,19 @@ var requiredParams = null;
 	                        <td></td>
 	                    </tr>                        
                      <% } %>
+                     <% if(InboundClientConstants.TYPE_KAFKA.equals(request.getParameter("inboundType"))){ %>
+                        <tr>
+                            <td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="1">
+                            <%
+                            String[] allSpecialParams = specialParams.split(",");
+                                for(int s = 0;s<allSpecialParams.length;s++){
+                                    if(allSpecialParams[s].contains(firstSpecialParam+".")){%>
+                                        <tr><td style="width:167px">topics</td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value=""/></td><td></td></tr>
+                                    <%}
+                                }%>
+                            </table></div></td>
+                        </tr>
+                     <%}%>
                      <% if(InboundClientConstants.TYPE_CLASS.equals(request.getParameter("inboundType"))){ %>
                     <tr>
                         <td class="buttonRow" colspan="3">       

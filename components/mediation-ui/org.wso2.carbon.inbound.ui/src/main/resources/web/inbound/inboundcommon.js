@@ -263,3 +263,16 @@ function showAdvancedOptions(id) {
     }
 }
 
+function showSpecialFields(specialParams) {
+    var consumerType = document.getElementById('consumer.type').value;
+    var specialFieldsArea ='<table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">';
+        allSpecialParams = specialParams.split(",");
+        for(var i=0; i<allSpecialParams.length; i++){
+            if(consumerType == allSpecialParams[i].split(".")[0]){
+                specialFieldsArea = specialFieldsArea  + '<tr><td style="width:167px">'+allSpecialParams[i].replace(consumerType+".","")+'</td><td align="left"><input id="'+allSpecialParams[i]+'" name="'+allSpecialParams[i]+'" class="longInput" type="text" value=""/></td><td></td></tr>';
+            }
+        }
+   specialFieldsArea = specialFieldsArea  + '</table>';
+   document.getElementById('specialFieldsForm').innerHTML = specialFieldsArea;
+}
+
