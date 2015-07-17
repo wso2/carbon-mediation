@@ -180,12 +180,12 @@ var requiredParams = null;
 	                        <td align="left">
 	                        <%if(arrParamOri.length > 2){%>
 	                            <%if(InboundClientConstants.TYPE_KAFKA.equals(request.getParameter("inboundType"))){
-                                    firstSpecialParam = arrParamOri[1].trim();
-                                %>
-                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>" onchange="javascript:showSpecialFields('<%=specialParams%>');">
-                                <%} else{%>
-                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>">
-                                <%}%>
+                                        firstSpecialParam = arrParamOri[1].trim();
+                                    %>
+                                        <select id="<%=defaultParam%>" name="<%=defaultParam%>" onchange="javascript:showSpecialFields('<%=specialParams%>');">
+                                    <%} else{%>
+                                        <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+                                    <%}%>
 	                            <%for(int i = 1;i<arrParamOri.length;i++){%>
 	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
 	                            <%}%>                                
