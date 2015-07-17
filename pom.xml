@@ -1295,7 +1295,6 @@
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
-
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediator.throttle.ui</artifactId>
                 <version>${carbon.mediation.version}</version>
@@ -1954,11 +1953,6 @@
                 <version>${org.wso2.caching.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.throttle</groupId>
-                <artifactId>wso2throttle-core</artifactId>
-                <version>${org.wso2.throttle.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
                 <artifactId>com.jayway.jsonpath</artifactId>
                 <version>${jsonpath.version}</version>
@@ -2148,7 +2142,6 @@
         <!--Misc-->
         <org.wso2.uri.template.version>1.6.4</org.wso2.uri.template.version>
         <org.wso2.caching.version>4.0.3</org.wso2.caching.version>
-        <org.wso2.throttle.version>3.3.0</org.wso2.throttle.version>
         <ec2.client.version>4.2.0</ec2.client.version>
         <carbon.startup.version>4.2.0</carbon.startup.version>
         <org.wso2.carbon.caching.core.version>4.2.0</org.wso2.carbon.caching.core.version>
