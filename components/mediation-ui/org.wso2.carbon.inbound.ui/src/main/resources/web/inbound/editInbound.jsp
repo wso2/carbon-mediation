@@ -201,7 +201,9 @@ var requiredParams = null;
 	                            <%for(int i = 1;i<arrParamOri.length;i++){
 	                                String eleValue = arrParamOri[i].trim();
 	                            %>
-	                            <%if(eleValue.equals(inboundDescription.getParameters().get(defaultParam))){ %>
+	                            <%if(eleValue.equals(inboundDescription.getParameters().get(defaultParam))){
+	                                firstSpecialParam = eleValue;
+	                            %>
 	                                <option value="<%=eleValue%>" selected><%=eleValue%></option>
 	                            <%}else{%>
 	                                <option value="<%=eleValue%>"><%=eleValue%></option>	                                                
