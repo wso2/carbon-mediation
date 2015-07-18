@@ -183,12 +183,10 @@ public class InboundManagementClient {
                     String tmpString = strKey + "." + i;
                     String strVal = prop.getProperty(tmpString);
                     if (strVal != null) {
-                        if (strProtocol.equals(InboundClientConstants.TYPE_KAFKA) &&
-                                (mandatory && !strVal.contains("highlevel.") &&
-                                        !strVal.contains("simple.")) || !mandatory) {
-                            rtnList.add(strVal);
-                        }
-                        else if(!strProtocol.equals(InboundClientConstants.TYPE_KAFKA)) {
+                        if ((strProtocol.equals(InboundClientConstants.TYPE_KAFKA) &&
+                                ((mandatory && !strVal.contains("highlevel.") &&
+                                        !strVal.contains("simple.")) || !mandatory)) ||
+                                !strProtocol.equals(InboundClientConstants.TYPE_KAFKA)) {
                             rtnList.add(strVal);
                         }
                     }
