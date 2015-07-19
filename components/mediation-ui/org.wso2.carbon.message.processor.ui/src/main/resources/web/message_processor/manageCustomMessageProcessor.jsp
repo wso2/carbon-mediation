@@ -61,7 +61,7 @@ function ValidateTextForm(form) {
         return false;
     }
 
-    if (IsEmpty(form.Provider)) {
+    if (IsEmpty(form.custom_provider_class)) {
         CARBON.showWarningDialog('<fmt:message key="provider.field.cannot.be.empty"/>')
         form.Name.focus();
         return false;

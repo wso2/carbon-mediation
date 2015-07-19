@@ -116,6 +116,8 @@
 
         if (provider.equals("org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor")) {
             designViewUrl = "manageMessageForwardingProcessor.jsp?origin=source";
+        } else if(provider.equals("org.apache.synapse.message.processor.impl.failover.FailoverScheduledMessageForwardingProcessor")) {
+            designViewUrl = "manageFailoverMessageForwardingProcessor.jsp?origin=source";
         } else if (provider.equals("org.apache.synapse.message.processor.impl.sampler.SamplingProcessor")) {
             designViewUrl = "manageMessageSamplingProcessor.jsp?origin=source";
         } else {
