@@ -30,7 +30,6 @@
                request="<%=request%>" i18nObjectName="messageStorei18n"/>
 <script src="../editarea/edit_area_full.js" type="text/javascript"></script>
 <script type="text/javascript" src="localentrycommons.js"></script>
-<script type="text/javascript" src="js/message-store-params.js"></script>
 
 <carbon:breadcrumb
         label="jms.message.store"
@@ -85,16 +84,7 @@
 
     function submitTextContent(value) {
         addServiceParams();
-        addFailoverConfigurationParams();
         return true;
-    }
-
-    function addFailoverConfigurationParams() {
-
-        if (document.getElementById('failoverMessageStoreProperties') != null) {
-            document.getElementById('failoverMessageStoreProperties').value = document.getElementById('failoverMessageStoreProperties').value + populateParams("headerTable");
-        }
-
     }
 
     function addServiceParams() {
@@ -106,7 +96,8 @@
         addServiceParameter("store.jms.password", document.getElementById('jms_password').value);
         addServiceParameter("store.jms.JMSSpecVersion", document.getElementById('jms_spec_version').options[document.getElementById('jms_spec_version').selectedIndex].value);
         addServiceParameter("store.producer.guaranteed.delivery.enable", document.getElementById('enable_guaranteed_delivery').options[document.getElementById('enable_guaranteed_delivery').selectedIndex].value);
-        addServiceParameter("store.failover.message.store.type", document.getElementById('failover_message_store_type').options[document.getElementById('failover_message_store_type').selectedIndex].value);
+        addServiceParameter("store.failover.message.store.name", document.getElementById('failover_message_store_name').options[document.getElementById('failover_message_store_name').selectedIndex].value);
+
     }
 
     function addServiceParameter(parameter, value) {
@@ -163,6 +154,7 @@
         });
     }
 
+
 </script>
 
 <div id="middle">
@@ -187,12 +179,17 @@
     String[] messageStores = client.getMessageStoreNames();
 
     MessageStoreData messageStore = null;
+    String failoverMessageStoreName = "";
 
     if (messageStoreName != null) {
         session.setAttribute("edit" + messageStoreName, "true");
         for (String name : messageStores) {
             if (name != null && name.equals(messageStoreName)) {
                 messageStore = client.getMessageStore(name);
+
+                if(messageStore.getParams().get("store.failover.message.store.name") != null) {
+                    failoverMessageStoreName = messageStore.getParams().get("store.failover.message.store.name");
+                }
             }
         }
     } else if (origin != null && !"".equals(origin)) {
@@ -369,43 +366,65 @@
                         <td><fmt:message key="store.producer.guaranteed.enable"/></td>
                         <td>
                             <select id="enable_guaranteed_delivery">
-                                <option value="true">True</option>
-                                <option selected="selected" value="false">False</option>
+                               <%
+                                if ((null != messageStore) && (messageStore.getParams().get("store.producer.guaranteed.delivery.enable") != null) && (messageStore.getParams().get("store.producer.guaranteed.delivery.enable").equals("true"))) {
+                               %>
+                                    <option selected="selected" value="true">True</option>
+                                    <option value="false">False</option>
+                               <%} else {%>
+                                    <option value="true">True</option>
+                                    <option selected="selected" value="false">False</option>
+                                <%}%>
                             </select>
                         </td>
                     </tr>
+
+                    <%if (messageStore != null) {%>
+
                     <tr>
-                       <td><fmt:message key="store.failover.messagestore.type"/></td>
-                           <td>
-                               <select id="failover_message_store_type">
-                                    <option value="jms">JMS</option>
-                                    <option selected="selected" value="jdbc">JDBC</option>
-                                </select>
-                            </td>
+                        <td><fmt:message key="store.failover.messagestore.name"/></td>
+                        <td>
+                         <select id="failover_message_store_name" name="MessageStore">
+                           <%
+                            if(messageStores != null) {
+
+                                for (String msn : messageStores) {
+
+                                  if(failoverMessageStoreName != null && msn.equals(failoverMessageStoreName)) {
+
+                                    %>
+                                    <option value="<%=msn%>" selected="true"><%=msn%></option>
+                                    <%
+                                    } else {
+                                    %>
+                                        <option  value="<%=msn%>"><%=msn%></option>
+                                    <%
+
+                                    }
+                                }}
+                                %>
+                         </select>
+                          </td>
                     </tr>
+                    <%} else { %>
+
                     <tr>
-                       <td colspan="2">
-                                <a onclick="addParams('headerTable')"
-                                   style="background-image: url('images/add.gif');" class="icon-link">Add
-                                                                                                               Property</a><input
-                                    type="hidden" name="failoverMessageStoreProperties" id="failoverMessageStoreProperties" value="PARAMS:|"/>
-                       </td>
-                    </tr>
-                    <tr>
+                       <td><fmt:message key="store.failover.messagestore.name"/></td>
                        <td>
-                        <table cellpadding="0" cellspacing="0" border="0" class="styledLeft"
-                                id="headerTable"
-                                style="display:none;">
-                            <thead>
-                                <tr>
-                                    <th style="width:25%"><fmt:message key="param.name"/></th>
-                                    <th style="width:25%"><fmt:message key="param.value"/></th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                           <select id="failover_message_store_name" name="MessageStore">
+                                <%
+                                if(messageStores != null) {
+
+                                for (String msn : messageStores)
+                                {%>
+                                    <option selected="true" value="<%=msn%>"><%=msn%></option>
+                                <%
+                                }}
+                                 %>
+                           </select>
                        </td>
                     </tr>
+                    <%}%>
                     </tbody>
                 </table>
             </div>

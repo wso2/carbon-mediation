@@ -61,12 +61,17 @@
     String[] messageStores = client.getMessageStoreNames();
 
     MessageStoreData messageStore = null;
+    String failoverMessageStoreName = "";
 
     if (messageStoreName != null) {
         session.setAttribute("edit" + messageStoreName, "true");
         for (String name : messageStores) {
             if (name != null && name.equals(messageStoreName)) {
                 messageStore = client.getMessageStore(name);
+
+                if(messageStore.getParams().get("store.failover.message.store.name") != null) {
+                    failoverMessageStoreName = messageStore.getParams().get("store.failover.message.store.name");
+                }
             }
         }
     } else if (origin != null && !"".equals(origin)) {
@@ -185,6 +190,9 @@
         }
 
         addServiceParameter("store.jdbc.table", document.getElementById('store_table').value);
+        addServiceParameter("store.producer.guaranteed.delivery.enable", document.getElementById('enable_guaranteed_delivery').options[document.getElementById('enable_guaranteed_delivery').selectedIndex].value);
+        addServiceParameter("store.failover.message.store.name", document.getElementById('failover_message_store_name').options[document.getElementById('failover_message_store_name').selectedIndex].value);
+
     }
 
     function addServiceParameter(parameter, value) {
@@ -196,6 +204,19 @@
         if (headerValue != '') {
             document.getElementById("tableParams").value = document.getElementById("tableParams").value + "|" + headerName + "#" + headerValue;
             document.getElementById("addedParams").value = document.getElementById("addedParams").value + "," + headerName + ":" + headerValue;
+        }
+    }
+
+    function showGuaranteedDeliveryOptions(id) {
+        var formElem = document.getElementById(id + '_guaranteedDeliveryForm');
+        if (formElem.style.display == 'none') {
+            formElem.style.display = '';
+            document.getElementById(id + '_adv_gur_delivery').innerHTML = '<a class="icon-link" ' +
+                            'onclick="javascript:showGuaranteedDeliveryOptions(\'' + id + '\');" style="background-image: url(images/up.gif);">' + "<fmt:message key="hide.guaranteed.delivery.parameters"/>" + '</a>';
+        } else {
+            formElem.style.display = 'none';
+            document.getElementById(id + '_adv_gur_delivery').innerHTML = '<a class="icon-link" ' +
+                'onclick="javascript:showGuaranteedDeliveryOptions(\'' + id + '\');" style="background-image: url(images/down.gif);">' + "<fmt:message key="show.guaranteed.delivery.parameters"/>" + '</a>';
         }
     }
 
@@ -395,11 +416,87 @@
                                 <td><input type="password" name="password" id="password" style="width:300px"
                                            value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jdbc.password")!=null))?messageStore.getParams().get("store.jdbc.password"):""%>"/></td>
                             </tr>
-
+                            <tr>
+                                <td>
+                                    <span id="_adv_gur_delivery" style="float: left; position: relative;">
+                                    <a class="icon-link" onclick="javascript:showGuaranteedDeliveryOptions('');"
+                                        style="background-image: url(images/down.gif);">
+                                        <fmt:message key="show.guaranteed.delivery.parameters"/></a>
+                                        </span>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
 
                         <div id="_advancedForm" style="display:none"></div>
+                         <div id="_guaranteedDeliveryForm" style="display:none">
+                            <table class="normal-nopadding">
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2" class="sub-header"><fmt:message key="failover.configuration.parameters"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><fmt:message key="store.producer.guaranteed.enable"/></td>
+                                        <td>
+                                            <select id="enable_guaranteed_delivery">
+                                            <%
+                                                if ((null != messageStore) && (messageStore.getParams().get("store.producer.guaranteed.delivery.enable") != null) && (messageStore.getParams().get("store.producer.guaranteed.delivery.enable").equals("true"))) {
+                                            %>
+                                                <option selected="selected" value="true">True</option>
+                                                <option value="false">False</option>
+                                            <%} else {%>
+                                                <option value="true">True</option>
+                                                <option selected="selected" value="false">False</option>
+                                            <%}%>
+                                            </select>
+                                        </td>
+                                    </tr>
+
+                                    <%if (messageStore != null) {%>
+                                    <tr>
+                                        <td><fmt:message key="store.failover.messagestore.name"/></td>
+                                        <td>
+                                            <select id="failover_message_store_name" name="MessageStore">
+                                                <%
+                                                if(messageStores != null) {
+                                                    for (String msn : messageStores) {
+
+                                                        if(failoverMessageStoreName != null && msn.equals(failoverMessageStoreName)) {
+
+                                                            %>
+                                                            <option value="<%=msn%>" selected="true"><%=msn%></option>
+                                                            <%
+                                                            } else {
+                                                            %>
+                                                                <option  value="<%=msn%>"><%=msn%></option>
+                                                            <%
+
+                                                            }
+                                                        }}
+                                                        %>
+                                                </select>
+                                        </td>
+                                     </tr>
+                                     <%} else { %>
+                                    <tr>
+                                       <td><fmt:message key="store.failover.messagestore.name"/></td>
+                                       <td>
+                                        <select id="failover_message_store_name" name="MessageStore">
+                                            <%
+                                                if(messageStores != null) {
+                                                    for (String msn : messageStores)
+                                                        {%>
+                                                            <option selected="true" value="<%=msn%>"><%=msn%></option>
+                                                        <%
+                                                    }}
+                                        %>
+                                         </select>
+                                        </td>
+                                    </tr>
+                                    <%}%>
+                                </tbody>
+                         </table>
+                     </div>
 
 
                     </td>
