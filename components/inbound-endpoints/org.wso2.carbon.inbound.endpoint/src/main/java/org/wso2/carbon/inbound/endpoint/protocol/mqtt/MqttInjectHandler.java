@@ -69,10 +69,11 @@ public class MqttInjectHandler {
      * @param mqttMessage
      * @return
      */
-    public boolean invoke(MqttMessage mqttMessage) {
+    public boolean invoke(MqttMessage mqttMessage, String name) {
 
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
+            msgCtx.setProperty("car.deployed.name", name);
             String message = mqttMessage.toString();
 
             if (log.isDebugEnabled()) {

@@ -40,6 +40,7 @@ public class MqttSyncCallback implements MqttCallback {
     InboundRequestProcessorFactoryImpl listener1;
     MqttListener listener;
     private MqttMessage msg;
+    private String name;
 
     public MqttSyncCallback(MqttInjectHandler injectHandler) {
         this.injectHandler = injectHandler;
@@ -64,6 +65,22 @@ public class MqttSyncCallback implements MqttCallback {
         }
     }
 
+    /**
+     * set the inbound endpoint name
+     * @param name
+     */
+    public void setName (String name) {
+        this.name = name;
+    }
+
+    /**
+     * Get the inbound endpoint name
+     * @return
+     */
+    public String getName () {
+        return this.name;
+    }
+
     private void connect() {
         boolean tryConnecting = true;
         while (tryConnecting) {
@@ -81,7 +98,7 @@ public class MqttSyncCallback implements MqttCallback {
                         log.info("Subscribed to the remote server.");
                     }
                     tryConnecting = false;
-                    injectHandler.invoke(msg);
+                    injectHandler.invoke(msg, name);
                     return;
                 }
             } catch (Exception e1) {
@@ -98,7 +115,7 @@ public class MqttSyncCallback implements MqttCallback {
             log.debug("Received Message: Topic:" + topic + "  Message: " + mqttMessage);
         }
         log.info("Received Message: Topic: " + topic);
-        injectHandler.invoke(mqttMessage);
+        injectHandler.invoke(mqttMessage, name);
     }
 
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {

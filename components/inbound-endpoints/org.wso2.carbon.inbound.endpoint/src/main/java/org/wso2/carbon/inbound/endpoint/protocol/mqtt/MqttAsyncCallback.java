@@ -42,6 +42,8 @@ public class MqttAsyncCallback implements MqttCallback {
     private Throwable ex = null;
     private boolean donext = false;
 
+    private String name;
+
     private MqttListener asycClient;
 
     private MqttInjectHandler injectHandler;
@@ -135,7 +137,7 @@ public class MqttAsyncCallback implements MqttCallback {
             log.debug("Received Message: Topic:" + topic + "  Message: " + mqttMessage);
         }
         log.info("Received Message: Topic: " + topic);
-        injectHandler.invoke(mqttMessage);
+        injectHandler.invoke(mqttMessage, name);
     }
 
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
@@ -239,6 +241,22 @@ public class MqttAsyncCallback implements MqttCallback {
                 ex = e;
             }
         }
+    }
+
+    /**
+     * Set the inbound endpoint name
+     * @param name
+     */
+    public void setName (String name) {
+        this.name = name;
+    }
+
+    /**
+     * get the inbound endpoint name
+     * @return name
+     */
+    public String getName () {
+        return this.name;
     }
 
     /**

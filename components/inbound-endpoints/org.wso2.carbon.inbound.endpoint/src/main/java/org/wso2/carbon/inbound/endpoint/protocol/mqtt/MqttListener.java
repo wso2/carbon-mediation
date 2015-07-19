@@ -155,6 +155,7 @@ public class MqttListener implements InboundRequestProcessor {
         }
         if (params != null) {
             mqttSyncCallback.setParams(params);
+            mqttSyncCallback.setName(params.getName());
         }
 
         MqttConnectOptions opt = new MqttConnectOptions();
@@ -221,6 +222,8 @@ public class MqttListener implements InboundRequestProcessor {
             mqttAsyncCallback = new MqttAsyncCallback(mqttAsyncClient, injectHandler);
 
             mqttAsyncCallback.setConOpt(opt);
+
+            mqttAsyncCallback.setName(params.getName());
 
             mqttAsyncCallback.subscribe(confac.getTopic(),
                     Integer.parseInt(mqttProperties.getProperty(MqttConstants.MQTT_QOS)));
