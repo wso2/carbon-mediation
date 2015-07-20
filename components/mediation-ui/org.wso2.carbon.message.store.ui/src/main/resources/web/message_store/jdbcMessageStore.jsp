@@ -125,6 +125,7 @@
             form.Name.focus();
             return false;
         }
+
         if(isPool){
             if (IsEmpty(form.driver)) {
                 CARBON.showWarningDialog('<fmt:message key="driver.field.cannot.be.empty"/>')
@@ -139,6 +140,12 @@
             if (IsEmpty(form.user)) {
                 CARBON.showWarningDialog('<fmt:message key="user.field.cannot.be.empty"/>')
                 form.Name.focus();
+                return false;
+            }
+        }  else {
+            if (IsEmpty(form.data_source)) {
+                CARBON.showWarningDialog('<fmt:message key="data.source.field.cannot.be.empty"/>')
+                form.data_source.focus();
                 return false;
             }
         }
