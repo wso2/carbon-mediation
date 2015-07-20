@@ -41,6 +41,7 @@
 <script type="text/javascript" src="inboundcommon.js"></script>
 <script type="text/javascript">
 var iParamCount = 0;
+var iParamMax = (-1);
 var classRequired = false;
 var sequenceRequired=false;
 var onErrorRequired=false;
