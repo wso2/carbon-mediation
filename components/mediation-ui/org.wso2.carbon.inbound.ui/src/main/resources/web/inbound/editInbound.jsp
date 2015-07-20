@@ -166,7 +166,7 @@ var requiredParams = null;
                     <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
                     <script type="text/javascript">classRequired = true;</script>       
                     <tr>
-                        <td style="width:150px"><fmt:message key="inbound.class"/></td>
+                        <td style="width:150px"><fmt:message key="inbound.class"/><span class="required">*</span></td>
                         <td align="left">                        
                             <input name="inboundClass" id="inboundClass" class="longInput" type="text" value="<%=inboundDescription.getClassImpl()%>"/>                                         
                         </td>
