@@ -41,6 +41,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
@@ -54,6 +55,7 @@ import org.apache.synapse.config.xml.SynapseImportFactory;
 import org.apache.synapse.config.xml.SynapseImportSerializer;
 import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.libraries.imports.SynapseImport;
 import org.apache.synapse.libraries.model.Library;
 import org.apache.synapse.libraries.util.LibDeployerUtils;
@@ -432,7 +434,7 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 			}
 			Library synLib = getSynapseConfiguration().getSynapseLibraries().get(libQName);
 			if (libQName != null && synLib != null) {
-				if ("enabled".equals(status)) {
+				if (ServiceBusConstants.ENABLED.equals(status)) {
 					synapseImport.setStatus(true);
 					synLib.setLibStatus(true);
 					synLib.loadLibrary();
@@ -551,7 +553,7 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 	}
 
 	/**
-	 * emove the local entry
+	 * Remove the local entry
 	 * */
 	public boolean deleteEntry(String ele) {
 
@@ -599,5 +601,4 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 		}
 		return false;
 	}
-    
 }
