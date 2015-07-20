@@ -238,14 +238,14 @@ function addRow(tableID) {
 function deleteRow(tableID) {
 	if(iParamCount > 0){
 	    try {
-	    	    if(iParamMax < iParamCount){
+	    	    if(iParamMax < 0 || iParamMax < iParamCount){
 		    		var table = document.getElementById(tableID);
 		    		var rowCount = table.rows.length;
 		    		table.deleteRow((rowCount-2));
 		    		iParamCount--;	    	    	
 	    	    }
 	        }catch(e) {
-	            alert(e);
+	            //alert(e);
 	        }
 	}
 }
