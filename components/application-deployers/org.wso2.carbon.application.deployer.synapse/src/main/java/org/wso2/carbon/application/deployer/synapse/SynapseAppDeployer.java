@@ -279,23 +279,36 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     artifact.setRuntimeObjectName(artifact.getName());
                     String fileName = artifact.getFiles().get(0).getName();
                     String artifactPath = artifact.getExtractedPath() + File.separator + fileName;
-
-                    try {
-                        deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
+                    String artifactDir = getArtifactDirPath(axisConfig, SynapseAppDeployerConstants.SYNAPSE_LIBS);
+                    File artifactInRepo = new File(artifactDir + File.separator + fileName);
+                    if (artifactInRepo.exists()) {
+                        log.warn("Synapse Library " + fileName + " already found in " + artifactInRepo.getAbsolutePath() +
+                                ". Ignoring CAPP's artifact");
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
+                    } else {
                         try {
-                            String artifactName = getArtifactName(artifactPath, axisConfig);
-                            String libName = artifactName.substring(artifactName.lastIndexOf("}")+1);
-                            String libraryPackage = artifactName.substring(1, artifactName.lastIndexOf("}"));
-                            updateStatus(artifactName, libName, libraryPackage, ServiceBusConstants.ENABLED, axisConfig);
-                        } catch (AxisFault axisFault) {
-                            axisFault.printStackTrace();
+                            deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
+                            artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
+                            try {
+                                String artifactName = getArtifactName(artifactPath, axisConfig);
+                                SynapseConfiguration configuration = getSynapseConfiguration(axisConfig);
+                                if (artifactName != null) {
+                                    if (configuration.getSynapseImports().get(artifactName) == null) {
+                                        String libName = artifactName.substring(artifactName.lastIndexOf("}") + 1);
+                                        String libraryPackage = artifactName.substring(1, artifactName.lastIndexOf("}"));
+                                        updateStatus(artifactName, libName, libraryPackage, ServiceBusConstants.ENABLED, axisConfig);
+                                    }
+                                }
+                            } catch (AxisFault axisFault) {
+                                log.error("Unable to update status for the synapse library : " + axisFault.getMessage());
+                            } catch (NullPointerException nullException) {
+                                log.error("Error while getting qualified name of the synapse library : " + nullException.getMessage());
+                            }
+                        } catch (DeploymentException e) {
+                            artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
+                            log.error("Error while deploying the synapse library : " + e.getMessage());
+                            throw e;
                         }
-
-                    } catch (DeploymentException e) {
-                        artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
-                        log.error("Error while deploying the synapse library : " + e.getMessage());
-                        throw e;
                     }
                 }
             }
