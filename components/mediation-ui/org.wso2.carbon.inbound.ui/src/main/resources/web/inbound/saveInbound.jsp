@@ -103,7 +103,7 @@
 		} else {
 	%>
 	<script type="text/javascript">
-    forward("index.jsp");
+    forward("index.jsp?region=region1&item=inbound_menu");
 </script>
     <% } %>
 	<%

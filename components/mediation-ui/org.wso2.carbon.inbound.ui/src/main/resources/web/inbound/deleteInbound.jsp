@@ -48,7 +48,7 @@
         }
     %>
     <script type="text/javascript">
-        document.location.href='index.jsp?ordinal=0';    
+        document.location.href='index.jsp?region=region1&item=inbound_menu';    
         //forward("index.jsp");
     </script>
 </fmt:bundle>

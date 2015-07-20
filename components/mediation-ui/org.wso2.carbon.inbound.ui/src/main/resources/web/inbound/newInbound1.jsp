@@ -41,6 +41,7 @@
 <script type="text/javascript" src="inboundcommon.js"></script>
 <script type="text/javascript">
 var iParamCount = 0;
+var iParamMax = (-1);
 var classRequired = false;
 var sequenceRequired=false;
 var onErrorRequired=false;
@@ -153,7 +154,7 @@ var requiredParams = null;
                     <% if(InboundClientConstants.TYPE_CLASS.equals(request.getParameter("inboundType"))){ %>
 					<script type="text/javascript">classRequired = true;</script>                    
                     <tr>
-                        <td style="width:150px"><fmt:message key="inbound.class"/></td>
+                        <td style="width:150px"><fmt:message key="inbound.class"/><span class="required">*</span></td>
                         <td align="left">                        
                             <input name="inboundClass" id="inboundClass" class="longInput" type="text"/>                                         
                         </td>
