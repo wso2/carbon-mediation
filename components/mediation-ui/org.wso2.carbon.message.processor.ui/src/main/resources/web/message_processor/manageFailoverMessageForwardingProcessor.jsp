@@ -312,6 +312,45 @@
                 <%}%>
 
                 <%if (processorData != null) { %>
+                    <tr>
+                        <td><fmt:message key="source.message.store"/><span class="required"> *</span></td>
+                        <td>
+                            <input name="MessageStore" id="MessageStore" type="hidden" value="<%=processorData
+                                .getMessageStore()%>"/>
+                            <select id="msgStore" name="msgStore" disabled="true">
+
+                            <%
+                            if(messageStores != null) {
+                                for (String msn : messageStores) {
+                                    if(processorData.getMessageStore() != null && msn.equals(processorData.getMessageStore())) {
+                            %>
+                                    <option value="<%=msn%>" selected="true"><%=msn%></option>
+                            <%
+                            } else {
+                            %>
+                                    <option  value="<%=msn%>"><%=msn%></option>
+                            <%
+                            }}}
+                            %>
+                            </select>
+                            <br/>
+                        </td>
+                    </tr>
+                <%} else {%>
+                    <tr>
+                        <td><fmt:message key="source.message.store"/><span class="required"> *</span></td>
+                        <td>
+                            <select id="MessageStore" name="MessageStore">
+                            <%if(messageStores != null) {
+                                for (String msn : messageStores) {%>
+                                    <option selected="true" value="<%=msn%>"><%=msn%></option>
+                            <%}} %>
+                            </select>
+                        </td>
+                    </tr>
+                <%}%>
+
+                <%if (processorData != null) { %>
                  <tr>
                     <td><fmt:message key="target.message.store"/><span class="required"> *</span></td>
                     <td>
@@ -366,50 +405,6 @@
                 <%} else {%>
                 <input id="Provider" name="Provider" type="hidden"
                        value="org.apache.synapse.message.processor.impl.failover.FailoverScheduledMessageForwardingProcessor"/>
-                <%}%>
-
-                <%if (processorData != null) { %>
-                <tr>
-                    <td><fmt:message key="message.store"/><span class="required"> *</span></td>
-                    <td>
-                        <input name="MessageStore" id="MessageStore" type="hidden" value="<%=processorData
-                        .getMessageStore()%>"/>
-                        <select id="msgStore" name="msgStore" disabled="true">
-
-                        <%
-                            if(messageStores != null) {
-                                for (String msn : messageStores) {
-                                    if(processorData.getMessageStore() != null && msn.equals(processorData.getMessageStore())) {
-                                        %>
-                                            <option value="<%=msn%>" selected="true"><%=msn%></option>
-                                        <%
-                                    } else {
-                                        %>
-                                            <option  value="<%=msn%>"><%=msn%></option>
-                                        <%
-
-                                    }
-                                 }
-                            }
-                         %>
-                        </select>
-
-                    <br/>
-                    </td>
-                </tr>
-                <%} else {%>
-                <tr>
-                    <td><fmt:message key="message.store"/><span class="required"> *</span></td>
-                    <td>
-                        <select id="MessageStore" name="MessageStore">
-                        <%if(messageStores != null) {
-                            for (String msn : messageStores) {%>
-                            <option selected="true" value="<%=msn%>"><%=msn%>
-                            </option>
-                            <%}} %>
-                        </select>
-                    </td>
-                </tr>
                 <%}%>
                 <tr>
                     <td>
