@@ -249,7 +249,7 @@
 
 
             <script type="text/javascript">
-                location.href = "../admin/error.jsp";
+                location.href = "./index.jsp";
             </script>
             <%
                 }
