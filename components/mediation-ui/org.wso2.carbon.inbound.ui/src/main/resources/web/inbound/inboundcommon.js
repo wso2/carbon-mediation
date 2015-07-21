@@ -265,11 +265,11 @@ function showAdvancedOptions(id) {
 
 function showSpecialFields(specialParams, inboundDescriptionOfParams) {
     var consumerType = document.getElementById('consumer.type').value;
-    var specialFieldsArea ='<table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">';
+    var specialFieldsArea = '<table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">';
         allSpecialParams = specialParams.split(",");
         splitedInboundDescription = inboundDescriptionOfParams.replace("{","").replace("}","").split(",");
         for(var i=0; i<allSpecialParams.length; i++){
-            if(consumerType == allSpecialParams[i].split(".")[0]){
+            if((consumerType == "highlevel" && allSpecialParams[i] == "topics") || (consumerType == "simple" && consumerType == allSpecialParams[i].split(".")[0])){
             var val = "";
             if(inboundDescriptionOfParams != ""){
                 for(var j=0; j<splitedInboundDescription.length; j++){

@@ -387,9 +387,17 @@ public class InboundManagementClient {
                     String strVal = prop.getProperty(tmpString);
                     if (strVal.contains("highlevel.") || strVal.contains("simple.")) {
                         if(specialParamsList.equals("")){
-                            specialParamsList = strVal;
+                            if (strVal.contains("highlevel.")){
+                                specialParamsList = strVal.replace("highlevel.", "");
+                            } else {
+                                specialParamsList = strVal;
+                            }
                         } else {
-                            specialParamsList = specialParamsList + "," + strVal;
+                            if (strVal.contains("highlevel.")){
+                                specialParamsList = strVal.replace("highlevel.", "");
+                            } else {
+                                specialParamsList = specialParamsList + "," + strVal;
+                            }
                         }
                     }
                 }

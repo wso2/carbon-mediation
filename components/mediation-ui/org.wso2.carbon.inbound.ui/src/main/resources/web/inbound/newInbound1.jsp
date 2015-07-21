@@ -209,9 +209,13 @@ var requiredParams = null;
                             <%
                             String[] allSpecialParams = specialParams.split(",");
                             for(int s = 0;s<allSpecialParams.length;s++){
-                                if(allSpecialParams[s].startsWith(firstSpecialParam+".")){%>
-                                    <tr><td style="width:167px"><%=allSpecialParams[s].replace(firstSpecialParam+".", "")%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value=""/></td><td></td></tr>
-                                <%}
+                                if(firstSpecialParam.equals("highlevel") && allSpecialParams[s].equals("topics")){%>
+                                    <tr><td style="width:167px"><%=allSpecialParams[s]%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value=""/></td><td></td></tr>
+                                <%} else{
+                                    if(allSpecialParams[s].startsWith(firstSpecialParam+".")){%>
+                                        <tr><td style="width:167px"><%=allSpecialParams[s].replace(firstSpecialParam+".", "")%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value=""/></td><td></td></tr>
+                                    <%}
+                                }
                             }%>
                             </table></div></td>
                         </tr>

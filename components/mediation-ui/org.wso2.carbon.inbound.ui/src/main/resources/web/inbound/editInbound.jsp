@@ -230,12 +230,17 @@ var requiredParams = null;
                                 String[] allSpecialParams = specialParams.split(",");
                                 for(int s = 0;s<allSpecialParams.length;s++){
                                     String eleVal = "";
-                                    if(allSpecialParams[s].startsWith(firstSpecialParam+".")){
-                                        if(inboundDescription.getParameters().get(allSpecialParams[s]) != null){
-                                            eleVal = inboundDescription.getParameters().get(allSpecialParams[s]);
-                                        }%>
-                                        <tr><td style="width:167px"><%=allSpecialParams[s].replace(firstSpecialParam+".", "")%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value="<%=eleVal%>"/></td><td></td></tr>
-                                    <%}
+                                    if(firstSpecialParam.equals("highlevel") && allSpecialParams[s].equals("topics")){
+                                        eleVal = inboundDescription.getParameters().get(allSpecialParams[s]);%>
+                                        <tr><td style="width:167px"><%=allSpecialParams[s]%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value="<%=eleVal%>"/></td><td></td></tr>
+                                    <%} else{
+                                        if(allSpecialParams[s].startsWith(firstSpecialParam+".")){
+                                            if(inboundDescription.getParameters().get(allSpecialParams[s]) != null){
+                                                eleVal = inboundDescription.getParameters().get(allSpecialParams[s]);
+                                            }%>
+                                            <tr><td style="width:167px"><%=allSpecialParams[s].replace(firstSpecialParam+".", "")%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value="<%=eleVal%>"/></td><td></td></tr>
+                                        <%}
+                                    }
                                 }%>
                             </table></div></td>
                         </tr>
