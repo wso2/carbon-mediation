@@ -57,17 +57,21 @@
     <div>
         <script type="text/javascript" src="../switch-mediator/js/mediator-util.js"></script>
         <script type="text/javascript">
+            function getSrcInput() {
+                return document.getElementById('sourceXPath').value;
+            }
+
             function addCase() {
                 if (!updateEditingMediator()) {
                     return;
                 }
-                document.location.href = "../switch-mediator/add_case.jsp";
+                document.location.href = "../switch-mediator/add_case.jsp?src=" + encodeURIComponent(getSrcInput());
             }
             function addDefault() {
                 if (!updateEditingMediator()) {
                     return;
                 }
-                document.location.href = "../switch-mediator/add_default.jsp";
+                document.location.href = "../switch-mediator/add_default.jsp?src=" + encodeURIComponent(getSrcInput());
             }
         </script>
         <table class="normal" width="100%">
