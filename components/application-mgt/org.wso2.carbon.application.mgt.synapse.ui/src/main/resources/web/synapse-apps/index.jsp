@@ -45,6 +45,8 @@
 
     SynapseApplicationMetadata synapseMetadata = null;
 
+    String epType = "";
+
     try {
         SynapseAppAdminClient client = new SynapseAppAdminClient(cookie,
                 backendServerURL, configContext, request.getLocale());
@@ -131,9 +133,15 @@
     <tbody>
     <%
         for (EndpointMetadata epData : endpoints) {
+            if (epData.getType().equals("WSDL")) {
+                epType = "wsdl";
+            }
+            else {
+                epType = epData.getType();
+            }
     %>
     <tr>
-        <td><a href="../endpoints/<%= epData.getType()%>Endpoint.jsp?endpointName=<%= epData.getName()%>&endpointAction=edit"><%= epData.getName()%></a></td>
+        <td><a href="../endpoints/<%= epType%>Endpoint.jsp?endpointName=<%= epData.getName()%>&endpointAction=edit"><%= epData.getName()%></a></td>
         <%--<td><a href="#" class="icon-link-nofloat" style="background-image:url(images/delete.gif);" onclick="deleteArtifact('<%= endpointName%>', 'endpoint', '../synapse-apps/delete_synapse_artifact.jsp');" title="<%= bundle.getString("carbonapps.delete.endpoint")%>"><%= bundle.getString("carbonapps.delete")%></a></td>--%>
     </tr>
     <%
