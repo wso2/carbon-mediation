@@ -108,6 +108,14 @@
                 }
             }
         }
+
+        // Fix for ESBJAVA-3562
+        for (ResourceData r : apiData.getResources()) {
+            if (r.getUriTemplate().charAt(0) != '/') {
+                r.setUriTemplate('/' + r.getUriTemplate());
+            }
+        }
+
         client.addApi(apiData);
     } catch (Exception e) {
         e.printStackTrace();
