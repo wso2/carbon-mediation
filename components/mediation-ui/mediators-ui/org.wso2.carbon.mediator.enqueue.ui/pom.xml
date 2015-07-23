@@ -57,6 +57,8 @@
                             org.jaxen,
                             org.wso2.carbon.priority.executors.stub.*,
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
+                            javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
+                            javax.servlet;version="${imp.pkg.version.javax.servlet}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
