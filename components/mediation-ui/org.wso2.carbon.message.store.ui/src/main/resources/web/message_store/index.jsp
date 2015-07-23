@@ -225,8 +225,13 @@
                     %>
 
                     <tr>
-                        <td><a href="viewMessageStore.jsp?messageStoreName=<%=name%>"><%=name%>
-                        </a>
+                        <td> <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore") && !type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
+                            <a href="viewMessageStore.jsp?messageStoreName=<%=name%>"><%=name%>
+                            </a>
+                        <%} else {%>
+                            <a><%=name%>
+                            </a>
+                        <%}%>
                         </td>
                         <td><%= type%>
                         </td>
