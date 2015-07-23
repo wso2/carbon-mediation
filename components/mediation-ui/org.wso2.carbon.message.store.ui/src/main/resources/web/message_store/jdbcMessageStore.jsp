@@ -169,8 +169,7 @@
     }
 
     function addServiceParams() {
-
-        if (document.getElementById('driver').value != "") {
+        if (document.getElementById('radio_pool').checked) {
             addServiceParameter("store.jdbc.driver", document.getElementById('driver').value);
             addServiceParameter("store.jdbc.connection.url", document.getElementById('url').value);
             addServiceParameter("store.jdbc.username", document.getElementById('user').value);
