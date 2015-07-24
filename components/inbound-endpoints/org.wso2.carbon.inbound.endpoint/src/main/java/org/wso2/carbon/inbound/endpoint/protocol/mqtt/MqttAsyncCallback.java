@@ -13,6 +13,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
 import org.apache.commons.logging.Log;
@@ -23,10 +24,12 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import java.util.Properties;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.wso2.carbon.inbound.endpoint.common.OneTimeTriggerAbstractCallback;
+
 /**
  * MQTT Synchronous call back handler
  */
-public class MqttAsyncCallback implements MqttCallback {
+public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements MqttCallback {
 
     private static final Log log = LogFactory.getLog(MqttAsyncCallback.class);
 
@@ -36,6 +39,8 @@ public class MqttAsyncCallback implements MqttCallback {
     private Properties mqttProperties;
     private MqttConnectOptions connectOptions;
     private MqttConnectionConsumer connectionConsumer;
+    private MqttConnectionListener connectionListener;
+
 
     public MqttAsyncCallback(MqttAsyncClient mqttAsyncClient, MqttInjectHandler injectHandler,
                              MqttConnectionFactory confac, MqttConnectOptions connectOptions,
@@ -56,25 +61,29 @@ public class MqttAsyncCallback implements MqttCallback {
     @Override
     public void connectionLost(Throwable throwable) {
         log.info("Connection lost occurred to the remote server.");
-        reConnect();
+        try {
+            super.handleReconnection();
+        } catch (InterruptedException ex) {
+            log.error("Unable to suspend the callback reconnection");
+        }
     }
 
-    private void reConnect() {
+    protected void reConnect() {
         if (mqttAsyncClient != null) {
             try {
-                MqttConnectionListener connectionListener =
-                        new MqttConnectionListener(connectionConsumer);
-                mqttAsyncClient.connect(connectOptions,connectionListener);
+                connectionListener = new MqttConnectionListener(connectionConsumer);
+                mqttAsyncClient.connect(connectOptions, connectionListener);
 
-                connectionConsumer.getTaskSuspensionSemaphore().acquire();
+                connectionConsumer.acquireTaskSuspension();
 
-                int qosLevel = Integer.parseInt(mqttProperties
-                        .getProperty(MqttConstants.MQTT_QOS));
-                if (confac.getTopic() != null) {
-                    mqttAsyncClient.subscribe(confac.getTopic(), qosLevel);
+                if (mqttAsyncClient.isConnected()) {
+                    int qosLevel = Integer.parseInt(mqttProperties
+                            .getProperty(MqttConstants.MQTT_QOS));
+                    if (confac.getTopic() != null) {
+                        mqttAsyncClient.subscribe(confac.getTopic(), qosLevel);
+                    }
+                    log.info("Re-Connected to the remote server.");
                 }
-
-                log.info("Re-Connected to the remote server.");
             } catch (MqttException ex) {
                 log.error("Error while trying to subscribe to the remote ");
             } catch (InterruptedException ex) {
@@ -95,7 +104,14 @@ public class MqttAsyncCallback implements MqttCallback {
         log.info("message delivered .. : " + iMqttDeliveryToken.toString());
     }
 
-    public void setMqttConnectionConsumer(MqttConnectionConsumer connectionConsumer){
+    public void setMqttConnectionConsumer(MqttConnectionConsumer connectionConsumer) {
         this.connectionConsumer = connectionConsumer;
+    }
+
+    public void shutdown() {
+        super.shutdown();
+        if (connectionListener != null) {
+            this.connectionListener.shutdown();
+        }
     }
 }
