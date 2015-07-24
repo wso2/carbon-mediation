@@ -606,6 +606,11 @@ public class FilePollingConsumer {
                 }
             }
 
+            //close the file system after processing
+            try{
+                child.close();
+            }catch(Exception e){}
+            
             // Manage throttling of file processing
             if (iFileProcessingInterval != null && iFileProcessingInterval > 0) {
                 try {
