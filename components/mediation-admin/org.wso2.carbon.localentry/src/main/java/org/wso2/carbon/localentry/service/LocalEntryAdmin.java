@@ -145,7 +145,7 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
     private EntryData[] doPaging(int pageNumber, EntryData entries[]) {
         if (entries.length == 0) {
             return entries;
-        }
+        }        
 
         int itemsPerPageInt = LOCAL_ENTRIES_PER_PAGE;
         int numberOfPages = (int) Math.ceil((double) entries.length / itemsPerPageInt);
