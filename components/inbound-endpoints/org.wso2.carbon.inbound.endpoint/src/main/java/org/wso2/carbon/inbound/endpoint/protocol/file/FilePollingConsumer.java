@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.axis2.AxisFault;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,6 +38,7 @@ import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.apache.commons.vfs2.provider.UriParser;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.commons.vfs.VFSParamDTO;
 import org.apache.synapse.commons.vfs.VFSUtils;
@@ -196,9 +196,9 @@ public class FilePollingConsumer {
                         try {
                             lastCycle = 2;
                             moveOrDeleteAfterProcessing(fileObject);
-                        } catch (AxisFault axisFault) {
+                        } catch (SynapseException synapseException) {
                             log.error("File object '" + fileObject.getURL().toString() + "' "
-                                    + "cloud not be moved after first attempt", axisFault);
+                                    + "cloud not be moved after first attempt", synapseException);
                         }
                         if (fileLock) {
                             // TODO: passing null to avoid build break. Fix properly
@@ -264,7 +264,7 @@ public class FilePollingConsumer {
                         runPostProcess = false;
                     }
                     lastCycle = 1;
-                } catch (AxisFault e) {
+                } catch (SynapseException e) {
                     lastCycle = 2;
                     log.error("Error processing File URI : " + fileObject.getName(), e);
                 }
@@ -272,10 +272,10 @@ public class FilePollingConsumer {
                 if (runPostProcess) {
                     try {
                         moveOrDeleteAfterProcessing(fileObject);
-                    } catch (AxisFault axisFault) {
+                    } catch (SynapseException synapseException) {
                         lastCycle = 3;
                         log.error("File object '" + fileObject.getURL().toString() + "' "
-                                + "cloud not be moved", axisFault);
+                                + "cloud not be moved", synapseException);
                         VFSUtils.markFailRecord(fsManager, fileObject);
                     }
                 }
@@ -562,10 +562,10 @@ public class FilePollingConsumer {
                     if (runPostProcess) {
                         try {
                             moveOrDeleteAfterProcessing(child);
-                        } catch (AxisFault axisFault) {
+                        } catch (SynapseException synapseException) {
                             log.error("File object '" + child.getURL().toString()
                                     + "'cloud not be moved, will remain in \"locked\" state",
-                                    axisFault);
+                                    synapseException);
                             skipUnlock = true;
                             failCount++;
                             lastCycle = 3;
@@ -591,9 +591,9 @@ public class FilePollingConsumer {
                 try {
                     lastCycle = 1;
                     moveOrDeleteAfterProcessing(child);
-                } catch (AxisFault axisFault) {
+                } catch (SynapseException synapseException) {
                     log.error("File object '" + child.getURL().toString()
-                            + "'cloud not be moved, will remain in \"fail\" state", axisFault);
+                            + "'cloud not be moved, will remain in \"fail\" state", synapseException);
                 }
                 if (fileLock) {
                     // TODO: passing null to avoid build break. Fix properly
@@ -725,9 +725,9 @@ public class FilePollingConsumer {
      * 
      * @param file
      * @return
-     * @throws AxisFault
+     * @throws synapseException
      */
-    private FileObject processFile(FileObject file) throws AxisFault {
+    private FileObject processFile(FileObject file) throws SynapseException {
         try {
             FileContent content = file.getContent();
             String fileName = file.getName().getBaseName();
@@ -764,9 +764,9 @@ public class FilePollingConsumer {
      * Do the post processing actions
      * 
      * @param fileObject
-     * @throws AxisFault
+     * @throws synapseException
      */
-    private void moveOrDeleteAfterProcessing(FileObject fileObject) throws AxisFault {
+    private void moveOrDeleteAfterProcessing(FileObject fileObject) throws SynapseException {
 
         String moveToDirectoryURI = null;
         try {
@@ -854,7 +854,7 @@ public class FilePollingConsumer {
                     if (!fileObject.delete()) {
                         String msg = "Cannot delete file : " + fileObject;
                         log.error(msg);
-                        throw new AxisFault(msg);
+                        throw new SynapseException(msg);
                     }
                 } catch (FileSystemException e) {
                     log.error("Error deleting file : " + fileObject, e);
