@@ -101,10 +101,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 File artifactInRepo = new File(artifactDir + File.separator + fileName);
 
                 if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(artifact.getType()) &&
-                        handleMainFaultSeqDeployment(artifact, axisConfig)) {
+                    handleMainFaultSeqDeployment(artifact, axisConfig)) {
                 } else if (artifactInRepo.exists()) {
                     log.warn("Artifact " + fileName + " already found in " + artifactInRepo.getAbsolutePath() +
-                            ". Ignoring CAPP's artifact");
+                    ". Ignoring CAPP's artifact");
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                 } else {
                     try {
@@ -162,7 +162,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             }
 
             if (deployer != null && AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED.
-                    equals(artifact.getDeploymentStatus())) {
+                                            equals(artifact.getDeploymentStatus())) {
 
                 String fileName = artifact.getFiles().get(0).getName();
                 String artifactName = artifact.getName();
@@ -173,7 +173,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SEQUENCE_TYPE.equals(artifact.getType())
-                            && handleMainFaultSeqUndeployment(artifact, axisConfig)) {
+                               && handleMainFaultSeqUndeployment(artifact, axisConfig)) {
                     } else if (artifactInRepo.exists()) {
                         log.info("Deleting artifact at " + artifactInRepo.getAbsolutePath());
                         if (!artifactInRepo.delete()) {
@@ -211,7 +211,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * @throws DeploymentException if something goes wrong while deployment
      */
     private void deployClassMediators(List<Artifact.Dependency> artifacts,
-                                      AxisConfiguration axisConfig) throws DeploymentException {
+                                     AxisConfiguration axisConfig) throws DeploymentException {
         for (Artifact.Dependency dependency : artifacts) {
 
             Artifact artifact = dependency.getArtifact();

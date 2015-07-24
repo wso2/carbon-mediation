@@ -101,9 +101,9 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
             MessageStore messageStore =
                     MessageStoreFactory.createMessageStore(msElem, new Properties());
 
-            if (messageStore == null) {
+            if(messageStore == null) {
                 String message = "Unable to edit the message Store. Error in the configuration";
-                handleException(log, message, null);
+                handleException(log,message,null);
             }
 
 
@@ -134,7 +134,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
                 assert false;
                 String message = "Unexpected Error!!! Message store with name "
                         + messageStore.getName() + " does not exist";
-                handleException(log, message, null);
+                handleException(log,message,null);
             }
 
         } catch (XMLStreamException e) {
@@ -180,7 +180,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
 
             MediationPersistenceManager pm = getMediationPersistenceManager();
             pm.deleteItem(removedMessageStore.getName(),
-                    fileName, ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                    fileName,ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
 
         } else {
             handleException(log, "Message Store " + name + " does not exist", null);
@@ -295,7 +295,6 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
 
             for (MessageContext mc : messageContexts) {
                 MessageInfo info = createMessageInfo(mc);
-
                 if (info != null) {
                     messageInfoList.add(info);
                 }
@@ -323,7 +322,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
             int itemsPerPageInt = MSGS_PER_PAGE;
             int numberOfPages = (int) Math.ceil((double) store.size() / itemsPerPageInt);
 
-            if (numberOfPages == 0) {
+            if(numberOfPages == 0) {
                 numberOfPages = 1;
             }
             if (pageNumber > numberOfPages - 1) {
@@ -462,18 +461,19 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
      *
      * @param str the XML string
      * @return the <code>OMElement</code> representation of the given string
-     * @throws javax.xml.stream.XMLStreamException if building the <code>OmElement</code> is unsuccessful
+     * @throws javax.xml.stream.XMLStreamException
+     *          if building the <code>OmElement</code> is unsuccessful
      */
     private OMElement createElement(String str) throws XMLStreamException {
-        byte[] bytes = null;
-        try {
-            bytes = str.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            log.error("Unable to extract bytes in UTF-8 encoding. "
-                    + "Extracting bytes in the system default encoding"
-                    + e.getMessage());
-            bytes = str.getBytes();
-        }
+		byte[] bytes = null;
+		try {
+			bytes = str.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			log.error("Unable to extract bytes in UTF-8 encoding. "
+					+ "Extracting bytes in the system default encoding"
+					+ e.getMessage());
+			bytes = str.getBytes();
+		}
 
         InputStream in = new ByteArrayInputStream(bytes);
         return new StAXOMBuilder(in).getDocumentElement();

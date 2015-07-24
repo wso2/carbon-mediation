@@ -205,7 +205,7 @@ public class MessageProcessorAdminServiceClient {
         String[] messageIds = null;
         try {
             if(name != null) {
-                messageIds = stub.getMessageIds(name);
+               messageIds = stub.getMessageIds(name);
             }
         } catch (Exception e) {
             handleException(e);
@@ -271,7 +271,7 @@ public class MessageProcessorAdminServiceClient {
     }
 
     public void resendAllMessages(String name) throws Exception {
-        try {
+         try {
             if (name != null) {
                 stub.resendAll(name);
             }
@@ -282,7 +282,7 @@ public class MessageProcessorAdminServiceClient {
 
 
     public void resendMessage(String name , String messageId) throws Exception {
-        try {
+         try {
             if (name != null) {
                 stub.resend(name, messageId);
             }
@@ -292,7 +292,7 @@ public class MessageProcessorAdminServiceClient {
     }
 
     public void resendFirstMessage(String name , String messageId) throws Exception {
-        try {
+         try {
             if (name != null) {
                 stub.resendFirstMessage(name, messageId);
             }

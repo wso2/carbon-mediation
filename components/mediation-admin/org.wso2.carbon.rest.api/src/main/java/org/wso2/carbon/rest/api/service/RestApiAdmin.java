@@ -137,12 +137,12 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
                 cAppArtifactDataService.setEdited(getTenantId(), artifactName);
             } else {
-                MediationPersistenceManager pm = getMediationPersistenceManager();
+    		MediationPersistenceManager pm = getMediationPersistenceManager();
             String fileName = api.getFileName();
             pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
             pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
             }
-            return true;
+    		return true;
         } catch (Exception e) {
             handleException(log, "Could not update API ", e);
             return false;
@@ -239,6 +239,44 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             apiName = apiName.trim();
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
+            if (log.isDebugEnabled()) {
+                log.debug("Deleting API : " + apiName + " from the configuration");
+            }
+
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            API api = synapseConfiguration.getAPI(apiName);
+            api.destroy();
+            synapseConfiguration.removeAPI(apiName);
+
+            MediationPersistenceManager pm = getMediationPersistenceManager();
+            String fileName = api.getFileName();
+            pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+
+            if (log.isDebugEnabled()) {
+                log.debug("Api : " + apiName + " removed from the configuration");
+            }
+            }
+        } finally {
+            lock.unlock();
+        }
+        return true;
+	}
+
+    /**
+     * Delete Selected API
+     * @param apiNames
+     * @return
+     * @throws APIException
+     */
+    public void deleteSelectedApi(String[] apiNames) throws APIException{
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
+            for (String apiName :apiNames ) {
+                assertNameNotEmpty(apiName);
+                apiName = apiName.trim();
+                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
                 if (log.isDebugEnabled()) {
                     log.debug("Deleting API : " + apiName + " from the configuration");
                 }
@@ -256,41 +294,6 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     log.debug("Api : " + apiName + " removed from the configuration");
                 }
             }
-        } finally {
-            lock.unlock();
-        }
-        return true;
-	}
-
-    /**
-     * Delete Selected API
-     * @param apiNames
-     * @return
-     * @throws APIException
-     */
-    public void deleteSelectedApi(String[] apiNames) throws APIException {
-        final Lock lock = getLock();
-        try {
-            lock.lock();
-            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
-            for (String apiName : apiNames) {
-                assertNameNotEmpty(apiName);
-                apiName = apiName.trim();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Deleting API : " + apiName + " from the configuration");
-                    }
-                    SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-                    API api = synapseConfiguration.getAPI(apiName);
-                    api.destroy();
-                    synapseConfiguration.removeAPI(apiName);
-                    MediationPersistenceManager pm = getMediationPersistenceManager();
-                    String fileName = api.getFileName();
-                    pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Api : " + apiName + " removed from the configuration");
-                    }
-                }
             }
         } finally {
             lock.unlock();
@@ -330,6 +333,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 			PrivilegedCarbonContext.endTenantFlow();
 		}
 	}
+
 
     public APIData[] getAPIsForListing(int pageNumber, int itemsPerPage){
         final Lock lock = getLock();

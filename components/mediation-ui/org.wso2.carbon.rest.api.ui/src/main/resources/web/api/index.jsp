@@ -476,7 +476,7 @@
                        onclick="#">Delete</a>
                 <% } else {%>
                     <a style="background-image:url(../admin/images/delete.gif);" class="icon-link" href="#"
-                       onclick="deleteApi('<%=apiData.getName()%>')">Delete</a>
+                    	onclick="deleteApi('<%=apiData.getName()%>')">Delete</a>
                 <% } %>
                 </div>
             </td>

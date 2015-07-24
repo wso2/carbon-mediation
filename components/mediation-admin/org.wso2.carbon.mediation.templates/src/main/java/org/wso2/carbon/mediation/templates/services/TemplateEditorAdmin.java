@@ -222,10 +222,10 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 synCfg.removeSequenceTemplate(templateName);
                 MediationPersistenceManager pm = getMediationPersistenceManager();
                 pm.deleteItem(templateName, sequence.getFileName(),
-                        ServiceBusConstants.ITEM_TYPE_TEMPLATE);
+                              ServiceBusConstants.ITEM_TYPE_TEMPLATE);
             } else {
                 handleException("No defined sequence with name " + templateName
-                        + " found to delete in the Synapse configuration");
+                                + " found to delete in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't get the Synapse Configuration to delete the sequence", fault);
@@ -256,7 +256,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                         template).serializeMediator(null, template);
             } else {
                 handleException("Template with the name "
-                        + templateName + " does not exist");
+                                + templateName + " does not exist");
             }
         } catch (SynapseException syne) {
             handleException("Unable to get the sequence : " + templateName, syne);
@@ -289,10 +289,10 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 }
                 if (config.getLocalRegistry().get(templateName) != null) {
                     handleException("The name '" + templateName +
-                            "' is already used within the configuration");
+                                    "' is already used within the configuration");
                 } else {
                     SynapseXMLConfigurationFactory.defineTemplate(config, templateElement,
-                            getSynapseConfiguration().getProperties());
+                                                                  getSynapseConfiguration().getProperties());
                     if (log.isDebugEnabled()) {
                         log.debug("Added template : " + templateName + " to the configuration");
                     }
@@ -311,7 +311,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             handleException("Error adding template : " + fault.getMessage(), fault);
         } catch (Error error) {
             throw new AxisFault("Unexpected error occured while " +
-                    "adding the template : " + error.getMessage(), error);
+                                              "adding the template : " + error.getMessage(), error);
         } finally {
             lock.unlock();
         }
@@ -395,11 +395,11 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
-                        + " found to enable statistics in the Synapse configuration");
+                                + " found to enable statistics in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't enable statistics of the template " + templateName
-                    + " : " + fault.getMessage(), fault);
+                            + " : " + fault.getMessage(), fault);
         } finally {
             lock.unlock();
         }
@@ -422,11 +422,11 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
-                        + " found to disable statistics in the Synapse configuration");
+                                + " found to disable statistics in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't disable statistics of the template " + templateName
-                    + " : " + fault.getMessage(), fault);
+                            + " : " + fault.getMessage(), fault);
         } finally {
             lock.unlock();
         }
@@ -449,11 +449,11 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
-                        + " found to enable tracing in the Synapse configuration");
+                                + " found to enable tracing in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't enable tracing of the template " + templateName
-                    + " : " + fault.getMessage(), fault);
+                            + " : " + fault.getMessage(), fault);
         } finally {
             lock.unlock();
         }
@@ -476,11 +476,11 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
-                        + " found to disable tracing in the Synapse configuration");
+                                + " found to disable tracing in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't disable tracing of the template " + templateName
-                    + " : " + fault.getMessage(), fault);
+                            + " : " + fault.getMessage(), fault);
         } finally {
             lock.unlock();
         }
@@ -715,7 +715,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 */
 
     private void persistTemplate(Mediator template) throws AxisFault {
-        if (template instanceof TemplateMediator) {
+       if (template instanceof TemplateMediator) {
             MediationPersistenceManager pm = getMediationPersistenceManager();
             pm.saveItem(((TemplateMediator) template).getName(), ServiceBusConstants.ITEM_TYPE_TEMPLATE);
         }

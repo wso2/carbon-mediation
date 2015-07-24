@@ -92,6 +92,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
         try {
             lock.lock();
             sequences = getSynapseConfiguration().getDefinedSequences().values();
+
             SequenceInfo[] info = SequenceInfoFactory.getSortedSequenceInfoArray(sequences);
             SequenceInfo[] ret;
             SequenceInfo[] sequenceInfos = new SequenceInfo[info.length];
@@ -863,7 +864,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     if (tempDependents[i].getType() !=
                             org.wso2.carbon.mediation.dependency.mgt.ConfigurationObject.TYPE_UNKNOWN) {
                         dependents.add(new ConfigurationObject(tempDependents[i].getType(),
-                                tempDependents[i].getId()));
+                            tempDependents[i].getId()));
                     }
                 }
 

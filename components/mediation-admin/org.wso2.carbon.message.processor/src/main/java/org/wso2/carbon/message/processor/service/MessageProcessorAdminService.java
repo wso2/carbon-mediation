@@ -77,6 +77,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                         messageProcessor);
                 MediationPersistenceManager mp = getMediationPersistenceManager();
                 mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+
             } else {
                 String message = "Unable to create Message Processor ";
                 handleException(log, message, null);
@@ -524,13 +525,13 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     MessageForwardingProcessorView view =
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if(view != null){
-                        active = view.isActive();
+                    	active = view.isActive();
                     }
                 } else if (processor instanceof SamplingProcessor) {
                     SamplingProcessorView view =
                             ((SamplingProcessor) processor).getView();
                     if(view != null){
-                        active = view.isActive();
+                    	active = view.isActive();
                     }
                 }
             }

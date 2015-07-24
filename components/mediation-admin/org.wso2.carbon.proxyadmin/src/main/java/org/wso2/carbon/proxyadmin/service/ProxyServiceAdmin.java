@@ -33,6 +33,7 @@ import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.util.PolicyInfo;
 import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.RegistryResources;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
@@ -232,8 +233,8 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 String proxyName = proxyServiceElement.getAttributeValue(new QName("name"));
 
                 if (getSynapseConfiguration().getProxyService(proxyName) != null ||
-                        getSynapseConfiguration().getAxisConfiguration().getService(
-                                proxyName) != null) {
+                    getSynapseConfiguration().getAxisConfiguration().getService(
+                        proxyName) != null) {
                     handleException(log, "A service named " + proxyName + " already exists", null);
                 } else {
                     ProxyService proxy = ProxyServiceFactory.createProxy(proxyServiceElement,
@@ -942,7 +943,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                   RegistryConstants.PATH_SEPARATOR + "services" +
                   RegistryConstants.PATH_SEPARATOR + axisService.getName();
 
-        String serviceParametersPath = servicePath + RegistryConstants.PATH_SEPARATOR + "parameters";
+          String serviceParametersPath = servicePath + RegistryConstants.PATH_SEPARATOR + "parameters";
 
         Registry registry = null;
         try {

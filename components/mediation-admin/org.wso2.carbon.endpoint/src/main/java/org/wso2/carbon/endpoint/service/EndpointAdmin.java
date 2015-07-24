@@ -242,23 +242,22 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                 assertNameNotEmpty(endpointName);
                 endpointName = endpointName.trim();
                 if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, endpointName))) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Deleting endpoint : " + endpointName + " from the configuration");
-                    }
-                    SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-                    Endpoint endpoint = synapseConfiguration.getDefinedEndpoints().get(endpointName);
-                    synapseConfiguration.removeEndpoint(endpointName);
-                    MediationPersistenceManager pm = getMediationPersistenceManager();
-                    String fileName = null;
-                    if (endpoint instanceof AbstractEndpoint) {
-                        fileName = endpoint.getFileName();
-                    }
-                    pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
-
-                    if (log.isDebugEnabled()) {
-                        log.debug("Endpoint : " + endpointName + " removed from the configuration");
-                    }
+                if (log.isDebugEnabled()) {
+                    log.debug("Deleting endpoint : " + endpointName + " from the configuration");
                 }
+                SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+                Endpoint endpoint = synapseConfiguration.getDefinedEndpoints().get(endpointName);
+                synapseConfiguration.removeEndpoint(endpointName);
+                MediationPersistenceManager pm = getMediationPersistenceManager();
+                String fileName = null;
+                if (endpoint instanceof AbstractEndpoint) {
+                    fileName = endpoint.getFileName();
+                }
+                pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+                if (log.isDebugEnabled()) {
+                    log.debug("Endpoint : " + endpointName + " removed from the configuration");
+                }
+            }
             }
 
         } finally {
@@ -284,23 +283,22 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                     assertNameNotEmpty(endpointName);
                     endpointName = endpointName.trim();
                     if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, endpointName))) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Deleting endpoint : " + endpointName + " from the configuration");
-                        }
-                        Endpoint endpoint = synapseConfiguration.getDefinedEndpoints().get(endpointName);
-                        synapseConfiguration.removeEndpoint(endpointName);
-                        MediationPersistenceManager pm = getMediationPersistenceManager();
-                        String fileName = null;
-                        if (endpoint instanceof AbstractEndpoint) {
-                            fileName = endpoint.getFileName();
-                        }
-                        pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
-
-                        if (log.isDebugEnabled()) {
-                            log.debug("Endpoint : " + endpointName + " removed from the configuration");
-                        }
+                    if (log.isDebugEnabled()) {
+                        log.debug("Deleting endpoint : " + endpointName + " from the configuration");
+                    }
+                    Endpoint endpoint = synapseConfiguration.getDefinedEndpoints().get(endpointName);
+                    synapseConfiguration.removeEndpoint(endpointName);
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    String fileName = null;
+                    if (endpoint instanceof AbstractEndpoint) {
+                        fileName = endpoint.getFileName();
+                    }
+                    pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Endpoint : " + endpointName + " removed from the configuration");
                     }
                 }
+            }
             }
         } finally {
             lock.unlock();

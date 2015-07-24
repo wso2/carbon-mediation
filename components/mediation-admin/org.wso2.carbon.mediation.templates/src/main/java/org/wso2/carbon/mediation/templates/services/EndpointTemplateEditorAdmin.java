@@ -199,7 +199,7 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                 return new TemplateSerializer().serializeEndpointTemplate(template, parentElement);
             } else {
                 handleException("Template with the name "
-                        + templateName + " does not exist");
+                                + templateName + " does not exist");
             }
         } catch (SynapseException syne) {
             handleException("Unable to get the endpoint template : " + templateName, syne);
@@ -221,10 +221,10 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                 synCfg.removeEndpointTemplate(templateName);
                 MediationPersistenceManager pm = getMediationPersistenceManager();
                 pm.deleteItem(templateName, sequence.getFileName(),
-                        ServiceBusConstants.ITEM_TYPE_TEMPLATE_ENDPOINTS);
+                              ServiceBusConstants.ITEM_TYPE_TEMPLATE_ENDPOINTS);
             } else {
                 handleException("No defined endpoint template with name " + templateName
-                        + " found to delete in the Synapse configuration");
+                                + " found to delete in the Synapse configuration");
             }
         } catch (Exception fault) {
             handleException("Couldn't get the Synapse Configuration to delete the sequence", fault);
@@ -353,10 +353,10 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                 }
                 if (config.getLocalRegistry().get(templateName) != null) {
                     handleException("The name '" + templateName +
-                            "' is already used within the configuration");
+                                    "' is already used within the configuration");
                 } else {
                     SynapseXMLConfigurationFactory.defineEndpointTemplate(config, templateElement,
-                            getSynapseConfiguration().getProperties());
+                                                                          getSynapseConfiguration().getProperties());
                     if (log.isDebugEnabled()) {
                         log.debug("Added template : " + templateName + " to the configuration");
                     }
@@ -375,7 +375,7 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
             handleException("Error adding template : " + fault.getMessage(), fault);
         } catch (Error error) {
             throw new AxisFault("Unexpected error occured while " +
-                    "adding the template : " + error.getMessage(), error);
+                                              "adding the template : " + error.getMessage(), error);
         } finally {
             lock.unlock();
         }
@@ -441,7 +441,7 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
         try {
             templateElement = AXIOMUtil.stringToOM(templateElementConfig);
         }
-        catch (XMLStreamException e) {
+         catch (XMLStreamException e) {
             handleException("unable to Checking template Endpoint...invalid configuration element", e);
         }
         if (templateElement!=null) {
@@ -468,6 +468,6 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                 lock.unlock();
             }
         }
-        return false;
+     return false;
     }
 }

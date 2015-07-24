@@ -53,8 +53,7 @@ public class ConfigHolder {
 
     /**
      * Returns the Config holder instance that holds the configurations
-     *
-     * @return Config holder singleton instance
+     * @return  Config holder singleton instance
      */
     public static ConfigHolder getInstance() {
         return instance;
@@ -62,8 +61,8 @@ public class ConfigHolder {
 
     /**
      * Returns the Synapse configuration that is stored in the ConfigHolder instance
-     *
      * @return synapseConfiguration
+     *
      */
     public SynapseConfiguration getSynapseConfiguration() throws Exception {
         assertNull("SynapseConfiguration", synapseConfiguration);

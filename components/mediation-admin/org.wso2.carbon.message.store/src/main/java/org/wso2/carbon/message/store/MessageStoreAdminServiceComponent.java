@@ -89,18 +89,18 @@ import java.util.Set;
  */
 
 @SuppressWarnings({"UnusedDeclaration"})
-public class MessageStoreAdminServiceComponent extends AbstractAxis2ConfigurationContextObserver {
+public class MessageStoreAdminServiceComponent extends AbstractAxis2ConfigurationContextObserver{
 
     private static Log log = LogFactory.getLog(MessageStoreAdminServiceComponent.class);
 
-    private boolean activated = false;
+       private boolean activated = false;
 
     protected void activate(ComponentContext ctxt) {
         try {
             BundleContext bndCtx = ctxt.getBundleContext();
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
             bndCtx.registerService(MessageStoreDeployerService.class.getName(),
-                    new MessageStoreDeployerServiceImpl(), null);
+                                   new MessageStoreDeployerServiceImpl(), null);
             SynapseEnvironmentService synEnvService =
                     ConfigHolder.getInstance().getSynapseEnvironmentService(
                             MultitenantConstants.SUPER_TENANT_ID);
@@ -235,17 +235,17 @@ public class MessageStoreAdminServiceComponent extends AbstractAxis2Configuratio
             AxisConfiguration axisConfig = synapseRegistrationsService.getConfigurationContext().
                     getAxisConfiguration();
             if (axisConfig != null) {
-                unregisterDeployer(axisConfig, env);
+                unregisterDeployer(axisConfig,env);
             }
         }
     }
 
-    protected void setServiceAdminService(ServiceAdmin service) {
+    protected  void  setServiceAdminService(ServiceAdmin service) {
 
     }
 
 
-    protected void unsetServiceAdminService(ServiceAdmin service) {
+    protected void unsetServiceAdminService(ServiceAdmin  service) {
 
     }
 
@@ -272,10 +272,11 @@ public class MessageStoreAdminServiceComponent extends AbstractAxis2Configuratio
     }
 
 
-    /**
+
+     /**
      * Registers the Message Store Deployer.
      *
-     * @param axisConfig         AxisConfiguration to which this deployer belongs
+     * @param axisConfig AxisConfiguration to which this deployer belongs
      * @param synapseEnvironment SynapseEnvironment to which this deployer belongs
      */
     private void registerDeployer(AxisConfiguration axisConfig, SynapseEnvironment synapseEnvironment) {
@@ -303,10 +304,10 @@ public class MessageStoreAdminServiceComponent extends AbstractAxis2Configuratio
     }
 
 
-    /**
+      /**
      * Un-registers the Message Store Deployer.
      *
-     * @param axisConfig         AxisConfiguration to which this deployer belongs
+     * @param axisConfig AxisConfiguration to which this deployer belongs
      * @param synapseEnvironment SynapseEnvironment to which this deployer belongs
      */
     private void unregisterDeployer(AxisConfiguration axisConfig, SynapseEnvironment synapseEnvironment) {
@@ -320,17 +321,17 @@ public class MessageStoreAdminServiceComponent extends AbstractAxis2Configuratio
                     storeDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
         }
     }
-
     public void createdConfigurationContext(ConfigurationContext configContext) {
         AxisConfiguration axisConfig = configContext.getAxisConfiguration();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         if (axisConfig != null) {
-            SynapseEnvironmentService synEnvService = ConfigHolder.getInstance().getSynapseEnvironmentService(tenantId);
+        SynapseEnvironmentService synEnvService = ConfigHolder.getInstance().getSynapseEnvironmentService(tenantId);
             if (synEnvService != null) {
                 try {
                     registerDeployer(axisConfig, synEnvService.getSynapseEnvironment());
-                } catch (Exception e) {
-                    log.error("Error while initializing MessageStore Admin", e);
+                }
+                catch (Exception e) {
+                    log.error("Error while initializing MessageStore Admin",e);
                 }
             }
         }

@@ -338,7 +338,7 @@
                 <a onclick="editCAppProcessor('<%= type%>','<%= data.getName()%>')" href="#"
                    class="icon-link"
                    style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                   key="edit"/></a>
+                    key="edit"/></a>
                 <a href="#" onclick="#"
                    id="delete_link" class="icon-link"
                    style="background-image:url(../admin/images/delete.gif);"><fmt:message
@@ -351,7 +351,7 @@
                 <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
                    id="delete_link" class="icon-link"
                    style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                   key="delete"/></a>
+                        key="delete"/></a>
                 <% } %>
 
                 <span class="icon-text" style="background-image:url(../message_processor/images/deactivate.gif);">
@@ -370,9 +370,9 @@
             <td>
                 <% if (data.getDeployedFromCApp()) { %>
                 <a onclick="editRow('<%= type%>', '<%= data.getName()%>')" href="#"
-                      class="icon-link"
-                      style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                      key="edit"/></a>
+                   class="icon-link"
+                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                    key="edit"/></a>
                 <a href="#" onclick="#"
                       id="delete_link" class="icon-link"
                       style="background-image:url(../admin/images/delete.gif);"><fmt:message
@@ -383,9 +383,9 @@
                       style="background-image:url(../admin/images/edit.gif);"><fmt:message
                       key="edit"/></a>
                 <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
-                      id="delete_link" class="icon-link"
-                      style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                      key="delete"/></a>
+                   id="delete_link" class="icon-link"
+                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                        key="delete"/></a>
                 <% } %>
 
                  <span class="icon-text"

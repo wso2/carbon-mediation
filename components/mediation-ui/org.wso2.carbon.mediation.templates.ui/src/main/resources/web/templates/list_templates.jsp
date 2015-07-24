@@ -551,24 +551,24 @@
                                     </div>
                                 </td>
                             <% } %>
-                           <td style="border-left:none;border-right:none;width:100px">
-                           <div class="inlineDiv">
+                                    <td style="border-left:none;border-right:none;width:100px">
+                                <div class="inlineDiv">
                                 <% if (sequence.getDeployedFromCApp()) { %>
                                     <a href="#" onclick="editCAppSequence('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/edit.gif);"><fmt:message key="sequence.edit.action"/></a>
                                 <% } else { %>
                                     <a href="#" onclick="editSequence('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/edit.gif);"><fmt:message key="sequence.edit.action"/></a>
                                 <% } %>
-                           </div>
-                           </td>
-                           <td style="border-left:none;width:100px">
-                             <div class="inlineDiv">
+                                    </div>
+                                </td>
+                                    <td style="border-left:none;width:100px">
+                                <div class="inlineDiv">
                                  <% if (sequence.getDeployedFromCApp()) { %>
                                      <a href="#" onclick="#" class="icon-link" style="background-image:url(../admin/images/delete.gif);"><fmt:message key="sequence.delete.action"/></a>
                                  <% } else { %>
                                      <a href="#" onclick="deleteSequence('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/delete.gif);"><fmt:message key="sequence.delete.action"/></a>
                                  <% } %>
-                             </div>
-                           </td>
+                                    </div>
+                                </td>
                 </tr>
                 <% } %>
             </tbody>
@@ -732,8 +732,8 @@
                 </td>--%>
 
                 <% if (endpoint.getDeployedFromCApp()) { %>
-                     <td style="border-left:none;border-right:none;width:100px">
-                           <div class="inlineDiv">
+                <td style="border-left:none;border-right:none;width:100px">
+                    <div class="inlineDiv">
                                 <a href="#" onclick="editCAppEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>','<%= endpoint.getParamColelctionString() %>')"
                                    class="icon-link"
                                    style="background-image:url(../admin/images/edit.gif);"><fmt:message
@@ -751,20 +751,20 @@
                 <% } else { %>
                      <td style="border-left:none;border-right:none;width:100px">
                             <div class="inlineDiv">
-                                  <a href="#" onclick="editEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>','<%= endpoint.getParamColelctionString() %>')"
-                                     class="icon-link"
-                                     style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                                     key="endpoint.edit.action"/></a>
-                            </div>
-                     </td>
-                     <td style="border-left:none;width:100px">
-                            <div class="inlineDiv">
-                                  <a href="#" onclick="deleteEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>')"
-                                     class="icon-link"
-                                     style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                                     key="endpoint.delete.action"/></a>
-                            </div>
-                     </td>
+                        <a href="#" onclick="editEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>','<%= endpoint.getParamColelctionString() %>')"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                key="endpoint.edit.action"/></a>
+                    </div>
+                </td>
+                <td style="border-left:none;width:100px">
+                    <div class="inlineDiv">
+                        <a href="#" onclick="deleteEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>')"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                key="endpoint.delete.action"/></a>
+                    </div>
+                </td>
                 <% } %>
             </tr>
             <% } %>
