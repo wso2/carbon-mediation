@@ -135,7 +135,7 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
             return ret;
         } catch (Exception fault) {
             handleException("Couldn't get the Synapse Configuration to " +
-                    "get the available templates", fault);
+                            "get the available templates", fault);
         } finally {
             lock.unlock();
         }

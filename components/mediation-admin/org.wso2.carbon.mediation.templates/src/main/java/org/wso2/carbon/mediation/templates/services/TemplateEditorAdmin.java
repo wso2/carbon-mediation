@@ -73,6 +73,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
     public static final String WSO2_TEMPLATE_MEDIA_TYPE = "application/vnd.wso2.template";
     private static final String artifactType = ServiceBusConstants.TEMPLATE_TYPE;
 
+
     public TemplateInfo[] getTemplates(int pageNumber, int templatePerPage)
             throws AxisFault {
         final Lock lock = getLock();
@@ -115,7 +116,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             return ret;
         } catch (Exception fault) {
             handleException("Couldn't get the Synapse Configuration to " +
-                    "get the available templates", fault);
+                            "get the available templates", fault);
         } finally {
             lock.unlock();
         }

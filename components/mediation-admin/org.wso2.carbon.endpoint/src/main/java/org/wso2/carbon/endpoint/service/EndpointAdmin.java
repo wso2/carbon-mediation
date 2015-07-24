@@ -269,7 +269,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
      * Delete
      * @throws EndpointAdminException
      */
-    public void deleteAllEndpointGroups() throws EndpointAdminException {
+     public void deleteAllEndpointGroups() throws EndpointAdminException {
         final Lock lock = getLock();
         try {
             lock.lock();
@@ -818,7 +818,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             if (registry != null) {
                 if (registry.getRegistryEntry(key).getType() == null) {
                     handleFault("The key '" + key +
-                            "' cannot be found within the configuration", null);
+                                "' cannot be found within the configuration", null);
                 }
                 registry.delete(key);
 
