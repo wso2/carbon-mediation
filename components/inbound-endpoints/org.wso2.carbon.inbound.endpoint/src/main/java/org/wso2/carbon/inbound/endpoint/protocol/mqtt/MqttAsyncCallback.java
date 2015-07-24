@@ -27,7 +27,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.wso2.carbon.inbound.endpoint.common.OneTimeTriggerAbstractCallback;
 
 /**
- * MQTT Synchronous call back handler
+ * MQTT Asynchronous call back handler
  */
 public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements MqttCallback {
 
