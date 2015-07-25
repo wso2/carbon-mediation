@@ -304,6 +304,7 @@
     }
 
 	givenParams = givenParams.replaceAll("\\\\", "\\\\\\\\");
+	givenParams = givenParams.replaceAll("'","\\\\'");
 	
     // sets pinned servers
     String pinnedServers = "";
@@ -410,6 +411,7 @@
             givenWsdlResources += "::" + resources[i].getKey() + "," + resources[i].getValue();
         }
         givenWsdlResources = givenWsdlResources.replaceAll("\\\\", "\\\\\\\\" );
+        givenWsdlResources = givenWsdlResources.replaceAll("'","\\\\'");
     }
 
     String saveOrModify = "add";
