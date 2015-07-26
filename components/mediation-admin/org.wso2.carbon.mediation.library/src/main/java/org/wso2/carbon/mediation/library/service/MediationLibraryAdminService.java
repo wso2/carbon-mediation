@@ -144,11 +144,19 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 		SynapseImport synImport = new SynapseImport();
 		synImport.setLibName(libName);
 		synImport.setLibPackage(packageName);
+		SynapseConfiguration configuration = getSynapseConfiguration();
+		SynapseImport synaImport = configuration.getSynapseImports().get("{"+packageName+"}"+libName);
 		OMElement impEl = SynapseImportSerializer.serializeImport(synImport);
 		if (impEl != null) {
 			try {
 				OMElement imprtElem = createElement(impEl.toString());
-				SynapseImport synapseImport = SynapseImportFactory.createImport(imprtElem, null);
+				SynapseImport synapseImport = null;
+				if(synaImport == null) {
+					synapseImport = SynapseImportFactory.createImport(imprtElem, null);
+				}
+				else {
+					synapseImport = synaImport;
+				}
 				if (synapseImport != null && synapseImport.getName() != null) {
 					// SynapseConfiguration synapseConfiguration =
 					// getSynapseConfiguration();
@@ -160,6 +168,7 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 					                 getSynapseConfiguration().getSynapseLibraries()
 					                                          .get(synImportQualfiedName);
 					if (synLib != null) {
+						String logInfo = "";
 						LibraryInfo info = new LibraryInfo();
 						info.setLibName(libName);
 						info.setPackageName(packageName);
@@ -178,10 +187,12 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 						}
 						LibraryArtifiactInfo[] artifacts =
 						                                   new LibraryArtifiactInfo[artifactsList.size()];
+						logInfo = artifactsList.size() + " artifacts are retrieved.";
 						for (int i = 0; i < artifacts.length; i++) {
 							artifacts[i] = artifactsList.get(i);
 						}
 						info.setArtifacts(artifacts);
+						log.info(logInfo);
 						return info;
 					}
 
