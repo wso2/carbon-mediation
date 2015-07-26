@@ -210,7 +210,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             synapseConfiguration.removeInboundEndpoint(name);
         }
 
-        SynapseXMLConfigurationFactory.defineInboundEndpoint(synapseConfiguration, elem,synapseConfiguration.getProperties());
+        SynapseXMLConfigurationFactory.defineInboundEndpoint(synapseConfiguration, elem, synapseConfiguration.getProperties());
         InboundEndpoint inboundEndpoint = getInboundEndpoint(name);
         persistInboundEndpoint(inboundEndpoint);
         try {
