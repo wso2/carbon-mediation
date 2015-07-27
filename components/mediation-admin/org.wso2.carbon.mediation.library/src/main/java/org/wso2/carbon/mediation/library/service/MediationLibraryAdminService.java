@@ -145,17 +145,13 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 		synImport.setLibName(libName);
 		synImport.setLibPackage(packageName);
 		SynapseConfiguration configuration = getSynapseConfiguration();
-		SynapseImport synaImport = configuration.getSynapseImports().get("{"+packageName+"}"+libName);
 		OMElement impEl = SynapseImportSerializer.serializeImport(synImport);
 		if (impEl != null) {
 			try {
+				SynapseImport synapseImport = configuration.getSynapseImports().get("{"+packageName+"}"+libName);
 				OMElement imprtElem = createElement(impEl.toString());
-				SynapseImport synapseImport = null;
-				if(synaImport == null) {
+				if(synapseImport == null) {
 					synapseImport = SynapseImportFactory.createImport(imprtElem, null);
-				}
-				else {
-					synapseImport = synaImport;
 				}
 				if (synapseImport != null && synapseImport.getName() != null) {
 					// SynapseConfiguration synapseConfiguration =
@@ -168,7 +164,6 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 					                 getSynapseConfiguration().getSynapseLibraries()
 					                                          .get(synImportQualfiedName);
 					if (synLib != null) {
-						int artifactsSize = 0;
 						LibraryInfo info = new LibraryInfo();
 						info.setLibName(libName);
 						info.setPackageName(packageName);
@@ -187,12 +182,10 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 						}
 						LibraryArtifiactInfo[] artifacts =
 						                                   new LibraryArtifiactInfo[artifactsList.size()];
-						artifactsSize = artifactsList.size();
 						for (int i = 0; i < artifacts.length; i++) {
 							artifacts[i] = artifactsList.get(i);
 						}
 						info.setArtifacts(artifacts);
-						log.info(artifactsSize+" artifacts are retrieved.");
 						return info;
 					}
 
