@@ -14,6 +14,7 @@ import org.apache.axiom.om.util.AXIOMUtil;
 import org.wso2.carbon.rest.api.stub.types.carbon.APIData;
 import org.wso2.carbon.rest.api.stub.types.carbon.ResourceData;
 import org.wso2.carbon.utils.xml.XMLPrettyPrinter;
+import org.apache.synapse.rest.RESTConstants;
 
 public class ApiEditorHelper {
 	
