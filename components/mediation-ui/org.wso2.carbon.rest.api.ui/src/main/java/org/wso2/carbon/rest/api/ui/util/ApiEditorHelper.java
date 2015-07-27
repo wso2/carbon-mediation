@@ -14,7 +14,6 @@ import org.apache.axiom.om.util.AXIOMUtil;
 import org.wso2.carbon.rest.api.stub.types.carbon.APIData;
 import org.wso2.carbon.rest.api.stub.types.carbon.ResourceData;
 import org.wso2.carbon.utils.xml.XMLPrettyPrinter;
-import org.apache.synapse.rest.RESTConstants;
 
 public class ApiEditorHelper {
 
@@ -111,8 +110,6 @@ public class ApiEditorHelper {
                 resourceData.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);
             } else if(protocol.getAttributeValue().equals(PROTOCOL_HTTPS)){
                 resourceData.setProtocol(RESTConstants.PROTOCOL_HTTPS_ONLY);
-            } else{
-                resourceData.setProtocol(Integer.parseInt(protocol.getAttributeValue()));
             }
         }
 
