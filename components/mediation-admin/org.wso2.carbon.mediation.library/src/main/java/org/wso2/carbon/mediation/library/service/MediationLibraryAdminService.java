@@ -168,7 +168,7 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 					                 getSynapseConfiguration().getSynapseLibraries()
 					                                          .get(synImportQualfiedName);
 					if (synLib != null) {
-						String logInfo = "";
+						int artifactsSize = 0;
 						LibraryInfo info = new LibraryInfo();
 						info.setLibName(libName);
 						info.setPackageName(packageName);
@@ -187,12 +187,12 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 						}
 						LibraryArtifiactInfo[] artifacts =
 						                                   new LibraryArtifiactInfo[artifactsList.size()];
-						logInfo = artifactsList.size() + " artifacts are retrieved.";
+						artifactsSize = artifactsList.size();
 						for (int i = 0; i < artifacts.length; i++) {
 							artifacts[i] = artifactsList.get(i);
 						}
 						info.setArtifacts(artifacts);
-						log.info(logInfo);
+						log.info(artifactsSize+" artifacts are retrieved.");
 						return info;
 					}
 
