@@ -73,7 +73,7 @@ public class MqttInjectHandler {
 
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
-            msgCtx.setProperty("car.deployed.name", name);
+            msgCtx.setProperty("inbound.endpoint.name", name);
             String message = mqttMessage.toString();
 
             if (log.isDebugEnabled()) {

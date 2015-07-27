@@ -64,7 +64,7 @@ public class KAFKAInjectHandler implements InjectHandler {
         byte[] msg = (byte[]) object;
 
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
-        msgCtx.setProperty("car.deployed.name", name);
+        msgCtx.setProperty("inbound.endpoint.name", name);
         log.debug("Processed Kafka Message ");
         MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
                 .getAxis2MessageContext();

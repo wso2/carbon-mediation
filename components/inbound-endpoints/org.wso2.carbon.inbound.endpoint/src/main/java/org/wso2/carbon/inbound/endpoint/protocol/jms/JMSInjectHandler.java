@@ -89,7 +89,7 @@ public class JMSInjectHandler {
         Message msg = (Message) object;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
-            msgCtx.setProperty("car.deployed.name", name);
+            msgCtx.setProperty("inbound.endpoint.name", name);
             String contentType = msg.getJMSType();
             
             if (contentType == null || contentType.trim().equals("")) {
