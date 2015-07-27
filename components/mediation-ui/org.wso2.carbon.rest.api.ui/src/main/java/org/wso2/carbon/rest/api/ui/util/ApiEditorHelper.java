@@ -111,6 +111,8 @@ public class ApiEditorHelper {
                 resourceData.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);
             } else if(protocol.getAttributeValue().equals(PROTOCOL_HTTPS)){
                 resourceData.setProtocol(RESTConstants.PROTOCOL_HTTPS_ONLY);
+            } else{
+                resourceData.setProtocol(Integer.parseInt(protocol.getAttributeValue()));
             }
         }
 
