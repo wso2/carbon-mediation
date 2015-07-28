@@ -57,10 +57,9 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
             isCreated = true;
         } catch (ZkTimeoutException toe) {
             logger.error(" Error in Creating Kafka Consumer Connector | ZkTimeout"
-                    + toe.getMessage(),toe);
+                    + toe.getMessage());
             throw new SynapseException(
-                    " Error in Creating Kafka Consumer Connector| ZkTimeout",
-                    toe);
+                    " Error in Creating Kafka Consumer Connector| ZkTimeout");
 
         } catch (Exception e) {
             logger.error(" Error in Creating Kafka Consumer Connector."
