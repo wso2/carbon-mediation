@@ -111,7 +111,7 @@
 
         // Fix for ESBJAVA-3562
         for (ResourceData r : apiData.getResources()) {
-            if (r.getUriTemplate().charAt(0) != '/') {
+            if (r.getUriTemplate() != null && r.getUriTemplate().charAt(0) != '/') {
                 r.setUriTemplate('/' + r.getUriTemplate());
             }
         }
