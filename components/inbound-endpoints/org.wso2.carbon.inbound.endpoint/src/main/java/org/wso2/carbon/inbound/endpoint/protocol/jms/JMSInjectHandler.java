@@ -44,9 +44,11 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.CustomLogSetter;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -89,7 +91,8 @@ public class JMSInjectHandler {
         Message msg = (Message) object;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
-            msgCtx.setProperty("inbound.endpoint.name", name);
+            InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
+            CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
             String contentType = msg.getJMSType();
             
             if (contentType == null || contentType.trim().equals("")) {

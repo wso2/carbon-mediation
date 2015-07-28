@@ -26,8 +26,10 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.CustomLogSetter;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
@@ -73,7 +75,8 @@ public class MqttInjectHandler {
 
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
-            msgCtx.setProperty("inbound.endpoint.name", name);
+            InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
+            CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
             String message = mqttMessage.toString();
 
             if (log.isDebugEnabled()) {

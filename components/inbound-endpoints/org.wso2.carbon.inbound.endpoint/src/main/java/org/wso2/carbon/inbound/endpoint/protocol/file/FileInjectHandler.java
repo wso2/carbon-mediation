@@ -44,6 +44,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.vfs.FileObjectDataSource;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -75,8 +76,8 @@ public class FileInjectHandler {
 		FileObject file = (FileObject)object;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
-            msgCtx.setProperty("inbound.endpoint.name", name);
-            CustomLogSetter.getInstance().setLogAppender(name);
+            InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
+            CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
             String contentType = vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_CONTENT_TYPE);
             if (contentType == null || contentType.trim().equals("")) {
                 if (file.getName().getExtension().toLowerCase().endsWith("xml")) {

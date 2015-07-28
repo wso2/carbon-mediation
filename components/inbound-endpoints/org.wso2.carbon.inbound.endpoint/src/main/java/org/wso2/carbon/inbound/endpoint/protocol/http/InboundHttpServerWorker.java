@@ -106,7 +106,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                     return;
                 }
 
-                CustomLogSetter.getInstance().setLogAppender(endpoint.getCarName());
+                CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
                 if (!isRESTRequest(axis2MsgContext, method)) {
                     if (request.isEntityEnclosing()) {
