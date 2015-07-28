@@ -75,7 +75,7 @@
                    sParams.add((new ParamDTO("CertificateRevocationVerifier",request.getParameter(strKey))));
                 }else if(strKey.startsWith("coordination")){
 		   sParams.add((new ParamDTO("coordination",request.getParameter("coordination")))); 
-		        } else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")|| strKey.startsWith("topic.filter.")|| strKey.startsWith("topics")||strKey.startsWith("filter.from.")||strKey.startsWith("consumer.type")|| strKey.startsWith("thread.count")|| strKey.startsWith("simple.")|| strKey.startsWith("content.type")){
+		        } else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")|| strKey.startsWith("topic.filter.")|| strKey.equals("topics")||strKey.startsWith("filter.from.")||strKey.startsWith("consumer.type")|| strKey.startsWith("thread.count")|| strKey.startsWith("simple.")|| strKey.startsWith("content.type")){
                    String strVal = request.getParameter(strKey);
                    if(strVal != null && !strVal.equals("")){
                       sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));

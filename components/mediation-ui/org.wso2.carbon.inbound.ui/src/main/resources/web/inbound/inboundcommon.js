@@ -263,3 +263,26 @@ function showAdvancedOptions(id) {
     }
 }
 
+function showSpecialFields(specialParams, inboundDescriptionOfParams) {
+    var consumerType = document.getElementById('consumer.type').value;
+    var specialFieldsArea = '<table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">';
+        allSpecialParams = specialParams.split(",");
+        splitedInboundDescription = inboundDescriptionOfParams.replace("{","").replace("}","").split(",");
+        for(var i=0; i<allSpecialParams.length; i++){
+            if((consumerType == "highlevel" && allSpecialParams[i] == "topics") || (consumerType == "simple" && consumerType == allSpecialParams[i].split(".")[0])){
+            var val = "";
+            if(inboundDescriptionOfParams != ""){
+                for(var j=0; j<splitedInboundDescription.length; j++){
+                    if(splitedInboundDescription[j].split("=")[0].trim() == allSpecialParams[i]){
+                        val = splitedInboundDescription[j].split("=")[1];
+                        break;
+                    }
+                }
+            }
+                specialFieldsArea = specialFieldsArea  + '<tr><td style="width:167px">'+allSpecialParams[i].replace(consumerType+".","")+'<span class="required">*</span></td><td align="left"><input id="'+allSpecialParams[i]+'" name="'+allSpecialParams[i]+'" class="longInput" type="text" value="'+val+'"/></td><td></td></tr>';
+            }
+        }
+   specialFieldsArea = specialFieldsArea  + '</table>';
+   document.getElementById('specialFieldsForm').innerHTML = specialFieldsArea;
+}
+
