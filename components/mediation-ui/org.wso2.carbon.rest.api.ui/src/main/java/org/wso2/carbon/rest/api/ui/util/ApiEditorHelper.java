@@ -17,7 +17,10 @@ import org.wso2.carbon.utils.xml.XMLPrettyPrinter;
 import org.apache.synapse.rest.RESTConstants;
 
 public class ApiEditorHelper {
-	
+
+    private static String PROTOCOL_HTTP = "http";
+    private static String PROTOCOL_HTTPS = "https";
+
 	public static String parseStringToPrettyfiedString(String ugly){
 		ByteArrayInputStream byteArrayInputStream
 		= new ByteArrayInputStream(ugly.getBytes());
@@ -104,7 +107,13 @@ public class ApiEditorHelper {
 
         OMAttribute protocol = resourceOM.getAttribute(new QName("protocol"));
         if (protocol != null) {
-            resourceData.setProtocol(Integer.parseInt(protocol.getAttributeValue()));
+            if(protocol.getAttributeValue().equals(PROTOCOL_HTTP)) {
+                resourceData.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);
+            } else if(protocol.getAttributeValue().equals(PROTOCOL_HTTPS)) {
+                resourceData.setProtocol(RESTConstants.PROTOCOL_HTTPS_ONLY);
+            } else {
+                resourceData.setProtocol(Integer.parseInt(protocol.getAttributeValue()));
+            }
         }
 
         OMAttribute userAgent = resourceOM.getAttribute(new QName("userAgent"));
