@@ -274,7 +274,7 @@
                             <table>
                                 <tr>
                                     <td style="width:130px;"><fmt:message key="proxy.service.name"/><span class="required">*</span></td>
-                                    <td><input id="proxy_name" type="text" name="proxyName" size="40" onkeypress="return validateText(event)"/></td>
+                                    <td><input id="proxy_name" type="text" name="proxyName" size="40" onkeypress="return validateProxyNameText(event)"/></td>
                                 </tr>
                                 <tr>
                                     <td><fmt:message key="wsdl.uri"/><span class="required">*</span></td>
