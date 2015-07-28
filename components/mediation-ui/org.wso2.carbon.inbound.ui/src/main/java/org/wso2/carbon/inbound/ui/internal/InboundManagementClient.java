@@ -233,7 +233,8 @@ public class InboundManagementClient {
                     }
 
                     if (!addMode && inboundEndpointDTO.getName().equals(name)
-                            && inboundEndpointDTO.getProtocol().equals(protocol)) { // an update on existing
+                            && inboundEndpointDTO.getProtocol() != null 
+                                    && inboundEndpointDTO.getProtocol().equals(protocol)) { // an update on existing
                         return true;
                     }
 
@@ -257,7 +258,7 @@ public class InboundManagementClient {
 
             return true;
         } catch (Exception e) {
-            log.error(e);
+            log.error("Error occured while validating the inbound endpoint.", e);
             return false;
         }
     }
