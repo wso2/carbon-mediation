@@ -71,7 +71,7 @@
         var table = document.getElementById("myTable");
         var row = table.rows[i];
         var cell = row.cells[0];
-        var content = cell.firstChild.innerHTML;
+        var content = cell.firstElementChild.innerHTML;
 
         function delEp() {
             document.location.href = "deleteMessageStoresHandler.jsp?" + "messageStoreName=" + content;

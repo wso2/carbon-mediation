@@ -95,7 +95,7 @@
 
             			String xmlBxpath = xml.substring(0, xpathIndex + 7);
             			String xpathAxpathString = xml.substring(xpathIndex + 7 + lenthXpath, xml.length());
-            			xmlout = xmlBxpath + xpath.replaceAll("<", "&lt").replaceAll(">", "&gt") + xpathAxpathString;
+            			xmlout = xmlBxpath + xpath.replaceAll("<", "&lt;").replaceAll(">", "&gt;") + xpathAxpathString;
             		}else{
             			xmlout =xml;
             		}

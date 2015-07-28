@@ -567,7 +567,9 @@
             </tr>
             </thead>
             <tbody>
-            <% for (SequenceInfo sequence : sequences) { %>
+            <%
+            if(sequences != null) {
+            for (SequenceInfo sequence : sequences) { %>
             <tr>
                 <td width="10px" style="text-align:center; !important">
                     <input type="checkbox" name="sequenceGroups"
@@ -670,7 +672,7 @@
                     </div>
                 </td>
             </tr>
-            <% } %>
+            <% } }%>
             </tbody>
         </table>
     </form>
