@@ -4,8 +4,10 @@ import ca.uhn.hl7v2.HL7Exception;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.CustomLogSetter;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundResponseSender;
@@ -87,6 +89,8 @@ public class HL7Processor implements InboundResponseSender {
 
         mllpContext.setMessageId(synCtx.getMessageID());
         synCtx.setProperty("inbound.endpoint.name", params.getName());
+        InboundEndpoint inboundEndpoint = synCtx.getConfiguration().getInboundEndpoint(params.getName());
+        CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
         synCtx.setProperty(MLLPConstants.HL7_INBOUND_MSG_ID, synCtx.getMessageID());
 
         // If not AUTO ACK, we need response invocation through this processor

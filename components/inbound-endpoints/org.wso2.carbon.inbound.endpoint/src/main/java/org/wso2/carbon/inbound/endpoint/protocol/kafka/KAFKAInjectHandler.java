@@ -66,6 +66,7 @@ public class KAFKAInjectHandler implements InjectHandler {
         byte[] msg = (byte[]) object;
 
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
+        msgCtx.setProperty("inbound.endpoint.name", name);
         InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
         CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
         log.debug("Processed Kafka Message ");

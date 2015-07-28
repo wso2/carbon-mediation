@@ -76,6 +76,7 @@ public class FileInjectHandler {
 		FileObject file = (FileObject)object;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
+            msgCtx.setProperty("inbound.endpoint.name", name);
             InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
             CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
             String contentType = vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_CONTENT_TYPE);

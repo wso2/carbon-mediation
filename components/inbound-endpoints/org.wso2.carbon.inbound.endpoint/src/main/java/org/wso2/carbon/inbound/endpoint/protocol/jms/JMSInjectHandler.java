@@ -91,6 +91,7 @@ public class JMSInjectHandler {
         Message msg = (Message) object;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
+            msgCtx.setProperty("inbound.endpoint.name", name);
             InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
             CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
             String contentType = msg.getJMSType();
