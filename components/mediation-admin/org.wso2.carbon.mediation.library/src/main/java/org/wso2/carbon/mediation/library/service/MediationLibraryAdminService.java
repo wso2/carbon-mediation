@@ -144,11 +144,15 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 		SynapseImport synImport = new SynapseImport();
 		synImport.setLibName(libName);
 		synImport.setLibPackage(packageName);
+		SynapseConfiguration configuration = getSynapseConfiguration();
 		OMElement impEl = SynapseImportSerializer.serializeImport(synImport);
 		if (impEl != null) {
 			try {
+				SynapseImport synapseImport = configuration.getSynapseImports().get("{"+packageName+"}"+libName);
 				OMElement imprtElem = createElement(impEl.toString());
-				SynapseImport synapseImport = SynapseImportFactory.createImport(imprtElem, null);
+				if(synapseImport == null) {
+					synapseImport = SynapseImportFactory.createImport(imprtElem, null);
+				}
 				if (synapseImport != null && synapseImport.getName() != null) {
 					// SynapseConfiguration synapseConfiguration =
 					// getSynapseConfiguration();
