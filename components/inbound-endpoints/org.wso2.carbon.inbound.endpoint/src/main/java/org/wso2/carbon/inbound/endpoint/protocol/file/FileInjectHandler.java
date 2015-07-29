@@ -138,7 +138,12 @@ public class FileInjectHandler {
             } else {
                 documentElement = ((DataSourceMessageBuilder)builder).processDocument(dataSource, contentType, axis2MsgCtx);
             }
+            
+            if("true".equals(vfsProperties.getProperty(VFSConstants.TRANSPORT_BUILD))){
+                documentElement.build();
+            }
             msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
+            
             if (injectingSeq == null || injectingSeq.equals("")) {
                 log.error("Sequence name not specified. Sequence : " + injectingSeq);
             }

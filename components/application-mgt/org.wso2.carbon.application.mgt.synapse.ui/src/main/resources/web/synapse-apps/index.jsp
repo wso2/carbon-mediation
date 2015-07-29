@@ -45,6 +45,8 @@
 
     SynapseApplicationMetadata synapseMetadata = null;
 
+    String epType = "";
+
     try {
         SynapseAppAdminClient client = new SynapseAppAdminClient(cookie,
                 backendServerURL, configContext, request.getLocale());
@@ -131,9 +133,15 @@
     <tbody>
     <%
         for (EndpointMetadata epData : endpoints) {
+            if (epData.getType().equals("WSDL")) {
+                epType = "wsdl";
+            }
+            else {
+                epType = epData.getType();
+            }
     %>
     <tr>
-        <td><a href="../endpoints/<%= epData.getType()%>Endpoint.jsp?endpointName=<%= epData.getName()%>&endpointAction=edit"><%= epData.getName()%></a></td>
+        <td><a href="../endpoints/<%= epType%>Endpoint.jsp?endpointName=<%= epData.getName()%>&endpointAction=edit"><%= epData.getName()%></a></td>
         <%--<td><a href="#" class="icon-link-nofloat" style="background-image:url(images/delete.gif);" onclick="deleteArtifact('<%= endpointName%>', 'endpoint', '../synapse-apps/delete_synapse_artifact.jsp');" title="<%= bundle.getString("carbonapps.delete.endpoint")%>"><%= bundle.getString("carbonapps.delete")%></a></td>--%>
     </tr>
     <%
@@ -162,6 +170,58 @@
     <tr>
         <td><a href="../localentries/inlinedXML.jsp?entryName=<%= leName%>"><%= leName%></a></td>
         <%--<td><a href="#" class="icon-link-nofloat" style="background-image:url(images/delete.gif);" onclick="deleteArtifact('<%= leName%>', 'localentry', '../synapse-apps/delete_synapse_artifact.jsp');" title="<%= bundle.getString("carbonapps.delete.local.entry")%>"><%= bundle.getString("carbonapps.delete")%></a></td>--%>
+    </tr>
+    <%
+        }
+    %>
+    </tbody>
+</table>
+
+<%
+    }
+
+    String[] msgStores = synapseMetadata.getMessageStores();
+    if (msgStores != null && msgStores.length > 0) {
+%>
+<p>&nbsp;&nbsp;</p>
+<table class="styledLeft" id="MessageStoreTable" width="40%">
+    <thead>
+    <tr>
+        <th><img src="../message_store/images/message_store.gif" alt="" style="vertical-align:middle;">&nbsp;<fmt:message key="carbonapps.message.stores"/></th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+        for (String msgStore : msgStores) {
+    %>
+    <tr>
+        <td><a href="../message_store/viewMessageStore.jsp?messageStoreName=<%= msgStore%>"><%= msgStore%></a></td>
+    </tr>
+    <%
+        }
+    %>
+    </tbody>
+</table>
+
+<%
+    }
+
+    String[] msgProcessors = synapseMetadata.getMessageProcessors();
+    if (msgProcessors != null && msgProcessors.length > 0) {
+%>
+<p>&nbsp;&nbsp;</p>
+<table class="styledLeft" id="MessageProcessorTable" width="40%">
+    <thead>
+    <tr>
+        <th><img src="../message_processor/images/message-processor.gif" alt="" style="vertical-align:middle;">&nbsp;<fmt:message key="carbonapps.message.processors"/></th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+        for (String msgProcessor : msgProcessors) {
+    %>
+    <tr>
+        <td><a href="../message_processor/manageMessageForwardingProcessor.jsp?messageProcessorName=<%= msgProcessor%>"><%= msgProcessor%></a></td>
     </tr>
     <%
         }

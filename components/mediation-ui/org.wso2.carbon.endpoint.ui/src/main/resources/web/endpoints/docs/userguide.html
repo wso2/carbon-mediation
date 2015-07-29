@@ -36,7 +36,7 @@
     Endpoints</strong></em> page appears.</li>
   <li>In the <strong>Add Endpoint</strong> tab, select the endpoint type you want
     to add.
-    The available options are: 
+    The available options are:
     <ul>
       <li>Address Endpoint - Defines the direct URL of the service</li>
        <li>Default Endpoint - Defines additional configuration for the default target</li>
@@ -44,12 +44,12 @@
       <li>Fail-over Endpoint - Defines a list of endpoints that the service will
         try to connect to in case of a failure. This will take place in a
         round robin manner.</li>
-      <li>Load-Balance Group - Defines groups of endpoints for replicated
+      <li>Load-Balance Group - Defines groups ofï¿½endpoints for replicated
         services.The incoming requests will be directed to these endpoints in
         a round robin manner. These endpoints automatically handle the
         fail-over cases as well.</li>
 	<li>Recipient List Group - Defines the list of endpoints a message will be routed to</li>
-	<li>Template Endpoint -	Defines a template endpoint that can parameterfy endpoints</li> 
+	<li>Template Endpoint -	Defines a template endpoint that can parameterfy endpoints</li>
     </ul>
   </li>
 </ol>
@@ -79,14 +79,14 @@
     <img alt="" src="images/address_endpoint.png" />
     <p>Figure 3: Configuring Address Endpoint - Advanced Options</p>
     </div>
-  <li>Enter the required details in the fields. 
+  <li>Enter the required details in the fields.
     The following fields are specific to the Address Endpoint.
     <ul>
       <li>Name: The unique name for the endpoint </li>
       <li>Address: The URL of the endpoint. You can test the availability of the given URL on the fly by just
           clicking the <i>Test Address</i>.</li>
       <li>Format: The message format for the endpoint. The available values
-        are: 
+        are:
         <ul>
           <li>Leave As-Is: No transformation is done to the outgoing message.
           </li>
@@ -100,7 +100,7 @@
         </ul>
       </li>
       <li>Optimize: Optimization for the message which transfers binary
-        data. The available values are: 
+        data.ï¿½The available values are:
         <ul>
           <li>Leave As-Is: No special Optimization. Keep the original message</li>
           <li>SwA: Optimized as a SwA (SOAP with Attachment) message. </li>
@@ -112,7 +112,7 @@
     </ul>
   </li>
   </ol>
-  <p>Note : The rest of the fields are general to Address, Default and WSDL endpoints. Common
+  <p>Note : The rest of the fields are general to Address, HTTP, Default and WSDL endpoints. Common
     <a href="#Description">Field  Descriptions</a>.</p>
 
 <h3>Adding a Default Endpoint</h3>
@@ -127,30 +127,72 @@
     </div>
   </li>
     <li>Enter the required details in the fields.
-        The Default Endpoint differ from the Addressing Endpoint only by the URL attribute. 
-    <p>Note : The rest of the fields are general to Address, Default and WSDL endpoints. Common
+        The Default Endpoint differ from the Addressing Endpoint only by the URL attribute.
+    <p>Note : The rest of the fields are general to Address, HTTP, Default and WSDL endpoints. Common
     <a href="#Description">Field  Descriptions</a>.</p>
-    </li>   
+    </li>
 </ol>
+
+<h3>Adding a HTTP Endpoint</h3>
+<ol>
+    <li>In the <strong>Add Endpoint</strong> tab, click <strong>HTTP
+        Endpoint</strong>. The <em><strong>HTTP Endpoint</strong></em> page
+        appears with its default view.
+    </li><br/>
+    <div class="image">
+        <img alt="" src="images/http_endpoint_default.png" />
+        <p>Figure 2: Configuring HTTP Endpoint</p>
+    </div>
+
+  <li>In case, you want to configure Advanced Options, then click on <i>Show Advanced Options</i> drop down pane.
+    Then the page with all the available HTTP Endpoint Options appears.</li><br/>
+    <div class="image">
+    <img alt="" src="images/http_endpoint.png" />
+    <p>Figure 3: Configuring HTTP Endpoint - Advanced Options</p>
+    </div>
+  <li>Enter the required details in the fields.
+    The following fields are specific to the HTTP Endpoint.
+    <ul>
+      <li>Name: The unique name for the endpoint </li>
+      <li>URI Template: The URL Template of the endpoint where template variables are placed inside curly braces with the prefix 'uri.var'. Example: http://wso2.com/{uri.var.pageId}/{uri.var.docId}.
+      <li>Method: The HTTP Method to use. The available values
+        are:
+        <ul>
+          <li>Leave As-Is: Incoming HTTP method is used.
+          </li>
+          <li>GET: HTTP GET Method</li>
+          <li>POST: HTTP POST Method</li>
+          <li>PUT: HTTP PUT Method</li>
+          <li>DELETE: HTTP DELETE Method</li>
+          <li>HEAD: HTTP HEAD Method</li>
+          <li>OPTIONS: HTTP OPTIONS Method</li>
+          <li>PATCH: HTTP PATCH Method</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  </ol>
+  <p>Note : The rest of the fields are general to Address, HTTP, Default and WSDL endpoints. Common
+    <a href="#Description">Field  Descriptions</a>.</p>
 
 <h3>Adding a WSDL Endpoint </h3>
 <ol>
   <li>In the <strong>Add Endpoint</strong> list, click <strong>WSDL
     Endpoint</strong>. The <em><strong>WSDL Endpoint</strong></em> page
     appears.
-    <br/><br/>    
+    <br/><br/>
     <div class="image">
     <img alt="" src="images/wsdl_endpoint.png" />
     <p>Figure 5: Configuring WSDL Endpoint </p>
     </div>
   </li>
   <li>Enter the required details in the fields.
-    The following fields are specific to the WSDL Endpoint. 
+    The following fields are specific to the WSDL Endpoint.ï¿½
 
     <ul>
       <li>Name: A unique name for the endpoint. </li>
       <li>WSDL URI: The URI of the WSDL. </li>
-      <li>Service: The service selected from the available services for the
+      <li>Service: Theï¿½serviceï¿½selected from the available services for the
         WSDL. </li>
       <li>Port: The port selected for the service specified in the above
         field. In a WSDL, an endpoint is bound to each port inside each
@@ -159,7 +201,7 @@
   </li>
 </ol>
 
-<p>Note : The rest of the fields are general to Address, Default and WSDL endpoints. Common
+<p>Note : The rest of the fields are general to Address, HTTP, Default and WSDL endpoints. Common
     <a href="#Description">Field  Descriptions</a>.</p>
 <ol>
 </ol>
@@ -184,7 +226,7 @@
   <li>Click on the endpoint you want to add as a fail-over endpoint.A tab with
     the fields relevant to the selected endpoint appears.</li>
   <li>Enter the details and click <strong>Save &amp; Close</strong>.
-    The following screen-shot displays adding a Address endpoint to the fail-over
+    The following screen-shot displays adding an Address endpoint to the fail-over
     endpoint list.
 
     <br/><br/>
@@ -192,10 +234,10 @@
     <img alt="Configuring Fail-over Endpoint"
     src="images/failover_endpoint.png" />
     <p>Figure 7: Configuring Fail-over Endpoint </p>
-    
+
     You can add fail-over and load-balance endpoints interchangeably to as
-    many levels as you want. 
-    
+    many levels as you want.
+
     </div>
   </li>
 </ol>
@@ -206,11 +248,11 @@
     Group Endpoint</strong>. The <em><strong>Load Balance Group
     Endpoint</strong></em> page appears. </li>
   <li>Enter the required details in the fields.
-    The following fields are specific to the Load-balance Group Endpoint.  
+    The following fields are specific to the Load-balance Group Endpoint.ï¿½
     <ul>
       <li>Endpoint Name: A unique name for the endpoint. </li>
       <li>Session Management: A session management method from the load
-        balancing group. The possible values are. 
+        balancing group. The possible values are.
         <ul>
           <li>None: Session management is not used. </li>
           <li>Transport: Session management is done on the transport level
@@ -288,7 +330,7 @@
   <li>Click on the endpoint you want to add as a Recipient List endpoint.A tab with
     the fields relevant to the selected endpoint appears.</li>
   <li>Enter the details and click <strong>Save &amp; Close</strong>.
-    The following screen-shot displays adding a Address endpoint to the Recipient List
+    The following screen-shot displays adding an Address endpoint to the Recipient List
     endpoint list.
 
     <br/><br/>
@@ -323,7 +365,7 @@
     <p>Figure 11.1: Saved dynamic endpoint</p>
 </div>
 
-<h2><a name="Description" id="Description">Description of Fields Common to Address, Default and WSDL
+<h2><a name="Description" id="Description">Description of Fields Common to Address, HTTP, Default and WSDL
 Endpoints</a></h2>
 
 <table style="border: 1px solid ;" border="1">
@@ -340,19 +382,19 @@ Endpoints</a></h2>
     </tr>
     <tr>
       <td>Initial Duration (Millis) </td>
-      <td>The duration that the endpoint is suspended for the first time
+      <td>The duration that the endpoint is suspended for theï¿½first time
         after the receiving the suspend error codes. </td>
     </tr>
     <tr>
       <td>Max Duration (Millis) </td>
-      <td>The maximum duration that the endpoint is suspended after the
+      <td>The maximum duration that the endpoint is suspendedï¿½after the
         receiving the suspend error codes. </td>
     </tr>
     <tr>
       <td>Factor </td>
       <td>The duration to suspend can vary from the first time suspension to
         the subsequent time. The factor value decides the suspense duration
-        variance between subsequent suspensions. </td>
+        variance betweenï¿½subsequent suspensions. </td>
     </tr>
     <tr>
       <td>On Timeout Error codes </td>
@@ -361,7 +403,7 @@ Endpoints</a></h2>
     </tr>
     <tr>
       <td>Retry </td>
-      <td>The number of re-tries in case of a timeout, caused by the above
+      <td>The number of re-triesï¿½inï¿½case of a timeout, caused by the above
         listed error codes. </td>
     </tr>
     <tr>
@@ -370,7 +412,7 @@ Endpoints</a></h2>
     </tr>
     <tr>
       <td>Timeout Action </td>
-      <td>The action to be done at a timeout situation. You can select from, 
+      <td>The action to be done at a timeout situation. You can select from,
         <ul>
           <li>Never Timeout </li>
           <li>Discard Message </li>

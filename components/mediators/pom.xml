@@ -30,17 +30,16 @@
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediators Aggregator Module</name>
     <url>http://wso2.org</url>
-
-			<modules>
-				<module>router</module>
-				<module>bam</module>
-				<module>command</module>
-				<module>event</module>
-				<module>fastXSLT</module>
-				<module>smooks</module>
-				<module>entitlement</module>
-				<module>oauth</module>
-                <module>publishEvent</module>
-			</modules>
-
+    <modules>
+        <module>router</module>
+        <module>bam</module>
+        <module>command</module>
+        <module>event</module>
+        <module>fastXSLT</module>
+        <module>smooks</module>
+        <module>entitlement</module>
+        <module>oauth</module>
+        <module>publishEvent</module>
+        <module>cache</module>
+    </modules>
 </project>

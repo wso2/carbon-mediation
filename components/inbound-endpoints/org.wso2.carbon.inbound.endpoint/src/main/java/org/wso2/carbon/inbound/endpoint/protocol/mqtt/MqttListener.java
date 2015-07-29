@@ -13,19 +13,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
-import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.wso2.carbon.inbound.endpoint.inboundfactory.InboundRequestProcessorFactoryImpl;
+import org.wso2.carbon.inbound.endpoint.common.InboundOneTimeTriggerRequestProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
+import org.wso2.carbon.utils.CarbonUtils;
 
 import java.util.Properties;
 
@@ -33,12 +32,10 @@ import java.util.Properties;
 /**
  * Listener to get a mqtt client from the factory and subscribe to a given topic
  */
-public class MqttListener implements InboundRequestProcessor {
+public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
 
+    private static final String ENDPOINT_POSTFIX = "MQTT" + COMMON_ENDPOINT_POSTFIX;
     private static final Log log = LogFactory.getLog(MqttListener.class);
-
-    private String name;
-    private SynapseEnvironment synapseEnvironment;
 
     private String injectingSeq;
     private String onErrorSeq;
@@ -48,12 +45,10 @@ public class MqttListener implements InboundRequestProcessor {
     private boolean sequential;
 
     private MqttConnectionFactory confac;
-
-    private MqttAsyncCallback mqttAsyncCallback;
-
-    private MqttClient mqttClient;
     private MqttAsyncClient mqttAsyncClient;
-
+    private MqttAsyncCallback mqttAsyncCallback;
+    private MqttConnectOptions connectOptions;
+    private MqttConnectionConsumer connectionConsumer;
     private MqttInjectHandler injectHandler;
 
     protected String userName;
@@ -61,12 +56,8 @@ public class MqttListener implements InboundRequestProcessor {
 
     protected boolean cleanSession;
 
-    private boolean mqttBlockingSenderEnable;
-    private int retryInterval = 1000;
-    private int retryCount = 50;
-
     private InboundProcessorParams params;
-    private InboundRequestProcessorFactoryImpl listner;
+
 
     /**
      * constructor
@@ -84,7 +75,15 @@ public class MqttListener implements InboundRequestProcessor {
         this.sequential = true;
         if (mqttProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL) != null) {
             this.sequential =
-                    Boolean.parseBoolean(mqttProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL));
+                    Boolean.parseBoolean(mqttProperties.getProperty
+                            (PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL));
+        }
+
+        this.coordination = true;
+        if (mqttProperties.getProperty(PollingConstants.INBOUND_COORDINATION) != null) {
+            this.coordination =
+                    Boolean.parseBoolean(mqttProperties.getProperty
+                            (PollingConstants.INBOUND_COORDINATION));
         }
 
         confac = new MqttConnectionFactory(mqttProperties);
@@ -93,6 +92,7 @@ public class MqttListener implements InboundRequestProcessor {
         injectHandler =
                 new MqttInjectHandler(injectingSeq, onErrorSeq, sequential,
                         synapseEnvironment, contentType);
+        this.synapseEnvironment = params.getSynapseEnvironment();
 
         if (mqttProperties.getProperty(MqttConstants.MQTT_USERNAME) != null) {
             userName = mqttProperties.getProperty(MqttConstants.MQTT_USERNAME);
@@ -104,171 +104,67 @@ public class MqttListener implements InboundRequestProcessor {
 
         cleanSession =
                 Boolean.parseBoolean(mqttProperties.getProperty(MqttConstants.MQTT_SESSION_CLEAN));
-        mqttBlockingSenderEnable =
-                Boolean.parseBoolean(mqttProperties.getProperty(MqttConstants.MQTT_BLOCKING_SENDER));
-
-    }
-
-    public InboundRequestProcessorFactoryImpl getListner() {
-        return listner;
     }
 
     @Override
     public void destroy() {
-
-        try {
-            if (mqttAsyncCallback != null) {
-                mqttAsyncCallback.disconnect();
-            } else
-                mqttClient.disconnect();
-            log.info("Disconnected.");
-        } catch (MqttException e) {
-            log.error("Error while disconnecting from the remote server...", e);
+        //release the thread from suspension
+        //this is need since Thread.join() causes issues
+        //this will release thread suspended thread for completion
+        super.destroy();
+        connectionConsumer.shutdown();
+        mqttAsyncCallback.shutdown();
+        if (CarbonUtils.isWorkerNode()) {
+            confac.shutdown();
         }
+        try {
+            if (mqttAsyncClient.isConnected()) {
+                mqttAsyncClient.disconnect();
+            }
+            mqttAsyncClient.close();
+            log.info("Disconnected from the remote MQTT server.");
+        } catch (MqttException e) {
+            log.error("Error while disconnecting from the remote server.");
+        }
+
 
     }
 
     @Override
     public void init() {
-
-        log.info("MQTT inbound endpoint: " + name + " initializing ...");
-
-        if (mqttBlockingSenderEnable){
-            initSyncClient();
-        }
-        else{
-            initAsyncClient();
-        }
+        log.info("MQTT inbound endpoint " + name + " initializing ...");
+        initAsyncClient();
+        start();
     }
 
-    /**
-     * MQTT synchrounous client
-     */
-    public void initSyncClient() {
-        mqttClient = confac.getMqttClient();
-
-        MqttSyncCallback mqttSyncCallback = new MqttSyncCallback(injectHandler);//changed
-        mqttClient.setCallback(mqttSyncCallback);
-
-        if (confac != null) {
-            mqttSyncCallback.setMqttSyncCallback(confac);
-        }
-        if (params != null) {
-            mqttSyncCallback.setParams(params);
-        }
-
-        MqttConnectOptions opt = new MqttConnectOptions();
-        opt.setCleanSession(cleanSession);
-        if (opt != null) {
-            mqttSyncCallback.setOpt(opt);
-        }
-
-        if (userName != null && password != null) {
-            opt.setUserName(userName);
-            opt.setPassword(password.toCharArray());
-        }
-
-        try {
-            mqttClient.connect();
-            if (confac.getTopic() != null) {
-                mqttClient.subscribe(confac.getTopic());
-            }
-            log.info("Connected to the remote server.");
-        } catch (MqttException e) {
-            if (!mqttClient.isConnected()) {
-                int retryC = 0;
-                while ((retryC < retryCount)) {
-                    retryC++;
-                    log.info("Attempting to reconnect" + " in " + retryInterval + " ms");
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException ignore) {
-                    }
-                    try {
-                        mqttClient.connect();
-                        if (mqttClient.isConnected()) {
-                            if (confac.getTopic() != null) {
-                                mqttClient.subscribe(confac.getTopic());
-                                log.info("Subscribed to the remote server.");
-                            }
-                            break;
-                        }
-                        log.info("Re-connected to the remote server.");
-                    } catch (MqttException e1) {
-                        log.error("Error while trying to retry", e1);
-                    }
-                }
-            }
-        }
-
-    }
-
-    /**
-     * MQTT Asynchrounous client
-     */
     public void initAsyncClient() {
         mqttAsyncClient = confac.getMqttAsyncClient();
-
-        MqttConnectOptions opt = new MqttConnectOptions();
-        opt.setCleanSession(cleanSession);
-
+        connectOptions = new MqttConnectOptions();
+        connectOptions.setCleanSession(cleanSession);
         if (userName != null && password != null) {
-            opt.setUserName(userName);
-            opt.setPassword(password.toCharArray());
+            connectOptions.setUserName(userName);
+            connectOptions.setPassword(password.toCharArray());
         }
-
-        try {
-            mqttAsyncCallback = new MqttAsyncCallback(mqttAsyncClient, injectHandler);
-
-            mqttAsyncCallback.setConOpt(opt);
-
-            mqttAsyncCallback.subscribe(confac.getTopic(),
-                    Integer.parseInt(mqttProperties.getProperty(MqttConstants.MQTT_QOS)));
-
-        } catch (MqttException e) {
-
-            if (!mqttAsyncClient.isConnected()) {
-                int retryC = 0;
-                while ((retryC < retryCount)) {
-                    retryC++;
-                    log.info("Attempting to reconnect" + " in " + retryInterval + " ms");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ignore) {
-                    }
-                    try {
-                        mqttAsyncCallback = new MqttAsyncCallback(mqttAsyncClient, injectHandler);
-
-                        mqttAsyncCallback.setConOpt(opt);
-
-                        if (confac.getTopic() != null) {
-                            try {
-                                mqttAsyncCallback.subscribe(confac.getTopic(),
-                                        Integer.parseInt(mqttProperties.getProperty(MqttConstants.MQTT_QOS)));
-                                if (mqttAsyncClient.isConnected()) {
-                                    break;
-                                }
-                            } catch (Throwable throwable) {
-                                log.info("Re-connected to the remote server.");
-                            }
-
-                        }
-
-                    } catch (MqttException e1) {
-                        log.error("Error while trying to retry", e1);
-                    }
-                }
-            }
-        } catch (NumberFormatException e) {
-            log.error("Error in qos level", e);
-
-        } catch (Throwable e) {
-            log.error("Error while subscribing to topic", e);
-        }
+        mqttAsyncCallback = new MqttAsyncCallback(mqttAsyncClient, injectHandler,
+                confac, connectOptions, mqttProperties);
+        connectionConsumer = new MqttConnectionConsumer(connectOptions, mqttAsyncClient,
+                confac, mqttProperties);
+        mqttAsyncCallback.setMqttConnectionConsumer(connectionConsumer);
+        mqttAsyncClient.setCallback(mqttAsyncCallback);
     }
 
     public void start() {
+        MqttTask mqttTask = new MqttTask(connectionConsumer);
+        mqttTask.setCallback(mqttAsyncCallback);
+        start(mqttTask, ENDPOINT_POSTFIX);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

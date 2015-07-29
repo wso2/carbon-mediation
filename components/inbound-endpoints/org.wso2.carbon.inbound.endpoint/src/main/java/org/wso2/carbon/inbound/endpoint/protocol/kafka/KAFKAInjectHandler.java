@@ -80,7 +80,7 @@ public class KAFKAInjectHandler implements InjectHandler {
                 builder = BuilderUtil.getBuilderFromSelector(type, axis2MsgCtx);
             } catch (AxisFault axisFault) {
                 log.error("Error while creating message builder :: "
-                        + axisFault.getMessage());
+                        + axisFault.getMessage(),axisFault);
 
             }
             if (builder == null) {
@@ -99,7 +99,7 @@ public class KAFKAInjectHandler implements InjectHandler {
                     axis2MsgCtx);
         } catch (AxisFault axisFault) {
             log.error("Error while processing message :: "
-                    + axisFault.getMessage());
+                    + axisFault.getMessage(),axisFault);
         }
 
         try {
@@ -107,7 +107,7 @@ public class KAFKAInjectHandler implements InjectHandler {
                     .createSOAPEnvelope(documentElement));
         } catch (AxisFault axisFault) {
             log.error("Error while setting message payload to the message context :: "
-                    + axisFault.getMessage());
+                    + axisFault.getMessage(),axisFault);
         }
         // Inject the message to the sequence.
 

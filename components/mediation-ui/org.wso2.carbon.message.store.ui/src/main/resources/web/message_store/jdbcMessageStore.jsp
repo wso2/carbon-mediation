@@ -125,20 +125,33 @@
             form.Name.focus();
             return false;
         }
+
+        if (IsEmpty(form.store_table)) {
+            CARBON.showWarningDialog('<fmt:message key="table.field.cannot.be.empty"/>')
+            form.store_table.focus();
+            return false;
+        }
+
         if(isPool){
             if (IsEmpty(form.driver)) {
                 CARBON.showWarningDialog('<fmt:message key="driver.field.cannot.be.empty"/>')
-                form.Name.focus();
+                form.driver.focus();
                 return false;
             }
             if (IsEmpty(form.url)) {
                 CARBON.showWarningDialog('<fmt:message key="url.field.cannot.be.empty"/>')
-                form.Name.focus();
+                form.url.focus();
                 return false;
             }
             if (IsEmpty(form.user)) {
                 CARBON.showWarningDialog('<fmt:message key="user.field.cannot.be.empty"/>')
-                form.Name.focus();
+                form.user.focus();
+                return false;
+            }
+        }  else {
+            if (IsEmpty(form.data_source)) {
+                CARBON.showWarningDialog('<fmt:message key="data.source.field.cannot.be.empty"/>')
+                form.data_source.focus();
                 return false;
             }
         }
@@ -162,8 +175,7 @@
     }
 
     function addServiceParams() {
-
-        if (document.getElementById('driver').value != "") {
+        if (document.getElementById('radio_pool').checked) {
             addServiceParameter("store.jdbc.driver", document.getElementById('driver').value);
             addServiceParameter("store.jdbc.connection.url", document.getElementById('url').value);
             addServiceParameter("store.jdbc.username", document.getElementById('user').value);
@@ -269,7 +281,7 @@
                             <%}%>
 
                             <tr>
-                                <td><fmt:message key="store.jdbc.table"/></td>
+                                <td><fmt:message key="store.jdbc.table"/><span class="required"> *</span></td>
                                 <td><input type="text" size="60" id="store_table" name="store_table"
                                            value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jdbc.table")!=null))?messageStore.getParams().get("store.jdbc.table"):""%>"/>
                                 </td>

@@ -59,6 +59,8 @@
                             org.apache.synapse.util.xpath,
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
                             org.jaxen,
+                            javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
+                            javax.servlet;version="${imp.pkg.version.javax.servlet}",
                             *;resolution:=optional,
 							org.wso2.carbon.ndatasource.ui.stub.*
                         </Import-Package>

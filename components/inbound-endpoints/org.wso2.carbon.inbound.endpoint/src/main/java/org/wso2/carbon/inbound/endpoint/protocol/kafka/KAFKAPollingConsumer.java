@@ -58,7 +58,7 @@ public class KAFKAPollingConsumer {
                         .getProperty(KAFKAConstants.THREAD_COUNT));
             }
         } catch (NumberFormatException nfe) {
-            logger.error("Invalid numeric value for thread count.");
+            logger.error("Invalid numeric value for thread count."+nfe.getMessage(),nfe);
             throw new SynapseException("Invalid numeric value for thread count.", nfe);
         }
         if (kafkaProperties.getProperty(KAFKAConstants.TOPICS) != null) {
@@ -97,7 +97,7 @@ public class KAFKAPollingConsumer {
                             kafkaProperties, injectHandler);
                 }
             } catch (Exception e) {
-                logger.error("The consumer type should be high level or simple");
+                logger.error("The consumer type should be high level or simple."+ e.getMessage(),e);
                 throw new SynapseException("The consumer type should be high level or simple", e);
             }
         }
@@ -119,7 +119,7 @@ public class KAFKAPollingConsumer {
                 logger.debug("End : KAFKA Inbound EP : ");
             }
         } catch (Exception e) {
-            logger.error("Error while retrieving or injecting KAFKA message. " + e.getMessage(), e);
+            logger.error("Error while retrieving or injecting KAFKA message." + e.getMessage(), e);
         }
     }
 
@@ -156,8 +156,8 @@ public class KAFKAPollingConsumer {
             }
 
         } catch (Exception e) {
-            logger.error("Error while receiving KAFKA message. "
-                    + e.getMessage());
+            logger.error("Error while receiving KAFKA message."
+                    + e.getMessage(),e);
         }
         return null;
     }

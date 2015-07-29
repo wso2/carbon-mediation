@@ -78,7 +78,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                 this.port = Integer.parseInt(kafkaProperties
                         .getProperty(KAFKAConstants.SIMPLE_PORT));
             } catch (NumberFormatException nfe) {
-                logger.error("simple consumer port should be number");
+                logger.error("simple consumer port should be number." + nfe.getMessage(), nfe);
                 throw new SynapseException("simple consumer port should be number.", nfe);
             }
         }
@@ -90,7 +90,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                 this.partition = Integer.parseInt(kafkaProperties
                         .getProperty(KAFKAConstants.SIMPLE_PARTITION));
             } catch (NumberFormatException nfe) {
-                logger.error("simple partition should be a number");
+                logger.error("simple partition should be a number " +nfe.getMessage(),nfe );
                 throw new SynapseException("simple partition should be a number", nfe);
             }
         }
@@ -103,7 +103,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                 this.maxReads = Long.parseLong(kafkaProperties
                         .getProperty(KAFKAConstants.SIMPLE_MAX_MSG_TO_READ));
             } catch (NumberFormatException nfe) {
-                logger.error("maximum messages should be a number");
+                logger.error("maximum messages should be a number " + nfe.getMessage(), nfe);
                 throw new SynapseException("maximum messages should be a number", nfe);
             }
         }
@@ -120,7 +120,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
         try {
             return Arrays.asList(brokers.split(","));
         } catch (Exception nfe) {
-            logger.error("Error to split the brokers from broker list");
+            logger.error("Error to split the brokers from broker list" + nfe.getMessage() ,nfe);
             throw new SynapseException("Error to split the brokers from broker list", nfe);
         }
     }
@@ -166,7 +166,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                     leadBroker = findNewLeader(leadBroker, topic,
                             partition, port);
                 } catch (Exception e) {
-                    logger.error(e.getMessage());
+                    logger.error("Error to find the new leader " + e.getMessage(),e);
                 }
             }
             try {
@@ -193,7 +193,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                         }
 
                     } catch (Exception e) {
-                        logger.error(e.getMessage());
+                        logger.error("Error while invoking the bytes " + e.getMessage(),e);
                     }
                     if (logger.isDebugEnabled()) {
                         logger.debug("0 - added to queue!");
@@ -207,7 +207,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                     }
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage());
+                logger.error("Error while fetching the responses" + e.getMessage(),e);
                 logger.debug("Error to fetch the responses");
             } finally {
                 if (consumer != null)

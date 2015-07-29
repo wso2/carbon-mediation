@@ -30,6 +30,7 @@ public class InboundHttpConstants {
      */
     public static final String INBOUND_ENDPOINT_PARAMETER_HTTP_PORT = "inbound.http.port";
     public static final String INBOUND_ENDPOINT_PARAMETER_API_DISPATCHING_ENABLED = "api.dispatching.enabled";
+    public static final String INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN = "dispatch.filter.pattern";
     public static final String KEY_STORE = "keystore";
     public static final String TRUST_STORE = "truststore";
     public static final String SSL_VERIFY_CLIENT = "SSLVerifyClient";
@@ -62,8 +63,5 @@ public class InboundHttpConstants {
     public static final String INBOUND_THREAD_GROUP_ID = "inbound.thread.group.id";
 
     public static final String INBOUND_THREAD_ID = "inbound.thread.id";
-
-
-
 
 }

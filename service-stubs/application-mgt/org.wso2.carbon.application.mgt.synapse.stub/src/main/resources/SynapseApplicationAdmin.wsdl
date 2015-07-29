@@ -55,6 +55,8 @@
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="endpoints" nillable="true" type="ax23:EndpointMetadata"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="events" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="inboundEPs" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="messageProcessors" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="messageStores" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="localEntries" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="mediators" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="proxyServices" nillable="true" type="xs:string"/>

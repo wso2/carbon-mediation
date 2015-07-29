@@ -14,13 +14,13 @@
  *  limitations under the License.
  **/
 
-package org.wso2.carbon.mediator.cache;
+package org.wso2.carbon.mediator.cache.ui;
 
 import org.wso2.carbon.mediator.service.AbstractMediatorService;
 import org.wso2.carbon.mediator.service.ui.Mediator;
 
 /**
- *
+ * Class that interfaces the mediator service
  */
 public class CacheMediatorService extends AbstractMediatorService {
 

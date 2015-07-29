@@ -24,6 +24,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
 import javax.jms.Queue;
 import javax.jms.QueueConnection;
 import javax.jms.QueueConnectionFactory;
@@ -64,8 +65,10 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     protected boolean transactedSession = false;
     protected int sessionAckMode = 0;
     protected boolean jmsSpec11;
-    protected boolean isDurable;
+    protected boolean isDurable;    
+    protected boolean noPubSubLocal;
     protected String clientId;
+    protected String subscriptionName;
     protected String messageSelector;
 
     public JMSConnectionFactory(Properties properties) {
@@ -87,11 +90,11 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             jmsSpec11 = true;
         }
 
-        String durableSubClientId = properties
-                .getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
-        if (durableSubClientId != null) {
-            clientId = durableSubClientId;
-        }
+        noPubSubLocal = Boolean.valueOf(properties.getProperty(JMSConstants.PARAM_PUBSUB_NO_LOCAL));
+        
+        clientId = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
+        subscriptionName = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_NAME);        
+
 
         String subDurable = properties.getProperty(JMSConstants.PARAM_SUB_DURABLE);
         if (subDurable != null) {
@@ -190,6 +193,9 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 	connection = ((TopicConnectionFactory) (this.connectionFactory))
                             .createTopicConnection();
                 }
+                if (isDurable) {
+                    connection.setClientID(clientId);
+                }                
 	            return connection;
             } else {
                 QueueConnectionFactory qConFac = null;
@@ -225,19 +231,23 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     }
 
     public Connection createConnection(String userName, String password) {
+        Connection connection = null;
         try {
             if (jmsSpec11) {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-                    return ((QueueConnectionFactory) (this.connectionFactory))
+                    connection = ((QueueConnectionFactory) (this.connectionFactory))
                             .createQueueConnection(userName, password);
                 } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-                    return ((TopicConnectionFactory) (this.connectionFactory))
+                    connection = ((TopicConnectionFactory) (this.connectionFactory))
                             .createTopicConnection(userName, password);
                 }
+                if (isDurable) {
+                    connection.setClientID(clientId);
+                }
+                return connection;
             } else {
                 QueueConnectionFactory qConFac = null;
-                TopicConnectionFactory tConFac = null;
-                Connection connection = null;
+                TopicConnectionFactory tConFac = null;                
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                     qConFac = (QueueConnectionFactory) this.connectionFactory;
                 } else {
@@ -256,6 +266,13 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         } catch (JMSException e) {
             logger.error("JMS Exception while creating connection through factory '"
                     + this.connectionFactoryString + "' " + e.getMessage());
+            // Need to close the connection in the case if durable subscriptions
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (Exception ex) {
+                }
+            }            
         }
 
         return null;
@@ -320,21 +337,24 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         try {
             if (jmsSpec11) {
                 if (isDurable) {
-                    return session.createDurableSubscriber((Topic) destination, messageSelector);
+                    return session.createDurableSubscriber((Topic) destination, subscriptionName,
+                                                           messageSelector, noPubSubLocal);
                 } else {
                     return session.createConsumer(destination, messageSelector);
                 }
             } else {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                     return ((QueueSession) session).createReceiver((Queue) destination,
-                            messageSelector);
+                                                                   messageSelector);
                 } else {
                     if (isDurable) {
-                        return ((TopicSession) session).createDurableSubscriber(
-                                (Topic) destination, messageSelector);
+                        return ((TopicSession) session).createDurableSubscriber((Topic) destination,
+                                                                                subscriptionName,
+                                                                                messageSelector,
+                                                                                noPubSubLocal);
                     } else {
                         return ((TopicSession) session).createSubscriber((Topic) destination,
-                                messageSelector, false);
+                                                                         messageSelector, false);
                     }
                 }
             }
@@ -344,35 +364,63 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         return null;
     }
 
+    /**
+     * This is a JMS spec independent method to create a MessageProducer. Please be cautious when
+     * making any changes
+     *
+     * @param session JMS session
+     * @param destination the Destination
+     * @param isQueue is the Destination a queue?
+     * @param jmsSpec11 should we use JMS 1.1 API ?
+     * @return a MessageProducer to send messages to the given Destination
+     * @throws JMSException on errors, to be handled and logged by the caller
+     */
+    public MessageProducer createProducer(Session session, Destination destination, Boolean isQueue) throws JMSException {
+        if (jmsSpec11 || isQueue == null) {
+            return session.createProducer(destination);
+        } else {
+            if (isQueue) {
+                return ((QueueSession) session).createSender((Queue) destination);
+            } else {
+                return ((TopicSession) session).createPublisher((Topic) destination);               
+            }
+        }
+    }     
+    
     private Destination createDestination(Connection connection) {
-
+        this.destination = createDestination(connection, this.destinationName);
+        return this.destination;
+    }
+    
+    public Destination createDestination(Connection connection, String destinationName) {
+        Destination destination = null;
         try {
             if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-                this.destination = (Queue) ctx.lookup(this.destinationName);
+                destination = (Queue) ctx.lookup(destinationName);
             } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-                this.destination = (Topic) ctx.lookup(this.destinationName);
+                destination = (Topic) ctx.lookup(destinationName);
             }
         } catch (NameNotFoundException e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Could not find destination '" + this.destinationName
+                logger.debug("Could not find destination '" + destinationName
                         + "' on connection factory for '" + this.connectionFactoryString + "'. "
                         + e.getMessage());
-                logger.debug("Creating destination '" + this.destinationName
+                logger.debug("Creating destination '" + destinationName
                         + "' on connection factory for '" + this.connectionFactoryString + ".");
             }
             Session createSession = createSession(connection);
             try {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-                    this.destination = (Queue) createSession.createQueue(this.destinationName);
+                    destination = (Queue) createSession.createQueue(destinationName);
                 } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-                    this.destination = (Topic) createSession.createTopic(this.destinationName);
+                    destination = (Topic) createSession.createTopic(destinationName);
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Created '" + this.destinationName
+                    logger.debug("Created '" + destinationName
                             + "' on connection factory for '" + this.connectionFactoryString + "'.");
                 }
             } catch (JMSException e1) {
-                logger.error("Could not find nor create '" + this.destinationName
+                logger.error("Could not find nor create '" + destinationName
                         + "' on connection factory for '" + this.connectionFactoryString + "'. "
                         + e.getMessage());
             } finally {
@@ -388,7 +436,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                     + this.connectionFactoryString + "' " + e.getMessage());
         }
 
-        return this.destination;
+        return destination;
     }
 
     public Session getSession(Connection connection) {
