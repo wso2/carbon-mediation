@@ -93,7 +93,7 @@
                                 <bundleDef>org.apache.openjpa.wso2:openjpa-all</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>
