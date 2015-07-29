@@ -82,7 +82,9 @@
             </xs:element>
             <xs:element name="getAllTaskDescriptions">
                 <xs:complexType>
-                    <xs:sequence/>
+                    <xs:sequence>
+                        <xs:any minOccurs="0"/>
+                    </xs:sequence>
                 </xs:complexType>
             </xs:element>
             <xs:element name="getAllTaskDescriptionsResponse">
