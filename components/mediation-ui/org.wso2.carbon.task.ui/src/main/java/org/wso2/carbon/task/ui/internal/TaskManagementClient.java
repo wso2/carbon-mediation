@@ -30,7 +30,7 @@ import org.apache.synapse.task.TaskDescriptionFactory;
 import org.apache.synapse.task.TaskDescriptionSerializer;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.task.stub.TaskAdminStub;
-import org.wso2.carbon.task.stub.TaskAdminTaskManagementException;
+import org.wso2.carbon.task.stub.TaskManagementException;
 import org.wso2.carbon.task.stub.types.carbon.TaskData;
 import org.wso2.carbon.ui.CarbonUIUtil;
 import org.wso2.carbon.utils.ServerConstants;
@@ -65,7 +65,7 @@ public class TaskManagementClient {
     private TaskManagementClient(String cookie,
                                  String backendServerURL,
                                  ConfigurationContext configCtx)
-            throws AxisFault, TaskAdminTaskManagementException {
+            throws AxisFault, TaskManagementException {
 
         String serviceURL = backendServerURL + "TaskAdmin";
         stub = new TaskAdminStub(configCtx, serviceURL);
@@ -78,7 +78,7 @@ public class TaskManagementClient {
 
     public static TaskManagementClient getInstance(ServletConfig config,
                                                    HttpSession session)
-            throws TaskAdminTaskManagementException, AxisFault {
+            throws TaskManagementException, AxisFault {
 
         String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
         ConfigurationContext configContext =

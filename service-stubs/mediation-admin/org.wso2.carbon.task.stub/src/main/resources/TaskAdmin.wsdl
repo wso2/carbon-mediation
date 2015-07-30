@@ -4,7 +4,7 @@
     <wsdl:types>
         <xs:schema xmlns:ax2604="http://task.carbon.wso2.org/xsd" xmlns:ns="http://org.apache.axis2/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
             <xs:import namespace="http://task.carbon.wso2.org/xsd"/>
-            <xs:element name="TaskAdminTaskManagementException">
+            <xs:element name="TaskManagementException">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="TaskManagementException" nillable="true" type="ax2604:TaskManagementException"/>
@@ -137,8 +137,8 @@
     <wsdl:message name="loadTaskClassPropertiesResponse">
         <wsdl:part name="parameters" element="ns1:loadTaskClassPropertiesResponse"/>
     </wsdl:message>
-    <wsdl:message name="TaskAdminTaskManagementException">
-        <wsdl:part name="parameters" element="ns1:TaskAdminTaskManagementException"/>
+    <wsdl:message name="TaskManagementException">
+        <wsdl:part name="parameters" element="ns1:TaskManagementException"/>
     </wsdl:message>
     <wsdl:message name="isContainsRequest">
         <wsdl:part name="parameters" element="ns1:isContains"/>
@@ -183,21 +183,21 @@
         <wsdl:operation name="loadTaskClassProperties">
             <wsdl:input message="tns:loadTaskClassPropertiesRequest" wsaw:Action="urn:loadTaskClassProperties"/>
             <wsdl:output message="tns:loadTaskClassPropertiesResponse" wsaw:Action="urn:loadTaskClassPropertiesResponse"/>
-            <wsdl:fault message="tns:TaskAdminTaskManagementException" name="TaskAdminTaskManagementException" wsaw:Action="urn:loadTaskClassPropertiesTaskAdminTaskManagementException"/>
+            <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:loadTaskClassPropertiesTaskManagementException"/>
         </wsdl:operation>
         <wsdl:operation name="isContains">
             <wsdl:input message="tns:isContainsRequest" wsaw:Action="urn:isContains"/>
             <wsdl:output message="tns:isContainsResponse" wsaw:Action="urn:isContainsResponse"/>
-            <wsdl:fault message="tns:TaskAdminTaskManagementException" name="TaskAdminTaskManagementException" wsaw:Action="urn:isContainsTaskAdminTaskManagementException"/>
+            <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:isContainsTaskManagementException"/>
         </wsdl:operation>
         <wsdl:operation name="getTaskDescription">
             <wsdl:input message="tns:getTaskDescriptionRequest" wsaw:Action="urn:getTaskDescription"/>
             <wsdl:output message="tns:getTaskDescriptionResponse" wsaw:Action="urn:getTaskDescriptionResponse"/>
-            <wsdl:fault message="tns:TaskAdminTaskManagementException" name="TaskAdminTaskManagementException" wsaw:Action="urn:getTaskDescriptionTaskAdminTaskManagementException"/>
+            <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:getTaskDescriptionTaskManagementException"/>
         </wsdl:operation>
         <wsdl:operation name="editTaskDescription">
             <wsdl:input message="tns:editTaskDescriptionRequest" wsaw:Action="urn:editTaskDescription"/>
-            <wsdl:fault message="tns:TaskAdminTaskManagementException" name="TaskAdminTaskManagementException" wsaw:Action="urn:editTaskDescriptionTaskAdminTaskManagementException"/>
+            <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:editTaskDescriptionTaskManagementException"/>
         </wsdl:operation>
         <wsdl:operation name="getAllJobGroups">
             <wsdl:input message="tns:getAllJobGroupsRequest" wsaw:Action="urn:getAllJobGroups"/>
@@ -205,21 +205,21 @@
         </wsdl:operation>
         <wsdl:operation name="deleteTaskDescription">
             <wsdl:input message="tns:deleteTaskDescriptionRequest" wsaw:Action="urn:deleteTaskDescription"/>
-            <wsdl:fault message="tns:TaskAdminTaskManagementException" name="TaskAdminTaskManagementException" wsaw:Action="urn:deleteTaskDescriptionTaskAdminTaskManagementException"/>
+            <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:deleteTaskDescriptionTaskManagementException"/>
         </wsdl:operation>
         <wsdl:operation name="getAllTaskDescriptions">
             <wsdl:input message="tns:getAllTaskDescriptionsRequest" wsaw:Action="urn:getAllTaskDescriptions"/>
             <wsdl:output message="tns:getAllTaskDescriptionsResponse" wsaw:Action="urn:getAllTaskDescriptionsResponse"/>
-            <wsdl:fault message="tns:TaskAdminTaskManagementException" name="TaskAdminTaskManagementException" wsaw:Action="urn:getAllTaskDescriptionsTaskAdminTaskManagementException"/>
+            <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:getAllTaskDescriptionsTaskManagementException"/>
         </wsdl:operation>
         <wsdl:operation name="addTaskDescription">
             <wsdl:input message="tns:addTaskDescriptionRequest" wsaw:Action="urn:addTaskDescription"/>
-            <wsdl:fault message="tns:TaskAdminTaskManagementException" name="TaskAdminTaskManagementException" wsaw:Action="urn:addTaskDescriptionTaskAdminTaskManagementException"/>
+            <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:addTaskDescriptionTaskManagementException"/>
         </wsdl:operation>
         <wsdl:operation name="getAllTaskData">
             <wsdl:input message="tns:getAllTaskDataRequest" wsaw:Action="urn:getAllTaskData"/>
             <wsdl:output message="tns:getAllTaskDataResponse" wsaw:Action="urn:getAllTaskDataResponse"/>
-            <wsdl:fault message="tns:TaskAdminTaskManagementException" name="TaskAdminTaskManagementException" wsaw:Action="urn:getAllTaskDataTaskAdminTaskManagementException"/>
+            <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:getAllTaskDataTaskManagementException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="TaskAdminSoap11Binding" type="tns:TaskAdminPortType">
@@ -232,8 +232,8 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="isContains">
@@ -244,8 +244,8 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="getTaskDescription">
@@ -256,8 +256,8 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="editTaskDescription">
@@ -265,8 +265,8 @@
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="deleteTaskDescription">
@@ -274,8 +274,8 @@
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="getAllJobGroups">
@@ -295,8 +295,8 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="addTaskDescription">
@@ -304,8 +304,8 @@
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="getAllTaskData">
@@ -316,8 +316,8 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
@@ -331,8 +331,8 @@
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap12:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap12:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="isContains">
@@ -343,8 +343,8 @@
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap12:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap12:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="getTaskDescription">
@@ -355,8 +355,8 @@
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap12:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap12:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="editTaskDescription">
@@ -364,8 +364,8 @@
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap12:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap12:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="deleteTaskDescription">
@@ -373,8 +373,8 @@
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap12:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap12:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="getAllJobGroups">
@@ -394,8 +394,8 @@
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap12:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap12:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="addTaskDescription">
@@ -403,8 +403,8 @@
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap12:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap12:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="getAllTaskData">
@@ -415,8 +415,8 @@
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="TaskAdminTaskManagementException">
-                <soap12:fault use="literal" name="TaskAdminTaskManagementException"/>
+            <wsdl:fault name="TaskManagementException">
+                <soap12:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
