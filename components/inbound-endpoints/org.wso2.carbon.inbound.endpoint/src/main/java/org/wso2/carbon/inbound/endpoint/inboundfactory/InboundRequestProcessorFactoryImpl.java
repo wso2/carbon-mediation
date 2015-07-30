@@ -59,7 +59,7 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
                 inboundRequestProcessor = new InboundHttpsListener(params);
             } else if (Protocols.hl7.toString().equals(protocol)) {
                 inboundRequestProcessor = new InboundHL7Listener(params);
-            }else if(Protocols.kafka.toString().equals(protocol)){
+            } else if (Protocols.kafka.toString().equals(protocol)) {
                 inboundRequestProcessor = new KAFKAProcessor(params);
             } else if (Protocols.cxf_ws_rm.toString().equals(protocol)) {
                 inboundRequestProcessor = CXFEndpointManager.getInstance().getCXFEndpoint(params);

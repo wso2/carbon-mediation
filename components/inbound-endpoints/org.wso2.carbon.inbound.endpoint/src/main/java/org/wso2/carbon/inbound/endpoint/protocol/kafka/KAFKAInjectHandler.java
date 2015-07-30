@@ -47,11 +47,11 @@ public class KAFKAInjectHandler implements InjectHandler {
     private SynapseEnvironment synapseEnvironment;
     private String contentType;
 
-    public KAFKAInjectHandler(String injectingSeq, String onErrorSeq,boolean sequential,
+    public KAFKAInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
                               SynapseEnvironment synapseEnvironment, String contentType) {
         this.injectingSeq = injectingSeq;
         this.onErrorSeq = onErrorSeq;
-        this.sequential=sequential;
+        this.sequential = sequential;
         this.synapseEnvironment = synapseEnvironment;
         this.contentType = contentType;
     }
@@ -80,7 +80,7 @@ public class KAFKAInjectHandler implements InjectHandler {
                 builder = BuilderUtil.getBuilderFromSelector(type, axis2MsgCtx);
             } catch (AxisFault axisFault) {
                 log.error("Error while creating message builder :: "
-                        + axisFault.getMessage(),axisFault);
+                        + axisFault.getMessage(), axisFault);
 
             }
             if (builder == null) {
@@ -99,7 +99,7 @@ public class KAFKAInjectHandler implements InjectHandler {
                     axis2MsgCtx);
         } catch (AxisFault axisFault) {
             log.error("Error while processing message :: "
-                    + axisFault.getMessage(),axisFault);
+                    + axisFault.getMessage(), axisFault);
         }
 
         try {
@@ -107,7 +107,7 @@ public class KAFKAInjectHandler implements InjectHandler {
                     .createSOAPEnvelope(documentElement));
         } catch (AxisFault axisFault) {
             log.error("Error while setting message payload to the message context :: "
-                    + axisFault.getMessage(),axisFault);
+                    + axisFault.getMessage(), axisFault);
         }
         // Inject the message to the sequence.
 
@@ -122,7 +122,7 @@ public class KAFKAInjectHandler implements InjectHandler {
             if (log.isDebugEnabled()) {
                 log.debug("injecting message to sequence : " + injectingSeq);
             }
-            synapseEnvironment.injectInbound(msgCtx, seq,sequential);
+            synapseEnvironment.injectInbound(msgCtx, seq, sequential);
         } else {
             log.error("Sequence: " + injectingSeq + " not found");
         }
