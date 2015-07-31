@@ -86,8 +86,12 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     if (classRequired && document.getElementById('inboundClass').value == '') {
         CARBON.showWarningDialog(msg4);
         return false;
-    }    
-    
+    }
+    if (isNaN(document.getElementById('interval').value)) {
+        CARBON.showWarningDialog(msg3);
+        return false;
+    }
+
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
     	    if (document.getElementById(requiredParams[i]).value.trim() == '') {
@@ -113,7 +117,11 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
     if (classRequired && document.getElementById('inboundClass').value == '') {
         CARBON.showWarningDialog(msg4);
         return false;
-    }    	
+    }
+    if (isNaN(document.getElementById('interval').value)) {
+        CARBON.showWarningDialog(msg3);
+        return false;
+    }
     
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
