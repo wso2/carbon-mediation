@@ -24,8 +24,6 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.wso2.carbon.inbound.endpoint.common.InboundOneTimeTriggerRequestProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
-import org.wso2.carbon.utils.CarbonUtils;
-
 import java.util.Properties;
 
 
@@ -111,12 +109,10 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
         //release the thread from suspension
         //this is need since Thread.join() causes issues
         //this will release thread suspended thread for completion
-        super.destroy();
         connectionConsumer.shutdown();
         mqttAsyncCallback.shutdown();
-        if (CarbonUtils.isWorkerNode()) {
-            confac.shutdown();
-        }
+        confac.shutdown();
+
         try {
             if (mqttAsyncClient.isConnected()) {
                 mqttAsyncClient.disconnect();
@@ -126,8 +122,7 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
         } catch (MqttException e) {
             log.error("Error while disconnecting from the remote server.");
         }
-
-
+        super.destroy();
     }
 
     @Override

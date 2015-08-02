@@ -30,4 +30,5 @@ public class MqttConstants {
     public static final String MQTT_PASSWORD = "mqtt.subscription.password";
     public static final String MQTT_TEMP_STORE = "mqtt.temporary.store.directory";
     public static final String MQTT_CLIENT_ID = "mqtt.client.id";
+    public static final String MQTT_RECONNECTION_INTERVAL = "mqtt.reconnection.interval";
 }

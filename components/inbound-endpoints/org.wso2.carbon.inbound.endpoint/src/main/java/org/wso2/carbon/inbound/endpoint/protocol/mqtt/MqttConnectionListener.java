@@ -27,6 +27,7 @@ public class MqttConnectionListener implements IMqttActionListener {
     private static final Log log = LogFactory.getLog(MqttConnectionListener.class);
     private MqttConnectionConsumer mqttConnectionConsumer;
     private boolean execute = true;
+    private static final int DEFAULT_RECONNECTION_INTERVAL = 10000;
 
     public MqttConnectionListener(MqttConnectionConsumer mqttConnectionConsumer) {
         this.mqttConnectionConsumer = mqttConnectionConsumer;
@@ -38,11 +39,22 @@ public class MqttConnectionListener implements IMqttActionListener {
 
     public void onFailure(IMqttToken token, Throwable exception) {
         try {
+
+            int retryInterval = mqttConnectionConsumer.getMqttConnectionFactory().
+                    getReconnectionInterval();
+            if (retryInterval != -1) {
+                Thread.sleep(retryInterval);
+            } else {
+                Thread.sleep(DEFAULT_RECONNECTION_INTERVAL);
+            }
+
             if (execute) {
                 mqttConnectionConsumer.getMqttAsyncClient()
                         .connect(mqttConnectionConsumer.getConnectOptions(), this);
             }
         } catch (MqttException ex) {
+            log.error("Error while trying to subscribe to the remote");
+        } catch (InterruptedException ex) {
             log.error("Error while trying to subscribe to the remote");
         }
     }

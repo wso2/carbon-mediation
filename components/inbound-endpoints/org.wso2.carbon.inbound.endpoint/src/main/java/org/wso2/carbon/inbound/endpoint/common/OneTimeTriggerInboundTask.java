@@ -53,5 +53,9 @@ public abstract class OneTimeTriggerInboundTask implements
         this.callback = callback;
     }
 
+    public OneTimeTriggerAbstractCallback getCallback() {
+        return callback;
+    }
+
     protected abstract void taskExecute();
 }

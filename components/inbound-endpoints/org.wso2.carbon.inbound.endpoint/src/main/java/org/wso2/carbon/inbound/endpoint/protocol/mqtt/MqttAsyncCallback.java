@@ -97,6 +97,7 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
             log.debug("Received Message: Topic:" + topic + "  Message: " + mqttMessage);
         }
         log.info("Received Message: Topic: " + topic);
+        super.loadTenantContext();
         injectHandler.invoke(mqttMessage);
     }
 

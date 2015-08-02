@@ -16,6 +16,13 @@
 
 package org.wso2.carbon.inbound.endpoint.common;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
+import org.wso2.carbon.utils.ConfigurationContextService;
+
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,15 +35,20 @@ public abstract class OneTimeTriggerAbstractCallback {
     private volatile Semaphore callbackSuspensionSemaphore = new Semaphore(0);
     private AtomicBoolean isCallbackSuspended = new AtomicBoolean(false);
     private AtomicBoolean isShutdownFlagSet = new AtomicBoolean(false);
-
+    private PrivilegedCarbonContext carbonContext;
+    private boolean isInboundRunnerMode = false;
 
     protected void handleReconnection() throws InterruptedException {
-        isCallbackSuspended.set(true);
-        callbackSuspensionSemaphore.acquire();
-        if (!isShutdownFlagSet.get()) {
+        if (!isInboundRunnerMode) {
+            isCallbackSuspended.set(true);
+            callbackSuspensionSemaphore.acquire();
+            if (!isShutdownFlagSet.get()) {
+                reConnect();
+            }
+            isCallbackSuspended.set(false);
+        } else {
             reConnect();
         }
-        isCallbackSuspended.set(false);
     }
 
     protected void shutdown() {
@@ -54,5 +66,34 @@ public abstract class OneTimeTriggerAbstractCallback {
 
     public boolean isCallbackSuspended() {
         return isCallbackSuspended.get();
+    }
+
+    public void preserveCarbonContext(PrivilegedCarbonContext carbonContext){
+        //this is needed since we have to keep tenant loaded in later stage but at that point
+        //we have no access to the PrivilegedCarbonContext if callbacks happens in a different
+        //thread this is different to generic polling inbound endpoints
+        this.carbonContext = carbonContext;
+    }
+
+    public void loadTenantContext(){
+        int tenantId = carbonContext.getTenantId();
+        String tenantDomain = null;
+        if (tenantId != MultitenantConstants.SUPER_TENANT_ID) {
+            tenantDomain = carbonContext.getTenantDomain();
+        }
+        //Keep the tenant loaded
+        if (tenantDomain != null) {
+            ConfigurationContextService configurationContext =
+                    InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
+            if (configurationContext != null) {
+                ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+                TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+            }
+        }
+
+    }
+
+    public void setInboundRunnerMode(boolean isInboundRunnerMode) {
+        this.isInboundRunnerMode = isInboundRunnerMode;
     }
 }

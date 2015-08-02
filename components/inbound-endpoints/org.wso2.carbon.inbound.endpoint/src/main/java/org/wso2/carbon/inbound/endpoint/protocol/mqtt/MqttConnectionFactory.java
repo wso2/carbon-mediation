@@ -88,17 +88,45 @@ public class MqttConnectionFactory {
                 }
             }
 
-            parameters.put(MqttConstants.MQTT_TEMP_STORE,
-                    passedInParameter.getProperty(MqttConstants.MQTT_TEMP_STORE));
+            if (passedInParameter.getProperty(MqttConstants.MQTT_TEMP_STORE) != null) {
+                parameters.put(MqttConstants.MQTT_TEMP_STORE,
+                        passedInParameter.getProperty(MqttConstants.MQTT_TEMP_STORE));
+            } else {
+                log.error("Default value will be used accordingly for the parameter : "
+                        + MqttConstants.MQTT_TEMP_STORE);
+            }
 
-            parameters.put(MqttConstants.MQTT_SESSION_CLEAN,
-                    passedInParameter.getProperty(MqttConstants.MQTT_SESSION_CLEAN));
+            if (passedInParameter.getProperty(MqttConstants.MQTT_SESSION_CLEAN) != null) {
+                parameters.put(MqttConstants.MQTT_SESSION_CLEAN,
+                        passedInParameter.getProperty(MqttConstants.MQTT_SESSION_CLEAN));
+            } else {
+                log.error("Default value will be used accordingly for the parameter : "
+                        + MqttConstants.MQTT_SESSION_CLEAN);
+            }
 
-            parameters.put(MqttConstants.MQTT_SSL_ENABLE,
-                    passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE));
+            if (passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE) != null) {
+                parameters.put(MqttConstants.MQTT_SSL_ENABLE,
+                        passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE));
+            } else {
+                log.error("Default value will be used accordingly for the parameter : "
+                        + MqttConstants.MQTT_SSL_ENABLE);
+            }
 
-            parameters.put(MqttConstants.MQTT_CLIENT_ID,
-                    passedInParameter.getProperty(MqttConstants.MQTT_CLIENT_ID));
+            if (passedInParameter.getProperty(MqttConstants.MQTT_CLIENT_ID) != null) {
+                parameters.put(MqttConstants.MQTT_CLIENT_ID,
+                        passedInParameter.getProperty(MqttConstants.MQTT_CLIENT_ID));
+            } else {
+                log.error("Default value will be used accordingly for the parameter : "
+                        + MqttConstants.MQTT_CLIENT_ID);
+            }
+
+            if (passedInParameter.getProperty(MqttConstants.MQTT_RECONNECTION_INTERVAL) != null) {
+                parameters.put(MqttConstants.MQTT_RECONNECTION_INTERVAL,
+                        passedInParameter.getProperty(MqttConstants.MQTT_RECONNECTION_INTERVAL));
+            } else {
+                log.error("Default value will be used accordingly for the parameter : "
+                        + MqttConstants.MQTT_RECONNECTION_INTERVAL);
+            }
 
         } catch (Exception e) {
             log.error("Error while reading properties for MQTT connection factory " + factoryName);
@@ -120,6 +148,14 @@ public class MqttConnectionFactory {
 
     public String getContent() {
         return parameters.get(MqttConstants.CONTENT_TYPE);
+    }
+
+    public int getReconnectionInterval() {
+        if (parameters.get(MqttConstants.MQTT_RECONNECTION_INTERVAL) != null) {
+            return Integer.parseInt(parameters.get(MqttConstants.MQTT_RECONNECTION_INTERVAL));
+        } else {
+            return -1;
+        }
     }
 
     private MqttAsyncClient createMqttAsyncClient() {

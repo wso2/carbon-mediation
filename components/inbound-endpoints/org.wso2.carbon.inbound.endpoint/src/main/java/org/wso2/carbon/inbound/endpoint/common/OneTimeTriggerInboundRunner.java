@@ -85,15 +85,7 @@ public class OneTimeTriggerInboundRunner implements Runnable {
         } catch (Exception e) {
             log.error("Error executing the Inbound Endpoint once time execution", e);
         }
-        //Keep the tenant loaded
-        if (tenantDomain != null) {
-            ConfigurationContextService configurationContext =
-                    InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
-            if (configurationContext != null) {
-                ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
-                TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
-            }
-        }
+
         if (log.isDebugEnabled()) {
             log.debug("Exiting the Inbound Endpoint.");
         }
