@@ -61,7 +61,9 @@ public abstract class OneTimeTriggerAbstractCallback {
     protected abstract void reConnect();
 
     public void releaseCallbackSuspension() {
-        callbackSuspensionSemaphore.release();
+        if (callbackSuspensionSemaphore.availablePermits() < 1) {
+            callbackSuspensionSemaphore.release();
+        }
     }
 
     public boolean isCallbackSuspended() {
@@ -76,21 +78,23 @@ public abstract class OneTimeTriggerAbstractCallback {
     }
 
     public void loadTenantContext(){
-        int tenantId = carbonContext.getTenantId();
-        String tenantDomain = null;
-        if (tenantId != MultitenantConstants.SUPER_TENANT_ID) {
-            tenantDomain = carbonContext.getTenantDomain();
-        }
-        //Keep the tenant loaded
-        if (tenantDomain != null) {
-            ConfigurationContextService configurationContext =
-                    InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
-            if (configurationContext != null) {
-                ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
-                TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+        //if carbon context is null tenant loading happen via task manager
+        if (carbonContext != null) {
+            int tenantId = carbonContext.getTenantId();
+            String tenantDomain = null;
+            if (tenantId != MultitenantConstants.SUPER_TENANT_ID) {
+                tenantDomain = carbonContext.getTenantDomain();
+            }
+            //Keep the tenant loaded
+            if (tenantDomain != null) {
+                ConfigurationContextService configurationContext =
+                        InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
+                if (configurationContext != null) {
+                    ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+                }
             }
         }
-
     }
 
     public void setInboundRunnerMode(boolean isInboundRunnerMode) {
