@@ -57,7 +57,7 @@
             return false;
         }
 
-        if ((/[~!@#$%^&*()\\\/+=\-:;<>'"?[\]{}|\s,]/).test((form.Name).value)) {
+        if (!(/^[\w&.-]+$/).test((form.Name).value)) {
             CARBON.showWarningDialog('<fmt:message key="name.field.value.invalid"/>')
             form.Name.focus();
             return false;
