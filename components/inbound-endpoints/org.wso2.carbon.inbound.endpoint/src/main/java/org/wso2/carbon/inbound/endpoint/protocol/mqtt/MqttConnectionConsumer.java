@@ -26,7 +26,7 @@ import java.util.Properties;
 import java.util.concurrent.Semaphore;
 
 public class MqttConnectionConsumer {
-    private static final Log log = LogFactory.getLog(MqttListener.class);
+    private static final Log log = LogFactory.getLog(MqttConnectionConsumer.class);
     private MqttAsyncClient mqttAsyncClient;
     private MqttConnectOptions connectOptions;
     private MqttConnectionFactory confac;
