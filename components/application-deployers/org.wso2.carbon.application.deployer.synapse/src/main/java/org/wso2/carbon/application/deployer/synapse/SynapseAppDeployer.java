@@ -109,7 +109,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             // Create CAppArtifactData to hold artifact details deployed with this CApp
             CAppArtifactData cAppArtifactData = new CAppArtifactData(artifact.getName(), artifact.getType(), true);
             // Put Artifact details to CApp Artifact Map
-            cAppArtifacts.setcAppArtifactDataMap(artifact.getType() + File.separator + artifact.getName(), cAppArtifactData);
+            cAppArtifacts.setcAppArtifactDataMap(artifact.getType() + File.separator
+                    + artifact.getName(), cAppArtifactData);
             if (!validateArtifact(artifact)) {
                 continue;
             }
@@ -227,14 +228,15 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     if (artifactFile.exists() && !artifactFile.delete()) {
                         log.warn("Couldn't delete App artifact file : " + artifactPath);
                     }
+                    // Remove Artifact details from CAppArtifactData
+                    cAppArtifactDataService.removeCappArtifactData(tenantId,artifact.getType()
+                            + File.separator + artifact.getName());
                 } catch (Exception e) {
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
                     log.error("Error occured while trying to un deploy : "+ artifactName);
                 }
             }
         }
-        // Remove Artifact details from CAppArtifactData
-        cAppArtifactDataService.removeCappArtifactData(tenantId);
     }
 
     /**

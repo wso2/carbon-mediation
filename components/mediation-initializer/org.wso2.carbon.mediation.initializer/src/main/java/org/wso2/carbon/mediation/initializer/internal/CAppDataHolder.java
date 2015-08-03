@@ -41,6 +41,7 @@ import org.wso2.carbon.mediation.initializer.utils.CAppArtifactsMap;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -69,7 +70,15 @@ public class CAppDataHolder {
      * @param cAppArtifactsMap CApp artifact details
      */
     public void addCAppArtifactData(int tenantId, CAppArtifactsMap cAppArtifactsMap) {
-        cAppArtifactDataForTenants.put(tenantId, cAppArtifactsMap.getcAppArtifactDataMap());
+        if (cAppArtifactDataForTenants.containsKey(tenantId)) {
+            Map<String, CAppArtifactData> artifactDataMap = getCAppArtifactDataMap(tenantId);
+            Map<String, CAppArtifactData> newArtifactDataMap = new HashMap<String, CAppArtifactData>();
+            newArtifactDataMap.putAll(artifactDataMap);
+            newArtifactDataMap.putAll(cAppArtifactsMap.getcAppArtifactDataMap());
+            cAppArtifactDataForTenants.put(tenantId, newArtifactDataMap);
+        } else {
+            cAppArtifactDataForTenants.put(tenantId, cAppArtifactsMap.getcAppArtifactDataMap());
+        }
     }
 
     /**
@@ -107,9 +116,12 @@ public class CAppDataHolder {
      *
      * @param tenantId Current tenant id
      */
-    public void removeCappArtifactData(int tenantId) {
+    public void removeCappArtifactData(int tenantId, String name) {
         if (cAppArtifactDataForTenants.containsKey(tenantId)) {
-            cAppArtifactDataForTenants.remove(tenantId);
+            Map<String, CAppArtifactData> artifactDataMap = getCAppArtifactDataMap(tenantId);
+            if (artifactDataMap.containsKey(name)) {
+                artifactDataMap.remove(name);
+            }
         }
     }
 

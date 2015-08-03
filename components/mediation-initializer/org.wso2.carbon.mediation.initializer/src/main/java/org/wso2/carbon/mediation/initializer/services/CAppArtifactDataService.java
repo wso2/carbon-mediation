@@ -34,6 +34,6 @@ public interface CAppArtifactDataService {
 
     public void addCAppArtifactData(int tenantId, CAppArtifactsMap cAppArtifactsMap);
 
-    public void removeCappArtifactData(int tenantId);
+    public void removeCappArtifactData(int tenantId, String name);
 
 }

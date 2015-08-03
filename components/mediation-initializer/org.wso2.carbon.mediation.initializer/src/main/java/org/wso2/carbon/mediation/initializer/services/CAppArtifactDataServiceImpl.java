@@ -51,8 +51,8 @@ public class CAppArtifactDataServiceImpl implements CAppArtifactDataService {
 
 
     @Override
-    public void removeCappArtifactData(int tenantId) {
-        CAppDataHolder.getInstance().removeCappArtifactData(tenantId);
+    public void removeCappArtifactData(int tenantId, String name) {
+        CAppDataHolder.getInstance().removeCappArtifactData(tenantId, name);
     }
 
 }
