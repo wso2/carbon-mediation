@@ -57,6 +57,8 @@
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
                             org.apache.synapse.config.xml,
                             org.apache.synapse.util.xpath,
+                            javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
+                            javax.servlet;version="${imp.pkg.version.javax.servlet}",
                             *;resolution:=optional
                         </Import-Package>
                     </instructions>
