@@ -30,7 +30,8 @@ public interface CAppArtifactDataService {
 
     public void setEdited(int tenantId, String name);
 
-    public CAppArtifactWrapper removeCAppArtifactsBeforePersist(int tenantId, SynapseConfiguration synapseConfiguration);
+    public CAppArtifactWrapper removeCAppArtifactsBeforePersist(int tenantId,
+            SynapseConfiguration synapseConfiguration);
 
     public void addCAppArtifactData(int tenantId, CAppArtifactsMap cAppArtifactsMap);
 

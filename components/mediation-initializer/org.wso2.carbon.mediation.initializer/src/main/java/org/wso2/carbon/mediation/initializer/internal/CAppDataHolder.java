@@ -47,6 +47,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * The data holder to contains tenant specific CAPP details
+ */
+
 public class CAppDataHolder {
 
     private static final Log log = LogFactory.getLog(CAppDataHolder.class);
@@ -172,7 +176,8 @@ public class CAppDataHolder {
      * @param synapseConfiguration Contains all the configuration includes CApp artifact configs
      * @return new Configuration which removes all the CApp related configs
      */
-    public CAppArtifactWrapper removeCAppArtifactsBeforePersist(int tenantId, SynapseConfiguration synapseConfiguration) {
+    public CAppArtifactWrapper removeCAppArtifactsBeforePersist(int tenantId,
+            SynapseConfiguration synapseConfiguration) {
 
         final Lock lock = getLock(synapseConfiguration.getAxisConfiguration());
         SynapseConfiguration cAppArtifactConfig = new SynapseConfiguration();
@@ -182,7 +187,8 @@ public class CAppDataHolder {
             lock.lock();
             Map<String, Endpoint> endpoints = synapseConfiguration.getDefinedEndpoints();
             for (String name : endpoints.keySet()) {
-                CAppArtifactData cAppEndpointData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.ENDPOINT_TYPE + File.separator + name);
+                CAppArtifactData cAppEndpointData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.ENDPOINT_TYPE + File.separator + name);
                 if (cAppEndpointData != null)
                     if (cAppEndpointData != null) {
                         Endpoint newEndpoint = endpoints.get(name);
@@ -194,7 +200,8 @@ public class CAppDataHolder {
 
             Map<String, SequenceMediator> sequences = synapseConfiguration.getDefinedSequences();
             for (String name : sequences.keySet()) {
-                CAppArtifactData cAppSequenceData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.SEQUENCE_TYPE + File.separator + name);
+                CAppArtifactData cAppSequenceData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.SEQUENCE_TYPE + File.separator + name);
                 if (cAppSequenceData != null) {
                     SequenceMediator newSequences = sequences.get(name);
                     cAppArtifactConfig.addSequence(name, newSequences);
@@ -205,7 +212,8 @@ public class CAppDataHolder {
 
             Collection<ProxyService> proxyServices = synapseConfiguration.getProxyServices();
             for (ProxyService proxy : proxyServices) {
-                CAppArtifactData cAppProxyData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator + proxy.getName());
+                CAppArtifactData cAppProxyData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.PROXY_SERVICE_TYPE + File.separator + proxy.getName());
                 if (cAppProxyData != null) {
                     cAppArtifactConfig.addProxyService(proxy.getName(), proxy);
                     cAppProxyData.setEdited(true);
@@ -215,7 +223,8 @@ public class CAppDataHolder {
 
             Map<String, Entry> localEntries = synapseConfiguration.getDefinedEntries();
             for (String name : localEntries.keySet()) {
-                CAppArtifactData cAppLocalEntryData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + name);
+                CAppArtifactData cAppLocalEntryData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.LOCAL_ENTRY_TYPE + File.separator + name);
                 if (cAppLocalEntryData != null) {
                     Entry newEntry = localEntries.get(name);
                     cAppArtifactConfig.addEntry(name, newEntry);
@@ -226,7 +235,8 @@ public class CAppDataHolder {
 
             Collection<MessageStore> messageStores = synapseConfiguration.getMessageStores().values();
             for (MessageStore store : messageStores) {
-                CAppArtifactData cAppStoreData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.MESSAGE_STORE_TYPE + File.separator + store.getName());
+                CAppArtifactData cAppStoreData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.MESSAGE_STORE_TYPE + File.separator + store.getName());
                 if (cAppStoreData != null) {
                     cAppArtifactConfig.addMessageStore(store.getName(), store);
                     cAppStoreData.setEdited(true);
@@ -236,7 +246,8 @@ public class CAppDataHolder {
 
             Collection<MessageProcessor> messageProcessors = synapseConfiguration.getMessageProcessors().values();
             for (MessageProcessor processor : messageProcessors) {
-                CAppArtifactData cAppProcessorData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.MESSAGE_PROCESSOR_TYPE + File.separator + processor.getName());
+                CAppArtifactData cAppProcessorData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.MESSAGE_PROCESSOR_TYPE + File.separator + processor.getName());
                 if (cAppProcessorData != null) {
                     cAppArtifactConfig.addMessageProcessor(processor.getName(), processor);
                     cAppProcessorData.setEdited(true);
@@ -246,7 +257,8 @@ public class CAppDataHolder {
 
             Map<String, TemplateMediator> sequenceTemplates = synapseConfiguration.getSequenceTemplates();
             for (String name : sequenceTemplates.keySet()) {
-                CAppArtifactData cAppSequenceTemplateData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.TEMPLATE_TYPE + File.separator + name);
+                CAppArtifactData cAppSequenceTemplateData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.TEMPLATE_TYPE + File.separator + name);
                 if (cAppSequenceTemplateData != null) {
                     TemplateMediator newTemplate = sequenceTemplates.get(name);
                     cAppArtifactConfig.addSequenceTemplate(name, newTemplate);
@@ -257,7 +269,8 @@ public class CAppDataHolder {
 
             Map<String, Template> endpointTemplates = synapseConfiguration.getEndpointTemplates();
             for (String name : endpointTemplates.keySet()) {
-                CAppArtifactData cAppEndpointTemplateData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.TEMPLATE_TYPE + File.separator + name);
+                CAppArtifactData cAppEndpointTemplateData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.TEMPLATE_TYPE + File.separator + name);
                 if (cAppEndpointTemplateData != null) {
                     Template newEndpointTemplate = endpointTemplates.get(name);
                     cAppArtifactConfig.addEndpointTemplate(name, newEndpointTemplate);
@@ -268,7 +281,8 @@ public class CAppDataHolder {
 
             Collection<API> apiCollection = synapseConfiguration.getAPIs();
             for (API api : apiCollection) {
-                CAppArtifactData cAppApiData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.API_TYPE + File.separator + api.getName());
+                CAppArtifactData cAppApiData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.API_TYPE + File.separator + api.getName());
                 if (cAppApiData != null) {
                     API newApi = api;
                     cAppArtifactConfig.addAPI(api.getName(), newApi);
@@ -279,7 +293,8 @@ public class CAppDataHolder {
 
             Collection<Startup> tasks = synapseConfiguration.getStartups();
             for (Startup task : tasks) {
-                CAppArtifactData cAppApiData = getCAppArtifactDataByName(tenantId, ServiceBusConstants.TASK_TYPE + File.separator + task.getName());
+                CAppArtifactData cAppApiData = getCAppArtifactDataByName(tenantId,
+                        ServiceBusConstants.TASK_TYPE + File.separator + task.getName());
                 if (cAppApiData != null) {
                     Startup newTask = task;
                     cAppArtifactConfig.addStartup(newTask);

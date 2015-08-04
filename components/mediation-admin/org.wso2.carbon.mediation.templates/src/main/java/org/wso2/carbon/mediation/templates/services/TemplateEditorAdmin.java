@@ -93,10 +93,12 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                 for (TemplateInfo infoTemp : info) {
                     TemplateInfo templateInfo = new TemplateInfo();
                     templateInfo = infoTemp;
-                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(),
+                            getArtifactName(artifactType, infoTemp.getName()))) {
                         templateInfo.setDeployedFromCApp(true);
                     }
-                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
+                    if (cAppArtifactDataService
+                            .isArtifactEdited(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
                         templateInfo.setEdited(true);
                     }
                     infos[position] = templateInfo;
@@ -386,11 +388,11 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             TemplateMediator template;
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
-            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
-                    getcAppArtifactDataService();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             if (template != null) {
                 template.enableStatistics();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
                     persistTemplate(template);
                 }
                 return templateName;
@@ -413,11 +415,11 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             TemplateMediator template;
             template = getSynapseConfiguration().getSequenceTemplate(templateName);
-            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
-                    getcAppArtifactDataService();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             if (template != null) {
                 template.disableStatistics();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
                     persistTemplate(template);
                 }
                 return templateName;
@@ -444,7 +446,8 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     getcAppArtifactDataService();
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_ON);
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
                     persistTemplate(template);
                 }
                 return templateName;
@@ -467,11 +470,11 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             TemplateMediator template;
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
-            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
-                    getcAppArtifactDataService();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_OFF);
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
                     persistTemplate(template);
                 }
                 return templateName;

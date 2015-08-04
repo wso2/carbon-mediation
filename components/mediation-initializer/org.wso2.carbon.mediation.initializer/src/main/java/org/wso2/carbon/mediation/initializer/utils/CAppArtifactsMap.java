@@ -33,7 +33,7 @@ public class CAppArtifactsMap {
         return cAppArtifactDataMap;
     }
 
-    public void setcAppArtifactDataMap(String key, CAppArtifactData artifactData) {
+    public void addCAppArtifactData(String key, CAppArtifactData artifactData) {
         cAppArtifactDataMap.put(key, artifactData);
     }
 }

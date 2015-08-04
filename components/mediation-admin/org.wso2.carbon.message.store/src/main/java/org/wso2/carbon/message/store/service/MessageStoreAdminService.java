@@ -223,7 +223,8 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
             for (String storeName : names) {
                 MessageStoreMetaData data = new MessageStoreMetaData();
                 data.setName(storeName);
-                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, storeName))) {
+                if (cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, storeName))) {
                     data.setDeployedFromCApp(true);
                 }
                 if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, storeName))) {

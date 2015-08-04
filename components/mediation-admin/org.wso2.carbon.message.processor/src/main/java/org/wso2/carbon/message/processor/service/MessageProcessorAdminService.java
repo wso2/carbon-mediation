@@ -261,7 +261,8 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                 for (String name : names) {
                     MessageProcessorMetaData data = new MessageProcessorMetaData();
                     data.setName(name);
-                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, name))) {
+                    if (cAppArtifactDataService
+                            .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, name))) {
                         data.setDeployedFromCApp(true);
                     }
                     if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, name))) {

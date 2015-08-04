@@ -544,10 +544,10 @@ public class MediationPersistenceManager {
             log.debug("Serializing full mediation configuration to the file system");
         }
 
-        CAppArtifactDataService cAppArtifactDataService = ConfigurationHolder.getInstance().
-                getcAppArtifactDataService();
-
-        CAppArtifactWrapper cAppArtifactWrapper = cAppArtifactDataService.removeCAppArtifactsBeforePersist(tenantId, config);
+        CAppArtifactDataService cAppArtifactDataService = ConfigurationHolder.getInstance()
+                .getcAppArtifactDataService();
+        CAppArtifactWrapper cAppArtifactWrapper = cAppArtifactDataService
+                .removeCAppArtifactsBeforePersist(tenantId, config);
         MultiXMLConfigurationSerializer serializer = new MultiXMLConfigurationSerializer(configPath);
         serializer.serialize(cAppArtifactWrapper.getNewConfig());
 
@@ -570,7 +570,8 @@ public class MediationPersistenceManager {
      * @param synapseConfiguration Current Configuration
      * @param cAppConfig           CApp artifact configuration
      */
-    public void addCAppArtifactsAfterPersist(SynapseConfiguration synapseConfiguration, SynapseConfiguration cAppConfig) {
+    public void addCAppArtifactsAfterPersist(SynapseConfiguration synapseConfiguration,
+            SynapseConfiguration cAppConfig) {
         final Lock lock = getLock(synapseConfiguration.getAxisConfiguration());
 
         try {
@@ -625,7 +626,8 @@ public class MediationPersistenceManager {
             for (API api : apiCollection) {
                 API newApi = api;
                 synapseConfiguration.addAPI(api.getName(), api);
-                api.init((SynapseEnvironment) synapseConfiguration.getAxisConfiguration().getParameter(SynapseConstants.SYNAPSE_ENV).getValue());
+                api.init((SynapseEnvironment) synapseConfiguration.getAxisConfiguration()
+                        .getParameter(SynapseConstants.SYNAPSE_ENV).getValue());
             }
 
             Collection<Startup> tasks = cAppConfig.getStartups();

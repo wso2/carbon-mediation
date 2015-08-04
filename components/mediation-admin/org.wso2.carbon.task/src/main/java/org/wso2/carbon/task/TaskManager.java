@@ -139,7 +139,8 @@ public class TaskManager {
             if (cAppArtifactDataService.isArtifactDeployedFromCApp(tenantId, artifactName)) {
                 cAppArtifactDataService.setEdited(tenantId, artifactName);
                 MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(axisCfg);
-                pm.deleteItem(taskDescription.getName(), taskDescription.getName() + ".xml", ServiceBusConstants.ITEM_TYPE_TASK);
+                pm.deleteItem(taskDescription.getName(), taskDescription.getName() + ".xml",
+                        ServiceBusConstants.ITEM_TYPE_TASK);
             }
         }
     }
@@ -185,10 +186,12 @@ public class TaskManager {
                 data.setName(taskDescription.getName());
                 data.setGroup(taskDescription.getTaskGroup());
 
-                if (cAppArtifactDataService.isArtifactDeployedFromCApp(tenantId, getArtifactName(artifactType, taskDescription.getName()))) {
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(tenantId,
+                        getArtifactName(artifactType, taskDescription.getName()))) {
                     data.setDeployedFromCApp(true);
                 }
-                if (cAppArtifactDataService.isArtifactEdited(tenantId, getArtifactName(artifactType, taskDescription.getName()))) {
+                if (cAppArtifactDataService
+                        .isArtifactEdited(tenantId, getArtifactName(artifactType, taskDescription.getName()))) {
                     data.setEdited(true);
                 }
                 taskDatas.add(data);

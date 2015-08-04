@@ -6,6 +6,10 @@ import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Data holder to contains synapse environment details for tenants
+ */
+
 public class DataHolder {
     private static DataHolder instance;
     private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices =

@@ -130,8 +130,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             synapseConfiguration.updateAPI(apiName, api);
             api.init(getSynapseEnvironment());
 
-            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
-                    getcAppArtifactDataService();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             String artifactName = getArtifactName(artifactType, apiName);
 
             if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
@@ -181,8 +180,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             synapseConfiguration.addAPI(api.getName(),api);
             api.init(getSynapseEnvironment());
 
-            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
-                    getcAppArtifactDataService();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             String artifactName = getArtifactName(artifactType, apiName);
 
             if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
@@ -238,7 +236,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             assertNameNotEmpty(apiName);
             apiName = apiName.trim();
             CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
-            if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
+            if (!cAppArtifactDataService
+                    .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
             if (log.isDebugEnabled()) {
                 log.debug("Deleting API : " + apiName + " from the configuration");
             }
@@ -276,7 +275,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             for (String apiName :apiNames ) {
                 assertNameNotEmpty(apiName);
                 apiName = apiName.trim();
-                if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
                 if (log.isDebugEnabled()) {
                     log.debug("Deleting API : " + apiName + " from the configuration");
                 }
@@ -353,10 +353,12 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     APIData apiData = new APIData();
                     apiData.setName(api.getName());
                     apiData.setContext(api.getContext());
-                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, api.getName()))) {
+                    if (cAppArtifactDataService
+                            .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, api.getName()))) {
                         apiData.setDeployedFromCApp(true);
                     }
-                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, api.getName()))) {
+                    if (cAppArtifactDataService
+                            .isArtifactEdited(getTenantId(), getArtifactName(artifactType, api.getName()))) {
                         apiData.setEdited(true);
                     }
 

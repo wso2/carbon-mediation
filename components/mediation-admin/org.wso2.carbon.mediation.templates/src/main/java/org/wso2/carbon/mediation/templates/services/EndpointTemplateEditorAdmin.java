@@ -113,10 +113,12 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                 for (EndpointTemplateInfo infoTemp : info) {
                     EndpointTemplateInfo templateInfo = new EndpointTemplateInfo();
                     templateInfo = infoTemp;
-                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, infoTemp.getTemplateName()))) {
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(),
+                            getArtifactName(artifactType, infoTemp.getTemplateName()))) {
                         templateInfo.setDeployedFromCApp(true);
                     }
-                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, infoTemp.getTemplateName()))) {
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(),
+                            getArtifactName(artifactType, infoTemp.getTemplateName()))) {
                         templateInfo.setEdited(true);
                     }
                     endpointTemplateInfos[position++] = templateInfo;
@@ -286,7 +288,8 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                     if (templ != null) {
 //                        templ.init(getSynapseEnvironment());
                         String artifactName = getArtifactName(artifactType, templateName);
-                        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
+                        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance()
+                                .getcAppArtifactDataService();
                         if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
                             cAppArtifactDataService.setEdited(getTenantId(), artifactName);
                         } else {

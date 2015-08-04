@@ -97,8 +97,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
         List<Artifact.Dependency> artifacts = carbonApp.getAppConfig().getApplicationArtifact()
                 .getDependencies();
 
-        CAppArtifactDataService cAppArtifactDataService = DataHolder.getInstance().
-                getcAppArtifactDataService();
+        CAppArtifactDataService cAppArtifactDataService = DataHolder.getInstance().getcAppArtifactDataService();
         deployClassMediators(artifacts, axisConfig);
         int tenantId = Integer.parseInt(AppDeployerUtils.getTenantIdString(axisConfig));
         CAppArtifactsMap cAppArtifacts = new CAppArtifactsMap();
@@ -109,8 +108,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             // Create CAppArtifactData to hold artifact details deployed with this CApp
             CAppArtifactData cAppArtifactData = new CAppArtifactData(artifact.getName(), artifact.getType(), true);
             // Put Artifact details to CApp Artifact Map
-            cAppArtifacts.setcAppArtifactDataMap(artifact.getType() + File.separator
-                    + artifact.getName(), cAppArtifactData);
+            cAppArtifacts
+                    .addCAppArtifactData(artifact.getType() + File.separator + artifact.getName(), cAppArtifactData);
             if (!validateArtifact(artifact)) {
                 continue;
             }
@@ -163,9 +162,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
         List<Artifact.Dependency> artifacts = carbonApplication.getAppConfig()
                 .getApplicationArtifact().getDependencies();
         int tenantId = Integer.parseInt(AppDeployerUtils.getTenantIdString(axisConfig));
-
-        CAppArtifactDataService cAppArtifactDataService = DataHolder.getInstance().
-                getcAppArtifactDataService();
+        CAppArtifactDataService cAppArtifactDataService = DataHolder.getInstance().getcAppArtifactDataService();
 
         for (Artifact.Dependency dep : artifacts) {
 
@@ -229,8 +226,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                         log.warn("Couldn't delete App artifact file : " + artifactPath);
                     }
                     // Remove Artifact details from CAppArtifactData
-                    cAppArtifactDataService.removeCappArtifactData(tenantId,artifact.getType()
-                            + File.separator + artifact.getName());
+                    cAppArtifactDataService
+                            .removeCappArtifactData(tenantId, artifact.getType() + File.separator + artifact.getName());
                 } catch (Exception e) {
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
                     log.error("Error occured while trying to un deploy : "+ artifactName);

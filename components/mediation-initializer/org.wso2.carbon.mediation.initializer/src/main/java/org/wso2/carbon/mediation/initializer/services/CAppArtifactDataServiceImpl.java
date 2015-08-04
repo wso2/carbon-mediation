@@ -24,34 +24,28 @@ import org.wso2.carbon.mediation.initializer.utils.CAppArtifactsMap;
 
 public class CAppArtifactDataServiceImpl implements CAppArtifactDataService {
 
-    @Override
-    public boolean isArtifactDeployedFromCApp(int tenantId, String name) {
+    @Override public boolean isArtifactDeployedFromCApp(int tenantId, String name) {
         return CAppDataHolder.getInstance().isDeployedFromCApp(tenantId, name);
     }
 
-    @Override
-    public boolean isArtifactEdited(int tenantId, String name) {
+    @Override public boolean isArtifactEdited(int tenantId, String name) {
         return CAppDataHolder.getInstance().isCAppArtifactEdited(tenantId, name);
     }
 
-    @Override
-    public void setEdited(int tenantId, String name) {
+    @Override public void setEdited(int tenantId, String name) {
         CAppDataHolder.getInstance().setEdited(tenantId, name);
     }
 
-    @Override
-    public CAppArtifactWrapper removeCAppArtifactsBeforePersist(int tenantId, SynapseConfiguration synapseConfiguration) {
+    @Override public CAppArtifactWrapper removeCAppArtifactsBeforePersist(int tenantId,
+            SynapseConfiguration synapseConfiguration) {
         return CAppDataHolder.getInstance().removeCAppArtifactsBeforePersist(tenantId, synapseConfiguration);
     }
 
-    @Override
-    public void addCAppArtifactData(int tenantId, CAppArtifactsMap cAppArtifactsMap) {
+    @Override public void addCAppArtifactData(int tenantId, CAppArtifactsMap cAppArtifactsMap) {
         CAppDataHolder.getInstance().addCAppArtifactData(tenantId, cAppArtifactsMap);
     }
 
-
-    @Override
-    public void removeCappArtifactData(int tenantId, String name) {
+    @Override public void removeCappArtifactData(int tenantId, String name) {
         CAppDataHolder.getInstance().removeCappArtifactData(tenantId, name);
     }
 
