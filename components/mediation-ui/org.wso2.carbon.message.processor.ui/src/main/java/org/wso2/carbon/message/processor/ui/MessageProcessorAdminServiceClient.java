@@ -17,6 +17,9 @@
 */
 package org.wso2.carbon.message.processor.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -25,9 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.message.processor.stub.MessageProcessorAdminServiceStub;
 import org.wso2.carbon.message.processor.ui.utils.MessageProcessorData;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MessageProcessorAdminServiceClient {
 
@@ -359,6 +359,23 @@ public class MessageProcessorAdminServiceClient {
         }
 
         return size;
+    }
+    
+    /**
+     * Checks whether given Axis2ClientRepo is valid one or not
+     * @param axis2ClientRepo input location of the Axis2 Client Repository given by the end user.
+     * @return <code>true</code> if the given axis client repository valid, <code>false</code> otherwise.
+     * @throws Exception If any error is encountered during the validation process.
+     */
+    public boolean validateAxis2ClientRepo(String axis2ClientRepo) throws Exception {
+        try {
+            if (axis2ClientRepo != null) {
+                return stub.validateAxis2ClientRepo(axis2ClientRepo);
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return true;
     }
 
     private void handleException(Exception e) throws Exception {
