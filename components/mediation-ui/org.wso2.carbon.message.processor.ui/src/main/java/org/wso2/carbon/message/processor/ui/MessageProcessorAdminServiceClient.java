@@ -17,9 +17,6 @@
 */
 package org.wso2.carbon.message.processor.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
@@ -28,6 +25,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.message.processor.stub.MessageProcessorAdminServiceStub;
 import org.wso2.carbon.message.processor.ui.utils.MessageProcessorData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MessageProcessorAdminServiceClient {
 
