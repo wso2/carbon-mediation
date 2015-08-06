@@ -87,7 +87,7 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
         CARBON.showWarningDialog(msg4);
         return false;
     }
-    if (isNaN(document.getElementById('interval').value)) {
+    if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
         CARBON.showWarningDialog(msg3);
         return false;
     }
