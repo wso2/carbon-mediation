@@ -27,10 +27,10 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.CustomLogSetter;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
