@@ -18,6 +18,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.https;
 
 
 import org.apache.log4j.Logger;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
@@ -61,7 +62,8 @@ public class InboundHttpsListener extends InboundHttpListener {
         if (isPortUsedByAnotherApplication(port)) {
             log.warn("Port " + port + "used by inbound endpoint " + name + " is already used by another application " +
                      "hence undeploying inbound endpoint");
-            this.destroy();
+            throw new SynapseException("Port " + port + " used by inbound endpoint " + name + " is already used by " +
+                                       "another application.");
         } else {
             HTTPEndpointManager.getInstance().startSSLEndpoint(port, name, sslConfiguration, processorParams);
         }
