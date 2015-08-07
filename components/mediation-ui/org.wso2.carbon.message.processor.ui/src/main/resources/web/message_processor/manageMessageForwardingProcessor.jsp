@@ -142,6 +142,9 @@
     }
 
     function addServiceParams() {
+    	// When an invalid value is given, then the user is redirected to the same page. Then if the user deletes that value, the empty value
+    	// is appended to the previous value leading to errors. This is used to solve that. The append takes place inside the addServiceParameter function.
+    	document.getElementById("tableParams").value = "";
         addServiceParameter("interval", document.getElementById('retry_interval').value);
         addServiceParameter("client.retry.interval", document.getElementById('client_retry_interval').value);
         addServiceParameter("max.delivery.attempts", document.getElementById('max_delivery_attempts').value);
