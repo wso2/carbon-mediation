@@ -561,7 +561,8 @@
                         <td>
                             <select id="bind_processor_server" name="bind_processor_server">
                             <% if (null!=processorData && processorData.getParams() != null) {
-                                if (!processorData.getParams().isEmpty()&&(processorData.getParams().get("bind.processor.server")!=null)
+                                if (!processorData.getParams().isEmpty()
+                                    && (processorData.getParams().get("bind.processor.server")!=null)
                                     && Boolean.valueOf(processorData.getParams().get("bind.processor.server"))) { %>
                             <option value="false">false</option>
                             <option value="true" selected>true</option>
