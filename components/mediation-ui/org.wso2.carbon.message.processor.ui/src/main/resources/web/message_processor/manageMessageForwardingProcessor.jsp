@@ -567,12 +567,12 @@
                             <option value="false">false</option>
                             <option value="true" selected>true</option>
                             <% } else { %>
-                            <option value="false" selected>false</option>
-                            <option value="true">true</option>
+                                <option value="false" selected>false</option>
+                                <option value="true">true</option>
                             <% } %>
                             <% } else { %>
-                            <option value="false">false</option>
-                            <option value="true" selected>true</option>
+                                <option value="false">false</option>
+                                <option value="true" selected>true</option>
                             <% } %>
                             </select>
                         </td>
