@@ -40,7 +40,7 @@ public abstract class OneTimeTriggerAbstractCallback {
     private static final Log log = LogFactory.getLog(OneTimeTriggerAbstractCallback.class);
 
     protected void handleReconnection() throws InterruptedException {
-        if(log.isDebugEnabled()){
+        if (log.isDebugEnabled()) {
             log.debug("Started handling reconnection due to connection lost callback");
         }
         if (!isInboundRunnerMode) {
@@ -88,8 +88,8 @@ public abstract class OneTimeTriggerAbstractCallback {
                 ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
                 //this is a blocking call
                 TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
-                if(log.isDebugEnabled()){
-                    log.debug("Manually loaded tenant: "+tenantDomain);
+                if (log.isDebugEnabled()) {
+                    log.debug("Manually loaded tenant: " + tenantDomain);
                 }
             }
         }

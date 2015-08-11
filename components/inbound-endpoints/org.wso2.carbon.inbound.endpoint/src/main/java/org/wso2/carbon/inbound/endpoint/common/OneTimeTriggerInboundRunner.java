@@ -23,7 +23,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 
 /**
  * OnetimeTriggerInboundRunner class is used to run the non coordinated processors in
- * background. This Runner is only active for one task execution iteration ( One time trigger ) 
+ * background. This Runner is only active for one task execution iteration ( One time trigger )
  */
 public class OneTimeTriggerInboundRunner implements Runnable {
 
