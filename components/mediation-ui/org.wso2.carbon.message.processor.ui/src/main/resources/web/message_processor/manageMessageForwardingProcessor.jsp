@@ -160,7 +160,6 @@
         addServiceParameter("non.retry.status.codes", document.getElementById('non_retry_status_codes').value);
         addServiceParameter("max.delivery.drop",document.getElementById('max_delivery_drop').value);
         addServiceParameter("member.count", document.getElementById('member_count').value);
-        addServiceParameter("bind.processor.server", document.getElementById('bind_processor_server').value);
     }
 
     function addServiceParameter(parameter, value) {
@@ -546,27 +545,6 @@
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
                                         && !processorData.getParams().isEmpty()&&(processorData.getParams().get("member.count")!=null))?processorData.getParams().get("member.count"):"1"%>"
                                 />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="bind.processor.server"/></td>
-                        <td>
-                            <select id="bind_processor_server" name="bind_processor_server">
-                            <% if (null!=processorData && processorData.getParams() != null) {
-                                if (!processorData.getParams().isEmpty()
-                                    && (processorData.getParams().get("bind.processor.server")!=null)
-                                    && Boolean.valueOf(processorData.getParams().get("bind.processor.server"))) { %>
-                            <option value="false">false</option>
-                            <option value="true" selected>true</option>
-                            <% } else { %>
-                                <option value="false" selected>false</option>
-                                <option value="true">true</option>
-                            <% } %>
-                            <% } else { %>
-                                <option value="false">false</option>
-                                <option value="true" selected>true</option>
-                            <% } %>
-                            </select>
                         </td>
                     </tr>
                     </tbody>
