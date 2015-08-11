@@ -77,9 +77,12 @@ public class MqttInjectHandler {
 
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
-            msgCtx.setProperty("inbound.endpoint.name", name);
-            InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
-            CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
+            if (name != null) {
+                msgCtx.setProperty("inbound.endpoint.name", name);
+                InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
+                CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
+            }
+
             String message = mqttMessage.toString();
 
             if (log.isDebugEnabled()) {
