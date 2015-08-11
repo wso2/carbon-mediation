@@ -189,7 +189,19 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                 entryKey = entryKey.trim();
                 log.debug("Adding local entry with key : " + entryKey);
 
+                // Fix for ESBJAVA-2641
+                boolean cont = true;
                 if (getSynapseConfiguration().getLocalRegistry().containsKey(entryKey)) {
+                    Entry e = (Entry) getSynapseConfiguration().getLocalRegistry().get(entryKey);
+                    if (e.getValue() == null) {
+                        getSynapseConfiguration().getLocalRegistry().remove(entryKey);
+                    } else {
+                        cont = false;
+                    }
+                }
+                // End Fix for ESBJAVA-2641
+
+                if (!cont) {
                     handleFault(log, "An Entry with key " + entryKey +
                             " is already used within the configuration");
                 } else {

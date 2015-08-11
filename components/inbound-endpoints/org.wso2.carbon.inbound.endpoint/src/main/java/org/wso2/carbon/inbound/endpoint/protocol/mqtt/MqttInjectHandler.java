@@ -13,6 +13,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
 import org.apache.axiom.om.OMElement;
@@ -57,7 +58,8 @@ public class MqttInjectHandler {
      * @param synapseEnvironment
      */
     public MqttInjectHandler(String injectingSeq, String onErrorSeq,
-                             boolean sequential, SynapseEnvironment synapseEnvironment, String contentType) {
+                             boolean sequential, SynapseEnvironment synapseEnvironment,
+                             String contentType) {
         this.injectingSeq = injectingSeq;
         this.onErrorSeq = onErrorSeq;
         this.sequential = sequential;
@@ -84,8 +86,9 @@ public class MqttInjectHandler {
                 log.debug("Processed MQTT Message of Content-type : "
                         + contentType);
             }
-            MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
-                    .getAxis2MessageContext();
+            MessageContext axis2MsgCtx =
+                    ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
+                            .getAxis2MessageContext();
             // Determine the message builder to use
 
             Builder builder = null;

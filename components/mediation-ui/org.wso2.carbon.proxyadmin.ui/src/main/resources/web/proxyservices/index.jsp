@@ -38,6 +38,7 @@
 <jsp:include page="../resources/resources-i18n-ajaxprocessor.jsp"/>
 
 <script type="text/javascript" src="../admin/js/main.js"></script>
+<script type="text/javascript" src="inc/utils.js"></script>
 <script type="text/javascript" src="../yui/build/yahoo-dom-event/yahoo-dom-event.js"></script>
 <script type="text/javascript" src="../yui/build/container/container_core-min.js"></script>
 <script type="text/javascript" src="../resources/js/resource_util.js"></script>
@@ -304,6 +305,7 @@
     }
 
 	givenParams = givenParams.replaceAll("\\\\", "\\\\\\\\");
+	givenParams = givenParams.replaceAll("'","\\\\'");
 	
     // sets pinned servers
     String pinnedServers = "";
@@ -410,6 +412,7 @@
             givenWsdlResources += "::" + resources[i].getKey() + "," + resources[i].getValue();
         }
         givenWsdlResources = givenWsdlResources.replaceAll("\\\\", "\\\\\\\\" );
+        givenWsdlResources = givenWsdlResources.replaceAll("'","\\\\'");
     }
 
     String saveOrModify = "add";
@@ -1132,7 +1135,7 @@
                 </td>
                 <td align="left">
                     <% if (!nameDisabled) { %>
-                    <input id="psName" name="psName" type="text" value="<%=name%>" onchange="changePSN()"  onkeypress="return validateText(event)"/>
+                    <input id="psName" name="psName" type="text" value="<%=name%>" onchange="changePSN()"  onkeypress="return validateProxyNameText(event)"/>
                     <% } else { %>
                         <strong><%=name%></strong>
                     <% } %>

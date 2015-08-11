@@ -156,15 +156,19 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                     }
                     SynapseXMLConfigurationFactory.defineEndpoint(
                             config, endpointElement, config.getProperties());
+
                     Endpoint endpoint = config.getEndpoint(endpointName);
-                    if (endpoint != null) {
-                        if (endpoint instanceof AbstractEndpoint) {
-                            endpoint.setFileName(
-                                    ServiceBusUtils.generateFileName(endpoint.getName()));
-                        }
-                        endpoint.init(getSynapseEnvironment());
-                        persistEndpoint(endpoint);
+                    if (endpoint == null) {
+                        handleFault("Unable to create endpoint", null);
                     }
+
+                    if (endpoint instanceof AbstractEndpoint) {
+                        endpoint.setFileName(
+                                ServiceBusUtils.generateFileName(endpoint.getName()));
+                    }
+                    endpoint.init(getSynapseEnvironment());
+                    persistEndpoint(endpoint);
+
                 }
                 if (log.isDebugEnabled()) {
                     log.debug("Added endpoint : " + endpointName + " to the configuration");

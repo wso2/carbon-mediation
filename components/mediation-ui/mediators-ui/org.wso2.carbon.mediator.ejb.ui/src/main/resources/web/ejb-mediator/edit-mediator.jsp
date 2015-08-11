@@ -84,7 +84,7 @@
 	 int m = 0;
 	 for(Value argumentVal : ejbMediator.getArguments()){
 		 if(argumentVal.getExpression() != null){
-	 SynapseXPath xpathExpr = argumentVal.getExpression();
+	 SynapseXPath xpathExpr = (SynapseXPath) argumentVal.getExpression();
 	 nameSpacesRegistrar.registerNameSpaces(xpathExpr,"argumentValue"+m,session);
 	   }
 		 m++;
@@ -243,7 +243,7 @@
 																		    for (Value arg : argumentList) {
 											                                if (arg != null) {
 											                                	String value = arg.getKeyValue();
-											                                	SynapseXPath expression = arg.getExpression();
+											                                	SynapseXPath expression = (SynapseXPath) arg.getExpression();
 										%>
 										<tr id="argumentRaw<%=l%>">
 											<td><select class="esb-edit small_textbox" name="propertyTypeSelection<%=l%>" id="propertyTypeSelection<%=l%>" onchange="onPropertyTypeSelectionChange('<%=l%>','<fmt:message key="mediator.ejb.namespace"/>')">

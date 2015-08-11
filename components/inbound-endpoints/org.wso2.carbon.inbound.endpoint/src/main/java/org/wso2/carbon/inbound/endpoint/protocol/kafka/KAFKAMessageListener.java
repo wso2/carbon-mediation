@@ -59,13 +59,11 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
             logger.error(" Error in Creating Kafka Consumer Connector | ZkTimeout"
                     + toe.getMessage());
             throw new SynapseException(
-                    " Error in Creating Kafka Consumer Connector| ZkTimeout",
-                    toe);
+                    " Error in Creating Kafka Consumer Connector| ZkTimeout");
 
         } catch (Exception e) {
-            logger.error(" Error in Creating Kafka Consumer Connector "
-
-                    + e.getMessage());
+            logger.error(" Error in Creating Kafka Consumer Connector."
+                    + e.getMessage(),e);
             throw new SynapseException(" Error in Creating Kafka Consumer Connector ",
                     e);
         }
@@ -79,7 +77,7 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
 
         logger.debug("Start to consume the streams");
         try {
-            logger.info("Starting KAFKA consumer listener...");
+            logger.info("Starting KAFKA consumer...");
             Map<String, Integer> topicCount = new HashMap<String, Integer>();
 
             if (topics != null && topics.size() > 0) {
@@ -125,10 +123,10 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
             }
 
         } catch (Exception e) {
-            logger.error("Error while Starting KAFKA consumer listener "
-                    + e.getMessage());
+            logger.error("Error while Starting KAFKA consumer."
+                    + e.getMessage(),e);
             throw new SynapseException(
-                    "Error while Starting KAFKA consumer listener ", e);
+                    "Error while Starting KAFKA consumer.", e);
         }
     }
 

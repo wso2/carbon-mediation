@@ -50,7 +50,7 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
             try {
                 this.interval = Long.parseLong(inboundEndpointInterval);
             } catch (NumberFormatException nfe) {
-                log.error("Invalid numeric value for interval.");
+                log.error("Invalid numeric value for interval." + nfe.getMessage(),nfe);
                 throw new SynapseException("Invalid numeric value for interval.", nfe);
             }
         }
@@ -60,7 +60,7 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
             try {
                 this.sequential = Boolean.parseBoolean(inboundEndpointSequential);
             } catch (Exception e) {
-                log.error("The sequential value should be true or false");
+                log.error("The sequential value should be true or false." + e.getMessage(),e);
                 throw new SynapseException("The sequential value should be true or false", e);
             }
         }
@@ -70,7 +70,7 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
             try {
                 this.coordination = Boolean.parseBoolean(inboundCoordination);
             } catch (Exception e) {
-                log.error("The Coordination value should be true or false");
+                log.error("The Coordination value should be true or false." + e.getMessage(),e);
                 throw new SynapseException("The Coordination value should be true or false", e);
             }
         }
@@ -87,14 +87,14 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
         try {
             pollingConsumer = new KAFKAPollingConsumer(kafkaProperties, interval, name);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(),e);
             return;
         }
         pollingConsumer.registerHandler(new KAFKAInjectHandler(injectingSeq, onErrorSeq, sequential, synapseEnvironment, kafkaProperties.getProperty(KAFKAConstants.CONTENT_TYPE)));
         try {
             pollingConsumer.startsMessageListener();
         } catch (Exception e) {
-            log.error("Error initializing message listener");
+            log.error("Error initializing message listener " + e.getMessage(),e);
             throw new SynapseException("Error initializing message listener", e);
         }
         start();
@@ -122,8 +122,8 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
 
     @Override
     public void destroy() {
-       log.info("Inbound endpoint " + name + " stopping.");
-       try {
+        log.info("Inbound endpoint " + name + " stopping.");
+        try {
             if (pollingConsumer.messageListener!=null) {
                 pollingConsumer.messageListener.consumerConnector.shutdown();
                 log.info("Shutdown the kafka consumer connector");
@@ -133,7 +133,7 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
                 log.info("Destroyed the startUpController");
             }
         }catch (Exception e) {
-            log.error("Error while shutdown the consumer connector or destroy the startup controller");
+            log.error("Error while shutdown the consumer connector or destroy the startup controller" + e.getMessage(),e);
         }
     }
 }

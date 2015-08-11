@@ -39,6 +39,12 @@
                 return false;
             }
 
+            if (!(/^[\w&.-]+$/).test((form.Name).value)) {
+                CARBON.showWarningDialog('<fmt:message key="name.field.value.invalid"/>')
+                form.Name.focus();
+                return false;
+            }
+
             if (IsEmpty(form.Value)) {
                 CARBON.showWarningDialog('<fmt:message key="value.field.cannot.be.empty"/>')
                 form.Value.focus();

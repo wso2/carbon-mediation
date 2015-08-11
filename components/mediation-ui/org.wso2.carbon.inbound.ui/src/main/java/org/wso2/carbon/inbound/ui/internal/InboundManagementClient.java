@@ -183,7 +183,12 @@ public class InboundManagementClient {
                     String tmpString = strKey + "." + i;
                     String strVal = prop.getProperty(tmpString);
                     if (strVal != null) {
-                        rtnList.add(strVal);
+                        if ((strProtocol.equals(InboundClientConstants.TYPE_KAFKA) &&
+                                ((mandatory && !strVal.contains("highlevel.") &&
+                                        !strVal.contains("simple.")) || !mandatory)) ||
+                                !strProtocol.equals(InboundClientConstants.TYPE_KAFKA)) {
+                            rtnList.add(strVal);
+                        }
                     }
                 }
             }
@@ -233,7 +238,8 @@ public class InboundManagementClient {
                     }
 
                     if (!addMode && inboundEndpointDTO.getName().equals(name)
-                            && inboundEndpointDTO.getProtocol().equals(protocol)) { // an update on existing
+                            && inboundEndpointDTO.getProtocol() != null 
+                                    && inboundEndpointDTO.getProtocol().equals(protocol)) { // an update on existing
                         return true;
                     }
 
@@ -257,7 +263,7 @@ public class InboundManagementClient {
 
             return true;
         } catch (Exception e) {
-            log.error(e);
+            log.error("Error occured while validating the inbound endpoint.", e);
             return false;
         }
     }
@@ -360,5 +366,44 @@ public class InboundManagementClient {
             log.error(e);
         }
         return inboundNameList;
+    }
+
+    public String getKAFKASpecialParameters() {
+        String specialParamsList = "";
+        loadProperties();
+        if (prop != null) {
+            String strKey = "kafka.mandatory";
+            String strLength = prop.getProperty(strKey);
+            Integer iLength = null;
+            if (strLength != null) {
+                try {
+                    iLength = Integer.parseInt(strLength);
+                } catch (Exception e) {
+                    iLength = null;
+                }
+            }
+            if (iLength != null) {
+                for (int i = 1; i <= iLength; i++) {
+                    String tmpString = strKey + "." + i;
+                    String strVal = prop.getProperty(tmpString);
+                    if (strVal.contains("highlevel.") || strVal.contains("simple.")) {
+                        if(specialParamsList.equals("")){
+                            if (strVal.contains("highlevel.")){
+                                specialParamsList = strVal.replace("highlevel.", "");
+                            } else {
+                                specialParamsList = strVal;
+                            }
+                        } else {
+                            if (strVal.contains("highlevel.")){
+                                specialParamsList = strVal.replace("highlevel.", "");
+                            } else {
+                                specialParamsList = specialParamsList + "," + strVal;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return specialParamsList;
     }
 }

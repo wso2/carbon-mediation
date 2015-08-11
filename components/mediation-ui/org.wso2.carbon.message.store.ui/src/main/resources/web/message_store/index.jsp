@@ -71,7 +71,7 @@
         var table = document.getElementById("myTable");
         var row = table.rows[i];
         var cell = row.cells[0];
-        var content = cell.firstChild.innerHTML;
+        var content = cell.firstElementChild.innerHTML;
 
         function delEp() {
             document.location.href = "deleteMessageStoresHandler.jsp?" + "messageStoreName=" + content;
@@ -97,7 +97,7 @@
         var row = table.rows[i];
         var cell = row.cells[0];
         var type = row.cells[1];
-        var content = cell.firstChild.innerHTML;
+        var content = cell.firstElementChild.innerHTML;
         if (storeType == "org.apache.synapse.message.store.impl.jms.JmsStore") {
             document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + content;
         } else if (storeType == "org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore") {
@@ -225,8 +225,13 @@
                     %>
 
                     <tr>
-                        <td><a href="viewMessageStore.jsp?messageStoreName=<%=name%>"><%=name%>
-                        </a>
+                        <td> <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore") && !type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
+                            <a href="viewMessageStore.jsp?messageStoreName=<%=name%>"><%=name%>
+                            </a>
+                        <%} else {%>
+                            <a><%=name%>
+                            </a>
+                        <%}%>
                         </td>
                         <td><%= type%>
                         </td>

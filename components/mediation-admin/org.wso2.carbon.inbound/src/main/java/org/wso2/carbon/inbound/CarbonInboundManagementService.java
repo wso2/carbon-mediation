@@ -149,7 +149,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         StAXOMBuilder builder = new StAXOMBuilder(reader);
         OMElement omElement = builder.getDocumentElement();
         SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-        SynapseXMLConfigurationFactory.defineInboundEndpoint(synapseConfiguration, omElement,  synapseConfiguration.getProperties());
+        SynapseXMLConfigurationFactory.defineInboundEndpoint(synapseConfiguration, omElement, synapseConfiguration.getProperties());
         String name = omElement.getAttributeValue(new QName("name"));
         InboundEndpoint inboundEndpoint = null;
         try {
@@ -213,7 +213,16 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         SynapseXMLConfigurationFactory.defineInboundEndpoint(synapseConfiguration, elem, synapseConfiguration.getProperties());
         InboundEndpoint inboundEndpoint = getInboundEndpoint(name);
         persistInboundEndpoint(inboundEndpoint);
-        inboundEndpoint.init(getSynapseEnvironment());
+        try {
+            inboundEndpoint.init(getSynapseEnvironment());
+        } catch (Exception e) {
+            inboundEndpoint.destroy();
+            synapseConfiguration.removeInboundEndpoint(name);
+            synapseConfiguration.addInboundEndpoint(oldInboundEndpoint.getName(), oldInboundEndpoint);
+            persistInboundEndpoint(oldInboundEndpoint);
+            oldInboundEndpoint.init(getSynapseEnvironment());
+            throw e;
+        }
     }
 
     /**

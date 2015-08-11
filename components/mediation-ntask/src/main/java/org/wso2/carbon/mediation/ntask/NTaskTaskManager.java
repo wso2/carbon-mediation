@@ -338,11 +338,13 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 } else {
                     logger.debug("#init Obtained Carbon task manager " + managerId());
                 }
+
+                initialized = true;
                 if (isStandaloneNode || isWorkerNode) {
                     taskService.registerTaskType(Constants.TASK_TYPE_ESB);
                     updateAndCleanupObservers();
                 }
-                initialized = true;
+
                 logger.info("Initialized task manager" + (!(isStandaloneNode || isWorkerNode) ? " on manager node. " : ". ") + "Tenant [" + getCurrentTenantId() + "]");
                 logger.debug("#init Initialized task manager : " + managerId());
                 logger.debug("#init Scheduling existing tasks if any. : " + managerId());

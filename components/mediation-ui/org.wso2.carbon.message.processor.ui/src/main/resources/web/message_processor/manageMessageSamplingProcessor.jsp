@@ -131,7 +131,6 @@
         addServiceParameter("sequence", document.getElementById('Sequence').value);
         addServiceParameter("quartz.conf", document.getElementById('quartz_conf').value);
         addServiceParameter("cronExpression", document.getElementById('cron_expression').value);
-        addServiceParameter("pinnedServers", document.getElementById('pinnedServers').value);
         addServiceParameter("is.active", document.getElementById('mp_state').value);
     }
 
@@ -412,14 +411,6 @@
                         <td><input type="text" id="cron_expression" name="cron_expression"
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
                                         && !processorData.getParams().isEmpty()&&(processorData.getParams().get("cronExpression")!=null))?processorData.getParams().get("cronExpression"):""%>"
-                                   size="75"/>
-                        </td>
-                    </tr>
-                     <tr>
-                        <td><fmt:message key="message.pinned.severs"/></td>
-                        <td><input type="text" id="pinnedServers" name="pinnedServers"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("pinnedServers")!=null))?processorData.getParams().get("pinnedServers"):""%>"
                                    size="75"/>
                         </td>
                     </tr>

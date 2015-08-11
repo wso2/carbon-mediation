@@ -86,8 +86,12 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     if (classRequired && document.getElementById('inboundClass').value == '') {
         CARBON.showWarningDialog(msg4);
         return false;
-    }    
-    
+    }
+    if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
+        CARBON.showWarningDialog(msg3);
+        return false;
+    }
+
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
     	    if (document.getElementById(requiredParams[i]).value.trim() == '') {
@@ -113,7 +117,11 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
     if (classRequired && document.getElementById('inboundClass').value == '') {
         CARBON.showWarningDialog(msg4);
         return false;
-    }    	
+    }
+    if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
+        CARBON.showWarningDialog(msg3);
+        return false;
+    }
     
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
@@ -238,14 +246,14 @@ function addRow(tableID) {
 function deleteRow(tableID) {
 	if(iParamCount > 0){
 	    try {
-	    	    if(iParamMax < iParamCount){
+	    	    if(iParamMax < 0 || iParamMax < iParamCount){
 		    		var table = document.getElementById(tableID);
 		    		var rowCount = table.rows.length;
 		    		table.deleteRow((rowCount-2));
 		    		iParamCount--;	    	    	
 	    	    }
 	        }catch(e) {
-	            alert(e);
+	            //alert(e);
 	        }
 	}
 }
@@ -261,5 +269,28 @@ function showAdvancedOptions(id) {
         document.getElementById(id + '_adv').innerHTML = '<a class="icon-link" ' +
                                                          'onclick="javascript:showAdvancedOptions(\'' + id + '\');" style="background-image: url(images/down.gif);">' + taskjsi18n['show.advanced.options'] + '</a>';
     }
+}
+
+function showSpecialFields(specialParams, inboundDescriptionOfParams) {
+    var consumerType = document.getElementById('consumer.type').value;
+    var specialFieldsArea = '<table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">';
+        allSpecialParams = specialParams.split(",");
+        splitedInboundDescription = inboundDescriptionOfParams.replace("{","").replace("}","").split(",");
+        for(var i=0; i<allSpecialParams.length; i++){
+            if((consumerType == "highlevel" && allSpecialParams[i] == "topics") || (consumerType == "simple" && consumerType == allSpecialParams[i].split(".")[0])){
+            var val = "";
+            if(inboundDescriptionOfParams != ""){
+                for(var j=0; j<splitedInboundDescription.length; j++){
+                    if(splitedInboundDescription[j].split("=")[0].trim() == allSpecialParams[i]){
+                        val = splitedInboundDescription[j].split("=")[1];
+                        break;
+                    }
+                }
+            }
+                specialFieldsArea = specialFieldsArea  + '<tr><td style="width:167px">'+allSpecialParams[i].replace(consumerType+".","")+'<span class="required">*</span></td><td align="left"><input id="'+allSpecialParams[i]+'" name="'+allSpecialParams[i]+'" class="longInput" type="text" value="'+val+'"/></td><td></td></tr>';
+            }
+        }
+   specialFieldsArea = specialFieldsArea  + '</table>';
+   document.getElementById('specialFieldsForm').innerHTML = specialFieldsArea;
 }
 

@@ -32,6 +32,7 @@ public class SynapseAppDeployerConstants {
     public static final String API_TYPE = "synapse/api";
     public static final String TEMPLATE_TYPE = "synapse/template";
     public static final String INBOUND_ENDPOINT_TYPE = "synapse/inbound-endpoint";
+    public static final String SYNAPSE_LIBRARY_TYPE = "synapse/lib";
 
     // Deployment folders for synapse artifacts
     public static final String SEQUENCES_FOLDER = "sequences";
@@ -49,6 +50,7 @@ public class SynapseAppDeployerConstants {
 
     // Synapse config path
     public static final String SYNAPSE_CONFIGS = "synapse-configs";
+    public static final String SYNAPSE_LIBS = "synapse-libs";
     public static final String DEFAULT_DIR = "default";
 
     public static final String MAIN_SEQ_FILE = "main.xml";

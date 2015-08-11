@@ -199,7 +199,7 @@
                         <table>
                             <tr>
                                 <td style="width:130px;"><fmt:message key="proxy.service.name"/><span class="required">*</span></td>
-                                <td><input id="proxy_name" class="required" minlength="2" type="text" name="proxyName" size="40" onkeypress="return validateText(event)"/></td>
+                                <td><input id="proxy_name" class="required" minlength="2" type="text" name="proxyName" size="40" onkeypress="return validateProxyNameText(event)"/></td>
                             </tr>
                             <jsp:include page="inc/endpoint_select.jsp"/>
                             <tr>

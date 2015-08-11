@@ -118,14 +118,15 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
     private void validateParameters(InboundProcessorParams params, Map<String, Object> parameters) {
         if (!params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equalsIgnoreCase("true")
                 && !params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equalsIgnoreCase("false")) {
-            log.warn("Parameter inbound.hl7.AutoAck is not valid. Default value of true will be used.");
+            log.warn("Parameter inbound.hl7.AutoAck in HL7 inbound " + params.getName() + " is not valid. Default " +
+                    "value of true will be used.");
             params.getProperties().setProperty(MLLPConstants.PARAM_HL7_AUTO_ACK, "true");
         }
 
         try {
             Integer.valueOf(params.getProperties().getProperty(MLLPConstants.PARAM_HL7_TIMEOUT));
         } catch (NumberFormatException e) {
-            log.warn("Parameter inbound.hl7.TimeOut is not valid. Default timeout " +
+            log.warn("Parameter inbound.hl7.TimeOut in HL7 inbound " + params.getName() + " is not valid. Default timeout " +
                     "of " + MLLPConstants.DEFAULT_HL7_TIMEOUT + " milliseconds will be used.");
             params.getProperties().setProperty(MLLPConstants.PARAM_HL7_TIMEOUT,
                     String.valueOf(MLLPConstants.DEFAULT_HL7_TIMEOUT));
@@ -147,7 +148,7 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
                 parameters.put(MLLPConstants.HL7_PRE_PROC_PARSER_CLASS, preProcParser);
             }
         } catch (Exception e) {
-            log.error("Error creating message preprocessor: ", e);
+            log.error("Error creating message preprocessor for HL7 inbound " + params.getName() + ": ", e);
         }
 
         try {
@@ -161,7 +162,8 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
         } catch (UnsupportedCharsetException e) {
             parameters.put(MLLPConstants.HL7_CHARSET_DECODER, MLLPConstants.UTF8_CHARSET.newDecoder());
             log.error("Unsupported charset '" + params.getProperties()
-                    .getProperty(MLLPConstants.PARAM_HL7_CHARSET) + "' specified. Default UTF-8 will be used instead.");
+                    .getProperty(MLLPConstants.PARAM_HL7_CHARSET) + "' specified in HL7 inbound " + params.getName() +
+                    ". Default UTF-8 will be used instead.");
         }
 
         if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_VALIDATE) == null) {
