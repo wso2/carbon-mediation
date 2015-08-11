@@ -123,6 +123,11 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
         CXFEndpointManager.getInstance().registerCXFInboundEndpoint(port, this);
     }
 
+    @Override
+    public void close() {
+
+    }
+
     /**
      * Shuts down the CXF WS-RM Inbound Endpoint
      */

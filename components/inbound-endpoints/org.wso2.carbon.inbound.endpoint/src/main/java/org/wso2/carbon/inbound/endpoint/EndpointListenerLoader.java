@@ -16,12 +16,14 @@
 package org.wso2.carbon.inbound.endpoint;
 
 import org.apache.axis2.context.ConfigurationContext;
+import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.inboundfactory.InboundRequestProcessorFactoryImpl;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
 import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointManager;
+import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
@@ -76,6 +78,14 @@ public class EndpointListenerLoader {
             } else if (inboundEndpointInfoDTO.getProtocol().equals(
                     InboundRequestProcessorFactoryImpl.Protocols.cxf_ws_rm.toString())) {
                 CXFEndpointManager.getInstance().startCXFEndpoint(port, inboundEndpointInfoDTO);
+            } else {
+                // Check for custom-listening-InboundEndpoints
+                InboundProcessorParams inboundParams = inboundEndpointInfoDTO.getInboundParams();
+
+                if (GenericEndpointManager.isListeningInboundEndpoint(inboundParams)) {
+                    GenericEndpointManager.getInstance(inboundParams).
+                            startListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundParams);
+                }
             }
         }
         
