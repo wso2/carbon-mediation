@@ -47,14 +47,6 @@
             <artifactId>hapi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.apache.cxf</groupId>
-            <artifactId>cxf-bundle</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
-            <artifactId>jetty-bundle</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.aries.blueprint</groupId>
             <artifactId>org.apache.aries.blueprint</artifactId>
         </dependency>
@@ -99,8 +91,6 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.persistence</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.osgi</bundleDef>
                                 <bundleDef>ca.uhn.hapi.wso2:hapi</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.cxf:cxf-bundle</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.eclipse.jetty:jetty-bundle</bundleDef>
                                 <bundleDef>org.apache.aries.blueprint:org.apache.aries.blueprint</bundleDef>
                                 <bundleDef>org.apache.aries.proxy:org.apache.aries.proxy</bundleDef>
                                 <bundleDef>org.apache.aries:org.apache.aries.util</bundleDef>

@@ -21,7 +21,6 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
@@ -37,7 +36,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.mqtt.MqttListener;
  */
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
-    public static enum Protocols {jms, file, http , https, hl7, kafka, cxf_ws_rm, mqtt}
+    public static enum Protocols {jms, file, http , https, hl7, kafka, mqtt}
 
     /**
      * return underlying Request Processor Implementation according to protocol
@@ -62,8 +61,6 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
                 inboundRequestProcessor = new InboundHL7Listener(params);
             }else if(Protocols.kafka.toString().equals(protocol)){
                 inboundRequestProcessor = new KAFKAProcessor(params);
-            } else if (Protocols.cxf_ws_rm.toString().equals(protocol)) {
-                inboundRequestProcessor = CXFEndpointManager.getInstance().getCXFEndpoint(params);
             }else if (Protocols.mqtt.toString().equals(protocol)) {
                 inboundRequestProcessor = new MqttListener(params);
             }

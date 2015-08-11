@@ -68,7 +68,6 @@ public class InboundHttpListener implements InboundRequestProcessor {
         }
     }
 
-    @Override
     public void close() {
         destroy();
     }

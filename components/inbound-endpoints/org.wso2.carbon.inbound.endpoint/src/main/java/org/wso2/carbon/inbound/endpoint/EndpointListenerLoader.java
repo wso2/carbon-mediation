@@ -22,7 +22,6 @@ import org.wso2.carbon.inbound.endpoint.inboundfactory.InboundRequestProcessorFa
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
@@ -75,9 +74,6 @@ public class EndpointListenerLoader {
                 HL7EndpointManager.getInstance().
                         startListener(port, inboundEndpointInfoDTO.getEndpointName(),
                                 inboundEndpointInfoDTO.getInboundParams());
-            } else if (inboundEndpointInfoDTO.getProtocol().equals(
-                    InboundRequestProcessorFactoryImpl.Protocols.cxf_ws_rm.toString())) {
-                CXFEndpointManager.getInstance().startCXFEndpoint(port, inboundEndpointInfoDTO);
             } else {
                 // Check for custom-listening-InboundEndpoints
                 InboundProcessorParams inboundParams = inboundEndpointInfoDTO.getInboundParams();
