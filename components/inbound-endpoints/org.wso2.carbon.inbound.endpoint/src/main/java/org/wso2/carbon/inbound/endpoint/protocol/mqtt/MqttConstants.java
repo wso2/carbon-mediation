@@ -16,6 +16,9 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
+/**
+ * MQTT Constants
+ */
 public class MqttConstants {
     public static final String PARAM_MQTT_CONFAC = "mqtt.connection.factory";
     public static final String DEFAULT_CONFAC_NAME = "default";

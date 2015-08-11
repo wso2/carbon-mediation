@@ -17,8 +17,8 @@
 package org.wso2.carbon.inbound.endpoint.common;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.base.MultitenantConstants;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -27,18 +27,22 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Generic callback for one time trigger inbound endpoints
+ * Generic callback implementation for one time trigger inbound endpoints. In this case
+ * Message injection is happens in a separate thread ( Callback ) per message.
  */
-
 public abstract class OneTimeTriggerAbstractCallback {
 
     private volatile Semaphore callbackSuspensionSemaphore = new Semaphore(0);
     private AtomicBoolean isCallbackSuspended = new AtomicBoolean(false);
     private AtomicBoolean isShutdownFlagSet = new AtomicBoolean(false);
-    private PrivilegedCarbonContext carbonContext;
+    protected String tenantDomain;
     private boolean isInboundRunnerMode = false;
+    private static final Log log = LogFactory.getLog(OneTimeTriggerAbstractCallback.class);
 
     protected void handleReconnection() throws InterruptedException {
+        if(log.isDebugEnabled()){
+            log.debug("Started handling reconnection due to connection lost callback");
+        }
         if (!isInboundRunnerMode) {
             isCallbackSuspended.set(true);
             callbackSuspensionSemaphore.acquire();
@@ -70,28 +74,22 @@ public abstract class OneTimeTriggerAbstractCallback {
         return isCallbackSuspended.get();
     }
 
-    public void preserveCarbonContext(PrivilegedCarbonContext carbonContext){
-        //this is needed since we have to keep tenant loaded in later stage but at that point
-        //we have no access to the PrivilegedCarbonContext if callbacks happens in a different
-        //thread this is different to generic polling inbound endpoints
-        this.carbonContext = carbonContext;
+    public void setTenantDomain(String tenantDomain) {
+        this.tenantDomain = tenantDomain;
     }
 
-    public void loadTenantContext(){
-        //if carbon context is null tenant loading happen via task manager
-        if (carbonContext != null) {
-            int tenantId = carbonContext.getTenantId();
-            String tenantDomain = null;
-            if (tenantId != MultitenantConstants.SUPER_TENANT_ID) {
-                tenantDomain = carbonContext.getTenantDomain();
-            }
-            //Keep the tenant loaded
-            if (tenantDomain != null) {
-                ConfigurationContextService configurationContext =
-                        InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
-                if (configurationContext != null) {
-                    ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
-                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+    public void startInboundTenantLoading(String inboundIdentifier) {
+        //make sure tenant is loaded before the message flow is started
+        //this case is only considered for the inbound runner mode
+        if (this.isInboundRunnerMode && tenantDomain != null) {
+            ConfigurationContextService configurationContext =
+                    InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
+            if (configurationContext != null) {
+                ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+                //this is a blocking call
+                TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+                if(log.isDebugEnabled()){
+                    log.debug("Manually loaded tenant: "+tenantDomain);
                 }
             }
         }
@@ -100,4 +98,9 @@ public abstract class OneTimeTriggerAbstractCallback {
     public void setInboundRunnerMode(boolean isInboundRunnerMode) {
         this.isInboundRunnerMode = isInboundRunnerMode;
     }
+
+    public boolean isInboundRunnerMode() {
+        return this.isInboundRunnerMode;
+    }
+
 }

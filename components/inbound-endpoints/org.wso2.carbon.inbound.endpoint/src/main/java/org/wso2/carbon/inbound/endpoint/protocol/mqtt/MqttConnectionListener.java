@@ -22,6 +22,10 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
+/**
+ * MQTT connection Listener bounded per MQTT client, this the listener registered per client
+ * when mqtt connection is being made. Delegates logic per successful and failed connection scenarios
+ */
 public class MqttConnectionListener implements IMqttActionListener {
 
     private static final Log log = LogFactory.getLog(MqttConnectionListener.class);
@@ -53,9 +57,9 @@ public class MqttConnectionListener implements IMqttActionListener {
                         .connect(mqttConnectionConsumer.getConnectOptions(), this);
             }
         } catch (MqttException ex) {
-            log.error("Error while trying to subscribe to the remote");
+            log.error("Error while trying to subscribe to the remote", ex);
         } catch (InterruptedException ex) {
-            log.error("Error while trying to subscribe to the remote");
+            log.error("Error while trying to subscribe to the remote", ex);
         }
     }
 

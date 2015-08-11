@@ -26,6 +26,12 @@ import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 
+/**
+ * This class provides the common implementation for one time trigger protocol processors
+ * Implemented the support if message injection happens in a separate thread. ( using Callbacks )
+ * One such requirement is loading the tenant when message is injected if at that moment tenant
+ * is unloaded.
+ */
 public abstract class InboundOneTimeTriggerRequestProcessor implements InboundRequestProcessor {
 
     protected StartUpController startUpController;
@@ -89,8 +95,8 @@ public abstract class InboundOneTimeTriggerRequestProcessor implements InboundRe
                 //where we do not have access to the carbon context, this is the case for all
                 //inbound endpoints where message injection happens in a different thread
                 // ( callbacks ) but this is not the case for polling based inbound endpoints
-                //later this context is used for keep tenant loaded
-                task.getCallback().preserveCarbonContext(carbonContext);
+                //later this tenantDomain is used for tenant loading
+                task.getCallback().setTenantDomain(tenantDomain);
             }
             runningThread = new Thread(inboundRunner);
             runningThread.start();

@@ -22,13 +22,15 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.InboundOneTimeTriggerRequestProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 import java.util.Properties;
 
 
 /**
- * Listener to get a mqtt client from the factory and subscribe to a given topic
+ * This is the listener which directly interacts with the external MQTT server. Every MQTT
+ * inbound listener is bound to Server Port, Server Host, Client ID.
  */
 public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
 
@@ -58,11 +60,12 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
 
 
     /**
-     * constructor
+     * constructor for the MQTT inbound endpoint listener     *
      *
      * @param params
      */
     public MqttListener(InboundProcessorParams params) {
+
         this.name = params.getName();
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq = params.getOnErrorSeq();
@@ -70,6 +73,7 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
         this.mqttProperties = params.getProperties();
         this.params = params;
 
+        //assign default value if sequential mode parameter is not present
         this.sequential = true;
         if (mqttProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL) != null) {
             this.sequential =
@@ -77,6 +81,7 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
                             (PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL));
         }
 
+        //assign default value if coordination mode parameter is not present
         this.coordination = true;
         if (mqttProperties.getProperty(PollingConstants.INBOUND_COORDINATION) != null) {
             this.coordination =
@@ -84,43 +89,64 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
                             (PollingConstants.INBOUND_COORDINATION));
         }
 
-        confac = new MqttConnectionFactory(mqttProperties);
-        contentType = confac.getContent();
+        this.confac = new MqttConnectionFactory(mqttProperties);
+        this.contentType = confac.getContent();
 
-        injectHandler =
+        this.injectHandler =
                 new MqttInjectHandler(injectingSeq, onErrorSeq, sequential,
                         synapseEnvironment, contentType);
         this.synapseEnvironment = params.getSynapseEnvironment();
 
+
+        //mqtt connection options
         if (mqttProperties.getProperty(MqttConstants.MQTT_USERNAME) != null) {
-            userName = mqttProperties.getProperty(MqttConstants.MQTT_USERNAME);
+            this.userName = mqttProperties.getProperty(MqttConstants.MQTT_USERNAME);
         }
 
         if (mqttProperties.getProperty(MqttConstants.MQTT_PASSWORD) != null) {
-            password = mqttProperties.getProperty(MqttConstants.MQTT_PASSWORD);
+            this.password = mqttProperties.getProperty(MqttConstants.MQTT_PASSWORD);
         }
 
-        cleanSession =
-                Boolean.parseBoolean(mqttProperties.getProperty(MqttConstants.MQTT_SESSION_CLEAN));
+        if (mqttProperties.getProperty(MqttConstants.MQTT_SESSION_CLEAN) != null) {
+            this.cleanSession =
+                    Boolean.parseBoolean(mqttProperties.getProperty(MqttConstants.MQTT_SESSION_CLEAN));
+        }
     }
 
     @Override
     public void destroy() {
-        //release the thread from suspension
-        //this is need since Thread.join() causes issues
-        //this will release thread suspended thread for completion
-        connectionConsumer.shutdown();
-        mqttAsyncCallback.shutdown();
-        confac.shutdown();
+        log.info("Mqtt Inbound endpoint: " + name + " Started destroying context.");
+        MqttClientManager clientManager = MqttClientManager.getInstance();
+        String inboundIdentifier = clientManager.buildIdentifier(mqttAsyncClient.getClientId(),
+                confac.getServerHost(), confac.getServerPort());
+        //we should ignore the case of manually loading of tenant
+        //we maintain a flag for cases where we load the tenant manually
+        if (!clientManager.isInboundTenantLoadingFlagSet(inboundIdentifier)) {
+            //release the thread from suspension
+            //this will release thread suspended thread for completion
+            connectionConsumer.shutdown();
+            mqttAsyncCallback.shutdown();
+            confac.shutdown();
+            try {
+                if (mqttAsyncClient.isConnected()) {
+                    mqttAsyncClient.unsubscribe(confac.getTopic());
+                    mqttAsyncClient.disconnect();
+                }
+                mqttAsyncClient.close();
 
-        try {
-            if (mqttAsyncClient.isConnected()) {
-                mqttAsyncClient.disconnect();
+                PrivilegedCarbonContext carbonContext =
+                        PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                int tenantId = carbonContext.getTenantId();
+                String nameIdentifier = clientManager
+                        .buildNameIdentifier(name, String.valueOf(tenantId));
+                //here we unregister it because this is not a case of tenant loading
+                MqttClientManager.getInstance()
+                        .unregisterMqttClient(inboundIdentifier, nameIdentifier);
+
+                log.info("Disconnected from the remote MQTT server.");
+            } catch (MqttException e) {
+                log.error("Error while disconnecting from the remote server.");
             }
-            mqttAsyncClient.close();
-            log.info("Disconnected from the remote MQTT server.");
-        } catch (MqttException e) {
-            log.error("Error while disconnecting from the remote server.");
         }
         super.destroy();
     }
@@ -133,19 +159,45 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
     }
 
     public void initAsyncClient() {
-        mqttAsyncClient = confac.getMqttAsyncClient();
-        connectOptions = new MqttConnectOptions();
-        connectOptions.setCleanSession(cleanSession);
-        if (userName != null && password != null) {
-            connectOptions.setUserName(userName);
-            connectOptions.setPassword(password.toCharArray());
+
+        mqttAsyncClient = confac.getMqttAsyncClient(this.name);
+
+        MqttClientManager clientManager = MqttClientManager.getInstance();
+        String inboundIdentifier = clientManager.buildIdentifier(mqttAsyncClient.getClientId(),
+                confac.getServerHost(), confac.getServerPort());
+
+        if (!clientManager.hasMqttCallback(inboundIdentifier)) {
+            //registering callback for the first time
+            connectOptions = new MqttConnectOptions();
+            connectOptions.setCleanSession(cleanSession);
+            if (userName != null && password != null) {
+                connectOptions.setUserName(userName);
+                connectOptions.setPassword(password.toCharArray());
+            }
+            mqttAsyncCallback = new MqttAsyncCallback(mqttAsyncClient, injectHandler,
+                    confac, connectOptions, mqttProperties);
+            connectionConsumer = new MqttConnectionConsumer(connectOptions, mqttAsyncClient,
+                    confac, mqttProperties);
+            mqttAsyncCallback.setMqttConnectionConsumer(connectionConsumer);
+            mqttAsyncClient.setCallback(mqttAsyncCallback);
+            //here we register the callback handler
+            clientManager.registerMqttCallback(inboundIdentifier, mqttAsyncCallback);
+        } else {
+            //has previously registered callback we just update the reference
+            //in other words has previous un-destroyed callback
+            //this is a manually tenant loading case
+            //should clear the previously set tenant loading flags for the inbound identifier
+            clientManager.unRegisterInboundTenantLoadingFlag(inboundIdentifier);
+
+            mqttAsyncCallback = clientManager.getMqttCallback(inboundIdentifier);
+
+            connectOptions = mqttAsyncCallback.getMqttConnectionOptions();
+            connectionConsumer = mqttAsyncCallback.getMqttConnectionConsumer();
+
+            //but we need to update injectHandler due to recreation of synapse environment
+            mqttAsyncCallback.updateInjectHandler(injectHandler);
+
         }
-        mqttAsyncCallback = new MqttAsyncCallback(mqttAsyncClient, injectHandler,
-                confac, connectOptions, mqttProperties);
-        connectionConsumer = new MqttConnectionConsumer(connectOptions, mqttAsyncClient,
-                confac, mqttProperties);
-        mqttAsyncCallback.setMqttConnectionConsumer(connectionConsumer);
-        mqttAsyncClient.setCallback(mqttAsyncCallback);
     }
 
     public void start() {
