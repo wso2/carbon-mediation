@@ -26,6 +26,8 @@ public class EndpointMetaData {
     private String description;
     private boolean switchOn;
     private String endpointString;
+    private String artifactContainerName;
+    private boolean isEdited;
 
     /**
      * Get the configuration of an Endpoint
@@ -107,4 +109,35 @@ public class EndpointMetaData {
         this.description = description;
     }
 
+    /**
+     * Get the artifactContainer of the endpoint which deployed from
+     * @return endpoint description
+     */
+    public String getArtifactContainerName() {
+        return artifactContainerName;
+    }
+
+    /**
+     * Set the endpoint artifact container name as a metadata
+     * @param artifactContainerName endpoint name
+     */
+    public void setArtifactContainerName(String artifactContainerName) {
+        this.artifactContainerName = artifactContainerName;
+    }
+
+    /**
+     * Get the edit state of the endpoint
+     * @return endpoint description
+     */
+    public boolean getIsEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set the edit state of the endpoint as a metadata
+     * @param isEdited endpoint name
+     */
+    public void setIsEdited(boolean isEdited) {
+        this.isEdited = isEdited;
+    }
 }
