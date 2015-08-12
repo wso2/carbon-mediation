@@ -68,6 +68,12 @@
             form.provider_url.focus();
             return false;
         }
+        else if (document.getElementById('enable_guaranteed_delivery').options[document.getElementById
+        ('enable_guaranteed_delivery').selectedIndex].value == "true" && document.getElementById
+        ('failover_message_store_name').selectedIndex == -1) {
+            CARBON.showWarningDialog('<fmt:message key="failover.message.store.cannot.be.empty"/>')
+            return false;
+        }
 
         return true;
     }

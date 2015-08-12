@@ -137,6 +137,13 @@
             return false;
         }
 
+        if (document.getElementById('enable_guaranteed_delivery').options[document.getElementById
+           ('enable_guaranteed_delivery').selectedIndex].value == "true" && document.getElementById
+           ('failover_message_store_name').selectedIndex == -1) {
+           CARBON.showWarningDialog('<fmt:message key="failover.message.store.cannot.be.empty"/>')
+           return false;
+        }
+
         if(isPool){
             if (IsEmpty(form.driver)) {
                 CARBON.showWarningDialog('<fmt:message key="driver.field.cannot.be.empty"/>')
