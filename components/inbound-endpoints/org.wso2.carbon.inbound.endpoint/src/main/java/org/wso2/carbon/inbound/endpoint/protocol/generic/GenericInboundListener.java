@@ -21,46 +21,73 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 
-public class GenericInboundListener implements InboundRequestProcessor {
+import java.lang.reflect.Constructor;
+
+public abstract class GenericInboundListener implements InboundRequestProcessor {
 
     private static final Logger log = Logger.getLogger(GenericInboundListener.class);
-    protected final String injectingSequence;
-    protected final String onErrorSequence;
-    protected final String name;
-    protected final String host;
-    protected int port;
-    protected final InboundProcessorParams params;
+    public static final String PARAM_INBOUND_ENDPOINT_LISTENING = "inbound.listening";
+
+    protected String injectingSequence;
+    protected String onErrorSequence;
+    protected String name;
+    protected InboundProcessorParams params;
+
 
     public GenericInboundListener(InboundProcessorParams inboundParams) {
-
         this.injectingSequence = inboundParams.getInjectingSeq();
         this.onErrorSequence = inboundParams.getOnErrorSeq();
         this.name = inboundParams.getName();
         this.params = inboundParams;
-        this.host = inboundParams.getProperties().getProperty(GenericConstants.LISTENING_INBOUND_HOST);
-        try {
-            this.port = Integer.parseInt(inboundParams.getProperties().getProperty(GenericConstants.LISTENING_INBOUND_PORT));
-        } catch (NumberFormatException e){
-            handleException("Illegal port number specified", e);
+    }
+
+    /**
+     * This is to get the GenericInboundListener instance for given params
+     *
+     * @param inboundParams
+     * @return
+     */
+    public static synchronized GenericInboundListener getInstance(InboundProcessorParams inboundParams) {
+        String classImpl = inboundParams.getClassImpl();
+        String name = inboundParams.getName();
+
+        if (null == classImpl) {
+            String msg = "GenericEndpointManager class not found";
+            log.error(msg);
+            throw new SynapseException(msg);
         }
+
+        GenericInboundListener instance = null;
+
+        log.info("Inbound listener " + name + " for class " + classImpl + " starting ...");
+        try {
+            // Dynamically load GenericEndpointManager from given classpath
+            Class c = Class.forName(classImpl);
+            Constructor cons = c.getConstructor(InboundProcessorParams.class);
+            instance = (GenericInboundListener) cons.newInstance(inboundParams);
+        } catch (ClassNotFoundException e) {
+            handleException("Class " + classImpl + " not found. Please check the required class is added to the classpath.", e);
+        } catch (Exception e) {
+            handleException("Unable to create the consumer", e);
+        }
+
+        return instance;
     }
 
-    @Override
-    public void init() {
-        startListener();
+    /**
+     * States whether generic endpoint is a listening
+     * Return true; if listening
+     *
+     * @param inboundParameters Inbound Parameters for endpoint
+     * @return boolean
+     */
+    public static boolean isListeningInboundEndpoint(InboundProcessorParams inboundParameters){
+        return inboundParameters.getProperties().containsKey(GenericInboundListener.PARAM_INBOUND_ENDPOINT_LISTENING)
+               && "true".equals(inboundParameters.getProperties().getProperty(GenericInboundListener.PARAM_INBOUND_ENDPOINT_LISTENING));
     }
 
-    @Override
-    public void destroy() {
-    }
 
-    public boolean startListener() {
-        log.info("GenericInboundListener started listening to port: " + port);
-
-        return true;
-    }
-
-    protected void handleException(String msg, Exception e) {
+    protected static void handleException(String msg, Exception e) {
         log.error(msg, e);
         throw new SynapseException(msg, e);
     }

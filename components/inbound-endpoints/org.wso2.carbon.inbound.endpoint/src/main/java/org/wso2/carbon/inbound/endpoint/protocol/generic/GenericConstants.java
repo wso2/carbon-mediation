@@ -18,8 +18,5 @@
 package org.wso2.carbon.inbound.endpoint.protocol.generic;
 
 public class GenericConstants {
-    public static final String LISTENING_INBOUND_PORT = "inbound.listener.port";
-    public static final String LISTENING_INBOUND_HOST = "inbound.listener.host";
-    public static final String PARAM_INBOUND_ENDPOINT_LISTENING = "inbound.listening";
-    public static final String GENERIC_INBOUND_NAME = "generic";
+
 }

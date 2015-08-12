@@ -22,7 +22,7 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
-import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericEndpointManager;
+import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.InboundHL7Listener;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
@@ -65,8 +65,8 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
                 inboundRequestProcessor = new MqttListener(params);
             }
         } else if (params.getClassImpl() != null) {
-            if (GenericEndpointManager.isListeningInboundEndpoint(params)) {
-                inboundRequestProcessor = GenericEndpointManager.getInstance(params).getEndpoint(params);
+            if (GenericInboundListener.isListeningInboundEndpoint(params)) {
+                inboundRequestProcessor = GenericInboundListener.getInstance(params);
             } else {
                 inboundRequestProcessor = new GenericProcessor(params);
             }
