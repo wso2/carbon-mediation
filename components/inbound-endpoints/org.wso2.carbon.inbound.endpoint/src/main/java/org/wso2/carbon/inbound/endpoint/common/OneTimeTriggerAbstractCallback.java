@@ -16,27 +16,43 @@
 
 package org.wso2.carbon.inbound.endpoint.common;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
+import org.wso2.carbon.utils.ConfigurationContextService;
+
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Generic callback for one time trigger inbound endpoints
+ * Generic callback implementation for one time trigger inbound endpoints. In this case
+ * Message injection is happens in a separate thread ( Callback ) per message.
  */
-
 public abstract class OneTimeTriggerAbstractCallback {
 
     private volatile Semaphore callbackSuspensionSemaphore = new Semaphore(0);
     private AtomicBoolean isCallbackSuspended = new AtomicBoolean(false);
     private AtomicBoolean isShutdownFlagSet = new AtomicBoolean(false);
-
+    protected String tenantDomain;
+    private boolean isInboundRunnerMode = false;
+    private static final Log log = LogFactory.getLog(OneTimeTriggerAbstractCallback.class);
 
     protected void handleReconnection() throws InterruptedException {
-        isCallbackSuspended.set(true);
-        callbackSuspensionSemaphore.acquire();
-        if (!isShutdownFlagSet.get()) {
+        if (log.isDebugEnabled()) {
+            log.debug("Started handling reconnection due to connection lost callback");
+        }
+        if (!isInboundRunnerMode) {
+            isCallbackSuspended.set(true);
+            callbackSuspensionSemaphore.acquire();
+            if (!isShutdownFlagSet.get()) {
+                reConnect();
+            }
+            isCallbackSuspended.set(false);
+        } else {
             reConnect();
         }
-        isCallbackSuspended.set(false);
     }
 
     protected void shutdown() {
@@ -49,10 +65,42 @@ public abstract class OneTimeTriggerAbstractCallback {
     protected abstract void reConnect();
 
     public void releaseCallbackSuspension() {
-        callbackSuspensionSemaphore.release();
+        if (callbackSuspensionSemaphore.availablePermits() < 1) {
+            callbackSuspensionSemaphore.release();
+        }
     }
 
     public boolean isCallbackSuspended() {
         return isCallbackSuspended.get();
     }
+
+    public void setTenantDomain(String tenantDomain) {
+        this.tenantDomain = tenantDomain;
+    }
+
+    public void startInboundTenantLoading(String inboundIdentifier) {
+        //make sure tenant is loaded before the message flow is started
+        //this case is only considered for the inbound runner mode
+        if (this.isInboundRunnerMode && tenantDomain != null) {
+            ConfigurationContextService configurationContext =
+                    InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
+            if (configurationContext != null) {
+                ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+                //this is a blocking call
+                TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
+                if (log.isDebugEnabled()) {
+                    log.debug("Manually loaded tenant: " + tenantDomain);
+                }
+            }
+        }
+    }
+
+    public void setInboundRunnerMode(boolean isInboundRunnerMode) {
+        this.isInboundRunnerMode = isInboundRunnerMode;
+    }
+
+    public boolean isInboundRunnerMode() {
+        return this.isInboundRunnerMode;
+    }
+
 }

@@ -25,8 +25,12 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
 
+/**
+ * Connection consumer for MQTT listener which delegates connection attempts and subscription
+ * from the MQTT inbound listener
+ */
 public class MqttConnectionConsumer {
-    private static final Log log = LogFactory.getLog(MqttListener.class);
+    private static final Log log = LogFactory.getLog(MqttConnectionConsumer.class);
     private MqttAsyncClient mqttAsyncClient;
     private MqttConnectOptions connectOptions;
     private MqttConnectionFactory confac;
@@ -46,6 +50,9 @@ public class MqttConnectionConsumer {
         if (mqttAsyncClient != null) {
             if (mqttAsyncClient.isConnected()) {
                 //do nothing just return
+                //this is a case for manually tenant loading case
+                //as we maintain connection when the tenant is manually loaded ( no connection
+                //disconnect and reconnect )
                 return;
             } else {
                 try {
@@ -63,9 +70,9 @@ public class MqttConnectionConsumer {
                         log.info("Connected to the remote server.");
                     }
                 } catch (MqttException ex) {
-                    log.error("Error while trying to subscribe to the remote ");
+                    log.error("Error while trying to subscribe to the remote ", ex);
                 } catch (InterruptedException ex) {
-                    log.error("Error while trying to subscribe to the remote ");
+                    log.error("Error while trying to subscribe to the remote ", ex);
                 }
             }
         }
@@ -94,11 +101,11 @@ public class MqttConnectionConsumer {
         return mqttProperties;
     }
 
-    public void releaseTaskSuspension(){
+    public void releaseTaskSuspension() {
         taskSuspensionSemaphore.release();
     }
 
-    public void acquireTaskSuspension() throws InterruptedException{
+    public void acquireTaskSuspension() throws InterruptedException {
         taskSuspensionSemaphore.acquire();
     }
 }
