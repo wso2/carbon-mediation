@@ -101,10 +101,6 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
         }
     }
 
-    public void close() {
-        destroy();
-    }
-
     /**
      * Stop the inbound polling processor This will be called when inbound is
      * undeployed/redeployed or when server stop

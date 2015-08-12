@@ -68,10 +68,6 @@ public class InboundHttpListener implements InboundRequestProcessor {
         }
     }
 
-    public void close() {
-        destroy();
-    }
-
     @Override
     public void destroy() {
         HTTPEndpointManager.getInstance().closeEndpoint(port);

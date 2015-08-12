@@ -50,10 +50,6 @@ public class GenericInboundListener implements InboundRequestProcessor {
         startListener();
     }
 
-    public void close() {
-        destroy();
-    }
-
     @Override
     public void destroy() {
     }
