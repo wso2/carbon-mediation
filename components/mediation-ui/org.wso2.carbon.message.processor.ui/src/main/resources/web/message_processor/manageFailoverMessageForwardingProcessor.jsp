@@ -138,12 +138,9 @@
     function addServiceParams() {
         // When an invalid value is given, then the user is redirected to the same page. Then if the user deletes that value, the empty value
         // is appended to the previous value leading to errors. This is used to solve that. The append takes place inside the addServiceParameter function.
-        document.getElementById("tableParams").value = "";
         addServiceParameter("interval", document.getElementById('retry_interval').value);
         addServiceParameter("client.retry.interval", document.getElementById('client_retry_interval').value);
         addServiceParameter("max.delivery.attempts", document.getElementById('max_delivery_attempts').value);
-        addServiceParameter("axis2.repo", document.getElementById('axis2_repo').value);
-        addServiceParameter("axis2.config", document.getElementById('axis2_config').value);
         addServiceParameter("message.processor.fault.sequence", document.getElementById('message_processor_fault_sequence').value);
         addServiceParameter("message.processor.deactivate.sequence", document.getElementById('message_processor_deactivate_sequence').value);
         addServiceParameter("quartz.conf", document.getElementById('quartz_conf').value);
@@ -253,8 +250,6 @@
         processorData.setClazz(mpProvider);
         processorData.setMessageStore(mpStore);
     }
-
-
     MessageStoreAdminServiceClient messageStoreClient =
             new MessageStoreAdminServiceClient(cookie, url, configContext);
 
@@ -357,7 +352,8 @@
                  <tr>
                     <td><fmt:message key="target.message.store"/><span class="required"> *</span></td>
                     <td>
-                        <select id="targetMessageStore" name="targetMessageStore" disabled="true"\>
+                        <input name="targetMessageStore" id="targetMessageStore" type="hidden" value="<%=targetMessageStoreName%>"/>
+                        <select id="trgMessageStore" name="trgMessageStore" disabled="true"\>
                             <%
                             if(messageStores != null) {
                                 for (String msn : messageStores) {
@@ -494,22 +490,6 @@
                                         <option value="Enabled">Enabled</option>
                                 <% } %>
                             </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="axis2.repo"/></td>
-                        <td><input type="text" id="axis2_repo" name="axis2_repo"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("axis2.repo")!=null))?processorData.getParams().get("axis2.repo"):""%>"
-                                   size="75"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="axis2.config"/></td>
-                        <td><input type="text" id="axis2_config" name="axis2_config"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("axis2.config")!=null))?processorData.getParams().get("axis2.config"):""%>"
-                                   size="75"/>
                         </td>
                     </tr>
                     <tr>
