@@ -173,7 +173,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                             //this case can only happen regex exists and it DOES match
                             //BUT there is no api or proxy found message to be injected
                             //should be routed to the main sequence instead inbound defined sequence
-                            injectToMainSequence(synCtx,endpoint);
+                            injectToMainSequence(synCtx, endpoint);
                         }
                     }
                 } else if (continueDispatch && dispatchPattern == null) {
@@ -182,7 +182,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                 } else {
                     //this case can only happen regex exists and it DOES NOT match
                     //should be routed to the main sequence instead inbound defined sequence
-                    injectToMainSequence(synCtx,endpoint);
+                    injectToMainSequence(synCtx, endpoint);
                 }
                 // send ack for client if needed
                 sendAck(axis2MsgContext);
