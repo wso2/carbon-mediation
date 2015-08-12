@@ -185,7 +185,8 @@ public class InboundManagementClient {
                     if (strVal != null) {
                         if ((strProtocol.equals(InboundClientConstants.TYPE_KAFKA) &&
                                 ((mandatory && !strVal.contains("highlevel.") &&
-                                        !strVal.contains("simple.")) || !mandatory)) ||
+                                        !strVal.contains("simple.") &&
+                                        !strVal.contains("list ~:~ ")) || !mandatory)) ||
                                 !strProtocol.equals(InboundClientConstants.TYPE_KAFKA)) {
                             rtnList.add(strVal);
                         }
@@ -405,5 +406,36 @@ public class InboundManagementClient {
             }
         }
         return specialParamsList;
+    }
+
+    public String getKAFKATopicListParameters() {
+        String topicListParams = "";
+        loadProperties();
+        if (prop != null) {
+            String strKey = "kafka.mandatory";
+            String strLength = prop.getProperty(strKey);
+            Integer iLength = null;
+            if (strLength != null) {
+                try {
+                    iLength = Integer.parseInt(strLength);
+                } catch (Exception e) {
+                    iLength = null;
+                }
+            }
+            if (iLength != null) {
+                for (int i = 1; i <= iLength; i++) {
+                    String tmpString = strKey + "." + i;
+                    String strVal = prop.getProperty(tmpString);
+                    if (strVal.contains("list ~:~ ")) {
+                        if (topicListParams.equals("")) {
+                            topicListParams = strVal;
+                        } else {
+                            topicListParams = topicListParams + "," + strVal;
+                        }
+                    }
+                }
+            }
+        }
+        return topicListParams;
     }
 }

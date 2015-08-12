@@ -76,11 +76,16 @@
                 }else if(strKey.startsWith("enableSSL")){
                     sParams.add((new ParamDTO("enableSSL",request.getParameter(strKey))));
                 }else if(strKey.startsWith("coordination")){
-		    sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));
-                }else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")|| strKey.startsWith("topic.filter.")|| strKey.equals("topics")||strKey.startsWith("filter.from.")||strKey.startsWith("consumer.type")|| strKey.startsWith("thread.count")|| strKey.startsWith("simple.")|| strKey.startsWith("content.type")){
-                  String strVal = request.getParameter(strKey);
+		            sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));
+                }else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")|| strKey.startsWith("topic.filter")|| strKey.equals("topics")||strKey.startsWith("filter.from")||strKey.startsWith("consumer.type")|| strKey.startsWith("thread.count")|| strKey.startsWith("simple.")|| strKey.startsWith("content.type")){
+                  String strVal = request.getParameter(strKey).trim();
+                  if(strKey.trim().equals("filter.from"))
+                  {
+                      strKey = request.getParameter(strKey);
+                      strVal = "true";
+                  }
                   if(strVal != null && !strVal.equals("")){
-                     sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                     sParams.add(new ParamDTO(strKey, strVal));
                   }
                 }else if(strKey.startsWith("mqtt.")|| strKey.startsWith("content.type")){
                                    String strVal = request.getParameter(strKey);
