@@ -303,7 +303,7 @@ function showSpecialFields(specialParams, inboundDescriptionOfParams, topicListP
                     var listval = fLists[1].trim();
                     if(inboundDescriptionOfParams != ""){
                         for(var j=0; j<splitedInboundDescription.length; j++){
-                            if((splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist" || splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist") && Boolean(splitedInboundDescription[j].split("=")[1])){
+                            if((splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist" || splitedInboundDescription[j].split("=")[0].trim() == "filter.from.blacklist") && Boolean(splitedInboundDescription[j].split("=")[1])){
                                 listval = splitedInboundDescription[j].split("=")[0].trim();
                                 break;
                             }
@@ -348,7 +348,7 @@ function showTopicsOrTopicFilterFields(inboundDescriptionOfParams, topicListPara
     var listval = fLists[1].trim();
         if(inboundDescriptionOfParams != ""){
             for(var j=0; j<splitedInboundDescription.length; j++){
-                if((splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist" || splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist") && Boolean(splitedInboundDescription[j].split("=")[1])){
+                if((splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist" || splitedInboundDescription[j].split("=")[0].trim() == "filter.from.blacklist") && Boolean(splitedInboundDescription[j].split("=")[1])){
                     listval = splitedInboundDescription[j].split("=")[0].trim();
                     break;
                 }

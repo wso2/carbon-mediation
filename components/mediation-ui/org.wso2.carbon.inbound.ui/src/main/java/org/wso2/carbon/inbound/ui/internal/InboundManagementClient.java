@@ -181,7 +181,7 @@ public class InboundManagementClient {
                         if ((strProtocol.equals(InboundClientConstants.TYPE_KAFKA) &&
                                 ((mandatory && !strVal.contains("highlevel.") &&
                                         !strVal.contains("simple.") &&
-                                        !strVal.contains("list ~:~ ")) || !mandatory)) ||
+                                        !strVal.contains("filter.from ~:~ ")) || !mandatory)) ||
                                 !strProtocol.equals(InboundClientConstants.TYPE_KAFKA)) {
                             rtnList.add(strVal);
                         }
@@ -421,7 +421,7 @@ public class InboundManagementClient {
                 for (int i = 1; i <= iLength; i++) {
                     String tmpString = strKey + "." + i;
                     String strVal = prop.getProperty(tmpString);
-                    if (strVal.contains("list ~:~ ")) {
+                    if (strVal.contains("filter.from ~:~ ")) {
                         if (topicListParams.equals("")) {
                             topicListParams = strVal;
                         } else {
@@ -434,3 +434,4 @@ public class InboundManagementClient {
         return topicListParams;
     }
 }
+
