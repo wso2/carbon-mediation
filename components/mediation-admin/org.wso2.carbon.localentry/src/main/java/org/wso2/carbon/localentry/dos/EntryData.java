@@ -25,6 +25,8 @@ public class EntryData {
     private String value;
     private String type;
     private String description;
+    private String artifactContainerName;
+    private boolean isEdited;
 
     public String getName() {
         return name;
@@ -56,5 +58,37 @@ public class EntryData {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * Get the artifactContainer of the local entry which deployed from
+     * @return local entry description
+     */
+    public String getArtifactContainerName() {
+        return artifactContainerName;
+    }
+
+    /**
+     * Set the local entry artifact container name as a metadata
+     * @param artifactContainerName local entry name
+     */
+    public void setArtifactContainerName(String artifactContainerName) {
+        this.artifactContainerName = artifactContainerName;
+    }
+
+    /**
+     * Get the edit state of the local entry
+     * @return local entry description
+     */
+    public boolean getIsEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set the edit state of the local entry as a metadata
+     * @param isEdited local entry name
+     */
+    public void setIsEdited(boolean isEdited) {
+        this.isEdited = isEdited;
     }
 }

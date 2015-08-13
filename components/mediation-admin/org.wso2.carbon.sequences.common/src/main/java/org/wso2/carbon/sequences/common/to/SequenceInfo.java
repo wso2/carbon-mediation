@@ -62,15 +62,15 @@ public class SequenceInfo {
     }
 
     /**
-     * Get the artifactContainer of the endpoint which deployed from
-     * @return endpoint description
+     * Get the artifactContainer of the sequence which deployed from
+     * @return sequence description
      */
     public String getArtifactContainerName() {
         return artifactContainerName;
     }
 
     /**
-     * Set the endpoint artifact container name as a metadata
+     * Set the sequence artifact container name as a metadata
      * @param artifactContainerName endpoint name
      */
     public void setArtifactContainerName(String artifactContainerName) {
@@ -78,16 +78,16 @@ public class SequenceInfo {
     }
 
     /**
-     * Get the edit state of the endpoint
-     * @return endpoint description
+     * Get the edit state of the sequence
+     * @return sequence description
      */
     public boolean getIsEdited() {
         return isEdited;
     }
 
     /**
-     * Set the edit state of the endpoint as a metadata
-     * @param isEdited endpoint name
+     * Set the edit state of the sequence as a metadata
+     * @param isEdited sequence name
      */
     public void setIsEdited(boolean isEdited) {
         this.isEdited = isEdited;

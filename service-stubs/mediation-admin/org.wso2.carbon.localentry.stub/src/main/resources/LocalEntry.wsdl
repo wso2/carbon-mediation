@@ -186,7 +186,9 @@
 
             <xs:complexType name="EntryData">
                 <xs:sequence>
+                    <xs:element minOccurs="0" name="artifactContainerName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="isEdited" nillable="true" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="type" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
