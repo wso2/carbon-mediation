@@ -94,5 +94,10 @@
         <artifactId>mqtt-client</artifactId>
         <version>0.4.0</version>
     </dependency>
+    <dependency>
+        <groupId>com.rabbitmq.wso2</groupId>
+        <artifactId>amqp-client</artifactId>
+        <version>3.4.4.wso2v1</version>
+    </dependency>
 </dependencies>
 </project>

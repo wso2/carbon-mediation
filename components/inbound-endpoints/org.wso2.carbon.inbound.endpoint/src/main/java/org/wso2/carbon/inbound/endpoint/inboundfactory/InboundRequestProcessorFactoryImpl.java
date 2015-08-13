@@ -30,13 +30,14 @@ import org.wso2.carbon.inbound.endpoint.protocol.https.InboundHttpsListener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.kafka.KAFKAProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.mqtt.MqttListener;
+import org.wso2.carbon.inbound.endpoint.protocol.rabbitmq.RabbitMQListener;
 
 /**
  * Class responsible for providing the implementation of the request processor according to the protocol.
  */
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
-    public static enum Protocols {jms, file, http , https, hl7, kafka, cxf_ws_rm,mqtt}
+    public static enum Protocols {jms, file, http , https, hl7, kafka, cxf_ws_rm, mqtt, rabbitmq}
 
     /**
      * return underlying Request Processor Implementation according to protocol
@@ -65,6 +66,8 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
                 inboundRequestProcessor = CXFEndpointManager.getInstance().getCXFEndpoint(params);
             }else if (Protocols.mqtt.toString().equals(protocol)) {
                 inboundRequestProcessor = new MqttListener(params);
+            }else if (Protocols.rabbitmq.toString().equals(protocol)) {
+                inboundRequestProcessor = new RabbitMQListener(params);
             }
         } else if (params.getClassImpl() != null) {
             inboundRequestProcessor = new GenericProcessor(params);
