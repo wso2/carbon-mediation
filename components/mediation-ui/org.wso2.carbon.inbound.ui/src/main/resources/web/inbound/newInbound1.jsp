@@ -61,6 +61,7 @@ var requiredParams = null;
             List<String>defaultParams = client.getDefaultParameters(request.getParameter("inboundType"));            
             List<String>advParams = client.getAdvParameters(request.getParameter("inboundType"));
             String specialParams = client.getKAFKASpecialParameters();
+            String topicListParams = client.getKAFKATopicListParameters();
             String firstSpecialParam = "";
     %>
     <form method="post" name="inboundcreationform" id="inboundcreationform"
@@ -183,7 +184,7 @@ var requiredParams = null;
 	                            <%if(InboundClientConstants.TYPE_KAFKA.equals(request.getParameter("inboundType"))){
                                     firstSpecialParam = arrParamOri[1].trim();
                                 %>
-                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>" onchange="javascript:showSpecialFields('<%=specialParams%>','');">
+                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>" onchange="javascript:showSpecialFields('<%=specialParams%>','','<%=topicListParams%>');">
                                 <%} else{%>
                                     <select id="<%=defaultParam%>" name="<%=defaultParam%>">
                                 <%}%>
@@ -205,13 +206,30 @@ var requiredParams = null;
 	                    </tr>                        
                      <% } %>
                     <% if(InboundClientConstants.TYPE_KAFKA.equals(request.getParameter("inboundType"))){ %>
-                        <tr>
-                            <td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">
+                        <tr><td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">
                             <%
                             String[] allSpecialParams = specialParams.split(",");
                             for(int s = 0;s<allSpecialParams.length;s++){
-                                if(firstSpecialParam.equals("highlevel") && allSpecialParams[s].equals("topics")){%>
-                                    <tr><td style="width:167px"><%=allSpecialParams[s]%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value=""/></td><td></td></tr>
+                                String specialParam = allSpecialParams[s];
+                                if(firstSpecialParam.equals("highlevel") && (specialParam.indexOf(InboundClientConstants.STRING_SPLITTER) > -1 && specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim().equals("topics/topic.filter"))) {%>
+                                    <tr><td style="width:167px"><%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%><span class="required">*</span></td><td align="left"><select id="topicsOrTopicFilter" name="topicsOrTopicFilter" onchange="javascript:showTopicsOrTopicFilterFields('','<%=topicListParams%>')">
+                                    <%
+                                    String[] tLists = specialParam.split(InboundClientConstants.STRING_SPLITTER);
+                                    for(int t = 1; t < tLists.length; t++){%>
+                                        <option value="<%=tLists[t].trim()%>"><%=tLists[t].trim()%></option>
+                                    <%}%>
+                                    </select></td><td></td></tr>
+                                    <tr><td colspan="3"><div id="tDiv"><table>
+                                    <%if(tLists[1].equals("topic.filter")){
+                                        String[] fLists = topicListParams.split(InboundClientConstants.STRING_SPLITTER);
+                                    %>
+                                        <tr><td style="width:157px"><%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%><span class="required">*</span></td><td align="left"><select id="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%>" name="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%>" onchange="javascript:showTopicsOrTopicFilterFields('','<%=topicListParams%>');">
+                                        <%for(int l = 1; l < fLists.length; l++){%>
+                                            <option value="<%=fLists[l].trim()%>"><%=fLists[l].trim()%></option>
+                                        <%}%>
+                                        </select></td><td></td></tr>
+                                    <%}%>
+                                    <tr><td style="width:155px"><%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[1].trim()%> name<span class="required">*</span></td><td align="left"><input id="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[1].trim()%>" name="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[1].trim()%>" class="longInput" type="text"/></td><td></td></tr></table></div></td></tr>
                                 <%} else{
                                     if(allSpecialParams[s].startsWith(firstSpecialParam+".")){%>
                                         <tr><td style="width:167px"><%=allSpecialParams[s].replace(firstSpecialParam+".", "")%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value=""/></td><td></td></tr>

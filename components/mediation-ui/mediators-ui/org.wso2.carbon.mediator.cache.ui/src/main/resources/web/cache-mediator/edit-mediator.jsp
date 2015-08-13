@@ -51,13 +51,13 @@
             <tbody>
                 <%if (cacheMediator.getId() != null) { %>
                 <tr>
-                    <td class="leftCol-small"><fmt:message key="mediator.cache.id"/></td>
+                    <td class="leftCol-med"><fmt:message key="mediator.cache.id"/></td>
                     <td><input type="text" name="cacheId" value="<%=cacheMediator.getId()%>"
                                size="40"/></td>
                 </tr>
                 <%} else { %>
                 <tr>
-                    <td class="leftCol-small"><fmt:message key="mediator.cache.id"/></td>
+                    <td class="leftCol-med"><fmt:message key="mediator.cache.id"/></td>
                     <td><input type="text" name="cacheId" value="" size="40"/></td>
                 </tr>
                 <%}%>
@@ -66,7 +66,8 @@
                             (cacheMediator.getScope().equalsIgnoreCase("Per-Mediator"))) {
                 %>
                 <tr>
-                    <td><fmt:message key="mediator.cache.scope"/></td>
+                    <td><fmt:message key="mediator.cache.scope"/><font
+                            style="color: red; font-size: 8pt;"> *</font></td>
                     <td><select name="cacheScope">
                         <option value="per-mediator">Per-Mediator</option>
                         <option value="per-host">Per-Host</option>
@@ -77,7 +78,8 @@
                         (cacheMediator.getScope().equalsIgnoreCase("Per-Host"))) {
                 %>
                 <tr>
-                    <td><fmt:message key="mediator.cache.scope"/></td>
+                    <td><fmt:message key="mediator.cache.scope"/><font
+                            style="color: red; font-size: 8pt;"> *</font></td>
                     <td><select name="cacheScope">
                         <option value="per-host">Per-Host</option>
                         <option value="Per-Mediator">Per-Mediator</option>
@@ -85,7 +87,8 @@
                 </tr>
                 <%} else {%>
                 <tr>
-                    <td><fmt:message key="mediator.cache.scope"/></td>
+                    <td><fmt:message key="mediator.cache.scope"/><font
+                            style="color: red; font-size: 8pt;"> *</font></td>
                     <td><select name="cacheScope">
                         <option value="per-mediator">Per-Mediator</option>
                         <option value="Per-Host">Per-Host</option>
@@ -95,7 +98,8 @@
 
                 <%if (cacheMediator.isCollector()) {%>
                 <tr>
-                    <td><fmt:message key="mediator.cache.type"/></td>
+                    <td><fmt:message key="mediator.cache.type"/><font
+                            style="color: red; font-size: 8pt;"> *</font></td>
                     <td><select name="cacheType" onchange="collectorSelector(this)">
                         <option value="Collector">Collector</option>
                         <option value="Finder">Finder</option>
@@ -103,7 +107,8 @@
                 </tr>
                 <%} else {%>
                 <tr>
-                    <td><fmt:message key="mediator.cache.type"/></td>
+                    <td><fmt:message key="mediator.cache.type"/><font
+                            style="color: red; font-size: 8pt;"> *</font></td>
                     <td><select name="cacheType" onchange="collectorSelector(this)">
                         <option value="Finder">Finder</option>
                         <option value="Collector">Collector</option>
@@ -114,20 +119,23 @@
                
                 
                 <tr>
-                    <td><div id="hasGen"><fmt:message key="mediator.cache.hashgenerator"/></div></td>
+                    <td><div id="hasGen"><fmt:message key="mediator.cache.hashgenerator"/><font
+                            style="color: red; font-size: 8pt;"> *</font></div></td>
                     <td><div id="hasGehVal"><input type="text" name="hashGen"
                                value="org.wso2.carbon.mediator.cache.digest.DOMHASHGenerator" readonly="readonly"
                                size="40"/></div></td>
                 </tr>
                 <%if (cacheMediator.getTimeout() > 0) {%>
                 <tr>
-                    <td><div id="timeout"><fmt:message key="mediator.cache.timeoutseconds"/></div></td>
+                    <td><div id="timeout"><fmt:message key="mediator.cache.timeoutseconds"/><font
+                            style="color: red; font-size: 8pt;"> *</font></div></td>
                     <td><div id="timeoutVal"><input type="text" name="cacheTimeout"
                                value="<%=cacheMediator.getTimeout()%>" size="40"/></div></td>
                 </tr>
                 <%} else {%>
                 <tr>
-                    <td><div id="timeout"><fmt:message key="mediator.cache.timeoutseconds"/></div></td>
+                    <td><div id="timeout"><fmt:message key="mediator.cache.timeoutseconds"/><font
+                            style="color: red; font-size: 8pt;"> *</font></div></td>
                     <td><div id="timeoutVal"><input type="text" name="cacheTimeout" value="" size="40"/></div></td>
                 </tr>
                 <%}%>
@@ -155,7 +163,7 @@
             <table class="normal">
 
                 <tr>
-                    <td class="leftCol-small"><fmt:message
+                    <td class="leftCol-med"><fmt:message
                             key="mediator.cache.implementationType"/></td>
                     <td><select name="impType">
                         <option value="In-Memory">In-Memory</option>

@@ -271,26 +271,101 @@ function showAdvancedOptions(id) {
     }
 }
 
-function showSpecialFields(specialParams, inboundDescriptionOfParams) {
-    var consumerType = document.getElementById('consumer.type').value;
+function showSpecialFields(specialParams, inboundDescriptionOfParams, topicListParams) {
+    var strSplitter = "~:~";
+    var consumerType = document.getElementById('consumer.type').value.trim();
     var specialFieldsArea = '<table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">';
         allSpecialParams = specialParams.split(",");
         splitedInboundDescription = inboundDescriptionOfParams.replace("{","").replace("}","").split(",");
         for(var i=0; i<allSpecialParams.length; i++){
-            if((consumerType == "highlevel" && allSpecialParams[i] == "topics") || (consumerType == "simple" && consumerType == allSpecialParams[i].split(".")[0])){
+        var specialParam = allSpecialParams[i];
+        if((consumerType == "highlevel" && (specialParam.indexOf(strSplitter) > -1 && specialParam.split(strSplitter)[0].trim() == "topics/topic.filter")) || (consumerType == "simple" && consumerType == specialParam.split(".")[0])){
             var val = "";
             if(inboundDescriptionOfParams != ""){
                 for(var j=0; j<splitedInboundDescription.length; j++){
-                    if(splitedInboundDescription[j].split("=")[0].trim() == allSpecialParams[i]){
+                    if(splitedInboundDescription[j].split("=")[0].trim() == specialParam || (specialParam.indexOf(strSplitter) > -1 && splitedInboundDescription[j].split("=")[0] == specialParam.split(strSplitter)[1].trim())){
                         val = splitedInboundDescription[j].split("=")[1];
                         break;
                     }
                 }
             }
-                specialFieldsArea = specialFieldsArea  + '<tr><td style="width:167px">'+allSpecialParams[i].replace(consumerType+".","")+'<span class="required">*</span></td><td align="left"><input id="'+allSpecialParams[i]+'" name="'+allSpecialParams[i]+'" class="longInput" type="text" value="'+val+'"/></td><td></td></tr>';
+
+            if(consumerType == "highlevel" && (specialParam.indexOf(strSplitter) > -1 && specialParam.split(strSplitter)[0].trim() == "topics/topic.filter")) {
+                specialFieldsArea = specialFieldsArea  + '<tr><td style="width:167px">'+specialParam.split(strSplitter)[0].trim()+'<span class="required">*</span></td><td align="left"><select id="topicsOrTopicFilter" name="topicsOrTopicFilter" onchange="javascript:showTopicsOrTopicFilterFields(\''+inboundDescriptionOfParams+'\',\''+topicListParams+'\')">';
+                var tLists = specialParam.split(strSplitter);
+                for(var t = 1; t < tLists.length; t++){
+                    specialFieldsArea = specialFieldsArea + '<option value="'+tLists[t].trim()+'">'+tLists[t].trim()+'</option>';
+                }
+                specialFieldsArea = specialFieldsArea + '</select></td><td></td></tr>';
+                specialFieldsArea = specialFieldsArea + '<tr><td colspan="3"><div id="tDiv"><table>';
+                if(tLists[0].trim() == "topic.filter") {
+                    var fLists = topicListParams.split(strSplitter);
+                    var listval = fLists[1].trim();
+                    if(inboundDescriptionOfParams != ""){
+                        for(var j=0; j<splitedInboundDescription.length; j++){
+                            if((splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist" || splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist") && Boolean(splitedInboundDescription[j].split("=")[1])){
+                                listval = splitedInboundDescription[j].split("=")[0].trim();
+                                break;
+                            }
+                        }
+                    }
+                    specialFieldsArea = specialFieldsArea + '<tr><td style="width:157px">'+fLists[0].trim()+'<span class="required">*</span></td><td align="left"><select id="'+fLists[0].trim()+'" name="'+fLists[0].trim()+'">';
+                    for(var l=1; l<fLists.length; l++){
+                        if(listval == fLists[l].trim()){
+                            specialFieldsArea = specialFieldsArea + '<option value="'+fLists[l].trim()+'" selected>'+fLists[l].trim()+'</option>';
+                        } else{
+                            specialFieldsArea = specialFieldsArea + '<option value="'+fLists[l].trim()+'">'+fLists[l].trim()+'</option>';
+                        }
+                    }
+                    specialFieldsArea = specialFieldsArea + '</select></td><td></td></tr>';
+                }
+                specialFieldsArea = specialFieldsArea + '<tr><td style="width:157px">'+specialParam.split(strSplitter)[1].trim()+' name<span class="required">*</span></td><td align="left"><input id="'+specialParam.split(strSplitter)[1].trim()+'" name="'+specialParam.split(strSplitter)[1].trim()+'" class="longInput" type="text" value="'+val+'"/></td><td></td></tr></table></div></td></tr>';
+            } else{
+                specialFieldsArea = specialFieldsArea + '<tr><td style="width:167px">'+specialParam.replace(consumerType+".","")+'<span class="required">*</span></td><td align="left"><input id="'+specialParam+'" name="'+specialParam+'" class="longInput" type="text" value="'+val+'"/></td><td></td></tr>';
+            }
             }
         }
    specialFieldsArea = specialFieldsArea  + '</table>';
    document.getElementById('specialFieldsForm').innerHTML = specialFieldsArea;
+}
+
+function showTopicsOrTopicFilterFields(inboundDescriptionOfParams, topicListParams) {
+    var strSplitter = "~:~";
+    var tField = document.getElementById('topicsOrTopicFilter').value.trim();
+    var tFieldsArea = '<table>';
+    var val = "";
+    splitedInboundDescription = inboundDescriptionOfParams.replace("{","").replace("}","").split(",");
+    if(inboundDescriptionOfParams != ""){
+        for(var j=0; j<splitedInboundDescription.length; j++){
+            if(splitedInboundDescription[j].split("=")[0].trim() == tField){
+                val = splitedInboundDescription[j].split("=")[1];
+                break;
+            }
+        }
+    }
+    if(tField == "topic.filter") {
+    var fLists = topicListParams.split(strSplitter);
+    var listval = fLists[1].trim();
+        if(inboundDescriptionOfParams != ""){
+            for(var j=0; j<splitedInboundDescription.length; j++){
+                if((splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist" || splitedInboundDescription[j].split("=")[0].trim() == "filter.from.whitelist") && Boolean(splitedInboundDescription[j].split("=")[1])){
+                    listval = splitedInboundDescription[j].split("=")[0].trim();
+                    break;
+                }
+            }
+        }
+        tFieldsArea = tFieldsArea + '<tr><td style="width:157px">'+fLists[0].trim()+'<span class="required">*</span></td><td align="left"><select id="'+fLists[0].trim()+'" name="'+fLists[0].trim()+'">';
+        for(var l=1; l<fLists.length; l++){
+            if(listval == fLists[l].trim()){
+                tFieldsArea = tFieldsArea + '<option value="'+fLists[l].trim()+'" selected>'+fLists[l].trim()+'</option>';
+            } else{
+                tFieldsArea = tFieldsArea + '<option value="'+fLists[l].trim()+'">'+fLists[l].trim()+'</option>';
+            }
+        }
+        tFieldsArea = tFieldsArea + '</select></td><td></td></tr>';
+    }
+    tFieldsArea = tFieldsArea + '<tr><td style="width:157px">'+tField.trim()+' name<span class="required">*</span></td><td align="left"><input id="'+tField.trim()+'" name="'+tField.trim()+'" class="longInput" type="text" value="'+val+'"/></td><td></td></tr>';
+    tFieldsArea = tFieldsArea + '</table>';
+    document.getElementById('tDiv').innerHTML = tFieldsArea;
 }
 
