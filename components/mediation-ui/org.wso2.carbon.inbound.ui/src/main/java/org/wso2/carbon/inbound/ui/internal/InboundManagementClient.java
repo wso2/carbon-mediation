@@ -110,12 +110,7 @@ public class InboundManagementClient {
 
     public List<String> getDefaultParameters(String strType) {
         List<String> rtnList = new ArrayList<String>();
-        if (!strType.equals(InboundClientConstants.TYPE_HTTP)
-                && !strType.equals(InboundClientConstants.TYPE_HTTPS)
-                && !strType.equals(InboundClientConstants.TYPE_HL7)
-                && !strType.equals(InboundClientConstants.TYPE_CXF_WS_RM)) {
-            rtnList.addAll(getList("common", true));
-        }
+
         if (!strType.equals(InboundClientConstants.TYPE_CLASS)) {
             rtnList.addAll(getList(strType, true));
         }
