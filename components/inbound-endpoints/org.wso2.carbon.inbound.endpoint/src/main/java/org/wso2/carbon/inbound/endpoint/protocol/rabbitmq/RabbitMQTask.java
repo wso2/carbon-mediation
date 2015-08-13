@@ -30,28 +30,20 @@ public class RabbitMQTask extends OneTimeTriggerInboundTask {
     private RabbitMQConnectionConsumer rabbitMQConnectionConsumer;
 
     public RabbitMQTask(RabbitMQConnectionConsumer rabbitMQConnectionConsumer) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("RabbitMQ Task initialize.");
-        }
+        logger.debug("RabbitMQ Task initialize.");
         this.rabbitMQConnectionConsumer = rabbitMQConnectionConsumer;
     }
 
     protected void taskExecute() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Executing RabbitMQ Task Execution.");
-        }
+        logger.debug("Executing RabbitMQ Task Execution.");
         rabbitMQConnectionConsumer.execute();
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Initializing.");
-        }
+        logger.debug("Initializing.");
     }
 
     public void destroy() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Destroying.");
-        }
+        logger.debug("Destroying.");
     }
 }
