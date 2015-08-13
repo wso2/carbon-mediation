@@ -26,7 +26,8 @@ import java.lang.reflect.Constructor;
 public abstract class GenericInboundListener implements InboundRequestProcessor {
 
     private static final Logger log = Logger.getLogger(GenericInboundListener.class);
-    public static final String PARAM_INBOUND_ENDPOINT_LISTENING = "inbound.listening";
+    public static final String PARAM_INBOUND_ENDPOINT_BEHAVIOR = "inbound.behavior";
+    public static final String PARAM_INBOUND_ENDPOINT_BEHAVIOR_LISTENING = "listening";
 
     protected String injectingSequence;
     protected String onErrorSequence;
@@ -82,8 +83,8 @@ public abstract class GenericInboundListener implements InboundRequestProcessor 
      * @return boolean
      */
     public static boolean isListeningInboundEndpoint(InboundProcessorParams inboundParameters){
-        return inboundParameters.getProperties().containsKey(GenericInboundListener.PARAM_INBOUND_ENDPOINT_LISTENING)
-               && "true".equals(inboundParameters.getProperties().getProperty(GenericInboundListener.PARAM_INBOUND_ENDPOINT_LISTENING));
+        return inboundParameters.getProperties().containsKey(GenericInboundListener.PARAM_INBOUND_ENDPOINT_BEHAVIOR)
+               && GenericInboundListener.PARAM_INBOUND_ENDPOINT_BEHAVIOR_LISTENING.equals(inboundParameters.getProperties().getProperty(GenericInboundListener.PARAM_INBOUND_ENDPOINT_BEHAVIOR));
     }
 
 

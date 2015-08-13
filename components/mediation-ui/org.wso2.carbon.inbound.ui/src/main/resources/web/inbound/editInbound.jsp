@@ -173,7 +173,33 @@ var requiredParams = null;
                             <input name="inboundClass" id="inboundClass" class="longInput" type="text" value="<%=inboundDescription.getClassImpl()%>"/>                                         
                         </td>
                         <td></td>
-                    </tr>                   
+                    </tr>
+                    <tr>
+                        <td style="width:150px"><fmt:message key="inbound.isListening"/></td>
+                        <td>
+                            <input type="radio" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')"><fmt:message key="inbound.polling"/>
+                            <input type="radio" id="inbound.behavior.listening" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
+                        </td>
+                        <td></td>
+                    </tr>
+
+                    <tr id="inboundIntervalRow">
+                        <td style="width:150px"><fmt:message key="inbound.interval"/><span class="required">*</span></td>
+                        <td align="left">
+                            <input name="inboundInterval" id="interval" class="longInput" type="text"/>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <script language="javascript">
+                        function toggleInboundInterval(event){
+                            if (event == "listening"){
+                                document.getElementById("inboundIntervalRow").style.display="none";
+                            } else {
+                                document.getElementById("inboundIntervalRow").style.display="table-row";
+                            }
+                        }
+                    </script>
+
                     <% } %>
                     <%if(!defaultParams.isEmpty()){                     
                     %>
@@ -259,6 +285,21 @@ var requiredParams = null;
 					<%  int i = 0;
 					    for(String strKey : inboundDescription.getParameters().keySet()) {
 					    if(!defaultParamNames.contains(strKey)){
+
+                            if (strKey.equalsIgnoreCase("inbound.behavior")) {
+                                if(inboundDescription.getParameters().get(strKey).equalsIgnoreCase("listening")){
+                                    %>
+                                        <script language="javascript">
+                                            document.getElementById("inbound.behavior.listening").checked = true;
+                                            document.getElementById("inboundIntervalRow").style.display="none";
+                                        </script>
+
+                                    <%
+                                }
+
+                                continue;
+                            }
+
 					    i++;
 					    %>                        
 	                    <tr>
