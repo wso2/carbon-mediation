@@ -99,6 +99,19 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
 
             EndpointTemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArrayByTemplate(templates);
             EndpointTemplateInfo[] ret;
+
+            if (info != null && info.length > 0) {
+                for (EndpointTemplateInfo tempplateInfo : info) {
+                    Template template = getSynapseConfiguration().getEndpointTemplates()
+                            .get(tempplateInfo.getTemplateName());
+                    if (template.getArtifactContainerName() != null) {
+                        tempplateInfo.setArtifactContainerName(template.getArtifactContainerName());
+                    }
+                    if (template.isEdited()) {
+                        tempplateInfo.setIsEdited(true);
+                    }
+                }
+            }
             if (info.length >= (endpointTemplatesPerPage * pageNumber + endpointTemplatesPerPage)) {
                 ret = new EndpointTemplateInfo[endpointTemplatesPerPage];
             } else {
@@ -262,7 +275,13 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                     Template templ = config.getEndpointTemplates().get(templateName);
                     if (templ != null) {
 //                        templ.init(getSynapseEnvironment());
-                        persistTemplate(templ);
+                        if (preSeq.getArtifactContainerName() != null) {
+                            templ.setArtifactContainerName(preSeq.getArtifactContainerName());
+                            templ.setIsEdited(true);
+                        }
+                        else {
+                            persistTemplate(templ);
+                        }
                     }
                 }
             } else {
