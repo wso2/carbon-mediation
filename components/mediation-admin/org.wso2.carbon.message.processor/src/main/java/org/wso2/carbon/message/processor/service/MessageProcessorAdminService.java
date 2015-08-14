@@ -35,6 +35,8 @@ import org.apache.synapse.config.xml.MessageProcessorFactory;
 import org.apache.synapse.config.xml.MessageProcessorSerializer;
 import org.apache.synapse.message.processor.MessageProcessor;
 import org.apache.synapse.message.processor.impl.ScheduledMessageProcessor;
+import org.apache.synapse.message.processor.impl.failover.FailoverMessageForwardingProcessorView;
+import org.apache.synapse.message.processor.impl.failover.FailoverScheduledMessageForwardingProcessor;
 import org.apache.synapse.message.processor.impl.forwarder.MessageForwardingProcessorView;
 import org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor;
 import org.apache.synapse.message.processor.impl.sampler.SamplingProcessor;
@@ -536,6 +538,12 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     if(view != null){
                     	active = view.isActive();
                     }
+                } else if (processor instanceof FailoverScheduledMessageForwardingProcessor) {
+                    FailoverMessageForwardingProcessorView view =
+                            ((FailoverScheduledMessageForwardingProcessor) processor).getView();
+                    if (view != null) {
+                        active = view.isActive();
+                    }
                 }
             }
         } catch (Exception e) {
@@ -572,6 +580,15 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     } else {
                         log.warn("Scheduled Message Forwarding Processor is already active");
                     }
+                } else if (processor instanceof FailoverScheduledMessageForwardingProcessor) {
+                    FailoverMessageForwardingProcessorView view =
+                            ((FailoverScheduledMessageForwardingProcessor) processor).getView();
+                    if (!view.isActive()) {
+                        view.activate();
+                    } else {
+                        log.warn("Scheduled Failover Message Forwarding Processor is already active");
+                    }
+
                 } else if (processor instanceof SamplingProcessor) {
                     SamplingProcessorView view =
                             ((SamplingProcessor) processor).getView();
@@ -621,6 +638,16 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     } else {
                         log.warn("Scheduled Message Forwarding Processor - already deActive");
                     }
+                } else if (processor instanceof FailoverScheduledMessageForwardingProcessor) {
+
+                    FailoverMessageForwardingProcessorView view =
+                            ((FailoverScheduledMessageForwardingProcessor) processor).getView();
+                    if (view.isActive()) {
+                        view.deactivate();
+                    } else {
+                        log.warn("Scheduled Failover Message Forwarding Processor - already deActive");
+                    }
+
                 } else if (processor instanceof SamplingProcessor) {
                     SamplingProcessorView view = ((SamplingProcessor) processor).getView();
                     if (view.isActive()) {

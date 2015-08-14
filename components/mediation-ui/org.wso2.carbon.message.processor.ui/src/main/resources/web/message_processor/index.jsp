@@ -109,6 +109,8 @@
 
         if (processorType == "Scheduled Message Forwarding Processor") {
             document.location.href = "manageMessageForwardingProcessor.jsp?" + "messageProcessorName=" + content;
+        } else if(processorType == "Scheduled Failover Message Forwarding Processor") {
+            document.location.href = "manageFailoverMessageForwardingProcessor.jsp?" + "messageProcessorName=" + content;
         } else if (processorType == "Message Sampling Processor") {
             document.location.href = "manageMessageSamplingProcessor.jsp?" + "messageProcessorName=" + content;
         } else {
@@ -254,13 +256,19 @@
                     type = client.getClassName(data.getName());
 
                     if (type != null) {
+
                         if ("org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor".
                                 equals(type.trim())) {
                             type = "Scheduled Message Forwarding Processor";
+                         } else if ("org.apache.synapse.message.processor.impl.failover.FailoverScheduledMessageForwardingProcessor".
+                                equals(type.trim())) {
+                            type = "Scheduled Failover Message Forwarding Processor";
+
                         } else if ("org.apache.synapse.message.processor.impl.sampler.SamplingProcessor".
                                 equals(type.trim())) {
                             type = "Message Sampling Processor";
                         }
+
                     } else {
                         type = "Custom Message Processor";
                     }
@@ -295,8 +303,8 @@
             </td>
             <%
                 if (("Scheduled Message Forwarding Processor".
-                        equalsIgnoreCase(type) || "Message Sampling Processor".equals(type))
-                        && client.isActive(data.getName())) {
+                        equalsIgnoreCase(type) || "Message Sampling Processor".equals(type) || "Scheduled Failover Message Forwarding Processor".equalsIgnoreCase(type))
+                        && client.isActive(name)) {
             %>
             <td>
                  <% if (data.getDeployedFromCApp()) { %>
@@ -363,6 +371,26 @@
                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 
             </td>
+            <%
+             } else if ("Scheduled Failover Message Forwarding Processor".
+                                equalsIgnoreCase(type)) {
+             %>
+                <td><a onclick="editRow('<%= type%>', this.parentNode.parentNode.rowIndex)" href="#"
+                        class="icon-link"
+                        style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                        key="edit"/></a>
+                    <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+                       id="delete_link" class="icon-link"
+                       style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                       key="delete"/></a>
+                    <span class="icon-text" style="background-image:url(../message_processor/images/deactivate.gif);">
+                    <fmt:message key="inactive"/>&nbsp;[</span>
+                    <a href="#" class="icon-link" id="activate_link"
+                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                       onclick="activateRow(this.parentNode.parentNode.rowIndex)"><fmt:message key="activate"/></a>
+                    <span class="icon-text"
+                          style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
+                </td>
             <%
             } else if ("Message Sampling Processor".
                     equalsIgnoreCase(type)) {
@@ -447,6 +475,18 @@
                 <fmt:message key="scheduled.message.forwarding.processor.desc"/>
             </td>
         </tr>
+        <tr>
+            <td style="width:155px;">
+                <a  href="manageFailoverMessageForwardingProcessor.jsp"  class="icon-link"
+                    style="background: url(../admin/images/add.gif)  no-repeat;">
+                    <fmt:message key="scheduled.failover.message.forwarding.processor"/>
+                </a>
+            </td>
+            <td>
+                <fmt:message key="scheduled.failover.message.forwarding.processor.desc"/>
+            </td>
+        </tr>
+
         <tr>
             <td style="width:155px;">
                 <a 
