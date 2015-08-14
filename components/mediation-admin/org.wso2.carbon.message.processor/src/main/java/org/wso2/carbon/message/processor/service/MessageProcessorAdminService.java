@@ -57,7 +57,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     private static final String artifactType = ServiceBusConstants.MESSAGE_PROCESSOR_TYPE;
     public final static String DEFAULT_AXIS2_XML = "./repository/conf/axis2/axis2_blocking_client.xml";
 
-
     /**
      * Get an XML configuration element for a message processor from the FE and creates and add
      * the MessageStore to the synapse configuration.
