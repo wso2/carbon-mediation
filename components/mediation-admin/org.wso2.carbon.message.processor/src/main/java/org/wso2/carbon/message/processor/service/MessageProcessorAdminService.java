@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -54,6 +55,8 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
 
     public static final int MSGS_PER_PAGE = 10;
     private static final String artifactType = ServiceBusConstants.MESSAGE_PROCESSOR_TYPE;
+    public final static String DEFAULT_AXIS2_XML = "./repository/conf/axis2/axis2_blocking_client.xml";
+
 
     /**
      * Get an XML configuration element for a message processor from the FE and creates and add
@@ -711,6 +714,23 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         }
 
         return endpoints;
+    }
+    
+    /**
+     * Checks whether given Axis2ClientRepo is valid one or not
+     * @param input location of the Axis2 Client Repository
+     * @return <code>true</code> if the given axis client repository valid, <code>false</code> otherwise.
+     * @throws AxisFault If an ERROR is encountered or given repository location is invalid.
+     */
+    public boolean validateAxis2ClientRepo(String input) throws AxisFault {
+        try {
+            ConfigurationContextFactory.createConfigurationContextFromFileSystem(input,
+                                                                                 DEFAULT_AXIS2_XML);
+            return true;
+        } catch (AxisFault e) {
+            handleException(log, "Error while validating the Axis2 Client Repository", e);
+            return false;
+        }
     }
 
 }

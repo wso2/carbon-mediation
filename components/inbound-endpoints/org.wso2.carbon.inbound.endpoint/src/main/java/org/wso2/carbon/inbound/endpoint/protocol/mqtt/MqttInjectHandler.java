@@ -149,7 +149,7 @@ public class MqttInjectHandler {
     }
 
     /**
-     * Create the initial message context for the file
+     * Create the initial message context
      */
     private org.apache.synapse.MessageContext createMessageContext() {
         org.apache.synapse.MessageContext msgCtx = synapseEnvironment

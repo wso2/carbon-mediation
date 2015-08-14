@@ -16,16 +16,15 @@
 
 package org.wso2.carbon.inbound.endpoint.common;
 
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
-import org.wso2.carbon.inbound.endpoint.protocol.mqtt.MqttTask;
 import org.wso2.carbon.mediation.clustering.ClusteringAgentUtil;
 import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.ConfigurationContextService;
 
+/**
+ * OnetimeTriggerInboundRunner class is used to run the non coordinated processors in
+ * background. This Runner is only active for one task execution iteration ( One time trigger )
+ */
 public class OneTimeTriggerInboundRunner implements Runnable {
 
     private OneTimeTriggerInboundTask task;
@@ -34,7 +33,7 @@ public class OneTimeTriggerInboundRunner implements Runnable {
     private String tenantDomain;
     private static final long CLUSTER_CONFIGURATION_CHECK_INTERVAL = 1000;
 
-    private static final Log log = LogFactory.getLog(InboundRunner.class);
+    private static final Log log = LogFactory.getLog(OneTimeTriggerInboundRunner.class);
 
     public OneTimeTriggerInboundRunner(OneTimeTriggerInboundTask task, String tenantDomain) {
         this.task = task;
@@ -85,15 +84,7 @@ public class OneTimeTriggerInboundRunner implements Runnable {
         } catch (Exception e) {
             log.error("Error executing the Inbound Endpoint once time execution", e);
         }
-        //Keep the tenant loaded
-        if (tenantDomain != null) {
-            ConfigurationContextService configurationContext =
-                    InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
-            if (configurationContext != null) {
-                ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
-                TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
-            }
-        }
+
         if (log.isDebugEnabled()) {
             log.debug("Exiting the Inbound Endpoint.");
         }

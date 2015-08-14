@@ -213,6 +213,20 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="validateAxis2ClientRepo">
+        		<xs:complexType>
+        			<xs:sequence>
+        				<xs:element name="in" type="xs:string"></xs:element>
+        			</xs:sequence>
+        		</xs:complexType>
+        	</xs:element>
+        	<xs:element name="validateAxis2ClientRepoResponse">
+        		<xs:complexType>
+        			<xs:sequence>
+        				<xs:element name="out" type="xs:boolean"></xs:element>
+        			</xs:sequence>
+        		</xs:complexType>
+        	</xs:element>
         </xs:schema>
     </wsdl:types>
     <wsdl:message name="getSizeRequest">
@@ -302,6 +316,12 @@
     <wsdl:message name="resendAllRequest">
         <wsdl:part name="parameters" element="ns:resendAll"/>
     </wsdl:message>
+    <wsdl:message name="validateAxis2ClientRepoRequest">
+    	<wsdl:part name="parameters" element="ns:validateAxis2ClientRepo"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="validateAxis2ClientRepoResponse">
+    	<wsdl:part name="parameters" element="ns:validateAxis2ClientRepoResponse"></wsdl:part>
+    </wsdl:message>
     <wsdl:portType name="MessageProcessorAdminServicePortType">
         <wsdl:operation name="getSize">
             <wsdl:input message="tns:getSizeRequest" wsaw:Action="urn:getSize"/>
@@ -371,6 +391,10 @@
         </wsdl:operation>
         <wsdl:operation name="resendAll">
             <wsdl:input message="tns:resendAllRequest" wsaw:Action="urn:resendAll"/>
+        </wsdl:operation>
+        <wsdl:operation name="validateAxis2ClientRepo">
+            <wsdl:input message="tns:validateAxis2ClientRepoRequest" wsaw:Action="urn:validateAxis2ClientRepo" />
+            <wsdl:output message="tns:validateAxis2ClientRepoResponse" wsaw:Action="urn:validateAxis2ClientRepoResponse" />
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="MessageProcessorAdminServiceSoap11Binding" type="tns:MessageProcessorAdminServicePortType">
@@ -522,6 +546,16 @@
                 <soap:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
+        <wsdl:operation name="validateAxis2ClientRepo">
+            <soap:operation
+                    soapAction="http://service.processor.message.carbon.wso2.org/validateAxis2ClientRepo" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="MessageProcessorAdminServiceSoap12Binding" type="tns:MessageProcessorAdminServicePortType">
         <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
@@ -672,6 +706,10 @@
                 <soap12:body use="literal"/>
             </wsdl:input>
         </wsdl:operation>
+        <wsdl:operation name="validateAxis2ClientRepo">
+            <wsdl:input></wsdl:input>
+            <wsdl:output></wsdl:output>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="MessageProcessorAdminServiceHttpBinding" type="tns:MessageProcessorAdminServicePortType">
         <http:binding verb="POST"/>
@@ -821,6 +859,15 @@
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="validateAxis2ClientRepo">
+            <http:operation location="/validateAxis2ClientRepo" />
+            <wsdl:input>
+                <mime:content type="application/x-www-form-urlencoded" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" />
+            </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="MessageProcessorAdminService">

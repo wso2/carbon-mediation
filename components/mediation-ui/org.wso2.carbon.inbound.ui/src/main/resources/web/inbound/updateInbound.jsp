@@ -73,19 +73,34 @@
                    sParams.add((new ParamDTO("SSLProtocol",request.getParameter(strKey))));
                 }else if(strKey.startsWith("CertificateRevocationVerifier")){
                    sParams.add((new ParamDTO("CertificateRevocationVerifier",request.getParameter(strKey))));
+                }else if(strKey.startsWith("enableSSL")){
+                   sParams.add((new ParamDTO("enableSSL",request.getParameter(strKey))));
                 }else if(strKey.startsWith("coordination")){
-		   sParams.add((new ParamDTO("coordination",request.getParameter("coordination")))); 
-		        } else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")|| strKey.startsWith("topic.filter.")|| strKey.equals("topics")||strKey.startsWith("filter.from.")||strKey.startsWith("consumer.type")|| strKey.startsWith("thread.count")|| strKey.startsWith("simple.")|| strKey.startsWith("content.type")){
-                   String strVal = request.getParameter(strKey);
+		           sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));
+		        }else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")|| strKey.startsWith("topic.filter")|| strKey.equals("topics")||strKey.startsWith("filter.from")||strKey.startsWith("consumer.type")
+                      || strKey.startsWith("thread.count")|| strKey.startsWith("simple.")|| strKey.startsWith("content.type") || strKey.startsWith("offsets.") || strKey.startsWith("socket.") || strKey.startsWith("fetch.")
+                      || strKey.startsWith("consumer.") || strKey.startsWith("num.consumer.fetchers") || strKey.startsWith("queued.max.message.chunks") || strKey.startsWith("rebalance.") || strKey.startsWith("exclude.internal.topics")
+                      || strKey.startsWith("partition.assignment.strategy") || strKey.startsWith("client.id") || strKey.startsWith("dual.commit.enabled")){
+                   String strVal = request.getParameter(strKey).trim();
+                   if(strKey.trim().equals("filter.from"))
+                   {
+                       strKey = request.getParameter(strKey);
+                       strVal = "true";
+                   }
                    if(strVal != null && !strVal.equals("")){
-                      sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                      sParams.add(new ParamDTO(strKey, strVal));
                    }
                 }else if(strKey.startsWith("mqtt.")|| strKey.startsWith("content.type")){
                                     String strVal = request.getParameter(strKey);
                                     if(strVal != null && !strVal.equals("")){
                                        sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
                                     }
-                                 }
+                }else if(strKey.startsWith("rabbitmq.")){
+                	String strVal = request.getParameter(strKey);
+                    if(strVal != null && !strVal.equals("")){
+                    	sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                    }
+                }
            }
 		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl,request.getParameter("inboundSuspend"), sParams);
 			if(!added){

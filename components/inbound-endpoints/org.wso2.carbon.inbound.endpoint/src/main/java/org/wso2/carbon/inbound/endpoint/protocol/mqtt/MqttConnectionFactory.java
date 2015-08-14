@@ -18,16 +18,18 @@ package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.util.Hashtable;
 import java.util.Properties;
 
 /**
- * MQTT factory, return instances of asynchronous and synchronous clients
+ * MQTT factory, return instances of asynchronous clients
  */
 public class MqttConnectionFactory {
 
@@ -35,7 +37,7 @@ public class MqttConnectionFactory {
 
     private String factoryName;
     private Hashtable<String, String> parameters = new Hashtable<String, String>();
-    MqttDefaultFilePersistence dataStore;
+    private MqttDefaultFilePersistence dataStore;
 
 
     public MqttConnectionFactory(Properties passedInParameter) {
@@ -48,32 +50,41 @@ public class MqttConnectionFactory {
                 parameters.put(MqttConstants.MQTT_SERVER_HOST_NAME,
                         passedInParameter.getProperty(MqttConstants.MQTT_SERVER_HOST_NAME));
             } else {
-                log.error("Host name cannot be empty");
+                String msg = "MQTT inbound listener Host Name cannot be empty";
+                log.error(msg);
+                throw new SynapseException(msg);
             }
 
             if (passedInParameter.getProperty(MqttConstants.MQTT_TOPIC_NAME) != null) {
                 parameters.put(MqttConstants.MQTT_TOPIC_NAME,
                         passedInParameter.getProperty(MqttConstants.MQTT_TOPIC_NAME));
             } else {
-                log.error("Specify the topic name to be subscribed");
+                String msg = "MQTT inbound listener Subscription Topic Name cannot be empty";
+                log.error(msg);
+                throw new SynapseException(msg);
             }
 
             if (passedInParameter.getProperty(MqttConstants.MQTT_SERVER_PORT) != null) {
                 parameters.put(MqttConstants.MQTT_SERVER_PORT,
                         passedInParameter.getProperty(MqttConstants.MQTT_SERVER_PORT));
             } else {
-                log.error("Port number cannot be empty");
+                String msg = "MQTT inbound listener Port Number cannot be empty";
+                log.error(msg);
+                throw new SynapseException(msg);
             }
 
             if (passedInParameter.getProperty(MqttConstants.CONTENT_TYPE) != null) {
                 parameters.put(MqttConstants.CONTENT_TYPE,
                         passedInParameter.getProperty(MqttConstants.CONTENT_TYPE));
             } else {
-                log.error("Specify the content type of the message");
+                log.warn("Default value is used for the parameter : "
+                        + MqttConstants.CONTENT_TYPE);
             }
 
             if (passedInParameter.getProperty(MqttConstants.MQTT_QOS) == null) {
                 parameters.put(MqttConstants.MQTT_QOS, "1");
+                log.warn("Default value is used for the parameter : "
+                        + MqttConstants.MQTT_QOS);
             }
 
             if (passedInParameter.getProperty(MqttConstants.MQTT_QOS) != null) {
@@ -84,24 +95,55 @@ public class MqttConnectionFactory {
                     parameters.put(MqttConstants.MQTT_QOS,
                             passedInParameter.getProperty(MqttConstants.MQTT_QOS));
                 } else {
-                    log.error("QOS must be either 0 or 1 or 2");
+                    parameters.put(MqttConstants.MQTT_QOS, "1");
+                    log.warn("Default value is used for the parameter : "
+                            + MqttConstants.MQTT_QOS);
                 }
             }
 
-            parameters.put(MqttConstants.MQTT_TEMP_STORE,
-                    passedInParameter.getProperty(MqttConstants.MQTT_TEMP_STORE));
+            if (passedInParameter.getProperty(MqttConstants.MQTT_TEMP_STORE) != null) {
+                parameters.put(MqttConstants.MQTT_TEMP_STORE,
+                        passedInParameter.getProperty(MqttConstants.MQTT_TEMP_STORE));
+            } else {
+                log.warn("Default value is used for the parameter : "
+                        + MqttConstants.MQTT_TEMP_STORE);
+            }
 
-            parameters.put(MqttConstants.MQTT_SESSION_CLEAN,
-                    passedInParameter.getProperty(MqttConstants.MQTT_SESSION_CLEAN));
+            if (passedInParameter.getProperty(MqttConstants.MQTT_SESSION_CLEAN) != null) {
+                parameters.put(MqttConstants.MQTT_SESSION_CLEAN,
+                        passedInParameter.getProperty(MqttConstants.MQTT_SESSION_CLEAN));
+            } else {
+                log.warn("Default value is used for the parameter : "
+                        + MqttConstants.MQTT_SESSION_CLEAN);
+            }
 
-            parameters.put(MqttConstants.MQTT_SSL_ENABLE,
-                    passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE));
+            if (passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE) != null) {
+                parameters.put(MqttConstants.MQTT_SSL_ENABLE,
+                        passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE));
+            } else {
+                log.warn("Default value is used for the parameter : "
+                        + MqttConstants.MQTT_SSL_ENABLE);
+            }
 
-            parameters.put(MqttConstants.MQTT_CLIENT_ID,
-                    passedInParameter.getProperty(MqttConstants.MQTT_CLIENT_ID));
+            if (passedInParameter.getProperty(MqttConstants.MQTT_CLIENT_ID) != null) {
+                parameters.put(MqttConstants.MQTT_CLIENT_ID,
+                        passedInParameter.getProperty(MqttConstants.MQTT_CLIENT_ID));
+            } else {
+                log.warn("Default value is used for the parameter : "
+                        + MqttConstants.MQTT_CLIENT_ID);
+            }
 
-        } catch (Exception e) {
-            log.error("Error while reading properties for MQTT connection factory " + factoryName);
+            if (passedInParameter.getProperty(MqttConstants.MQTT_RECONNECTION_INTERVAL) != null) {
+                parameters.put(MqttConstants.MQTT_RECONNECTION_INTERVAL,
+                        passedInParameter.getProperty(MqttConstants.MQTT_RECONNECTION_INTERVAL));
+            } else {
+                log.warn("Default value is used for the parameter : "
+                        + MqttConstants.MQTT_RECONNECTION_INTERVAL);
+            }
+
+        } catch (Exception ex) {
+            log.error("MQTT connection factory : " + factoryName + " failed to initialize " +
+                    "the MQTT Inbound configuration properties", ex);
         }
 
     }
@@ -110,8 +152,8 @@ public class MqttConnectionFactory {
         return factoryName;
     }
 
-    public MqttAsyncClient getMqttAsyncClient() {
-        return createMqttAsyncClient();
+    public MqttAsyncClient getMqttAsyncClient(String name) {
+        return createMqttAsyncClient(name);
     }
 
     public String getTopic() {
@@ -122,13 +164,54 @@ public class MqttConnectionFactory {
         return parameters.get(MqttConstants.CONTENT_TYPE);
     }
 
-    private MqttAsyncClient createMqttAsyncClient() {
+    public String getServerHost() {
+        return parameters.get(MqttConstants.MQTT_SERVER_HOST_NAME);
+    }
 
+    public String getServerPort() {
+        return parameters.get(MqttConstants.MQTT_SERVER_PORT);
+    }
+
+    public int getReconnectionInterval() {
+        if (parameters.get(MqttConstants.MQTT_RECONNECTION_INTERVAL) != null) {
+            return Integer.parseInt(parameters.get(MqttConstants.MQTT_RECONNECTION_INTERVAL));
+        } else {
+            return -1;
+        }
+    }
+
+    private MqttAsyncClient createMqttAsyncClient(String name) {
+
+        MqttClientManager clientManager = MqttClientManager.getInstance();
         String uniqueClientId;
+        String inboundIdentifier;
+
+
         if (parameters.get(MqttConstants.MQTT_CLIENT_ID) != null) {
             uniqueClientId = parameters.get(MqttConstants.MQTT_CLIENT_ID);
         } else {
             uniqueClientId = MqttAsyncClient.generateClientId();
+        }
+
+
+        PrivilegedCarbonContext carbonContext =
+                PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        int tenantId = carbonContext.getTenantId();
+        name = clientManager.buildNameIdentifier(name, String.valueOf(tenantId));
+
+        if (clientManager.hasInboundEndpoint(name)) {
+            inboundIdentifier = clientManager.getInboundEndpointIdentifier(name);
+        } else {
+            inboundIdentifier = clientManager.
+                    buildIdentifier(uniqueClientId, getServerHost(), getServerPort());
+        }
+
+        if (clientManager.hasMqttClient(inboundIdentifier)) {
+            //update data store reference
+            if (clientManager.hasClientDataStore(inboundIdentifier)) {
+                dataStore = clientManager.getMqttClientDataStore(inboundIdentifier);
+            }
+            return clientManager.getMqttClient(inboundIdentifier);
         }
 
         String sslEnable = parameters.get(MqttConstants.MQTT_SSL_ENABLE);
@@ -169,20 +252,27 @@ public class MqttConnectionFactory {
             } else {
                 mqttClient = new MqttAsyncClient(mqttEndpointURL, uniqueClientId);
             }
-            log.info("Successfully created to mqtt client");
+            log.info("Successfully created MQTT client");
         } catch (MqttException ex) {
-            log.error("Error while creating the MQTT asynchronous client");
+            log.error("Error while creating the MQTT asynchronous client", ex);
         }
+        //here we register the created client in Mqtt clientManager
+        clientManager.registerInboundEndpoint(name, inboundIdentifier);
+        clientManager.registerMqttClient(inboundIdentifier, mqttClient);
+        //register dataStore for Client
+        if (dataStore != null) {
+            clientManager.registerClientDataStore(inboundIdentifier, dataStore);
+        }
+
         return mqttClient;
     }
 
     public void shutdown() {
         if (dataStore != null) {
             try {
-                dataStore.clear();
                 dataStore.close();
             } catch (MqttPersistenceException ex) {
-                log.error("Error while releasing the resources for data store");
+                log.error("Error while releasing the resources for data store", ex);
             }
         }
     }

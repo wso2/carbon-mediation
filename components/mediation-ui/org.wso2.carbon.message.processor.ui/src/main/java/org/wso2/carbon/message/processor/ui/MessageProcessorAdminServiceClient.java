@@ -399,6 +399,23 @@ public class MessageProcessorAdminServiceClient {
 
         return size;
     }
+    
+    /**
+     * Checks whether given Axis2ClientRepo is valid one or not
+     * @param axis2ClientRepo input location of the Axis2 Client Repository given by the end user.
+     * @return <code>true</code> if the given axis client repository valid, <code>false</code> otherwise.
+     * @throws Exception If any error is encountered during the validation process.
+     */
+    public boolean validateAxis2ClientRepo(String axis2ClientRepo) throws Exception {
+        try {
+            if (axis2ClientRepo != null) {
+                return stub.validateAxis2ClientRepo(axis2ClientRepo);
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+        return true;
+    }
 
     private void handleException(Exception e) throws Exception {
         String message = "Error Executing MessageProcessorAdminServiceClient" + e.getMessage();

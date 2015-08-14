@@ -34,7 +34,6 @@ import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
-import org.wso2.carbon.ntask.core.impl.clustered.ClusterGroupCommunicator;
 import org.wso2.carbon.ntask.core.impl.clustered.ClusteredTaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -338,11 +337,13 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 } else {
                     logger.debug("#init Obtained Carbon task manager " + managerId());
                 }
+
+                initialized = true;
                 if (isStandaloneNode || isWorkerNode) {
                     taskService.registerTaskType(Constants.TASK_TYPE_ESB);
                     updateAndCleanupObservers();
                 }
-                initialized = true;
+
                 logger.info("Initialized task manager" + (!(isStandaloneNode || isWorkerNode) ? " on manager node. " : ". ") + "Tenant [" + getCurrentTenantId() + "]");
                 logger.debug("#init Initialized task manager : " + managerId());
                 logger.debug("#init Scheduling existing tasks if any. : " + managerId());
@@ -627,6 +628,28 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         }
         return false;
     }
+    
+
+    public boolean isTaskExist(String taskName) {
+        if (!isInitialized()) {
+            return false;
+        }
+        synchronized (lock) {
+            if (taskManager == null) {
+                logger.warn("#isTaskExist Could not determine the state of the task [" + taskName +
+                            "]. Task manager is not available.");
+                return false;
+            }
+            try {
+                return !taskManager.getTaskState(taskName)
+                                   .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.NONE);
+            } catch (Exception e) {
+                logger.error("Cannot return task status [" + taskName + "]. Error: " +
+                                     e.getLocalizedMessage(), e);
+            }
+        }
+        return false;
+    }
 
     private void updateAndCleanupObservers() {
         Iterator<TaskManagerObserver> i = observers.iterator();
@@ -675,5 +698,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
         }
 
     }
+
 }
 
