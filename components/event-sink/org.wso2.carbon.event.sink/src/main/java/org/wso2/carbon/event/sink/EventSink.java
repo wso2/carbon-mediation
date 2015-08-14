@@ -197,7 +197,7 @@ public class EventSink {
 	 * @param eventSink name of the Event Sink which is going to be removed
 	 */
 	public static void stopDataPublisher(EventSink eventSink) {
-		if(eventSink != null) {
+		if(eventSink != null && eventSink.getDataPublisher() != null) {
 			eventSink.getDataPublisher().stop();
 		}
 
