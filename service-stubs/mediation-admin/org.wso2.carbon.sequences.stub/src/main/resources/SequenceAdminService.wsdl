@@ -21,7 +21,9 @@
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://to.common.sequences.carbon.wso2.org/xsd">
             <xs:complexType name="SequenceInfo">
                 <xs:sequence>
+                    <xs:element minOccurs="0" name="deployedFromCApp" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="edited" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="enableStatistics" type="xs:boolean" />
                     <xs:element minOccurs="0" name="enableTracing" type="xs:boolean" />
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
@@ -249,13 +251,13 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-         <xs:element name="deleteSelectedSequence">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element maxOccurs="unbounded" minOccurs="0" name="sequenceNames" nillable="true" type="xs:string"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
+            <xs:element name="deleteSelectedSequence">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="sequenceNames" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="deleteDynamicSequence">
                 <xs:complexType>
                     <xs:sequence>
@@ -264,11 +266,11 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-         <xs:element name="deleteAllSequence">
-            <xs:complexType>
-               <xs:sequence/>
-            </xs:complexType>
-         </xs:element>
+            <xs:element name="deleteAllSequence">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="addSequence">
                 <xs:complexType>
                     <xs:sequence>
@@ -286,37 +288,37 @@
                 </xs:complexType>
 
             </xs:element>
-			  <xs:element name="addSequenceForTenant">
+            <xs:element name="addSequenceForTenant">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:any minOccurs="0"/>
-						<xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string" />
                     </xs:sequence>
                 </xs:complexType>
-			</xs:element>
-			<xs:element name="deleteSequenceForTenant">
+            </xs:element>
+            <xs:element name="deleteSequenceForTenant">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="sequenceName" nillable="true" type="xs:string" />
-						 <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string" />
                     </xs:sequence>
                 </xs:complexType>
-			</xs:element>
-			<xs:element name="getSequenceForTenant">
+            </xs:element>
+            <xs:element name="getSequenceForTenant">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="sequenceName" nillable="true" type="xs:string" />
-						<xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string" />
                     </xs:sequence>
                 </xs:complexType>
-			</xs:element>
-			<xs:element name="getSequenceForTenantResponse">
+            </xs:element>
+            <xs:element name="getSequenceForTenantResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:any minOccurs="0"/>
                     </xs:sequence>
                 </xs:complexType>
-			</xs:element>
+            </xs:element>
             <xs:element name="isExistingSequence">
                 <xs:complexType>
                     <xs:sequence>
@@ -358,9 +360,9 @@
     <wsdl:message name="SequenceEditorException">
         <wsdl:part name="parameters" element="ns:SequenceEditorException" />
     </wsdl:message>
-   <wsdl:message name="deleteSelectedSequenceRequest">
-      <wsdl:part name="parameters" element="ns:deleteSelectedSequence"/>
-   </wsdl:message>
+    <wsdl:message name="deleteSelectedSequenceRequest">
+        <wsdl:part name="parameters" element="ns:deleteSelectedSequence"/>
+    </wsdl:message>
     <wsdl:message name="enableStatisticsRequest">
         <wsdl:part name="parameters" element="ns:enableStatistics" />
     </wsdl:message>
@@ -375,9 +377,9 @@
     <wsdl:message name="saveSequenceRequest">
         <wsdl:part name="parameters" element="ns:saveSequence" />
     </wsdl:message>
-   <wsdl:message name="deleteAllSequenceRequest">
-      <wsdl:part name="parameters" element="ns:deleteAllSequence"/>
-   </wsdl:message>
+    <wsdl:message name="deleteAllSequenceRequest">
+        <wsdl:part name="parameters" element="ns:deleteAllSequence"/>
+    </wsdl:message>
     <wsdl:message name="addDynamicSequenceRequest">
         <wsdl:part name="parameters" element="ns:addDynamicSequence" />
 
@@ -454,16 +456,16 @@
     <wsdl:message name="saveDynamicSequenceRequest">
         <wsdl:part name="parameters" element="ns:saveDynamicSequence" />
     </wsdl:message>
-	<wsdl:message name="addSequenceForTenantRequest">
+    <wsdl:message name="addSequenceForTenantRequest">
         <wsdl:part name="parameters" element="ns:addSequenceForTenant" />
-	</wsdl:message>
-	<wsdl:message name="deleteSequenceForTenantRequest">
+    </wsdl:message>
+    <wsdl:message name="deleteSequenceForTenantRequest">
         <wsdl:part name="parameters" element="ns:deleteSequenceForTenant" />
-	</wsdl:message>
-	<wsdl:message name="getSequenceForTenantRequest">
+    </wsdl:message>
+    <wsdl:message name="getSequenceForTenantRequest">
         <wsdl:part name="parameters" element="ns:getSequenceForTenant" />
     </wsdl:message>
-	<wsdl:message name="getSequenceForTenantResponse">
+    <wsdl:message name="getSequenceForTenantResponse">
         <wsdl:part name="parameters" element="ns:getSequenceForTenantResponse" />
     </wsdl:message>
     <wsdl:message name="isExistingSequenceRequest">
@@ -478,7 +480,7 @@
     <wsdl:message name="isExistingSequenceForTenantResponse">
         <wsdl:part name="parameters" element="ns:isExistingSequenceForTenantResponse" />
     </wsdl:message>
-	
+
     <wsdl:portType name="SequenceAdminServicePortType">
         <wsdl:operation name="getSequence">
             <wsdl:input message="axis2:getSequenceRequest" wsaw:Action="urn:getSequence" />
@@ -502,8 +504,8 @@
             <wsdl:fault message="axis2:SequenceEditorException" name="SequenceEditorException" wsaw:Action="urn:saveSequenceSequenceEditorException" />
         </wsdl:operation>
         <wsdl:operation name="deleteAllSequence">
-         <wsdl:input message="axis2:deleteAllSequenceRequest" wsaw:Action="urn:deleteAllSequence"/>
-         <wsdl:fault message="axis2:SequenceEditorException" name="SequenceEditorException" wsaw:Action="urn:deleteAllSequenceEditorException"/>
+            <wsdl:input message="axis2:deleteAllSequenceRequest" wsaw:Action="urn:deleteAllSequence"/>
+            <wsdl:fault message="axis2:SequenceEditorException" name="SequenceEditorException" wsaw:Action="urn:deleteAllSequenceEditorException"/>
         </wsdl:operation>
         <wsdl:operation name="deleteSelectedSequence">
             <wsdl:input message="axis2:deleteSelectedSequenceRequest" wsaw:Action="urn:deleteSelectedSequence"/>
@@ -585,19 +587,19 @@
             <wsdl:fault message="axis2:SequenceEditorException" name="SequenceEditorException" wsaw:Action="urn:saveDynamicSequenceSequenceEditorException" />
 
         </wsdl:operation>
-		<wsdl:operation name="addSequenceForTenant">
+        <wsdl:operation name="addSequenceForTenant">
             <wsdl:input message="axis2:addSequenceForTenantRequest" wsaw:Action="urn:addSequenceForTenant" />
             <wsdl:fault message="axis2:SequenceEditorException" name="SequenceEditorException" wsaw:Action="urn:addSequenceForTenantSequenceEditorException" />
-		</wsdl:operation>
-		<wsdl:operation name="deleteSequenceForTenant">
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequenceForTenant">
             <wsdl:input message="axis2:deleteSequenceForTenantRequest" wsaw:Action="urn:deleteSequenceForTenant" />
             <wsdl:fault message="axis2:SequenceEditorException" name="SequenceEditorException" wsaw:Action="urn:deleteSequenceForTenantSequenceEditorException" />
-		</wsdl:operation>
-		<wsdl:operation name="getSequenceForTenant">
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceForTenant">
             <wsdl:input message="axis2:getSequenceForTenantRequest" wsaw:Action="urn:getSequenceForTenant" />
             <wsdl:output message="axis2:getSequenceForTenantResponse" wsaw:Action="urn:getSequenceForTenantResponse" />
             <wsdl:fault message="axis2:SequenceEditorException" name="SequenceEditorException" wsaw:Action="urn:getSequenceForTenantSequenceEditorException" />
-		</wsdl:operation>
+        </wsdl:operation>
         <wsdl:operation name="isExistingSequence">
             <wsdl:input message="axis2:isExistingSequenceRequest" wsaw:Action="urn:isExistingSequence" />
             <wsdl:output message="axis2:isExistingSequenceResponse" wsaw:Action="urn:isExistingSequenceResponse" />
@@ -622,15 +624,15 @@
                 <soap:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
         </wsdl:operation>
-      <wsdl:operation name="deleteSelectedSequence">
-         <soap:operation soapAction="urn:deleteSelectedSequence" style="document"/>
-         <wsdl:input>
-            <soap:body use="literal"/>
-         </wsdl:input>
-         <wsdl:fault name="SequenceEditorException">
-            <soap:fault use="literal" name="SequenceEditorException"/>
-         </wsdl:fault>
-      </wsdl:operation>
+        <wsdl:operation name="deleteSelectedSequence">
+            <soap:operation soapAction="urn:deleteSelectedSequence" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="SequenceEditorException">
+                <soap:fault use="literal" name="SequenceEditorException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="enableStatistics">
             <soap:operation soapAction="urn:enableStatistics" style="document" />
 
@@ -668,15 +670,15 @@
                 <soap:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
         </wsdl:operation>
-      <wsdl:operation name="deleteAllSequence">
-         <soap:operation soapAction="urn:deleteAllSequence" style="document"/>
-         <wsdl:input>
-            <soap:body use="literal"/>
-         </wsdl:input>
-         <wsdl:fault name="SequenceEditorException">
-            <soap:fault use="literal" name="SequenceEditorException"/>
-         </wsdl:fault>
-      </wsdl:operation>
+        <wsdl:operation name="deleteAllSequence">
+            <soap:operation soapAction="urn:deleteAllSequence" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="SequenceEditorException">
+                <soap:fault use="literal" name="SequenceEditorException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="addDynamicSequence">
             <soap:operation soapAction="urn:addDynamicSequence" style="document" />
             <wsdl:input>
@@ -854,7 +856,7 @@
             </wsdl:fault>
 
         </wsdl:operation>
-		<wsdl:operation name="addSequenceForTenant">
+        <wsdl:operation name="addSequenceForTenant">
             <soap:operation soapAction="urn:addSequenceForTenant" style="document" />
             <wsdl:input>
                 <soap:body use="literal" />
@@ -862,8 +864,8 @@
             <wsdl:fault name="SequenceEditorException">
                 <soap:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
-		</wsdl:operation>
-		<wsdl:operation name="deleteSequenceForTenant">
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequenceForTenant">
             <soap:operation soapAction="urn:deleteSequenceForTenant" style="document" />
             <wsdl:input>
                 <soap:body use="literal" />
@@ -871,8 +873,8 @@
             <wsdl:fault name="SequenceEditorException">
                 <soap:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
-		</wsdl:operation>
-		<wsdl:operation name="getSequenceForTenant">
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceForTenant">
             <soap:operation soapAction="urn:getSequenceForTenant" style="document" />
             <wsdl:input>
                 <soap:body use="literal" />
@@ -883,7 +885,7 @@
             <wsdl:fault name="SequenceEditorException">
                 <soap:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
-		</wsdl:operation>
+        </wsdl:operation>
         <wsdl:operation name="isExistingSequence">
             <soap:operation soapAction="urn:isExistingSequence" style="document" />
             <wsdl:input>
@@ -918,15 +920,15 @@
                 <soap12:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
         </wsdl:operation>
-      <wsdl:operation name="deleteSelectedSequence">
-         <soap12:operation soapAction="urn:deleteSelectedSequence" style="document"/>
-         <wsdl:input>
-            <soap12:body use="literal"/>
-         </wsdl:input>
-         <wsdl:fault name="SequenceEditorException">
-            <soap12:fault use="literal" name="SequenceEditorException"/>
-         </wsdl:fault>
-      </wsdl:operation>
+        <wsdl:operation name="deleteSelectedSequence">
+            <soap12:operation soapAction="urn:deleteSelectedSequence" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="SequenceEditorException">
+                <soap12:fault use="literal" name="SequenceEditorException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="enableStatistics">
             <soap12:operation soapAction="urn:enableStatistics" style="document" />
 
@@ -964,15 +966,15 @@
                 <soap12:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
         </wsdl:operation>
-      <wsdl:operation name="deleteAllSequence">
-         <soap12:operation soapAction="urn:deleteAllSequence" style="document"/>
-         <wsdl:input>
-            <soap12:body use="literal"/>
-         </wsdl:input>
-         <wsdl:fault name="SequenceEditorException">
-            <soap12:fault use="literal" name="SequenceEditorException"/>
-         </wsdl:fault>
-      </wsdl:operation>
+        <wsdl:operation name="deleteAllSequence">
+            <soap12:operation soapAction="urn:deleteAllSequence" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="SequenceEditorException">
+                <soap12:fault use="literal" name="SequenceEditorException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="addDynamicSequence">
             <soap12:operation soapAction="urn:addDynamicSequence" style="document" />
             <wsdl:input>
@@ -1150,7 +1152,7 @@
             </wsdl:fault>
 
         </wsdl:operation>
-		<wsdl:operation name="addSequenceForTenant">
+        <wsdl:operation name="addSequenceForTenant">
             <soap12:operation soapAction="urn:addSequenceForTenant" style="document" />
             <wsdl:input>
                 <soap12:body use="literal" />
@@ -1158,8 +1160,8 @@
             <wsdl:fault name="SequenceEditorException">
                 <soap12:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
-		</wsdl:operation>
-		<wsdl:operation name="deleteSequenceForTenant">
+        </wsdl:operation>
+        <wsdl:operation name="deleteSequenceForTenant">
             <soap12:operation soapAction="urn:deleteSequenceForTenant" style="document" />
             <wsdl:input>
                 <soap12:body use="literal" />
@@ -1167,8 +1169,8 @@
             <wsdl:fault name="SequenceEditorException">
                 <soap12:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
-		</wsdl:operation>
-		<wsdl:operation name="getSequenceForTenant">
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceForTenant">
             <soap12:operation soapAction="urn:getSequenceForTenant" style="document" />
             <wsdl:input>
                 <soap12:body use="literal" />
@@ -1180,7 +1182,7 @@
             <wsdl:fault name="SequenceEditorException">
                 <soap12:fault use="literal" name="SequenceEditorException" />
             </wsdl:fault>
-		</wsdl:operation>
+        </wsdl:operation>
         <wsdl:operation name="isExistingSequence">
             <soap12:operation soapAction="urn:isExistingSequence" style="document" />
             <wsdl:input>
@@ -1214,12 +1216,12 @@
                 <mime:content type="text/xml" part="parameters" />
             </wsdl:output>
         </wsdl:operation>
-      <wsdl:operation name="deleteSelectedSequence">
-         <http:operation location="deleteSelectedSequence"/>
-         <wsdl:input>
-            <mime:content type="text/xml" part="parameters"/>
-         </wsdl:input>
-      </wsdl:operation>
+        <wsdl:operation name="deleteSelectedSequence">
+            <http:operation location="deleteSelectedSequence"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
         <wsdl:operation name="enableStatistics">
             <http:operation location="enableStatistics" />
             <wsdl:input>
@@ -1247,12 +1249,12 @@
             </wsdl:output>
 
         </wsdl:operation>
-      <wsdl:operation name="deleteAllSequence">
-         <http:operation location="deleteAllSequence"/>
-         <wsdl:input>
-            <mime:content type="text/xml" part="parameters"/>
-         </wsdl:input>
-      </wsdl:operation>
+        <wsdl:operation name="deleteAllSequence">
+            <http:operation location="deleteAllSequence"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
         <wsdl:operation name="addDynamicSequence">
             <http:operation location="addDynamicSequence" />
             <wsdl:input>
@@ -1383,19 +1385,19 @@
             </wsdl:input>
 
         </wsdl:operation>
-		<wsdl:operation name="addSequenceForTenant">
+        <wsdl:operation name="addSequenceForTenant">
             <http:operation location="addSequenceForTenant" />
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters" />
             </wsdl:input>
         </wsdl:operation>
-		<wsdl:operation name="deleteSequenceForTenant">
+        <wsdl:operation name="deleteSequenceForTenant">
             <http:operation location="deleteSequenceForTenant" />
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters" />
             </wsdl:input>
-		</wsdl:operation>
-		<wsdl:operation name="getSequenceForTenant">
+        </wsdl:operation>
+        <wsdl:operation name="getSequenceForTenant">
             <http:operation location="getSequenceForTenant" />
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters" />
@@ -1404,7 +1406,7 @@
             <wsdl:output>
                 <mime:content type="text/xml" part="parameters" />
             </wsdl:output>
-		</wsdl:operation>
+        </wsdl:operation>
         <wsdl:operation name="isExistingSequence">
             <http:operation location="isExistingSequence" />
             <wsdl:input>

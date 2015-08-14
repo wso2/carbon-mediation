@@ -55,6 +55,9 @@ import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
+import org.wso2.carbon.mediation.initializer.utils.CAppArtifactData;
+import org.wso2.carbon.mediation.initializer.utils.CAppArtifactsMap;
 import org.wso2.carbon.mediation.library.service.LibraryInfo;
 import org.wso2.carbon.mediation.library.service.MediationLibraryAdminService;
 import org.wso2.carbon.mediation.library.util.LocalEntryUtil;
@@ -94,11 +97,19 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
         List<Artifact.Dependency> artifacts = carbonApp.getAppConfig().getApplicationArtifact()
                 .getDependencies();
 
+        CAppArtifactDataService cAppArtifactDataService = DataHolder.getInstance().getcAppArtifactDataService();
         deployClassMediators(artifacts, axisConfig);
+        int tenantId = Integer.parseInt(AppDeployerUtils.getTenantIdString(axisConfig));
+        CAppArtifactsMap cAppArtifacts = new CAppArtifactsMap();
         deploySynapseLibrary(artifacts, axisConfig);
         for (Artifact.Dependency dep : artifacts) {
             Artifact artifact = dep.getArtifact();
 
+            // Create CAppArtifactData to hold artifact details deployed with this CApp
+            CAppArtifactData cAppArtifactData = new CAppArtifactData(artifact.getName(), artifact.getType(), true);
+            // Put Artifact details to CApp Artifact Map
+            cAppArtifacts
+                    .addCAppArtifactData(artifact.getType() + File.separator + artifact.getName(), cAppArtifactData);
             if (!validateArtifact(artifact)) {
                 continue;
             }
@@ -134,6 +145,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 }
             }
         }
+        // Add the CApp artifacts details for specific tenant
+        cAppArtifactDataService.addCAppArtifactData(tenantId, cAppArtifacts);
     }
 
     /**
@@ -148,6 +161,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
         List<Artifact.Dependency> artifacts = carbonApplication.getAppConfig()
                 .getApplicationArtifact().getDependencies();
+        int tenantId = Integer.parseInt(AppDeployerUtils.getTenantIdString(axisConfig));
+        CAppArtifactDataService cAppArtifactDataService = DataHolder.getInstance().getcAppArtifactDataService();
 
         for (Artifact.Dependency dep : artifacts) {
 
@@ -210,6 +225,9 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     if (artifactFile.exists() && !artifactFile.delete()) {
                         log.warn("Couldn't delete App artifact file : " + artifactPath);
                     }
+                    // Remove Artifact details from CAppArtifactData
+                    cAppArtifactDataService
+                            .removeCappArtifactData(tenantId, artifact.getType() + File.separator + artifact.getName());
                 } catch (Exception e) {
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
                     log.error("Error occured while trying to un deploy : "+ artifactName);

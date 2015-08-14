@@ -1,45 +1,13 @@
-<!--
- ~ Copyright (c) 2005-2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- ~
- ~ WSO2 Inc. licenses this file to you under the Apache License,
- ~ Version 2.0 (the "License"); you may not use this file except
- ~ in compliance with the License.
- ~ You may obtain a copy of the License at
- ~
- ~    http://www.apache.org/licenses/LICENSE-2.0
- ~
- ~ Unless required by applicable law or agreed to in writing,
- ~ software distributed under the License is distributed on an
- ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- ~ KIND, either express or implied.  See the License for the
- ~ specific language governing permissions and limitations
- ~ under the License.
- -->
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://service.task.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ax2601="http://task.carbon.wso2.org/xsd" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.task.carbon.wso2.org">
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://task.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax2603="http://task.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://task.carbon.wso2.org">
     <wsdl:documentation>TaskAdmin</wsdl:documentation>
     <wsdl:types>
-        <xs:schema xmlns:ns="http://org.apache.axis2/xsd" xmlns:ax2602="http://task.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
+        <xs:schema xmlns:ax2604="http://task.carbon.wso2.org/xsd" xmlns:ns="http://org.apache.axis2/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
             <xs:import namespace="http://task.carbon.wso2.org/xsd"/>
             <xs:element name="TaskManagementException">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="TaskManagementException" nillable="true" type="ax2602:TaskManagementException"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteTaskDescription">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="s" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="group" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="editTaskDescription">
-                <xs:complexType>
-                    <xs:sequence>
-                        <!--xs:element minOccurs="0" name="taskElement" nillable="true" type="xs:anyType"/-->
-			            <xs:any/>
+                        <xs:element minOccurs="0" name="TaskManagementException" nillable="true" type="ax2604:TaskManagementException"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -58,6 +26,33 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getAllTaskData">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllTaskDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2604:TaskData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteTaskDescription">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="s" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="group" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="editTaskDescription">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:any minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="loadTaskClassProperties">
                 <xs:complexType>
                     <xs:sequence>
@@ -69,8 +64,7 @@
             <xs:element name="loadTaskClassPropertiesResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <!--xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/-->
-			            <xs:any/>
+                        <xs:any minOccurs="0"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -86,11 +80,24 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getAllTaskDescriptions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:any minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getAllTaskDescriptionsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:any minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="addTaskDescription">
                 <xs:complexType>
                     <xs:sequence>
-                        <!--xs:element minOccurs="0" name="taskElement" nillable="true" type="xs:anyType"/-->
-			            <xs:any/>
+                        <xs:any minOccurs="0"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -105,23 +112,7 @@
             <xs:element name="getTaskDescriptionResponse">
                 <xs:complexType>
                     <xs:sequence>
-                        <!--xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/-->
-			            <xs:any/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllTaskDescriptions">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/>
-		            </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getAllTaskDescriptionsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <!--xs:element minOccurs="0" name="return" nillable="true" type="xs:anyType"/-->
-			            <xs:any/>
+                        <xs:any minOccurs="0"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -129,6 +120,14 @@
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://task.carbon.wso2.org/xsd">
             <xs:complexType name="TaskManagementException">
                 <xs:sequence/>
+            </xs:complexType>
+            <xs:complexType name="TaskData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="deployedFromCApp" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="edited" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="group" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                </xs:sequence>
             </xs:complexType>
         </xs:schema>
     </wsdl:types>
@@ -174,6 +173,12 @@
     <wsdl:message name="addTaskDescriptionRequest">
         <wsdl:part name="parameters" element="ns1:addTaskDescription"/>
     </wsdl:message>
+    <wsdl:message name="getAllTaskDataRequest">
+        <wsdl:part name="parameters" element="ns1:getAllTaskData"/>
+    </wsdl:message>
+    <wsdl:message name="getAllTaskDataResponse">
+        <wsdl:part name="parameters" element="ns1:getAllTaskDataResponse"/>
+    </wsdl:message>
     <wsdl:portType name="TaskAdminPortType">
         <wsdl:operation name="loadTaskClassProperties">
             <wsdl:input message="tns:loadTaskClassPropertiesRequest" wsaw:Action="urn:loadTaskClassProperties"/>
@@ -210,6 +215,11 @@
         <wsdl:operation name="addTaskDescription">
             <wsdl:input message="tns:addTaskDescriptionRequest" wsaw:Action="urn:addTaskDescription"/>
             <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:addTaskDescriptionTaskManagementException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getAllTaskData">
+            <wsdl:input message="tns:getAllTaskDataRequest" wsaw:Action="urn:getAllTaskData"/>
+            <wsdl:output message="tns:getAllTaskDataResponse" wsaw:Action="urn:getAllTaskDataResponse"/>
+            <wsdl:fault message="tns:TaskManagementException" name="TaskManagementException" wsaw:Action="urn:getAllTaskDataTaskManagementException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="TaskAdminSoap11Binding" type="tns:TaskAdminPortType">
@@ -294,6 +304,18 @@
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
+            <wsdl:fault name="TaskManagementException">
+                <soap:fault use="literal" name="TaskManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAllTaskData">
+            <soap:operation soapAction="urn:getAllTaskData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
             <wsdl:fault name="TaskManagementException">
                 <soap:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
@@ -385,6 +407,18 @@
                 <soap12:fault use="literal" name="TaskManagementException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="getAllTaskData">
+            <soap12:operation soapAction="urn:getAllTaskData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="TaskManagementException">
+                <soap12:fault use="literal" name="TaskManagementException"/>
+            </wsdl:fault>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="TaskAdminHttpBinding" type="tns:TaskAdminPortType">
         <http:binding verb="POST"/>
@@ -450,6 +484,15 @@
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getAllTaskData">
+            <http:operation location="getAllTaskData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="TaskAdmin">

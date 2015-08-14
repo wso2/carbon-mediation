@@ -31,22 +31,23 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
+import org.wso2.carbon.message.store.util.ConfigHolder;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.locks.Lock;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public class MessageStoreAdminService extends AbstractServiceBusAdmin {
 
     private static Log log = LogFactory.getLog(MessageStoreAdminService.class);
 
-
+    private static final String artifactType = ServiceBusConstants.MESSAGE_STORE_TYPE;
     public static final int MSGS_PER_PAGE = 10;
 
     /**
@@ -89,6 +90,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
      * Modify and Existing Message store based on the given XML that is passed from the FE
      * This this case user may change the message store implementation/ change parameters
      * So we add and init new message store and then remove and destroy old.
+     *
      * @param xml XML configuration for the changed Message store
      * @throws AxisFault if Some thing goes wrong when modifying the
      *                   Message store
@@ -107,7 +109,9 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
 
             SynapseConfiguration configuration = getSynapseConfiguration();
             MessageStore oldMessageStore = configuration.getMessageStore(messageStore.getName());
-            if(oldMessageStore != null) {
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+            if (oldMessageStore != null) {
                 // this means there is an existing message store
 
                 //1st we clean up the old
@@ -118,9 +122,14 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
                 String fileName = oldMessageStore.getFileName();
                 messageStore.setFileName(fileName);
                 messageStore.init(getSynapseEnvironment());
-                configuration.addMessageStore(messageStore.getName(),messageStore);
-                MediationPersistenceManager mp = getMediationPersistenceManager();
-                mp.saveItem(messageStore.getName(),ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                configuration.addMessageStore(messageStore.getName(), messageStore);
+                String artifactName = getArtifactName(artifactType, messageStore.getName());
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                    cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+                } else {
+                    MediationPersistenceManager mp = getMediationPersistenceManager();
+                    mp.saveItem(messageStore.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                }
             } else {
                 assert false;
                 String message = "Unexpected Error!!! Message store with name "
@@ -131,6 +140,8 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
         } catch (XMLStreamException e) {
             String message = "Unable to Modify Message Store ";
             handleException(log, message, e);
+        } catch (Exception e) {
+            handleException(log, "Unable to Modify Message Store ", e);
         }
     }
 
@@ -190,6 +201,42 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
         return names.toArray(new String[names.size()]);
     }
 
+    /**
+     * Get all the Current Message store details defined in the configuration
+     *
+     * @return array of Message Store Meta Data that contains MessageStore names
+     * @throws AxisFault
+     */
+    public MessageStoreMetaData[] getMessageStoreData() throws AxisFault {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration configuration = getSynapseConfiguration();
+
+            assert configuration != null;
+            Collection<String> names = configuration.getMessageStores().keySet();
+            List<MessageStoreMetaData> metaDatas = new ArrayList<MessageStoreMetaData>();
+
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+
+            for (String storeName : names) {
+                MessageStoreMetaData data = new MessageStoreMetaData();
+                data.setName(storeName);
+                if (cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, storeName))) {
+                    data.setDeployedFromCApp(true);
+                }
+                if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, storeName))) {
+                    data.setEdited(true);
+                }
+                metaDatas.add(data);
+            }
+            return metaDatas.toArray(new MessageStoreMetaData[metaDatas.size()]);
+        } finally {
+            lock.unlock();
+        }
+    }
 
     /**
      * Get the number of messages in the Message store with given name

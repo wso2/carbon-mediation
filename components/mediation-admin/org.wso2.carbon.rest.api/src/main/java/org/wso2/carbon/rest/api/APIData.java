@@ -18,18 +18,22 @@ package org.wso2.carbon.rest.api;
 
 
 public class APIData {
-	
+
 	private String name;
-	
+
 	private String host;
-	
+
 	private int port = -1;
-	
+
 	private String context;
-	
+
 	private String fileName;
-	
+
 	private ResourceData[] resources;
+
+    private boolean isDeployedFromCApp = false;
+
+    private boolean isEdited = false;
 
 	public String getName() {
 		return name;
@@ -38,7 +42,7 @@ public class APIData {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getHost() {
 		return host;
 	}
@@ -70,13 +74,45 @@ public class APIData {
 	public void setResources(ResourceData[] resources) {
 		this.resources = resources;
 	}
-	
+
 	public String getFileName() {
 		return fileName;
 	}
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+    }
+
+    /**
+     * Check whether the api is deployed from CApp
+     * @return true if api deployed from CApp, else false
+     */
+    public boolean getDeployedFromCApp() {
+        return isDeployedFromCApp;
+    }
+
+    /**
+     * Set whether the api is deployed from CApp
+     * @param isDeployedFromCApp true if api deployed from CApp, else false
+     */
+    public void setDeployedFromCApp(boolean isDeployedFromCApp) {
+        this.isDeployedFromCApp = isDeployedFromCApp;
+    }
+
+    /**
+     * Check whether the api deployed from CApp is edited through management console
+     * @return true if the api is edited, else false
+     */
+    public boolean getEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set whether the api deployed from CApp is edited through management console
+     * @param isEdited true if the api is edited, else false
+     */
+    public void setEdited(boolean isEdited) {
+        this.isEdited = isEdited;
 	}
-	
+
 }

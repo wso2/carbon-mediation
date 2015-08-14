@@ -35,14 +35,17 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.mediation.templates.common.EndpointTemplateInfo;
 import org.wso2.carbon.mediation.templates.common.factory.TemplateInfoFactory;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.mediation.templates.internal.ConfigHolder;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,6 +57,7 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
 
     //TODO: Move WSO2_TEMPLATE_MEDIA_TYPE to registry
     public static final String WSO2_ENDPOINT_TEMPLATE_MEDIA_TYPE = "application/vnd.wso2.template.endpoint";
+    private static final String artifactType = ServiceBusConstants.TEMPLATE_TYPE;
 
     public int getEndpointTemplatesCount() throws AxisFault {
         final Lock lock = getLock();
@@ -99,14 +103,35 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
 
             EndpointTemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArrayByTemplate(templates);
             EndpointTemplateInfo[] ret;
-            if (info.length >= (endpointTemplatesPerPage * pageNumber + endpointTemplatesPerPage)) {
+            EndpointTemplateInfo[] endpointTemplateInfos = new EndpointTemplateInfo[info.length];
+            int position = 0;
+
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+
+            if (info != null && info.length > 0) {
+                for (EndpointTemplateInfo infoTemp : info) {
+                    EndpointTemplateInfo templateInfo = new EndpointTemplateInfo();
+                    templateInfo = infoTemp;
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(),
+                            getArtifactName(artifactType, infoTemp.getTemplateName()))) {
+                        templateInfo.setDeployedFromCApp(true);
+                    }
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(),
+                            getArtifactName(artifactType, infoTemp.getTemplateName()))) {
+                        templateInfo.setEdited(true);
+                    }
+                    endpointTemplateInfos[position++] = templateInfo;
+                }
+            }
+            if (endpointTemplateInfos.length >= (endpointTemplatesPerPage * pageNumber + endpointTemplatesPerPage)) {
                 ret = new EndpointTemplateInfo[endpointTemplatesPerPage];
             } else {
-                ret = new EndpointTemplateInfo[info.length - (endpointTemplatesPerPage * pageNumber)];
+                ret = new EndpointTemplateInfo[endpointTemplateInfos.length - (endpointTemplatesPerPage * pageNumber)];
             }
             for (int i = 0; i < endpointTemplatesPerPage; ++i) {
                 if (ret.length > i) {
-                    ret[i] = info[endpointTemplatesPerPage * pageNumber + i];
+                    ret[i] = endpointTemplateInfos[endpointTemplatesPerPage * pageNumber + i];
                 }
             }
             return ret;
@@ -262,7 +287,14 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
                     Template templ = config.getEndpointTemplates().get(templateName);
                     if (templ != null) {
 //                        templ.init(getSynapseEnvironment());
-                        persistTemplate(templ);
+                        String artifactName = getArtifactName(artifactType, templateName);
+                        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance()
+                                .getcAppArtifactDataService();
+                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+                        } else {
+                            persistTemplate(templ);
+                        }
                     }
                 }
             } else {

@@ -26,6 +26,40 @@ public class EndpointMetaData {
     private String description;
     private boolean switchOn;
     private String endpointString;
+    private boolean isDeployedFromCApp = false;
+    private boolean isEdited = false;
+
+    /**
+     * Check whether the endpoint is deployed from CApp
+     * @return true if endpoint deployed from CApp, else false
+     */
+    public boolean getDeployedFromCApp() {
+        return isDeployedFromCApp;
+    }
+
+    /**
+     * Set whether the endpoint is deployed from CApp
+     * @param isDeployedFromCApp true if endpoint deployed from CApp, else false
+     */
+    public void setDeployedFromCApp(boolean isDeployedFromCApp) {
+        this.isDeployedFromCApp = isDeployedFromCApp;
+    }
+
+    /**
+     * Check whether the endpoint deployed from CApp is edited through management console
+     * @return true if the endpoint is edited, else false
+     */
+    public boolean getEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set whether the endpoint deployed from CApp is edited through management console
+     * @param isEdited true if the endpoint is edited, else false
+     */
+    public void setEdited(boolean isEdited) {
+        this.isEdited = isEdited;
+    }
 
     /**
      * Get the configuration of an Endpoint

@@ -38,11 +38,14 @@ import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.templates.common.TemplateInfo;
 import org.wso2.carbon.mediation.templates.common.factory.TemplateInfoFactory;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.mediation.templates.internal.ConfigHolder;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 
@@ -68,6 +71,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 
     //TODO: Move WSO2_TEMPLATE_MEDIA_TYPE to registry
     public static final String WSO2_TEMPLATE_MEDIA_TYPE = "application/vnd.wso2.template";
+    private static final String artifactType = ServiceBusConstants.TEMPLATE_TYPE;
 
 
     public TemplateInfo[] getTemplates(int pageNumber, int templatePerPage)
@@ -80,14 +84,35 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 
             TemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArrayByTemplateMediator(templates);
             TemplateInfo[] ret;
-            if (info.length >= (templatePerPage * pageNumber + templatePerPage)) {
+
+            TemplateInfo[] infos = new TemplateInfo[info.length];
+            int position = 0;
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
+            if (info != null && info.length > 0) {
+                for (TemplateInfo infoTemp : info) {
+                    TemplateInfo templateInfo = new TemplateInfo();
+                    templateInfo = infoTemp;
+                    if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(),
+                            getArtifactName(artifactType, infoTemp.getName()))) {
+                        templateInfo.setDeployedFromCApp(true);
+                    }
+                    if (cAppArtifactDataService
+                            .isArtifactEdited(getTenantId(), getArtifactName(artifactType, infoTemp.getName()))) {
+                        templateInfo.setEdited(true);
+                    }
+                    infos[position] = templateInfo;
+                    position++;
+                }
+            }
+            if (infos.length >= (templatePerPage * pageNumber + templatePerPage)) {
                 ret = new TemplateInfo[templatePerPage];
             } else {
-                ret = new TemplateInfo[info.length - (templatePerPage * pageNumber)];
+                ret = new TemplateInfo[infos.length - (templatePerPage * pageNumber)];
             }
             for (int i = 0; i < templatePerPage; ++i) {
                 if (ret.length > i) {
-                    ret[i] = info[templatePerPage * pageNumber + i];
+                    ret[i] = infos[templatePerPage * pageNumber + i];
                 }
             }
             return ret;
@@ -117,7 +142,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
     @SuppressWarnings({"unchecked"})
     public TemplateInfo[] getDynamicTemplates(int pageNumber, int sequencePerPage)
             throws AxisFault {
-        
+
         org.wso2.carbon.registry.core.Registry registry;
         TemplateInfo[] ret;
         final Lock lock = getLock();
@@ -126,7 +151,7 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             String[] configInfo = getConfigSystemRegistry() != null?getMimeTypeResult(getConfigSystemRegistry()):new String[0];
             String[] govInfo = getGovernanceRegistry() != null?getMimeTypeResult(getGovernanceRegistry()): new String[0];
             String[] info = new String[configInfo.length + govInfo.length];
-            
+
             int ptr = 0;
             for (String aConfigInfo : configInfo) {
                 info[ptr] = "conf:" + aConfigInfo;
@@ -335,9 +360,16 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     log.debug("Saved template : " + templateName + " to the configuration");
 
                     TemplateMediator templ = config.getSequenceTemplates().get(templateName);
+                    String artifactName = getArtifactName(artifactType, templateName);
                     if (templ != null) {
                         templ.init(getSynapseEnvironment());
-                        persistTemplate(templ);
+                        CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                                getcAppArtifactDataService();
+                        if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+                        } else {
+                            persistTemplate(templ);
+                        }
                     }
                 }
             } else {
@@ -356,9 +388,13 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             TemplateMediator template;
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             if (template != null) {
                 template.enableStatistics();
-                persistTemplate(template);
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
@@ -378,10 +414,14 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
         try {
             lock.lock();
             TemplateMediator template;
-            template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
+            template = getSynapseConfiguration().getSequenceTemplate(templateName);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             if (template != null) {
                 template.disableStatistics();
-                persistTemplate(template);
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
@@ -402,9 +442,14 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             TemplateMediator template;
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                    getcAppArtifactDataService();
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_ON);
-                persistTemplate(template);
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
@@ -425,9 +470,13 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             TemplateMediator template;
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_OFF);
-                persistTemplate(template);
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, templateName))) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName

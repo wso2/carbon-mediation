@@ -16,6 +16,7 @@
  ~ under the License.
  -->
 <%@ page import="org.apache.synapse.task.TaskDescription" %>
+<%@ page import="org.wso2.carbon.task.stub.types.carbon.TaskData" %>
 <%@ page import="org.wso2.carbon.task.ui.internal.TaskClientConstants" %>
 <%@ page import="org.wso2.carbon.task.ui.internal.TaskManagementClient" %>
 <%@ page import="java.util.List" %>
@@ -47,9 +48,11 @@
         <div id="workArea">
             <%
                 TaskManagementClient client;
+                TaskData[] data = null;
                 try {
                     client = TaskManagementClient.getInstance(config, session);
                     List<TaskDescription> descriptions = client.getAllTaskDescriptions();
+                    data = client.getAllTaskData();
                     if (descriptions != null && !descriptions.isEmpty()) {
 
             %>
@@ -70,23 +73,41 @@
                             return a.getName().compareTo(b.getName());
                         }
                     });
-                    for (TaskDescription taskDescription : descriptions) {
-                        if (taskDescription != null) {
-                            String name = taskDescription.getName();
-                            String group = taskDescription.getTaskGroup();
+                    for (TaskData taskData : data) {
+                        if (taskData != null) {
+
+                            String name = taskData.getName();
+                            String group = taskData.getGroup();
                 %>
                 <tr id="tr_<%=name%>">
 
                     <td>
+                    <% if(taskData.getDeployedFromCApp()) { %>
+                    <img src="images/applications.gif">
                         <%=name%>
+                      <% if(taskData.getEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                    <% } else { %>
+                        <%=name%>
+                    <% } %>
                     </td>
+                    <% if (taskData.getDeployedFromCApp()) { %>
                     <td>
-                        <a href="javascript:editRow('<%=name%>','<%=group%>')" id="config_link"
+                        <a href="javascript:editCAppRow('<%=name%>','<%=group%>')" id="config_link"
                            class="edit-icon-link"><fmt:message key="task.edit"/></a>
-                        <a href="javascript:deleteRow('<%=name%>','<%=group%>')"
+                        <a href="#"
                            id="delete_link" class="delete-icon-link"><fmt:message
                                 key="task.property.delete"/></a>
                     </td>
+                    <% } else { %>
+                    <td>
+                        <a href="javascript:editRow('<%=name%>','<%=group%>')" id="config_link"
+                            class="edit-icon-link"><fmt:message key="task.edit"/></a>
+                        <a href="javascript:deleteRow('<%=name%>','<%=group%>')"
+                            id="delete_link" class="delete-icon-link"><fmt:message
+                                 key="task.property.delete"/></a>
+                    </td>
+                    <% } %>
+
 
                 </tr>
                 <%

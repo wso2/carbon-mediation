@@ -1,15 +1,21 @@
 package org.wso2.carbon.application.deployer.synapse.internal;
 
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 
 import java.util.HashMap;
 import java.util.Map;
+
+/**
+ * Data holder to contains synapse environment details for tenants
+ */
 
 public class DataHolder {
     private static DataHolder instance;
     private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices =
             new HashMap<Integer, SynapseEnvironmentService>();
 
+    private CAppArtifactDataService cAppArtifactDataService;
 
     public static DataHolder getInstance() {
         if (instance == null) {
@@ -33,5 +39,13 @@ public class DataHolder {
 
     public Map<Integer, SynapseEnvironmentService> getSynapseEnvironmentServices() {
         return synapseEnvironmentServices;
+    }
+
+    public CAppArtifactDataService getcAppArtifactDataService() {
+        return cAppArtifactDataService;
+    }
+
+    public void setcAppArtifactDataService(CAppArtifactDataService cAppArtifactDataService) {
+        this.cAppArtifactDataService = cAppArtifactDataService;
     }
 }

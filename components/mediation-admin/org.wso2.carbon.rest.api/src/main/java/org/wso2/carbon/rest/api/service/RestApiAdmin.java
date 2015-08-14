@@ -1,5 +1,6 @@
 package org.wso2.carbon.rest.api.service;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
@@ -40,6 +41,7 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.CarbonConfigurationContextFactory;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
@@ -48,10 +50,11 @@ import org.wso2.carbon.utils.NetworkUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 public class RestApiAdmin extends AbstractServiceBusAdmin{
-	
+
     private static Log log = LogFactory.getLog(RestApiAdmin.class);
     private static final String TENANT_DELIMITER = "/t/";
-	
+    private static final String artifactType = ServiceBusConstants.API_TYPE;
+
 	public boolean addApi(APIData apiData) throws APIException{
 		final Lock lock = getLock();
         try {
@@ -68,7 +71,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             lock.unlock();
         }
 	}
-	
+
 	public boolean addApiFromString(String apiData) throws APIException{
 		final Lock lock = getLock();
         try {
@@ -83,10 +86,10 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             lock.unlock();
         }
 	}
-	
+
 	/**
-	 * Set the tenant domain when a publisher publishes his API in MT mode. When publisher publishes 
-	 * the API, we login the gateway as supretenant. But we need to publish the API in the particular 
+	 * Set the tenant domain when a publisher publishes his API in MT mode. When publisher publishes
+	 * the API, we login the gateway as supretenant. But we need to publish the API in the particular
 	 * tenant domain.
 	 *
 	 * @param apiData
@@ -106,77 +109,96 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 			PrivilegedCarbonContext.endTenantFlow();
 		}
 	}
-	
+
 	public boolean updateApi(String apiName, APIData apiData) throws APIException{
-		
+
 		final Lock lock = getLock();
         try {
             lock.lock();
             assertNameNotEmpty(apiName);
-            
+
             API oldAPI = null;
             API api = APIFactory.createAPI(RestApiAdminUtils.retrieveAPIOMElement(apiData));
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-            
+
             oldAPI = synapseConfiguration.getAPI(apiName);
             if (oldAPI != null) {
                 oldAPI.destroy();
             	api.setFileName(oldAPI.getFileName());
             }
-    		
+
             synapseConfiguration.updateAPI(apiName, api);
             api.init(getSynapseEnvironment());
-    		
+
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
+            String artifactName = getArtifactName(artifactType, apiName);
+
+            if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+            } else {
     		MediationPersistenceManager pm = getMediationPersistenceManager();
             String fileName = api.getFileName();
             pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
             pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
-    		
+            }
     		return true;
+        } catch (Exception e) {
+            handleException(log, "Could not update API ", e);
+            return false;
         } finally {
             lock.unlock();
         }
 	}
-	
+
 	public boolean updateApiFromString(String apiName, String apiData) throws APIException{
-		
+
 		final Lock lock = getLock();
         try {
             lock.lock();
             assertNameNotEmpty(apiName);
-            
+
             OMElement apiElement = AXIOMUtil.stringToOM(apiData);
-            
+
             //Set API name to old value since we do not allow editing the API name.
             OMAttribute nameAttribute = apiElement.getAttribute(new QName("name"));
             if(nameAttribute == null || "".equals(nameAttribute.getAttributeValue().trim())){
             	apiElement.addAttribute("name", apiName, null);
             }
-            
+
             API oldAPI = null;
             API api = APIFactory.createAPI(apiElement);
-            
+
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-            
+
             oldAPI = synapseConfiguration.getAPI(apiName);
             if (oldAPI != null){
                 oldAPI.destroy();
             	api.setFileName(oldAPI.getFileName());
             }
-                        
+
     		synapseConfiguration.removeAPI(apiName);
             synapseConfiguration.addAPI(api.getName(),api);
             api.init(getSynapseEnvironment());
-    		
-    		MediationPersistenceManager pm = getMediationPersistenceManager();
+
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
+            String artifactName = getArtifactName(artifactType, apiName);
+
+            if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+            } else {
+                MediationPersistenceManager pm = getMediationPersistenceManager();
             String fileName = api.getFileName();
             pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
             pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
-    		
+            }
+
     		return true;
         } catch (XMLStreamException e) {
 			handleException(log, "Could not parse String to OMElement", e);
 			return false;
+        } catch (Exception e) {
+            handleException(log, "Unable to update API ", e);
+            return false;
 		} finally {
             lock.unlock();
         }
@@ -187,7 +209,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 	 * publisher updates
 	 * the API, we login the gateway as supretenant. But we need to update the
 	 * API,which is in the particular tenant domain.
-	 * 
+	 *
 	 * @param apiName
 	 * @param apiData
 	 * @return
@@ -206,13 +228,16 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 			PrivilegedCarbonContext.endTenantFlow();
 		}
 	}
-	
+
 	public boolean deleteApi(String apiName) throws APIException{
 		final Lock lock = getLock();
         try {
             lock.lock();
             assertNameNotEmpty(apiName);
             apiName = apiName.trim();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
+            if (!cAppArtifactDataService
+                    .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
             if (log.isDebugEnabled()) {
                 log.debug("Deleting API : " + apiName + " from the configuration");
             }
@@ -228,6 +253,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
             if (log.isDebugEnabled()) {
                 log.debug("Api : " + apiName + " removed from the configuration");
+            }
             }
         } finally {
             lock.unlock();
@@ -245,9 +271,12 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         final Lock lock = getLock();
         try {
             lock.lock();
+            CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().getcAppArtifactDataService();
             for (String apiName :apiNames ) {
                 assertNameNotEmpty(apiName);
                 apiName = apiName.trim();
+                if (!cAppArtifactDataService
+                        .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, apiName))) {
                 if (log.isDebugEnabled()) {
                     log.debug("Deleting API : " + apiName + " from the configuration");
                 }
@@ -264,6 +293,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 if (log.isDebugEnabled()) {
                     log.debug("Api : " + apiName + " removed from the configuration");
                 }
+            }
             }
         } finally {
             lock.unlock();
@@ -285,7 +315,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 	 * publisher deletes
 	 * the API, we login the gateway as supretenant. But we need to delete the
 	 * API,which is in the particular tenant domain.
-	 * 
+	 *
 	 * @param apiName
 	 * @param tenantDomain
 	 * @return
@@ -303,8 +333,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 			PrivilegedCarbonContext.endTenantFlow();
 		}
 	}
-	
-	
+
+
     public APIData[] getAPIsForListing(int pageNumber, int itemsPerPage){
         final Lock lock = getLock();
         try {
@@ -315,12 +345,22 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             List<APIData> apiDataList = null;
             if(apis != null){
                 apiDataList = new ArrayList<APIData>(apis.size());
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
 
                 for(API api : apis){
                     //Populate the fields we need to show
                     APIData apiData = new APIData();
                     apiData.setName(api.getName());
                     apiData.setContext(api.getContext());
+                    if (cAppArtifactDataService
+                            .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, api.getName()))) {
+                        apiData.setDeployedFromCApp(true);
+                    }
+                    if (cAppArtifactDataService
+                            .isArtifactEdited(getTenantId(), getArtifactName(artifactType, api.getName()))) {
+                        apiData.setEdited(true);
+                    }
 
                     apiDataList.add(apiData);
                 }
@@ -368,7 +408,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             lock.unlock();
         }
     }
-    
+
     public String getServerContext() throws APIException {
         AxisConfiguration configuration = null;
 
@@ -392,7 +432,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         } else {
             throw new APIException("http/https transport required");
         }
-		
+
         String host = null;
 
         Parameter hostParam =  configuration.getParameter("hostname");
@@ -460,7 +500,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 	 * publisher gets
 	 * the API, we login the gateway as supretenant. But we need to get the
 	 * API,which is in the particular tenant domain.
-	 * 
+	 *
 	 * @param apiName
 	 * @param tenantDomain
 	 * @return
@@ -478,7 +518,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 			PrivilegedCarbonContext.endTenantFlow();
 		}
 	}
-	
+
 	public String[] getSequences(){
 		final Lock lock = getLock();
 		String[] sequenceNames = new String[0];
@@ -697,20 +737,20 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             throw new APIException(message, e);
         }
     }
-	
+
 	private void persistApi(API api) throws APIException {
         MediationPersistenceManager pm = getMediationPersistenceManager();
         if (pm != null) {
             pm.saveItem(api.getName(), ServiceBusConstants.ITEM_TYPE_REST_API);
         }
     }
-	
+
 	private void assertNameNotEmpty(String apiName) throws APIException {
         if (apiName == null || "".equals(apiName.trim())) {
             handleFault("Invalid name : Name is empty.", null);
         }
     }
-	
+
 	private void handleFault(String message, Exception e) throws APIException {
         if (e != null) {
             log.error(message, e);
@@ -720,15 +760,15 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             throw new APIException(message);
         }
     }
-	
+
 	/**
 	 * Override the parent's getSynapseconfig() method to retrieve the Synapse
 	 * configuration from the relevant axis configuration
-	 * 
+	 *
 	 * @return extracted SynapseConfiguration from the relevant
 	 *         AxisConfiguration
 	 */
-	protected SynapseConfiguration getSynapseConfiguration() {	
+	protected SynapseConfiguration getSynapseConfiguration() {
 		return (SynapseConfiguration)getAxisConfig().getParameter(SynapseConstants.SYNAPSE_CONFIG)
                 .getValue() ;
 	}
@@ -738,7 +778,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 	 * We do this to support, publishing APIs as a supertenant but want to deploy that in tenant space.
 	 * (This model is needed for APIManager)
 	 */
-	
+
 	protected AxisConfiguration getAxisConfig() {
 		return (axisConfig != null) ? axisConfig : getConfigContext().getAxisConfiguration();
 	}
@@ -747,7 +787,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		if (configurationContext != null) {
 			return configurationContext;
 		}
-		
+
 		MessageContext msgContext = MessageContext.getCurrentMessageContext();
 		if (msgContext != null) {
 			ConfigurationContext mainConfigContext = msgContext.getConfigurationContext();

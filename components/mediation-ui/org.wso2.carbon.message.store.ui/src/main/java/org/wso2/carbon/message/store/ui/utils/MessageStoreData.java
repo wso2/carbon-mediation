@@ -40,7 +40,13 @@ public class MessageStoreData {
 
     private String sequence;
 
+    private boolean isDeployedFromCApp;
+
+    private boolean isEdited;
+
     private Map<String, String> params = new HashMap<String, String>();
+
+    public MessageStoreData(){}
 
     public MessageStoreData(String xml) throws XMLStreamException {
         populate(xml);
@@ -114,6 +120,38 @@ public class MessageStoreData {
         storeString.append("sequence: " + sequence + "\n");
         storeString.append("params: " + params + "\n");
         return storeString.toString();
+    }
+
+    /**
+     * Check whether the store is deployed from CApp
+     * @return true if store deployed from CApp, else false
+     */
+    public boolean getDeployedFromCApp() {
+        return isDeployedFromCApp;
+    }
+
+    /**
+     * Set whether the store is deployed from CApp
+     * @param isDeployedFromCApp true if store deployed from CApp, else false
+     */
+    public void setDeployedFromCApp(boolean isDeployedFromCApp) {
+        this.isDeployedFromCApp = isDeployedFromCApp;
+    }
+
+    /**
+     * Check whether the store deployed from CApp is edited through management console
+     * @return true if the store is edited, else false
+     */
+    public boolean getEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set whether the store deployed from CApp is edited through management console
+     * @param isEdited true if the store is edited, else false
+     */
+    public void setEdited(boolean isEdited) {
+        this.isEdited = isEdited;
     }
 
 }

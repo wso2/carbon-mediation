@@ -118,6 +118,8 @@ public class EndpointTemplateAdminClient {
                 templInfo.setTemplateName(info.getTemplateName());
                 templInfo.setDescription(info.getDescription());
                 templInfo.setEndpointType(info.getEndpointType());
+                templInfo.setDeployedFromCApp(info.getDeployedFromCApp());
+                templInfo.setEdited(info.getEdited());
                 templates.add(templInfo);
             }
         } catch (Exception e) {

@@ -19,6 +19,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="org.wso2.carbon.message.processor.service.xsd.MessageProcessorMetaData" %>
 <%@ page import="org.wso2.carbon.message.processor.ui.MessageProcessorAdminServiceClient" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -118,31 +119,37 @@
 
     }
 
-    function deactivateRow(i) {
-        var table = document.getElementById("myTable");
-        var row = table.rows[i];
-        var cell = row.cells[0];
-        var content = cell.innerHTML;
+     function editCAppProcessor(processorType,name) {
+         CARBON.showConfirmationDialog('<fmt:message key="edit.cApp.processor.on.page.prompt"/>', function() {
+               $.ajax({
+                     type: 'POST',
+                     success: function() {
+                     if (processorType == "Scheduled Message Forwarding Processor") {
+                            document.location.href = "manageMessageForwardingProcessor.jsp?" + "messageProcessorName=" + name;
+                     } else if (processorType == "Message Sampling Processor") {
+                            document.location.href = "manageMessageSamplingProcessor.jsp?" + "messageProcessorName=" + name;
+                     } else {
+                            document.location.href = "manageCustomMessageProcessor.jsp?" + "messageProcessorName=" + name;
+                     }
+                     }
+               });
+         });
+     }
+
+    function deactivateRow(name) {
 
         function deacEp() {
-            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + content +
+            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + name +
                     "&action=Deactivate";
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.deactivate.the.processor"/>", deacEp);
     }
 
-    function activateRow(i, linked) {
-        var table = document.getElementById("myTable");
-        var row = table.rows[i];
-        var cell = row.cells[0];
-        var content = cell.innerHTML;
+    function activateRow(name) {
 
-        if (linked) {
-            content = cell.firstChild.innerHTML;
-        }
         function deacEp() {
-            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + content +
+            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + name +
                     "&action=Activate";
         }
 
@@ -180,7 +187,7 @@
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
     MessageProcessorAdminServiceClient client = null;
-    String[] messageProcessors = null;
+    MessageProcessorMetaData[] messageProcessors = null;
     int numberOfMessageProcessors = 0;
     int numberOfPages = 1;
     String pageNumber = request.getParameter("pageNumber");
@@ -195,7 +202,7 @@
 
     try {
         client = new MessageProcessorAdminServiceClient(cookie, url, configContext);
-        messageProcessors = client.getPaginatedMessageProcessorNames(pageNumberInt);
+        messageProcessors = client.getPaginatedMessageProcessorData(pageNumberInt);
         String[] processorNameList = client.getMessageProcessorNames();
 
         if (processorNameList != null) {
@@ -242,11 +249,11 @@
         <tbody>
 
         <%
-            for (String name : messageProcessors) {
+            for (MessageProcessorMetaData data : messageProcessors) {
 
                 String type = "";
                 try {
-                    type = client.getClassName(name);
+                    type = client.getClassName(data.getName());
 
                     if (type != null) {
 
@@ -283,7 +290,15 @@
             <%--<td><%=name%>--%>
             <%--</td>--%>
             <%--<%} %>--%>
-            <td><%=name%></td>
+            <td>
+            <% if (data.getDeployedFromCApp()) { %>
+                <img src="images/applications.gif">
+                <%=data.getName()%>
+                <% if(data.getEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+            <% } else { %>
+                <%=data.getName()%>
+            <% } %>
+            </td>
             <td><%=type%>
             </td>
             <%
@@ -291,19 +306,33 @@
                         equalsIgnoreCase(type) || "Message Sampling Processor".equals(type) || "Scheduled Failover Message Forwarding Processor".equalsIgnoreCase(type))
                         && client.isActive(name)) {
             %>
-            <td><a onclick="editRow('<%= type%>',this.parentNode.parentNode.rowIndex)" href="#"
-                   class="icon-link"
-                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                    key="edit"/></a>
-                <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
-                   id="delete_link" class="icon-link"
-                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                        key="delete"/></a>
+            <td>
+                 <% if (data.getDeployedFromCApp()) { %>
+                        <a onclick="editCAppProcessor('<%= type%>','<%= data.getName()%>')" href="#"
+                                     class="icon-link"
+                                     style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                     key="edit"/></a>
+                        <a href="#" onclick="#"
+                                     id="delete_link" class="icon-link"
+                                     style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                     key="delete"/></a>
+                 <% } else { %>
+                        <a onclick="editRow('<%= type%>',this.parentNode.parentNode.rowIndex)" href="#"
+                                     class="icon-link"
+                                     style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                     key="edit"/></a>
+                        <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+                                     id="delete_link" class="icon-link"
+                                     style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                     key="delete"/></a>
+                 <% } %>
+
+
                 <span class="icon-text" style="background-image:url(../message_processor/images/activate.gif);">
                     <fmt:message key="active"/>&nbsp;[</span>
                 <a href="#" class="icon-link" id="deactivate_link"
                    style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                   onclick="deactivateRow(this.parentNode.parentNode.rowIndex)"><fmt:message key="deactivate"/></a>
+                   onclick="deactivateRow('<%= data.getName()%>')"><fmt:message key="deactivate"/></a>
                 <span class="icon-text"
                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 
@@ -312,19 +341,32 @@
             } else if ("Scheduled Message Forwarding Processor".
                     equalsIgnoreCase(type)) {
             %>
-            <td><a onclick="editRow('<%= type%>', this.parentNode.parentNode.rowIndex)" href="#"
+            <td>
+                <% if (data.getDeployedFromCApp()) { %>
+                <a onclick="editCAppProcessor('<%= type%>','<%= data.getName()%>')" href="#"
                    class="icon-link"
                    style="background-image:url(../admin/images/edit.gif);"><fmt:message
                     key="edit"/></a>
+                <a href="#" onclick="#"
+                   id="delete_link" class="icon-link"
+                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                   key="delete"/></a>
+                <% } else { %>
+                <a onclick="editRow('<%= type%>', this.parentNode.parentNode.rowIndex)" href="#"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                   key="edit"/></a>
                 <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
                    id="delete_link" class="icon-link"
                    style="background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
+                <% } %>
+
                 <span class="icon-text" style="background-image:url(../message_processor/images/deactivate.gif);">
                     <fmt:message key="inactive"/>&nbsp;[</span>
                 <a href="#" class="icon-link" id="activate_link"
                    style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                   onclick="activateRow(this.parentNode.parentNode.rowIndex)"><fmt:message key="activate"/></a>
+                   onclick="activateRow('<%= data.getName()%>')"><fmt:message key="activate"/></a>
                 <span class="icon-text"
                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 
@@ -353,20 +395,33 @@
             } else if ("Message Sampling Processor".
                     equalsIgnoreCase(type)) {
             %>
-            <td><a onclick="editRow('<%= type%>', this.parentNode.parentNode.rowIndex)" href="#"
+            <td>
+                <% if (data.getDeployedFromCApp()) { %>
+                <a onclick="editRow('<%= type%>', '<%= data.getName()%>')" href="#"
                    class="icon-link"
                    style="background-image:url(../admin/images/edit.gif);"><fmt:message
                     key="edit"/></a>
+                <a href="#" onclick="#"
+                      id="delete_link" class="icon-link"
+                      style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                      key="delete"/></a>
+                <% } else { %>
+                <a onclick="editRow('<%= type%>', this.parentNode.parentNode.rowIndex)" href="#"
+                      class="icon-link"
+                      style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                      key="edit"/></a>
                 <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
                    id="delete_link" class="icon-link"
                    style="background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
+                <% } %>
+
                  <span class="icon-text"
                        style="background-image:url(../message_processor/images/deactivate.gif);">
                     <fmt:message key="inactive"/>&nbsp;[</span>
                 <a href="#" class="icon-link" id="activate_link"
                    style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                   onclick="activateRow(this.parentNode.parentNode.rowIndex)"><fmt:message key="activate"/></a>
+                   onclick="activateRow('<%= data.getName()%>')"><fmt:message key="activate"/></a>
                 <span class="icon-text"
                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 

@@ -290,6 +290,17 @@
         document.location.href = "design_sequence.jsp?sequenceAction=edit&sequenceName=" + arguments[0];
     }
 
+    function editCAppSequence(sequenceName) {
+      CARBON.showConfirmationDialog('<fmt:message key="edit.cApp.sequences.on.page.prompt"/>', function() {
+       $.ajax({
+                          type: 'POST',
+                          success: function() {
+                             location.href = "design_sequence.jsp?sequenceAction=edit&sequenceName=" + sequenceName;
+                          }
+                      });
+       });
+    }
+
     function deleteSequence(sequenceName) {
         if (sequenceName == "main" || sequenceName == "fault") {
             CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
@@ -578,7 +589,13 @@
                     &nbsp;
                 </td>
                 <td>
-                    <span href="#" <% if(sequence.getDescription()!= null){ %>onmouseover="showTooltip(this,'<%=sequence.getDescription()%>')" <% } %>><%= sequence.getName() %></span>
+                    <span href="#" <% if(sequence.getDescription()!= null){ %>onmouseover="showTooltip(this,'<%=sequence.getDescription()%>')" <% } %>>
+                    <% if (sequence.getDeployedFromCApp()) { %>
+                        <img src="images/applications.gif">
+                    <% } %>
+                        <%= sequence.getName() %>
+                     <% if(sequence.getEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                    </span>
                 </td>
 
                 <% if (sequence.isEnableStatistics()) { %>
@@ -655,22 +672,44 @@
                     </div>
                 </td>
                 <% } %>
+                <% if(sequence.getDeployedFromCApp()) { %>
                 <td style="border-left:none;border-right:none;width:100px">
                     <div class="inlineDiv">
-                        <a href="#" onclick="editSequence('<%= sequence.getName() %>')"
+                        <a href="#" onclick="editCAppSequence('<%= sequence.getName() %>')"
                            class="icon-link"
                            style="background-image:url(../admin/images/edit.gif);"><fmt:message
                                 key="sequence.edit.action"/></a>
                     </div>
                 </td>
+
                 <td style="border-left:none;width:100px">
-                    <div class="inlineDiv">
-                        <a href="#" onclick="deleteSequence('<%= sequence.getName() %>')"
-                           class="icon-link"
-                           style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                                key="sequence.delete.action"/></a>
-                    </div>
-                </td>
+                                    <div class="inlineDiv">
+                                        <a href="#" onclick="#"
+                                           class="icon-link"
+                                           style="color:grey;"><fmt:message
+                                                key="sequence.delete.action"/></a>
+                                    </div>
+                                </td>
+                <% } else { %>
+                <td style="border-left:none;border-right:none;width:100px">
+                                    <div class="inlineDiv">
+                                        <a href="#" onclick="editSequence('<%= sequence.getName() %>')"
+                                           class="icon-link"
+                                           style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                                key="sequence.edit.action"/></a>
+                                    </div>
+                                </td>
+                <td style="border-left:none;width:100px">
+                                    <div class="inlineDiv">
+                                        <a href="#" onclick="deleteSequence('<%= sequence.getName() %>')"
+                                           class="icon-link"
+                                           style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                                key="sequence.delete.action"/></a>
+                                    </div>
+                                </td>
+                <% } %>
+
+
             </tr>
             <% } }%>
             </tbody>

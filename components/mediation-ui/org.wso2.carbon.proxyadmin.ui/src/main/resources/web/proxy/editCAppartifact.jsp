@@ -35,6 +35,7 @@
             configContext, backendServerURL, cookie, request.getLocale());
     ProxyData pd = client.getProxy(serviceName);
     String name = pd.getName();
+
     boolean loggedIn = session.getAttribute(CarbonSecuredHttpContext.LOGGED_USER) != null;
 %>
 <carbon:jsi18n
@@ -44,20 +45,51 @@
 />
 
 <script type="text/javascript">
-    function editPS(serviceName) {
+function editPS(serviceName) {
         window.location.href='../proxyservices/index.jsp?header=Modify' + '&serviceName='+serviceName+'&startwiz=true';
     }
 
-    function editProxySourceView(serviceName) {
+function editCAppPS(serviceName) {
+      CARBON.showConfirmationDialog("The changes will not persist to the CAPP after restart or redeploy. Do you want to Edit?", function() {
+           jQuery.ajax({
+                    type: 'POST',
+                    success: function() {
+                         window.location.href='../proxyservices/index.jsp?header=Modify' + '&serviceName='+serviceName+'&startwiz=true';
+                    }
+           });
+      });
+}
+
+function editProxySourceView(serviceName) {
         window.location.href='../proxyservices/index.jsp?header=Modify' + '&serviceName='+serviceName+'&startwiz=false&sourceView=true';
     }
+
+function editCAppProxySourceView(serviceName) {
+       CARBON.showConfirmationDialog("The changes will not persist to the CAPP after restart or redeploy. Do you want to Edit?", function() {
+            jQuery.ajax({
+                    type: 'POST',
+                    success: function() {
+                        window.location.href='../proxyservices/index.jsp?header=Modify' + '&serviceName='+serviceName+'&startwiz=false&sourceView=true';
+                    }
+            });
+       });
+}
 </script>
 <td>
-    <a title="Edit '<%=pd.getName()%>' in the design view" href="#" onclick="editPS('<%=pd.getName()%>');return false;">
+    <% if (pd.getDeployedFromCApp()) { %>
+        <a title="Edit '<%=pd.getName()%>' in the design view" href="#" onclick="editCAppPS('<%=pd.getName()%>');return false;">
+    <% } else { %>
+        <a title="Edit '<%=pd.getName()%>' in the design view" href="#" onclick="editPS('<%=pd.getName()%>');return false;">
+    <% } %>
     <img src="../proxyservices/images/design-view.gif" alt="" border="0"> Design View</a>
 </td>
 <td>
-    <a title="Edit '<%=pd.getName()%>' in the source view editor" style="background-image: url(../proxyservices/images/source-view.gif);"
-    class="icon-link" onclick="editProxySourceView('<%=pd.getName()%>')" href="#">Source View</a>
-
+    <% if (pd.getDeployedFromCApp()) { %>
+        <a title="Edit '<%=pd.getName()%>' in the source view editor" style="background-image: url(../proxyservices/images/source-view.gif);"
+            class="icon-link" onclick="editCAppProxySourceView('<%=pd.getName()%>')" href="#">Source View</a>
+    <% } else { %>
+        <a title="Edit '<%=pd.getName()%>' in the source view editor" style="background-image: url(../proxyservices/images/source-view.gif);"
+            class="icon-link" onclick="editProxySourceView('<%=pd.getName()%>')" href="#">Source View</a>
+    <% } %>
 </td>
+

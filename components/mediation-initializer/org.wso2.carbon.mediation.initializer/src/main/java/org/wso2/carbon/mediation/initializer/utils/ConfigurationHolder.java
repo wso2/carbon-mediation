@@ -21,6 +21,7 @@ package org.wso2.carbon.mediation.initializer.utils;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public class ConfigurationHolder {
     private static ConfigurationHolder ourInstance = new ConfigurationHolder();
 
     private BundleContext bundleContext;
-
+    private CAppArtifactDataService cAppArtifactDataService;
     private Map<Integer, ServiceRegistration> synapseRegistrations =
             new HashMap<Integer, ServiceRegistration>(); 
 
@@ -54,5 +55,13 @@ public class ConfigurationHolder {
 
     public ServiceRegistration getSynapseRegistration(int tenantId) {
         return synapseRegistrations.get(tenantId);
+    }
+
+    public CAppArtifactDataService getcAppArtifactDataService() {
+        return cAppArtifactDataService;
+    }
+
+    public void setcAppArtifactDataService(CAppArtifactDataService cAppArtifactDataService) {
+        this.cAppArtifactDataService = cAppArtifactDataService;
     }
 }

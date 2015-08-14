@@ -68,6 +68,7 @@ import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.securevault.SecurityConstants;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,6 +123,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * interface="org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService"
  * cardinality="1..1" policy="dynamic"
  * bind="setInboundPersistenceService" unbind="unsetInboundPersistenceService"
+ * @scr.reference name="synapse.capp.deployment.service"
+ * interface="org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService"
+ * cardinality="1..n" policy="dynamic" bind="setCAppArtifactDataService"
+ * unbind="unsetCAppArtifactDataService"
  */
 @SuppressWarnings({"JavaDoc", "UnusedDeclaration"})
 public class ServiceBusInitializer {
@@ -589,6 +594,16 @@ public class ServiceBusInitializer {
     //        }
     //        this.dataSourceInformationRepositoryService = null;
     //    }
+
+    protected void setCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigurationHolder.getInstance().setcAppArtifactDataService(cAppArtifactDataService);
+    }
+
+    protected void unsetCAppArtifactDataService(
+            CAppArtifactDataService cAppArtifactDataService) {
+        ConfigurationHolder.getInstance().setcAppArtifactDataService(null);
+    }
 
     protected void setTaskDescriptionRepositoryService(
             TaskDescriptionRepositoryService repositoryService) {

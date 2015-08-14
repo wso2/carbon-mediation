@@ -45,13 +45,18 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.mediation.initializer.services.CAppArtifactDataService;
+import org.wso2.carbon.message.processor.util.ConfigHolder;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.concurrent.locks.Lock;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     private static Log log = LogFactory.getLog(MessageProcessorAdminService.class);
 
     public static final int MSGS_PER_PAGE = 10;
-    
+    private static final String artifactType = ServiceBusConstants.MESSAGE_PROCESSOR_TYPE;
     public final static String DEFAULT_AXIS2_XML = "./repository/conf/axis2/axis2_blocking_client.xml";
 
     /**
@@ -113,8 +118,16 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                 messageProcessor.setFileName(fileName);
                 synapseConfiguration.addMessageProcessor(messageProcessor.getName(),
                         messageProcessor);
-                MediationPersistenceManager mp = getMediationPersistenceManager();
-                mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                String artifactName = getArtifactName(artifactType, messageProcessor.getName());
+                if (cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                    cAppArtifactDataService.setEdited(getTenantId(), artifactName);
+                } else {
+                    MediationPersistenceManager mp = getMediationPersistenceManager();
+                    mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                }
+
             } else {
                 String message = "Unable to Update Message Processor ";
                 handleException(log, message, null);
@@ -123,6 +136,8 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         } catch (XMLStreamException e) {
             String message = "Unable to Modify Message Processor ";
             handleException(log, message, e);
+        } catch (Exception e) {
+            handleException(log, "Unable to Modify Message Processor ", e);
         }
     }
 
@@ -228,6 +243,43 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         }
 
         return messageIds;
+    }
+
+    /**
+     * Get all the Current Message processor data defined in the configuration
+     *
+     * @return Array of  MessageProcessorMetaDatas.
+     * @throws AxisFault
+     */
+    public MessageProcessorMetaData[] getMessageProcessorDataList() throws AxisFault {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration configuration = getSynapseConfiguration();
+            Collection<String> names = configuration.getMessageProcessors().keySet();
+
+            List<MessageProcessorMetaData> messageProcessorDataList = new ArrayList<MessageProcessorMetaData>();
+            if (names != null && !names.isEmpty()) {
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                for (String name : names) {
+                    MessageProcessorMetaData data = new MessageProcessorMetaData();
+                    data.setName(name);
+                    if (cAppArtifactDataService
+                            .isArtifactDeployedFromCApp(getTenantId(), getArtifactName(artifactType, name))) {
+                        data.setDeployedFromCApp(true);
+                    }
+                    if (cAppArtifactDataService.isArtifactEdited(getTenantId(), getArtifactName(artifactType, name))) {
+                        data.setEdited(true);
+                    }
+                    messageProcessorDataList.add(data);
+                }
+            }
+            return messageProcessorDataList.toArray(new MessageProcessorMetaData[messageProcessorDataList.size()]);
+
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -510,12 +562,21 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
             if (configuration.getMessageProcessors().containsKey(processorName)) {
                 MessageProcessor processor =
                         configuration.getMessageProcessors().get(processorName);
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                String artifactName = getArtifactName(artifactType, processorName);
 
                 if (processor instanceof ScheduledMessageForwardingProcessor) {
                     MessageForwardingProcessorView view =
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
+
+                        if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
+
                     } else {
                         log.warn("Scheduled Message Forwarding Processor is already active");
                     }
@@ -533,6 +594,11 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((SamplingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
+
+                        if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
                     } else {
                         log.warn("Sampling Processor is already active");
                     }
@@ -555,12 +621,20 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
             if (configuration.getMessageProcessors().containsKey(processorName)) {
                 MessageProcessor processor =
                         configuration.getMessageProcessors().get(processorName);
+                CAppArtifactDataService cAppArtifactDataService = ConfigHolder.getInstance().
+                        getcAppArtifactDataService();
+                String artifactName = getArtifactName(artifactType, processorName);
 
                 if (processor instanceof ScheduledMessageForwardingProcessor) {
                     MessageForwardingProcessorView view =
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if (view.isActive()) {
                         view.deactivate();
+
+                        if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
                     } else {
                         log.warn("Scheduled Message Forwarding Processor - already deActive");
                     }
@@ -578,6 +652,11 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     SamplingProcessorView view = ((SamplingProcessor) processor).getView();
                     if (view.isActive()) {
                         view.deactivate();
+
+                        if (!cAppArtifactDataService.isArtifactDeployedFromCApp(getTenantId(), artifactName)) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
                     } else {
                         log.warn("Sampling Message Processor - already in the deactivated state");
                     }

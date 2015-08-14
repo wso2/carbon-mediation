@@ -29,6 +29,10 @@ public class EndpointTemplateInfo {
 
     private String endpointType;
 
+    private boolean isDeployedFromCApp;
+    private boolean isEdited;
+
+
     private ArrayList<String> params = new ArrayList<String>();
 
     public String getTemplateName() {
@@ -71,6 +75,38 @@ public class EndpointTemplateInfo {
             i++;
         }
         return collectionStr;
+    }
+
+    /**
+     * Check whether the template is deployed from CApp
+     * @return true if v deployed from CApp, else false
+     */
+    public boolean getDeployedFromCApp() {
+        return isDeployedFromCApp;
+    }
+
+    /**
+     * Set whether the template is deployed from CApp
+     * @param isDeployedFromCApp true if template deployed from CApp, else false
+     */
+    public void setDeployedFromCApp(boolean isDeployedFromCApp) {
+        this.isDeployedFromCApp = isDeployedFromCApp;
+    }
+
+    /**
+     * Check whether the template deployed from CApp is edited through management console
+     * @return true if the template is edited, else false
+     */
+    public boolean getEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set whether the template deployed from CApp is edited through management console
+     * @param isEdited true if the template is edited, else false
+     */
+    public void setEdited(boolean isEdited) {
+        this.isEdited = isEdited;
     }
 
 }

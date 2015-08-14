@@ -31,18 +31,34 @@
     ConfigurationContext configContext =
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-
     ProxyServiceAdminClient client = new ProxyServiceAdminClient(
             configContext, backendServerURL, cookie, request.getLocale());
     ProxyData pd = client.getProxy(serviceName);
     String name = pd.getName();
+
     boolean loggedIn = session.getAttribute(CarbonSecuredHttpContext.LOGGED_USER) != null;
 %>
+<carbon:jsi18n
+    resourceBundle="org.wso2.carbon.proxyadmin.ui.i18n.JSResources"
+    request="<%=request%>"
+    i18nObjectName="proxyi18n"
+/>
 
 <td width="200px">
+
+<% if(pd.getDeployedFromCApp()) { %>
+    <img src="images/applications.gif">
+    <% if (loggedIn) { %>
+        <a href="./service_info.jsp?serviceName=<%=serviceName%>"><%=name%>
+    <% if(pd.getEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+    <% } else { %>
+        <%=name%>
+    <% } %>
+<% } else { %>
    <% if (loggedIn) { %>
         <a href="./service_info.jsp?serviceName=<%=serviceName%>"><%=name%>
    <% } else { %>
        <%=name%>
    <% } %>
+<% } %>
 </td>
