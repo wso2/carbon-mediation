@@ -13,6 +13,7 @@
     <modules>
         <module>org.wso2.carbon.inbound.endpoints.server.feature</module>
         <module>org.wso2.carbon.inbound.endpoints.feature</module>
+        <module>org.wso2.carbon.inbound.endpoints.ext.wsrm.feature</module>
     </modules>
 
 
