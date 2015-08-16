@@ -22,6 +22,7 @@
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.Comparator" %>
+<%@ page import="org.wso2.carbon.task.stub.types.carbon.TaskData" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -47,9 +48,11 @@
         <div id="workArea">
             <%
                 TaskManagementClient client;
+                TaskData[] data = null;
                 try {
                     client = TaskManagementClient.getInstance(config, session);
                     List<TaskDescription> descriptions = client.getAllTaskDescriptions();
+                    data = client.getAllTaskData();
                     if (descriptions != null && !descriptions.isEmpty()) {
 
             %>
@@ -70,16 +73,31 @@
                             return a.getName().compareTo(b.getName());
                         }
                     });
-                    for (TaskDescription taskDescription : descriptions) {
-                        if (taskDescription != null) {
-                            String name = taskDescription.getName();
-                            String group = taskDescription.getTaskGroup();
+                    for (TaskData taskData : data) {
+                        if (taskData != null) {
+                            String name = taskData.getName();
+                            String group = taskData.getGroup();
                 %>
                 <tr id="tr_<%=name%>">
 
                     <td>
+                        <% if(taskData.getArtifactContainerName() != null) { %>
+                        <img src="images/applications.gif">
                         <%=name%>
+                        <% if(taskData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                        <% } else { %>
+                        <%=name%>
+                        <% } %>
                     </td>
+                    <% if (taskData.getArtifactContainerName() != null) { %>
+                    <td>
+                        <a href="javascript:editCAppRow('<%=name%>','<%=group%>')" id="config_link"
+                           class="edit-icon-link"><fmt:message key="task.edit"/></a>
+                        <a href="#"
+                           id="delete_link" class="delete-icon-link"><fmt:message
+                                key="task.property.delete"/></a>
+                    </td>
+                    <% } else { %>
                     <td>
                         <a href="javascript:editRow('<%=name%>','<%=group%>')" id="config_link"
                            class="edit-icon-link"><fmt:message key="task.edit"/></a>
@@ -87,6 +105,7 @@
                            id="delete_link" class="delete-icon-link"><fmt:message
                                 key="task.property.delete"/></a>
                     </td>
+                    <% } %>
 
                 </tr>
                 <%
