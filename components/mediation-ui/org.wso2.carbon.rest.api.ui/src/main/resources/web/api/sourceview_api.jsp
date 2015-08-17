@@ -59,12 +59,12 @@
     apiName = request.getParameter("apiName");
     hostname = request.getParameter("hostname");
     port = request.getParameter("port");
-    
+
     if ("edit".equals(mode)) {
 
         APIData apiData = new APIData();
         apiData.setName(apiName);
-        apiData.setContext(apiContext);
+        apiData.setContext(apiContext != null && !"/".equals(apiContext.trim()) ? apiContext : "");
         apiData.setHost(hostname == null || "".equals(hostname) ? null : hostname);
         apiData.setPort(Integer.parseInt(port != null && !"".equals(port) ? port : "-1"));
         apiData.setResources(resources.toArray(resourceArray));
@@ -73,7 +73,7 @@
     } else {
         APIData apiData = new APIData();
         apiData.setName(apiName != null ? apiName : "");
-        apiData.setContext(apiContext != null ? apiContext : "/");
+        apiData.setContext(apiContext != null && !"/".equals(apiContext.trim()) ? apiContext : "");
         apiData.setHost(hostname == null || "".equals(hostname) ? null : hostname);
         apiData.setPort(Integer.parseInt(port != null && !"".equals(port) ? port : "-1"));
         apiData.setResources(resources.toArray(resourceArray));
@@ -121,6 +121,18 @@
         var isValidXML = isValidXml(trim(source));
         if (!isValidXML) {
             return false;
+        } else {
+            if (window.DOMParser) {
+                var parser=new DOMParser();
+                xmlDoc=parser.parseFromString(trim(source),"text/xml");
+            }
+            else {
+                xmlDoc = new ActiveXObject("Microsoft.XMLDOM"); xmlDoc.loadXML(trim(source));
+            }
+            if ((xmlDoc.getElementsByTagName('api')[0].getAttribute("context")).trim() == "/") {
+            xmlDoc.getElementsByTagName('api')[0].setAttribute("context","");
+            source = new XMLSerializer().serializeToString(xmlDoc);
+            }
         }
 
     <%if("edit".equals(mode)){%>
