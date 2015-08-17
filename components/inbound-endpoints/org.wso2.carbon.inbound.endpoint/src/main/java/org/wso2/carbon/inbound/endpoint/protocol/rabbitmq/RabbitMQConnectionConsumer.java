@@ -41,7 +41,7 @@ public class RabbitMQConnectionConsumer {
     private static final int STATE_FAULTY = 5;
 
     private volatile int workerState = STATE_STOPPED;
-    private String factoryName;
+    private String inboundName;
     private Connection connection = null;
     private Channel channel = null;
     private boolean autoAck = false;
@@ -72,18 +72,18 @@ public class RabbitMQConnectionConsumer {
                     startConsumer();
                 } catch (ShutdownSignalException sse) {
                     if (!sse.isInitiatedByApplication()) {
-                        log.error("RabbitMQ Listener of the inbound " + factoryName +
+                        log.error("RabbitMQ Listener of the inbound " + inboundName +
                                 " was disconnected", sse);
                         waitForConnection();
                     }
                 } catch (IOException e) {
-                    log.error("RabbitMQ Listener of the inbound " + factoryName +
+                    log.error("RabbitMQ Listener of the inbound " + inboundName +
                             " was disconnected", e);
                     waitForConnection();
                 }
             }
         } catch (IOException e) {
-            handleException("Error initializing consumer for inbound " + factoryName, e);
+            handleException("Error initializing consumer for inbound " + inboundName, e);
         } finally {
             closeConnection();
             workerState = STATE_STOPPED;
@@ -97,20 +97,20 @@ public class RabbitMQConnectionConsumer {
         while ((workerState == STATE_STARTED) && !connection.isOpen()
                 && ((retryCountMax == -1) || (retryCount < retryCountMax))) {
             retryCount++;
-            log.info("Attempting to reconnect to RabbitMQ Broker for the inbound " + factoryName +
+            log.info("Attempting to reconnect to RabbitMQ Broker for the inbound " + inboundName +
                     " in " + retryInterval + " ms");
             try {
                 Thread.sleep(retryInterval);
             } catch (InterruptedException e) {
                 log.error("Error while trying to reconnect to RabbitMQ Broker for the inbound " +
-                        factoryName, e);
+                        inboundName, e);
             }
         }
         if (connection.isOpen()) {
-            log.info("Successfully reconnected to RabbitMQ Broker for the inbound " + factoryName);
+            log.info("Successfully reconnected to RabbitMQ Broker for the inbound " + inboundName);
             initConsumer();
         } else {
-            log.error("Could not reconnect to the RabbitMQ Broker for the inbound " + factoryName +
+            log.error("Could not reconnect to the RabbitMQ Broker for the inbound " + inboundName +
                     ". Connection is closed.");
             workerState = STATE_FAULTY;
         }
@@ -128,7 +128,7 @@ public class RabbitMQConnectionConsumer {
         connection = getConnection();
         if (channel == null || !channel.isOpen()) {
             channel = connection.createChannel();
-            log.debug("Channel is not open. Creating a new channel for inbound " + factoryName);
+            log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
         }
         //set the qos value for the consumer//
         String qos = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_QOS);
@@ -198,8 +198,8 @@ public class RabbitMQConnectionConsumer {
      * @throws IOException on error
      */
     private void initConsumer() throws IOException {
-        factoryName = rabbitMQProperties.getProperty(RabbitMQConstants.RABBITMQ_CON_FAC);
-        log.debug("Initializing consumer for inbound " + factoryName);
+        //inboundName = rabbitMQProperties.getProperty(RabbitMQConstants.RABBITMQ_CON_FAC);
+        log.debug("Initializing consumer for inbound " + inboundName);
         connection = getConnection();
         channel = connection.createChannel();
         queueName = rabbitMQProperties.getProperty(RabbitMQConstants.QUEUE_NAME);
@@ -216,8 +216,8 @@ public class RabbitMQConnectionConsumer {
         }
         //If no queue name is specified then inbound factory name will be used as queue name
         if (StringUtils.isEmpty(queueName)) {
-            queueName = factoryName;
-            log.info("No queue name is specified for " + factoryName + ". " +
+            queueName = inboundName;
+            log.info("No queue name is specified for " + inboundName + ". " +
                     "inbound factory name will be used as queue name");
         }
 
@@ -237,7 +237,7 @@ public class RabbitMQConnectionConsumer {
 
             if (!channel.isOpen()) {
                 channel = connection.createChannel();
-                log.debug("Channel is not open. Creating a new channel for inbound " + factoryName);
+                log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
             }
             channel.queueBind(queueName, exchangeName, routeKey);
             log.debug("Bind queue '" + queueName + "' to exchange '" + exchangeName + "' with route key '" + routeKey + "'");
@@ -245,7 +245,7 @@ public class RabbitMQConnectionConsumer {
 
         if (!channel.isOpen()) {
             channel = connection.createChannel();
-            log.debug("Channel is not open. Creating a new channel for inbound " + factoryName);
+            log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
         }
 
         queueingConsumer = new QueueingConsumer(channel);
@@ -253,10 +253,10 @@ public class RabbitMQConnectionConsumer {
         consumerTagString = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_TAG);
         if (consumerTagString != null) {
             channel.basicConsume(queueName, autoAck, consumerTagString, queueingConsumer);
-            log.debug("Start consuming queue '" + queueName + "' with consumer tag '" + consumerTagString + "' for inbound " + factoryName);
+            log.debug("Start consuming queue '" + queueName + "' with consumer tag '" + consumerTagString + "' for inbound " + inboundName);
         } else {
             consumerTagString = channel.basicConsume(queueName, autoAck, queueingConsumer);
-            log.debug("Start consuming queue '" + queueName + "' with consumer tag '" + consumerTagString + "' for inbound " + factoryName);
+            log.debug("Start consuming queue '" + queueName + "' with consumer tag '" + consumerTagString + "' for inbound " + inboundName);
         }
     }
 
@@ -272,7 +272,7 @@ public class RabbitMQConnectionConsumer {
         RabbitMQMessage message = new RabbitMQMessage();
         QueueingConsumer.Delivery delivery = null;
         try {
-            log.debug("Waiting for next delivery from queue for inbound " + factoryName);
+            log.debug("Waiting for next delivery from queue for inbound " + inboundName);
             delivery = consumer.nextDelivery();
         } catch (ShutdownSignalException e) {
             return null;
@@ -307,7 +307,7 @@ public class RabbitMQConnectionConsumer {
                 }
             }
         } else {
-            log.debug("Queue delivery item is null for inbound " + factoryName);
+            log.debug("Queue delivery item is null for inbound " + inboundName);
             return null;
         }
         return message;
@@ -317,9 +317,9 @@ public class RabbitMQConnectionConsumer {
         if (connection != null && connection.isOpen()) {
             try {
                 connection.close();
-                log.info("RabbitMQ connection closed for inbound " + factoryName);
+                log.info("RabbitMQ connection closed for inbound " + inboundName);
             } catch (IOException e) {
-                log.error("Error while closing RabbitMQ connection for inbound " + factoryName, e);
+                log.error("Error while closing RabbitMQ connection for inbound " + inboundName, e);
             } finally {
                 connection = null;
             }
@@ -330,9 +330,9 @@ public class RabbitMQConnectionConsumer {
         Connection connection = null;
         try {
             connection = rabbitMQConnectionFactory.createConnection();
-            log.info("RabbitMQ connection created for inbound " + factoryName);
+            log.info("RabbitMQ connection created for inbound " + inboundName);
         } catch (Exception e) {
-            handleException("Error while creating RabbitMQ connection for inbound " + factoryName, e);
+            handleException("Error while creating RabbitMQ connection for inbound " + inboundName, e);
         }
         return connection;
     }
@@ -353,6 +353,14 @@ public class RabbitMQConnectionConsumer {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
+    }
+
+    public String getInboundName() {
+        return inboundName;
+    }
+
+    public void setInboundName(String inboundName) {
+        this.inboundName = inboundName;
     }
 
     protected void requestShutdown() {

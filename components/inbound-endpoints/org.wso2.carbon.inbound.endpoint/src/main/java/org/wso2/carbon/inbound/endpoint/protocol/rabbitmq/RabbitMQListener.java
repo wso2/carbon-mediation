@@ -84,6 +84,7 @@ public class RabbitMQListener extends InboundOneTimeTriggerRequestProcessor {
         log.info("RABBITMQ inbound endpoint " + name + " initializing ...");
         connectionConsumer = new RabbitMQConnectionConsumer(rabbitMQConnectionFactory, rabbitmqProperties,
                 injectHandler);
+        connectionConsumer.setInboundName(name);
         start();
     }
 
