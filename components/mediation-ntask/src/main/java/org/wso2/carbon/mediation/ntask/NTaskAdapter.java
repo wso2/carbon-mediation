@@ -68,7 +68,7 @@ public class NTaskAdapter extends AbstractTask {
     }
 
     public void execute() {
-        //introduced due to limitation of Ntask.core scheduling task for single cycle when task
+        //introduced due to limitation of Ntask.core executing task for single cycle when task
         // count 0
         //trigger count cannot be null for a task description hence null check avoided
         if (Integer.parseInt(getProperties().get("task.count")) == 0) {
