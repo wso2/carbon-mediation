@@ -363,194 +363,396 @@ public class ConfigurationUpdater {
     }
 
     private void setFileNames(SynapseConfiguration newConfig) {
-        Map<String, Endpoint> endpoints = newConfig.getDefinedEndpoints();
-        for (String name : endpoints.keySet()) {
-            Endpoint newEndpoint = endpoints.get(name);
-            Endpoint oldEndpoint = currentConfig.getDefinedEndpoints().get(name);
-            if (oldEndpoint != null) {
-                newEndpoint.setFileName(oldEndpoint.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.ENDPOINTS_DIR, oldEndpoint.getFileName(), name, newConfig);
-            } else {
-                newEndpoint.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.ENDPOINTS_DIR, newEndpoint.getFileName(), name, newConfig);
+        try {
+            Map<String, Endpoint> endpoints = newConfig.getDefinedEndpoints();
+            for (String name : endpoints.keySet()) {
+                Endpoint newEndpoint = endpoints.get(name);
+                Endpoint oldEndpoint = currentConfig.getDefinedEndpoints().get(name);
+                if (oldEndpoint != null) {
+                    newEndpoint.setFileName(oldEndpoint.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.ENDPOINTS_DIR, oldEndpoint.getFileName(), name, newConfig);
+                } else {
+                    if (currentConfig.getDefinedEndpoints().size() >= newConfig.getDefinedEndpoints().size()) {
+                        newConfig.removeEndpoint(name);
+                        log.error("Unable to update the endpoints.");
+                        Map<String, Endpoint> oldEndpoints = currentConfig.getDefinedEndpoints();
+                        for (String oldName : oldEndpoints.keySet()) {
+                            if (newConfig.getDefinedEndpoints().get(oldName) == null) {
+                                newConfig.addEndpoint(oldName, oldEndpoints.get(oldName));
+                            }
+                        }
+                    } else {
+                        Map<String, Endpoint> oldEndpoints = currentConfig.getDefinedEndpoints();
+                        for (String oldName : oldEndpoints.keySet()) {
+                            if (newConfig.getDefinedEndpoints().get(oldName) == null) {
+                                newConfig.addEndpoint(oldName, oldEndpoints.get(oldName));
+                            }
+                        }
+                        log.info("The endpoint which you are updating is created as a new endpoint.");
+                        newEndpoint.setFileName(name + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.ENDPOINTS_DIR, newEndpoint.getFileName(), name, newConfig);
+                    }
+                }
             }
-        }
 
-        Map<String, SequenceMediator> sequences = newConfig.getDefinedSequences();
-        for (String name : sequences.keySet()) {
-            SequenceMediator oldSequence = currentConfig.getDefinedSequences().get(name);
-            if (oldSequence != null) {
-                sequences.get(name).setFileName(oldSequence.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, oldSequence.getFileName(), name, newConfig);
-            } else {
-                SequenceMediator newSequence = sequences.get(name);
-                newSequence.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, newSequence.getFileName(), name, newConfig);
+            Map<String, SequenceMediator> sequences = newConfig.getDefinedSequences();
+            for (String name : sequences.keySet()) {
+                SequenceMediator oldSequence = currentConfig.getDefinedSequences().get(name);
+                if (oldSequence != null) {
+                    sequences.get(name).setFileName(oldSequence.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, oldSequence.getFileName(), name, newConfig);
+                } else {
+                    if (currentConfig.getDefinedSequences().size() >= newConfig.getDefinedSequences().size()) {
+                        newConfig.removeSequence(name);
+                        log.error("Unable to update the sequences.");
+                        Map<String, SequenceMediator> oldSequences = currentConfig.getDefinedSequences();
+                        for (String oldName : oldSequences.keySet()) {
+                            if (newConfig.getDefinedSequences().get(oldName) == null) {
+                                newConfig.addSequence(oldName, oldSequences.get(oldName));
+                            }
+                        }
+                    } else {
+                        Map<String, SequenceMediator> oldSequences = currentConfig.getDefinedSequences();
+                        for (String oldName : oldSequences.keySet()) {
+                            if (newConfig.getDefinedSequences().get(oldName) == null) {
+                                newConfig.addSequence(oldName, oldSequences.get(oldName));
+                            }
+                        }
+                        log.info("The sequence which you are updating is created as a new sequence.");
+                        SequenceMediator newSequence = sequences.get(name);
+                        newSequence.setFileName(name + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, newSequence.getFileName(), name, newConfig);
+                    }
+                }
             }
-        }
 
-        Collection<ProxyService> proxyServices = newConfig.getProxyServices();
-        for (ProxyService proxy : proxyServices) {
-            ProxyService oldProxy = currentConfig.getProxyService(proxy.getName());
-            if (oldProxy != null) {
-                proxy.setFileName(oldProxy.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR, oldProxy.getFileName(), proxy.getName(), newConfig);
-            } else {
-                proxy.setFileName(proxy.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, proxy.getFileName(), proxy.getName(), newConfig);
+            Collection<ProxyService> proxyServices = newConfig.getProxyServices();
+            for (ProxyService proxy : proxyServices) {
+                ProxyService oldProxy = currentConfig.getProxyService(proxy.getName());
+                if (oldProxy != null) {
+                    proxy.setFileName(oldProxy.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR, oldProxy.getFileName(), proxy.getName(), newConfig);
+                } else {
+                    if (currentConfig.getProxyServices().size() >= newConfig.getProxyServices().size()) {
+                        newConfig.removeProxyService(proxy.getName());
+                        log.error("Unable to update the proxy services.");
+                        Collection<ProxyService> oldProxies = currentConfig.getProxyServices();
+                        for (ProxyService eachOldProxy : oldProxies) {
+                            if (newConfig.getProxyService(eachOldProxy.getName()) == null) {
+                                newConfig.addProxyService(eachOldProxy.getName(), eachOldProxy);
+                            }
+                        }
+                    } else {
+                        Collection<ProxyService> oldProxies = currentConfig.getProxyServices();
+                        for (ProxyService eachOldProxy : oldProxies) {
+                            if (newConfig.getProxyService(eachOldProxy.getName()) == null) {
+                                newConfig.addProxyService(eachOldProxy.getName(), eachOldProxy);
+                            }
+                        }
+                        log.info("The proxy service which you are updating is created as a new proxy service.");
+                        proxy.setFileName(proxy.getName() + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, proxy.getFileName(), proxy.getName(), newConfig);
+                    }
+                }
             }
-        }
 
-        Map<String, Entry> localEntries = newConfig.getDefinedEntries();
-        for (String name : localEntries.keySet()) {
-            Entry newEntry = localEntries.get(name);
-            Entry oldEntry = currentConfig.getDefinedEntries().get(name);
-            if (oldEntry != null) {
-                newEntry.setFileName(oldEntry.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR, oldEntry.getFileName(), name, newConfig);
-            } else {
-                newEntry.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR, newEntry.getFileName(), name, newConfig);
+            Map<String, Entry> localEntries = newConfig.getDefinedEntries();
+            for (String name : localEntries.keySet()) {
+                Entry newEntry = localEntries.get(name);
+                Entry oldEntry = currentConfig.getDefinedEntries().get(name);
+                if (oldEntry != null) {
+                    newEntry.setFileName(oldEntry.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR, oldEntry.getFileName(), name, newConfig);
+                } else {
+                    if (currentConfig.getDefinedEntries().size() >= newConfig.getDefinedEntries().size()) {
+                        newConfig.removeEntry(name);
+                        log.error("Unable to update the local entries.");
+                        Map<String, Entry> oldEntries = currentConfig.getDefinedEntries();
+                        for (String oldName : oldEntries.keySet()) {
+                            if (newConfig.getDefinedEntries().get(oldName) == null) {
+                                newConfig.addEntry(oldName, oldEntries.get(oldName));
+                            }
+                        }
+                    } else {
+                        Map<String, Entry> oldEntries = currentConfig.getDefinedEntries();
+                        for (String oldName : oldEntries.keySet()) {
+                            if (newConfig.getDefinedEntries().get(oldName) == null) {
+                                newConfig.addEntry(oldName, oldEntries.get(oldName));
+                            }
+                        }
+                        log.info("The local entry which you are updating is created as a new local entry.");
+                        newEntry.setFileName(name + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR, newEntry.getFileName(), name, newConfig);
+                    }
+                }
             }
-        }
 
-        Collection<Startup> tasks = newConfig.getStartups();
-        for (Startup task : tasks) {
-            Startup oldTask = currentConfig.getStartup(task.getName());
-            if (oldTask != null) {
-                task.setFileName(oldTask.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.TASKS_DIR, oldTask.getFileName(), task.getName(), newConfig);
-            } else {
-                task.setFileName(task.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.TASKS_DIR, task.getFileName(), task.getName(), newConfig);
+            Collection<Startup> tasks = newConfig.getStartups();
+            for (Startup task : tasks) {
+                Startup oldTask = currentConfig.getStartup(task.getName());
+                if (oldTask != null) {
+                    task.setFileName(oldTask.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.TASKS_DIR, oldTask.getFileName(), task.getName(), newConfig);
+                } else {
+                    task.setFileName(task.getName() + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.TASKS_DIR, task.getFileName(), task.getName(), newConfig);
+                }
             }
-        }
 
-        Collection<SynapseEventSource> eventSources = newConfig.getEventSources();
-        for (SynapseEventSource eventSource : eventSources) {
-            SynapseEventSource oldEventSource = currentConfig.getEventSource(eventSource.getName());
-            if (oldEventSource != null) {
-                eventSource.setFileName(oldEventSource.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.EVENTS_DIR, oldEventSource.getFileName(), eventSource.getName(), newConfig);
-            } else {
-                eventSource.setFileName(eventSource.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.EVENTS_DIR, eventSource.getFileName(), eventSource.getName(), newConfig);
+            Collection<SynapseEventSource> eventSources = newConfig.getEventSources();
+            for (SynapseEventSource eventSource : eventSources) {
+                SynapseEventSource oldEventSource = currentConfig.getEventSource(eventSource.getName());
+                if (oldEventSource != null) {
+                    eventSource.setFileName(oldEventSource.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.EVENTS_DIR, oldEventSource.getFileName(), eventSource.getName(), newConfig);
+                } else {
+                    if (currentConfig.getEventSources().size() >= newConfig.getEventSources().size()) {
+                        newConfig.removeEventSource(eventSource.getName());
+                        log.error("Unable to update the event sources.");
+                        Collection<SynapseEventSource> oldEventSources = currentConfig.getEventSources();
+                        for (SynapseEventSource eachOldEventSource : oldEventSources) {
+                            if (newConfig.getEventSource(eachOldEventSource.getName()) == null) {
+                                newConfig.addEventSource(eachOldEventSource.getName(), eachOldEventSource);
+                            }
+                        }
+                    } else {
+                        Collection<SynapseEventSource> oldEventSources = currentConfig.getEventSources();
+                        for (SynapseEventSource eachOldEventSource : oldEventSources) {
+                            if (newConfig.getEventSource(eachOldEventSource.getName()) == null) {
+                                newConfig.addEventSource(eachOldEventSource.getName(), eachOldEventSource);
+                            }
+                        }
+                        log.info("The event source which you are updating is created as a new event source.");
+                        eventSource.setFileName(eventSource.getName() + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.EVENTS_DIR, eventSource.getFileName(), eventSource.getName(), newConfig);
+                    }
+                }
             }
-        }
 
-        Collection<PriorityExecutor> executors = newConfig.getPriorityExecutors().values();
-        for (PriorityExecutor exec : executors) {
-            PriorityExecutor oldExec = currentConfig.getPriorityExecutors().get(exec.getName());
-            if (oldExec != null) {
-                exec.setFileName(oldExec.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.EXECUTORS_DIR, oldExec.getFileName(), exec.getName(), newConfig);
-            } else {
-                exec.setFileName(exec.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.EXECUTORS_DIR, exec.getFileName(), exec.getName(), newConfig);
+            Collection<PriorityExecutor> executors = newConfig.getPriorityExecutors().values();
+            for (PriorityExecutor exec : executors) {
+                PriorityExecutor oldExec = currentConfig.getPriorityExecutors().get(exec.getName());
+                if (oldExec != null) {
+                    exec.setFileName(oldExec.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.EXECUTORS_DIR, oldExec.getFileName(), exec.getName(), newConfig);
+                } else {
+                    exec.setFileName(exec.getName() + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.EXECUTORS_DIR, exec.getFileName(), exec.getName(), newConfig);
+                }
             }
-        }
 
-        Collection<MessageStore> messageStores = newConfig.getMessageStores().values();
+            Collection<MessageStore> messageStores = newConfig.getMessageStores().values();
 
-        for (MessageStore store : messageStores) {
-            MessageStore oldStore = currentConfig.getMessageStore(store.getName());
-            if (oldStore != null) {
-                store.setFileName(oldStore.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR, oldStore.getFileName(), store.getName(), newConfig);
-            } else {
-                store.setFileName(store.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR, store.getFileName(), store.getName(), newConfig);
+            for (MessageStore store : messageStores) {
+                MessageStore oldStore = currentConfig.getMessageStore(store.getName());
+                if (oldStore != null) {
+                    store.setFileName(oldStore.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR, oldStore.getFileName(), store.getName(), newConfig);
+                } else {
+                    if (currentConfig.getMessageStores().values().size() >= newConfig.getMessageStores().values().size()) {
+                        newConfig.removeMessageStore(store.getName());
+                        log.error("Unable to update the message stores.");
+                        Collection<MessageStore> oldMessageStores = currentConfig.getMessageStores().values();
+                        for (MessageStore eachOldStore : oldMessageStores) {
+                            if (newConfig.getMessageStore(eachOldStore.getName()) == null) {
+                                newConfig.addMessageStore(eachOldStore.getName(), eachOldStore);
+                            }
+                        }
+                    } else {
+                        Collection<MessageStore> oldMessageStores = currentConfig.getMessageStores().values();
+                        for (MessageStore eachOldStore : oldMessageStores) {
+                            if (newConfig.getMessageStore(eachOldStore.getName()) == null) {
+                                newConfig.addMessageStore(eachOldStore.getName(), eachOldStore);
+                            }
+                        }
+                        log.info("The message store which you are updating is created as a new message store.");
+                        store.setFileName(store.getName() + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR, store.getFileName(), store.getName(), newConfig);
+                    }
+                }
             }
-        }
 
-        Collection<MessageProcessor> messageProcessors = newConfig.getMessageProcessors().values();
+            Collection<MessageProcessor> messageProcessors = newConfig.getMessageProcessors().values();
 
-        for (MessageProcessor processor : messageProcessors) {
-            MessageProcessor oldProcessor =
-                    currentConfig.getMessageProcessors().get(processor.getName());
-            if (oldProcessor != null) {
-                processor.setFileName(oldProcessor.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR, oldProcessor.getFileName(), processor.getName(), newConfig);
-            } else {
-                processor.setFileName(processor.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR, processor.getFileName(), processor.getName(), newConfig);
+            for (MessageProcessor processor : messageProcessors) {
+                MessageProcessor oldProcessor =
+                        currentConfig.getMessageProcessors().get(processor.getName());
+                if (oldProcessor != null) {
+                    processor.setFileName(oldProcessor.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR, oldProcessor.getFileName(), processor.getName(), newConfig);
+                } else {
+                    if (currentConfig.getMessageProcessors().values().size() >= newConfig.getMessageProcessors().values().size()) {
+                        newConfig.removeMessageProcessor(processor.getName());
+                        log.error("Unable to update the message processors.");
+                        Collection<MessageProcessor> oldMessageProcessors = currentConfig.getMessageProcessors().values();
+                        for (MessageProcessor eachOldProcessor : oldMessageProcessors) {
+                            if (newConfig.getMessageProcessors().get(eachOldProcessor.getName()) == null) {
+                                newConfig.addMessageProcessor(eachOldProcessor.getName(), eachOldProcessor);
+                            }
+                        }
+                    } else {
+                        Collection<MessageProcessor> oldMessageProcessors = currentConfig.getMessageProcessors().values();
+                        for (MessageProcessor eachOldProcessor : oldMessageProcessors) {
+                            if (newConfig.getMessageProcessors().get(eachOldProcessor.getName()) == null) {
+                                newConfig.addMessageProcessor(eachOldProcessor.getName(), eachOldProcessor);
+                            }
+                        }
+                        log.info("The synapse import which you are updating is created as a new synapse import.");
+                        processor.setFileName(processor.getName() + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR, processor.getFileName(), processor.getName(), newConfig);
+                    }
+                }
             }
-        }
 
-        Map<String, TemplateMediator> sequenceTemplates = newConfig.getSequenceTemplates();
-        for (String name : sequenceTemplates.keySet()) {
-            TemplateMediator oldSequenceTempl = currentConfig.getSequenceTemplates().get(name);
-            if (oldSequenceTempl != null) {
-                sequenceTemplates.get(name).setFileName(oldSequenceTempl.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, oldSequenceTempl.getFileName(), name, newConfig);
-            } else {
-                TemplateMediator newSeqTemplate = sequenceTemplates.get(name);
-                newSeqTemplate.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newSeqTemplate.getFileName(), name, newConfig);
+            Map<String, TemplateMediator> sequenceTemplates = newConfig.getSequenceTemplates();
+            for (String name : sequenceTemplates.keySet()) {
+                TemplateMediator oldSequenceTempl = currentConfig.getSequenceTemplates().get(name);
+                if (oldSequenceTempl != null) {
+                    sequenceTemplates.get(name).setFileName(oldSequenceTempl.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, oldSequenceTempl.getFileName(), name, newConfig);
+                } else {
+                    if (currentConfig.getSequenceTemplates().size() >= newConfig.getSequenceTemplates().size()) {
+                        newConfig.removeSequenceTemplate(name);
+                        log.error("Unable to update the sequence templates.");
+                        Map<String, TemplateMediator> oldSequenceTemplates = currentConfig.getSequenceTemplates();
+                        for (String oldName : oldSequenceTemplates.keySet()) {
+                            if (newConfig.getSequenceTemplates().get(oldName) == null) {
+                                newConfig.addSequenceTemplate(oldName, oldSequenceTemplates.get(oldName));
+                            }
+                        }
+                    } else {
+                        Map<String, TemplateMediator> oldSequenceTemplates = currentConfig.getSequenceTemplates();
+                        for (String oldName : oldSequenceTemplates.keySet()) {
+                            if (newConfig.getSequenceTemplates().get(oldName) == null) {
+                                newConfig.addSequenceTemplate(oldName, oldSequenceTemplates.get(oldName));
+                            }
+                        }
+                        log.info("The sequence template which you are updating is created as a new sequence template.");
+                        TemplateMediator newSeqTemplate = sequenceTemplates.get(name);
+                        newSeqTemplate.setFileName(name + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newSeqTemplate.getFileName(), name, newConfig);
+                    }
+                }
             }
-        }
 
-        Map<String, Template> endpointTemplates = newConfig.getEndpointTemplates();
-        for (String name : endpointTemplates.keySet()) {
-            Template oldEndpointTempl = currentConfig.getEndpointTemplates().get(name);
-            if (oldEndpointTempl != null) {
-                endpointTemplates.get(name).setFileName(oldEndpointTempl.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, oldEndpointTempl.getFileName(), name, newConfig);
-            } else {
-                Template newTemplate = endpointTemplates.get(name);
-                newTemplate.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newTemplate.getFileName(), name, newConfig);
+            Map<String, Template> endpointTemplates = newConfig.getEndpointTemplates();
+            for (String name : endpointTemplates.keySet()) {
+                Template oldEndpointTempl = currentConfig.getEndpointTemplates().get(name);
+                if (oldEndpointTempl != null) {
+                    endpointTemplates.get(name).setFileName(oldEndpointTempl.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, oldEndpointTempl.getFileName(), name, newConfig);
+                } else {
+                    if (currentConfig.getEndpointTemplates().size() >= newConfig.getEndpointTemplates().size()) {
+                        newConfig.removeEndpointTemplate(name);
+                        log.error("Unable to update the endpoint templates.");
+                        Map<String, Template> oldEndpointTemplates = currentConfig.getEndpointTemplates();
+                        for (String oldName : oldEndpointTemplates.keySet()) {
+                            if (newConfig.getEndpointTemplates().get(oldName) == null) {
+                                newConfig.addEndpointTemplate(oldName, oldEndpointTemplates.get(oldName));
+                            }
+                        }
+                    } else {
+                        Map<String, Template> oldEndpointTemplates = currentConfig.getEndpointTemplates();
+                        for (String oldName : oldEndpointTemplates.keySet()) {
+                            if (newConfig.getEndpointTemplates().get(oldName) == null) {
+                                newConfig.addEndpointTemplate(oldName, oldEndpointTemplates.get(oldName));
+                            }
+                        }
+                        log.info("The endpoint template which you are updating is created as a new endpoint template.");
+                        Template newTemplate = endpointTemplates.get(name);
+                        newTemplate.setFileName(name + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newTemplate.getFileName(), name, newConfig);
+                    }
+                }
             }
-        }
 
-        Collection<API> apiCollection = newConfig.getAPIs();
-        for (API api : apiCollection) {
-            API oldAPI = currentConfig.getAPI(api.getName());
-            if (oldAPI != null) {
-                api.setFileName(oldAPI.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
-            } else {
-                api.setFileName(api.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
+            Collection<API> apiCollection = newConfig.getAPIs();
+            for (API api : apiCollection) {
+                API oldAPI = currentConfig.getAPI(api.getName());
+                if (oldAPI != null) {
+                    api.setFileName(oldAPI.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
+                } else {
+                    if (currentConfig.getAPIs().size() >= newConfig.getAPIs().size()) {
+                        newConfig.removeAPI(api.getName());
+                        log.error("Unable to update the APIs.");
+                        Collection<API> oldApiCollection = currentConfig.getAPIs();
+                        for (API eachOldApi : oldApiCollection) {
+                            if (newConfig.getAPI(eachOldApi.getName()) == null) {
+                                newConfig.addAPI(eachOldApi.getName(), eachOldApi);
+                            }
+                        }
+                    } else {
+                        Collection<API> oldApiCollection = currentConfig.getAPIs();
+                        for (API eachOldApi : oldApiCollection) {
+                            if (newConfig.getAPI(eachOldApi.getName()) == null) {
+                                newConfig.addAPI(eachOldApi.getName(), eachOldApi);
+                            }
+                        }
+                        log.info("The API which you are updating is created as a new API.");
+                        api.setFileName(api.getName() + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
+                    }
+                }
             }
-        }
 
-        Map<String, SynapseImport> imports = newConfig.getSynapseImports();
-        for (String name : imports.keySet()) {
-            SynapseImport oldImport = currentConfig.getSynapseImports().get(name);
-            if (oldImport != null) {
-                imports.get(name).setFileName(oldImport.getFileName());
-                addToDeploymentStore(MultiXMLConfigurationBuilder.SYNAPSE_IMPORTS_DIR, oldImport.getFileName(), name, newConfig);
-            } else {
-                SynapseImport newImport = imports.get(name);
-                newImport.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.SYNAPSE_IMPORTS_DIR, newImport.getFileName(), name, newConfig);
+            Map<String, SynapseImport> imports = newConfig.getSynapseImports();
+            for (String name : imports.keySet()) {
+                SynapseImport oldImport = currentConfig.getSynapseImports().get(name);
+                if (oldImport != null) {
+                    imports.get(name).setFileName(oldImport.getFileName());
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.SYNAPSE_IMPORTS_DIR, oldImport.getFileName(), name, newConfig);
+                } else {
+                    if (currentConfig.getSynapseImports().size() >= newConfig.getSynapseImports().size()) {
+                        newConfig.removeSynapseImport(name);
+                        log.error("Unable to update the synapse imports.");
+                        Map<String, SynapseImport> oldImports = currentConfig.getSynapseImports();
+                        for (String oldName : oldImports.keySet()) {
+                            if (newConfig.getSynapseImports().get(oldName) == null) {
+                                newConfig.addSynapseImport(oldName, oldImports.get(oldName));
+                            }
+                        }
+                    } else {
+                        Map<String, SynapseImport> oldImports = currentConfig.getSynapseImports();
+                        for (String oldName : oldImports.keySet()) {
+                            if (newConfig.getSynapseImports().get(oldName) == null) {
+                                newConfig.addSynapseImport(oldName, oldImports.get(oldName));
+                            }
+                        }
+                        log.info("The synapse import which you are updating is created as a new synapse import.");
+                        SynapseImport newImport = imports.get(name);
+                        newImport.setFileName(name + XML);
+                        addToDeploymentStore(MultiXMLConfigurationBuilder.SYNAPSE_IMPORTS_DIR, newImport.getFileName(), name, newConfig);
+                    }
+                }
             }
-        }
 
-        //fix for persistence issue in mediation library (connector .zip files)
-        Map<String, Library> libraryMap = currentConfig.getSynapseLibraries();
-        for (String name : libraryMap.keySet()) {
-            newConfig.getSynapseLibraries().put(name, libraryMap.get(name));
-            String fileName = libraryMap.get(name).getFileName();
-            SynapseArtifactDeploymentStore store = newConfig.getArtifactDeploymentStore();
-            LibDeployerUtils.deployingLocalEntries(libraryMap.get(name), newConfig);
-            if (!store.containsFileName(fileName)) {
-                store.addArtifact(fileName, name);
+            //fix for persistence issue in mediation library (connector .zip files)
+            Map<String, Library> libraryMap = currentConfig.getSynapseLibraries();
+            for (String name : libraryMap.keySet()) {
+                newConfig.getSynapseLibraries().put(name, libraryMap.get(name));
+                String fileName = libraryMap.get(name).getFileName();
+                SynapseArtifactDeploymentStore store = newConfig.getArtifactDeploymentStore();
+                LibDeployerUtils.deployingLocalEntries(libraryMap.get(name), newConfig);
+                if (!store.containsFileName(fileName)) {
+                    store.addArtifact(fileName, name);
+                }
+                store.addRestoredArtifact(fileName);
             }
-            store.addRestoredArtifact(fileName);
-        }
 
-        if (Boolean.valueOf(currentConfig.getProperty(
-                MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION))) {
-            newConfig.getProperties().setProperty(
-                    MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION, "true");
-        }
+            if (Boolean.valueOf(currentConfig.getProperty(
+                    MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION))) {
+                newConfig.getProperties().setProperty(
+                        MultiXMLConfigurationBuilder.SEPARATE_REGISTRY_DEFINITION, "true");
+            }
 
-        if (Boolean.valueOf(currentConfig.getProperty(
-                MultiXMLConfigurationBuilder.SEPARATE_TASK_MANAGER_DEFINITION))) {
-            newConfig.getProperties().setProperty(
-                    MultiXMLConfigurationBuilder.SEPARATE_TASK_MANAGER_DEFINITION, "true");
+            if (Boolean.valueOf(currentConfig.getProperty(
+                    MultiXMLConfigurationBuilder.SEPARATE_TASK_MANAGER_DEFINITION))) {
+                newConfig.getProperties().setProperty(
+                        MultiXMLConfigurationBuilder.SEPARATE_TASK_MANAGER_DEFINITION, "true");
+            }
+        } catch (Exception e) {
+        log.error(e.getMessage());
         }
     }
 
