@@ -65,6 +65,8 @@ final class TaskBuilder {
         }
         String nameGroup = description.getName() + "::" + description.getTaskGroup();
         props.put("task.name", nameGroup);
+        //trigger count cannot be null for a task description hence null check avoided
+        props.put("task.count",String.valueOf(description.getCount()));
         Object taskInstance = description.getResource(TaskDescription.INSTANCE);
         if (taskInstance instanceof org.apache.synapse.task.Task) {
             NTaskAdapter.addProperty(nameGroup, taskInstance);
