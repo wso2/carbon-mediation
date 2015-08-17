@@ -32,8 +32,9 @@ public abstract class AbstractKafkaMessageListener {
     protected InjectHandler injectHandler;
     protected Properties kafkaProperties;
     protected ConsumerIterator<byte[], byte[]> consumerIte;
-    protected static final Log logger = LogFactory
+    protected static final Log log = LogFactory
             .getLog(KAFKAMessageListener.class.getName());
+
     /**
      * the consumer types are high level and simple,high level is used for kafka high level configuration
      * and simple is used for kafka low level configuration

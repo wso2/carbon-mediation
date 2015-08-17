@@ -17,12 +17,16 @@ package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.util.Properties;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.OneTimeTriggerAbstractCallback;
 
 /**
@@ -43,7 +47,6 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
     private MqttConnectOptions connectOptions;
     private MqttConnectionConsumer connectionConsumer;
     private MqttConnectionListener connectionListener;
-
 
     public MqttAsyncCallback(MqttAsyncClient mqttAsyncClient, MqttInjectHandler injectHandler,
                              MqttConnectionFactory confac, MqttConnectOptions connectOptions,
@@ -67,7 +70,7 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
         try {
             super.handleReconnection();
         } catch (InterruptedException ex) {
-            log.error("Unable to suspend the callback reconnection");
+            log.error("Unable to suspend the callback reconnection", ex);
         }
     }
 
@@ -88,9 +91,9 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
                     log.info("Re-Connected to the remote server.");
                 }
             } catch (MqttException ex) {
-                log.error("Error while trying to subscribe to the remote ");
+                log.error("Error while trying to subscribe to the remote.", ex);
             } catch (InterruptedException ex) {
-                log.error("Error while trying to subscribe to the remote ");
+                log.error("Error while trying to subscribe to the remote.", ex);
             }
         }
     }
@@ -100,7 +103,29 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
             log.debug("Received Message: Topic:" + topic + "  Message: " + mqttMessage);
         }
         log.info("Received Message: Topic: " + topic);
-        injectHandler.invoke(mqttMessage, name);
+        MqttClientManager clientManager = MqttClientManager.getInstance();
+        String inboundIdentifier = clientManager.buildIdentifier
+                (mqttAsyncClient.getClientId(), confac.getServerHost(), confac.getServerPort());
+        if (super.isInboundRunnerMode()) {
+            //register tenant loading flag for inbound identifier
+            clientManager.registerInboundTenantLoadingFlag(inboundIdentifier);
+            //this is a blocking call
+            super.startInboundTenantLoading(inboundIdentifier);
+            //un-register tenant loading flag for inbound identifier
+            clientManager.unRegisterInboundTenantLoadingFlag(inboundIdentifier);
+
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext privilegedCarbonContext =
+                        PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                privilegedCarbonContext.setTenantDomain(super.tenantDomain, true);
+                injectHandler.invoke(mqttMessage, name);
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
+        } else {
+            injectHandler.invoke(mqttMessage, name);
+        }
     }
 
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
@@ -109,6 +134,18 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
 
     public void setMqttConnectionConsumer(MqttConnectionConsumer connectionConsumer) {
         this.connectionConsumer = connectionConsumer;
+    }
+
+    public MqttConnectionConsumer getMqttConnectionConsumer() {
+        return this.connectionConsumer;
+    }
+
+    public MqttConnectOptions getMqttConnectionOptions() {
+        return this.connectOptions;
+    }
+
+    public void updateInjectHandler(MqttInjectHandler injectHandler) {
+        this.injectHandler = injectHandler;
     }
 
     public void shutdown() {

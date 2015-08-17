@@ -42,27 +42,26 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
      */
     public boolean createKafkaConsumerConnector() throws Exception {
 
-        logger.debug("Create the connection and start to consume the streams");
+        log.debug("Create the connection and start to consume the streams");
         boolean isCreated;
         try {
             if (consumerConnector == null) {
-                logger.info("Creating Kafka Consumer Connector...");
+                log.info("Creating Kafka Consumer Connector...");
                 consumerConnector = Consumer
                         .createJavaConsumerConnector(new ConsumerConfig(
                                 kafkaProperties));
-                logger.info("Kafka Consumer Connector is created");
+                log.info("Kafka Consumer Connector is created");
                 start();
-
             }
             isCreated = true;
         } catch (ZkTimeoutException toe) {
-            logger.error(" Error in Creating Kafka Consumer Connector | ZkTimeout"
+            log.error(" Error in Creating Kafka Consumer Connector | ZkTimeout"
                     + toe.getMessage());
             throw new SynapseException(
                     " Error in Creating Kafka Consumer Connector| ZkTimeout");
 
         } catch (Exception e) {
-            logger.error(" Error in Creating Kafka Consumer Connector."
+            log.error(" Error in Creating Kafka Consumer Connector."
                     + e.getMessage(),e);
             throw new SynapseException(" Error in Creating Kafka Consumer Connector ",
                     e);
@@ -75,9 +74,9 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
      */
     public void start() throws Exception {
 
-        logger.debug("Start to consume the streams");
+        log.debug("Start to consume the streams");
         try {
-            logger.info("Starting KAFKA consumer...");
+            log.info("Starting KAFKA consumer...");
             Map<String, Integer> topicCount = new HashMap<String, Integer>();
 
             if (topics != null && topics.size() > 0) {
@@ -123,7 +122,7 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
             }
 
         } catch (Exception e) {
-            logger.error("Error while Starting KAFKA consumer."
+            log.error("Error while Starting KAFKA consumer."
                     + e.getMessage(),e);
             throw new SynapseException(
                     "Error while Starting KAFKA consumer.", e);

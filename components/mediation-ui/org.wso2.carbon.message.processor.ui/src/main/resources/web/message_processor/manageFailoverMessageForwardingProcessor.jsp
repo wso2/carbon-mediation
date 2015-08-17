@@ -17,7 +17,6 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ page import="org.apache.axiom.om.OMElement" %>
 <%@ page import="org.apache.axiom.om.util.AXIOMUtil" %>
-
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.message.processor.ui.MessageProcessorAdminServiceClient" %>
@@ -84,12 +83,6 @@
             return false;
         }
 
-        if (IsEmpty(form.TargetEndpoint)) {
-            CARBON.showWarningDialog('<fmt:message key="endpoint.field.cannot.be.empty"/>')
-            form.TargetEndpoint.focus();
-            return false;
-        }
-        
         if (!isNumber(form.retry_interval)) {
             CARBON.showWarningDialog('<fmt:message key="number.field.cannot.be.minus"/>')
             form.retry_interval.focus();
@@ -143,23 +136,20 @@
     }
 
     function addServiceParams() {
-    	// When an invalid value is given, then the user is redirected to the same page. Then if the user deletes that value, the empty value
-    	// is appended to the previous value leading to errors. This is used to solve that. The append takes place inside the addServiceParameter function.
-    	document.getElementById("tableParams").value = "";
+        // When an invalid value is given, then the user is redirected to the same page. Then if the user deletes that value, the empty value
+        // is appended to the previous value leading to errors. This is used to solve that. The append takes place inside the addServiceParameter function.
         addServiceParameter("interval", document.getElementById('retry_interval').value);
         addServiceParameter("client.retry.interval", document.getElementById('client_retry_interval').value);
         addServiceParameter("max.delivery.attempts", document.getElementById('max_delivery_attempts').value);
-        addServiceParameter("axis2.repo", document.getElementById('axis2_repo').value);
-        addServiceParameter("axis2.config", document.getElementById('axis2_config').value);
-        addServiceParameter("message.processor.reply.sequence", document.getElementById('message_processor_reply_sequence').value);
         addServiceParameter("message.processor.fault.sequence", document.getElementById('message_processor_fault_sequence').value);
         addServiceParameter("message.processor.deactivate.sequence", document.getElementById('message_processor_deactivate_sequence').value);
         addServiceParameter("quartz.conf", document.getElementById('quartz_conf').value);
         addServiceParameter("cronExpression", document.getElementById('cron_expression').value);
         addServiceParameter("is.active", document.getElementById('mp_state').value);
-        addServiceParameter("non.retry.status.codes", document.getElementById('non_retry_status_codes').value);
         addServiceParameter("max.delivery.drop",document.getElementById('max_delivery_drop').value);
         addServiceParameter("member.count", document.getElementById('member_count').value);
+        addServiceParameter("message.target.store.name", document.getElementById('targetMessageStore').options[document.getElementById('targetMessageStore').selectedIndex].value);
+
     }
 
     function addServiceParameter(parameter, value) {
@@ -197,7 +187,7 @@
             return false;
         }
         addServiceParams();
-        var messageStoreStr = {Name : document.getElementById("Name").value, TargetEndpoint : document.getElementById("TargetEndpoint").value, Provider : document.getElementById("Provider").value, MessageStore : document.getElementById("MessageStore").value, tableParams : document.getElementById("tableParams").value};
+        var messageStoreStr = {Name : document.getElementById("Name").value, Provider : document.getElementById("Provider").value, MessageStore : document.getElementById("MessageStore").value, tableParams : document.getElementById("tableParams").value};
         jQuery.ajax({
             type: 'POST',
             url: 'updatePages/messageProcessorUpdate.jsp',
@@ -212,7 +202,7 @@
 </script>
 
 <div id="middle">
-<h2><fmt:message key="scheduled.message.forwarding.processor"/></h2>
+<h2><fmt:message key="scheduled.failover.message.forwarding.processor"/></h2>
 
 <div id="workArea">
 <form name="Submit" action="ServiceCaller.jsp" method="POST"
@@ -232,12 +222,14 @@
     String[] messageProcessorNames = client.getMessageProcessorNames();
 
     MessageProcessorData processorData = null;
+    String targetMessageStoreName = null;
 
     if (messageStoreName != null) {
         session.setAttribute("edit" + messageStoreName, "true");
         for (String name : messageProcessorNames) {
             if (name != null && name.equals(messageStoreName)) {
                 processorData = client.getMessageProcessor(name);
+                targetMessageStoreName = processorData.getParams().get("message.target.store.name");
             }
         }
     } else if (origin != null && !"".equals(origin)) {
@@ -258,8 +250,6 @@
         processorData.setClazz(mpProvider);
         processorData.setMessageStore(mpStore);
     }
-
-
     MessageStoreAdminServiceClient messageStoreClient =
             new MessageStoreAdminServiceClient(cookie, url, configContext);
 
@@ -287,7 +277,7 @@
     <thead>
     <tr>
         <th colspan="2"><span style="float: left; position: relative; margin-top: 2px;">
-                            <fmt:message key="scheduled.message.forwarding.processor"/></span>
+                            <fmt:message key="scheduled.failover.message.forwarding.processor"/></span>
             <a class="icon-link"
                style="background-image: url(images/source-view.gif);"
                onclick="switchToSource();"
@@ -318,26 +308,93 @@
                     <td><input id="Name" type="text" size="60" name="Name" value=""/></td>
                 </tr>
                 <%}%>
-                <tr>
-                    <td width="276px"><fmt:message key="target.endpoint"/><span class="required"> *</span></td>
+
+                <%if (processorData != null) { %>
+                    <tr>
+                        <td><fmt:message key="source.message.store"/><span class="required"> *</span></td>
+                        <td>
+                            <input name="MessageStore" id="MessageStore" type="hidden" value="<%=processorData
+                                .getMessageStore()%>"/>
+                            <select id="msgStore" name="msgStore" disabled="true">
+
+                            <%
+                            if(messageStores != null) {
+                                for (String msn : messageStores) {
+                                    if(processorData.getMessageStore() != null && msn.equals(processorData.getMessageStore())) {
+                            %>
+                                    <option value="<%=msn%>" selected="true"><%=msn%></option>
+                            <%
+                            } else {
+                            %>
+                                    <option  value="<%=msn%>"><%=msn%></option>
+                            <%
+                            }}}
+                            %>
+                            </select>
+                            <br/>
+                        </td>
+                    </tr>
+                <%} else {%>
+                    <tr>
+                        <td><fmt:message key="source.message.store"/><span class="required"> *</span></td>
+                        <td>
+                            <select id="MessageStore" name="MessageStore">
+                            <%if(messageStores != null) {
+                                for (String msn : messageStores) {%>
+                                    <option selected="true" value="<%=msn%>"><%=msn%></option>
+                            <%}} %>
+                            </select>
+                        </td>
+                    </tr>
+                <%}%>
+
+                <%if (processorData != null) { %>
+                 <tr>
+                    <td><fmt:message key="target.message.store"/><span class="required"> *</span></td>
                     <td>
-                        <input type="text" size="60" id="TargetEndpoint" name="TargetEndpoint"
-                               value="<%=((null!=processorData)&& processorData.getTargetEndpoint() != null
-                                        && !processorData.getTargetEndpoint().isEmpty())? processorData.getTargetEndpoint():""%>"/>
-                    <td>
-                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('TargetEndpoint','/_system/config')"><fmt:message key="processor.conf.registry.browser"/></a>
-                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('TargetEndpoint','/_system/governance')"><fmt:message key="processor.gov.registry.browser"/></a>
+                        <input name="targetMessageStore" id="targetMessageStore" type="hidden" value="<%=targetMessageStoreName%>"/>
+                        <select id="trgMessageStore" name="trgMessageStore" disabled="true"\>
+                            <%
+                            if(messageStores != null) {
+                                for (String msn : messageStores) {
+                                    if(targetMessageStoreName != null && msn.equals(targetMessageStoreName)) {
+                            %>
+                                        <option value="<%=msn%>" selected="true"><%=msn%></option>
+                                    <%
+                                    } else {
+                                    %>
+                                        <option  value="<%=msn%>"><%=msn%></option>
+                                    <%
+
+                                    }
+                            }}
+                           %>
+                        </select>
+                    <br/>
                     </td>
-                    </td>
-                </tr>
-                <%if ((processorData != null)) { %>
+                 </tr>
+                 <%} else {%>
+                 <tr>
+                      <td><fmt:message key="target.message.store"/><span class="required"> *</span></td>
+                      <td>
+                         <select id="targetMessageStore" name="targetMessageStore">
+                             <%
+                             if(messageStores != null) {
+                                for (String msn : messageStores) {%>
+                                    <option selected="true" value="<%=msn%>"><%=msn%></option>
+                             <%}} %>
+                         </select>
+                  </tr>
+              <%}%>
+
+                <%if (processorData != null) { %>
                 <tr>
                     <td><fmt:message key="provider"/><span class="required"> *</span></td>
                     <td>
                         <input name="Provider" id="Provider" type="hidden"
-                               value="org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor"/>
+                               value="org.apache.synapse.message.processor.impl.failover.FailoverScheduledMessageForwardingProcessor"/>
                         <%
-                            String providerLabel = "Scheduled Message Forwarding Processor";
+                            String providerLabel = "Scheduled Failover Message Forwarding Processor";
                         %>
                         <label id="Provider_label" for="Provider"><%=providerLabel%>
                         </label>
@@ -346,31 +403,7 @@
                 </tr>
                 <%} else {%>
                 <input id="Provider" name="Provider" type="hidden"
-                       value="org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor"/>
-                <%}%>
-                <%if ((processorData != null)) { %>
-                <tr>
-                    <td><fmt:message key="message.store"/><span class="required"> *</span></td>
-                    <td>
-                        <input name="MessageStore" id="MessageStore" type="hidden"
-                               value="<%=processorData.getMessageStore()%>"/>
-                        <label id="MessageStore_label" for="MessageStore"><%=processorData.getMessageStore()%>
-                        </label>
-                        <br/>
-                    </td>
-                </tr>
-                <%} else {%>
-                <tr>
-                    <td><fmt:message key="message.store"/><span class="required"> *</span></td>
-                    <td>
-                        <select id="MessageStore" name="MessageStore">
-                            <%for (String msn : messageStores) {%>
-                            <option selected="true" value="<%=msn%>"><%=msn%>
-                            </option>
-                            <%} %>
-                        </select>
-                    </td>
-                </tr>
+                       value="org.apache.synapse.message.processor.impl.failover.FailoverScheduledMessageForwardingProcessor"/>
                 <%}%>
                 <tr>
                     <td>
@@ -432,14 +465,6 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><fmt:message key="non.retry.status.codes"/></td>
-                        <td><input type="text" id="non_retry_status_codes" name="non_retry_status_codes"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("non.retry.status.codes")!=null))?processorData.getParams().get("non.retry.status.codes"):""%>"
-                                />
-                        </td>
-                    </tr>
-                    <tr>
                         <td><fmt:message key="max.delivery.attempts"/></td>
                         <td><input type="text" id="max_delivery_attempts" name="max_delivery_attempts"
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
@@ -466,36 +491,6 @@
                                 <% } %>
                             </select>
                         </td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="axis2.repo"/></td>
-                        <td><input type="text" id="axis2_repo" name="axis2_repo"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("axis2.repo")!=null))?processorData.getParams().get("axis2.repo"):""%>"
-                                   size="75"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="axis2.config"/></td>
-                        <td><input type="text" id="axis2_config" name="axis2_config"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("axis2.config")!=null))?processorData.getParams().get("axis2.config"):""%>"
-                                   size="75"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="message.processor.reply.sequence"/></td>
-                        <td><input type="text" id="message_processor_reply_sequence"
-                                   name="message_processor_reply_sequence" style="float: left; position: relative;"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("message.processor.reply.sequence")!=null))?processorData.getParams().get("message.processor.reply.sequence"):""%>"
-                                />
-
-                            <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('message_processor_reply_sequence','/_system/config')"><fmt:message key="processor.conf.registry.browser"/></a>
-                       		<a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('message_processor_reply_sequence','/_system/governance')"><fmt:message key="processor.gov.registry.browser"/></a>
-                
-                        </td>
-                    
                     </tr>
                     <tr>
                         <td><fmt:message key="message.processor.fault.sequence"/></td>
