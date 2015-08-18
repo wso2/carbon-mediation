@@ -120,7 +120,7 @@
     }
 
     function editCAppProcessor(processorType,name) {
-        CARBON.showConfirmationDialog('<fmt:message key="edit.cApp.processor.on.page.prompt"/>', function() {
+        CARBON.showConfirmationDialog('<fmt:message key="edit.artifactContainer.processor.on.page.prompt"/>', function() {
             $.ajax({
                 type: 'POST',
                 success: function() {
