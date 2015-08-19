@@ -121,18 +121,6 @@
         var isValidXML = isValidXml(trim(source));
         if (!isValidXML) {
             return false;
-        } else {
-            if (window.DOMParser) {
-                var parser=new DOMParser();
-                xmlDoc=parser.parseFromString(trim(source),"text/xml");
-            }
-            else {
-                xmlDoc = new ActiveXObject("Microsoft.XMLDOM"); xmlDoc.loadXML(trim(source));
-            }
-            if ((xmlDoc.getElementsByTagName('api')[0].getAttribute("context")).trim() == "/") {
-            xmlDoc.getElementsByTagName('api')[0].setAttribute("context","");
-            source = new XMLSerializer().serializeToString(xmlDoc);
-            }
         }
 
     <%if("edit".equals(mode)){%>
