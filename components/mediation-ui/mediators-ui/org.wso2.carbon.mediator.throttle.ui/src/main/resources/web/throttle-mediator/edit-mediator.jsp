@@ -39,6 +39,7 @@
     String inLinePolicy = "", acceptKey = "", rejectKey = "";
     String key = "";
     String policyID = SequenceEditorHelper.getEditingMediatorPosition(session) + "_throttle_policy";
+    System.out.println(policyID);
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     if (!(mediator instanceof ThrottleMediator)) {
         // todo : proper error handling
@@ -56,6 +57,7 @@
             policyXMLMap = new HashMap();
         }
         policyXMLMap.put(policyID, inLinePolicy);
+        System.out.println(policyID);
         request.getSession().setAttribute("throttle_policy_map", policyXMLMap);
     } else if (throttleMediator.getPolicyKey() != null) {
         key = throttleMediator.getPolicyKey();
