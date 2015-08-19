@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.Lock;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public class MessageStoreAdminService extends AbstractServiceBusAdmin {
@@ -119,8 +120,15 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
                 messageStore.setFileName(fileName);
                 messageStore.init(getSynapseEnvironment());
                 configuration.addMessageStore(messageStore.getName(),messageStore);
-                MediationPersistenceManager mp = getMediationPersistenceManager();
-                mp.saveItem(messageStore.getName(),ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+
+                if (oldMessageStore.getArtifactContainerName() != null) {
+                    messageStore.setArtifactContainerName(oldMessageStore.getArtifactContainerName());
+                    messageStore.setIsEdited(true);
+                }
+                else {
+                    MediationPersistenceManager mp = getMediationPersistenceManager();
+                    mp.saveItem(messageStore.getName(),ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                }
             } else {
                 assert false;
                 String message = "Unexpected Error!!! Message store with name "
@@ -190,6 +198,39 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
         return names.toArray(new String[names.size()]);
     }
 
+    /**
+     * Get all the Current Message store details defined in the configuration
+     *
+     * @return array of Message Store Meta Data that contains MessageStore names
+     * @throws AxisFault
+     */
+    public MessageStoreMetaData[] getMessageStoreData() throws AxisFault {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration configuration = getSynapseConfiguration();
+
+            assert configuration != null;
+            Collection<String> names = configuration.getMessageStores().keySet();
+            List<MessageStoreMetaData> metaDatas = new ArrayList<MessageStoreMetaData>();
+
+            for (String storeName : names) {
+                MessageStoreMetaData data = new MessageStoreMetaData();
+                MessageStore ms = getSynapseConfiguration().getMessageStore(storeName);
+                data.setName(storeName);
+                if (ms.getArtifactContainerName() != null) {
+                    data.setArtifactContainerName(ms.getArtifactContainerName());
+                }
+                if (ms.isEdited()) {
+                    data.setIsEdited(true);
+                }
+                metaDatas.add(data);
+            }
+            return metaDatas.toArray(new MessageStoreMetaData[metaDatas.size()]);
+        } finally {
+            lock.unlock();
+        }
+    }
 
     /**
      * Get the number of messages in the Message store with given name

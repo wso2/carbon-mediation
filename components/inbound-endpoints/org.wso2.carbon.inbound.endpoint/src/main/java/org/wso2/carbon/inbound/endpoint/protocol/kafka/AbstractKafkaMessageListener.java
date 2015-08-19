@@ -72,7 +72,7 @@ public abstract class AbstractKafkaMessageListener {
     /**
      * Poll the messages from the zookeeper and injected to the sequence
      */
-    public abstract void injectMessageToESB();
+    public abstract void injectMessageToESB(String name);
 
     /**
      * Check ConsumerIterator whether It has next value

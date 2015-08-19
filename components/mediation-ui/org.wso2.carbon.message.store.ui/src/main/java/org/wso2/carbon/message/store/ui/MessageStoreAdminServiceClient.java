@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.message.store.stub.MessageInfo;
 import org.wso2.carbon.message.store.stub.MessageStoreAdminServiceStub;
+import org.wso2.carbon.message.store.stub.MessageStoreMetaData;
 import org.wso2.carbon.message.store.ui.utils.MessageStoreData;
 import org.wso2.carbon.ndatasource.ui.stub.NDataSourceAdminDataSourceException;
 import org.wso2.carbon.ndatasource.ui.stub.NDataSourceAdminStub;
@@ -115,6 +116,57 @@ public class MessageStoreAdminServiceClient {
         }
 
         return messageStoreNames;
+    }
+
+    public MessageStoreData[] getMessageStoreData() throws Exception {
+        List<MessageStoreData> messageStores = new ArrayList<MessageStoreData>();
+        try {
+            MessageStoreMetaData[] temp = stub.getMessageStoreData();
+            if (temp == null || temp.length == 0 || temp[0] == null) {
+                return null;
+            }
+            for (MessageStoreMetaData info : temp) {
+                MessageStoreData storeData = new MessageStoreData();
+                storeData.setName(info.getName());
+                storeData.setArtifactContainerName(info.getArtifactContainerName());
+                storeData.setIsEdited(info.getIsEdited());
+                messageStores.add(storeData);
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+
+        if (messageStores.size() > 0) {
+            return messageStores.toArray(new MessageStoreData[messageStores.size()]);
+        }
+        return null;
+    }
+
+    public MessageStoreData[] getPaginatedMessageStoreData(int pageNumber) throws Exception {
+        int numberOfPages = 0;
+        MessageStoreData[] messageStoreNames = getMessageStoreData();
+        if (messageStoreNames != null) {
+            numberOfPages = (int) Math.ceil((double) messageStoreNames.length /
+                    MESSAGE_STORES_PER_PAGE);
+        }
+        if (pageNumber == 0) {
+            numberOfPages = 1;
+        }
+        if (pageNumber > numberOfPages - 1) {
+            pageNumber = numberOfPages - 1;
+        }
+        int startIndex = (pageNumber * MESSAGE_STORES_PER_PAGE);
+        int endIndex = ((pageNumber + 1) * MESSAGE_STORES_PER_PAGE);
+
+        if (messageStoreNames == null) {
+            return null;
+        }
+        ArrayList<MessageStoreData> nameList = new ArrayList<MessageStoreData>();
+        for (int i = startIndex; i < endIndex && i < messageStoreNames.length; i++) {
+            nameList.add(messageStoreNames[i]);
+        }
+
+        return nameList.toArray(new MessageStoreData[nameList.size()]);
     }
 
     public String[] getPaginatedMessageStoreNames(int pageNumber) throws Exception {

@@ -28,7 +28,9 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
@@ -60,10 +62,13 @@ public class KAFKAInjectHandler implements InjectHandler {
      * Determine the message builder to use, set the message payload to the message context and
      * inject the message to the sequence
      */
-    public boolean invoke(Object object) {
+    public boolean invoke(Object object, String name) {
         byte[] msg = (byte[]) object;
 
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
+        msgCtx.setProperty("inbound.endpoint.name", name);
+        InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
+        CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
         log.debug("Processed Kafka Message ");
         MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
                 .getAxis2MessageContext();

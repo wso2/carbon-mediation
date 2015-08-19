@@ -87,7 +87,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 } else {
                     proxy.getAspectConfiguration().enableStatistics();
                 }
-                persistProxyService(proxy);
+
+                /** Persist the proxy service if it is not deployed via an artifact container */
+                if (proxy.getArtifactContainerName() == null) {
+                    persistProxyService(proxy);
+                }
             } else {
                 log.error("Couldn't find the proxy service with name "
                         + proxyName + " to enable statistics");
@@ -126,7 +130,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 } else {
                     proxy.getAspectConfiguration().disableStatistics();
                 }
-                persistProxyService(proxy);
+
+                /** Persist the proxy service if it is not deployed via an artifact container */
+                if (proxy.getArtifactContainerName() == null) {
+                    persistProxyService(proxy);
+                }
             } else {
                 log.error("Couldn't find the proxy service with name "
                         + proxyName + " to disable statistics");
@@ -158,7 +166,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
 
             ProxyService proxy = getSynapseConfiguration().getProxyService(proxyName);
             proxy.setTraceState(SynapseConstants.TRACING_ON);
-            persistProxyService(proxy);
+
+            /** persist the proxy only if it is not deployed from an artifact container */
+            if (proxy.getArtifactContainerName() == null) {
+                persistProxyService(proxy);
+            }
             if(log.isDebugEnabled()) {
                 log.debug("Enabled tracing on proxy service : " + proxyName);
             }
@@ -185,7 +197,12 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
 
             ProxyService proxy = getSynapseConfiguration().getProxyService(proxyName);
             proxy.setTraceState(SynapseConstants.TRACING_OFF);
-            persistProxyService(proxy);
+
+            /** persist the proxy only if it is not deployed from an artifact container */
+            if (proxy.getArtifactContainerName() == null) {
+                persistProxyService(proxy);
+            }
+
             if(log.isDebugEnabled()) {
                 log.debug("Disabled tracing on proxy service : " + proxyName);
             }
@@ -342,6 +359,14 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                             if (proxy.getTargetInLineEndpoint() != null) {
                                 proxy.getTargetInLineEndpoint().init(getSynapseEnvironment());
                             }
+                        }
+
+                        /** If the proxy is deployed from an artifact container
+                         * then the edit state should set to true
+                         */
+                        if (currentProxy.getArtifactContainerName() != null) {
+                            proxy.setArtifactContainerName(currentProxy.getArtifactContainerName());
+                            proxy.setIsEdited(true);
                         }
                     } catch (Exception e) {
 
@@ -717,6 +742,19 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
             pd.setStartOnLoad(true);
         } else {
             pd.setStartOnLoad(false);
+        }
+
+        /** If the proxy is deployed from an artifact container then the
+         * proxy data set its artifact container name*/
+        if (ps.getArtifactContainerName() != null) {
+            pd.setArtifactContainerName(ps.getArtifactContainerName());
+        }
+
+        /**
+         * If the proxy is edited set the edit state of the proxyData
+         */
+        if (ps.isEdited()) {
+            pd.setIsEdited(true);
         }
 
         // sets transports

@@ -93,7 +93,7 @@ public class CarbonTaskManagementService extends AbstractAdmin {
             log.debug("Edit TaskDescription - Get a Task configuration  :" + taskElement);
         }
         try {
-            getTaskManager().editTaskDescription(validateAndCreate(taskElement));
+            getTaskManager().editTaskDescription(validateAndCreate(taskElement), getAxisConfig());
         } catch (Exception e) {
             handleException("Error editing a task : " + e.getMessage(), e);
         }
@@ -156,6 +156,14 @@ public class CarbonTaskManagementService extends AbstractAdmin {
                     e.getMessage(), e);
         }
         return null;
+    }
+
+    public TaskData[] getAllTaskData() throws TaskManagementException {
+        TaskData[] taskData = null;
+        if (getTaskManager().getAllTaskData(getAxisConfig()) != null) {
+            taskData = getTaskManager().getAllTaskData(getAxisConfig());
+        }
+        return taskData;
     }
 
     public boolean isContains(String s, String group) throws TaskManagementException {

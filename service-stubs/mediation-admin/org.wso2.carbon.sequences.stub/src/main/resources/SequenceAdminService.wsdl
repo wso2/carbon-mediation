@@ -21,10 +21,12 @@
         <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://to.common.sequences.carbon.wso2.org/xsd">
             <xs:complexType name="SequenceInfo">
                 <xs:sequence>
+                    <xs:element minOccurs="0" name="artifactContainerName" nillable="true" type="xs:string" />
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string" />
                     <xs:element minOccurs="0" name="enableStatistics" type="xs:boolean" />
                     <xs:element minOccurs="0" name="enableTracing" type="xs:boolean" />
-                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="isEdited" nillable="true" type="xs:boolean" />
+                    <xs:element minOccurs="0" name="name" type="xs:string" />
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="ConfigurationObject">

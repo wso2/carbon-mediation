@@ -19,8 +19,10 @@ package org.wso2.carbon.message.processor.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -113,8 +115,15 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                 messageProcessor.setFileName(fileName);
                 synapseConfiguration.addMessageProcessor(messageProcessor.getName(),
                         messageProcessor);
-                MediationPersistenceManager mp = getMediationPersistenceManager();
-                mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+
+                if (removedProcessor.getArtifactContainerName() != null) {
+                    messageProcessor.setArtifactContainerName(removedProcessor.getArtifactContainerName());
+                    messageProcessor.setIsEdited(true);
+                }
+                else {
+                    MediationPersistenceManager mp = getMediationPersistenceManager();
+                    mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                }
             } else {
                 String message = "Unable to Update Message Processor ";
                 handleException(log, message, null);
@@ -228,6 +237,41 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         }
 
         return messageIds;
+    }
+
+    /**
+     * Get all the Current Message processor data defined in the configuration
+     *
+     * @return Array of  MessageProcessorMetaDatas.
+     * @throws AxisFault
+     */
+    public MessageProcessorMetaData[] getMessageProcessorDataList() throws AxisFault {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration configuration = getSynapseConfiguration();
+            Collection<String> names = configuration.getMessageProcessors().keySet();
+
+            List<MessageProcessorMetaData> messageProcessorDataList = new ArrayList<MessageProcessorMetaData>();
+            if (names != null && !names.isEmpty()) {
+                for (String name : names) {
+                    MessageProcessor messageProcessor = configuration.getMessageProcessors().get(name);
+                    MessageProcessorMetaData data = new MessageProcessorMetaData();
+                    data.setName(name);
+                    if (messageProcessor.getArtifactContainerName() != null) {
+                        data.setArtifactContainerName(messageProcessor.getArtifactContainerName());
+                    }
+                    if (messageProcessor.isEdited()) {
+                        data.setIsEdited(true);
+                    }
+                    messageProcessorDataList.add(data);
+                }
+            }
+            return messageProcessorDataList.toArray(new MessageProcessorMetaData[messageProcessorDataList.size()]);
+
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -516,6 +560,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
+                        if (processor.getArtifactContainerName() == null) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
                     } else {
                         log.warn("Scheduled Message Forwarding Processor is already active");
                     }
@@ -533,6 +581,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((SamplingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
+                        if (processor.getArtifactContainerName() == null) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
                     } else {
                         log.warn("Sampling Processor is already active");
                     }
@@ -578,6 +630,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     SamplingProcessorView view = ((SamplingProcessor) processor).getView();
                     if (view.isActive()) {
                         view.deactivate();
+                        if (processor.getArtifactContainerName() == null) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
                     } else {
                         log.warn("Sampling Message Processor - already in the deactivated state");
                     }

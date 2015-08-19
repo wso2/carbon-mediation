@@ -186,6 +186,18 @@ function editRow(name, group) {
     document.location.href = "edittask.jsp?" + "taskName=" + name + "&taskGroup=" + group + "&ordinal=1";
 }
 
+function editCAppRow(name, group) {
+
+    CARBON.showConfirmationDialog("The changes will not persist to the CAPP after restart or redeploy. Do you want to Edit?", function() {
+        $.ajax({
+            type: 'POST',
+            success: function() {
+                document.location.href = "edittask.jsp?" + "taskName=" + name + "&taskGroup=" + group + "&ordinal=1";
+            }
+        });
+    });
+}
+
 function onclassnamefieldchange(id) {
     var classnmae = document.getElementById("taskClass").value;
     if (classnmae != null && classnmae != undefined && classnmae != "") {

@@ -267,9 +267,11 @@
             </xs:complexType>
             <xs:complexType name="APIData">
                 <xs:sequence>
+                    <xs:element minOccurs="0" name="artifactContainerName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="context" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="host" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="isEdited" nillable="true" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="port" type="xs:int"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="resources" nillable="true" type="ax2409:ResourceData"/>

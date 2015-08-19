@@ -13,7 +13,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
 import org.apache.commons.logging.Log;
@@ -36,6 +35,10 @@ import org.wso2.carbon.inbound.endpoint.common.OneTimeTriggerAbstractCallback;
 public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements MqttCallback {
 
     private static final Log log = LogFactory.getLog(MqttAsyncCallback.class);
+
+    private String name;
+
+    private MqttListener asycClient;
 
     private MqttInjectHandler injectHandler;
     private MqttConnectionFactory confac;
@@ -116,12 +119,12 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
                 PrivilegedCarbonContext privilegedCarbonContext =
                         PrivilegedCarbonContext.getThreadLocalCarbonContext();
                 privilegedCarbonContext.setTenantDomain(super.tenantDomain, true);
-                injectHandler.invoke(mqttMessage);
+                injectHandler.invoke(mqttMessage, name);
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         } else {
-            injectHandler.invoke(mqttMessage);
+            injectHandler.invoke(mqttMessage, name);
         }
     }
 
@@ -150,5 +153,21 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
         if (connectionListener != null) {
             this.connectionListener.shutdown();
         }
+    }
+
+    /**
+     * Set the inbound endpoint name
+     * @param name
+     */
+    public void setName (String name) {
+        this.name = name;
+    }
+
+    /**
+     * get the inbound endpoint name
+     * @return name
+     */
+    public String getName () {
+        return this.name;
     }
 }

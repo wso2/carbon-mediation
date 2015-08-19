@@ -85,7 +85,7 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
     public void init() {
         log.info("Initializing inbound KAFKA listener for destination " + name);
         try {
-            pollingConsumer = new KAFKAPollingConsumer(kafkaProperties, interval);
+            pollingConsumer = new KAFKAPollingConsumer(kafkaProperties, interval, name);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return;

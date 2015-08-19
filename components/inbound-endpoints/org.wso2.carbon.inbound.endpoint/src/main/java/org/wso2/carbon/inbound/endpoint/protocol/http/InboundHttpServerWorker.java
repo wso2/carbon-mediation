@@ -38,6 +38,7 @@ import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.rest.RESTRequestHandler;
+import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.apache.synapse.transport.passthru.ServerWorker;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
@@ -104,6 +105,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
                     return;
                 }
+
+                CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
                 if (!isRESTRequest(axis2MsgContext, method)) {
                     if (request.isEntityEnclosing()) {
@@ -234,6 +237,7 @@ public class InboundHttpServerWorker extends ServerWorker {
         if (log.isDebugEnabled()) {
             log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
         }
+        synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
 

@@ -44,6 +44,7 @@ public class JMSPollingConsumer {
     private String strPassword;
     private Integer iReceiveTimeout;
     private String replyDestinationName;
+    private String name;
     
     private Connection connection = null;
     private Session session = null;
@@ -51,10 +52,11 @@ public class JMSPollingConsumer {
     private MessageConsumer messageConsumer = null;
     private Destination replyDestination = null;
     
-    public JMSPollingConsumer( Properties jmsProperties, long scanInterval) {
+    public JMSPollingConsumer( Properties jmsProperties, long scanInterval, String name) {
         this.jmsConnectionFactory = new CachedJMSConnectionFactory(jmsProperties);
         strUserName = jmsProperties.getProperty(JMSConstants.PARAM_JMS_USERNAME);
         strPassword = jmsProperties.getProperty(JMSConstants.PARAM_JMS_PASSWORD);
+        this.name = name;
         
         String strReceiveTimeout = jmsProperties.getProperty(JMSConstants.RECEIVER_TIMEOUT);
         if(strReceiveTimeout != null){
@@ -150,7 +152,7 @@ public class JMSPollingConsumer {
                         injectHandler.setReplyDestination(replyDestination);
                     }
                     injectHandler.setConnection(connection);
-                    commitOrAck = injectHandler.invoke(msg);
+                    commitOrAck = injectHandler.invoke(msg, name);
                     // if client acknowledgement is selected, and processing
                     // requested ACK
                     if (jmsConnectionFactory.getSessionAckMode() == Session.CLIENT_ACKNOWLEDGE) {

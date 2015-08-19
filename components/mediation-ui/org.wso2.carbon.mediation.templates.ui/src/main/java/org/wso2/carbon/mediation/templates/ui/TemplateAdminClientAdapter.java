@@ -83,6 +83,8 @@ public class TemplateAdminClientAdapter extends SequenceAdminClient {
                 seqInfo.setEnableTracing(info.getEnableTracing());
                 seqInfo.setName(info.getName());
                 seqInfo.setDescription(info.getDescription());
+                seqInfo.setArtifactContainerName(info.getArtifactContainerName());
+                seqInfo.setIsEdited(info.getIsEdited());
                 sequences.add(seqInfo);
             }
         } catch (Exception e) {

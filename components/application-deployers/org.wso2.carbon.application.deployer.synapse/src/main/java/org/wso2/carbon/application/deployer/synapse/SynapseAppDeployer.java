@@ -30,6 +30,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.deployers.AbstractSynapseArtifactDeployer;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.Entry;
@@ -125,6 +126,11 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                 } else {
                     try {
+
+                        if (deployer instanceof AbstractSynapseArtifactDeployer) {
+                            ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApp.getAppName(),
+                                    AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
+                        }
                         deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                     } catch (DeploymentException e) {
@@ -184,6 +190,12 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
                 try {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
+
+                        if (deployer instanceof AbstractSynapseArtifactDeployer) {
+                            ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApplication.getAppName(),
+                                    AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
+                        }
+
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifact.getType())){
                         String libQName = getArtifactName(artifactPath, axisConfig);
