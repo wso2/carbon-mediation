@@ -52,9 +52,10 @@
         <module>org.wso2.carbon.task.stub</module>
         <module>org.wso2.carbon.priority.executors.stub</module>
         <module>org.wso2.carbon.rest.api.stub</module>
-	    <module>org.wso2.carbon.inbound.stub</module>
+	<module>org.wso2.carbon.inbound.stub</module>
         <module>org.wso2.carbon.mediation.ntaskadmin.stub</module>
         <module>org.wso2.carbon.event.sink.config.stub</module>
+        <module>org.wso2.carbon.mediators.throttle.admin.stub</module>
     </modules>
   <dependencies>
     <dependency>
