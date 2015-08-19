@@ -1,0 +1,63 @@
+<!--
+  ~ Copyright 2005-2007 WSO2, Inc. (http://wso2.com)
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+        "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+<body>
+<h1>Throttle Component</h1>
+
+<h2>INTRODUCTION</h2>
+
+<p>Throttle mechanism in Carbon is used to control access in different levels. It can be enabled in global level, service level or in operation level. If throttling is enabled globally, restrictions are applied globally (for every message coming into the server). If it is enabled for a particular service, restrictions are applied to all messages coming into that service. And if it is enabled only for an operation in a given service, restrictions are applied only for the messages accessing that particular operation.</p>
+
+<h2>USER INTERFACE TO ENABLE THROTTLING</h2>
+
+<p>Following diagram shows the user interface of the throttle component.</p>
+
+<p>
+<img alt="Throttle UI" src="images/throttle.jpg"/><br clear="all"/>
+</p>
+
+<p>The "Enable Throttling" option can be used to enable or disable throttling. If you select "Yes", it will show the currently existing throttle configuration on the UI. After doing whatever changes in the configuration, "Done" button can be used to engage throttling for the particular service.</p>
+
+<p>Maximum Concurrent Accesses parameter can be used to control the number of requests that are served at any given moment. If throttling is enabled globally, this value is the maximum number of requests that are served by all the services deployed in the server at the given moment. If throttling is enabled in service level, it is the maximum for that particular service. And in the case of operation level, it is the maximum for that particular operation.</p>
+
+<p>The table shown in the UI can be used to apply restrictions for specific users.</p>
+
+<h3>Fields in the configuration table</h3>
+
+<p><strong>Range :</strong> The IP address range or the domain to restrict. Requests from those clients will be restricted using the specified values</p>
+<p><strong>Type :</strong> This indicates the type of Range. It can be "IP" or "DOMAIN". It should be "IP" if the Range is given as a single IP address or a range of IP addresses (Eg: 10.100.1.30-10.100.1.60). It should be "DOMAIN" if the range is given as as a domain (Eg: *.wso2.com).</p>
+<p><strong>Allow Access :</strong> If this is set to "Yes", no restriction is applied for that range and all requests are allowed to go in as they come in. If it is "No", then the specified constraints are applied for that particular range. These constraints are given through following three parameters.</p>
+<p><strong>Maximum Request Count (MRC) :</strong> If Allow Access is set to "No" this is the maximum number of requests that are served within the time interval specified by Unit Time parameter.</p>
+<p><strong>Unit Time (UT) :</strong> Time period in seconds in which the maximum requests served is the number specified by Maximum Request Count. Throttle starts counting periods of this amount of seconds from the moment it is enabled and number of requests are measured within that period.</p>
+<p><strong>Prohibit Time Period (PTP) :</strong> If the Maximum Request Count is achieved before Unit Time, this is the period for which no more requests are allowed to go in. By setting this value, Unit Time slot is altered.</p>
+
+<p><strong>Example :</strong> MRC = 50, UT = 50000, PTP = 5000
+If 50 requests are arrived within 35000s in a particular time period, no more requests are taken in for another 5000s (=PTP). This time the UT is altered to 35000 + 5000 = 40000</p>
+
+<h3>Buttons to control</h3>
+
+<p><strong>Delete :</strong> To delete the particular row in the table infront of which the button exists</p>
+<p><strong>New Entry :</strong> To add a new row into the table</p>
+<p><strong>Done :</strong> To submit the currently shown configuration</p>
+<p><strong>Reset :</strong> To load the last saved configuration</p>
+<p><strong>Default :</strong> To load the default configuration</p>
+<p><strong>Clear :</strong> To clear all text areas in the UI</p>
+
+</body>
+</html>
