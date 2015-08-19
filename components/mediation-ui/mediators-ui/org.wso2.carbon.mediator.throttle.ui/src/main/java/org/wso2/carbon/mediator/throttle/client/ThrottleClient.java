@@ -17,10 +17,10 @@
 */
 package org.wso2.carbon.mediator.throttle.client;
 
-import org.wso2.carbon.mediation.throttle.stub.ThrottleAdminServiceStub;
-import org.wso2.carbon.mediation.throttle.stub.ThrottleComponentExceptionException;
-import org.wso2.carbon.mediation.throttle.stub.types.InternalData;
-import org.wso2.carbon.mediation.throttle.stub.types.ThrottlePolicy;
+import org.wso2.carbon.mediators.throttle.admin.stub.ThrottleAdminServiceStub;
+import org.wso2.carbon.mediators.throttle.admin.stub.ThrottleComponentExceptionException;
+import org.wso2.carbon.mediators.throttle.admin.stub.types.InternalData;
+import org.wso2.carbon.mediators.throttle.admin.stub.types.ThrottlePolicy;
 import org.wso2.carbon.ui.CarbonUIMessage;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.client.Options;

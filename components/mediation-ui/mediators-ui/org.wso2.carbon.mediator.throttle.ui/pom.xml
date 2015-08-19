@@ -50,7 +50,7 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            org.wso2.carbon.mediation.throttle.stub.*;version="${carbon.mediation.imp.pkg.version}",
+                            org.wso2.carbon.mediators.throttle.admin.stub.*;version="${carbon.mediation.imp.pkg.version}",
                             javax.xml.namespace; version=0.0.0,
                             org.apache.commons.logging,
                             org.osgi.framework,
@@ -87,7 +87,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.mediation.throttle.stub</artifactId>
+            <artifactId>org.wso2.carbon.mediators.throttle.admin.stub</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>

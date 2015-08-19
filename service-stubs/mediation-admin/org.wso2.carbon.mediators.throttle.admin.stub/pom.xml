@@ -21,12 +21,13 @@
 
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
-      <artifactId>mediation-throttle-stub</artifactId>
+      <artifactId>carbon-mediation</artifactId>
       <version>4.4.4-SNAPSHOT</version>
+      <relativePath>../../pom.xml</relativePath>
    </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.mediation.throttle.stub</artifactId>
+    <artifactId>org.wso2.carbon.mediators.throttle.admin.stub</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon Mediation - Throttle Stub</name>
     <url>http://wso2.org</url>
@@ -54,8 +55,8 @@
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
                                     <arg line="-uri src/main/resources/ThrottleAdminService.wsdl -u -uw -o target/generated-code
-                                    -p org.wso2.carbon.mediation.throttle.stub
-                                    -ns2p http://service.throttle.mediation.carbon.wso2.org=org.wso2.carbon.mediation.throttle.stub,http://throttle.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.throttle.stub.types"/>
+                                    -p org.wso2.carbon.mediators.throttle.admin.stub
+                                    -ns2p http://service.throttle.mediation.carbon.wso2.org=org.wso2.carbon.mediators.throttle.admin.stub,http://throttle.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediators.throttle.admin.stub.types"/>
                                     <classpath refid="wsdl2java.classpath"/>
                                 </java>
                             </tasks>
@@ -93,7 +94,7 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.carbon.mediation.throttle.stub.*;version="${carbon.mediation.exp.pkg.version}",
+                            org.wso2.carbon.mediators.throttle.admin.stub.*;version="${carbon.mediation.exp.pkg.version}",
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
