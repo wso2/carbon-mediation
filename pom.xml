@@ -57,6 +57,7 @@
                 <module>components/mediation-clustering</module>
                 <module>components/application-deployers</module>
                 <module>components/application-mgt</module>
+                <module>components/mediation-throttle</module>
 		<module>features/event-sink</module>
                 <module>features/scheduled-tasks</module>
                 <module>features/business-adaptors</module>
@@ -72,6 +73,7 @@
                 <module>features/mediation-clustering</module>
                 <module>features/application-deployers</module>
                 <module>features/application-mgt</module>
+                <module>features/mediation-throttle-features</module>
                 <module>components/mediation-message-processor</module>
             </modules>
         </profile>
