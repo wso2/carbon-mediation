@@ -126,8 +126,11 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                 } else {
                     try {
-                                ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApp.getAppName(),
-                                        AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
+
+                        if (deployer instanceof AbstractSynapseArtifactDeployer) {
+                            ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApp.getAppName(),
+                                    AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
+                        }
                         deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                     } catch (DeploymentException e) {
@@ -188,8 +191,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 try {
                     if (SynapseAppDeployerConstants.MEDIATOR_TYPE.endsWith(artifact.getType())) {
 
-                        ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApplication.getAppName(),
-                                AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
+                        if (deployer instanceof AbstractSynapseArtifactDeployer) {
+                            ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApplication.getAppName(),
+                                    AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
+                        }
 
                         deployer.undeploy(artifactPath);
                     } else if (SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifact.getType())){
