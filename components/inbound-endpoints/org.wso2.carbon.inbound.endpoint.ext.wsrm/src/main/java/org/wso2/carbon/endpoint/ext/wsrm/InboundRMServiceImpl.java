@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm;
+package org.wso2.carbon.endpoint.ext.wsrm;
 
 /**
  * This is a dummy class to instantiate the RM Inbound Endpoint

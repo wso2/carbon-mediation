@@ -15,16 +15,16 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.invoker;
+package org.wso2.carbon.endpoint.ext.wsrm.invoker;
 
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.AbstractInvoker;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.InboundRMResponseSender;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.RMRequestCallable;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.utils.RMConstants;
+import org.wso2.carbon.endpoint.ext.wsrm.InboundRMResponseSender;
+import org.wso2.carbon.endpoint.ext.wsrm.RMRequestCallable;
+import org.wso2.carbon.endpoint.ext.wsrm.utils.RMConstants;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

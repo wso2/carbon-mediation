@@ -129,7 +129,8 @@ var requiredParams = null;
                                 <option value="true">true</option>     
                                 <option value="false" selected>false</option>           
                             </select>                            
-                        </td>                      
+                        </td>
+                        <td></td>
                     </tr>
                      <% } else { %>
                         <tr>
@@ -163,6 +164,32 @@ var requiredParams = null;
                         </td>
                         <td></td>
                     </tr>
+                    <tr>
+                        <td style="width:150px"><fmt:message key="inbound.isListening"/></td>
+                        <td>
+                            <input type="radio" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')" checked><fmt:message key="inbound.polling"/>
+                            <input type="radio" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
+                        </td>
+                        <td></td>
+                    </tr>
+
+                    <tr id="inboundIntervalRow">
+                        <td style="width:150px"><fmt:message key="inbound.interval"/><span class="required">*</span></td>
+                        <td align="left">
+                            <input name="inboundInterval" id="interval" class="longInput" type="text"/>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <script language="javascript">
+                        function toggleInboundInterval(event){
+                            if (event == "listening"){
+                                document.getElementById("inboundIntervalRow").style.display="none";
+                            } else {
+                                document.getElementById("inboundIntervalRow").style.display="table-row";
+                            }
+                        }
+                    </script>
+
                     <% } %>             
                     <%if(!defaultParams.isEmpty()){                     
                     %>

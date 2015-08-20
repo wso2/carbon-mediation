@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm;
+package org.wso2.carbon.endpoint.ext.wsrm;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.util.UIDGenerator;
@@ -41,7 +41,7 @@ import org.eclipse.jetty.http.HttpURI;
 import org.eclipse.jetty.server.Request;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.utils.RMConstants;
+import org.wso2.carbon.endpoint.ext.wsrm.utils.RMConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
@@ -103,7 +103,7 @@ public class RMRequestCallable implements Callable<Boolean> {
      * @param request The HttpServletRequest
      * @param bytes Request in bytes
      * @return success
-     * @throws AxisFault
+     * @throws org.apache.axis2.AxisFault
      */
     private boolean injectToSynapse(Request request, byte[] bytes) throws AxisFault {
 

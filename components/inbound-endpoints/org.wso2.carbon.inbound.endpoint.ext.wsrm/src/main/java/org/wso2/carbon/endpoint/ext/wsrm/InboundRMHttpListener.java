@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm;
+package org.wso2.carbon.endpoint.ext.wsrm;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -23,12 +23,11 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.log4j.Logger;
 import org.apache.synapse.inbound.InboundProcessorParams;
-import org.apache.synapse.inbound.InboundRequestProcessor;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.interceptor.RequestInterceptor;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.interceptor.ResponseInterceptor;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.invoker.InboundRMHttpInvoker;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointManager;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.utils.RMConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
+import org.wso2.carbon.endpoint.ext.wsrm.interceptor.RequestInterceptor;
+import org.wso2.carbon.endpoint.ext.wsrm.interceptor.ResponseInterceptor;
+import org.wso2.carbon.endpoint.ext.wsrm.invoker.InboundRMHttpInvoker;
+import org.wso2.carbon.endpoint.ext.wsrm.utils.RMConstants;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -37,45 +36,35 @@ import java.net.URL;
 /**
  * Creates an endpoint that supports WS-RM using Apache CXF
  */
-public class InboundRMHttpListener implements InboundRequestProcessor {
+public class InboundRMHttpListener extends GenericInboundListener {
 
     private static final Logger logger = Logger.getLogger(InboundRMHttpListener.class);
-    private String injectingSequence;
-    private String onErrorSequence;
-    private int port;
     private InboundRMHttpInvoker invoker;
     private String cxfServerConfigFileLoc;
-    private String name;
-    private String host;
     private Server server;
-    private InboundProcessorParams params;
+    private String host;
+    private int port;
 
     //For Secured inbound endpoints
     private Boolean enableSSL = false;
 
     public InboundRMHttpListener(InboundProcessorParams params) {
-
-        this.port = Integer.parseInt(params.getProperties().getProperty(RMConstants.INBOUND_CXF_RM_PORT));
-        this.injectingSequence = params.getInjectingSeq();
-        this.onErrorSequence = params.getOnErrorSeq();
+        super(params);
         this.cxfServerConfigFileLoc = params.getProperties().getProperty(RMConstants.INBOUND_CXF_RM_CONFIG_FILE);
-        this.host = params.getProperties().getProperty(RMConstants.INBOUND_CXF_RM_HOST);
         this.enableSSL = Boolean.parseBoolean(params.getProperties().getProperty(RMConstants.CXF_ENABLE_SSL));
-        this.name = params.getName();
-        this.params = params;
-    }
-
-    @Override
-    public void init() {
-        if (CXFEndpointManager.getInstance().authorizeCXFInboundEndpoint(port, name, params)) {
-            startListener();
-        }
+        this.port = Integer.parseInt(params.getProperties().getProperty(RMConstants.INBOUND_CXF_RM_PORT));
+        // Overriding host
+        this.host = params.getProperties().getProperty(RMConstants.INBOUND_CXF_RM_HOST);
     }
 
     /**
      * Starts a new CXF WS-RM Inbound Endpoint
      */
-    public void startListener() {
+    public boolean startListener() {
+//        if (!CXFEndpointManager.getInstance().startEndpoint(port, name, params)) {
+//            return false;
+//        }
+
         logger.info("Starting CXF RM Listener on " + this.host + ":" + this.port);
         SpringBusFactory bf = new SpringBusFactory();
         /*
@@ -89,12 +78,12 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
                 bus = bf.createBus(busFile.toString());
             } catch (MalformedURLException e) {
                 logger.error("The provided CXF RM configuration file location is invalid", e);
-                return;
+                return false;
             }
         } else {
             logger.error("CXF RM Inbound endpoint creation failed. " +
                          "The CXF RM inbound endpoint requires a configuration file to initialize");
-            return;
+            return false;
         }
         /*
          * Create a dummy class to act as the service class of the CXF endpoint
@@ -120,15 +109,22 @@ public class InboundRMHttpListener implements InboundRequestProcessor {
         //set the host and port to listen to
         serverFactory.setAddress(protocol + "://" + host + ":" + port);
         server = serverFactory.create();
-        CXFEndpointManager.getInstance().registerCXFInboundEndpoint(port, this);
+//        CXFEndpointManager.getInstance().registerCXFInboundEndpoint(port, this);
+        return true;
+    }
+
+    @Override
+    public void init() {
+        startListener();
     }
 
     /**
-     * Shuts down the CXF WS-RM Inbound Endpoint
+     * Shutdown the CXF WS-RM Inbound Endpoint
+     * TODO : Check issue https://github.com/wso2/wso2-synapse/pull/198
      */
     @Override
     public void destroy() {
-        CXFEndpointManager.getInstance().unregisterCXFInboundEndpoint(port);
+//        CXFEndpointManager.getInstance().closeEndpoint(port);
         if (server != null) {
             server.stop();
             server.destroy();

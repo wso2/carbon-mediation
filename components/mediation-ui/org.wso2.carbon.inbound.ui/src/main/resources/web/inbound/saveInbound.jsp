@@ -57,7 +57,9 @@
 					if(paramKey != null && !paramKey.trim().equals("")){
 						sParams.add((new ParamDTO(paramKey, request.getParameter("paramval" + strKey.replaceAll("paramkey","")))));
 					}
-				}else if(strKey.startsWith("interval")){
+				}else if(strKey.startsWith("inbound.behavior")){
+                    sParams.add((new ParamDTO("inbound.behavior", request.getParameter("inbound.behavior"))));
+                }else if(strKey.startsWith("interval")){
 				    sParams.add((new ParamDTO("interval",request.getParameter("interval"))));
 				}else if(strKey.startsWith("sequential")){
 				    sParams.add((new ParamDTO("sequential",request.getParameter("sequential"))));

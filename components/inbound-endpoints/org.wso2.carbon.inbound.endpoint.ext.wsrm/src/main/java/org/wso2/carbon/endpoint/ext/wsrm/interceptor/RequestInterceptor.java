@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.interceptor;
+package org.wso2.carbon.endpoint.ext.wsrm.interceptor;
 
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -29,7 +29,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.utils.RMConstants;
+import org.wso2.carbon.endpoint.ext.wsrm.utils.RMConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +66,7 @@ public class RequestInterceptor extends AbstractPhaseInterceptor<Message> {
      * Handles the client request by removing additional interceptors that are present
      *
      * @param message Request that is received
-     * @throws Fault
+     * @throws org.apache.cxf.interceptor.Fault
      */
     public void handleMessage(Message message) throws Fault {
         /*

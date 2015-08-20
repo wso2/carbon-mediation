@@ -34,6 +34,7 @@
         <module>org.wso2.carbon.inbound.endpoint.osgi</module>
         <module>org.wso2.carbon.inbound.endpoint.persistence</module>
         <module>org.wso2.carbon.inbound.endpoint</module>
+        <module>org.wso2.carbon.inbound.endpoint.ext.wsrm</module>
     </modules>
 
 <dependencies>
@@ -80,14 +81,6 @@
                 <artifactId>jms</artifactId>
             </exclusion>
         </exclusions>
-    </dependency>
-    <dependency>
-        <groupId>org.wso2.orbit.org.apache.cxf</groupId>
-        <artifactId>cxf-bundle</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
-        <artifactId>jetty-bundle</artifactId>
     </dependency>
     <dependency>
         <groupId>org.eclipse.paho</groupId>

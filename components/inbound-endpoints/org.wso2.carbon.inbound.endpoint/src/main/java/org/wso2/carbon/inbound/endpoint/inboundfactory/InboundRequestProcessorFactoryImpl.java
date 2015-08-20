@@ -21,8 +21,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.management.CXFEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
+import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.InboundHL7Listener;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
@@ -37,7 +37,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.rabbitmq.RabbitMQListener;
  */
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
-    public static enum Protocols {jms, file, http , https, hl7, kafka, cxf_ws_rm, mqtt, rabbitmq}
+    public static enum Protocols {jms, file, http , https, hl7, kafka, mqtt, rabbitmq}
 
     /**
      * return underlying Request Processor Implementation according to protocol
@@ -62,15 +62,17 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
                 inboundRequestProcessor = new InboundHL7Listener(params);
             } else if (Protocols.kafka.toString().equals(protocol)) {
                 inboundRequestProcessor = new KAFKAProcessor(params);
-            } else if (Protocols.cxf_ws_rm.toString().equals(protocol)) {
-                inboundRequestProcessor = CXFEndpointManager.getInstance().getCXFEndpoint(params);
             }else if (Protocols.mqtt.toString().equals(protocol)) {
                 inboundRequestProcessor = new MqttListener(params);
             }else if (Protocols.rabbitmq.toString().equals(protocol)) {
                 inboundRequestProcessor = new RabbitMQListener(params);
             }
         } else if (params.getClassImpl() != null) {
-            inboundRequestProcessor = new GenericProcessor(params);
+            if (GenericInboundListener.isListeningInboundEndpoint(params)) {
+                inboundRequestProcessor = GenericInboundListener.getInstance(params);
+            } else {
+                inboundRequestProcessor = new GenericProcessor(params);
+            }
         } else {
             throw new SynapseException("Protocol or Class should be specified for Inbound Endpoint " + params.getName());
         }

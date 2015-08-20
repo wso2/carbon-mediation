@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.inbound.endpoint.protocol.cxf.wsrm.utils;
+package org.wso2.carbon.endpoint.ext.wsrm.utils;
 
 /**
  * Holds the constants used by the CXF RM Inbound endpoint
@@ -37,4 +37,6 @@ public class RMConstants {
     public static final String SOCKET_LAYER_PROTOCOL = "socket.layer.protocol";
 
     public final static int THREAD_POOL_SIZE = 100;
+
+    public static final String CXF_INBOUND_PROTOCOL_NAME = "generic-cxf-rm";
 }
