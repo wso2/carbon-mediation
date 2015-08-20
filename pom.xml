@@ -2155,13 +2155,16 @@
             <artifactId>cxf-bundle</artifactId>
             <version>${cxf.wso2.version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
             <artifactId>jetty-bundle</artifactId>
             <version>${jetty.wso2.version}</version>
         </dependency>
+	        <dependency>
+	            <groupId>libthrift.wso2</groupId>
+	            <artifactId>libthrift</artifactId>
+	            <version>${libthrift.version}</version>
+	        </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2330,6 +2333,7 @@
         <xercesImpl.version>2.8.1.wso2v2</xercesImpl.version>
 	<cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
         <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
+        <libthrift.version>0.8.0.wso2v1</libthrift.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
