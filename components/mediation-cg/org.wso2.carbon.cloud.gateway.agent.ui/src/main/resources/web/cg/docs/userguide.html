@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--
+ ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ ~
+ ~ WSO2 Inc. licenses this file to you under the Apache License,
+ ~ Version 2.0 (the "License"); you may not use this file except
+ ~ in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~    http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing,
+ ~ software distributed under the License is distributed on an
+ ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ ~ KIND, either express or implied.  See the License for the
+ ~ specific language governing permissions and limitations
+ ~ under the License.
+ -->
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+  <title>Cloud GateWay - User Guide</title>
+  <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all" />
+</head>
+<body>
+    <h1>Cloud GateWay - User Guide</h1>
+    <h2 id="intro">Introduction</h2>
+    <p>
+        This is the user guide for <a href="http://wso2.com/cloud/connectors/services-gateway/">
+        Cloud GateWay</a>. If you read this document that means you have successfully
+        installed the CG Agent component.
+
+        Cloud GateWay(CG) is consist of two parts.
+    </p>
+    <ol>
+        <li>CG Agent - This feature let you to add/edit CG servers and publish/unpublished services
+         to a remote CG server. This feature should be installed in the service hosting product
+            (WSO2 Application server for example). </li>
+        <li>CG Server - This is the server component which holds the public service for published
+        services. This comes either as a stand alone product of as a service for cloud deployments.</li>
+    </ol>
+
+    <h2>Table of Content</h2>
+    <ul>
+        <li>
+            <a href="#intro">Introduction</a>
+        </li>
+        <li>
+            <a href="#what-does">What does Cloud Gateway(CG) do?</a>
+        </li>
+        <li>
+            <a href="#deployment">Deployment of CG</a>
+        </li>
+        <li>
+            <a href="#use-case">Use case of CG</a>
+        </li>
+        <li>
+            <a href="#default-user">Default CG user</a>
+        </li>
+        <li>
+            <a href="#add-server">Adding a new CG server</a>
+        </li>
+        <li>
+            <a href="#publish">Publishing options</a>
+        </li>
+        <li>
+            <a href="#roles">Users and publishing roles</a>
+        </li>
+        <li>
+            <a href="#firewall">Configuring firewall rule for CG server</a>
+        </li>
+    </ul>
+
+    <h2 id="what-does">What does Cloud Gateway(CG) do?</h2>
+    <p>Most of the corporate networks in today's world are secured with corporate firewalls. There
+         are services deployed in the private network that can only access within the organization. If you
+        want to access one of these services from your home, you'll not be able to do that because of the
+        firewall. In such time CG can come to rescue you.
+    </p>
+    <p>
+       When a private service is published a public proxy will be deployed on CG server which acts as the front end
+        for the private service. This minimal proxy has a very specific feature. The proxy will have an
+        endpoint on a server(which is based on Apache Thrift) which holds the incoming messages. In turns the private
+        service (when published) starts to poll the endpoint on the  Thrift server. This queue
+        is used the as the communication medium for the front end proxy and the back end private
+        service. The server that holds message on behalf of the private service is bundle into the CG server.
+    </p>
+    <p>
+        The technique that we have used to publish a private to public is very simple. When you are within the
+        firewall you can access the outside but not from outside to inside. When you publish a private service
+        that service will act as the client and will always make the connection to internet from inside the corporate
+        firewall. Since the firewall allows connection from inside to outside we'll not face any problem publishing
+        services and using them outside. Once published, a proxy service will be deployed on ESB which you can use as the
+        public service. At runtime messages will flow in the same path.</p>
+
+    <p> The deploying proxy will have the same name as the private service.</p>
+
+    <h2 id="deployment">Deployment of CG</h2>
+    <p>When deploying CG the private services which will be hosted on one of the service hosting products
+    (such as AS, BPS, BRS, MS etc..) and will be deployed behind the corporate firewall. The CG server
+    will be deployed in a place where publicly accessible.</p>
+
+    <p><img alt="" src="images/csg-deployment.png" height="769" width="876"/></p>
+    <p>Figure 1: The deployment diagram for CG deployment.</p>
+
+    <h2 id="use-case">Use case of CG</h2>
+    <p>CG can be used to expose a private service to public through a corporate firewall.</p>
+    
+    <h2 id="default-user">Default CG user</h2>
+    <p>CG server has a default user, 'cguser' (without quotes) which can be used to publish a
+    service. 'cguser'(with password wso2@123, see CG server documentation to see how to 
+    change the password) can be used instead of the admin user with all permissions.</p>
+
+    <h2 id="add-server">Adding a new CG server</h2>
+    <p>To add a new CG server just login into one of the service hosing servers( from this point onwards WSO2 Application Server-AS, will
+        be used) you can add a new CG server
+    by using the <span style="font-weight: bold;">CG Agent</span> link from the left menu of the console under Configure section.
+    This will forward you to the UI to add new CG server or publish a service wizard.</p>
+    <p><img alt="" src="images/add-server-pub-service.png" height="220" width="815"/></p>
+    <p>Figure 2: Add server or publish a service</p>
+
+    <p>Select the Add/Edit CG server option to add a new CG server. This will display the new CG server add wizard.</p>
+    <p><img alt="" src="images/add-server.png" height="290" width="1067"/></p>
+    <p>Figure 3: Add/Edit server</p>
+
+    <p>Each of the field has the following meaning. Note that all these fields are mandatory except Domain Name field.</p>
+    <ol>
+        <li><span style="font-weight: bold;">CG Server Name</span> - A logical name for the server so that later you can select the server to
+            publish the service.</li>
+        <li><span style="font-weight: bold;">CG Server URL</span> - The remote CG server URL. </li>
+        <li><span style="font-weight: bold;">User Name</span> - The user name of the remote CG server user. If the domain name is not given the user name will be only the provided username, otherwise
+        it'll be 'user-name@domain-name'(for cloud deployments). By default a user called 'cguser' is used.</li>
+        <li><span style="font-weight: bold;">Password</span> - The password of the remote CG server user, ex - password of test@test.org.</li>
+    </ol>
+
+    <p>Once this server is added it'll list under the CG server listing page. This wizard can be
+    use to edit the already added servers or to remove any servers.</p>
+    <p><img src="images/server-list.png"  height="171" width="942"/></p>
+    <p>Figure 4: List of added servers</p>
+
+<h2 id="publish">Publishing options</h2>
+<p>Once a server is added you can publish the already deployed services to those servers. Go to
+home page of CG Agent and follow the link "Publish/Unpublish service". This will bring you to the
+service publishing wizard.</p>
+<p><img src="images/publish-service-1.png"  height="300" width="1054"/></p>
+    <p>Figure 5: Publish service</p>
+<p>Select the service that you want to publish and click on Publish link. This will you to the service publishing option wizard.</p>
+    
+<p><img src="images/publish-service-2.png" height="214" width="906"/></p>
+<p>Figure 6: Select publishing options.</p>
+    
+<p>From the wizard you can select the mode and the server that you want to publish this
+service. The drop down menu will list added CG serves set. When selecting the mode either you can use automatic or manual.
+A public proxy service that was added using the automatic method will respond to its private service changes (service deleted)
+and manual mode will not aware of any changes in private service changes. The default mode is automatic.</p>
+
+<p>Once the service is published it's additional actions will be listed. An already published service can either
+    Unpublish, Restart, Switch-To-Automatic(if manual mode was selected) or Switch-To-Manual(if automatic mode was
+    selected). Also note that the Restart option is only available in manual mode because in automatic mode that is
+    handle automatically.
+</p>
+<p>Once the private service is published, a use can view or try the CG service WSDL or using the try it tool.</p>
+
+    <p><img src="images/publish-service-3.png" height="314" width="1515"/></p>
+    <p>Figure 6: Other publishing options.</p>
+
+<p>An unpublished service can be published again if required.</p>
+    
+<h2 id="roles">Users and publishing roles</h2>
+<p>Any users can be assigned one of the two roles 'cg_publisher' and 'cg_unpublisher' roles to perform the
+    mentioned actions. To add and/or edit a remote CG server users need to have admin role.</p>
+ <p><img src="images/roles.png" height="266" width="1054"/></p>
+ <p>Figure 7: CG specific roles for users.</p>
+
+<h2 id="firewall">Configuring firewall rule for CG server</h2>
+<p>
+    Upon publishing a service it'll start to poll the remote CG server's message store infrastructure queue
+    for any request messages. As you may aware CG server uses Apache Thrift based server implementation for
+    storing any request messages. Since CG Agent side requires to access this Thrift based server the firewall
+    has to enable for this server port(by default which runs on port 15001).
+</p>
+</body>
+</html>

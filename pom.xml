@@ -42,6 +42,7 @@
                 <module>service-stubs/mediation-admin</module>
                 <module>service-stubs/mediation-monitor</module>
                 <module>service-stubs/application-mgt</module>
+                <module>service-stubs/mediation-cg</module>
                 <module>components/mediation-registry</module>
                 <module>components/mediation-initializer</module>
                 <module>components/mediation-monitor</module>
@@ -58,6 +59,7 @@
                 <module>components/application-deployers</module>
                 <module>components/application-mgt</module>
                 <module>components/mediation-throttle</module>
+                <module>components/mediation-cg</module>
 		<module>features/event-sink</module>
                 <module>features/scheduled-tasks</module>
                 <module>features/business-adaptors</module>
@@ -74,6 +76,7 @@
                 <module>features/application-deployers</module>
                 <module>features/application-mgt</module>
                 <module>features/mediation-throttle-features</module>
+                <module>features/mediation-cg-features</module>
                 <module>components/mediation-message-processor</module>
             </modules>
         </profile>
@@ -510,6 +513,11 @@
                 <artifactId>org.wso2.carbon.server.admin</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.core.services</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
 
             <!--5 Carbon-Registry -->
             <dependency>
@@ -572,6 +580,11 @@
             </dependency>
 
             <!--7  Carbon-Identity -->
+            <dependency>
+                <groupId>org.wso2.carbon.identity</groupId>
+                <artifactId>org.wso2.carbon.user.mgt</artifactId>
+                <version>${carbon.identity.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity</groupId>
                 <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
@@ -648,6 +661,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.deployment</groupId>
+                <artifactId>org.wso2.carbon.service.mgt.ui</artifactId>
+                <version>${carbon.deployment.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.deployment</groupId>
                 <artifactId>org.wso2.carbon.jaxws.webapp.mgt</artifactId>
                 <version>${carbon.deployment.version}</version>
             </dependency>
@@ -712,6 +730,16 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.statistics.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.stub</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
@@ -860,7 +888,32 @@
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.inbound.endpoint.osgi</artifactId>
                 <version>${carbon.mediation.version}</version>
-            </dependency>           
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.common</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.proxyadmin.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>  
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>       
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>                 
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.application.deployer.synapse</artifactId>
@@ -1463,6 +1516,30 @@
             </dependency>
 
             <!--10.3 Features -->
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.proxyadmin.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.application.mgt.synapse.server.feature</artifactId>
