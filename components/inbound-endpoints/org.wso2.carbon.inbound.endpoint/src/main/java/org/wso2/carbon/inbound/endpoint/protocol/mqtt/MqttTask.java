@@ -21,6 +21,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.common.OneTimeTriggerInboundTask;
 
+/**
+ * MQTT task for support coordination. Run on top of NTaskManager instance.
+ */
 public class MqttTask extends OneTimeTriggerInboundTask {
 
     private static final Log logger = LogFactory.getLog(MqttTask.class.getName());

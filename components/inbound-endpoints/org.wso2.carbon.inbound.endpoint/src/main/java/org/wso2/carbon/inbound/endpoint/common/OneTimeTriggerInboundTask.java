@@ -19,13 +19,13 @@ package org.wso2.carbon.inbound.endpoint.common;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.mqtt.MqttAsyncCallback;
 
 /**
  * This class provides Generic Task implementation for one time trigger Inbound Endpoint Tasks
  */
 public abstract class OneTimeTriggerInboundTask implements
         org.apache.synapse.task.Task, ManagedLifecycle {
+
     private static final Log logger = LogFactory.getLog(InboundTask.class.getName());
     private boolean isOneTimeTriggered = false;
     private OneTimeTriggerAbstractCallback callback;
@@ -34,7 +34,7 @@ public abstract class OneTimeTriggerInboundTask implements
         //this check is there to synchronize task cycle round hit and connection lost reconnection
         //introduced due to task switches between multiple worker nodes, if connection lost happens
         //reconnection only happens if task is scheduled for that node at that given time
-        if (callback.isCallbackSuspended()) {
+        if (callback != null && callback.isCallbackSuspended()) {
             callback.releaseCallbackSuspension();
         }
 
@@ -51,6 +51,10 @@ public abstract class OneTimeTriggerInboundTask implements
 
     public void setCallback(OneTimeTriggerAbstractCallback callback) {
         this.callback = callback;
+    }
+
+    public OneTimeTriggerAbstractCallback getCallback() {
+        return callback;
     }
 
     protected abstract void taskExecute();

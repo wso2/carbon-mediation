@@ -79,6 +79,8 @@ public class SequenceAdminClient implements EditorUIClient {
                 seqInfo.setName(info.getName());
                 seqInfo.setDescription(info.getDescription());
                 sequences.add(seqInfo);
+                seqInfo.setArtifactContainerName(info.getArtifactContainerName());
+                seqInfo.setIsEdited(info.getIsEdited());
             }
         } catch (Exception e) {
             handleException("Couldn't retrieve the information of the sequences", e);

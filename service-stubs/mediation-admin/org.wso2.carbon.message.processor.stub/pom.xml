@@ -20,12 +20,12 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-admin-stub</artifactId>
-      <version>4.4.3-SNAPSHOT</version>
+      <version>4.4.4-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>org.wso2.carbon.message.processor.stub</artifactId>
    <packaging>bundle</packaging>
-   <version>4.4.3-SNAPSHOT</version>
+   <version>4.4.4-SNAPSHOT</version>
    <name>WSO2 Carbon - Message Processor Stub</name>
    <url>http://wso2.org</url>
    <build>
@@ -39,9 +39,13 @@
                   <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                   <Bundle-Name>${project.artifactId}</Bundle-Name>
                   <Private-Package />
-                  <Export-Package>org.wso2.carbon.message.processor.stub.*;
-			    version="${carbon.mediation.exp.pkg.version}"</Export-Package>
-                  <Import-Package>!org.wso2.carbon.message.processor.stub.*</Import-Package>
+                   <Export-Package>
+                       org.wso2.carbon.message.processor.service.xsd.*; version="${carbon.mediation.exp.pkg.version}",
+                       org.wso2.carbon.message.processor.stub.*; version="${carbon.mediation.exp.pkg.version}"
+                   </Export-Package>
+                   <Import-Package>
+                       !org.wso2.carbon.message.processor.stub.*
+                   </Import-Package>
                   <DynamicImport-Package>*</DynamicImport-Package>
                </instructions>
             </configuration>

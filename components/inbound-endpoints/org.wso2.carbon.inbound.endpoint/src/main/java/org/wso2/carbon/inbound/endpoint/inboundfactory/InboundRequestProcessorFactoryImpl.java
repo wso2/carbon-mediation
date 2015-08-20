@@ -30,13 +30,14 @@ import org.wso2.carbon.inbound.endpoint.protocol.https.InboundHttpsListener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.kafka.KAFKAProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.mqtt.MqttListener;
+import org.wso2.carbon.inbound.endpoint.protocol.rabbitmq.RabbitMQListener;
 
 /**
  * Class responsible for providing the implementation of the request processor according to the protocol.
  */
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
-    public static enum Protocols {jms, file, http , https, hl7, kafka, mqtt}
+    public static enum Protocols {jms, file, http , https, hl7, kafka, mqtt, rabbitmq}
 
     /**
      * return underlying Request Processor Implementation according to protocol
@@ -59,10 +60,12 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
                 inboundRequestProcessor = new InboundHttpsListener(params);
             } else if (Protocols.hl7.toString().equals(protocol)) {
                 inboundRequestProcessor = new InboundHL7Listener(params);
-            }else if(Protocols.kafka.toString().equals(protocol)){
+            } else if (Protocols.kafka.toString().equals(protocol)) {
                 inboundRequestProcessor = new KAFKAProcessor(params);
             }else if (Protocols.mqtt.toString().equals(protocol)) {
                 inboundRequestProcessor = new MqttListener(params);
+            }else if (Protocols.rabbitmq.toString().equals(protocol)) {
+                inboundRequestProcessor = new RabbitMQListener(params);
             }
         } else if (params.getClassImpl() != null) {
             if (GenericInboundListener.isListeningInboundEndpoint(params)) {

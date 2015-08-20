@@ -16,10 +16,17 @@
 
 package org.wso2.carbon.task;
 
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Startup;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskDescriptionRepository;
+import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
+import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
+import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -115,13 +122,26 @@ public class TaskManager {
      *
      * @param taskDescription TaskDescription instance
      */
-    public void editTaskDescription(TaskDescription taskDescription) {
+    public void editTaskDescription(TaskDescription taskDescription, AxisConfiguration axisConfig) {
         assetInitialized();
         String className =
                 jobMetaDataProviderServiceHandler.getTaskManagementServiceImplementer(
                         taskDescription.getTaskGroup());
+        SynapseConfiguration synapseConfig = (SynapseConfiguration)axisConfig
+                .getParameterValue(SynapseConstants.SYNAPSE_CONFIG);
+        Startup startup = synapseConfig.getStartup(taskDescription.getName());
+        String artifactContainerName = startup.getArtifactContainerName();
+        String startupName = taskDescription.getName();
+
         if (className != null && !"".equals(className)) {
             taskManagementServiceHandler.editTaskDescription(taskDescription, className);
+            if (artifactContainerName != null) {
+                MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(axisConfig);
+                pm.deleteItem(taskDescription.getName(), taskDescription.getName() + ".xml",
+                        ServiceBusConstants.ITEM_TYPE_TASK);
+                synapseConfig.getStartup(startupName).setIsEdited(true);
+                synapseConfig.getStartup(startupName).setArtifactContainerName(artifactContainerName);
+            }
         }
     }
 
@@ -147,6 +167,38 @@ public class TaskManager {
             log.debug("All available Task based Startup " + taskDescriptions);
         }
         return taskDescriptions;
+    }
+
+    public TaskData[] getAllTaskData(AxisConfiguration axisConfig) {
+        assetInitialized();
+        List<TaskData> taskDatas = new ArrayList<TaskData>();
+        if (repository == null) {
+            return null;
+        }
+        Iterator<TaskDescription> iterator = repository.getAllTaskDescriptions();
+        while (iterator.hasNext()) {
+            TaskDescription taskDescription = iterator.next();
+            if (taskDescription != null) {
+                TaskData data = new TaskData();
+                data.setName(taskDescription.getName());
+                data.setGroup(taskDescription.getTaskGroup());
+                SynapseConfiguration synapseConfig = (SynapseConfiguration)axisConfig
+                        .getParameterValue(SynapseConstants.SYNAPSE_CONFIG);
+                Startup startup = synapseConfig.getStartup(taskDescription.getName());
+
+                if (startup.getArtifactContainerName() != null) {
+                    data.setArtifactContainerName(startup.getArtifactContainerName());
+                }
+                if (startup.isEdited()) {
+                    data.setIsEdited(true);
+                }
+                taskDatas.add(data);
+            }
+        }
+        if (log.isDebugEnabled()) {
+            log.debug("All available Task based Startup " + taskDatas);
+        }
+        return taskDatas.toArray(new TaskData[taskDatas.size()]);
     }
 
     /**

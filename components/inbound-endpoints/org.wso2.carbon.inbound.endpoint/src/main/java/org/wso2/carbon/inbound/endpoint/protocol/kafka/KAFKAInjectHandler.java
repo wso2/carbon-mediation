@@ -28,7 +28,9 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
@@ -47,11 +49,11 @@ public class KAFKAInjectHandler implements InjectHandler {
     private SynapseEnvironment synapseEnvironment;
     private String contentType;
 
-    public KAFKAInjectHandler(String injectingSeq, String onErrorSeq,boolean sequential,
+    public KAFKAInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
                               SynapseEnvironment synapseEnvironment, String contentType) {
         this.injectingSeq = injectingSeq;
         this.onErrorSeq = onErrorSeq;
-        this.sequential=sequential;
+        this.sequential = sequential;
         this.synapseEnvironment = synapseEnvironment;
         this.contentType = contentType;
     }
@@ -60,10 +62,13 @@ public class KAFKAInjectHandler implements InjectHandler {
      * Determine the message builder to use, set the message payload to the message context and
      * inject the message to the sequence
      */
-    public boolean invoke(Object object) {
+    public boolean invoke(Object object, String name) {
         byte[] msg = (byte[]) object;
 
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
+        msgCtx.setProperty("inbound.endpoint.name", name);
+        InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
+        CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
         log.debug("Processed Kafka Message ");
         MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
                 .getAxis2MessageContext();
@@ -80,7 +85,7 @@ public class KAFKAInjectHandler implements InjectHandler {
                 builder = BuilderUtil.getBuilderFromSelector(type, axis2MsgCtx);
             } catch (AxisFault axisFault) {
                 log.error("Error while creating message builder :: "
-                        + axisFault.getMessage(),axisFault);
+                        + axisFault.getMessage(), axisFault);
 
             }
             if (builder == null) {
@@ -99,7 +104,7 @@ public class KAFKAInjectHandler implements InjectHandler {
                     axis2MsgCtx);
         } catch (AxisFault axisFault) {
             log.error("Error while processing message :: "
-                    + axisFault.getMessage(),axisFault);
+                    + axisFault.getMessage(), axisFault);
         }
 
         try {
@@ -107,7 +112,7 @@ public class KAFKAInjectHandler implements InjectHandler {
                     .createSOAPEnvelope(documentElement));
         } catch (AxisFault axisFault) {
             log.error("Error while setting message payload to the message context :: "
-                    + axisFault.getMessage(),axisFault);
+                    + axisFault.getMessage(), axisFault);
         }
         // Inject the message to the sequence.
 
@@ -122,7 +127,7 @@ public class KAFKAInjectHandler implements InjectHandler {
             if (log.isDebugEnabled()) {
                 log.debug("injecting message to sequence : " + injectingSeq);
             }
-            synapseEnvironment.injectInbound(msgCtx, seq,sequential);
+            synapseEnvironment.injectInbound(msgCtx, seq, sequential);
         } else {
             log.error("Sequence: " + injectingSeq + " not found");
         }

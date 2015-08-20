@@ -42,6 +42,12 @@ public class MessageStoreData {
 
     private Map<String, String> params = new HashMap<String, String>();
 
+    private String artifactContainerName;
+
+    private boolean isEdited;
+
+    public MessageStoreData(){}
+
     public MessageStoreData(String xml) throws XMLStreamException {
         populate(xml);
     }
@@ -116,4 +122,35 @@ public class MessageStoreData {
         return storeString.toString();
     }
 
+    /**
+     * Get the name of the artifact container from which the proxy deployed
+     * @return artifactContainerName
+     */
+    public String getArtifactContainerName() {
+        return artifactContainerName;
+    }
+
+    /**
+     * Set the name of the artifact container
+     * @param artifactContainerName
+     */
+    public void setArtifactContainerName(String artifactContainerName) {
+        this.artifactContainerName = artifactContainerName;
+    }
+
+    /**
+     * Whether the proxy is edited through the management console
+     * @return isEdited
+     */
+    public boolean getIsEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set whether the proxy is deployed via the management console
+     * @param isEdited
+     */
+    public void setIsEdited(boolean isEdited) {
+        this.isEdited = isEdited;
+    }
 }

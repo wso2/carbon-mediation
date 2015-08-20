@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class KAFKAPollingConsumer {
-    private static final Log logger = LogFactory
+    private static final Log log = LogFactory
             .getLog(KAFKAPollingConsumer.class.getName());
 
     private InjectHandler injectHandler;
@@ -38,14 +38,16 @@ public class KAFKAPollingConsumer {
     protected AbstractKafkaMessageListener messageListener;
     private long scanInterval;
     private Long lastRanTime;
+    private String name;
 
     /**
      * Initialize the kafka properties and the polling interval
      */
-    public KAFKAPollingConsumer(Properties kafkaProperties, long interval) throws Exception {
+    public KAFKAPollingConsumer(Properties kafkaProperties, long interval, String name) throws Exception {
 
         this.kafkaProperties = kafkaProperties;
         this.scanInterval = interval;
+        this.name = name;
         try {
             if (kafkaProperties.getProperty(KAFKAConstants.THREAD_COUNT) == null
                     || kafkaProperties.getProperty(KAFKAConstants.THREAD_COUNT)
@@ -58,7 +60,7 @@ public class KAFKAPollingConsumer {
                         .getProperty(KAFKAConstants.THREAD_COUNT));
             }
         } catch (NumberFormatException nfe) {
-            logger.error("Invalid numeric value for thread count."+nfe.getMessage(),nfe);
+            log.error("Invalid numeric value for thread count." + nfe.getMessage(), nfe);
             throw new SynapseException("Invalid numeric value for thread count.", nfe);
         }
         if (kafkaProperties.getProperty(KAFKAConstants.TOPICS) != null) {
@@ -72,7 +74,7 @@ public class KAFKAPollingConsumer {
      */
     public void startsMessageListener() throws Exception {
 
-        logger.debug("Create the Kafka message listener");
+        log.debug("Create the Kafka message listener");
         if (messageListener == null) {
             //Start a high level listener
             try {
@@ -97,7 +99,7 @@ public class KAFKAPollingConsumer {
                             kafkaProperties, injectHandler);
                 }
             } catch (Exception e) {
-                logger.error("The consumer type should be high level or simple."+ e.getMessage(),e);
+                log.error("The consumer type should be high level or simple." + e.getMessage(), e);
                 throw new SynapseException("The consumer type should be high level or simple", e);
             }
         }
@@ -105,21 +107,21 @@ public class KAFKAPollingConsumer {
 
     public void execute() {
         try {
-            logger.debug("Executing : KAFKA Inbound EP : ");
+            log.debug("Executing : KAFKA Inbound EP : ");
             // Check if the cycles are running in correct interval and start
             // scan
             long currentTime = (new Date()).getTime();
             if (lastRanTime == null || ((lastRanTime + (scanInterval)) <= currentTime)) {
                 lastRanTime = currentTime;
                 poll();
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("Skip cycle since concurrent rate is higher than the scan interval : KAFKA Inbound EP ");
+            } else if (log.isDebugEnabled()) {
+                log.debug("Skip cycle since concurrent rate is higher than the scan interval : KAFKA Inbound EP ");
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("End : KAFKA Inbound EP : ");
+            if (log.isDebugEnabled()) {
+                log.debug("End : KAFKA Inbound EP : ");
             }
         } catch (Exception e) {
-            logger.error("Error while retrieving or injecting KAFKA message." + e.getMessage(), e);
+            log.error("Error while retrieving or injecting KAFKA message." + e.getMessage(), e);
         }
     }
 
@@ -137,27 +139,27 @@ public class KAFKAPollingConsumer {
      */
     public Object poll() {
 
-        logger.debug("Run to poll messages and inject to the sequence");
+        log.debug("Run to poll messages and inject to the sequence");
         //Create the connection to the zookeeper and start to consume the message steams
         try {
             if (!messageListener.createKafkaConsumerConnector()) {
                 return null;
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
         //Inject the messages to the sequence
         try {
             if (injectHandler != null && messageListener.hasNext()) {
-                messageListener.injectMessageToESB();
+                messageListener.injectMessageToESB(name);
             } else {
                 return null;
             }
 
         } catch (Exception e) {
-            logger.error("Error while receiving KAFKA message."
-                    + e.getMessage(),e);
+            log.error("Error while receiving KAFKA message."
+                    + e.getMessage(), e);
         }
         return null;
     }

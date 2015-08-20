@@ -126,11 +126,17 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     		
             synapseConfiguration.updateAPI(apiName, api);
             api.init(getSynapseEnvironment());
-    		
-    		MediationPersistenceManager pm = getMediationPersistenceManager();
-            String fileName = api.getFileName();
-            pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
-            pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+
+            if (oldAPI.getArtifactContainerName() != null) {
+                api.setIsEdited(true);
+                api.setArtifactContainerName(oldAPI.getArtifactContainerName());
+                apiData.setIsEdited(true);
+            } else {
+                MediationPersistenceManager pm = getMediationPersistenceManager();
+                String fileName = api.getFileName();
+                pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+            }
     		
     		return true;
         } finally {
@@ -167,11 +173,17 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     		synapseConfiguration.removeAPI(apiName);
             synapseConfiguration.addAPI(api.getName(),api);
             api.init(getSynapseEnvironment());
-    		
-    		MediationPersistenceManager pm = getMediationPersistenceManager();
-            String fileName = api.getFileName();
-            pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
-            pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+
+            if (oldAPI.getArtifactContainerName() != null) {
+                api.setArtifactContainerName(oldAPI.getArtifactContainerName());
+                api.setIsEdited(true);
+                getApiByName(apiName).setIsEdited(true);
+            } else {
+                MediationPersistenceManager pm = getMediationPersistenceManager();
+                String fileName = api.getFileName();
+                pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+            }
     		
     		return true;
         } catch (XMLStreamException e) {
@@ -213,21 +225,24 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             lock.lock();
             assertNameNotEmpty(apiName);
             apiName = apiName.trim();
-            if (log.isDebugEnabled()) {
-                log.debug("Deleting API : " + apiName + " from the configuration");
-            }
 
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             API api = synapseConfiguration.getAPI(apiName);
-            api.destroy();
-            synapseConfiguration.removeAPI(apiName);
 
-            MediationPersistenceManager pm = getMediationPersistenceManager();
-            String fileName = api.getFileName();
-            pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+            if (api.getArtifactContainerName() == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Deleting API : " + apiName + " from the configuration");
+                }
+                api.destroy();
+                synapseConfiguration.removeAPI(apiName);
 
-            if (log.isDebugEnabled()) {
-                log.debug("Api : " + apiName + " removed from the configuration");
+                MediationPersistenceManager pm = getMediationPersistenceManager();
+                String fileName = api.getFileName();
+                pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Api : " + apiName + " removed from the configuration");
+                }
             }
         } finally {
             lock.unlock();
@@ -248,21 +263,24 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             for (String apiName :apiNames ) {
                 assertNameNotEmpty(apiName);
                 apiName = apiName.trim();
-                if (log.isDebugEnabled()) {
-                    log.debug("Deleting API : " + apiName + " from the configuration");
-                }
-
                 SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
                 API api = synapseConfiguration.getAPI(apiName);
-                api.destroy();
-                synapseConfiguration.removeAPI(apiName);
 
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                String fileName = api.getFileName();
-                pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                if (api.getArtifactContainerName() == null) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Deleting API : " + apiName + " from the configuration");
+                    }
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Api : " + apiName + " removed from the configuration");
+                    api.destroy();
+                    synapseConfiguration.removeAPI(apiName);
+
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    String fileName = api.getFileName();
+                    pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Api : " + apiName + " removed from the configuration");
+                    }
                 }
             }
         } finally {
@@ -321,6 +339,13 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     APIData apiData = new APIData();
                     apiData.setName(api.getName());
                     apiData.setContext(api.getContext());
+
+                    if (api.getArtifactContainerName() != null) {
+                        apiData.setArtifactContainerName(api.getArtifactContainerName());
+                    }
+                    if (api.isEdited()) {
+                        apiData.setIsEdited(true);
+                    }
 
                     apiDataList.add(apiData);
                 }

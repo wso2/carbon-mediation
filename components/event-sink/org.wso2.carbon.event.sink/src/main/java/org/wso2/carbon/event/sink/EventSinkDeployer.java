@@ -106,6 +106,7 @@ public class EventSinkDeployer extends AbstractDeployer {
 	@Override
 	public void undeploy(String fileName) throws DeploymentException {
 		String eventSinkName = FilenameUtils.getBaseName(fileName);
+		EventSink.stopDataPublisher(EventSinkStore.getInstance().getEventSink(eventSinkName));
 		EventSinkStore.getInstance().removeEventSink(eventSinkName);
 		log.info("Event sink named '" + eventSinkName + "' has been undeployed");
 	}

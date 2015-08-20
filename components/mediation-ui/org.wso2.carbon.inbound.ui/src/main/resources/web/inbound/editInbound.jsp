@@ -66,6 +66,7 @@ var requiredParams = null;
             List<String>advParams = client.getAdvParameters(inboundDescription.getType()); 
             Set<String>defaultParamNames = new HashSet<String>();
             String specialParams = client.getKAFKASpecialParameters();
+            String topicListParams = client.getKAFKATopicListParameters();
             String firstSpecialParam = "";
     %>       
     
@@ -220,7 +221,7 @@ var requiredParams = null;
 	                            <%if(InboundClientConstants.TYPE_KAFKA.equals(inboundDescription.getType())){
                                     firstSpecialParam = arrParamOri[1].trim();
                                 %>
-                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>" onchange="javascript:showSpecialFields('<%=specialParams%>','<%=inboundDescription.getParameters()%>');">
+                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>" onchange="javascript:showSpecialFields('<%=specialParams%>','<%=inboundDescription.getParameters()%>','<%=topicListParams%>');">
                                 <%} else{%>
                                     <select id="<%=defaultParam%>" name="<%=defaultParam%>">
                                 <%}%>
@@ -250,15 +251,62 @@ var requiredParams = null;
 	                    </tr>                        
                      <% } %>
                     <% if(InboundClientConstants.TYPE_KAFKA.equals(inboundDescription.getType())){%>
-                        <tr>
-                            <td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">
+                        <tr><td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">
                             <%
                                 String[] allSpecialParams = specialParams.split(",");
                                 for(int s = 0;s<allSpecialParams.length;s++){
+                                    String topicsOrTopicFilterEle = "";
                                     String eleVal = "";
-                                    if(firstSpecialParam.equals("highlevel") && allSpecialParams[s].equals("topics")){
-                                        eleVal = inboundDescription.getParameters().get(allSpecialParams[s]);%>
-                                        <tr><td style="width:167px"><%=allSpecialParams[s]%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value="<%=eleVal%>"/></td><td></td></tr>
+                                    String[] fLists = topicListParams.split(InboundClientConstants.STRING_SPLITTER);
+                                    String listval = fLists[1].trim();
+                                    String specialParam = allSpecialParams[s];
+                                    if(firstSpecialParam.equals("highlevel") && (specialParam.indexOf(InboundClientConstants.STRING_SPLITTER) > -1 && specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim().equals("topics/topic.filter"))) {
+                                        String[] tLists = specialParam.split(InboundClientConstants.STRING_SPLITTER);
+                                        if(inboundDescription.getParameters().get(tLists[1].trim())==null && inboundDescription.getParameters().get(tLists[2].trim())==null){
+                                            eleVal = "";
+                                            topicsOrTopicFilterEle = tLists[1].trim();
+                                        } else{
+                                            eleVal = ((inboundDescription.getParameters().get(tLists[1].trim())==null)?inboundDescription.getParameters().get(tLists[2].trim()):inboundDescription.getParameters().get(tLists[1].trim()));
+                                            topicsOrTopicFilterEle = ((inboundDescription.getParameters().get(tLists[1].trim())==null)?tLists[2].trim():tLists[1].trim());
+                                        }
+                                        String inboundDescriptionOfParams = inboundDescription.getParameters().toString();
+                                        %>
+                                        <tr><td style="width:167px"><%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%><span class="required">*</span></td><td align="left"><select id="topicsOrTopicFilter" name="topicsOrTopicFilter" onchange="javascript:showTopicsOrTopicFilterFields('<%=inboundDescriptionOfParams%>','<%=topicListParams%>')">
+                                        <%
+                                        for(int t = 1; t < tLists.length; t++){
+                                            if(topicsOrTopicFilterEle.equals(tLists[t])){%>
+                                                <option value="<%=tLists[t].trim()%>" selected><%=tLists[t].trim()%></option>
+                                            <%} else{%>
+                                                <option value="<%=tLists[t].trim()%>"><%=tLists[t].trim()%></option>
+                                            <%}
+                                        }%>
+                                        </select></td><td></td></tr>
+                                        <tr><td colspan="3"><div id="tDiv"><table>
+                                        <%
+                                        if(topicsOrTopicFilterEle.equals("topic.filter")){
+                                            String[] splitedInboundDescription = inboundDescriptionOfParams.replace("{","").replace("}","").split(",");
+                                            if(!inboundDescriptionOfParams.equals("")){
+                                                for(int j=0; j<splitedInboundDescription.length; j++){
+                                                    if((splitedInboundDescription[j].split("=")[0].trim().equals("filter.from.whitelist") || splitedInboundDescription[j].split("=")[0].trim().equals("filter.from.blacklist")) && Boolean.parseBoolean(splitedInboundDescription[j].split("=")[1])){
+                                                        listval = splitedInboundDescription[j].split("=")[0].trim();
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        %>
+                                        <tr><td style="width:157px"><%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%><span class="required">*</span></td><td align="left"><select id="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%>" name="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%>" onchange="javascript:showTopicsOrTopicFilterFields('<%=inboundDescription.getParameters()%>','<%=topicListParams%>');">
+                                        <%for(int l = 1; l < fLists.length; l++){
+                                            if(listval.equals(fLists[l])){%>
+                                                 <option value="<%=fLists[l].trim()%>" selected><%=fLists[l].trim()%></option>
+                                            <%} else{%>
+                                                 <option value="<%=fLists[l].trim()%>"><%=fLists[l].trim()%></option>
+                                            <%}
+                                        }%>
+                                        </td><td></td></tr>
+                                        <%
+                                        }
+                                        %>
+                                        <tr><td style="width:155px"><%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[1].trim()%> name<span class="required">*</span></td><td align="left"><input id="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[1].trim()%>" name="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[1].trim()%>" class="longInput" type="text" value="<%=eleVal%>"/></td><td></td></tr></table></div></td></tr>
                                     <%} else{
                                         if(allSpecialParams[s].startsWith(firstSpecialParam+".")){
                                             if(inboundDescription.getParameters().get(allSpecialParams[s]) != null){

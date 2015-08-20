@@ -12,8 +12,10 @@
                    targetNamespace="http://common.templates.mediation.carbon.wso2.org/xsd">
             <xs:complexType name="EndpointTemplateInfo">
                 <xs:sequence>
+                    <xs:element minOccurs="0" name="artifactContainerName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="endpointType" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="isEdited" nillable="true" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="paramColelctionString" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="templateName" nillable="true" type="xs:string"/>
                 </xs:sequence>

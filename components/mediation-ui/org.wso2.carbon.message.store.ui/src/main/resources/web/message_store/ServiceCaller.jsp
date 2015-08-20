@@ -46,7 +46,7 @@
 
     private String getMessageStoreXML() throws Exception {
 
-        String name = req.getParameter("Name").trim();
+        String messageStoreName = req.getParameter("Name").trim();
         String provider = req.getParameter("Provider");
         String addedParams = req.getParameter("addedParams");
         String removedParams = req.getParameter("removedParams");
@@ -73,11 +73,11 @@
 
         if (provider == null || provider.equals("")) {
             messageStoreXml.append("<ns1:messageStore name=\"");
-            messageStoreXml.append(name.trim()).append("\"" + " ").append(" xmlns:ns1=\"")
+            messageStoreXml.append(messageStoreName.trim()).append("\"" + " ").append(" xmlns:ns1=\"")
                     .append(SYNAPSE_NS).append("\">");
         } else {
             messageStoreXml.append("<ns1:messageStore name=\"");
-            messageStoreXml.append(name.trim()).append("\"" + " ").append("class=\"").append(provider).append("\"" + " ").append(" xmlns:ns1=\"")
+            messageStoreXml.append(messageStoreName.trim()).append("\"" + " ").append("class=\"").append(provider).append("\"" + " ").append(" xmlns:ns1=\"")
                     .append(SYNAPSE_NS).append("\">");
         }
 
@@ -125,11 +125,11 @@
     ConfigurationContext configContext =
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-    MessageStoreAdminServiceClient client = new MessageStoreAdminServiceClient(cookie, url, configContext);
+    MessageStoreAdminServiceClient messageStoreClient = new MessageStoreAdminServiceClient(cookie, url, configContext);
     int error = 0;
-    StringBuilder ss = new StringBuilder();
+    StringBuilder messageStore = new StringBuilder();
     try {
-        ss.append(getMessageStoreXML());
+        messageStore.append(getMessageStoreXML());
     } catch (Exception e) {
         error = 1;
 %>
@@ -153,7 +153,7 @@
 
     if (((String) session.getAttribute("edit" + name)) != null) {
         try {
-            client.modifyMessageStore(ss.toString());
+            messageStoreClient.modifyMessageStore(messageStore.toString());
             session.removeAttribute("edit" + name);
         } catch (Exception e) {
             error = 1;
@@ -187,7 +187,7 @@
 <%
     try {
 
-        client.addMessageStore(ss.toString());
+        messageStoreClient.addMessageStore(messageStore.toString());
     } catch (Exception e) {
         error = 1;
         String msg = e.getMessage();

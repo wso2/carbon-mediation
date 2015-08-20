@@ -23,6 +23,8 @@ public class TemplateInfo {
     private boolean enableStatistics;
     private boolean enableTracing;
     private String description;
+    private String artifactContainerName;
+    private boolean isEdited;
 
     public String getName() {
         return name;
@@ -54,6 +56,38 @@ public class TemplateInfo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * Get the artifactContainer of the sequence which deployed from
+     * @return sequence description
+     */
+    public String getArtifactContainerName() {
+        return artifactContainerName;
+    }
+
+    /**
+     * Set the sequence artifact container name as a metadata
+     * @param artifactContainerName endpoint name
+     */
+    public void setArtifactContainerName(String artifactContainerName) {
+        this.artifactContainerName = artifactContainerName;
+    }
+
+    /**
+     * Get the edit state of the sequence
+     * @return sequence description
+     */
+    public boolean getIsEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set the edit state of the sequence as a metadata
+     * @param isEdited sequence name
+     */
+    public void setIsEdited(boolean isEdited) {
+        this.isEdited = isEdited;
     }
 
 }

@@ -109,6 +109,12 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                         }
                     }
 
+                    if (value.getArtifactContainerName() != null) {
+                        data.setArtifactContainerName(value.getArtifactContainerName());
+                    }
+                    if (value.getIsEdited()) {
+                        data.setIsEdited(true);
+                    }
                     globalEntryList.add(data);
                 }
             }
@@ -268,9 +274,16 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                     getSynapseConfiguration().removeEntry(key);
                     getSynapseConfiguration().addEntry(key, entry);
                     entry.setFileName(oldEntry.getFileName());
-                    MediationPersistenceManager pm
-                            = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-                    pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
+
+                    if (oldEntry.getArtifactContainerName() != null) {
+                        entry.setArtifactContainerName(oldEntry.getArtifactContainerName());
+                        entry.setIsEdited(true);
+                    }
+                    else {
+                        MediationPersistenceManager pm
+                                = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+                        pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    }
 
                     if (log.isDebugEnabled()) {
                         log.debug("Added local entry : " + key + " into the configuration");

@@ -30,6 +30,7 @@
     private HttpSession ses = null;
     private static final String gt = ">";
     private static final String lt = "<";
+    private MessageProcessorAdminServiceClient client = null;
 %>
 <script type="text/javascript">
 
@@ -46,12 +47,13 @@
 
         String name = req.getParameter("Name").trim();
         String targetEndpoint = req.getParameter("TargetEndpoint");
+        String targetMessageStore = req.getParameter("targetMessageStore");
         String provider = req.getParameter("Provider");
         String store = req.getParameter("MessageStore");
         String addedParams = req.getParameter("addedParams");
         String removedParams = req.getParameter("removedParams");
         String params = req.getParameter("tableParams");
-
+        params = params + "|message.target.store.name#"+targetMessageStore;
         if("custom.processor".equals(provider)) {
             provider = req.getParameter("custom_provider_class");
         }
@@ -99,6 +101,11 @@
                 String[] pair = part.split("#");
                 String pName = pair[0];
                 String value = pair[1];
+                
+                if (pName.equalsIgnoreCase("axis2.repo") && value.length() > 0){
+                    client.validateAxis2ClientRepo(value);
+                }
+                
                 messageProcessorXml.append("<ns1:parameter name=\"").append(pName.trim()).append("\" >").
                         append(value.trim()).append("</ns1:parameter>");
 
@@ -115,18 +122,43 @@
     String name = request.getParameter("Name");
     req = request;
     ses = session;
+    int error = 0;
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
             session);
     ConfigurationContext configContext =
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-    MessageProcessorAdminServiceClient client = new MessageProcessorAdminServiceClient(cookie, url, configContext);
+    client = new MessageProcessorAdminServiceClient(cookie, url, configContext);
 
     StringBuilder ss = new StringBuilder();
-    ss.append(getMessageStoreXML());
+    try{
+        ss.append(getMessageStoreXML());
+    } catch (Exception e) {
+        error = 1;
+        String msg = e.getMessage();
+        String errMsg = msg.replaceAll("\\'", " ");
+        String pageName = request.getParameter("pageName");
+		
+%>
+<script type="text/javascript">
+    //function backtoForm(){
 
+    jQuery(document).ready(function() {
+        function gotoPage() {
+
+            history.go(-1);
+        }
+        CARBON.showErrorDialog('Invalid value is given to the Axis2 Client Repo', gotoPage);
+    });
+    //}
+
+
+</script>
+<%
+return;
+    }
     
-    int error = 0;
+    
     if ( ((String) session.getAttribute("edit" + name)) != null) {
         try {
             client.modifyMessageProcessor(ss.toString());

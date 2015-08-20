@@ -38,6 +38,7 @@ import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.rest.RESTRequestHandler;
+import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.apache.synapse.transport.passthru.ServerWorker;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
@@ -105,6 +106,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                     return;
                 }
 
+                CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
+
                 if (!isRESTRequest(axis2MsgContext, method)) {
                     if (request.isEntityEnclosing()) {
                         processEntityEnclosingRequest(axis2MsgContext, false);
@@ -170,14 +173,19 @@ public class InboundHttpServerWorker extends ServerWorker {
                                 processNonEntityEnclosingRESTHandler(soapEnvelope,axis2MsgContext,true);
                             }
                         } else {
-                            injectToSequence(synCtx, endpoint);
+                            //this case can only happen regex exists and it DOES match
+                            //BUT there is no api or proxy found message to be injected
+                            //should be routed to the main sequence instead inbound defined sequence
+                            injectToMainSequence(synCtx, endpoint);
                         }
                     }
                 } else if (continueDispatch && dispatchPattern == null) {
                     // else if for clarity compiler will optimize
                     injectToSequence(synCtx, endpoint);
                 } else {
-                    injectToSequence(synCtx, endpoint);
+                    //this case can only happen regex exists and it DOES NOT match
+                    //should be routed to the main sequence instead inbound defined sequence
+                    injectToMainSequence(synCtx, endpoint);
                 }
                 // send ack for client if needed
                 sendAck(axis2MsgContext);
@@ -187,6 +195,24 @@ public class InboundHttpServerWorker extends ServerWorker {
         } else {
             log.error("InboundSourceRequest cannot be null");
         }
+    }
+
+    private void injectToMainSequence(org.apache.synapse.MessageContext synCtx,
+                                      InboundEndpoint endpoint) {
+
+        SequenceMediator injectingSequence = (SequenceMediator) synCtx.getMainSequence();
+
+        SequenceMediator faultSequence = getFaultSequence(synCtx, endpoint);
+
+        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
+        synCtx.pushFaultHandler(mediatorFaultHandler);
+
+        /* handover synapse message context to synapse environment for inject it to given
+        sequence in synchronous manner*/
+        if (log.isDebugEnabled()) {
+            log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
+        }
+        synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
 
     private void injectToSequence(org.apache.synapse.MessageContext synCtx, InboundEndpoint endpoint) {
@@ -211,6 +237,7 @@ public class InboundHttpServerWorker extends ServerWorker {
         if (log.isDebugEnabled()) {
             log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
         }
+        synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
 

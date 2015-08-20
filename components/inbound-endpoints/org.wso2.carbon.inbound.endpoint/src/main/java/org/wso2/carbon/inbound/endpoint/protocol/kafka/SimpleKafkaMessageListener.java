@@ -32,7 +32,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
-    private List<String> m_replicaBrokers;
+    private List<String> replicaBrokers;
     private boolean init;
     private String topic;
     private long maxReads = Long.MAX_VALUE;
@@ -48,7 +48,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                                       InjectHandler injectHandler) throws Exception {
         this.kafkaProperties = kafkaProperties;
         this.injectHandler = injectHandler;
-        m_replicaBrokers = new ArrayList<String>();
+        replicaBrokers = new ArrayList<String>();
         validateInputParameters();
     }
 
@@ -57,45 +57,45 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
      */
     private void validateInputParameters() throws Exception {
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_TOPIC) == null) {
-            logger.error("simple consumer topic is invalid");
+            log.error("simple consumer topic is invalid");
             throw new SynapseException("simple consumer topic is invalid");
         } else {
             this.topic = kafkaProperties
                     .getProperty(KAFKAConstants.SIMPLE_TOPIC);
         }
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_BROKERS) == null) {
-            logger.error("simple consumer brokers is invalid");
+            log.error("simple consumer brokers is invalid");
             throw new SynapseException("simple consumer brokers is invalid");
         } else {
             this.seedBrokers = getSeedBrokers(kafkaProperties
                     .getProperty(KAFKAConstants.SIMPLE_BROKERS));
         }
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_PORT) == null) {
-            logger.error("simple consumer port is invalid");
+            log.error("simple consumer port is invalid");
             throw new SynapseException("simple consumer port is invalid");
         } else {
             try {
                 this.port = Integer.parseInt(kafkaProperties
                         .getProperty(KAFKAConstants.SIMPLE_PORT));
             } catch (NumberFormatException nfe) {
-                logger.error("simple consumer port should be number." + nfe.getMessage(), nfe);
+                log.error("simple consumer port should be number." + nfe.getMessage(), nfe);
                 throw new SynapseException("simple consumer port should be number.", nfe);
             }
         }
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_PARTITION) == null) {
-            logger.error("simple consumer partition is invalid");
+            log.error("simple consumer partition is invalid");
             throw new SynapseException("simple consumer partition is invalid");
         } else {
             try {
                 this.partition = Integer.parseInt(kafkaProperties
                         .getProperty(KAFKAConstants.SIMPLE_PARTITION));
             } catch (NumberFormatException nfe) {
-                logger.error("simple partition should be a number " +nfe.getMessage(),nfe );
+                log.error("simple partition should be a number " + nfe.getMessage(), nfe);
                 throw new SynapseException("simple partition should be a number", nfe);
             }
         }
         if (kafkaProperties.getProperty(KAFKAConstants.SIMPLE_MAX_MSG_TO_READ) == null) {
-            logger.error("simple consumer maximum messages to read is invalid");
+            log.error("simple consumer maximum messages to read is invalid");
             throw new SynapseException(
                     "simple consumer maximum messages to read is invalid");
         } else {
@@ -103,7 +103,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                 this.maxReads = Long.parseLong(kafkaProperties
                         .getProperty(KAFKAConstants.SIMPLE_MAX_MSG_TO_READ));
             } catch (NumberFormatException nfe) {
-                logger.error("maximum messages should be a number " + nfe.getMessage(), nfe);
+                log.error("maximum messages should be a number " + nfe.getMessage(), nfe);
                 throw new SynapseException("maximum messages should be a number", nfe);
             }
         }
@@ -120,7 +120,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
         try {
             return Arrays.asList(brokers.split(","));
         } catch (Exception nfe) {
-            logger.error("Error to split the brokers from broker list" + nfe.getMessage() ,nfe);
+            log.error("Error to split the brokers from broker list" + nfe.getMessage(), nfe);
             throw new SynapseException("Error to split the brokers from broker list", nfe);
         }
     }
@@ -135,9 +135,9 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
     }
 
     @Override
-    public void injectMessageToESB() {
+    public void injectMessageToESB(String name) {
 
-        logger.debug("Fetch the messages until maximum message is zero");
+        log.debug("Fetch the messages until maximum message is zero");
         if (maxReads > 0) {
             if (consumer == null) {
                 consumer = new SimpleConsumer(leadBroker, port,
@@ -153,7 +153,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
 
             if (fetchResponse.hasError()) {
                 short code = fetchResponse.errorCode(topic, partition);
-                logger.error("Error fetching data from the Broker:"
+                log.error("Error fetching data from the Broker:"
                         + leadBroker + " Reason: " + code);
                 if (code == ErrorMapping.OffsetOutOfRangeCode()) {
                     readOffset = getLastOffset(consumer, topic, partition,
@@ -166,7 +166,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                     leadBroker = findNewLeader(leadBroker, topic,
                             partition, port);
                 } catch (Exception e) {
-                    logger.error("Error to find the new leader " + e.getMessage(),e);
+                    log.error("Error to find the new leader " + e.getMessage(), e);
                 }
             }
             try {
@@ -174,7 +174,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                         .messageSet(topic, partition)) {
                     long currentOffset = messageAndOffset.offset();
                     if (currentOffset < readOffset) {
-                        logger.info("Found an old offset: " + currentOffset
+                        log.info("Found an old offset: " + currentOffset
                                 + " Expecting: " + readOffset);
                         continue;
                     }
@@ -184,22 +184,22 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                     byte[] bytes = new byte[payload.limit()];
                     payload.get(bytes);
                     try {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Start : Add to injectHandler to invoke");
+                        if (log.isDebugEnabled()) {
+                            log.debug("Start : Add to injectHandler to invoke");
                         }
-                        injectHandler.invoke(bytes);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("End : Add the injectHandler to invoke");
+                        injectHandler.invoke(bytes, name);
+                        if (log.isDebugEnabled()) {
+                            log.debug("End : Add the injectHandler to invoke");
                         }
 
                     } catch (Exception e) {
-                        logger.error("Error while invoking the bytes " + e.getMessage(),e);
+                        log.error("Error while invoking the bytes " + e.getMessage(), e);
                     }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("0 - added to queue!");
+                    if (log.isDebugEnabled()) {
+                        log.debug("0 - added to queue!");
                     }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Reduce the maximum message by 1");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Reduce the maximum message by 1");
                     }
                     maxReads--;
                     if (maxReads < 1) {
@@ -207,8 +207,8 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Error while fetching the responses" + e.getMessage(),e);
-                logger.debug("Error to fetch the responses");
+                log.error("Error while fetching the responses" + e.getMessage(), e);
+                log.debug("Error to fetch the responses");
             } finally {
                 if (consumer != null)
                     consumer.close();
@@ -266,7 +266,7 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
         OffsetResponse response = consumer.getOffsetsBefore(request);
 
         if (response.hasError()) {
-            logger.error("Error fetching data Offset Data the Broker. Reason: "
+            log.error("Error fetching data Offset Data the Broker. Reason: "
                     + response.errorCode(topic, partition));
             return 0;
         }
@@ -274,17 +274,17 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
         return offsets[0];
     }
 
-    private String findNewLeader(String a_oldLeader, String a_topic,
-                                 int a_partition, int a_port) throws Exception {
+    private String findNewLeader(String oldLeader, String topic,
+                                 int partition, int port) throws Exception {
         for (int i = 0; i < 3; i++) {
             boolean goToSleep = false;
-            PartitionMetadata metadata = findLeader(m_replicaBrokers, a_port,
-                    a_topic, a_partition);
+            PartitionMetadata metadata = findLeader(replicaBrokers, port,
+                    topic, partition);
             if (metadata == null) {
                 goToSleep = true;
             } else if (metadata.leader() == null) {
                 goToSleep = true;
-            } else if (a_oldLeader.equalsIgnoreCase(metadata.leader().host())
+            } else if (oldLeader.equalsIgnoreCase(metadata.leader().host())
                     && i == 0) {
                 goToSleep = true;
             } else {
@@ -302,23 +302,23 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
     }
 
     private PartitionMetadata findLeader(List<String> a_seedBrokers,
-                                         int a_port, String a_topic, int a_partition) throws Exception {
+                                         int port, String topic, int partition) throws Exception {
         PartitionMetadata returnMetaData = null;
         loop:
         for (String seed : a_seedBrokers) {
             SimpleConsumer consumer = null;
             try {
-                consumer = new SimpleConsumer(seed, a_port,
+                consumer = new SimpleConsumer(seed, port,
                         KAFKAConstants.SO_TIMEOUT, KAFKAConstants.BUFFER_SIZE,
                         "leaderLookup");
-                List<String> topics = Collections.singletonList(a_topic);
+                List<String> topics = Collections.singletonList(topic);
                 TopicMetadataRequest req = new TopicMetadataRequest(topics);
                 TopicMetadataResponse resp = consumer.send(req);
 
                 List<TopicMetadata> metaData = resp.topicsMetadata();
                 for (TopicMetadata item : metaData) {
                     for (PartitionMetadata part : item.partitionsMetadata()) {
-                        if (part.partitionId() == a_partition) {
+                        if (part.partitionId() == partition) {
                             returnMetaData = part;
                             break loop;
                         }
@@ -326,17 +326,17 @@ public class SimpleKafkaMessageListener extends AbstractKafkaMessageListener {
                 }
             } catch (Exception e) {
                 throw new SynapseException("Error communicating with Broker [" + seed
-                        + "] to find Leader for [" + a_topic + ", "
-                        + a_partition + "] Reason: ", e);
+                        + "] to find Leader for [" + topic + ", "
+                        + partition + "] Reason: ", e);
             } finally {
                 if (consumer != null)
                     consumer.close();
             }
         }
         if (returnMetaData != null) {
-            m_replicaBrokers.clear();
+            replicaBrokers.clear();
             for (kafka.cluster.Broker replica : returnMetaData.replicas()) {
-                m_replicaBrokers.add(replica.host());
+                replicaBrokers.add(replica.host());
             }
         }
         return returnMetaData;
