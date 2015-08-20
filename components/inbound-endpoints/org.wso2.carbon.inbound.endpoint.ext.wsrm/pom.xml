@@ -20,52 +20,42 @@
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
-            <version>${carbon.kernel.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.utils</artifactId>
-            <version>${carbon.kernel.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>
-            <version>${synapse.version}</version>
         </dependency>
         <dependency>
             <groupId>ca.uhn.hapi.wso2</groupId>
             <artifactId>hapi</artifactId>
-            <version>${ca.uhn.hapi.wso2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.apache.cxf</groupId>
             <artifactId>cxf-bundle</artifactId>
-            <version>${cxf.wso2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
             <artifactId>jetty-bundle</artifactId>
-            <version>${jetty.wso2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound</artifactId>
-            <version>${carbon.mediation.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint.osgi</artifactId>
-            <version>${carbon.mediation.version}</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint.persistence</artifactId>
-            <version>${carbon.mediation.version}</version>
         </dependency>
     </dependencies>
 
