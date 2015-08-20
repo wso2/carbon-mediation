@@ -16,25 +16,25 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-   <parent>
-      <groupId>org.wso2.carbon.mediation</groupId>
-      <artifactId>mediation-admin-stub</artifactId>
-      <version>4.4.4-SNAPSHOT</version>
-   </parent>
+    <parent>
+        <groupId>org.wso2.carbon</groupId>
+        <artifactId>carbon-service-stubs</artifactId>
+        <version>4.2.0</version>
+	<relativePath>../../pom.xml</relativePath>
+    </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.wso2.carbon.mediators.throttle.admin.stub</artifactId>
+	<version>4.2.0</version>
+    <artifactId>org.wso2.carbon.cloud.gateway.agent.stub</artifactId>
     <packaging>bundle</packaging>
-    <version>4.4.4-SNAPSHOT</version>
-    <name>WSO2 Carbon Mediation - Throttle Stub</name>
+    <name>WSO2 Carbon - Cloud Gateway Agent Stub</name>
     <url>http://wso2.org</url>
 
     <build>
         <plugins>
-
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -49,14 +49,13 @@
                         <configuration>
                             <tasks>
                                 <path id="wsdl2java.classpath">
-			 <pathelement location="${settings.localRepository}/org/apache/ws/commons/axiom/wso2/axiom/${axiom.wso2.version}/axiom-${axiom.wso2.version}.jar" />
-                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2-client/${orbit.version.axis2}/axis2-client-${orbit.version.axis2}.jar" />
-                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar" />
+			 <pathelement location="${settings.localRepository}/org/apache/ws/commons/axiom/wso2/axiom/${orbit.version.axiom}/axiom-${orbit.version.axiom}.jar"/>
+                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2-client/${orbit.version.axis2}/axis2-client-${orbit.version.axis2}.jar"/>
+                                    <pathelement location="${settings.localRepository}/org/apache/axis2/wso2/axis2/${orbit.version.axis2}/axis2-${orbit.version.axis2}.jar"/>
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
-                                    <arg line="-uri src/main/resources/ThrottleAdminService.wsdl -u -uw -o target/generated-code
-                                    -p org.wso2.carbon.mediators.throttle.admin.stub
-                                    -ns2p http://service.throttle.mediation.carbon.wso2.org=org.wso2.carbon.mediators.throttle.admin.stub,http://throttle.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediators.throttle.admin.stub.types"/>
+                                    <arg line="-uri src/main/resources/CGAgentAdminService.wsdl -u -uw -o target/generated-code
+                                    -p org.wso2.carbon.cloud.gateway.agent.stub -ns2p http://service.agent.gateway.cloud.carbon.wso2.org=org.wso2.carbon.cloud.gateway.agent.stub,http://org.apache.axis2/xsd=org.wso2.carbon.cloud.gateway.agent.stub.types.axis2,http://org.apache.synapse/xsd=org.wso2.carbon.cloud.gateway.agent.stub.types.synapse,http://common.types.stub.gateway.cloud.carbon.wso2.org/xsd=org.wso2.carbon.cloud.gateway.agent.stub.types.carbon,http://common.gateway.cloud.carbon.wso2.org/xsd=org.wso2.carbon.cloud.gateway.agent.stub.types.carbon"/>
                                     <classpath refid="wsdl2java.classpath"/>
                                 </java>
                             </tasks>
@@ -84,29 +83,29 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+			<plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-
+                
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
+						<Private-Package>
+						</Private-Package>
                         <Export-Package>
-                            org.wso2.carbon.mediators.throttle.admin.stub.*;version="${carbon.mediation.exp.pkg.version}",
+							org.wso2.carbon.cloud.gateway.agent.stub.*;
+                            version="${carbon.platform.package.export.version}"
                         </Export-Package>
                         <Import-Package>
-                            !javax.xml.namespace,
-                            javax.xml.namespace; version=0.0.0,
-                            javax.servlet; version="${imp.pkg.version.javax.servlet}",
-                            javax.servlet.http; version="${imp.pkg.version.javax.servlet}",
-                            org.apache.axiom.*; version="${axiom.osgi.version.range}",
-                            *;resolution:=optional
+							!org.wso2.carbon.cloud.gateway.agent.stub.*
                         </Import-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 
@@ -116,13 +115,11 @@
             <artifactId>axis2</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.ws.commons.axiom.wso2</groupId>
-            <artifactId>axiom</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.axis2.wso2</groupId>
             <artifactId>axis2-client</artifactId>
+            <version>${orbit.version.axis2}</version>
         </dependency>
+
     </dependencies>
 
 </project>

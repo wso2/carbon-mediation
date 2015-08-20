@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>cg-features</artifactId>
+        <groupId>org.wso2.carbon.mediation</groupId>
+        <version>4.4.4-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <version>4.4.4-SNAPSHOT</version>
+    <artifactId>org.wso2.carbon.cloud.gateway.agent.server.feature</artifactId>
+    <name>WSO2 Carbon - Cloud Gateway Agent server feature</name>
+    <packaging>pom</packaging>
+    <url>http://wso2.org</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.cloud.gateway.common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.cloud.gateway.agent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>libthrift.wso2</groupId>
+            <artifactId>libthrift</artifactId>
+            <version>${libthrift.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.cloud.gateway.stub</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.wso2.maven</groupId>
+                <artifactId>carbon-p2-plugin</artifactId>
+                <version>${carbon.p2.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>4-p2-feature-generation</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>p2-feature-gen</goal>
+                        </goals>
+                        <configuration>
+                            <id>org.wso2.carbon.cloud.gateway.agent.server</id>
+                            <propertiesFile>../../etc/feature.properties</propertiesFile>
+                            <adviceFile>
+                                <properties>
+                                    <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
+                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
+                                </properties>
+                            </adviceFile>
+                            <bundles>
+                                <bundleDef>libthrift.wso2:libthrift</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.cloud.gateway.agent</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.cloud.gateway.common</bundleDef>
+                                <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.cloud.gateway.stub</bundleDef>
+                            </bundles>
+                            <importFeatures>
+                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
+                            </importFeatures>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <libthrift.version>0.8.0.wso2v1</libthrift.version>
+    </properties>
+
+</project>

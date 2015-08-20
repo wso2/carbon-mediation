@@ -1,0 +1,311 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://org.apache.synapse/xsd" xmlns:ax27="http://common.gateway.cloud.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://service.gateway.cloud.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.gateway.cloud.carbon.wso2.org">
+    <wsdl:documentation>CGAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://common.gateway.cloud.carbon.wso2.org/xsd">
+            <xs:complexType name="CGException">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:complexType name="CGThriftServerBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="hostName" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="port" type="xs:int" />
+                    <xs:element minOccurs="0" name="timeOut" type="xs:int" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="CGProxyToolsURLs">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="eprArray" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="tryItURL" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="wsdl11URL" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="wsdl2URL" nillable="true" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="CGServiceMetaDataBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="MTOMEnabled" type="xs:boolean" />
+                    <xs:element minOccurs="0" name="endpoint" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="hasInOutMEP" type="xs:boolean" />
+                    <xs:element minOccurs="0" name="inLineWSDL" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="rmPolicy" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="secPolicy" nillable="true" type="xs:string" />
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="serviceDependencies" nillable="true" type="ax27:CGServiceDependencyBean" />
+                    <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="wsRmEnabled" type="xs:boolean" />
+                    <xs:element minOccurs="0" name="wsSecEnabled" type="xs:boolean" />
+                    <xs:element minOccurs="0" name="wsdlLocation" nillable="true" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="CGServiceDependencyBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="content" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax28="http://common.gateway.cloud.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.synapse/xsd">
+            <xs:import namespace="http://common.gateway.cloud.carbon.wso2.org/xsd" />
+            <xs:element name="CGAdminServiceCGException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="CGException" nillable="true" type="ax27:CGException" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateProxy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="eventType" type="xs:int" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="unDeployProxy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getThriftServerConnectionBean">
+                <xs:complexType>
+                    <xs:sequence />
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getThriftServerConnectionBeanResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax27:CGThriftServerBean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPublishedProxyToolsURLs">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string" />
+                        <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPublishedProxyToolsURLsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax27:CGProxyToolsURLs" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deployProxy">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="metaData" nillable="true" type="ax27:CGServiceMetaDataBean" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="unDeployProxyRequest">
+        <wsdl:part name="parameters" element="ns:unDeployProxy" />
+    </wsdl:message>
+    <wsdl:message name="CGAdminServiceCGException">
+        <wsdl:part name="parameters" element="ns:CGAdminServiceCGException" />
+    </wsdl:message>
+    <wsdl:message name="updateProxyRequest">
+        <wsdl:part name="parameters" element="ns:updateProxy" />
+    </wsdl:message>
+    <wsdl:message name="deployProxyRequest">
+        <wsdl:part name="parameters" element="ns:deployProxy" />
+    </wsdl:message>
+    <wsdl:message name="getThriftServerConnectionBeanRequest">
+        <wsdl:part name="parameters" element="ns:getThriftServerConnectionBean" />
+    </wsdl:message>
+    <wsdl:message name="getThriftServerConnectionBeanResponse">
+        <wsdl:part name="parameters" element="ns:getThriftServerConnectionBeanResponse" />
+    </wsdl:message>
+    <wsdl:message name="getPublishedProxyToolsURLsRequest">
+        <wsdl:part name="parameters" element="ns:getPublishedProxyToolsURLs" />
+    </wsdl:message>
+    <wsdl:message name="getPublishedProxyToolsURLsResponse">
+        <wsdl:part name="parameters" element="ns:getPublishedProxyToolsURLsResponse" />
+    </wsdl:message>
+    <wsdl:portType name="CGAdminServicePortType">
+        <wsdl:operation name="unDeployProxy">
+            <wsdl:input message="tns:unDeployProxyRequest" wsaw:Action="urn:unDeployProxy" />
+            <wsdl:fault message="tns:CGAdminServiceCGException" name="CGAdminServiceCGException" wsaw:Action="urn:unDeployProxyCGAdminServiceCGException" />
+        </wsdl:operation>
+        <wsdl:operation name="updateProxy">
+            <wsdl:input message="tns:updateProxyRequest" wsaw:Action="urn:updateProxy" />
+            <wsdl:fault message="tns:CGAdminServiceCGException" name="CGAdminServiceCGException" wsaw:Action="urn:updateProxyCGAdminServiceCGException" />
+        </wsdl:operation>
+        <wsdl:operation name="deployProxy">
+            <wsdl:input message="tns:deployProxyRequest" wsaw:Action="urn:deployProxy" />
+            <wsdl:fault message="tns:CGAdminServiceCGException" name="CGAdminServiceCGException" wsaw:Action="urn:deployProxyCGAdminServiceCGException" />
+        </wsdl:operation>
+        <wsdl:operation name="getThriftServerConnectionBean">
+            <wsdl:input message="tns:getThriftServerConnectionBeanRequest" wsaw:Action="urn:getThriftServerConnectionBean" />
+            <wsdl:output message="tns:getThriftServerConnectionBeanResponse" wsaw:Action="urn:getThriftServerConnectionBeanResponse" />
+            <wsdl:fault message="tns:CGAdminServiceCGException" name="CGAdminServiceCGException" wsaw:Action="urn:getThriftServerConnectionBeanCGAdminServiceCGException" />
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedProxyToolsURLs">
+            <wsdl:input message="tns:getPublishedProxyToolsURLsRequest" wsaw:Action="urn:getPublishedProxyToolsURLs" />
+            <wsdl:output message="tns:getPublishedProxyToolsURLsResponse" wsaw:Action="urn:getPublishedProxyToolsURLsResponse" />
+            <wsdl:fault message="tns:CGAdminServiceCGException" name="CGAdminServiceCGException" wsaw:Action="urn:getPublishedProxyToolsURLsCGAdminServiceCGException" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="CGAdminServiceSoap11Binding" type="tns:CGAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="unDeployProxy">
+            <soap:operation soapAction="urn:unDeployProxy" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateProxy">
+            <soap:operation soapAction="urn:updateProxy" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deployProxy">
+            <soap:operation soapAction="urn:deployProxy" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getThriftServerConnectionBean">
+            <soap:operation soapAction="urn:getThriftServerConnectionBean" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedProxyToolsURLs">
+            <soap:operation soapAction="urn:getPublishedProxyToolsURLs" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="CGAdminServiceSoap12Binding" type="tns:CGAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+        <wsdl:operation name="unDeployProxy">
+            <soap12:operation soapAction="urn:unDeployProxy" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateProxy">
+            <soap12:operation soapAction="urn:updateProxy" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deployProxy">
+            <soap12:operation soapAction="urn:deployProxy" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getThriftServerConnectionBean">
+            <soap12:operation soapAction="urn:getThriftServerConnectionBean" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedProxyToolsURLs">
+            <soap12:operation soapAction="urn:getPublishedProxyToolsURLs" style="document" />
+            <wsdl:input>
+                <soap12:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="CGAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAdminServiceCGException" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="CGAdminServiceHttpBinding" type="tns:CGAdminServicePortType">
+        <http:binding verb="POST" />
+        <wsdl:operation name="unDeployProxy">
+            <http:operation location="unDeployProxy" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="updateProxy">
+            <http:operation location="updateProxy" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deployProxy">
+            <http:operation location="deployProxy" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getThriftServerConnectionBean">
+            <http:operation location="getThriftServerConnectionBean" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedProxyToolsURLs">
+            <http:operation location="getPublishedProxyToolsURLs" />
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="CGAdminService">
+        <wsdl:port name="CGAdminServiceHttpsSoap11Endpoint" binding="tns:CGAdminServiceSoap11Binding">
+            <soap:address location="https://localhost.localdomain:8243/services/CGAdminService.CGAdminServiceHttpsSoap11Endpoint" />
+        </wsdl:port>
+        <wsdl:port name="CGAdminServiceHttpsSoap12Endpoint" binding="tns:CGAdminServiceSoap12Binding">
+            <soap12:address location="https://localhost.localdomain:8243/services/CGAdminService.CGAdminServiceHttpsSoap12Endpoint" />
+        </wsdl:port>
+        <wsdl:port name="CGAdminServiceHttpsEndpoint" binding="tns:CGAdminServiceHttpBinding">
+            <http:address location="https://localhost.localdomain:8243/services/CGAdminService.CGAdminServiceHttpsEndpoint" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

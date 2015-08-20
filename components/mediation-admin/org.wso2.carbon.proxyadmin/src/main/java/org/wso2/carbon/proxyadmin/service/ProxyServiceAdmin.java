@@ -367,6 +367,8 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                         if (currentProxy.getArtifactContainerName() != null) {
                             proxy.setArtifactContainerName(currentProxy.getArtifactContainerName());
                             proxy.setIsEdited(true);
+                            MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+                            pm.deleteItem(proxy.getName(), proxy.getName() + ".xml", ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
                         }
                     } catch (Exception e) {
 
@@ -375,7 +377,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
 
                         try {
                             synapseConfig.addProxyService(proxyName, currentProxy);
-                            persistProxyService(currentProxy);
+                            if (currentProxy.getArtifactContainerName() != null) {
+                                currentProxy.setIsEdited(true);
+                            } else {
+                                persistProxyService(currentProxy);
+                            }
                             currentProxy.buildAxisService(synapseConfig, getAxisConfig());
                             addParameterObserver(currentProxy.getName());
 
