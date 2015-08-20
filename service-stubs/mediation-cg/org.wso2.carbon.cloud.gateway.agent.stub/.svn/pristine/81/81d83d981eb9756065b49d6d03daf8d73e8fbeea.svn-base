@@ -1,0 +1,727 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://org.apache.synapse/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://service.agent.gateway.cloud.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ax229="http://common.types.stub.gateway.cloud.carbon.wso2.org/xsd" xmlns:ax227="http://common.gateway.cloud.carbon.wso2.org/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.agent.gateway.cloud.carbon.wso2.org">
+    <wsdl:documentation>CGAgentAdminService</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://common.gateway.cloud.carbon.wso2.org/xsd">
+            <xs:complexType name="CGException">
+                <xs:sequence/>
+            </xs:complexType>
+            <xs:complexType name="CGServerBean">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="domainName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="host" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="passWord" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="port" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://common.types.stub.gateway.cloud.carbon.wso2.org/xsd">
+            <xs:complexType name="CGProxyToolsURLs">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="eprArray" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="eprArraySpecified" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="tryItURL" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="tryItURLSpecified" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="wsdl11URL" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="wsdl11URLSpecified" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="wsdl2URL" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="wsdl2URLSpecified" type="xs:boolean"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ax228="http://common.gateway.cloud.carbon.wso2.org/xsd" xmlns:ax230="http://common.types.stub.gateway.cloud.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.synapse/xsd">
+            <xs:import namespace="http://common.gateway.cloud.carbon.wso2.org/xsd"/>
+            <xs:import namespace="http://common.types.stub.gateway.cloud.carbon.wso2.org/xsd"/>
+            <xs:element name="CGAgentAdminServiceCGException">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="CGException" nillable="true" type="ax228:CGException"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="updateCGServer">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="csgServer" nillable="true" type="ax228:CGServerBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="unPublishService">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="serverName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="setServiceStatus">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="status" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="removeCGServer">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="csgServerName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="rePublishService">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="serverName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="isAutomatic" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="publishService">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="serverName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="isAutomatic" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isHasPublishedServices">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="csgServerName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isHasPublishedServicesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getServiceStatus">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getServiceStatusResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPublishedServer">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPublishedServerResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPublishedProxyToolsURLs">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getPublishedProxyToolsURLsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax230:CGProxyToolsURLs"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCGServerList">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCGServerListResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax228:CGServerBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCGServer">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="csgServerName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getCGServerResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax228:CGServerBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="doServiceUpdate">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="eventType" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addCGServer">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="csgServer" nillable="true" type="ax228:CGServerBean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="getServiceStatusRequest">
+        <wsdl:part name="parameters" element="ns:getServiceStatus"/>
+    </wsdl:message>
+    <wsdl:message name="getServiceStatusResponse">
+        <wsdl:part name="parameters" element="ns:getServiceStatusResponse"/>
+    </wsdl:message>
+    <wsdl:message name="CGAgentAdminServiceCGException">
+        <wsdl:part name="parameters" element="ns:CGAgentAdminServiceCGException"/>
+    </wsdl:message>
+    <wsdl:message name="addCGServerRequest">
+        <wsdl:part name="parameters" element="ns:addCGServer"/>
+    </wsdl:message>
+    <wsdl:message name="rePublishServiceRequest">
+        <wsdl:part name="parameters" element="ns:rePublishService"/>
+    </wsdl:message>
+    <wsdl:message name="getPublishedServerRequest">
+        <wsdl:part name="parameters" element="ns:getPublishedServer"/>
+    </wsdl:message>
+    <wsdl:message name="getPublishedServerResponse">
+        <wsdl:part name="parameters" element="ns:getPublishedServerResponse"/>
+    </wsdl:message>
+    <wsdl:message name="unPublishServiceRequest">
+        <wsdl:part name="parameters" element="ns:unPublishService"/>
+    </wsdl:message>
+    <wsdl:message name="publishServiceRequest">
+        <wsdl:part name="parameters" element="ns:publishService"/>
+    </wsdl:message>
+    <wsdl:message name="getCGServerListRequest">
+        <wsdl:part name="parameters" element="ns:getCGServerList"/>
+    </wsdl:message>
+    <wsdl:message name="getCGServerListResponse">
+        <wsdl:part name="parameters" element="ns:getCGServerListResponse"/>
+    </wsdl:message>
+    <wsdl:message name="doServiceUpdateRequest">
+        <wsdl:part name="parameters" element="ns:doServiceUpdate"/>
+    </wsdl:message>
+    <wsdl:message name="getCGServerRequest">
+        <wsdl:part name="parameters" element="ns:getCGServer"/>
+    </wsdl:message>
+    <wsdl:message name="getCGServerResponse">
+        <wsdl:part name="parameters" element="ns:getCGServerResponse"/>
+    </wsdl:message>
+    <wsdl:message name="updateCGServerRequest">
+        <wsdl:part name="parameters" element="ns:updateCGServer"/>
+    </wsdl:message>
+    <wsdl:message name="getPublishedProxyToolsURLsRequest">
+        <wsdl:part name="parameters" element="ns:getPublishedProxyToolsURLs"/>
+    </wsdl:message>
+    <wsdl:message name="getPublishedProxyToolsURLsResponse">
+        <wsdl:part name="parameters" element="ns:getPublishedProxyToolsURLsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="setServiceStatusRequest">
+        <wsdl:part name="parameters" element="ns:setServiceStatus"/>
+    </wsdl:message>
+    <wsdl:message name="removeCGServerRequest">
+        <wsdl:part name="parameters" element="ns:removeCGServer"/>
+    </wsdl:message>
+    <wsdl:message name="isHasPublishedServicesRequest">
+        <wsdl:part name="parameters" element="ns:isHasPublishedServices"/>
+    </wsdl:message>
+    <wsdl:message name="isHasPublishedServicesResponse">
+        <wsdl:part name="parameters" element="ns:isHasPublishedServicesResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="CGAgentAdminServicePortType">
+        <wsdl:operation name="getServiceStatus">
+            <wsdl:input message="tns:getServiceStatusRequest" wsaw:Action="urn:getServiceStatus"/>
+            <wsdl:output message="tns:getServiceStatusResponse" wsaw:Action="urn:getServiceStatusResponse"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:getServiceStatusCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addCGServer">
+            <wsdl:input message="tns:addCGServerRequest" wsaw:Action="urn:addCGServer"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:addCGServerCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="rePublishService">
+            <wsdl:input message="tns:rePublishServiceRequest" wsaw:Action="urn:rePublishService"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:rePublishServiceCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedServer">
+            <wsdl:input message="tns:getPublishedServerRequest" wsaw:Action="urn:getPublishedServer"/>
+            <wsdl:output message="tns:getPublishedServerResponse" wsaw:Action="urn:getPublishedServerResponse"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:getPublishedServerCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="unPublishService">
+            <wsdl:input message="tns:unPublishServiceRequest" wsaw:Action="urn:unPublishService"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:unPublishServiceCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="publishService">
+            <wsdl:input message="tns:publishServiceRequest" wsaw:Action="urn:publishService"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:publishServiceCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getCGServerList">
+            <wsdl:input message="tns:getCGServerListRequest" wsaw:Action="urn:getCGServerList"/>
+            <wsdl:output message="tns:getCGServerListResponse" wsaw:Action="urn:getCGServerListResponse"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:getCGServerListCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="doServiceUpdate">
+            <wsdl:input message="tns:doServiceUpdateRequest" wsaw:Action="urn:doServiceUpdate"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:doServiceUpdateCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getCGServer">
+            <wsdl:input message="tns:getCGServerRequest" wsaw:Action="urn:getCGServer"/>
+            <wsdl:output message="tns:getCGServerResponse" wsaw:Action="urn:getCGServerResponse"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:getCGServerCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="updateCGServer">
+            <wsdl:input message="tns:updateCGServerRequest" wsaw:Action="urn:updateCGServer"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:updateCGServerCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedProxyToolsURLs">
+            <wsdl:input message="tns:getPublishedProxyToolsURLsRequest" wsaw:Action="urn:getPublishedProxyToolsURLs"/>
+            <wsdl:output message="tns:getPublishedProxyToolsURLsResponse" wsaw:Action="urn:getPublishedProxyToolsURLsResponse"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:getPublishedProxyToolsURLsCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="setServiceStatus">
+            <wsdl:input message="tns:setServiceStatusRequest" wsaw:Action="urn:setServiceStatus"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:setServiceStatusCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="removeCGServer">
+            <wsdl:input message="tns:removeCGServerRequest" wsaw:Action="urn:removeCGServer"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:removeCGServerCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+        <wsdl:operation name="isHasPublishedServices">
+            <wsdl:input message="tns:isHasPublishedServicesRequest" wsaw:Action="urn:isHasPublishedServices"/>
+            <wsdl:output message="tns:isHasPublishedServicesResponse" wsaw:Action="urn:isHasPublishedServicesResponse"/>
+            <wsdl:fault message="tns:CGAgentAdminServiceCGException" name="CGAgentAdminServiceCGException" wsaw:Action="urn:isHasPublishedServicesCGAgentAdminServiceCGException"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="CGAgentAdminServiceSoap11Binding" type="tns:CGAgentAdminServicePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getServiceStatus">
+            <soap:operation soapAction="urn:getServiceStatus" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="rePublishService">
+            <soap:operation soapAction="urn:rePublishService" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addCGServer">
+            <soap:operation soapAction="urn:addCGServer" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedServer">
+            <soap:operation soapAction="urn:getPublishedServer" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="unPublishService">
+            <soap:operation soapAction="urn:unPublishService" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="publishService">
+            <soap:operation soapAction="urn:publishService" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCGServerList">
+            <soap:operation soapAction="urn:getCGServerList" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="doServiceUpdate">
+            <soap:operation soapAction="urn:doServiceUpdate" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateCGServer">
+            <soap:operation soapAction="urn:updateCGServer" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCGServer">
+            <soap:operation soapAction="urn:getCGServer" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedProxyToolsURLs">
+            <soap:operation soapAction="urn:getPublishedProxyToolsURLs" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setServiceStatus">
+            <soap:operation soapAction="urn:setServiceStatus" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="removeCGServer">
+            <soap:operation soapAction="urn:removeCGServer" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isHasPublishedServices">
+            <soap:operation soapAction="urn:isHasPublishedServices" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="CGAgentAdminServiceSoap12Binding" type="tns:CGAgentAdminServicePortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="getServiceStatus">
+            <soap12:operation soapAction="urn:getServiceStatus" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="rePublishService">
+            <soap12:operation soapAction="urn:rePublishService" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addCGServer">
+            <soap12:operation soapAction="urn:addCGServer" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedServer">
+            <soap12:operation soapAction="urn:getPublishedServer" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="unPublishService">
+            <soap12:operation soapAction="urn:unPublishService" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="publishService">
+            <soap12:operation soapAction="urn:publishService" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCGServerList">
+            <soap12:operation soapAction="urn:getCGServerList" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="doServiceUpdate">
+            <soap12:operation soapAction="urn:doServiceUpdate" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="updateCGServer">
+            <soap12:operation soapAction="urn:updateCGServer" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getCGServer">
+            <soap12:operation soapAction="urn:getCGServer" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedProxyToolsURLs">
+            <soap12:operation soapAction="urn:getPublishedProxyToolsURLs" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="setServiceStatus">
+            <soap12:operation soapAction="urn:setServiceStatus" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="removeCGServer">
+            <soap12:operation soapAction="urn:removeCGServer" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="isHasPublishedServices">
+            <soap12:operation soapAction="urn:isHasPublishedServices" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="CGAgentAdminServiceCGException">
+                <soap12:fault use="literal" name="CGAgentAdminServiceCGException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="CGAgentAdminServiceHttpBinding" type="tns:CGAgentAdminServicePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="getServiceStatus">
+            <http:operation location="getServiceStatus"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="rePublishService">
+            <http:operation location="rePublishService"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="addCGServer">
+            <http:operation location="addCGServer"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedServer">
+            <http:operation location="getPublishedServer"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="unPublishService">
+            <http:operation location="unPublishService"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="publishService">
+            <http:operation location="publishService"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getCGServerList">
+            <http:operation location="getCGServerList"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="doServiceUpdate">
+            <http:operation location="doServiceUpdate"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="updateCGServer">
+            <http:operation location="updateCGServer"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getCGServer">
+            <http:operation location="getCGServer"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getPublishedProxyToolsURLs">
+            <http:operation location="getPublishedProxyToolsURLs"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="setServiceStatus">
+            <http:operation location="setServiceStatus"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="removeCGServer">
+            <http:operation location="removeCGServer"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="isHasPublishedServices">
+            <http:operation location="isHasPublishedServices"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="CGAgentAdminService">
+        <wsdl:port name="CGAgentAdminServiceHttpsSoap11Endpoint" binding="tns:CGAgentAdminServiceSoap11Binding">
+            <soap:address location="https://10.225.162.105:9444/services/CGAgentAdminService.CGAgentAdminServiceHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="CGAgentAdminServiceHttpsSoap12Endpoint" binding="tns:CGAgentAdminServiceSoap12Binding">
+            <soap12:address location="https://10.225.162.105:9444/services/CGAgentAdminService.CGAgentAdminServiceHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="CGAgentAdminServiceHttpsEndpoint" binding="tns:CGAgentAdminServiceHttpBinding">
+            <http:address location="https://10.225.162.105:9444/services/CGAgentAdminService.CGAgentAdminServiceHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
