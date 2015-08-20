@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.endpoint.ext.wsrm.interceptor;
+package org.wso2.carbon.inbound.endpoint.ext.wsrm.interceptor;
 
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
@@ -29,7 +29,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.wsdl.interceptors.DocLiteralInInterceptor;
 import org.apache.log4j.Logger;
-import org.wso2.carbon.endpoint.ext.wsrm.utils.RMConstants;
+import org.wso2.carbon.inbound.endpoint.ext.wsrm.utils.RMConstants;
 
 import java.io.IOException;
 import java.io.InputStream;

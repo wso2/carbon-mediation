@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.endpoint.ext.wsrm;
+package org.wso2.carbon.inbound.endpoint.ext.wsrm;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -24,10 +24,10 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.log4j.Logger;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
-import org.wso2.carbon.endpoint.ext.wsrm.interceptor.RequestInterceptor;
-import org.wso2.carbon.endpoint.ext.wsrm.interceptor.ResponseInterceptor;
-import org.wso2.carbon.endpoint.ext.wsrm.invoker.InboundRMHttpInvoker;
-import org.wso2.carbon.endpoint.ext.wsrm.utils.RMConstants;
+import org.wso2.carbon.inbound.endpoint.ext.wsrm.interceptor.RequestInterceptor;
+import org.wso2.carbon.inbound.endpoint.ext.wsrm.interceptor.ResponseInterceptor;
+import org.wso2.carbon.inbound.endpoint.ext.wsrm.invoker.InboundRMHttpInvoker;
+import org.wso2.carbon.inbound.endpoint.ext.wsrm.utils.RMConstants;
 
 import java.io.File;
 import java.net.MalformedURLException;

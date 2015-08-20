@@ -36,7 +36,20 @@
             <artifactId>org.wso2.carbon.inbound.endpoint.ext.wsrm</artifactId>
             <version>4.4.4-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.apache.cxf</groupId>
+            <artifactId>cxf-bundle</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+            <artifactId>jetty-bundle</artifactId>
+        </dependency>
     </dependencies>
+
+    <properties>
+        <cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
+        <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
+    </properties>
 
     <build>
         <plugins>
@@ -57,11 +70,13 @@
                             <adviceFile>
                                 <properties>
                                     <propertyDef>org.wso2.carbon.p2.category.type:server</propertyDef>
-                                    <propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>
+                                    <!--<propertyDef>org.eclipse.equinox.p2.type.group:false</propertyDef>-->
                                 </properties>
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound.endpoint.ext.wsrm</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.cxf:cxf-bundle</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.eclipse.jetty:jetty-bundle</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>

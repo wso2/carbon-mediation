@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.endpoint.ext.wsrm.utils;
+package org.wso2.carbon.inbound.endpoint.ext.wsrm.utils;
 
 import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.om.OMXMLBuilderFactory;
