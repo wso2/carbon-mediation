@@ -820,7 +820,7 @@
                             <%
                                 if (SequenceEditorHelper.getEditingSequenceAction(session) != "anonify") {
                             %>
-                                <input type="button" class="button" value="<fmt:message key='<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.button.saveas.text",session)%>'/>" id="saveAsButton" onclick="javascript: saveSequence(); javascript: showSaveAsForm(true); return false;">
+                                <input type="button" class="button" value="<fmt:message key='<%=SequenceEditorHelper.getUIMetadataForEditor("sequence.button.saveas.text",session)%>'/>" id="saveAsButton" onclick="javascript: showSaveAsForm(true); return false;">
                             <%
                                 }
                             %>
