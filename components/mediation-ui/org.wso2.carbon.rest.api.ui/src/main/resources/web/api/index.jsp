@@ -471,7 +471,7 @@
             <td width="20px" style="text-align:left;border-left:none;width:100px;">
                 <div class="inlineDiv">
                     <% if (apiData.getArtifactContainerName() != null) { %>
-                        <a style="background-image:url(../admin/images/delete.gif);" class="icon-link" href="#"
+                        <a style="color:gray;background-image:url(../admin/images/delete.gif);" class="icon-link" href="#"
                            onclick="#">Delete</a>
                     <% } else {%>
                         <a style="background-image:url(../admin/images/delete.gif);" class="icon-link" href="#"
