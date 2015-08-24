@@ -295,7 +295,7 @@
                         key="edit"/></a>
                 <a href="#" onclick="#"
                    id="delete_link" class="icon-link"
-                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
                 <% } else { %>
                 <a onclick="editRow('<%= type%>','<%=mspData.getName()%>')" href="#"
@@ -330,7 +330,7 @@
                         key="edit"/></a>
                 <a href="#" onclick="#"
                    id="delete_link" class="icon-link"
-                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
                 <% } else { %>
                 <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
@@ -384,7 +384,7 @@
                         key="edit"/></a>
                 <a href="#" onclick="#"
                    id="delete_link" class="icon-link"
-                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
                 <% } else { %>
                 <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"

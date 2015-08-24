@@ -274,7 +274,7 @@
 
                             <a href="#" onclick="#"
                                id="delete_link" class="icon-link"
-                               style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                               style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                                     key="delete"/></a>
                             <% } else {%>
                             <a onclick="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"return false":"editRow(this.parentNode.parentNode.rowIndex,"+"'" + type + "',"+"'" + name + "');"%>"
