@@ -92,7 +92,7 @@
         return this.replace(/\s+$/, "");
     }
 
-    function editRow(i) {
+    function editRow(i, name) {
         var table = document.getElementById("myTable");
         var row = table.rows[i];
         var cell = row.cells[0];
@@ -101,13 +101,13 @@
         var endType = type.firstChild.nodeValue;
 
         if (endType.trim() == 'Inline Text') {
-            document.location.href = "inlinedText.jsp?" + "entryName=" + content;
+            document.location.href = "inlinedText.jsp?" + "entryName=" + name;
         }
         else if (endType.trim() == 'Inline XML') {
-            document.location.href = "inlinedXML.jsp?" + "entryName=" + content
+            document.location.href = "inlinedXML.jsp?" + "entryName=" + name
         }
         else {
-            document.location.href = "sourceURL.jsp?" + "entryName=" + content;
+            document.location.href = "sourceURL.jsp?" + "entryName=" + name;
         }
     }
 
