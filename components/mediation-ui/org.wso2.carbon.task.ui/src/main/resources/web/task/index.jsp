@@ -94,7 +94,7 @@
                         <a href="javascript:editCAppRow('<%=name%>','<%=group%>')" id="config_link"
                            class="edit-icon-link"><fmt:message key="task.edit"/></a>
                         <a href="#"
-                           id="delete_link" class="delete-icon-link"><fmt:message
+                           id="delete_link" class="delete-icon-link" style="color:gray;"><fmt:message
                                 key="task.property.delete"/></a>
                     </td>
                     <% } else { %>

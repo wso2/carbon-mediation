@@ -562,7 +562,7 @@
                             <td style="border-left:none;width:100px">
                                 <div class="inlineDiv">
                                     <% if (sequence.getArtifactContainerName() != null) { %>
-                                        <a href="#" onclick="#" class="icon-link" style="background-image:url(../admin/images/delete.gif);"><fmt:message key="sequence.delete.action"/></a>
+                                        <a href="#" onclick="#" class="icon-link" style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message key="sequence.delete.action"/></a>
                                     <% } else { %>
                                         <a href="#" onclick="deleteSequence('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/delete.gif);"><fmt:message key="sequence.delete.action"/></a>
                                     <% } %>

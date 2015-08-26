@@ -431,12 +431,18 @@
             }
 
             function editStreamData(rowNumber){
-                jQuery("#streamsTable_" + document.getElementById("hfStreamTableRowNumber").value).css("background-color","");
-                jQuery("#streamsTable_" + rowNumber).css("background-color","rgb(234,234,255)");
-                document.getElementById("propertiesTr").style.display = "";
-                document.getElementById("hfStreamTableRowNumber").value = rowNumber;
-                loadPropertyDataTable();
-                loadDumpData();
+                var validationResult = validateStreamsTable();
+
+                if(validationResult == "true"){
+                    jQuery("#streamsTable_" + document.getElementById("hfStreamTableRowNumber").value).css("background-color","");
+                    jQuery("#streamsTable_" + rowNumber).css("background-color","rgb(234,234,255)");
+                    document.getElementById("propertiesTr").style.display = "";
+                    document.getElementById("hfStreamTableRowNumber").value = rowNumber;
+                    loadPropertyDataTable();
+                    loadDumpData();
+                } else {
+                    CARBON.showInfoDialog(validationResult);
+                }
             }
 
             function loadPropertyDataTable(){

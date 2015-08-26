@@ -68,14 +68,14 @@
 </script>
 
 <script type="text/javascript">
-    function deleteRow(i) {
+    function deleteRow(i, name) {
         var table = document.getElementById("myTable");
         var row = table.rows[i];
         var cell = row.cells[0];
         var content = cell.firstElementChild.innerHTML;
 
         function delEp() {
-            document.location.href = "deleteMessageStoresHandler.jsp?" + "messageStoreName=" + content;
+            document.location.href = "deleteMessageStoresHandler.jsp?" + "messageStoreName=" + name;
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message.store"/>", delEp);
@@ -93,22 +93,21 @@
         return this.replace(/\s+$/, "");
     }
 
-    function editRow(i, storeType) {
+    function editRow(i, storeType, name) {
         var table = document.getElementById("myTable");
         var row = table.rows[i];
         var cell = row.cells[0];
         var type = row.cells[1];
-        var content = cell.firstElementChild.innerHTML;
         if (storeType == "org.apache.synapse.message.store.impl.jms.JmsStore") {
-            document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + content;
+            document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + name;
         } else if (storeType == "org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore") {
-            document.location.href = "rabbitmqMessageStore.jsp?" + "messageStoreName=" + content;
+            document.location.href = "rabbitmqMessageStore.jsp?" + "messageStoreName=" + name;
         } else if (storeType == "org.apache.synapse.message.store.impl.memory.InMemoryStore") {
-            document.location.href = "inMemoryMessageStore.jsp?" + "messageStoreName=" + content;
+            document.location.href = "inMemoryMessageStore.jsp?" + "messageStoreName=" + name;
         } else if (storeType == "org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore") {
-            document.location.href = "jdbcMessageStore.jsp?" + "messageStoreName=" + content;
+            document.location.href = "jdbcMessageStore.jsp?" + "messageStoreName=" + name;
         } else {
-            document.location.href = "customMessageStore.jsp?" + "messageStoreName=" + content;
+            document.location.href = "customMessageStore.jsp?" + "messageStoreName=" + name;
         }
     }
 
@@ -275,7 +274,7 @@
 
                             <a href="#" onclick="#"
                                id="delete_link" class="icon-link"
-                               style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                               style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                                     key="delete"/></a>
                             <% } else {%>
                             <a onclick="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"return false":"editRow(this.parentNode.parentNode.rowIndex,"+"'" + type + "',"+"'" + name + "');"%>"
