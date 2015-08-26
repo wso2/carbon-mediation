@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ArrayList;
 
 public class KAFKAMessageListener extends AbstractKafkaMessageListener {
 
@@ -47,6 +48,11 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
         try {
             if (consumerConnector == null) {
                 log.info("Creating Kafka Consumer Connector...");
+
+                //set default consumer timeout to 3000ms if it is not set by the user
+                if(!kafkaProperties.containsKey(KAFKAConstants.CONSUMER_TIMEOUT)){
+                    kafkaProperties.put(KAFKAConstants.CONSUMER_TIMEOUT,"3000");
+                }
                 consumerConnector = Consumer
                         .createJavaConsumerConnector(new ConsumerConfig(
                                 kafkaProperties));
@@ -86,6 +92,8 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
                 }
                 Map<String, List<KafkaStream<byte[], byte[]>>> consumerStreams = consumerConnector
                         .createMessageStreams(topicCount);
+
+                consumerIte = new ArrayList<ConsumerIterator<byte[], byte[]>>();
                 for (String topic : topics) {
                     List<KafkaStream<byte[], byte[]>> streams = consumerStreams
                             .get(topic);
@@ -134,20 +142,65 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
      * @param streams
      */
     protected void startConsumers(List<KafkaStream<byte[], byte[]>> streams) {
-        for (KafkaStream<byte[], byte[]> stream : streams) {
-            consumerIte = stream.iterator();
-            break;
+//        for (KafkaStream<byte[], byte[]> stream : streams) {
+//            consumerIte = stream.iterator();
+//            break;
+//        }
+        if(streams.size() >= 1){
+            consumerIte.add(streams.get(0).iterator());
         }
     }
 
     @Override
-    public void injectMessageToESB(String name) {
-        byte[] msg = consumerIte.next().message();
-        injectHandler.invoke(msg, name);
+    public void injectMessageToESB(String sequenceName) {
+        if(consumerIte.size() == 1){
+            injectMessageToESB(sequenceName,consumerIte.get(0));
+        }else{
+            log.debug("There are multiple topics to consume from not a single topic");
+        }
+    }
+
+    public void injectMessageToESB(String sequenceName,ConsumerIterator<byte[], byte[]> consumerIterator){
+        byte[] msg = consumerIterator.next().message();
+        injectHandler.invoke(msg, sequenceName);
+    }
+
+    @Override public boolean hasNext() {
+        if(consumerIte.size() == 1){
+            return hasNext(consumerIte.get(0));
+        }else{
+            log.debug("There are multiple topics to consume from not a single topic");
+        }
+        return false;
+    }
+
+    public boolean hasNext(ConsumerIterator<byte[], byte[]> consumerIterator) {
+        try {
+            return consumerIterator.hasNext();
+        }catch (ConsumerTimeoutException e) {
+            //exception ignored
+            if(log.isDebugEnabled()){
+                log.debug("Topic has no new messages to consume");
+            }
+            return false;
+        }
     }
 
     @Override
-    public boolean hasNext() {
-        return consumerIte.hasNext();
+    public boolean hasMultipleTopicsToConsume() {
+        if(consumerIte.size() > 1){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    @Override
+    public void consumeMultipleTopics(String sequenceName){
+        for (ConsumerIterator<byte[], byte[]> consumerIterator : consumerIte) {
+            if (hasNext(consumerIterator)) {
+                injectMessageToESB(sequenceName, consumerIterator);
+            }
+        }
     }
 }
