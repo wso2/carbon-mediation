@@ -152,7 +152,11 @@ public class KAFKAPollingConsumer {
         //Inject the messages to the sequence
         try {
             if(messageListener.hasMultipleTopicsToConsume()) {
-                messageListener.consumeMultipleTopics(name);
+                if (injectHandler != null) {
+                    messageListener.consumeMultipleTopics(name);
+                }else {
+                    return null;
+                }
             }else{
                 if (injectHandler != null && messageListener.hasNext()) {
                     messageListener.injectMessageToESB(name);
