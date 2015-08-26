@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
+ * <p/>
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -198,8 +198,9 @@ public class RabbitMQConnectionConsumer {
      * @throws IOException on error
      */
     private void initConsumer() throws IOException {
-        //inboundName = rabbitMQProperties.getProperty(RabbitMQConstants.RABBITMQ_CON_FAC);
-        log.debug("Initializing consumer for inbound " + inboundName);
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing consumer for inbound " + inboundName);
+        }
         connection = getConnection();
         channel = connection.createChannel();
         queueName = rabbitMQProperties.getProperty(RabbitMQConstants.QUEUE_NAME);
@@ -237,7 +238,9 @@ public class RabbitMQConnectionConsumer {
 
             if (!channel.isOpen()) {
                 channel = connection.createChannel();
-                log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
+                if (log.isDebugEnabled()) {
+                    log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
+                }
             }
             channel.queueBind(queueName, exchangeName, routeKey);
             log.debug("Bind queue '" + queueName + "' to exchange '" + exchangeName + "' with route key '" + routeKey + "'");

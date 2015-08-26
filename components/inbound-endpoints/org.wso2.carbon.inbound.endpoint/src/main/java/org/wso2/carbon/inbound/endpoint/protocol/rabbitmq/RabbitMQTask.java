@@ -25,25 +25,25 @@ import org.wso2.carbon.inbound.endpoint.common.OneTimeTriggerInboundTask;
 
 public class RabbitMQTask extends OneTimeTriggerInboundTask {
 
-    private static final Log logger = LogFactory.getLog(RabbitMQTask.class.getName());
+    private static final Log log = LogFactory.getLog(RabbitMQTask.class.getName());
 
     private RabbitMQConnectionConsumer rabbitMQConnectionConsumer;
 
     public RabbitMQTask(RabbitMQConnectionConsumer rabbitMQConnectionConsumer) {
-        logger.debug("RabbitMQ Task initialize.");
+        log.debug("RabbitMQ Task initialize.");
         this.rabbitMQConnectionConsumer = rabbitMQConnectionConsumer;
     }
 
     protected void taskExecute() {
-        logger.debug("Executing RabbitMQ Task Execution.");
+        log.debug("Executing RabbitMQ Task Execution.");
         rabbitMQConnectionConsumer.execute();
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {
-        logger.debug("Initializing.");
+        log.debug("Initializing.");
     }
 
     public void destroy() {
-        logger.debug("Destroying.");
+        log.debug("Destroying.");
     }
 }
