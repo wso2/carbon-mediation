@@ -151,10 +151,14 @@ public class KAFKAPollingConsumer {
         }
         //Inject the messages to the sequence
         try {
-            if (injectHandler != null && messageListener.hasNext()) {
-                messageListener.injectMessageToESB(name);
-            } else {
-                return null;
+            if(messageListener.hasMultipleTopicsToConsume()) {
+                messageListener.consumeMultipleTopics(name);
+            }else{
+                if (injectHandler != null && messageListener.hasNext()) {
+                    messageListener.injectMessageToESB(name);
+                } else {
+                    return null;
+                }
             }
 
         } catch (Exception e) {
