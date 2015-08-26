@@ -46,6 +46,7 @@ var classRequired = false;
 var sequenceRequired=false;
 var onErrorRequired=false;
 var requiredParams = null;
+var kafkaSpecialParameters = null;
 </script>
     <carbon:jsi18n
         resourceBundle="org.wso2.carbon.inbound.ui.i18n.Resources"
@@ -236,6 +237,24 @@ var requiredParams = null;
                         <tr><td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">
                             <%
                             String[] allSpecialParams = specialParams.split(",");
+                            String[] parentLevelParameters = allSpecialParams[0].split(InboundClientConstants.STRING_SPLITTER);
+                            %>
+                            <script type="text/javascript">var kafkaSpecialParameters = new Array(<%=allSpecialParams.length + parentLevelParameters.length - 1%>);</script>
+                            <%
+                            int specialParameterCount = 0;
+                            for(int s = 0;s<parentLevelParameters.length;s++){
+                            %>
+                                <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=parentLevelParameters[s]%>';</script>
+                            <%
+                                specialParameterCount++;
+                            }
+                            for(int s = 1;s<allSpecialParams.length;s++){
+                            %>
+                                <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=allSpecialParams[s]%>';</script>
+                            <%
+                                 specialParameterCount++;
+                            }
+
                             for(int s = 0;s<allSpecialParams.length;s++){
                                 String specialParam = allSpecialParams[s];
                                 if(firstSpecialParam.equals("highlevel") && (specialParam.indexOf(InboundClientConstants.STRING_SPLITTER) > -1 && specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim().equals("topics/topic.filter"))) {%>

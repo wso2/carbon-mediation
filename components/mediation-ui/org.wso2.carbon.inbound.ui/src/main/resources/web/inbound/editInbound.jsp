@@ -52,6 +52,7 @@ var classRequired = false;
 var sequenceRequired=false;
 var onErrorRequired=false;
 var requiredParams = null;
+var kafkaSpecialParameters = null;
 </script>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
     <carbon:breadcrumb label="inbound.header.update"
@@ -254,6 +255,24 @@ var requiredParams = null;
                         <tr><td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">
                             <%
                                 String[] allSpecialParams = specialParams.split(",");
+                                String[] parentLevelParameters = allSpecialParams[0].split(InboundClientConstants.STRING_SPLITTER);
+                            %>
+                            <script type="text/javascript">var kafkaSpecialParameters = new Array(<%=allSpecialParams.length + parentLevelParameters.length - 1%>);</script>
+                            <%
+                                int specialParameterCount = 0;
+                                for(int s = 0;s<parentLevelParameters.length;s++){
+                            %>
+                            <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=parentLevelParameters[s]%>';</script>
+                            <%
+                                    specialParameterCount++;
+                                }
+                                for(int s = 1;s<allSpecialParams.length;s++){
+                            %>
+                            <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=allSpecialParams[s]%>';</script>
+                            <%
+                                    specialParameterCount++;
+                                }
+
                                 for(int s = 0;s<allSpecialParams.length;s++){
                                     String topicsOrTopicFilterEle = "";
                                     String eleVal = "";
