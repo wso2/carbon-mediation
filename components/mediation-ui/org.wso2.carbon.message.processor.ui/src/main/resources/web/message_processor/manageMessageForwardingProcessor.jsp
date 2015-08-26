@@ -443,7 +443,7 @@
                         <td><fmt:message key="max.delivery.attempts"/></td>
                         <td><input type="text" id="max_delivery_attempts" name="max_delivery_attempts"
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("max.delivery.attempts")!=null))?processorData.getParams().get("max.delivery.attempts"):""%>"
+                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("max.delivery.attempts")!=null))?processorData.getParams().get("max.delivery.attempts"):"4"%>"
                                 />
                         </td>
                     </tr>
