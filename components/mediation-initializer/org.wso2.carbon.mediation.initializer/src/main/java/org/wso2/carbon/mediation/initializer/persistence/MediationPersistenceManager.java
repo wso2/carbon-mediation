@@ -34,6 +34,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.template.TemplateMediator;
 import org.apache.synapse.message.processor.MessageProcessor;
@@ -610,6 +611,12 @@ public class MediationPersistenceManager {
                 Startup newTask = task;
                 synapseConfiguration.addStartup(task);
             }
+
+            Collection<InboundEndpoint> inboundEndpoints = cAppConfig.getInboundEndpoints();
+            for (InboundEndpoint inboundEndpoint : inboundEndpoints) {
+                InboundEndpoint newInbound = inboundEndpoint;
+                synapseConfiguration.addInboundEndpoint(newInbound.getName(), newInbound);
+            }
         } finally {
             lock.unlock();
         }
@@ -769,7 +776,16 @@ public class MediationPersistenceManager {
                 }
 
             }
-            return cAppArtifactConfig;
+
+            Collection<InboundEndpoint> inboundEndpoints = synapseConfiguration.getInboundEndpoints();
+            for (InboundEndpoint inboundEndpoint : inboundEndpoints) {
+                if (inboundEndpoint != null && inboundEndpoint.getArtifactContainerName() != null) {
+                    inboundEndpoint.setIsEdited(true);
+                    cAppArtifactConfig.addInboundEndpoint(inboundEndpoint.getName(), inboundEndpoint);
+                    synapseConfiguration.removeInboundEndpoint(inboundEndpoint.getName());
+                }
+            }
+             return cAppArtifactConfig;
         } finally {
             lock.unlock();
         }
