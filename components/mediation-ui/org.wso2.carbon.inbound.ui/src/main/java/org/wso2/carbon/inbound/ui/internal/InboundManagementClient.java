@@ -100,10 +100,6 @@ public class InboundManagementClient {
         for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
             InboundDescription inboundDescription = new InboundDescription(
                     inboundEndpointDTO.getName());
-            if (inboundEndpointDTO.getArtifactContainerName() != null) {
-                inboundDescription.setArtifactContainerName(inboundEndpointDTO.getArtifactContainerName());
-                inboundDescription.setIsEdited(inboundEndpointDTO.getIsEdited());
-            }
             descriptions.add(inboundDescription);
         }
         if (log.isDebugEnabled()) {

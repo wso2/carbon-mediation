@@ -212,12 +212,6 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 
         SynapseXMLConfigurationFactory.defineInboundEndpoint(synapseConfiguration, elem, synapseConfiguration.getProperties());
         InboundEndpoint inboundEndpoint = getInboundEndpoint(name);
-
-        /** If the inbound service deployed from artifact container, set the isEdited variable to true */
-        if (oldInboundEndpoint.getArtifactContainerName() != null) {
-            inboundEndpoint.setArtifactContainerName(oldInboundEndpoint.getArtifactContainerName());
-            inboundEndpoint.setIsEdited(true);
-        }
         persistInboundEndpoint(inboundEndpoint);
         try {
             inboundEndpoint.init(getSynapseEnvironment());
@@ -245,7 +239,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             }
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             InboundEndpoint inboundEndpoint = synapseConfiguration.getInboundEndpoint(name);
-            if (inboundEndpoint != null && inboundEndpoint.getArtifactContainerName() == null) {
+            if (inboundEndpoint != null) {
                 synapseConfiguration.removeInboundEndpoint(name);
                 inboundEndpoint.destroy();
                 MediationPersistenceManager pm = getMediationPersistenceManager();
@@ -255,11 +249,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
                     log.debug("Inbound service : " + name + " deleted");
                 }
             } else {
-                if (inboundEndpoint.getArtifactContainerName() != null) {
-                    log.warn("Inbound service" + name + " deployed from artifact container. Will not be deleted.");
-                } else {
-                    log.warn("No Inbound service exists by the name : " + name);
-                }
+                log.warn("No Inbound service exists by the name : " + name);
             }
         } catch (Exception e) {
             log.error("Unable to delete inbound service : " + name, e);
@@ -272,7 +262,7 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         if (pm == null) {
             log.error("Cannot Persist sequence because persistence manager is null, "
                     + "probably persistence is disabled");
-        } else if (inboundEndpoint.getArtifactContainerName() == null) {
+        } else {
             pm.saveItem(inboundEndpoint.getName(), ServiceBusConstants.ITEM_TYPE_INBOUND);
         }
     }
