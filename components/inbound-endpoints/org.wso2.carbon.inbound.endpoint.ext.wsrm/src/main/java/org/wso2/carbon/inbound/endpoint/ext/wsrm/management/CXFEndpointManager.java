@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package org.wso2.carbon.endpoint.ext.wsrm.management;
+package org.wso2.carbon.inbound.endpoint.ext.wsrm.management;
 
 /*import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;

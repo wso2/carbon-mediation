@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.endpoint.ext.wsrm.utils;
+package org.wso2.carbon.inbound.endpoint.ext.wsrm.utils;
 
 /**
  * Holds the constants used by the CXF RM Inbound endpoint

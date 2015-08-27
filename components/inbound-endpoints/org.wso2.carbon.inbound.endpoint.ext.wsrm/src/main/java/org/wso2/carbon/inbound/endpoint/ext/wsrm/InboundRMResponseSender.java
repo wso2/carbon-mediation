@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.endpoint.ext.wsrm;
+package org.wso2.carbon.inbound.endpoint.ext.wsrm;
 
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
@@ -30,7 +30,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.passthru.Pipe;
-import org.wso2.carbon.endpoint.ext.wsrm.utils.RMConstants;
+import org.wso2.carbon.inbound.endpoint.ext.wsrm.utils.RMConstants;
 
 import javax.xml.stream.XMLStreamException;
 

@@ -15,7 +15,7 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.endpoint.ext.wsrm.interceptor;
+package org.wso2.carbon.inbound.endpoint.ext.wsrm.interceptor;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -30,8 +30,8 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.log4j.Logger;
 import org.apache.synapse.util.PayloadHelper;
-import org.wso2.carbon.endpoint.ext.wsrm.utils.RMConstants;
-import org.wso2.carbon.endpoint.ext.wsrm.utils.SOAPEnvelopeCreator;
+import org.wso2.carbon.inbound.endpoint.ext.wsrm.utils.RMConstants;
+import org.wso2.carbon.inbound.endpoint.ext.wsrm.utils.SOAPEnvelopeCreator;
 
 import javax.xml.namespace.QName;
 import java.io.IOException;
