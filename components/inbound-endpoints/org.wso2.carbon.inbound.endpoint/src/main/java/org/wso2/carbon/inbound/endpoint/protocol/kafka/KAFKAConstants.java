@@ -54,6 +54,8 @@ public class KAFKAConstants {
 
     public static final String CONSUMER_TYPE = "consumer.type";
 
+    public static final String CONSUMER_TIMEOUT = "consumer.timeout.ms";
+
     public static final int SO_TIMEOUT = 100000;
 
     public static final int BUFFER_SIZE = 64 * 1024;

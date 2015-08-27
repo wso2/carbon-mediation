@@ -22,6 +22,7 @@ import kafka.javaapi.consumer.ConsumerConnector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -31,7 +32,7 @@ public abstract class AbstractKafkaMessageListener {
     protected ConsumerConnector consumerConnector;
     protected InjectHandler injectHandler;
     protected Properties kafkaProperties;
-    protected ConsumerIterator<byte[], byte[]> consumerIte;
+    protected ArrayList<ConsumerIterator<byte[], byte[]>> consumerIte;
     protected static final Log log = LogFactory
             .getLog(KAFKAMessageListener.class.getName());
 
@@ -78,4 +79,17 @@ public abstract class AbstractKafkaMessageListener {
      * Check ConsumerIterator whether It has next value
      */
     public abstract boolean hasNext();
+
+    /**
+     * Used to check whether there are multiple topics to consume from
+     */
+    public boolean hasMultipleTopicsToConsume(){
+        return false;
+    }
+
+    /**
+     * Consume from multiple topics
+     */
+    public void consumeMultipleTopics(String sequenceName) {
+    }
 }
