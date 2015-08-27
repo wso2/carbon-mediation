@@ -46,10 +46,6 @@
         </dependency>
     </dependencies>
 
-    <properties>
-        <cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
-        <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
-    </properties>
 
     <build>
         <plugins>
