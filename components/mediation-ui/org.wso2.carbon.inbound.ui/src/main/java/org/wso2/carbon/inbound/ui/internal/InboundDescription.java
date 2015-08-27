@@ -35,8 +35,6 @@ public class InboundDescription {
    private Map<String, String> parameters;
    private String fileName;
    public static final String REGISTRY_KEY_PREFIX = "$registry:";
-	private String artifactContainerName;
-	private boolean isEdited;
     
 	public InboundDescription(InboundEndpointDTO inboundEndpoint){
 		this.name = inboundEndpoint.getName();
@@ -53,8 +51,6 @@ public class InboundDescription {
 		this.onErrorSeq = inboundEndpoint.getOnErrorSeq();
 		this.fileName = inboundEndpoint.getFileName();
 		this.parameters = new HashMap<String, String>();
-		this.artifactContainerName = inboundEndpoint.getArtifactContainerName();
-		this.isEdited = inboundEndpoint.getIsEdited();
 		if(inboundEndpoint.getParameters() != null){
 			for(ParameterDTO parameterDTO :inboundEndpoint.getParameters()){
 				if(parameterDTO.getKey() != null){
@@ -142,21 +138,5 @@ public class InboundDescription {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
-	}
-
-	public String getArtifactContainerName() {
-		return artifactContainerName;
-	}
-
-	public void setArtifactContainerName(String artifactContainerName) {
-		this.artifactContainerName = artifactContainerName;
-	}
-
-	public boolean getIsEdited() {
-		return isEdited;
-	}
-
-	public void setIsEdited(boolean isEdited) {
-		this.isEdited = isEdited;
 	}
 }

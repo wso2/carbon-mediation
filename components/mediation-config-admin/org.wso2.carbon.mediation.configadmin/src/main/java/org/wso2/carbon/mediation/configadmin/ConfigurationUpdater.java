@@ -48,7 +48,6 @@ import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.eventing.SynapseEventSource;
-import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.libraries.imports.SynapseImport;
 import org.apache.synapse.libraries.model.Library;
 import org.apache.synapse.libraries.util.LibDeployerUtils;
@@ -83,7 +82,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -525,14 +523,6 @@ public class ConfigurationUpdater {
             } else {
                 api.setFileName(api.getName() + XML);
                 addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
-            }
-        }
-
-        Collection<InboundEndpoint> inboundEndpoints = newConfig.getInboundEndpoints();
-        for (InboundEndpoint inboundEndpoint : inboundEndpoints) {
-            InboundEndpoint oldInbound = currentConfig.getInboundEndpoint(inboundEndpoint.getName());
-            if (oldInbound != null) {
-                inboundEndpoint.setArtifactContainerName(oldInbound.getArtifactContainerName());
             }
         }
 
