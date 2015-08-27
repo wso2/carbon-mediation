@@ -100,6 +100,17 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     	    }    		
     	}
     }
+
+    if(kafkaSpecialParameters != null){
+        for(var i = 0;i<kafkaSpecialParameters.length;i++){
+            if(document.getElementById(kafkaSpecialParameters[i]) != null) {
+                if (document.getElementById(kafkaSpecialParameters[i]).value.trim() == '') {
+                    CARBON.showWarningDialog(msg5);
+                    return false;
+                }
+            }
+        }
+    }
     
     form.submit();
     return false;	
@@ -130,8 +141,18 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
     	        return false;
     	    }    		
     	}
-    }    
-    
+    }
+
+    if(kafkaSpecialParameters != null){
+        for(var i = 0;i<kafkaSpecialParameters.length;i++){
+            if(document.getElementById(kafkaSpecialParameters[i]) != null) {
+                if (document.getElementById(kafkaSpecialParameters[i]).value.trim() == '') {
+                    CARBON.showWarningDialog(msg5);
+                    return false;
+                }
+            }
+        }
+    }
     form.submit();
     return false;	
 }
