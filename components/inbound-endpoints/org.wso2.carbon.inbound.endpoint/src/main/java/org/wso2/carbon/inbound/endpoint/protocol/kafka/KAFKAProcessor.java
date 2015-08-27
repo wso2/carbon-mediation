@@ -122,18 +122,15 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
 
     @Override
     public void destroy() {
-        log.info("Inbound endpoint " + name + " stopping.");
         try {
-            if (pollingConsumer.messageListener != null) {
+            if (pollingConsumer != null && pollingConsumer.messageListener != null &&
+                pollingConsumer.messageListener.consumerConnector != null) {
                 pollingConsumer.messageListener.consumerConnector.shutdown();
                 log.info("Shutdown the kafka consumer connector");
             }
-            if (startUpController != null) {
-                startUpController.destroy();
-                log.info("Destroyed the startUpController");
-            }
         } catch (Exception e) {
-            log.error("Error while shutdown the consumer connector or destroy the startup controller" + e.getMessage(), e);
+            log.error("Error while shutdown the consumer connector" + e.getMessage(), e);
         }
+        super.destroy();
     }
 }
