@@ -98,6 +98,10 @@ public class Axis2IDocHandler implements JCoIDocHandler {
     			//convert recieved idocs to an output format
                 xmlProcessor.render(docList, osw);
     			osw.flush();
+                String output = baos.toString();
+                if (output.contains("<?xml version=\"1.1\"?>")) {
+                    output = output.replaceFirst("1.1", "1.0");
+                }
 
                 MessageContext msgContext = endpoint.createMessageContext();
                 msgContext.setIncomingTransportName(SAPConstants.SAP_IDOC_PROTOCOL_NAME);
@@ -106,7 +110,7 @@ public class Axis2IDocHandler implements JCoIDocHandler {
                     log.debug("Creating SOAP envelope from the IDoc");
                 }
 
-                bais = new ByteArrayInputStream(baos.toByteArray());
+                bais = new ByteArrayInputStream(output.getBytes());
                 if (log.isDebugEnabled()) {
                     //just print the recieved idocs to System
                     StringBuffer buffer = new StringBuffer("Received IDoc content: ");
