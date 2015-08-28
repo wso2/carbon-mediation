@@ -186,13 +186,16 @@ public class TaskManager {
                         .getParameterValue(SynapseConstants.SYNAPSE_CONFIG);
                 Startup startup = synapseConfig.getStartup(taskDescription.getName());
 
-                if (startup.getArtifactContainerName() != null) {
-                    data.setArtifactContainerName(startup.getArtifactContainerName());
+                if(startup != null) {
+                    if (startup.getArtifactContainerName() != null) {
+                        data.setArtifactContainerName(startup.getArtifactContainerName());
+                    }
+                    if (startup.isEdited()) {
+                        data.setIsEdited(true);
+                    }
+
+                    taskDatas.add(data);
                 }
-                if (startup.isEdited()) {
-                    data.setIsEdited(true);
-                }
-                taskDatas.add(data);
             }
         }
         if (log.isDebugEnabled()) {
