@@ -82,10 +82,10 @@ public class MqttClientManager {
             //server port, client id
             String msg = "Client ID: " +
                     callback.getMqttConnectionConsumer().getMqttAsyncClient().getClientId() +
-                    "Server Host: " + callback.getMqttConnectionConsumer()
+                    " Server Host: " + callback.getMqttConnectionConsumer()
                     .getMqttConnectionFactory().getServerHost() +
                     " Server Port: " + callback.getMqttConnectionConsumer()
-                    .getMqttConnectionFactory().getServerHost() +
+                    .getMqttConnectionFactory().getServerPort() +
                     " is bound to existing MQTT Inbound Endpoint.";
             log.error(msg);
             throw new SynapseException(msg);
