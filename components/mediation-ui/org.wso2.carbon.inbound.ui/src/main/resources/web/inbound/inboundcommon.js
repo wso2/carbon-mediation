@@ -183,6 +183,17 @@ function editRecord(name) {
     document.location.href = "editInbound.jsp?" + "name=" + name;
 }
 
+function editCAppInbound(name) {
+    CARBON.showConfirmationDialog(taskjsi18n["edit.artifactContainer.inbound.on.page.prompt"], function() {
+        $.ajax({
+            type: 'POST',
+            success: function() {
+                document.location.href = "editInbound.jsp?" + "name=" + name;
+            }
+        });
+    });
+}
+
 function onclassnamefieldchange(id) {
     var classnmae = document.getElementById("taskClass").value;
     if (classnmae != null && classnmae != undefined && classnmae != "") {
