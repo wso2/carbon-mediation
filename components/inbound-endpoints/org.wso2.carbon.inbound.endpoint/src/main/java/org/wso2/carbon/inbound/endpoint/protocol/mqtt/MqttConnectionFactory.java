@@ -38,7 +38,8 @@ public class MqttConnectionFactory {
     private String factoryName;
     private Hashtable<String, String> parameters = new Hashtable<String, String>();
     private MqttDefaultFilePersistence dataStore;
-
+    private static final int PORT_MIN_BOUND = 0;
+    private static final int PORT_MAX_BOUND = 65535;
 
     public MqttConnectionFactory(Properties passedInParameter) {
 
@@ -65,6 +66,7 @@ public class MqttConnectionFactory {
             }
 
             if (passedInParameter.getProperty(MqttConstants.MQTT_SERVER_PORT) != null) {
+                validatePortField(passedInParameter.getProperty(MqttConstants.MQTT_SERVER_PORT));
                 parameters.put(MqttConstants.MQTT_SERVER_PORT,
                         passedInParameter.getProperty(MqttConstants.MQTT_SERVER_PORT));
             } else {
@@ -144,6 +146,9 @@ public class MqttConnectionFactory {
         } catch (Exception ex) {
             log.error("MQTT connection factory : " + factoryName + " failed to initialize " +
                     "the MQTT Inbound configuration properties", ex);
+            //this will prevent the inbound from deployment if anything goes bad and exception
+            //thrown at this point will be thrown to the higher layer
+            throw new SynapseException(ex.getMessage());
         }
 
     }
@@ -265,6 +270,29 @@ public class MqttConnectionFactory {
         }
 
         return mqttClient;
+    }
+
+    protected void validatePortField(String port) {
+        try {
+            int portInteger = Integer.parseInt(port);
+            if ((PORT_MIN_BOUND < portInteger) && (portInteger < PORT_MAX_BOUND)) {
+                //this is a valid port integer so just return
+                return;
+            } else {
+                //in this case port number is not bounded to min and max, throwing synapse
+                //exception will prevent the inbound from deployment
+                String msg = "Server Port number should be bounded to min integer value: "
+                        + PORT_MIN_BOUND + " and max integer value: " + PORT_MAX_BOUND;
+                log.error(msg);
+                throw new SynapseException(msg);
+            }
+        } catch (NumberFormatException ex) {
+            //in this case port string contain any special characters, throwing synapse
+            //exception will prevent the inbound from deployment
+            String msg = "Server Port number should not contain any special characters";
+            log.error(msg);
+            throw new SynapseException(msg);
+        }
     }
 
     public void shutdown() {
