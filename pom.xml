@@ -2269,7 +2269,7 @@
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.3-wso2v8-SNAPSHOT</synapse.version>
+        <synapse.version>2.1.3-wso2v8</synapse.version>
 
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1.wso2v12</orbit.version.axis2>
