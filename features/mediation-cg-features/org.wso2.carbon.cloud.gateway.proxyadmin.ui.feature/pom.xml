@@ -5,11 +5,11 @@
     <parent>
         <artifactId>cg-features</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.4.6-SNAPSHOT</version>
+        <version>4.4.6</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <version>4.4.6-SNAPSHOT</version>
+    <version>4.4.6</version>
     <artifactId>org.wso2.carbon.cloud.gateway.proxyadmin.ui.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Cloud Gateway proxy admin UI feature</name>
