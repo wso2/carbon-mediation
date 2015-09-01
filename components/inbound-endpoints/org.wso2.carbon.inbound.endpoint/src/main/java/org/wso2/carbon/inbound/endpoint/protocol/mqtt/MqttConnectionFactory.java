@@ -295,9 +295,13 @@ public class MqttConnectionFactory {
         }
     }
 
-    public void shutdown() {
-        if (dataStore != null) {
+    public void shutdown(boolean isClientConnected) {
+        //need to clear the resources if and only if client holds the lock for the resource
+        //that is client has made a successful connection to the server
+        //this will clear the persistence resources and releases the the lock bound to that resource
+        if (dataStore != null && isClientConnected) {
             try {
+                dataStore.clear();
                 dataStore.close();
             } catch (MqttPersistenceException ex) {
                 log.error("Error while releasing the resources for data store", ex);

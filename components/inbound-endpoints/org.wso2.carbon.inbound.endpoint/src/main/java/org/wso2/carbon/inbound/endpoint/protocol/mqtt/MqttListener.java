@@ -126,7 +126,7 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
             //this will release thread suspended thread for completion
             connectionConsumer.shutdown();
             mqttAsyncCallback.shutdown();
-            confac.shutdown();
+            confac.shutdown(mqttAsyncClient.isConnected());
             try {
                 if (mqttAsyncClient.isConnected()) {
                     mqttAsyncClient.unsubscribe(confac.getTopic());
