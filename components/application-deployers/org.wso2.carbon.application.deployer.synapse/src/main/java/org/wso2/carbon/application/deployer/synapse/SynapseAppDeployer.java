@@ -126,12 +126,9 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                 } else {
                     try {
-
-                        if (deployer instanceof AbstractSynapseArtifactDeployer) {
-                            ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApp.getAppName(),
-                                    AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
-                        }
+                        setCustomLogContent(deployer, carbonApp);
                         deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
+                        setCustomLogContent(deployer, null);
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                     } catch (DeploymentException e) {
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
@@ -960,6 +957,16 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                File.separator + SynapseAppDeployerConstants.DEFAULT_DIR +
                File.separator + SynapseAppDeployerConstants.SEQUENCES_FOLDER +
                File.separator + SynapseAppDeployerConstants.FAULT_SEQ_FILE;
+    }
+
+    public void setCustomLogContent (Deployer deployer, CarbonApplication carbonApp) {
+        if ((deployer instanceof AbstractSynapseArtifactDeployer) && carbonApp != null) {
+            ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApp.getAppName(),
+                    AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
+        }
+        else if ((deployer instanceof AbstractSynapseArtifactDeployer) && carbonApp == null) {
+            ((AbstractSynapseArtifactDeployer) deployer).setCustomLogContentNull();
+        }
     }
 
 }
