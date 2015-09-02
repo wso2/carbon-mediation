@@ -295,7 +295,7 @@
     }
 
     function editCAppEndpoint(endPointName, endPointType ,paramCollectionStr) {
-        CARBON.showConfirmationDialog('<fmt:message key="edit.cApp.sequences.template.on.page.prompt"/>', function() {
+        CARBON.showConfirmationDialog('<fmt:message key="edit.artifactContainer.sequences.template.on.page.prompt"/>', function() {
             jQuery.ajax({
                 type: 'POST',
                 url: '../templates/endpoint_template-ajaxprocessor.jsp',
