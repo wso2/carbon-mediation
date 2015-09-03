@@ -321,7 +321,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                 } else {
                     log.debug("Deleting existing proxy service : " + proxyName);
                     AxisService axisService = synapseConfig.getAxisConfiguration().
-                            getService(proxyName);
+                            getServiceForActivation(proxyName);
                     if (axisService != null) {
                         wasRunning = axisService.isActive();
                         axisService.getParent().addParameter(
