@@ -44,7 +44,7 @@ function forward(destinationJSP) {
     location.href = destinationJSP;
 }
 
-function tasksave(namemsg, classmsg, cronmsg, countmsg, intervalmsg, form) {
+function tasksave(namemsg, classmsg, cronmsg, countmsg, intervalmsg, msgEntryInfo,propertyTableErrorMsg, form) {
 
     if (!isNameValid(document.getElementById('taskName').value)) {
         CARBON.showWarningDialog(namemsg);
@@ -76,6 +76,37 @@ function tasksave(namemsg, classmsg, cronmsg, countmsg, intervalmsg, form) {
             }
         }
     }
+
+    //Injecting the message to a named sequence or proxy service message property is mandatory to set. This check
+    // whether message exists or not when using org.apache.synapse.startup.tasks.MessageInjector class, as if message is
+    // not set there will be an exception thrown in the console
+    if ((document.getElementById('taskClass') != null) && (document.getElementById('taskClass').value.trim() == 'org.apache.synapse.startup.tasks.MessageInjector')) {
+        var propertyTable = document.getElementById('property_table');
+        if (propertyTable != null) {
+            var propertyTableRows = propertyTable.getElementsByTagName('tr');
+            if (propertyTableRows != null) {
+                for (var i = 0; i < propertyTableRows.length; i++) {
+                    var inputs = propertyTableRows[i].getElementsByTagName('input');
+                    if ((inputs != null) && (inputs.length > 0)) {
+                        if (inputs[0].value.trim() == 'message') {
+                            if (propertyTableRows[i].getElementsByTagName('textarea')[0].value.trim() != '') {
+                                break;
+                            }
+                            if (inputs[2].value.trim() != '') {
+                                break;
+                            }
+                            CARBON.showWarningDialog(msgEntryInfo);
+                            return false;
+                        }
+                    }
+                }
+            }
+        } else {
+            CARBON.showWarningDialog(propertyTableErrorMsg);
+            return false;
+        }
+    }
+
     validateClass(document.getElementById('taskClass').value, document.getElementById('taskGroup').value, form);
     return false;
 }
