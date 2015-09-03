@@ -60,7 +60,7 @@
 				}else if(strKey.startsWith("interval")){
 				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("interval",request.getParameter("interval"))));
 				}else if(strKey.startsWith("sequential")){
-				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("sequential",request.getParameter("sequential"))));				    
+				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("sequential",request.getParameter("sequential"))));
 				}else if(strKey.startsWith("keystore")){
                     sParams.add((new ParamDTO("keystore",request.getParameter(strKey))));
                 }else if(strKey.startsWith("feed.url")){
