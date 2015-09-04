@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.inbound.endpoint.protocol.rss;
+package org.wso2.carbon.inbound.endpoint.protocol.FeedEP;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,12 +29,12 @@ import org.wso2.carbon.context.RegistryType;
 import org.wso2.carbon.registry.api.Registry;
 import org.wso2.carbon.registry.api.RegistryException;
 import org.wso2.carbon.registry.api.Resource;
+import org.wso2.carbon.inbound.endpoint.persistence.ServiceReferenceHolder;
 
 public class RegistryHandler {
 	private static final Log log = LogFactory.getLog(RegistryHandler.class.getName());
 	Resource resource;
 	byte[] content;
-	CarbonContext cCtx;
 	Registry registry;
 	ByteArrayInputStream bis;
 	ObjectInputStream in;
@@ -43,8 +43,12 @@ public class RegistryHandler {
 	Object obj;
 
 	public RegistryHandler() {
-		cCtx = CarbonContext.getThreadLocalCarbonContext();
-		registry = cCtx.getRegistry(RegistryType.LOCAL_REPOSITORY);
+		try {
+			registry = ServiceReferenceHolder.getInstance().getRegistry();
+		} catch (RegistryException e) {
+            log.error(e.getMessage());
+		}
+
 	}
 
 	public Object readFromRegistry(String ResorcePath) {
@@ -61,7 +65,7 @@ public class RegistryHandler {
 				}
 			}
 		} catch (RegistryException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 		return obj;
 	}
@@ -101,7 +105,7 @@ public class RegistryHandler {
 		}
 	}
 
-	public void DeleteFromRegitry(String ResorcePath) {
+	public void deleteFromRegitry(String ResorcePath) {
 		try {
 			registry.delete(ResorcePath);
 			log.debug(ResorcePath + " Rigistry Deleted");
