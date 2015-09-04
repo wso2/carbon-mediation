@@ -61,7 +61,7 @@
                     sParams.add((new ParamDTO("inbound.behavior", request.getParameter("inbound.behavior"))));
                 }else if(strKey.startsWith("interval")){
 				    sParams.add((new ParamDTO("interval",request.getParameter("interval"))));
-				}else if(strKey.startsWith("Sequential")){
+				}else if(strKey.startsWith("sequential")){
 				    sParams.add((new ParamDTO("sequential",request.getParameter("sequential"))));
 				}else if(strKey.startsWith("keystore")){
                  	sParams.add((new ParamDTO("keystore",request.getParameter(strKey))));
