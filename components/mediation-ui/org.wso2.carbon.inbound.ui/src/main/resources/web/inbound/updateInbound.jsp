@@ -67,6 +67,8 @@
                     sParams.add((new ParamDTO("feed.url",request.getParameter(strKey))));
                 }else if(strKey.startsWith("feed.type")){
                     sParams.add((new ParamDTO("feed.type",request.getParameter(strKey))));
+                }else if(strKey.startsWith("TimeFormat")){
+                     sParams.add((new ParamDTO("TimeFormat",request.getParameter(strKey))));
                 }else if(strKey.startsWith("truststore")){
                     sParams.add((new ParamDTO("truststore",request.getParameter(strKey))));
                 }else if(strKey.startsWith("SSLVerifyClient")){
