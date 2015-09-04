@@ -68,6 +68,11 @@ public class NTaskAdapter extends AbstractTask {
     }
 
     public void execute() {
+
+        if (!isInitialized()) {
+            return;
+        }
+
         //introduced due to limitation of Ntask.core executing task for single cycle when task
         // count 0
         //trigger count cannot be null for a task description hence null check avoided
@@ -75,9 +80,6 @@ public class NTaskAdapter extends AbstractTask {
             return;
         }
 
-        if (!isInitialized()) {
-            return;
-        }
         if (logger.isDebugEnabled()) {
             logger.debug("#execute Executing NTaskAdapter: " + getProperties()
                 + " Worker-node[" + CarbonUtils.isWorkerNode() + "]" );
