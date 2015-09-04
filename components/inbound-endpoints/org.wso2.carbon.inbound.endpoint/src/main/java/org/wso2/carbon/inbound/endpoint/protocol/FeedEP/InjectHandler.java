@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.inbound.endpoint.protocol.rss;
+package org.wso2.carbon.inbound.endpoint.protocol.FeedEP;
 
 public interface InjectHandler {
 
