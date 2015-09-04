@@ -65,12 +65,12 @@
 				    sParams.add((new ParamDTO("sequential",request.getParameter("sequential"))));
 				}else if(strKey.startsWith("keystore")){
                  	sParams.add((new ParamDTO("keystore",request.getParameter(strKey))));
+                 }else if(strKey.startsWith("TimeFormat")){
+                    sParams.add((new ParamDTO("TimeFormat",request.getParameter(strKey))));
                 }else if(strKey.startsWith("feed.url")){
                     sParams.add((new ParamDTO("feed.url",request.getParameter(strKey))));
                 }else if(strKey.startsWith("feed.type")){
                     sParams.add((new ParamDTO("feed.type",request.getParameter(strKey))));
-                }else if(strKey.startsWith("TimeFormat")){
-                     sParams.add((new ParamDTO("TimeFormat",request.getParameter(strKey))));
                 }else if(strKey.startsWith("truststore")){
                  	sParams.add((new ParamDTO("truststore",request.getParameter(strKey))));
                 }else if(strKey.startsWith("SSLVerifyClient")){
