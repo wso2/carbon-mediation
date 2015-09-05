@@ -184,8 +184,8 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
             }
             return false;
         } catch (Exception e) {
-            //Message Listening thread is interrupted during server shutdown. This cannot be fixed and only happen
-            // during ESB shutdown is triggered.
+            //Message Listening thread is interrupted during server shutdown. This happen during ESB shutdown is
+            // triggered
             if (log.isDebugEnabled()) {
                 log.debug("Kafka listener is interrupted by server shutdown.", e);
             }
