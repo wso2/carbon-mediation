@@ -146,16 +146,16 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
 //            consumerIte = stream.iterator();
 //            break;
 //        }
-        if(streams.size() >= 1){
+        if (streams.size() >= 1) {
             consumerIte.add(streams.get(0).iterator());
         }
     }
 
     @Override
     public void injectMessageToESB(String sequenceName) {
-        if(consumerIte.size() == 1){
-            injectMessageToESB(sequenceName,consumerIte.get(0));
-        }else{
+        if (consumerIte.size() == 1) {
+            injectMessageToESB(sequenceName, consumerIte.get(0));
+        } else {
             log.debug("There are multiple topics to consume from not a single topic");
         }
     }
@@ -166,10 +166,10 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
     }
 
     @Override public boolean hasNext() {
-        if(consumerIte.size() == 1){
+        if (consumerIte.size() == 1) {
             return hasNext(consumerIte.get(0));
-        }else{
-            log.debug("There are multiple topics to consume from not a single topic");
+        } else {
+            log.debug("There are multiple topics to consume from not a single topic,");
         }
         return false;
     }
@@ -177,10 +177,17 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
     public boolean hasNext(ConsumerIterator<byte[], byte[]> consumerIterator) {
         try {
             return consumerIterator.hasNext();
-        }catch (ConsumerTimeoutException e) {
+        } catch (ConsumerTimeoutException e) {
             //exception ignored
-            if(log.isDebugEnabled()){
-                log.debug("Topic has no new messages to consume");
+            if (log.isDebugEnabled()) {
+                log.debug("Topic has no new messages to consume.");
+            }
+            return false;
+        } catch (Exception e) {
+            //Message Listening thread is interrupted during server shutdown. This happen during ESB shutdown is
+            // triggered
+            if (log.isDebugEnabled()) {
+                log.debug("Kafka listener is interrupted by server shutdown.", e);
             }
             return false;
         }
@@ -188,9 +195,9 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
 
     @Override
     public boolean hasMultipleTopicsToConsume() {
-        if(consumerIte.size() > 1){
+        if (consumerIte.size() > 1) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
