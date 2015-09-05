@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.inbound.endpoint.protocol.rss;
+package org.wso2.carbon.inbound.endpoint.protocol.FeedEP;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.UUIDGenerator;
@@ -45,12 +45,12 @@ public class RssInject implements InjectHandler {
 	private SynapseEnvironment synapseEnvironment;
 	private String contentType;
 
-	public RssInject(String injectingSeq2, String onErrorSeq2, boolean sequential2,
-	                 SynapseEnvironment synapseEnvironment2, String contentType) {
-		this.injectingSeq = injectingSeq2;
-		this.onErrorSeq = onErrorSeq2;
-		this.sequential = sequential2;
-		this.synapseEnvironment = synapseEnvironment2;
+	public RssInject(String injectingSeq, String onErrorSeq, boolean sequential,
+	                 SynapseEnvironment synapseEnvironment, String contentType) {
+		this.injectingSeq = injectingSeq;
+		this.onErrorSeq = onErrorSeq;
+		this.sequential = sequential;
+		this.synapseEnvironment = synapseEnvironment;
 		this.contentType = contentType;
 	}
 
@@ -60,31 +60,23 @@ public class RssInject implements InjectHandler {
 	 * inject the message to the sequence
 	 */
 	public boolean invoke(Object object) {
-		log.debug("Feed Parse into invoke ");
 		org.apache.synapse.MessageContext msgCtx = null;
 		try {
 			msgCtx = createMessageContext();
 		} catch (Exception e) {
 			log.error(e.getMessage());
 		}
-		log.info("Processed Feeds Message ");
 		MessageContext axis2MsgCtx = null;
 		try {
 			axis2MsgCtx =
 			              ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx).getAxis2MessageContext();
 		} catch (Exception e) {
-			log.info(e.getMessage());
+			log.error(e.getMessage(),e);
 		}
 		// Determine the message builder to use
 		Builder builder = null;
-		if (contentType == null) {
-			log.debug("No content type specified. Using SOAP builder.");
-			builder = new SOAPBuilder();
-		} else {
-			int index = contentType.indexOf(';');
-			String type = index > 0 ? contentType.substring(0, index) : contentType;
 			try {
-				builder = BuilderUtil.getBuilderFromSelector(type, axis2MsgCtx);
+				builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
 			} catch (AxisFault axisFault) {
 				log.error("Error while creating message builder :: " + axisFault.getMessage(),
 				          axisFault);
@@ -92,12 +84,12 @@ public class RssInject implements InjectHandler {
 			}
 			if (builder == null) {
 				if (log.isDebugEnabled()) {
-					log.info("No message builder found for type '" + type +
+					log.info("No message builder found for type '" + contentType +
 					         "'. Falling back to SOAP.");
 				}
 				builder = new SOAPBuilder();
 			}
-		}
+
 
 		try {
 			OMElement documentElement = (OMElement) object;
@@ -106,7 +98,7 @@ public class RssInject implements InjectHandler {
 			log.error("Error while setting message to the message context :: " +
 			                  axisFault.getMessage(), axisFault);
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error(e.getMessage(),e);
 		}
 		// Inject the message to the sequence.
 
@@ -120,7 +112,7 @@ public class RssInject implements InjectHandler {
 		try {
 			seq.setErrorHandler(onErrorSeq);
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error(e.getMessage(),e);
 		}
 
 		if (seq != null) {
