@@ -583,8 +583,15 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 return taskManager.getTaskState(taskName)
                                   .equals(org.wso2.carbon.ntask.core.TaskManager.TaskState.PAUSED);
             } catch (Exception e) {
-                logger.error("Cannot return task status [" + taskName + "]. Error: " +
-                                     e.getLocalizedMessage(), e);
+                /*
+                 * This fix was given to avoid error messages printing
+                 * while server shutdowns in cluster mode when MP is running.
+                 * This is related to the issue ESBJAVA-4061.
+                 */
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Cannot return task status [" + taskName + "]. Error: " +
+                            e.getLocalizedMessage(), e);
+                }
             }
         }
         return false;
