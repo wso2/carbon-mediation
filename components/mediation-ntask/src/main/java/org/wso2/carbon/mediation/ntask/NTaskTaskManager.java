@@ -99,9 +99,14 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     queueTask(taskDescription);
 					return false;
 				}
-				taskManager.registerTask(taskInfo);
-				taskManager.scheduleTask(taskInfo.getName());
-                removeTask(taskDescription);
+                //Schedule task only if this is a standalone node or a worker node
+                boolean isStandaloneNode = NtaskService.getCcServiceInstance().getServerConfigContext()
+                        .getAxisConfiguration().getClusteringAgent() == null;
+                if(isStandaloneNode || CarbonUtils.isWorkerNode()) {
+                    taskManager.registerTask(taskInfo);
+                    taskManager.scheduleTask(taskInfo.getName());
+                    removeTask(taskDescription);
+                }
 			}
 			logger.info("Scheduled task " + taskId(taskDescription));
 		} catch (Exception e) {
