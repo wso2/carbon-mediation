@@ -252,7 +252,14 @@
                                 <%}%>
                             </a>
                         <%} else {%>
-                            <a><%=name%>
+                            <a>
+                                <% if (msData.getArtifactContainerName() != null) { %>
+                                    <img src="images/applications.gif">
+                                    <%=name%>
+                                <% if(msData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                                <% } else {%>
+                                    <%=name%>
+                                <%}%>
                             </a>
                         <%}%>
                         </td>
