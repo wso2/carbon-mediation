@@ -75,8 +75,8 @@ public class NTaskAdapter extends AbstractTask {
 
         //introduced due to limitation of Ntask.core executing task for single cycle when task
         // count 0
-        //trigger count cannot be null for a task description hence null check avoided
-        if (Integer.parseInt(getProperties().get("task.count")) == 0) {
+        //trigger count can be null in some scenarios when editing tasks hence null check
+        if (getProperties().get("task.count") == null || (getProperties().get("task.count") != null && Integer.parseInt(getProperties().get("task.count")) == 0)) {
             return;
         }
 
