@@ -190,8 +190,8 @@ var kafkaSpecialParameters = null;
                             }
                         }
                     </script>
+                    <% } %>
 
-                    <% } %>             
                     <%if(!defaultParams.isEmpty()){                     
                     %>
                     <script type="text/javascript">var requiredParams = new Array(<%=defaultParams.size()%>);</script>
@@ -206,7 +206,7 @@ var kafkaSpecialParameters = null;
 					%> 	
 					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
 	                    <tr>
-	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
+	                        <td style="width:150px"><fmt:message key="<%=defaultParam%>"/><span class="required">*</span></td>
 	                        <td align="left">
 	                        <%if(arrParamOri.length > 2){%>
 	                            <%if(InboundClientConstants.TYPE_KAFKA.equals(request.getParameter("inboundType"))){
@@ -350,7 +350,7 @@ var kafkaSpecialParameters = null;
                                    onclick="inboundsave2('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>',document.inboundcreationform); return false;"/>
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.cancel.button.text"/>"
-                                   onclick="document.location.href='index.jsp?ordinal=0';"/>                                                                 
+                                   onclick="document.location.href='index.jsp?ordinal=0';"/>
                         </td>
                     </tr>
 				         </tbody> 
