@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.inbound.endpoint.protocol.FeedEP;
+package org.wso2.carbon.inbound.endpoint.protocol.feedep;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,8 +25,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
-
-import javax.xml.namespace.QName;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.factory.Factory;
@@ -47,7 +45,7 @@ import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
  * ConsumeFeed uses to feeds from given Backend
  */
 
-public class ConsumeFeed extends InboundRequestProcessorImpl {
+class ConsumeFeed extends InboundRequestProcessorImpl {
 
     private static final Log log = LogFactory.getLog(ConsumeFeed.class.getName());
     private long scanInterval;
@@ -55,22 +53,11 @@ public class ConsumeFeed extends InboundRequestProcessorImpl {
     private String host;
     private String feedType;
     private Feed feed = null;
-    private OMElement item = null;
-    Date date;
     private java.util.Date lastUpdated;
-    private Date newUpdated;
-    RssInject rssInject;
-    Document<Feed> doc;
-    InputStream input;
-    DateFormat format;
-    Parser parser;
-    ParserOptions opts;
-    ListParseFilter filter;
-    Entry entry = null;
-    Factory factory;
-    RegistryHandler registryHandler;
-    String pathName;
-    String dateFormat;
+    private RssInject rssInject;
+    private RegistryHandler registryHandler;
+    private String pathName;
+    private String dateFormat;
 
     public ConsumeFeed(RssInject rssInject, long scanInterval, String host, String feedType,
                        RegistryHandler registryHandler, String name, String dateFormat) {
@@ -81,6 +68,8 @@ public class ConsumeFeed extends InboundRequestProcessorImpl {
         this.registryHandler = registryHandler;
         this.pathName = name;
         this.dateFormat = dateFormat;
+
+
     }
 
     //check time interval
@@ -92,7 +81,12 @@ public class ConsumeFeed extends InboundRequestProcessorImpl {
                 log.debug("lastRanTime " + lastRanTime);
                 consume();
             } else if (log.isDebugEnabled()) {
-                log.debug("Skip cycle since concurrent rate is higher than the scan interval : Feed Inbound EP ");
+                log.debug("Skip cycle since concurrent rate is higher than the scan interval : Feed Inbound EP " + pathName);
+            } else if (scanInterval < 999999999) {
+                scanInterval = scanInterval + 1000;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("End : Feed Inbound EP : " + pathName);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -100,35 +94,27 @@ public class ConsumeFeed extends InboundRequestProcessorImpl {
     }
 
     //consume feeds
-    public void consume() throws ClassNotFoundException, IOException {
-        format = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
-        parser = Abdera.getNewParser();
-        try {
-            input = new URL(host).openStream();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return;
-        }
+    private void consume() throws ClassNotFoundException, IOException {
 
+        DateFormat format = new SimpleDateFormat(FeedEPConstant.RSS_FEED_DATE_FORMAT, Locale.ENGLISH);
+        Parser parser = Abdera.getNewParser();
         //set filter
-        opts = parser.getDefaultParserOptions();
-        filter = new WhiteListParseFilter();
+        ParserOptions opts = parser.getDefaultParserOptions();
+        ListParseFilter filter = new WhiteListParseFilter();
         try {
-            if (feedType.equalsIgnoreCase("RSS")) {
-                filter.add(new QName("rss"));
-                filter.add(new QName("channel"));
-                filter.add(new QName("item"));
-                filter.add(new QName("title"));
-                filter.add(new QName("guid"));
-                filter.add(new QName("description"));
-                filter.add(new QName("pubDate"));
-                filter.add(new QName("link"));
-            } else if (feedType.equalsIgnoreCase("Atom")) {
+            if (feedType.equalsIgnoreCase(FeedEPConstant.FEED_TYPE_RSS)) {
+                filter.add(FeedEPConstant.FEED_RSS);
+                filter.add(FeedEPConstant.FEED_CHANNEL);
+                filter.add(FeedEPConstant.FEED_ITEM);
+                filter.add(FeedEPConstant.FEED_TITLE);
+                filter.add(FeedEPConstant.FEED_GUID);
+                filter.add(FeedEPConstant.FEED_PUBDATE);
+                filter.add(FeedEPConstant.FEED_LINK);
+            } else if (feedType.equalsIgnoreCase(FeedEPConstant.FEED_TYPE_ATOM)) {
                 filter.add(Constants.FEED);
                 filter.add(Constants.ENTRY);
                 filter.add(Constants.TITLE);
                 filter.add(Constants.ID);
-                filter.add(Constants.CONTENT);
                 filter.add(Constants.UPDATED);
                 filter.add(Constants.LINK);
                 filter.add(Constants.AUTHOR);
@@ -139,7 +125,14 @@ public class ConsumeFeed extends InboundRequestProcessorImpl {
         }
 
         opts.setParseFilter(filter);
-
+        InputStream input;
+        try {
+            input = new URL(host).openStream();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return;
+        }
+        Document<Feed> doc;
         try {
             doc = parser.parse(input, "", opts);
             if (doc.getRoot() == null) {
@@ -150,26 +143,26 @@ public class ConsumeFeed extends InboundRequestProcessorImpl {
             log.error(e.getMessage());
             return;
         }
+
         //convert RSS feeds as Atom
         try {
-            if (feedType.equalsIgnoreCase("RSS")) {
-                factory = Abdera.getNewFactory();
+            if (feedType.equalsIgnoreCase(FeedEPConstant.FEED_TYPE_RSS)) {
+                Factory factory = Abdera.getNewFactory();
                 feed = factory.newFeed();
+                OMElement item = (OMElement) doc.getRoot();
+                Iterator values1 = item.getFirstElement().getChildrenWithName(FeedEPConstant.FEED_ITEM);
 
-                item = (OMElement) doc.getRoot();
-
-
-                Iterator values1 = item.getFirstElement().getChildrenWithName(new QName("item"));
                 while (values1.hasNext()) {
-                    entry = feed.insertEntry();
+                    Entry entry = feed.insertEntry();
                     OMElement omElement = (OMElement) values1.next();
 
-                    Iterator values2 = omElement.getChildrenWithName(new QName("title"));
+                    Iterator values2 = omElement.getChildrenWithName(FeedEPConstant.FEED_TITLE);
                     OMElement Title = (OMElement) values2.next();
                     entry.setTitle(Title.getText());
 
-                    Iterator values3 = omElement.getChildrenWithName(new QName("pubDate"));
+                    Iterator values3 = omElement.getChildrenWithName(FeedEPConstant.FEED_PUBDATE);
                     OMElement Updated = (OMElement) values3.next();
+                    Date date;
                     try {
                         date = format.parse(Updated.getText());
                         entry.setUpdated(date);
@@ -180,31 +173,27 @@ public class ConsumeFeed extends InboundRequestProcessorImpl {
                             date = format.parse(Updated.getText());
                             entry.setUpdated(date);
                         } else {
-                            log.error(e.getMessage(),e);
+                            log.error(e.getMessage(), e);
                             return;
                         }
                     }
 
-                    Iterator values4 = omElement.getChildrenWithName(new QName("description"));
-                    OMElement Content = (OMElement) values4.next();
-                    entry.setContent(Content.getText());
-
-                    Iterator values5 = omElement.getChildrenWithName(new QName("guid"));
+                    Iterator values5 = omElement.getChildrenWithName(FeedEPConstant.FEED_GUID);
                     OMElement guid1 = (OMElement) values5.next();
                     entry.setId(guid1.getText());
 
-                    Iterator values6 = omElement.getChildrenWithName(new QName("link"));
+                    Iterator values6 = omElement.getChildrenWithName(FeedEPConstant.FEED_LINK);
                     OMElement link = (OMElement) values6.next();
                     entry.setBaseUri(link.getText());
 
                 }
-            } else if (feedType.equalsIgnoreCase("Atom")) {
+            } else if (feedType.equalsIgnoreCase(FeedEPConstant.FEED_TYPE_ATOM)) {
                 feed = doc.getRoot();
             }
             try {
                 log.debug(lastUpdated + " : " + feed.getEntries().get(0).getUpdated());
-                format = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy", Locale.ENGLISH);
-                newUpdated=feed.getEntries().get(0).getUpdated();
+                format = new SimpleDateFormat(FeedEPConstant.REGISTRY_TIME_FORMAT, Locale.ENGLISH);
+                Date newUpdated = feed.getEntries().get(0).getUpdated();
                 if (registryHandler.readFromRegistry(pathName) != null) {
                     lastUpdated =
                             format.parse(registryHandler.readFromRegistry(pathName)
@@ -224,7 +213,6 @@ public class ConsumeFeed extends InboundRequestProcessorImpl {
                     log.debug("there Is No New Feed");
                     return;
                 }
-
             } catch (Exception e) {
                 log.error("Error in lastUpdate time checking " + e.getMessage());
             }
@@ -236,4 +224,5 @@ public class ConsumeFeed extends InboundRequestProcessorImpl {
 
     public void init() {
     }
+
 }

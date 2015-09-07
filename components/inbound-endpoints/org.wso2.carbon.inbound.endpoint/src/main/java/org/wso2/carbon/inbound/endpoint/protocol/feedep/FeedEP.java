@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.inbound.endpoint.protocol.FeedEP;
+package org.wso2.carbon.inbound.endpoint.protocol.feedep;
 
 import java.util.Properties;
 
@@ -29,8 +29,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 public class FeedEP extends InboundRequestProcessorImpl {
 
     private static final Log log = LogFactory.getLog(FeedEP.class.getName());
-    private static final String ENDPOINT_POSTFIX = "FeedEP" + COMMON_ENDPOINT_POSTFIX;
-    private Properties rssProperties;
+    private static final String ENDPOINT_POSTFIX = "feedep" + COMMON_ENDPOINT_POSTFIX;
     private String injectingSeq;
     private String onErrorSeq;
     private boolean sequential;
@@ -38,31 +37,30 @@ public class FeedEP extends InboundRequestProcessorImpl {
     private String feedType;
     private ConsumeFeed consume;
     private long scanInterval;
-    RegistryHandler registryHandler;
-    private  String dateFormat;
+    private RegistryHandler registryHandler;
+    private String dateFormat;
 
     public FeedEP(InboundProcessorParams params) {
         registryHandler = new RegistryHandler();
         this.name = params.getName();
-        this.rssProperties = params.getProperties();
+        Properties rssProperties = params.getProperties();
         String inboundEndpointInterval =
                 rssProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL);
         if (inboundEndpointInterval != null) {
             try {
-                this.scanInterval = Long.parseLong(inboundEndpointInterval);
+                this.interval = Long.parseLong(inboundEndpointInterval);
             } catch (NumberFormatException nfe) {
                 log.error("Invalid numeric value for interval. " + nfe.getMessage(), nfe);
                 throw new SynapseException("Invalid numeric value for interval. ", nfe);
             }
         }
         this.sequential = true;
-        this.host = rssProperties.getProperty("feed.url");
-        this.feedType = rssProperties.getProperty("feed.type");
+        this.host = rssProperties.getProperty(FeedEPConstant.FEED_URL);
+        this.feedType = rssProperties.getProperty(FeedEPConstant.FEED_TYPE);
         log.info("URL : " + host + "Feed Type : " + feedType);
-        if(rssProperties.getProperty("TimeFormat")!=null){
-            this.dateFormat=rssProperties.getProperty("TimeFormat");
+        if (rssProperties.getProperty(FeedEPConstant.FEED_TIMEFORMAT) != null) {
+            this.dateFormat = rssProperties.getProperty(FeedEPConstant.FEED_TIMEFORMAT);
         }
-
         String inboundEndpointSequential =
                 rssProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL);
         if (inboundEndpointSequential != null) {
@@ -106,8 +104,15 @@ public class FeedEP extends InboundRequestProcessorImpl {
     public void init() {
         RssInject rssInject =
                 new RssInject(injectingSeq, onErrorSeq, sequential,
-                        synapseEnvironment, "TEXT");
-        consume = new ConsumeFeed(rssInject, scanInterval, host, feedType, registryHandler, name,dateFormat);
+                        synapseEnvironment, FeedEPConstant.FEED_FORMAT);
+        consume = new ConsumeFeed(rssInject, interval, host, feedType, registryHandler, name, dateFormat);
+        start();
+    }
+
+    /**
+     * Register/start the schedule service
+     */
+    private void start() {
         InboundTask task = new FeedTask(consume, interval);
         start(task, ENDPOINT_POSTFIX);
     }

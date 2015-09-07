@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.wso2.carbon.inbound.endpoint.protocol.FeedEP;
+package org.wso2.carbon.inbound.endpoint.protocol.feedep;
 
-public interface InjectHandler {
+interface InjectHandler {
 
-	public boolean invoke(Object object);
+	boolean invoke(Object object);
 
 }

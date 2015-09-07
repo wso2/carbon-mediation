@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.inbound.endpoint.protocol.FeedEP;
+package org.wso2.carbon.inbound.endpoint.protocol.feedep;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,33 +23,32 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 
 /**
- * 
  * FeedTask class is use to schedule tasks for inbound Feed processor when
  * required (coordination==true)
- * 
  */
-public class FeedTask extends InboundTask {
+class FeedTask extends InboundTask {
 
-	private static final Log logger = LogFactory.getLog(FeedTask.class.getName());
+    private static final Log logger = LogFactory.getLog(FeedTask.class.getName());
 
-	private ConsumeFeed feedScanner;
+    private ConsumeFeed feedScanner;
 
-	public FeedTask(ConsumeFeed feedScanner, long interval) {
-		logger.debug("Feed Task initalize.");
-		this.interval = interval;
-		this.feedScanner = feedScanner;
-	}
+    public FeedTask(ConsumeFeed feedScanner, long interval) {
+        logger.debug("Feed Task initalize.");
+        this.interval = interval;
+        this.feedScanner = feedScanner;
+    }
 
-	protected void taskExecute() {
-		logger.debug("Feed Task executing.");
-		feedScanner.execute();
-	}
+    protected void taskExecute() {
+        logger.debug("Feed Task executing.");
+        feedScanner.execute();
+    }
 
-	public void init(SynapseEnvironment synapseEnvironment) {
-		logger.debug("Initializing Task.");
-	}
+    public void init(SynapseEnvironment synapseEnvironment) {
+        logger.debug("Initializing Task.");
+    }
 
-	public void destroy() {
-		logger.debug("Destroying Task. ");
-	}
+    public void destroy() {
+        logger.debug("Destroying Task. ");
+
+    }
 }
