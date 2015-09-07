@@ -37,7 +37,7 @@ public class SynapseConfigAdmin extends AbstractServiceBusAdmin {
 
     // Constants to identify
     private final String ADDRESS_EP = "address";
-    private final String FAILOVER_EP = "failOver";
+    private final String FAILOVER_EP = "failover";
     private final String WSDL_EP = "WSDL";
     private final String LOADBALANCE_EP = "loadBalance";
     private final String DEFAULT_EP = "default";
