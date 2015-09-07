@@ -148,7 +148,12 @@
         addServiceParameter("is.active", document.getElementById('mp_state').value);
         addServiceParameter("max.delivery.drop",document.getElementById('max_delivery_drop').value);
         addServiceParameter("member.count", document.getElementById('member_count').value);
-        addServiceParameter("message.target.store.name", document.getElementById('targetMessageStore').options[document.getElementById('targetMessageStore').selectedIndex].value);
+
+        if (document.getElementById('targetMessageStore').options == null) {
+            addServiceParameter("message.target.store.name", document.getElementById('targetMessageStore').value);
+        } else {
+            addServiceParameter("message.target.store.name", document.getElementById('targetMessageStore').options[document.getElementById('targetMessageStore').selectedIndex].value);
+        }
 
     }
 
