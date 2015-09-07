@@ -206,7 +206,7 @@ var kafkaSpecialParameters = null;
 					%> 	
 					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
 	                    <tr>
-	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
+	                        <td style="width:150px"><fmt:message key="<%=defaultParam%>"/><span class="required">*</span></td>
 	                        <td align="left">
 	                        <%if(arrParamOri.length > 2){%>
 	                            <%if(InboundClientConstants.TYPE_KAFKA.equals(request.getParameter("inboundType"))){
@@ -318,7 +318,7 @@ var kafkaSpecialParameters = null;
                                     if (arrParamOri.length == 2) { defaultVal = arrParamOri[1].trim(); }
 								%> 					                       
 				                    <tr>
-				                        <td style="width:150px"><%=defaultParam %></td>
+				                        <td style="width:150px"><fmt:message key="<%=defaultParam%>"/></td>
 				                        <td align="left">
 				                        <%if(arrParamOri.length > 2){%>
 				                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
