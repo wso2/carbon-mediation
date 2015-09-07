@@ -148,7 +148,12 @@
         addServiceParameter("is.active", document.getElementById('mp_state').value);
         addServiceParameter("max.delivery.drop",document.getElementById('max_delivery_drop').value);
         addServiceParameter("member.count", document.getElementById('member_count').value);
-        addServiceParameter("message.target.store.name", document.getElementById('targetMessageStore').options[document.getElementById('targetMessageStore').selectedIndex].value);
+
+        if (document.getElementById('targetMessageStore').options == null) {
+            addServiceParameter("message.target.store.name", document.getElementById('targetMessageStore').value);
+        } else {
+            addServiceParameter("message.target.store.name", document.getElementById('targetMessageStore').options[document.getElementById('targetMessageStore').selectedIndex].value);
+        }
 
     }
 
@@ -223,7 +228,6 @@
 
     MessageProcessorData processorData = null;
     String targetMessageStoreName = null;
-
     if (messageStoreName != null) {
         session.setAttribute("edit" + messageStoreName, "true");
         for (String name : messageProcessorNames) {
@@ -249,6 +253,8 @@
         processorData.setName(mpName);
         processorData.setClazz(mpProvider);
         processorData.setMessageStore(mpStore);
+        targetMessageStoreName = processorData.getParams().get("message.target.store.name");
+
     }
     MessageStoreAdminServiceClient messageStoreClient =
             new MessageStoreAdminServiceClient(cookie, url, configContext);
@@ -313,26 +319,13 @@
                     <tr>
                         <td><fmt:message key="source.message.store"/><span class="required"> *</span></td>
                         <td>
-                            <input name="MessageStore" id="MessageStore" type="hidden" value="<%=processorData
-                                .getMessageStore()%>"/>
-                            <select id="msgStore" name="msgStore" disabled="true">
-
-                            <%
-                            if(messageStores != null) {
-                                for (String msn : messageStores) {
-                                    if(processorData.getMessageStore() != null && msn.equals(processorData.getMessageStore())) {
-                            %>
-                                    <option value="<%=msn%>" selected="true"><%=msn%></option>
-                            <%
-                            } else {
-                            %>
-                                    <option  value="<%=msn%>"><%=msn%></option>
-                            <%
-                            }}}
-                            %>
-                            </select>
-                            <br/>
+                            <input name="MessageStore" id="MessageStore" type="hidden"
+                                   value="<%=processorData.getMessageStore()%>"/>
+                            <label id="MessageStore_label" for="MessageStore"><%=processorData.getMessageStore()%>
+                            </label>
+                        <br/>
                         </td>
+
                     </tr>
                 <%} else {%>
                     <tr>
@@ -352,25 +345,11 @@
                  <tr>
                     <td><fmt:message key="target.message.store"/><span class="required"> *</span></td>
                     <td>
-                        <input name="targetMessageStore" id="targetMessageStore" type="hidden" value="<%=targetMessageStoreName%>"/>
-                        <select id="trgMessageStore" name="trgMessageStore" disabled="true"\>
-                            <%
-                            if(messageStores != null) {
-                                for (String msn : messageStores) {
-                                    if(targetMessageStoreName != null && msn.equals(targetMessageStoreName)) {
-                            %>
-                                        <option value="<%=msn%>" selected="true"><%=msn%></option>
-                                    <%
-                                    } else {
-                                    %>
-                                        <option  value="<%=msn%>"><%=msn%></option>
-                                    <%
-
-                                    }
-                            }}
-                           %>
-                        </select>
-                    <br/>
+                        <input name="targetMessageStore" id="targetMessageStore" type="hidden"
+                               value="<%=targetMessageStoreName%>"/>
+                        <label id="TargetMessageStore_label" for="targetMessageStore"><%=targetMessageStoreName%>
+                        </label>
+                        <br/>
                     </td>
                  </tr>
                  <%} else {%>

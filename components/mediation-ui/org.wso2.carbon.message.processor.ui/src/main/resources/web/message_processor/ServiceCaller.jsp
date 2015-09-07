@@ -44,16 +44,13 @@
 
 
     private String getMessageStoreXML() throws Exception {
-
         String name = req.getParameter("Name").trim();
         String targetEndpoint = req.getParameter("TargetEndpoint");
-        String targetMessageStore = req.getParameter("targetMessageStore");
         String provider = req.getParameter("Provider");
         String store = req.getParameter("MessageStore");
         String addedParams = req.getParameter("addedParams");
         String removedParams = req.getParameter("removedParams");
         String params = req.getParameter("tableParams");
-        params = params + "|message.target.store.name#"+targetMessageStore;
         if("custom.processor".equals(provider)) {
             provider = req.getParameter("custom_provider_class");
         }
