@@ -188,7 +188,7 @@ var kafkaSpecialParameters = null;
                     <tr id="inboundIntervalRow">
                         <td style="width:150px"><fmt:message key="inbound.interval"/><span class="required">*</span></td>
                         <td align="left">
-                            <input name="inboundInterval" id="interval" class="longInput" type="text"/>
+                            <input name="interval" id="interval" class="longInput" type="text"/>
                         </td>
                         <td></td>
                     </tr>
