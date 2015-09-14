@@ -1,0 +1,49 @@
+<html>
+<head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"/>
+    <title>Configuring Service Data Agent - User Guide</title>
+    <link href="../../admin/css/documentation.css" rel="stylesheet" type="text/css" media="all"/>
+</head>
+<body>
+<h1>Configuring Service Data Agent</h1>
+<ol>
+    <li>Go to AS management console and select <strong>Configure→Service Data Publishing</strong>
+        from side panel.<br /></li>
+    <li>Fill the form.<br/>
+        <ol>
+            <li>Tick on<strong> Enable Service stats</strong> and <strong>Enable Activity
+                                                                          Service</strong>.
+            </li>
+            <li>Setting up the <strong><span style="color: rgb(17,17,17);">Stream Definition Configuration</span></strong><br/>
+                <ol>
+                    <li><span style="color: rgb(17,17,17);"><em><strong>Stream Name</strong></em> : Stream Name can be any string with alpha-numeric characters</span>
+                    </li>
+                    <li><span style="color: rgb(17,17,17);"><em><strong>Version</strong></em> : Stream Version distinguishes different streams with the same Stream Name. Default version should be <strong>1.0.0</strong> .</span>
+                    </li>
+                    <li><span style="color: rgb(17,17,17);"><em><strong>Nick Name</strong></em> : This is a user preferred nick name to the Stream Name in alpha-numeric characters</span>
+                    </li>
+                    <li><span style="color: rgb(17,17,17);"><em><strong>Description</strong></em> : A description describing about the particular stream defined by Stream Name, Stream Version pair. Description should also consists of alpha-numeric characters.</span>
+                    </li>
+                </ol>
+            </li>
+            <li>Setting up <strong><em>BAM Credentials.</em></strong><br/>
+                <ol>
+                    <li><strong><em>BAM URL</em></strong> : Enter the IP address of the BAM server.
+                                                          And the port should be the thrift port
+                        <span>( <em>ex: tcp://127.0.0.1:7611</em> )</span>.
+                    </li>
+                    <li><em><strong>Username</strong></em>: Put the BAM Thrift log-in user name.
+                                                          Default value is <strong>admin</strong>.
+                    </li>
+                    <li><em><strong>Password</strong></em>: Put the BAM Thrift log-in password.
+                                                          Default value is <strong>admin</strong>.
+                    </li>
+                </ol>
+            </li>
+            <li>Click on <strong>Update</strong> button.</li>
+        </ol>
+    </li>
+</ol>
+<p><img src="images/filled-form.png"/></p>
+</body>
+</html>

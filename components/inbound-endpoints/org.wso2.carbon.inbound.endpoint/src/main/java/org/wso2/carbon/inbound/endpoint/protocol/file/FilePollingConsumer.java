@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.axis2.AxisFault;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,6 +38,7 @@ import org.apache.commons.vfs2.FileSystemOptions;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.apache.commons.vfs2.provider.UriParser;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.commons.vfs.VFSParamDTO;
 import org.apache.synapse.commons.vfs.VFSUtils;
@@ -153,7 +153,7 @@ public class FilePollingConsumer {
     public FileObject poll() {
         if (fileURI == null || fileURI.trim().equals("")) {
             log.error("Invalid file url. Check the inbound endpoint configuration. Endpoint Name : "
-                    + name + ", File URL : " + fileURI);
+                    + name + ", File URL : " + VFSUtils.maskURLPassword(fileURI));
             return null;
         }
 
@@ -196,16 +196,16 @@ public class FilePollingConsumer {
                         try {
                             lastCycle = 2;
                             moveOrDeleteAfterProcessing(fileObject);
-                        } catch (AxisFault axisFault) {
-                            log.error("File object '" + fileObject.getURL().toString() + "' "
-                                    + "cloud not be moved after first attempt", axisFault);
+                        } catch (SynapseException synapseException) {
+                            log.error("File object '" + VFSUtils.maskURLPassword(fileObject.getURL().toString()) + "' "
+                                    + "cloud not be moved after first attempt", synapseException);
                         }
                         if (fileLock) {
                             // TODO: passing null to avoid build break. Fix properly
                             VFSUtils.releaseLock(fsManager, fileObject, fso);
                         }
                         if (log.isDebugEnabled()) {
-                            log.debug("File '" + fileObject.getURL()
+                            log.debug("File '" + VFSUtils.maskURLPassword(fileObject.getURL().toString())
                                     + "' has been marked as a failed"
                                     + " record, it will not process");
                         }
@@ -264,18 +264,19 @@ public class FilePollingConsumer {
                         runPostProcess = false;
                     }
                     lastCycle = 1;
-                } catch (AxisFault e) {
+                } catch (SynapseException e) {
                     lastCycle = 2;
-                    log.error("Error processing File URI : " + fileObject.getName(), e);
+                    log.error("Error processing File URI : "
+                              + VFSUtils.maskURLPassword(fileObject.getName().toString()), e);
                 }
 
                 if (runPostProcess) {
                     try {
                         moveOrDeleteAfterProcessing(fileObject);
-                    } catch (AxisFault axisFault) {
+                    } catch (SynapseException synapseException) {
                         lastCycle = 3;
-                        log.error("File object '" + fileObject.getURL().toString() + "' "
-                                + "cloud not be moved", axisFault);
+                        log.error("File object '" + VFSUtils.maskURLPassword(fileObject.getURL().toString()) + "' "
+                                + "cloud not be moved", synapseException);
                         VFSUtils.markFailRecord(fsManager, fileObject);
                     }
                 }
@@ -284,13 +285,14 @@ public class FilePollingConsumer {
                     // TODO: passing null to avoid build break. Fix properly
                     VFSUtils.releaseLock(fsManager, fileObject, fso);
                     if (log.isDebugEnabled()) {
-                        log.debug("Removed the lock file '" + fileObject.toString()
-                                + ".lock' of the file '" + fileObject.toString());
+                        log.debug("Removed the lock file '" + VFSUtils.maskURLPassword(fileObject.toString())
+                                + ".lock' of the file '" + VFSUtils.maskURLPassword(fileObject.toString()));
                     }
                 }
 
             } else {
-                log.error("Couldn't get the lock for processing the file : " + fileObject.getName());
+                log.error("Couldn't get the lock for processing the file : " +
+                          VFSUtils.maskURLPassword(fileObject.getName().toString()));
             }
 
         } else {
@@ -533,7 +535,7 @@ public class FilePollingConsumer {
                     boolean runPostProcess = true;
                     try {
                         if (log.isDebugEnabled()) {
-                            log.debug("Processing file :" + child);
+                            log.debug("Processing file :" + VFSUtils.maskURLPassword(child.toString()));
                         }
                         processCount++;
                         if (processFile(child) == null) {
@@ -545,11 +547,13 @@ public class FilePollingConsumer {
                         lastCycle = 1;
                     } catch (Exception e) {
                         if (e.getCause() instanceof FileNotFoundException) {
-                            log.warn("Error processing File URI : " + child.getName()
-                                    + ". This can be due to file moved from another process.");
+                            log.warn("Error processing File URI : " +
+                                     VFSUtils.maskURLPassword(child.getName().toString()) +
+                                     ". This can be due to file moved from another process.");
                             runPostProcess = false;
                         } else {
-                            log.error("Error processing File URI : " + child.getName(), e);
+                            log.error("Error processing File URI : " +
+                                      VFSUtils.maskURLPassword(child.getName().toString()), e);
                             failCount++;
                             // tell moveOrDeleteAfterProcessing() file failed
                             lastCycle = 2;
@@ -562,10 +566,10 @@ public class FilePollingConsumer {
                     if (runPostProcess) {
                         try {
                             moveOrDeleteAfterProcessing(child);
-                        } catch (AxisFault axisFault) {
-                            log.error("File object '" + child.getURL().toString()
+                        } catch (SynapseException synapseException) {
+                            log.error("File object '" + VFSUtils.maskURLPassword(child.getURL().toString())
                                     + "'cloud not be moved, will remain in \"locked\" state",
-                                    axisFault);
+                                    synapseException);
                             skipUnlock = true;
                             failCount++;
                             lastCycle = 3;
@@ -589,11 +593,11 @@ public class FilePollingConsumer {
             } else if (isFailedRecord) {
                 // it is a failed record
                 try {
-                    lastCycle = 2;
+                    lastCycle = 1;
                     moveOrDeleteAfterProcessing(child);
-                } catch (AxisFault axisFault) {
-                    log.error("File object '" + child.getURL().toString()
-                            + "'cloud not be moved, will remain in \"fail\" state", axisFault);
+                } catch (SynapseException synapseException) {
+                    log.error("File object '" + VFSUtils.maskURLPassword(child.getURL().toString())
+                            + "'cloud not be moved, will remain in \"fail\" state", synapseException);
                 }
                 if (fileLock) {
                     // TODO: passing null to avoid build break. Fix properly
@@ -601,11 +605,16 @@ public class FilePollingConsumer {
                     VFSUtils.releaseLock(fsManager, fileObject, fso);
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug("File '" + fileObject.getURL()
+                    log.debug("File '" + VFSUtils.maskURLPassword(fileObject.getURL().toString())
                             + "' has been marked as a failed record, it will not " + "process");
                 }
             }
 
+            //close the file system after processing
+            try{
+                child.close();
+            }catch(Exception e){}
+            
             // Manage throttling of file processing
             if (iFileProcessingInterval != null && iFileProcessingInterval > 0) {
                 try {
@@ -720,9 +729,9 @@ public class FilePollingConsumer {
      * 
      * @param file
      * @return
-     * @throws AxisFault
+     * @throws synapseException
      */
-    private FileObject processFile(FileObject file) throws AxisFault {
+    private FileObject processFile(FileObject file) throws SynapseException {
         try {
             FileContent content = file.getContent();
             String fileName = file.getName().getBaseName();
@@ -744,13 +753,13 @@ public class FilePollingConsumer {
 
                 injectHandler.setTransportHeaders(transportHeaders);
                 // injectHandler
-                if (!injectHandler.invoke(file)) {
+                if (!injectHandler.invoke(file, name)) {
                     return null;
                 }
             }
 
         } catch (FileSystemException e) {
-            log.error("Error reading file content or attributes : " + file, e);
+            log.error("Error reading file content or attributes : " + VFSUtils.maskURLPassword(file.toString()), e);
         }
         return file;
     }
@@ -759,9 +768,9 @@ public class FilePollingConsumer {
      * Do the post processing actions
      * 
      * @param fileObject
-     * @throws AxisFault
+     * @throws synapseException
      */
-    private void moveOrDeleteAfterProcessing(FileObject fileObject) throws AxisFault {
+    private void moveOrDeleteAfterProcessing(FileObject fileObject) throws SynapseException {
 
         String moveToDirectoryURI = null;
         try {
@@ -827,36 +836,40 @@ public class FilePollingConsumer {
                 FileObject dest = moveToDirectory.resolveFile(prefix
                         + fileObject.getName().getBaseName());
                 if (log.isDebugEnabled()) {
-                    log.debug("Moving to file :" + dest.getName().getURI());
+                    log.debug("Moving to file :" + VFSUtils.maskURLPassword(dest.getName().getURI()));
                 }
                 try {
                     fileObject.moveTo(dest);
+                    if (VFSUtils.isFailRecord(fsManager, fileObject)) {
+                        VFSUtils.releaseFail(fsManager, fileObject);
+                    }
                 } catch (FileSystemException e) {
-                    log.error("Error moving file : " + fileObject + " to " + moveToDirectoryURI, e);
+                    if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
+                        VFSUtils.markFailRecord(fsManager, fileObject);
+                    }
+                    log.error("Error moving file : " + VFSUtils.maskURLPassword(fileObject.toString()) + " to " +
+                              VFSUtils.maskURLPassword(moveToDirectoryURI), e);
                 }
             } else {
                 try {
                     if (log.isDebugEnabled()) {
-                        log.debug("Deleting file :" + fileObject);
+                        log.debug("Deleting file :" + VFSUtils.maskURLPassword(fileObject.toString()));
                     }
                     fileObject.close();
                     if (!fileObject.delete()) {
-                        String msg = "Cannot delete file : " + fileObject;
+                        String msg = "Cannot delete file : " + VFSUtils.maskURLPassword(fileObject.toString());
                         log.error(msg);
-                        throw new AxisFault(msg);
+                        throw new SynapseException(msg);
                     }
                 } catch (FileSystemException e) {
-                    log.error("Error deleting file : " + fileObject, e);
+                    log.error("Error deleting file : " + VFSUtils.maskURLPassword(fileObject.toString()), e);
                 }
-            }
-            if (VFSUtils.isFailRecord(fsManager, fileObject)) {
-                VFSUtils.releaseFail(fsManager, fileObject);
             }
         } catch (FileSystemException e) {
             if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
                 VFSUtils.markFailRecord(fsManager, fileObject);
                 log.error("Error resolving directory to move after processing : "
-                        + moveToDirectoryURI, e);
+                        + VFSUtils.maskURLPassword(moveToDirectoryURI), e);
             }
         }
     }

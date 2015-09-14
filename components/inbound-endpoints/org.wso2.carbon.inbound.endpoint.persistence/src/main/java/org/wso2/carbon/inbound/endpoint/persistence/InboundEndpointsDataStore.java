@@ -31,17 +31,21 @@ import org.wso2.carbon.registry.core.exceptions.ResourceNotFoundException;
 
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InboundEndpointsDataStore {
 
     private static final Logger log = Logger.getLogger(InboundEndpointsDataStore.class);
 
-    private Map<Integer,List<InboundEndpointInfoDTO>> endpointInfo;
+    private Map<Integer,List<InboundEndpointInfoDTO>> endpointListeningInfo;
+    //Store polling endpoints with <TenantId<Endpoint_Name>> format
+    private Map<String,Set<String>> endpointPollingInfo;
     private Registry registry = null;
-    private final String rootPath = RegistryResources.ROOT + "inbound-endpoints/";
+    private final String rootPath = RegistryResources.ROOT + "esb/inbound/inbound-endpoints/";
 
     private static InboundEndpointsDataStore instance = new InboundEndpointsDataStore();
 
@@ -69,7 +73,8 @@ public class InboundEndpointsDataStore {
                 } catch (XMLStreamException e) {
                     handleException("Error while converting fetched registry data to a OM", e);
                 }
-                endpointInfo = PersistenceUtils.convertOMToEndpointInfo(fetchedOM);
+                endpointListeningInfo = PersistenceUtils.convertOMToEndpointListeningInfo(fetchedOM);
+                endpointPollingInfo = PersistenceUtils.convertOMToEndpointPollingInfo(fetchedOM);
             }
         } catch (ResourceNotFoundException ex) {
             log.info("Inbound endpoint registry data not found, so re-initializing registry data");
@@ -84,10 +89,11 @@ public class InboundEndpointsDataStore {
      */
     private void initRegistryData() {
 
-        endpointInfo = new ConcurrentHashMap<Integer, List<InboundEndpointInfoDTO>>();
+        endpointListeningInfo = new ConcurrentHashMap<Integer, List<InboundEndpointInfoDTO>>();
+        endpointPollingInfo = new ConcurrentHashMap<String, Set<String>>();
         try {
             Resource resource = registry.newResource();
-            resource.setContent(PersistenceUtils.convertEndpointInfoToOM(endpointInfo).toString());
+            resource.setContent(PersistenceUtils.convertEndpointInfoToOM(endpointListeningInfo, endpointPollingInfo).toString());
             registry.put(rootPath, resource);
         } catch (RegistryException e) {
             handleException("Initializing registry data.Error while creating registry resource", e);
@@ -102,18 +108,35 @@ public class InboundEndpointsDataStore {
      * @param protocol     protocol
      * @param name         endpoint name
      */
-    public void registerEndpoint(int port, String tenantDomain, String protocol, String name, InboundProcessorParams params) {
+    public void registerListeningEndpoint(int port, String tenantDomain, String protocol, String name, InboundProcessorParams params) {
 
-        List<InboundEndpointInfoDTO> tenantList = endpointInfo.get(port);
+        List<InboundEndpointInfoDTO> tenantList = endpointListeningInfo.get(port);
         if (tenantList == null) {
             // If there is no existing listeners in the port, create a new list
             tenantList = new ArrayList<InboundEndpointInfoDTO>();
-            endpointInfo.put(port, tenantList);
+            endpointListeningInfo.put(port, tenantList);
         }
         tenantList.add(new InboundEndpointInfoDTO(tenantDomain, protocol, name, params));
         updateRegistry();
     }
 
+    /**
+     * Register endpoint in the InboundEndpointsDataStore
+     *
+     * @param tenantDomain tenant domain
+     * @param name         endpoint name
+     */
+    public void registerPollingingEndpoint(String tenantDomain, String name) {
+
+        Set<String> lNames = endpointPollingInfo.get(tenantDomain);
+        if (lNames == null) {
+      	   lNames = new HashSet<String>();           
+        }
+        lNames.add(name);
+        endpointPollingInfo.put(tenantDomain, lNames);
+        updateRegistry();
+    }
+    
     /**
      * Register SSL endpoint in the InboundEndpointsDataStore
      *
@@ -122,15 +145,16 @@ public class InboundEndpointsDataStore {
      * @param protocol     protocol
      * @param name         endpoint name
      */
-    public void registerSSLEndpoint(int port, String tenantDomain, String protocol, String name,SSLConfiguration sslConfiguration) {
+    public void registerSSLListeningEndpoint(int port, String tenantDomain, String protocol, String name,
+                                             SSLConfiguration sslConfiguration, InboundProcessorParams params) {
 
-        List<InboundEndpointInfoDTO> tenantList = endpointInfo.get(port);
+        List<InboundEndpointInfoDTO> tenantList = endpointListeningInfo.get(port);
         if (tenantList == null) {
             // If there is no existing listeners in the port, create a new list
             tenantList = new ArrayList<InboundEndpointInfoDTO>();
-            endpointInfo.put(port, tenantList);
+            endpointListeningInfo.put(port, tenantList);
         }
-        InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name, null);
+        InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name, params);
         inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
         tenantList.add(inboundEndpointInfoDTO);
 
@@ -144,8 +168,8 @@ public class InboundEndpointsDataStore {
      * @param tenantDomain tenant domain
      * @return endpoint name
      */
-    public String getEndpointName(int port, String tenantDomain) {
-        List<InboundEndpointInfoDTO> tenantList = endpointInfo.get(port);
+    public String getListeningEndpointName(int port, String tenantDomain) {
+        List<InboundEndpointInfoDTO> tenantList = endpointListeningInfo.get(port);
         if (tenantList != null) {
             for (InboundEndpointInfoDTO tenantInfo : tenantList) {
                 if (tenantInfo.getTenantDomain().equals(tenantDomain)) {
@@ -162,8 +186,8 @@ public class InboundEndpointsDataStore {
      * @param port         port
      * @param tenantDomain tenant domain name
      */
-    public void unregisterEndpoint(int port, String tenantDomain) {
-        List<InboundEndpointInfoDTO> tenantList = endpointInfo.get(port);
+    public void unregisterListeningEndpoint(int port, String tenantDomain) {
+        List<InboundEndpointInfoDTO> tenantList = endpointListeningInfo.get(port);
         if (tenantList != null) {
             for (InboundEndpointInfoDTO tenantInfo : tenantList) {
                 if (tenantInfo.getTenantDomain().equals(tenantDomain)) {
@@ -172,12 +196,52 @@ public class InboundEndpointsDataStore {
                 }
             }
         }
-        if (endpointInfo.get(port) != null && endpointInfo.get(port).size() == 0) {
-            endpointInfo.remove(port);
+        if (endpointListeningInfo.get(port) != null && endpointListeningInfo.get(port).size() == 0) {
+      	  endpointListeningInfo.remove(port);
         }
         updateRegistry();
     }
 
+    /**
+     * Unregister an endpoint from data store
+     *
+     * @param tenantId        
+     * @param name 
+     */
+    public void unregisterPollingEndpoint(String tenantDomain, String name) {
+        Set<String> lNames = endpointPollingInfo.get(tenantDomain);
+        if (lNames != null && !lNames.isEmpty()) {
+            for (String strName : lNames) {
+                if (strName.equals(name)) {
+               	  lNames.remove(strName);
+                    break;
+                }
+            }
+            if(lNames.isEmpty()){
+            	endpointPollingInfo.remove(tenantDomain);
+            }
+        }        
+        updateRegistry();
+    }    
+
+    /**
+     * Check polling endpoint from data store
+     *
+     * @param tenantDomain      
+     * @param name 
+     */
+    public boolean isPollingEndpointRegistered(String tenantDomain, String name) {
+        Set<String> lNames = endpointPollingInfo.get(tenantDomain);
+        if (lNames != null && !lNames.isEmpty()) {
+            for (String strName : lNames) {
+                if (strName.equals(name)) {
+               	  return true;
+                }
+            }
+        }        
+        return false;
+    }   
+    
     /**
      * Check whether endpoint registry is empty for a particular port
      *
@@ -185,7 +249,7 @@ public class InboundEndpointsDataStore {
      * @return whether no endpoint is registered for a port
      */
     public boolean isEndpointRegistryEmpty(int port) {
-        return endpointInfo.get(port) == null;
+        return endpointListeningInfo.get(port) == null;
     }
 
     /**
@@ -193,15 +257,24 @@ public class InboundEndpointsDataStore {
      *
      * @return information of all endpoints
      */
-    public  Map<Integer,List<InboundEndpointInfoDTO>> getAllEndpointData() {
-        return endpointInfo;
+    public  Map<Integer,List<InboundEndpointInfoDTO>> getAllListeningEndpointData() {
+        return endpointListeningInfo;
     }
 
+    /**
+     * Get details of all polling endpoints
+     *
+     * @return information of all polling endpoints
+     */
+    public  Map<String,Set<String>> getAllPollingingEndpointData() {
+        return endpointPollingInfo;
+    }
+    
     /**
      * Synchronize in memory endpoint data with registry
      */
     private synchronized void updateRegistry() {
-        OMElement dataOM = PersistenceUtils.convertEndpointInfoToOM(endpointInfo);
+        OMElement dataOM = PersistenceUtils.convertEndpointInfoToOM(endpointListeningInfo, endpointPollingInfo);
         try {
             Resource resource = registry.get(rootPath);
             resource.setContent(dataOM.toString());

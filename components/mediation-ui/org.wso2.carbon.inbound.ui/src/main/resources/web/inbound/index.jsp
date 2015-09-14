@@ -66,14 +66,31 @@
                 <tr id="tr_<%=name%>">
 
                     <td>
+                        <% if (inboundDescription.getArtifactContainerName() != null) { %>
+                            <img src="images/applications.gif">
+                        <% } %>
                         <%=name%>
+                        <% if (inboundDescription.getIsEdited()) { %>
+                            <span style="color:grey"> ( Edited )</span>
+                        <% } %>
                     </td>
                     <td>
-                        <a href="javascript:editRecord('<%=name%>')" id="config_link"
-                           class="edit-icon-link"><fmt:message key="inbound.edit"/></a>
-                        <a href="javascript:deleteRecord('<%=name%>')"
-                           id="delete_link" class="delete-icon-link"><fmt:message
+                        <% if (inboundDescription.getArtifactContainerName() !=null) { %>
+                            <a href="javascript:editCAppInbound('<%=name%>')" id="config_link"
+                               class="edit-icon-link"><fmt:message key="inbound.edit"/></a>
+                        <% } else { %>
+                            <a href="javascript:editRecord('<%=name%>')" id="config_link"
+                               class="edit-icon-link"><fmt:message key="inbound.edit"/></a>
+                        <% } %>
+
+                        <% if (inboundDescription.getArtifactContainerName() != null) { %>
+                        <a href="#" id="delete_link" class="delete-icon-link" onclick="return false"><fmt:message
                                 key="inbound.property.delete"/></a>
+                        <% } else { %>
+                            <a href="javascript:deleteRecord('<%=name%>')"
+                               id="delete_link" class="delete-icon-link"><fmt:message
+                                    key="inbound.property.delete"/></a>
+                        <% } %>
                     </td>
 
                 </tr>

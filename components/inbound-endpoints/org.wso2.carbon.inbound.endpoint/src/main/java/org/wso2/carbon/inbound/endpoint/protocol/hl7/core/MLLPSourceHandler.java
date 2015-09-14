@@ -30,13 +30,10 @@ import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContextFactory;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MLLPSourceHandler implements IOEventDispatch {
     private static final Log log = LogFactory.getLog(MLLPSourceHandler.class);
 
-    private Map<String, String> sessionIdToPort;
     private volatile HL7Processor hl7Processor;
 
     private final ByteBuffer hl7TrailerBuf = ByteBuffer.wrap(MLLPConstants.HL7_TRAILER);
@@ -48,20 +45,15 @@ public class MLLPSourceHandler implements IOEventDispatch {
 
     public MLLPSourceHandler(HL7Processor hl7Processor) {
         super();
-        sessionIdToPort = new HashMap<String, String>();
         this.hl7Processor = hl7Processor;
         this.bufferFactory = (BufferFactory) hl7Processor.getInboundParameterMap().get(
                 MLLPConstants.INBOUND_HL7_BUFFER_FACTORY);
     }
 
-    private String getRemoteAddress(int hashCode) {
-        return sessionIdToPort.get(String.valueOf(hashCode));
-    }
+
 
     @Override
     public void connected(IOSession session) {
-        sessionIdToPort.put(String.valueOf(session.hashCode()), String.valueOf(session.getRemoteAddress()));
-
         if (session.getAttribute(MLLPConstants.MLLP_CONTEXT) == null) {
             session.setAttribute(MLLPConstants.MLLP_CONTEXT,
                     MLLPContextFactory.createMLLPContext(session, hl7Processor));
@@ -85,11 +77,16 @@ public class MLLPSourceHandler implements IOEventDispatch {
                 try {
                     mllpContext.getCodec().decode(inputBuffer, mllpContext);
                 } catch (MLLProtocolException e) {
-                    shutdownConnection(session, mllpContext, e);
+                    handleException(session, mllpContext, e);
+                    clearInputBuffers(mllpContext);
+                    return;
                 } catch (HL7Exception e) {
-                    shutdownConnection(session, mllpContext, e);
+                    handleException(session, mllpContext, e);
+                    clearInputBuffers(mllpContext);
+                    return;
                 } catch (IOException e) {
                     shutdownConnection(session, mllpContext, e);
+                    return;
                 }
             }
 
@@ -99,12 +96,15 @@ public class MLLPSourceHandler implements IOEventDispatch {
                     bufferFactory.release(inputBuffer);
                     inputBuffer = bufferFactory.getBuffer();
                 }
-                hl7Processor.processRequest(mllpContext);
+                try {
+                    hl7Processor.processRequest(mllpContext);
+                } catch (Exception e) {
+                    shutdownConnection(session, mllpContext, e);
+                }
             }
 
             if (read < 0) {
-                bufferFactory.release(inputBuffer);
-                inputBuffer = bufferFactory.getBuffer();
+                clearInputBuffers(mllpContext);
                 session.close();
             }
 
@@ -112,6 +112,12 @@ public class MLLPSourceHandler implements IOEventDispatch {
             shutdownConnection(session, mllpContext, e);
         }
 
+    }
+
+    private void clearInputBuffers(MLLPContext context) {
+        bufferFactory.release(inputBuffer);
+        inputBuffer = bufferFactory.getBuffer();
+        context.reset();
     }
 
     @Override
@@ -177,6 +183,7 @@ public class MLLPSourceHandler implements IOEventDispatch {
 
     private void shutdownConnection(IOSession session, MLLPContext mllpContext, Exception e) {
         if (e != null) {
+            log.error("An unexpected error has occurred.");
             handleException(session, mllpContext, e);
         }
 
@@ -186,6 +193,6 @@ public class MLLPSourceHandler implements IOEventDispatch {
     }
 
     private void handleException(IOSession session, MLLPContext mllpContext, Exception e) {
-        log.error("Exception caught while in IO handler. Cause: ", e);
+        log.error("Exception caught in I/O handler.", e);
     }
 }

@@ -290,6 +290,17 @@
         document.location.href = "design_sequence.jsp?sequenceAction=edit&sequenceName=" + arguments[0];
     }
 
+    function editCAppSequence(sequenceName) {
+        CARBON.showConfirmationDialog('<fmt:message key="edit.artifactContainer.sequences.on.page.prompt"/>', function() {
+            $.ajax({
+                type: 'POST',
+                success: function() {
+                    location.href = "design_sequence.jsp?sequenceAction=edit&sequenceName=" + sequenceName;
+                }
+            });
+        });
+    }
+
     function deleteSequence(sequenceName) {
         if (sequenceName == "main" || sequenceName == "fault") {
             CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
@@ -567,7 +578,9 @@
             </tr>
             </thead>
             <tbody>
-            <% for (SequenceInfo sequence : sequences) { %>
+            <%
+            if(sequences != null) {
+            for (SequenceInfo sequence : sequences) { %>
             <tr>
                 <td width="10px" style="text-align:center; !important">
                     <input type="checkbox" name="sequenceGroups"
@@ -576,7 +589,20 @@
                     &nbsp;
                 </td>
                 <td>
-                    <span href="#" <% if(sequence.getDescription()!= null){ %>onmouseover="showTooltip(this,'<%=sequence.getDescription()%>')" <% } %>><%= sequence.getName() %></span>
+                    <span href="#"
+                        <% if(sequence.getDescription()!= null){ %>
+                            onmouseover="showTooltip(this,'<%=sequence.getDescription()%>')"
+                        <% } %>>
+                        <% if (sequence.getArtifactContainerName() != null) { %>
+                            <img src="images/applications.gif">
+                            <%=sequence.getName()%>
+                            <% if(sequence.getIsEdited()) { %>
+                                <span style="color:grey"> ( Edited )</span>
+                            <% } %>
+                        <% } else { %>
+                            <%=sequence.getName()%>
+                        <% } %>
+                    </span>
                 </td>
 
                 <% if (sequence.isEnableStatistics()) { %>
@@ -653,24 +679,45 @@
                     </div>
                 </td>
                 <% } %>
-                <td style="border-left:none;border-right:none;width:100px">
-                    <div class="inlineDiv">
-                        <a href="#" onclick="editSequence('<%= sequence.getName() %>')"
-                           class="icon-link"
-                           style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                                key="sequence.edit.action"/></a>
-                    </div>
-                </td>
-                <td style="border-left:none;width:100px">
-                    <div class="inlineDiv">
-                        <a href="#" onclick="deleteSequence('<%= sequence.getName() %>')"
-                           class="icon-link"
-                           style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                                key="sequence.delete.action"/></a>
-                    </div>
-                </td>
+
+                <% if (sequence.getArtifactContainerName() != null) { %>
+                    <td style="border-left:none;border-right:none;width:100px">
+                        <div class="inlineDiv">
+                            <a href="#" onclick="editCAppSequence('<%= sequence.getName() %>')"
+                                class="icon-link"
+                                style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                    key="sequence.edit.action"/></a>
+                        </div>
+                    </td>
+
+                    <td style="border-left:none;width:100px">
+                        <div class="inlineDiv">
+                            <a href="#" onclick="#"
+                                class="icon-link"
+                                style="color:grey;background-image:url(../admin/images/delete.gif);"><fmt:message
+                                    key="sequence.delete.action"/></a>
+                        </div>
+                    </td>
+                <% } else { %>
+                    <td style="border-left:none;border-right:none;width:100px">
+                        <div class="inlineDiv">
+                            <a href="#" onclick="editSequence('<%= sequence.getName() %>')"
+                                class="icon-link"
+                                style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                    key="sequence.edit.action"/></a>
+                        </div>
+                    </td>
+                    <td style="border-left:none;width:100px">
+                        <div class="inlineDiv">
+                            <a href="#" onclick="deleteSequence('<%= sequence.getName() %>')"
+                                class="icon-link"
+                                style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                    key="sequence.delete.action"/></a>
+                        </div>
+                    </td>
+                <% } %>
             </tr>
-            <% } %>
+            <% } }%>
             </tbody>
         </table>
     </form>

@@ -8,15 +8,22 @@
 //import ca.uhn.hl7v2.app.SimpleServer;
 //import ca.uhn.hl7v2.model.Message;
 //import ca.uhn.hl7v2.model.v26.message.ADT_A01;
+//import org.apache.synapse.transport.passthru.util.BufferFactory;
 //import org.junit.After;
 //import org.junit.Before;
 //import org.junit.Test;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
+//import org.wso2.carbon.inbound.endpoint.protocol.hl7.codec.HL7Codec;
+//import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContext;
+//import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.HL7Processor;
+//import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.InboundHL7IOReactor;
+//import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLProtocolException;
 //
 //import java.io.IOException;
 //import java.nio.ByteBuffer;
 //import java.nio.charset.Charset;
+//import java.nio.charset.CharsetDecoder;
 //
 //import static org.junit.Assert.*;
 //
@@ -29,12 +36,14 @@
 //    private String message;
 //    private byte [] llpEncodedMessage;
 //    private ByteBuffer req;
+//    private BufferFactory bufferFactory;
+//    private CharsetDecoder charsetDecoder = Charset.forName("UTF-8").newDecoder();
 //
 //    @Before
 //    public void config() throws Exception {
 //        System.setProperty("ca.uhn.hl7v2.llp.logBytesRead", "FALSE");
 //        System.setProperty("ca.uhn.hl7v2.util.status.out", "");
-//        context = new MLLPContext();
+//        context = new MLLPContext(null, charsetDecoder, true, true,null, bufferFactory);
 //        codec = context.getCodec();
 //        message = "MSH|^~\\&|||||20150403091225.929+0530||ADT^A01^ADT_A01|208601|T|2.6";
 //        llpEncodedMessage = (MllpTestConstants.START_BYTE + message + MllpTestConstants.END_BYTE1 + MllpTestConstants.END_BYTE1 + MllpTestConstants.END_BYTE2).getBytes();
@@ -79,9 +88,11 @@
 //        codec.decode(req, context);
 //        req.flip();
 //        assertNotNull(context.getHl7Message());
-//        ByteBuffer response = codec.encode(context.getHl7Message(), context);
-//        byte[] ack = new byte[response.capacity()];
-//        response.get(ack, 0, response.capacity());
+//        ByteBuffer outBuff = ByteBuffer.allocate(1024);
+//        codec.encode(outBuff, context);
+//
+//        byte[] ack = new byte[outBuff.remaining()];
+//        outBuff.get(ack);
 //        String v = new String( ack, Charset.forName("UTF-8"));
 //        log.info("ACK: " + v);
 //        assertTrue(v.contains("ACK^A01^ACK"));
@@ -90,16 +101,15 @@
 //    @Test
 //    public void testReceiveWithDelayInBetween() throws Exception {
 //
-//        int port = 9090;
-//        Listener listener = new Listener(port);
+//        int port = 20000;
 //
-//        try {
-//            listener.start();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+//        InboundHL7IOReactor.start();
 //
-//        Thread.sleep(3000);
+//        HL7Processor hl7Processor = new HL7Processor(null);
+//
+//        InboundHL7IOReactor.bind(port, hl7Processor);
+//
+//        Thread.sleep(2000);
 //
 //        HapiContext context = new DefaultHapiContext();
 //        Connection c = context.newClient("127.0.0.1", port, false);
@@ -121,6 +131,9 @@
 //        c.close();
 //        Thread.sleep(SimpleServer.SO_TIMEOUT + 500);
 //
-//        listener.shutdownReactor();
+//        InboundHL7IOReactor.stop();
 //    }
+//
 //}
+//
+//

@@ -20,12 +20,12 @@
     <parent>
         <artifactId>carbon-mediation</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.4.1-SNAPSHOT</version>
+        <version>4.4.11-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>inbound-endpoints</artifactId>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.11-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Inbound Endpoint Module</name>
     <url>http://wso2.org</url>
@@ -34,6 +34,7 @@
         <module>org.wso2.carbon.inbound.endpoint.osgi</module>
         <module>org.wso2.carbon.inbound.endpoint.persistence</module>
         <module>org.wso2.carbon.inbound.endpoint</module>
+        <module>org.wso2.carbon.inbound.endpoint.ext.wsrm</module>
     </modules>
 
 <dependencies>
@@ -60,6 +61,36 @@
     <dependency>
         <groupId>ca.uhn.hapi.wso2</groupId>
         <artifactId>hapi</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.kafka</groupId>
+        <artifactId>kafka_2.9.2</artifactId>
+        <version>0.8.1.1</version>
+        <scope>compile</scope>
+        <exclusions>
+            <exclusion>
+                <groupId>com.sun.jmx</groupId>
+                <artifactId>jmxri</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>com.sun.jdmk</groupId>
+                <artifactId>jmxtools</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>javax.jms</groupId>
+                <artifactId>jms</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
+        <groupId>org.eclipse.paho</groupId>
+        <artifactId>mqtt-client</artifactId>
+        <version>0.4.0</version>
+    </dependency>
+    <dependency>
+        <groupId>com.rabbitmq.wso2</groupId>
+        <artifactId>amqp-client</artifactId>
+        <version>3.4.4.wso2v1</version>
     </dependency>
 </dependencies>
 </project>

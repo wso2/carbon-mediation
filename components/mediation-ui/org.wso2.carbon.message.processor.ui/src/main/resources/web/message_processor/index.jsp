@@ -20,6 +20,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.message.processor.ui.MessageProcessorAdminServiceClient" %>
+<%@ page import="org.wso2.carbon.message.processor.service.xsd.MessageProcessorMetaData" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.message.processor.ui.i18n.Resources">
@@ -66,18 +67,10 @@
 </script>
 
 <script type="text/javascript">
-    function deleteRow(i, linked) {
-        var table = document.getElementById("myTable");
-        var row = table.rows[i];
-        var cell = row.cells[0];
-        var content = cell.innerHTML;
-
-        if (linked) {
-            content = cell.firstChild.innerHTML;
-        }
+    function deleteRow(name) {
 
         function delEp() {
-            document.location.href = "deleteMessageProcessorHandler.jsp?" + "processorName=" + content;
+            document.location.href = "deleteMessageProcessorHandler.jsp?" + "processorName=" + name;
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.processor"/>", delEp);
@@ -95,52 +88,49 @@
         return this.replace(/\s+$/, "");
     }
 
-    function editRow(processorType, i, linked) {
-        var table = document.getElementById("myTable");
-        var row = table.rows[i];
-        var cell = row.cells[0];
-        var type = row.cells[1];
-        var content = cell.innerHTML;
-
-        if (linked) {
-            content = cell.firstChild.innerHTML;
-        }
-
+    function editRow(processorType, name) {
         if (processorType == "Scheduled Message Forwarding Processor") {
-            document.location.href = "manageMessageForwardingProcessor.jsp?" + "messageProcessorName=" + content;
+            document.location.href = "manageMessageForwardingProcessor.jsp?" + "messageProcessorName=" + name;
+        } else if(processorType == "Scheduled Failover Message Forwarding Processor") {
+            document.location.href = "manageFailoverMessageForwardingProcessor.jsp?" + "messageProcessorName=" + name;
         } else if (processorType == "Message Sampling Processor") {
-            document.location.href = "manageMessageSamplingProcessor.jsp?" + "messageProcessorName=" + content;
+            document.location.href = "manageMessageSamplingProcessor.jsp?" + "messageProcessorName=" + name;
         } else {
-            document.location.href = "manageCustomMessageProcessor.jsp?" + "messageProcessorName=" + content;
+            document.location.href = "manageCustomMessageProcessor.jsp?" + "messageProcessorName=" + name;
         }
 
     }
 
-    function deactivateRow(i) {
-        var table = document.getElementById("myTable");
-        var row = table.rows[i];
-        var cell = row.cells[0];
-        var content = cell.innerHTML;
+    function editCAppProcessor(processorType,name) {
+        CARBON.showConfirmationDialog('<fmt:message key="edit.artifactContainer.processor.on.page.prompt"/>', function() {
+            $.ajax({
+                type: 'POST',
+                success: function() {
+                    if (processorType == "Scheduled Message Forwarding Processor") {
+                        document.location.href = "manageMessageForwardingProcessor.jsp?" + "messageProcessorName=" + name;
+                    } else if (processorType == "Message Sampling Processor") {
+                        document.location.href = "manageMessageSamplingProcessor.jsp?" + "messageProcessorName=" + name;
+                    } else {
+                        document.location.href = "manageCustomMessageProcessor.jsp?" + "messageProcessorName=" + name;
+                    }
+                }
+            });
+        });
+    }
+
+    function deactivateRow(name) {
 
         function deacEp() {
-            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + content +
+            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + name +
                     "&action=Deactivate";
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.deactivate.the.processor"/>", deacEp);
     }
 
-    function activateRow(i, linked) {
-        var table = document.getElementById("myTable");
-        var row = table.rows[i];
-        var cell = row.cells[0];
-        var content = cell.innerHTML;
-
-        if (linked) {
-            content = cell.firstChild.innerHTML;
-        }
+    function activateRow(name) {
         function deacEp() {
-            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + content +
+            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + name +
                     "&action=Activate";
         }
 
@@ -178,7 +168,7 @@
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
     MessageProcessorAdminServiceClient client = null;
-    String[] messageProcessors = null;
+    MessageProcessorMetaData[] messageProcessorMetaData = null;
     int numberOfMessageProcessors = 0;
     int numberOfPages = 1;
     String pageNumber = request.getParameter("pageNumber");
@@ -193,7 +183,7 @@
 
     try {
         client = new MessageProcessorAdminServiceClient(cookie, url, configContext);
-        messageProcessors = client.getPaginatedMessageProcessorNames(pageNumberInt);
+        messageProcessorMetaData = client.getPaginatedMessageProcessorData(pageNumberInt);
         String[] processorNameList = client.getMessageProcessorNames();
 
         if (processorNameList != null) {
@@ -212,7 +202,7 @@
 </script>
 <%
     }
-    if (messageProcessors == null) {
+    if (messageProcessorMetaData == null) {
 %>
 <div id="tabs-1">
     <script type="text/javascript"> emtpyEntries = true</script>
@@ -221,7 +211,7 @@
 
 <%}%>
 
-<%if (messageProcessors != null) {%>
+<%if (messageProcessorMetaData != null) {%>
 <div id="tabs-1">
     <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
                       page="index.jsp" pageNumberParameterName="pageNumber"
@@ -240,20 +230,26 @@
         <tbody>
 
         <%
-            for (String name : messageProcessors) {
-
+            for (MessageProcessorMetaData mspData : messageProcessorMetaData) {
+                String name = mspData.getName();
                 String type = "";
                 try {
                     type = client.getClassName(name);
 
                     if (type != null) {
+
                         if ("org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor".
                                 equals(type.trim())) {
                             type = "Scheduled Message Forwarding Processor";
+                         } else if ("org.apache.synapse.message.processor.impl.failover.FailoverScheduledMessageForwardingProcessor".
+                                equals(type.trim())) {
+                            type = "Scheduled Failover Message Forwarding Processor";
+
                         } else if ("org.apache.synapse.message.processor.impl.sampler.SamplingProcessor".
                                 equals(type.trim())) {
                             type = "Message Sampling Processor";
                         }
+
                     } else {
                         type = "Custom Message Processor";
                     }
@@ -275,80 +271,147 @@
             <%--<td><%=name%>--%>
             <%--</td>--%>
             <%--<%} %>--%>
-            <td><%=name%></td>
+            <td>
+                <% if (mspData.getArtifactContainerName() != null) { %>
+                    <img src="images/applications.gif">
+                    <%=mspData.getName()%>
+                    <% if(mspData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                <% } else { %>
+                    <%=mspData.getName()%>
+                <% } %>
+                </td>
             <td><%=type%>
             </td>
             <%
                 if (("Scheduled Message Forwarding Processor".
-                        equalsIgnoreCase(type) || "Message Sampling Processor".equals(type))
+                        equalsIgnoreCase(type) || "Message Sampling Processor".equals(type) || "Scheduled Failover Message Forwarding Processor".equalsIgnoreCase(type))
                         && client.isActive(name)) {
             %>
-            <td><a onclick="editRow('<%= type%>',this.parentNode.parentNode.rowIndex)" href="#"
+            <td>
+                <% if (mspData.getArtifactContainerName() != null) { %>
+                <a onclick="editCAppProcessor('<%= type%>','<%= mspData.getName()%>')" href="#"
                    class="icon-link"
                    style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                    key="edit"/></a>
-                <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+                        key="edit"/></a>
+                <a href="#" onclick="#"
+                   id="delete_link" class="icon-link"
+                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
+                        key="delete"/></a>
+                <% } else { %>
+                <a onclick="editRow('<%= type%>','<%=mspData.getName()%>')" href="#"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                        key="edit"/></a>
+                <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
                    id="delete_link" class="icon-link"
                    style="background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
-                <span class="icon-text" style="background-image:url(../message_processor/images/activate.gif);">
-                    <fmt:message key="active"/>&nbsp;[</span>
+                <% } %>
+
+
+            <span class="icon-text" style="background-image:url(../message_processor/images/activate.gif);">
+                <fmt:message key="active"/>&nbsp;[</span>
                 <a href="#" class="icon-link" id="deactivate_link"
                    style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                   onclick="deactivateRow(this.parentNode.parentNode.rowIndex)"><fmt:message key="deactivate"/></a>
-                <span class="icon-text"
-                      style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
+                   onclick="deactivateRow('<%= mspData.getName()%>')"><fmt:message key="deactivate"/></a>
+            <span class="icon-text"
+                  style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 
             </td>
             <%
             } else if ("Scheduled Message Forwarding Processor".
                     equalsIgnoreCase(type)) {
             %>
-            <td><a onclick="editRow('<%= type%>', this.parentNode.parentNode.rowIndex)" href="#"
+            <td>
+                <% if (mspData.getArtifactContainerName() != null) { %>
+                <a onclick="editCAppProcessor('<%= type%>','<%= mspData.getName()%>')" href="#"
                    class="icon-link"
                    style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                    key="edit"/></a>
-                <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+                        key="edit"/></a>
+                <a href="#" onclick="#"
+                   id="delete_link" class="icon-link"
+                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
+                        key="delete"/></a>
+                <% } else { %>
+                <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                        key="edit"/></a>
+                <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
                    id="delete_link" class="icon-link"
                    style="background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
+                <% } %>
+
                 <span class="icon-text" style="background-image:url(../message_processor/images/deactivate.gif);">
                     <fmt:message key="inactive"/>&nbsp;[</span>
-                <a href="#" class="icon-link" id="activate_link"
-                   style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                   onclick="activateRow(this.parentNode.parentNode.rowIndex)"><fmt:message key="activate"/></a>
+                    <a href="#" class="icon-link" id="activate_link"
+                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                       onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
                 <span class="icon-text"
                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 
             </td>
             <%
+             } else if ("Scheduled Failover Message Forwarding Processor".
+                                equalsIgnoreCase(type)) {
+             %>
+                <td><a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
+                        class="icon-link"
+                        style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                        key="edit"/></a>
+                    <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
+                       id="delete_link" class="icon-link"
+                       style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                       key="delete"/></a>
+                    <span class="icon-text" style="background-image:url(../message_processor/images/deactivate.gif);">
+                    <fmt:message key="inactive"/>&nbsp;[</span>
+                    <a href="#" class="icon-link" id="activate_link"
+                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                       onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
+                    <span class="icon-text"
+                          style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
+                </td>
+            <%
             } else if ("Message Sampling Processor".
                     equalsIgnoreCase(type)) {
             %>
-            <td><a onclick="editRow('<%= type%>', this.parentNode.parentNode.rowIndex)" href="#"
+            <td>
+                <% if (mspData.getArtifactContainerName() != null) { %>
+                <a onclick="editRow('<%= type%>', '<%= mspData.getName()%>')" href="#"
                    class="icon-link"
                    style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                    key="edit"/></a>
-                <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+                        key="edit"/></a>
+                <a href="#" onclick="#"
+                   id="delete_link" class="icon-link"
+                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
+                        key="delete"/></a>
+                <% } else { %>
+                <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                        key="edit"/></a>
+                <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
                    id="delete_link" class="icon-link"
                    style="background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
-                 <span class="icon-text"
+                <% } %>
+                <span class="icon-text"
                        style="background-image:url(../message_processor/images/deactivate.gif);">
                     <fmt:message key="inactive"/>&nbsp;[</span>
-                <a href="#" class="icon-link" id="activate_link"
-                   style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                   onclick="activateRow(this.parentNode.parentNode.rowIndex)"><fmt:message key="activate"/></a>
+                    <a href="#" class="icon-link" id="activate_link"
+                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                       onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
                 <span class="icon-text"
                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 
             </td>
             <%} else { %>
-            <td><a onclick="editRow('<%= type%>', this.parentNode.parentNode.rowIndex)" href="#"
+            <td><a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
                    class="icon-link"
                    style="background-image:url(../admin/images/edit.gif);"><fmt:message
                     key="edit"/></a>
-                <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+                <a href="#" onclick="deleteRow('<%=mspData.getName()%>')"
                    id="delete_link" class="icon-link"
                    style="background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
@@ -392,6 +455,18 @@
                 <fmt:message key="scheduled.message.forwarding.processor.desc"/>
             </td>
         </tr>
+        <tr>
+            <td style="width:155px;">
+                <a  href="manageFailoverMessageForwardingProcessor.jsp"  class="icon-link"
+                    style="background: url(../admin/images/add.gif)  no-repeat;">
+                    <fmt:message key="scheduled.failover.message.forwarding.processor"/>
+                </a>
+            </td>
+            <td>
+                <fmt:message key="scheduled.failover.message.forwarding.processor.desc"/>
+            </td>
+        </tr>
+
         <tr>
             <td style="width:155px;">
                 <a 

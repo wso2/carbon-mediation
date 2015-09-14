@@ -18,10 +18,12 @@ package org.wso2.carbon.inbound.endpoint.protocol.https;
 
 
 import org.apache.log4j.Logger;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
+import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 
 public class InboundHttpsListener extends InboundHttpListener {
@@ -31,9 +33,11 @@ public class InboundHttpsListener extends InboundHttpListener {
     private SSLConfiguration sslConfiguration;
     private int port;
     private String name;
+    private InboundProcessorParams processorParams;
 
     public InboundHttpsListener(InboundProcessorParams params) {
         super(params);
+        processorParams = params;
         String portParam = params.getProperties().getProperty(
                    InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
         try {
@@ -58,9 +62,10 @@ public class InboundHttpsListener extends InboundHttpListener {
         if (isPortUsedByAnotherApplication(port)) {
             log.warn("Port " + port + "used by inbound endpoint " + name + " is already used by another application " +
                      "hence undeploying inbound endpoint");
-            this.destroy();
+            throw new SynapseException("Port " + port + " used by inbound endpoint " + name + " is already used by " +
+                                       "another application.");
         } else {
-            HTTPEndpointManager.getInstance().startSSLEndpoint(port, name, sslConfiguration);
+            HTTPEndpointManager.getInstance().startSSLEndpoint(port, name, sslConfiguration, processorParams);
         }
 
     }

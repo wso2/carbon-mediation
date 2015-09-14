@@ -11,6 +11,9 @@ import org.apache.synapse.rest.RESTConstants;
 import javax.xml.stream.XMLStreamException;
 
 public class RestApiAdminUtils {
+
+    private static String PROTOCOL_HTTP = "http";
+    private static String PROTOCOL_HTTPS = "https";
 	
 	public static OMElement retrieveAPIOMElement(APIData apiData) {
 
@@ -67,7 +70,13 @@ public class RestApiAdminUtils {
         	resource.addAttribute("userAgent", resourceData.getUserAgent(), nullNS);
         }
         if(resourceData.getProtocol() != RESTConstants.PROTOCOL_HTTP_AND_HTTPS){
-        	resource.addAttribute("protocol", String.valueOf(resourceData.getProtocol()), nullNS);
+            if (resourceData.getProtocol() == RESTConstants.PROTOCOL_HTTP_ONLY) {
+        	    resource.addAttribute("protocol", PROTOCOL_HTTP, nullNS);
+            } else if (resourceData.getProtocol() == RESTConstants.PROTOCOL_HTTPS_ONLY) {
+                resource.addAttribute("protocol", PROTOCOL_HTTPS, nullNS);
+            } else {
+                resource.addAttribute("protocol", String.valueOf(resourceData.getProtocol()), nullNS);
+            }
         }
 
         try {

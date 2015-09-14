@@ -200,6 +200,26 @@ public class JDBCStore implements MessageStore {
     }
 
     @Override
+    public boolean isEdited() {
+        return false;
+    }
+
+    @Override
+    public void setIsEdited(boolean b) {
+
+    }
+
+    @Override
+    public String getArtifactContainerName() {
+        return null;
+    }
+
+    @Override
+    public void setArtifactContainerName(String s) {
+
+    }
+
+    @Override
     public String toString() {
         return "HL7 Store [" + getName() + "]";
     }

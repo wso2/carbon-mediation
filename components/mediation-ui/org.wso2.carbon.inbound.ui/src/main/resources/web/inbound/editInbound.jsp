@@ -49,7 +49,10 @@
 var iParamCount = 0;
 var iParamMax = 0;
 var classRequired = false;
+var sequenceRequired=false;
+var onErrorRequired=false;
 var requiredParams = null;
+var kafkaSpecialParameters = null;
 </script>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
     <carbon:breadcrumb label="inbound.header.update"
@@ -63,6 +66,9 @@ var requiredParams = null;
             List<String>defaultParams = client.getDefaultParameters(inboundDescription.getType());            
             List<String>advParams = client.getAdvParameters(inboundDescription.getType()); 
             Set<String>defaultParamNames = new HashSet<String>();
+            String specialParams = client.getKAFKASpecialParameters();
+            String topicListParams = client.getKAFKATopicListParameters();
+            String firstSpecialParam = "";
     %>       
     
     <form method="post" name="inboundupdateform" id="inboundupdateform"
@@ -97,6 +103,11 @@ var requiredParams = null;
                         </td>
                         <td></td>
                     </tr>
+
+                   <%
+                   if(!(InboundClientConstants.TYPE_HTTP.equals(inboundDescription.getType()) || InboundClientConstants.TYPE_HTTPS.equals(inboundDescription.getType())) ) { %>
+                    <script type="text/javascript">sequenceRequired = true;</script>
+                    <script type="text/javascript">onErrorRequired = true;</script>
                     <tr>
                         <td style="width:150px"><fmt:message key="inbound.sequence"/><span
                                 class="required">*</span></td>
@@ -119,16 +130,78 @@ var requiredParams = null;
 	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
                         </td>
                     </tr>
-                    
+                    <tr>
+                        <td style="width:150px"><fmt:message key="inbound.error.suspend"/><span
+                                class="required">*</span></td>
+                        <td align="left">
+                            <select id="inboundSuspend" name="inboundSuspend" class="longInput">
+                               <%if(inboundDescription.isSuspend()){%>                                
+                                <option value="true" selected>true</option>  
+                                <option value="false">false</option>
+                                <%} else {%>
+                                <option value="true">true</option>  
+                                <option value="false" selected>false</option>                                
+                                <%}%>              
+                            </select>                            
+                        </td>                      
+                    </tr>
+                     <% } else { %>
+                   <tr>
+                        <td style="width:150px"><fmt:message key="inbound.sequence"/></td>
+                        <td align="left">
+                        <input id="inboundSequence" name="inboundSequence" class="longInput" type="text" value="<%=inboundDescription.getInjectingSeq()!= null ? inboundDescription.getInjectingSeq():"" %>"/>
+                        </td>
+                         <td align="left">
+                         <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
+                         <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
+                         </td>
+                   </tr>
+                   <tr>
+                       <td style="width:150px"><fmt:message key="inbound.error.sequence"/></td>
+                       <td align="left">
+                       <input id="inboundErrorSequence" name="inboundErrorSequence" class="longInput" type="text" value="<%=inboundDescription.getOnErrorSeq() != null ? inboundDescription.getOnErrorSeq():""%>"/>
+                       </td>
+                       <td align="left">
+                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
+                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
+                        </td>
+                   </tr>
+                   <% } %>
                     <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
                     <script type="text/javascript">classRequired = true;</script>       
                     <tr>
-                        <td style="width:150px"><fmt:message key="inbound.class"/></td>
+                        <td style="width:150px"><fmt:message key="inbound.class"/><span class="required">*</span></td>
                         <td align="left">                        
                             <input name="inboundClass" id="inboundClass" class="longInput" type="text" value="<%=inboundDescription.getClassImpl()%>"/>                                         
                         </td>
                         <td></td>
-                    </tr>                   
+                    </tr>
+                    <tr>
+                        <td style="width:150px"><fmt:message key="inbound.isListening"/></td>
+                        <td>
+                            <input type="radio" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')"><fmt:message key="inbound.polling"/>
+                            <input type="radio" id="inbound.behavior.listening" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
+                        </td>
+                        <td></td>
+                    </tr>
+
+                    <tr id="inboundIntervalRow">
+                        <td style="width:150px"><fmt:message key="inbound.interval"/><span class="required">*</span></td>
+                        <td align="left">
+                            <input name="interval" id="interval" class="longInput" type="text"/>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <script language="javascript">
+                        function toggleInboundInterval(event){
+                            if (event == "listening"){
+                                document.getElementById("inboundIntervalRow").style.display="none";
+                            } else {
+                                document.getElementById("inboundIntervalRow").style.display="table-row";
+                            }
+                        }
+                    </script>
+
                     <% } %>
                     <%if(!defaultParams.isEmpty()){                     
                     %>
@@ -146,11 +219,19 @@ var requiredParams = null;
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
 	                        <td align="left">
 	                        <%if(arrParamOri.length > 2){%>
-	                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+	                            <%if(InboundClientConstants.TYPE_KAFKA.equals(inboundDescription.getType())){
+                                    firstSpecialParam = arrParamOri[1].trim();
+                                %>
+                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>" onchange="javascript:showSpecialFields('<%=specialParams%>','<%=inboundDescription.getParameters()%>','<%=topicListParams%>');">
+                                <%} else{%>
+                                    <select id="<%=defaultParam%>" name="<%=defaultParam%>">
+                                <%}%>
 	                            <%for(int i = 1;i<arrParamOri.length;i++){
 	                                String eleValue = arrParamOri[i].trim();
 	                            %>
-	                            <%if(eleValue.equals(inboundDescription.getParameters().get(defaultParam))){ %>
+	                            <%if(eleValue.equals(inboundDescription.getParameters().get(defaultParam))){
+	                                firstSpecialParam = eleValue;
+	                            %>
 	                                <option value="<%=eleValue%>" selected><%=eleValue%></option>
 	                            <%}else{%>
 	                                <option value="<%=eleValue%>"><%=eleValue%></option>	                                                
@@ -169,7 +250,94 @@ var requiredParams = null;
 	                        </td>
 	                        <td></td>
 	                    </tr>                        
-                     <% } %>                     
+                     <% } %>
+                    <% if(InboundClientConstants.TYPE_KAFKA.equals(inboundDescription.getType())){%>
+                        <tr><td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">
+                            <%
+                                String[] allSpecialParams = specialParams.split(",");
+                                String[] parentLevelParameters = allSpecialParams[0].split(InboundClientConstants.STRING_SPLITTER);
+                            %>
+                            <script type="text/javascript">var kafkaSpecialParameters = new Array(<%=allSpecialParams.length + parentLevelParameters.length - 1%>);</script>
+                            <%
+                                int specialParameterCount = 0;
+                                for(int s = 0;s<parentLevelParameters.length;s++){
+                            %>
+                            <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=parentLevelParameters[s]%>';</script>
+                            <%
+                                    specialParameterCount++;
+                                }
+                                for(int s = 1;s<allSpecialParams.length;s++){
+                            %>
+                            <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=allSpecialParams[s]%>';</script>
+                            <%
+                                    specialParameterCount++;
+                                }
+
+                                for(int s = 0;s<allSpecialParams.length;s++){
+                                    String topicsOrTopicFilterEle = "";
+                                    String eleVal = "";
+                                    String[] fLists = topicListParams.split(InboundClientConstants.STRING_SPLITTER);
+                                    String listval = fLists[1].trim();
+                                    String specialParam = allSpecialParams[s];
+                                    if(firstSpecialParam.equals("highlevel") && (specialParam.indexOf(InboundClientConstants.STRING_SPLITTER) > -1 && specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim().equals("topics/topic.filter"))) {
+                                        String[] tLists = specialParam.split(InboundClientConstants.STRING_SPLITTER);
+                                        if(inboundDescription.getParameters().get(tLists[1].trim())==null && inboundDescription.getParameters().get(tLists[2].trim())==null){
+                                            eleVal = "";
+                                            topicsOrTopicFilterEle = tLists[1].trim();
+                                        } else{
+                                            eleVal = ((inboundDescription.getParameters().get(tLists[1].trim())==null)?inboundDescription.getParameters().get(tLists[2].trim()):inboundDescription.getParameters().get(tLists[1].trim()));
+                                            topicsOrTopicFilterEle = ((inboundDescription.getParameters().get(tLists[1].trim())==null)?tLists[2].trim():tLists[1].trim());
+                                        }
+                                        String inboundDescriptionOfParams = inboundDescription.getParameters().toString();
+                                        %>
+                                        <tr><td style="width:167px"><%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%><span class="required">*</span></td><td align="left"><select id="topicsOrTopicFilter" name="topicsOrTopicFilter" onchange="javascript:showTopicsOrTopicFilterFields('<%=inboundDescriptionOfParams%>','<%=topicListParams%>')">
+                                        <%
+                                        for(int t = 1; t < tLists.length; t++){
+                                            if(topicsOrTopicFilterEle.equals(tLists[t])){%>
+                                                <option value="<%=tLists[t].trim()%>" selected><%=tLists[t].trim()%></option>
+                                            <%} else{%>
+                                                <option value="<%=tLists[t].trim()%>"><%=tLists[t].trim()%></option>
+                                            <%}
+                                        }%>
+                                        </select></td><td></td></tr>
+                                        <tr><td colspan="3"><div id="tDiv"><table>
+                                        <%
+                                        if(topicsOrTopicFilterEle.equals("topic.filter")){
+                                            String[] splitedInboundDescription = inboundDescriptionOfParams.replace("{","").replace("}","").split(",");
+                                            if(!inboundDescriptionOfParams.equals("")){
+                                                for(int j=0; j<splitedInboundDescription.length; j++){
+                                                    if((splitedInboundDescription[j].split("=")[0].trim().equals("filter.from.whitelist") || splitedInboundDescription[j].split("=")[0].trim().equals("filter.from.blacklist")) && Boolean.parseBoolean(splitedInboundDescription[j].split("=")[1])){
+                                                        listval = splitedInboundDescription[j].split("=")[0].trim();
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        %>
+                                        <tr><td style="width:157px"><%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%><span class="required">*</span></td><td align="left"><select id="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%>" name="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[0].trim()%>" onchange="javascript:showTopicsOrTopicFilterFields('<%=inboundDescription.getParameters()%>','<%=topicListParams%>');">
+                                        <%for(int l = 1; l < fLists.length; l++){
+                                            if(listval.equals(fLists[l])){%>
+                                                 <option value="<%=fLists[l].trim()%>" selected><%=fLists[l].trim()%></option>
+                                            <%} else{%>
+                                                 <option value="<%=fLists[l].trim()%>"><%=fLists[l].trim()%></option>
+                                            <%}
+                                        }%>
+                                        </td><td></td></tr>
+                                        <%
+                                        }
+                                        %>
+                                        <tr><td style="width:155px"><%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[1].trim()%> name<span class="required">*</span></td><td align="left"><input id="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[1].trim()%>" name="<%=specialParam.split(InboundClientConstants.STRING_SPLITTER)[1].trim()%>" class="longInput" type="text" value="<%=eleVal%>"/></td><td></td></tr></table></div></td></tr>
+                                    <%} else{
+                                        if(allSpecialParams[s].startsWith(firstSpecialParam+".")){
+                                            if(inboundDescription.getParameters().get(allSpecialParams[s]) != null){
+                                                eleVal = inboundDescription.getParameters().get(allSpecialParams[s]);
+                                            }%>
+                                            <tr><td style="width:167px"><%=allSpecialParams[s].replace(firstSpecialParam+".", "")%><span class="required">*</span></td><td align="left"><input id="<%=allSpecialParams[s]%>" name="<%=allSpecialParams[s]%>" class="longInput" type="text" value="<%=eleVal%>"/></td><td></td></tr>
+                                        <%}
+                                    }
+                                }%>
+                            </table></div></td>
+                        </tr>
+                    <%}%>
                      <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
                     <tr>
                         <td class="buttonRow" colspan="3">       
@@ -184,6 +352,21 @@ var requiredParams = null;
 					<%  int i = 0;
 					    for(String strKey : inboundDescription.getParameters().keySet()) {
 					    if(!defaultParamNames.contains(strKey)){
+
+                            if (strKey.equalsIgnoreCase("inbound.behavior")) {
+                                if(inboundDescription.getParameters().get(strKey).equalsIgnoreCase("listening")){
+                                    %>
+                                        <script language="javascript">
+                                            document.getElementById("inbound.behavior.listening").checked = true;
+                                            document.getElementById("inboundIntervalRow").style.display="none";
+                                        </script>
+
+                                    <%
+                                }
+
+                                continue;
+                            }
+
 					    i++;
 					    %>                        
 	                    <tr>
@@ -198,7 +381,8 @@ var requiredParams = null;
                      <% } %> 
                      <% } %> 
                      <script type="text/javascript">iParamCount=<%=i%>;iParamMax=<%=i%>;</script>
-                     <%}else{ %>
+                     <%}else{
+                     if(!advParams.isEmpty()){%>
 				    <tr>
 				        <td><span id="_adv" style="float: left; position: relative;">
 				            <a class="icon-link" onclick="javascript:showAdvancedOptions('');"
@@ -207,7 +391,7 @@ var requiredParams = null;
 				        </span>
 				        </td>
 				    </tr> 
-				    <%} %>                     
+				    <%} }%>
 				    <tr>
 					    <td colspan="3">
 						    <div id="_advancedForm" style="display:none">

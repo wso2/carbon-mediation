@@ -17,9 +17,19 @@
 */
 package org.wso2.carbon.message.processor.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapseConfiguration;
@@ -27,6 +37,8 @@ import org.apache.synapse.config.xml.MessageProcessorFactory;
 import org.apache.synapse.config.xml.MessageProcessorSerializer;
 import org.apache.synapse.message.processor.MessageProcessor;
 import org.apache.synapse.message.processor.impl.ScheduledMessageProcessor;
+import org.apache.synapse.message.processor.impl.failover.FailoverMessageForwardingProcessorView;
+import org.apache.synapse.message.processor.impl.failover.FailoverScheduledMessageForwardingProcessor;
 import org.apache.synapse.message.processor.impl.forwarder.MessageForwardingProcessorView;
 import org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor;
 import org.apache.synapse.message.processor.impl.sampler.SamplingProcessor;
@@ -36,17 +48,13 @@ import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-
 @SuppressWarnings({"UnusedDeclaration"})
 public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     private static Log log = LogFactory.getLog(MessageProcessorAdminService.class);
 
     public static final int MSGS_PER_PAGE = 10;
+    
+    public final static String DEFAULT_AXIS2_XML = "./repository/conf/axis2/axis2_blocking_client.xml";
 
     /**
      * Get an XML configuration element for a message processor from the FE and creates and add
@@ -107,8 +115,15 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                 messageProcessor.setFileName(fileName);
                 synapseConfiguration.addMessageProcessor(messageProcessor.getName(),
                         messageProcessor);
-                MediationPersistenceManager mp = getMediationPersistenceManager();
-                mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+
+                if (removedProcessor.getArtifactContainerName() != null) {
+                    messageProcessor.setArtifactContainerName(removedProcessor.getArtifactContainerName());
+                    messageProcessor.setIsEdited(true);
+                }
+                else {
+                    MediationPersistenceManager mp = getMediationPersistenceManager();
+                    mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                }
             } else {
                 String message = "Unable to Update Message Processor ";
                 handleException(log, message, null);
@@ -222,6 +237,41 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         }
 
         return messageIds;
+    }
+
+    /**
+     * Get all the Current Message processor data defined in the configuration
+     *
+     * @return Array of  MessageProcessorMetaDatas.
+     * @throws AxisFault
+     */
+    public MessageProcessorMetaData[] getMessageProcessorDataList() throws AxisFault {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration configuration = getSynapseConfiguration();
+            Collection<String> names = configuration.getMessageProcessors().keySet();
+
+            List<MessageProcessorMetaData> messageProcessorDataList = new ArrayList<MessageProcessorMetaData>();
+            if (names != null && !names.isEmpty()) {
+                for (String name : names) {
+                    MessageProcessor messageProcessor = configuration.getMessageProcessors().get(name);
+                    MessageProcessorMetaData data = new MessageProcessorMetaData();
+                    data.setName(name);
+                    if (messageProcessor.getArtifactContainerName() != null) {
+                        data.setArtifactContainerName(messageProcessor.getArtifactContainerName());
+                    }
+                    if (messageProcessor.isEdited()) {
+                        data.setIsEdited(true);
+                    }
+                    messageProcessorDataList.add(data);
+                }
+            }
+            return messageProcessorDataList.toArray(new MessageProcessorMetaData[messageProcessorDataList.size()]);
+
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -466,8 +516,8 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
             assert configuration != null;
             if (configuration.getMessageProcessors().containsKey(processorName)) {
                 MessageProcessor processor =
-                        configuration.getMessageProcessors().get(processorName);            
-                
+                        configuration.getMessageProcessors().get(processorName);
+
                 if (processor instanceof ScheduledMessageForwardingProcessor) {
                     MessageForwardingProcessorView view =
                             ((ScheduledMessageForwardingProcessor) processor).getView();
@@ -479,6 +529,12 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((SamplingProcessor) processor).getView();
                     if(view != null){
                     	active = view.isActive();
+                    }
+                } else if (processor instanceof FailoverScheduledMessageForwardingProcessor) {
+                    FailoverMessageForwardingProcessorView view =
+                            ((FailoverScheduledMessageForwardingProcessor) processor).getView();
+                    if (view != null) {
+                        active = view.isActive();
                     }
                 }
             }
@@ -504,18 +560,31 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
-                        getMediationPersistenceManager()
-                                .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        if (processor.getArtifactContainerName() == null) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
                     } else {
                         log.warn("Scheduled Message Forwarding Processor is already active");
                     }
+                } else if (processor instanceof FailoverScheduledMessageForwardingProcessor) {
+                    FailoverMessageForwardingProcessorView view =
+                            ((FailoverScheduledMessageForwardingProcessor) processor).getView();
+                    if (!view.isActive()) {
+                        view.activate();
+                    } else {
+                        log.warn("Scheduled Failover Message Forwarding Processor is already active");
+                    }
+
                 } else if (processor instanceof SamplingProcessor) {
                     SamplingProcessorView view =
                             ((SamplingProcessor) processor).getView();
                     if (!view.isActive()) {
                         view.activate();
-                        getMediationPersistenceManager()
-                                .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        if (processor.getArtifactContainerName() == null) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
                     } else {
                         log.warn("Sampling Processor is already active");
                     }
@@ -544,17 +613,27 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                             ((ScheduledMessageForwardingProcessor) processor).getView();
                     if (view.isActive()) {
                         view.deactivate();
-                        getMediationPersistenceManager()
-                                .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
                     } else {
                         log.warn("Scheduled Message Forwarding Processor - already deActive");
                     }
+                } else if (processor instanceof FailoverScheduledMessageForwardingProcessor) {
+
+                    FailoverMessageForwardingProcessorView view =
+                            ((FailoverScheduledMessageForwardingProcessor) processor).getView();
+                    if (view.isActive()) {
+                        view.deactivate();
+                    } else {
+                        log.warn("Scheduled Failover Message Forwarding Processor - already deActive");
+                    }
+
                 } else if (processor instanceof SamplingProcessor) {
                     SamplingProcessorView view = ((SamplingProcessor) processor).getView();
                     if (view.isActive()) {
                         view.deactivate();
-                        getMediationPersistenceManager()
-                                .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        if (processor.getArtifactContainerName() == null) {
+                            getMediationPersistenceManager()
+                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                        }
                     } else {
                         log.warn("Sampling Message Processor - already in the deactivated state");
                     }
@@ -638,6 +717,23 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         }
 
         return endpoints;
+    }
+    
+    /**
+     * Checks whether given Axis2ClientRepo is valid one or not
+     * @param input location of the Axis2 Client Repository
+     * @return <code>true</code> if the given axis client repository valid, <code>false</code> otherwise.
+     * @throws AxisFault If an ERROR is encountered or given repository location is invalid.
+     */
+    public boolean validateAxis2ClientRepo(String input) throws AxisFault {
+        try {
+            ConfigurationContextFactory.createConfigurationContextFromFileSystem(input,
+                                                                                 DEFAULT_AXIS2_XML);
+            return true;
+        } catch (AxisFault e) {
+            handleException(log, "Error while validating the Axis2 Client Repository", e);
+            return false;
+        }
     }
 
 }

@@ -373,6 +373,26 @@ public class JPAStore implements MessageStore {
         return null;
     }
 
+    @Override
+    public boolean isEdited() {
+        return false;
+    }
+
+    @Override
+    public void setIsEdited(boolean b) {
+
+    }
+
+    @Override
+    public String getArtifactContainerName() {
+        return null;
+    }
+
+    @Override
+    public void setArtifactContainerName(String s) {
+
+    }
+
     private String getTableName() {
         return PersistentHL7Message.class.getSimpleName();
     }

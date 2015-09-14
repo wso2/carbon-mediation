@@ -68,13 +68,25 @@ public class NTaskAdapter extends AbstractTask {
     }
 
     public void execute() {
+
         if (!isInitialized()) {
             return;
         }
+
+        //introduced due to limitation of Ntask.core executing task for single cycle when task
+        // count 0
+        //trigger count can be null in some scenarios when editing tasks hence null check
+        if (getProperties().get("task.count") == null || (getProperties().get("task.count") != null && Integer.parseInt(getProperties().get("task.count")) == 0)) {
+            return;
+        }
+
         if (logger.isDebugEnabled()) {
             logger.debug("#execute Executing NTaskAdapter: " + getProperties()
                 + " Worker-node[" + CarbonUtils.isWorkerNode() + "]" );
         }
+        //needs to keep the tenant loaded
+        Map<String, String> properties = getProperties();
+        checkLoadTenant(properties.get(TaskInfo.TENANT_ID_PROP));
         synapseTask.execute();
     }
     /**

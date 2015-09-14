@@ -15,16 +15,23 @@
  */
 package org.wso2.carbon.inbound.endpoint;
 
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.synapse.inbound.InboundProcessorParams;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.inboundfactory.InboundRequestProcessorFactoryImpl;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
+import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
+import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
+import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is responsible for starting Listeners( like HTTP, HTTPS, HL7) on server startup for
@@ -47,7 +54,7 @@ public class EndpointListenerLoader {
     public static void loadListeners() {
 
         Map<Integer, List<InboundEndpointInfoDTO>> tenantData =
-                InboundEndpointsDataStore.getInstance().getAllEndpointData();
+                InboundEndpointsDataStore.getInstance().getAllListeningEndpointData();
 
         for (Map.Entry tenantInfoEntry : tenantData.entrySet()) {
             int port = (Integer) tenantInfoEntry.getKey();
@@ -57,17 +64,34 @@ public class EndpointListenerLoader {
 
             if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTP)) {
                 HTTPEndpointManager.getInstance().
-                        startListener(port, inboundEndpointInfoDTO.getEndpointName());
+                        startListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                inboundEndpointInfoDTO.getInboundParams());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTPS)) {
                 HTTPEndpointManager.getInstance().
                            startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(),
-                                         inboundEndpointInfoDTO.getSslConfiguration());
+                                         inboundEndpointInfoDTO.getSslConfiguration(), inboundEndpointInfoDTO.getInboundParams());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.Protocols.hl7.toString())) {
                 HL7EndpointManager.getInstance().
-                        startListener(port, inboundEndpointInfoDTO.getEndpointName(), inboundEndpointInfoDTO.getInboundParams());
-            }
+                        startListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                inboundEndpointInfoDTO.getInboundParams());
+            } else {
+                // Check for custom-listening-InboundEndpoints
+                InboundProcessorParams inboundParams = inboundEndpointInfoDTO.getInboundParams();
 
+                if (GenericInboundListener.isListeningInboundEndpoint(inboundParams)) {
+                    GenericInboundListener.getInstance(inboundParams).init();
+                }
+            }
+        }
+        
+        //Load tenats required for polling inbound protocols
+        Map<String, Set<String>> mPollingEndpoints =
+		                                  InboundEndpointsDataStore.getInstance().getAllPollingingEndpointData();
+        ConfigurationContextService configurationContext = 
+      	                               InboundEndpointPersistenceServiceDSComponent.getConfigContextService();
+        ConfigurationContext mainConfigCtx = configurationContext.getServerConfigContext();
+        for (String tenantDomain : mPollingEndpoints.keySet()) {
+            TenantAxisUtils.getTenantConfigurationContext(tenantDomain, mainConfigCtx);
         }
     }
-
 }

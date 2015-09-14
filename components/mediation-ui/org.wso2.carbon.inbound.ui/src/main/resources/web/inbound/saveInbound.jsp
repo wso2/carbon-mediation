@@ -47,7 +47,7 @@
 			List<ParamDTO>sParams = new ArrayList<ParamDTO>();
 			Map<String,String[]>paramMap = request.getParameterMap();
 			for(String strKey:paramMap.keySet()){
-				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.") || strKey.startsWith("api.")){
+				if(strKey.startsWith("transport.") || strKey.startsWith("java.naming.") || strKey.startsWith("inbound.") || strKey.startsWith("api.") || strKey.startsWith("dispatch.filter.")){
 					String strVal = request.getParameter(strKey);
 					if(strVal != null && !strVal.equals("")){
 						sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
@@ -57,7 +57,9 @@
 					if(paramKey != null && !paramKey.trim().equals("")){
 						sParams.add((new ParamDTO(paramKey, request.getParameter("paramval" + strKey.replaceAll("paramkey","")))));
 					}
-				}else if(strKey.startsWith("interval")){
+				}else if(strKey.startsWith("inbound.behavior")){
+                    sParams.add((new ParamDTO("inbound.behavior", request.getParameter("inbound.behavior"))));
+                }else if(strKey.startsWith("interval")){
 				    sParams.add((new ParamDTO("interval",request.getParameter("interval"))));
 				}else if(strKey.startsWith("sequential")){
 				    sParams.add((new ParamDTO("sequential",request.getParameter("sequential"))));
@@ -73,40 +75,63 @@
                     sParams.add((new ParamDTO("SSLProtocol",request.getParameter(strKey))));
                 }else if(strKey.startsWith("CertificateRevocationVerifier")){
                     sParams.add((new ParamDTO("CertificateRevocationVerifier",request.getParameter(strKey))));
+                }else if(strKey.startsWith("enableSSL")){
+                    sParams.add((new ParamDTO("enableSSL",request.getParameter(strKey))));
                 }else if(strKey.startsWith("coordination")){
-		    sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));
+		            sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));
+                }else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")|| strKey.startsWith("topic.filter")|| strKey.equals("topics")||strKey.startsWith("filter.from")||strKey.startsWith("consumer.type")
+                    || strKey.startsWith("thread.count")|| strKey.startsWith("simple.")|| strKey.startsWith("content.type") || strKey.startsWith("offsets.") || strKey.startsWith("socket.") || strKey.startsWith("fetch.")
+                    || strKey.startsWith("consumer.") || strKey.startsWith("num.consumer.fetchers") || strKey.startsWith("queued.max.message.chunks") || strKey.startsWith("rebalance.") || strKey.startsWith("exclude.internal.topics")
+                    || strKey.startsWith("partition.assignment.strategy") || strKey.startsWith("client.id") || strKey.startsWith("dual.commit.enabled")){
+                  String strVal = request.getParameter(strKey).trim();
+                  if(strKey.trim().equals("filter.from"))
+                  {
+                      strKey = request.getParameter(strKey);
+                      strVal = "true";
+                  }
+                  if(strVal != null && !strVal.equals("")){
+                     sParams.add(new ParamDTO(strKey, strVal));
+                  }
+                }else if(strKey.startsWith("mqtt.")|| strKey.startsWith("content.type")){
+                                   String strVal = request.getParameter(strKey);
+                                   if(strVal != null && !strVal.equals("")){
+                                      sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                                      }
+                }else if(strKey.startsWith("rabbitmq.")){
+                String strVal = request.getParameter(strKey);
+                    if(strVal != null && !strVal.equals("")){
+                        sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                    }
                 }
 			}
-		boolean added =	client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, sParams);
+		boolean added =	client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, request.getParameter("inboundSuspend"), sParams);
 		if(!added){
 		%>
-		<script type="text/javascript">
-            jQuery(document).ready(function() {
-                CARBON.showErrorDialog('Cannot add inbound endpoint may be name or port already consumed', function() {
-        				goBackOnePage();
-        			}, function() {
-        				goBackOnePage();
-        			});
-        		});
-        	</script>
-
-
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            CARBON.showErrorDialog('Cannot add inbound endpoint. Maybe name or port is already in use.', function () {
+                goBackTwoPages();
+            }, function () {
+                goBackTwoPages();
+            });
+        });
+    </script>
 		<%
-		}
+		} else {
 	%>
 	<script type="text/javascript">
-    forward("index.jsp");
+    forward("index.jsp?region=region1&item=inbound_menu");
 </script>
+    <% } %>
 	<%
 			} catch (Exception e) {
 	%>
 	<script type="text/javascript">
     jQuery(document).ready(function() {
-        CARBON.showErrorDialog('<%=e.getMessage()%>
-		', function() {
-				goBackOnePage();
+        CARBON.showErrorDialog('<%=e.getMessage()%>', function() {
+                goBackTwoPages();
 			}, function() {
-				goBackOnePage();
+                goBackTwoPages();
 			});
 		});
 	</script>

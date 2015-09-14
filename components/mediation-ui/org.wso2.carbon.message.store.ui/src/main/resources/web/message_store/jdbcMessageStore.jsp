@@ -61,12 +61,17 @@
     String[] messageStores = client.getMessageStoreNames();
 
     MessageStoreData messageStore = null;
+    String failoverMessageStoreName = "";
 
     if (messageStoreName != null) {
         session.setAttribute("edit" + messageStoreName, "true");
         for (String name : messageStores) {
             if (name != null && name.equals(messageStoreName)) {
                 messageStore = client.getMessageStore(name);
+
+                if(messageStore.getParams().get("store.failover.message.store.name") != null) {
+                    failoverMessageStoreName = messageStore.getParams().get("store.failover.message.store.name");
+                }
             }
         }
     } else if (origin != null && !"".equals(origin)) {
@@ -118,10 +123,49 @@
     }
 
     function ValidateTextForm(form) {
+        var isPool = document.getElementById('radio_pool').checked;
+
         if (IsEmpty(form.Name)) {
             CARBON.showWarningDialog('<fmt:message key="name.field.cannot.be.empty"/>')
             form.Name.focus();
             return false;
+        }
+
+        if (IsEmpty(form.store_table)) {
+            CARBON.showWarningDialog('<fmt:message key="table.field.cannot.be.empty"/>')
+            form.store_table.focus();
+            return false;
+        }
+
+        if (document.getElementById('enable_guaranteed_delivery').options[document.getElementById
+           ('enable_guaranteed_delivery').selectedIndex].value == "true" && document.getElementById
+           ('failover_message_store_name').selectedIndex == -1) {
+           CARBON.showWarningDialog('<fmt:message key="failover.message.store.cannot.be.empty"/>')
+           return false;
+        }
+
+        if(isPool){
+            if (IsEmpty(form.driver)) {
+                CARBON.showWarningDialog('<fmt:message key="driver.field.cannot.be.empty"/>')
+                form.driver.focus();
+                return false;
+            }
+            if (IsEmpty(form.url)) {
+                CARBON.showWarningDialog('<fmt:message key="url.field.cannot.be.empty"/>')
+                form.url.focus();
+                return false;
+            }
+            if (IsEmpty(form.user)) {
+                CARBON.showWarningDialog('<fmt:message key="user.field.cannot.be.empty"/>')
+                form.user.focus();
+                return false;
+            }
+        }  else {
+            if (IsEmpty(form.data_source)) {
+                CARBON.showWarningDialog('<fmt:message key="data.source.field.cannot.be.empty"/>')
+                form.data_source.focus();
+                return false;
+            }
         }
 
         return true;
@@ -143,8 +187,7 @@
     }
 
     function addServiceParams() {
-
-        if (document.getElementById('driver').value != "") {
+        if (document.getElementById('radio_pool').checked) {
             addServiceParameter("store.jdbc.driver", document.getElementById('driver').value);
             addServiceParameter("store.jdbc.connection.url", document.getElementById('url').value);
             addServiceParameter("store.jdbc.username", document.getElementById('user').value);
@@ -154,6 +197,9 @@
         }
 
         addServiceParameter("store.jdbc.table", document.getElementById('store_table').value);
+        addServiceParameter("store.producer.guaranteed.delivery.enable", document.getElementById('enable_guaranteed_delivery').options[document.getElementById('enable_guaranteed_delivery').selectedIndex].value);
+        addServiceParameter("store.failover.message.store.name", document.getElementById('failover_message_store_name').options[document.getElementById('failover_message_store_name').selectedIndex].value);
+
     }
 
     function addServiceParameter(parameter, value) {
@@ -165,6 +211,19 @@
         if (headerValue != '') {
             document.getElementById("tableParams").value = document.getElementById("tableParams").value + "|" + headerName + "#" + headerValue;
             document.getElementById("addedParams").value = document.getElementById("addedParams").value + "," + headerName + ":" + headerValue;
+        }
+    }
+
+    function showGuaranteedDeliveryOptions(id) {
+        var formElem = document.getElementById(id + '_guaranteedDeliveryForm');
+        if (formElem.style.display == 'none') {
+            formElem.style.display = '';
+            document.getElementById(id + '_adv_gur_delivery').innerHTML = '<a class="icon-link" ' +
+                            'onclick="javascript:showGuaranteedDeliveryOptions(\'' + id + '\');" style="background-image: url(images/up.gif);">' + "<fmt:message key="hide.guaranteed.delivery.parameters"/>" + '</a>';
+        } else {
+            formElem.style.display = 'none';
+            document.getElementById(id + '_adv_gur_delivery').innerHTML = '<a class="icon-link" ' +
+                'onclick="javascript:showGuaranteedDeliveryOptions(\'' + id + '\');" style="background-image: url(images/down.gif);">' + "<fmt:message key="show.guaranteed.delivery.parameters"/>" + '</a>';
         }
     }
 
@@ -250,7 +309,7 @@
                             <%}%>
 
                             <tr>
-                                <td><fmt:message key="store.jdbc.table"/></td>
+                                <td><fmt:message key="store.jdbc.table"/><span class="required"> *</span></td>
                                 <td><input type="text" size="60" id="store_table" name="store_table"
                                            value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jdbc.table")!=null))?messageStore.getParams().get("store.jdbc.table"):""%>"/>
                                 </td>
@@ -364,11 +423,87 @@
                                 <td><input type="password" name="password" id="password" style="width:300px"
                                            value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jdbc.password")!=null))?messageStore.getParams().get("store.jdbc.password"):""%>"/></td>
                             </tr>
-
+                            <tr>
+                                <td>
+                                    <span id="_adv_gur_delivery" style="float: left; position: relative;">
+                                    <a class="icon-link" onclick="javascript:showGuaranteedDeliveryOptions('');"
+                                        style="background-image: url(images/down.gif);">
+                                        <fmt:message key="show.guaranteed.delivery.parameters"/></a>
+                                        </span>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
 
                         <div id="_advancedForm" style="display:none"></div>
+                         <div id="_guaranteedDeliveryForm" style="display:none">
+                            <table class="normal-nopadding">
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2" class="sub-header"><fmt:message key="failover.configuration.parameters"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><fmt:message key="store.producer.guaranteed.enable"/></td>
+                                        <td>
+                                            <select id="enable_guaranteed_delivery">
+                                            <%
+                                                if ((null != messageStore) && (messageStore.getParams().get("store.producer.guaranteed.delivery.enable") != null) && (messageStore.getParams().get("store.producer.guaranteed.delivery.enable").equals("true"))) {
+                                            %>
+                                                <option selected="selected" value="true">True</option>
+                                                <option value="false">False</option>
+                                            <%} else {%>
+                                                <option value="true">True</option>
+                                                <option selected="selected" value="false">False</option>
+                                            <%}%>
+                                            </select>
+                                        </td>
+                                    </tr>
+
+                                    <%if (messageStore != null) {%>
+                                    <tr>
+                                        <td><fmt:message key="store.failover.messagestore.name"/></td>
+                                        <td>
+                                            <select id="failover_message_store_name" name="MessageStore">
+                                                <%
+                                                if(messageStores != null) {
+                                                    for (String msn : messageStores) {
+
+                                                        if(failoverMessageStoreName != null && msn.equals(failoverMessageStoreName)) {
+
+                                                            %>
+                                                            <option value="<%=msn%>" selected="true"><%=msn%></option>
+                                                            <%
+                                                            } else {
+                                                            %>
+                                                                <option  value="<%=msn%>"><%=msn%></option>
+                                                            <%
+
+                                                            }
+                                                        }}
+                                                        %>
+                                                </select>
+                                        </td>
+                                     </tr>
+                                     <%} else { %>
+                                    <tr>
+                                       <td><fmt:message key="store.failover.messagestore.name"/></td>
+                                       <td>
+                                        <select id="failover_message_store_name" name="MessageStore">
+                                            <%
+                                                if(messageStores != null) {
+                                                    for (String msn : messageStores)
+                                                        {%>
+                                                            <option selected="true" value="<%=msn%>"><%=msn%></option>
+                                                        <%
+                                                    }}
+                                        %>
+                                         </select>
+                                        </td>
+                                    </tr>
+                                    <%}%>
+                                </tbody>
+                         </table>
+                     </div>
 
 
                     </td>

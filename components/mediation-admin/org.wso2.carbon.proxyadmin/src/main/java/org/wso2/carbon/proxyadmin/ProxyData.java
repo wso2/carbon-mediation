@@ -79,6 +79,12 @@ public class ProxyData {
 
     private String description;
 
+    /** name of the artifact container from which the proxy deployed */
+    private String artifactContainerName;
+
+    /** Whether the artifact is edited via the management console or not */
+    private boolean isEdited;
+
     public String getDescription() {
         return description;
     }
@@ -506,5 +512,37 @@ public class ProxyData {
     	
         InputStream in = new ByteArrayInputStream(bytes);
         return new StAXOMBuilder(in).getDocumentElement();
+    }
+
+    /**
+     * Get the name of the artifact container from which the proxy deployed
+     * @return artifactContainerName
+     */
+    public String getArtifactContainerName() {
+        return artifactContainerName;
+    }
+
+    /**
+     * Set the name of the artifact container
+     * @param artifactContainerName
+     */
+    public void setArtifactContainerName(String artifactContainerName) {
+        this.artifactContainerName = artifactContainerName;
+    }
+
+    /**
+     * Whether the proxy is edited through the management console
+     * @return isEdited
+     */
+    public boolean getIsEdited() {
+        return isEdited;
+    }
+
+    /**
+     * Set whether the proxy is deployed via the management console
+     * @param isEdited
+     */
+    public void setIsEdited(boolean isEdited) {
+        this.isEdited = isEdited;
     }
 }

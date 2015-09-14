@@ -26,6 +26,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.wso2.carbon.identity.oauth.mediator.OAuthMediator;
+import org.wso2.carbon.mediator.service.MediatorException;
 
 import java.util.Properties;
 
@@ -59,14 +60,21 @@ public class OAuthMediatorFactory extends AbstractMediatorFactory {
         remoteServiceUrl = element.getAttribute(ATTR_NAME_SERVICE_EPR);
         if (remoteServiceUrl != null && remoteServiceUrl.getAttributeValue() != null) {
             mediator.setRemoteServiceUrl(remoteServiceUrl.getAttributeValue());
+        }else {
+            throw new MediatorException(
+                    "The 'remoteServiceUrl' attribute is required for the OAuth mediator");
         }
         username = element.getAttribute(ATTR_NAME_USERNAME);
         if(username != null && username.getAttributeValue() != null){
         	mediator.setUsername(username.getAttributeValue());
+        } else {
+            throw new MediatorException("The 'username' attribute is required for the OAuth mediator ");
         }
         password = element.getAttribute(ATTR_NAME_PASSWORD);
         if(password != null && password.getAttributeValue() != null){
         	mediator.setPassword(password.getAttributeValue());
+        }else {
+            throw new MediatorException("The 'password' attribute is required for the OAuth mediator");
         }
         return mediator;
     }

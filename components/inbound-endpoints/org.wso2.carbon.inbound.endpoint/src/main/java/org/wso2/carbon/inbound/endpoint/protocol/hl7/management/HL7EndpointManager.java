@@ -55,11 +55,8 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
     }
 
     @Override
-    public void startListener(int port, String name) {
-        return;
-    }
-
-    public void startListener(int port, String name, InboundProcessorParams params) {
+    public boolean startListener(int port, String name, InboundProcessorParams params) {
+        log.info("Starting HL7 Inbound Endpoint on port " + port);
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
         if (params.getProperties().getProperty(MLLPConstants.HL7_INBOUND_TENANT_DOMAIN) == null) {
@@ -75,18 +72,17 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
         HL7Processor hl7Processor = new HL7Processor(parameters);
         parameters.put(MLLPConstants.HL7_REQ_PROC, hl7Processor);
 
-        InboundHL7IOReactor.bind(port, hl7Processor);
+        return InboundHL7IOReactor.bind(port, hl7Processor);
     }
 
-    public void startEndpoint(int port, String name, InboundProcessorParams params) {
-        log.info("Starting HL7 Inbound Endpoint on port " + port);
-
+    @Override
+    public boolean startEndpoint(int port, String name, InboundProcessorParams params) {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
 
         params.getProperties().setProperty(MLLPConstants.HL7_INBOUND_TENANT_DOMAIN, tenantDomain);
 
-        String epName = dataStore.getEndpointName(port, tenantDomain);
+        String epName = dataStore.getListeningEndpointName(port, tenantDomain);
         if (epName != null) {
             if (epName.equalsIgnoreCase(name)) {
                 log.info(epName + " Endpoint is already started in port : " + port);
@@ -96,27 +92,23 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
                 throw new SynapseException(msg);
             }
         } else {
-            dataStore.registerEndpoint(port, tenantDomain,
+            dataStore.registerListeningEndpoint(port, tenantDomain,
                     InboundRequestProcessorFactoryImpl.Protocols.hl7.toString(), name, params);
-            startListener(port, name, params);
+            return startListener(port, name, params);
         }
 
-    }
-
-    @Override
-    public void startEndpoint(int port, String name) {
-        return;
+        return false;
     }
 
     @Override
     public void closeEndpoint(int port) {
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = cc.getTenantDomain();
-        dataStore.unregisterEndpoint(port, tenantDomain);
+        dataStore.unregisterListeningEndpoint(port, tenantDomain);
 
         if (!InboundHL7IOReactor.isEndpointRunning(port)) {
             log.info("Listener Endpoint is not started");
-            return;
+            return ;
         } else if (dataStore.isEndpointRegistryEmpty(port)) {
             // if no other endpoint is working on this port. close the listening endpoint
             InboundHL7IOReactor.unbind(port);
@@ -126,14 +118,15 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
     private void validateParameters(InboundProcessorParams params, Map<String, Object> parameters) {
         if (!params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equalsIgnoreCase("true")
                 && !params.getProperties().getProperty(MLLPConstants.PARAM_HL7_AUTO_ACK).equalsIgnoreCase("false")) {
-            log.warn("Parameter inbound.hl7.AutoAck is not valid. Default value of true will be used.");
+            log.warn("Parameter inbound.hl7.AutoAck in HL7 inbound " + params.getName() + " is not valid. Default " +
+                    "value of true will be used.");
             params.getProperties().setProperty(MLLPConstants.PARAM_HL7_AUTO_ACK, "true");
         }
 
         try {
             Integer.valueOf(params.getProperties().getProperty(MLLPConstants.PARAM_HL7_TIMEOUT));
         } catch (NumberFormatException e) {
-            log.warn("Parameter inbound.hl7.TimeOut is not valid. Default timeout " +
+            log.warn("Parameter inbound.hl7.TimeOut in HL7 inbound " + params.getName() + " is not valid. Default timeout " +
                     "of " + MLLPConstants.DEFAULT_HL7_TIMEOUT + " milliseconds will be used.");
             params.getProperties().setProperty(MLLPConstants.PARAM_HL7_TIMEOUT,
                     String.valueOf(MLLPConstants.DEFAULT_HL7_TIMEOUT));
@@ -155,7 +148,7 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
                 parameters.put(MLLPConstants.HL7_PRE_PROC_PARSER_CLASS, preProcParser);
             }
         } catch (Exception e) {
-            log.error("Error creating message preprocessor: ", e);
+            log.error("Error creating message preprocessor for HL7 inbound " + params.getName() + ": ", e);
         }
 
         try {
@@ -169,7 +162,8 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
         } catch (UnsupportedCharsetException e) {
             parameters.put(MLLPConstants.HL7_CHARSET_DECODER, MLLPConstants.UTF8_CHARSET.newDecoder());
             log.error("Unsupported charset '" + params.getProperties()
-                    .getProperty(MLLPConstants.PARAM_HL7_CHARSET) + "' specified. Default UTF-8 will be used instead.");
+                    .getProperty(MLLPConstants.PARAM_HL7_CHARSET) + "' specified in HL7 inbound " + params.getName() +
+                    ". Default UTF-8 will be used instead.");
         }
 
         if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_VALIDATE) == null) {

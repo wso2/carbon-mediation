@@ -23,6 +23,8 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 import javax.jms.BytesMessage;
+import javax.jms.Connection;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.jms.Message;
@@ -42,10 +44,16 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
-import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.inbound.InboundEndpoint;
+import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
  * 
@@ -61,7 +69,10 @@ public class JMSInjectHandler {
     private boolean sequential;
     private SynapseEnvironment synapseEnvironment;
     private Properties jmsProperties;
-
+    //Following is used when using reply destination
+    private Connection connection;
+    private Destination replyDestination;
+    
     public JMSInjectHandler(String injectingSeq, String onErrorSeq, boolean sequential,
             SynapseEnvironment synapseEnvironment, Properties jmsProperties) {
         this.injectingSeq = injectingSeq;
@@ -69,22 +80,89 @@ public class JMSInjectHandler {
         this.sequential = sequential;
         this.synapseEnvironment = synapseEnvironment;
         this.jmsProperties = jmsProperties;
+
     }
 
-    public boolean invoke(Object object) throws SynapseException{
+    /**
+     * Invoke the mediation logic for the passed message
+     * */
+    public boolean invoke(Object object, String name) throws SynapseException{
 
         Message msg = (Message) object;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
+            msgCtx.setProperty("inbound.endpoint.name", name);
+            InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
+            CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
             String contentType = msg.getJMSType();
+            
+            if (contentType == null || contentType.trim().equals("")) {
+                String contentTypeProperty =
+                                             jmsProperties.getProperty(JMSConstants.CONTENT_TYPE_PROPERTY);
+                if (contentTypeProperty != null) {
+                    contentType = msg.getStringProperty(contentTypeProperty);
+                }
+            }else{
+                msgCtx.setProperty(JMSConstants.JMS_MESSAGE_TYPE, contentType);
+            }
+            
             if(contentType == null || contentType.trim().equals("")){
                 contentType = jmsProperties.getProperty(JMSConstants.CONTENT_TYPE);
             }
             if (log.isDebugEnabled()) {
                 log.debug("Processed JMS Message of Content-type : " + contentType);
             }
-            MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
-                    .getAxis2MessageContext();
+            MessageContext axis2MsgCtx =
+                                         ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx).getAxis2MessageContext();
+            // set the JMS Message ID as the Message ID of the MessageContext
+            try {
+                msgCtx.setMessageID(msg.getJMSMessageID());
+                String jmsCorrelationID = msg.getJMSCorrelationID();
+                if (jmsCorrelationID != null && !jmsCorrelationID.isEmpty()) {
+                    msgCtx.setProperty(JMSConstants.JMS_COORELATION_ID, jmsCorrelationID);
+                } else {
+                    msgCtx.setProperty(JMSConstants.JMS_COORELATION_ID, msg.getJMSMessageID());
+                }
+            } catch (JMSException ignore) {
+                log.warn("Error getting the COORELATION ID from the message.");
+            }  
+                      
+            // Handle dual channel
+            Destination replyTo = msg.getJMSReplyTo();
+            if (replyTo != null) {
+                msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
+                // Create the cachedJMSConnectionFactory with the existing
+                // connection
+                CachedJMSConnectionFactory cachedJMSConnectionFactory =
+                                                                        new CachedJMSConnectionFactory(
+                                                                                                       jmsProperties,
+                                                                                                       connection);
+                String strUserName = jmsProperties.getProperty(JMSConstants.PARAM_JMS_USERNAME);
+                String strPassword = jmsProperties.getProperty(JMSConstants.PARAM_JMS_PASSWORD);
+                JMSReplySender jmsReplySender =
+                                                new JMSReplySender(replyTo,
+                                                                   cachedJMSConnectionFactory,
+                                                                   strUserName, strPassword);
+                msgCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
+                                   jmsReplySender);
+            } else if (replyDestination != null) {
+                msgCtx.setProperty(SynapseConstants.IS_INBOUND, true);
+                // Create the cachedJMSConnectionFactory with the existing
+                // connection
+                CachedJMSConnectionFactory cachedJMSConnectionFactory =
+                                                                        new CachedJMSConnectionFactory(
+                                                                                                       jmsProperties,
+                                                                                                       connection);
+                String strUserName = jmsProperties.getProperty(JMSConstants.PARAM_JMS_USERNAME);
+                String strPassword = jmsProperties.getProperty(JMSConstants.PARAM_JMS_PASSWORD);
+                JMSReplySender jmsReplySender =
+                                                new JMSReplySender(replyDestination,
+                                                                   cachedJMSConnectionFactory,
+                                                                   strUserName, strPassword);
+                msgCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
+                                   jmsReplySender);
+            }
+            
             // Determine the message builder to use
             Builder builder;
             if (contentType == null) {
@@ -152,7 +230,8 @@ public class JMSInjectHandler {
         } catch (SynapseException se) {
             throw se;            
         } catch (Exception e) {
-            log.error("Error while processing the JMS Message");
+            log.error("Error while processing the JMS Message", e);
+            throw new SynapseException("Error while processing the JMS Message", e);            
         }
         return true;
     }
@@ -183,15 +262,27 @@ public class JMSInjectHandler {
         return jmsMap;
     }
 
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+    
+    public void setReplyDestination(Destination replyDestination) {
+        this.replyDestination = replyDestination;
+    }
+
     /**
      * Create the initial message context for the file
      * */
     private org.apache.synapse.MessageContext createMessageContext() {
         org.apache.synapse.MessageContext msgCtx = synapseEnvironment.createMessageContext();
+        //Need to set this to build the message
+        msgCtx.setProperty(SynapseConstants.INBOUND_JMS_PROTOCOL, true);
         MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
                 .getAxis2MessageContext();
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setMessageID(UUIDGenerator.getUUID());
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, carbonContext.getTenantDomain());
         // There is a discrepency in what I thought, Axis2 spawns a nes threads
         // to
         // send a message is this is TRUE - and I want it to be the other way

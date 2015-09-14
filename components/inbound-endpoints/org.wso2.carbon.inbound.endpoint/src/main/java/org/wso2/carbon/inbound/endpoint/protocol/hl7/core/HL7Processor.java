@@ -6,10 +6,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContext;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.HL7ExecutorServiceFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.Axis2HL7Constants;
@@ -65,7 +67,12 @@ public class HL7Processor implements InboundResponseSender {
 
     }
 
-    public void processRequest(final MLLPContext mllpContext) {
+    /**
+     * HL7 Request Processing logic
+     * @param mllpContext
+     * @throws Exception - catch any generic exceptions or else I/O Reactor may shutdown.
+     */
+    public void processRequest(final MLLPContext mllpContext) throws Exception {
         mllpContext.setRequestTime(System.currentTimeMillis());
 
         // Prepare Synapse Context for message injection
@@ -81,6 +88,9 @@ public class HL7Processor implements InboundResponseSender {
         }
 
         mllpContext.setMessageId(synCtx.getMessageID());
+        synCtx.setProperty("inbound.endpoint.name", params.getName());
+        InboundEndpoint inboundEndpoint = synCtx.getConfiguration().getInboundEndpoint(params.getName());
+        CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
         synCtx.setProperty(MLLPConstants.HL7_INBOUND_MSG_ID, synCtx.getMessageID());
 
         // If not AUTO ACK, we need response invocation through this processor
@@ -93,6 +103,12 @@ public class HL7Processor implements InboundResponseSender {
         addProperties(synCtx, mllpContext);
 
         SequenceMediator injectSeq = (SequenceMediator) synCtx.getEnvironment().getSynapseConfiguration().getSequence(inSequence);
+        if (injectSeq == null) {
+            log.error("Could not find inbound sequence '" + inSequence + "'.");
+            handleException(mllpContext, "Could not find inbound sequence.");
+            return;
+        }
+
         injectSeq.setErrorHandler(onErrorSequence);
 
         if (!autoAck && timeOut > 0) {
@@ -161,7 +177,8 @@ public class HL7Processor implements InboundResponseSender {
                 mllpContext.setNackMode(true);
                 mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(), nackMessage));
             } else {
-                // if HL7_APPLICATION_ACK is set then we are going to send the auto-generated ACK
+                // if HL7_APPLICATION_ACK is set then we are going to send the auto-generated ACK based on
+                // the HL7 request, so we do not set the payload contents as context HL7 Message.
                 if (messageContext.getProperty(Axis2HL7Constants.HL7_APPLICATION_ACK) != null &&
                         messageContext.getProperty(Axis2HL7Constants.HL7_APPLICATION_ACK).equals("true")) {
                     mllpContext.setApplicationAck(true);

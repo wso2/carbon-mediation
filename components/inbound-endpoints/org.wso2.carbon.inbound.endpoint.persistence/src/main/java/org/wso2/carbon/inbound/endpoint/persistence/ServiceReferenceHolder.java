@@ -42,7 +42,7 @@ public class ServiceReferenceHolder {
 
     public Registry getRegistry() throws RegistryException {
         if (registrySvc != null) {
-            return registrySvc.getLocalRepository();
+            return registrySvc.getConfigSystemRegistry();
         }
         return null;
     }

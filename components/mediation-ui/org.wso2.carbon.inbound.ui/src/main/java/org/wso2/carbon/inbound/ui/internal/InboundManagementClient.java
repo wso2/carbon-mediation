@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.ui.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -33,6 +34,7 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.inbound.stub.InboundAdminInboundManagementException;
 import org.wso2.carbon.inbound.stub.InboundAdminStub;
 import org.wso2.carbon.inbound.stub.types.carbon.InboundEndpointDTO;
 import org.wso2.carbon.inbound.stub.types.carbon.ParameterDTO;
@@ -98,6 +100,10 @@ public class InboundManagementClient {
         for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
             InboundDescription inboundDescription = new InboundDescription(
                     inboundEndpointDTO.getName());
+            if (inboundEndpointDTO.getArtifactContainerName() != null) {
+                inboundDescription.setArtifactContainerName(inboundEndpointDTO.getArtifactContainerName());
+                inboundDescription.setIsEdited(inboundEndpointDTO.getIsEdited());
+            }
             descriptions.add(inboundDescription);
         }
         if (log.isDebugEnabled()) {
@@ -108,11 +114,7 @@ public class InboundManagementClient {
 
     public List<String> getDefaultParameters(String strType) {
         List<String> rtnList = new ArrayList<String>();
-        if (!strType.equals(InboundClientConstants.TYPE_HTTP)
-                && !strType.equals(InboundClientConstants.TYPE_HTTPS)
-                && !strType.equals(InboundClientConstants.TYPE_HL7)) {
-            rtnList.addAll(getList("common", true));
-        }
+
         if (!strType.equals(InboundClientConstants.TYPE_CLASS)) {
             rtnList.addAll(getList(strType, true));
         }
@@ -128,8 +130,9 @@ public class InboundManagementClient {
     }
 
     public boolean addInboundEndpoint(String name, String sequence, String onError,
-                                      String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
+                                      String protocol, String classImpl, String suspended, List<ParamDTO> lParameters) throws Exception {
         try {
+            lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
             int i = 0;
             for (ParamDTO parameter : lParameters) {
@@ -142,17 +145,17 @@ public class InboundManagementClient {
                 parameterDTO.setValue(strValue);
                 parameterDTOs[i++] = parameterDTO;
             }
-            if (canAdd(name, protocol, parameterDTOs)) {
-                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+            if (canAdd(name, protocol, parameterDTOs, true)) {
+                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, suspended, parameterDTOs);
                 return true;
             }else {
                 log.warn("Cannot add Inbound endpoint " + name + " may be duplicate inbound already exists");
+                return false;
             }
         } catch (Exception e) {
             log.error(e);
-            return false;
+            throw e;
         }
-        return false;
     }
 
     private List<String> getList(String strProtocol, boolean mandatory) {
@@ -179,7 +182,13 @@ public class InboundManagementClient {
                     String tmpString = strKey + "." + i;
                     String strVal = prop.getProperty(tmpString);
                     if (strVal != null) {
-                        rtnList.add(strVal);
+                        if ((strProtocol.equals(InboundClientConstants.TYPE_KAFKA) &&
+                                ((mandatory && !strVal.contains("highlevel.") &&
+                                        !strVal.contains("simple.") &&
+                                        !strVal.contains("filter.from ~:~ ")) || !mandatory)) ||
+                                !strProtocol.equals(InboundClientConstants.TYPE_KAFKA)) {
+                            rtnList.add(strVal);
+                        }
                     }
                 }
             }
@@ -197,41 +206,97 @@ public class InboundManagementClient {
         }
     }
 
-    private boolean canAdd(String name, String protocol, ParameterDTO[] parameterDTOs) {
+    /**
+     * We can add an endpoint on following criteria:
+     * - Protocol can be polling or listener:
+     *      - If two endpoints have the same name do not allow.
+     * - If protocol is listener:
+     *      - If two endpoints have same protocol do no allow.
+     * these.
+     * @param name
+     * @param protocol
+     * @param parameterDTOs
+     * @param addMode Use when new endpoint is being added (not update).
+     * @return boolean on whether endpoint can be added.
+     */
+    private boolean canAdd(String name, String protocol, ParameterDTO[] parameterDTOs, boolean addMode) {
         try {
             String port = null;
-            InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
-            if(inboundEndpointDTOs != null) {
-                for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
-                    if (inboundEndpointDTO.getName().equals(name)) {
-                        return false;
-                    }
-                    if (protocol.equals("http") || protocol.equals("https")) {
-                        ParameterDTO[] existparameterDTOs = inboundEndpointDTO.getParameters();
-                        for (ParameterDTO parameterDTO : existparameterDTOs) {
-                            if (parameterDTO.getName().equals("inbound.http.port")) {
-                                port = parameterDTO.getValue();
-                            }
-                        }
-                    }
-                }
-                if (protocol.equals("http") || protocol.equals("https")) {
-                    for (ParameterDTO parameterDTO : parameterDTOs) {
-                        if (parameterDTO.getName().equals("inbound.http.port") && parameterDTO.getValue().equals(port)) {
-                            log.warn("Already used port " + port + "by another endpoint may be inbound endpoint " + name + " deployment failed");
-                            return false;
-                        }
+            if (protocol != null && (isListener(protocol))) {
+                for(ParameterDTO paramDTO: parameterDTOs) {
+                    if(isListenerPortParam(paramDTO.getName())) {
+                        Integer.parseInt(paramDTO.getValue());
                     }
                 }
             }
+
+            InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
+            if(inboundEndpointDTOs != null) {
+                for (InboundEndpointDTO inboundEndpointDTO : inboundEndpointDTOs) {
+                    if (addMode && inboundEndpointDTO.getName().equals(name)) {  // if two names are same, we can't add.
+                        return false;
+                    }
+
+                    if (!addMode && inboundEndpointDTO.getName().equals(name)
+                            && inboundEndpointDTO.getProtocol() != null 
+                                    && inboundEndpointDTO.getProtocol().equals(protocol)) { // an update on existing
+                        return true;
+                    }
+
+                    if (protocol != null && isListener(protocol)) {   // if listener, only allow if no other endpoint has port in use
+                        ParameterDTO[] existingParameterDTOs = inboundEndpointDTO.getParameters();
+                        for (ParameterDTO parameterDTO : existingParameterDTOs) {
+                            if (isListenerPortParam(parameterDTO.getName())) {
+                                port = parameterDTO.getValue();
+                                if (isListenerPortInUse(port, parameterDTOs)) {
+                                    log.warn("Port " + port + " already in use by another endpoint. Inbound endpoint "
+                                            + name + " deployment failed");
+                                    return false;
+                                }
+                            }
+                        }
+
+                        return true;
+                    }
+                }
+            }
+
+            return true;
         } catch (Exception e) {
-            log.error(e);
+            log.error("Error occured while validating the inbound endpoint.", e);
             return false;
         }
-        return true;
     }
 
+    private boolean isListenerPortInUse(String port, ParameterDTO[] parameterDTOs) {
+        for (ParameterDTO parameterDTO : parameterDTOs) {
+            if (isListenerPortParam(parameterDTO.getName()) && parameterDTO.getValue().equals(port)) {
+                return true;
+            }
+        }
 
+        return false;
+    }
+
+    private boolean isListener(String protocolName) {
+        for (String listener : InboundClientConstants.LISTENER_TYPES) {
+            if (protocolName.equals(listener)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isListenerPortParam(String portParam) {
+        for (String listenerPortParam : InboundClientConstants.LISTENER_PORT_PARAMS) {
+            if (portParam.equals(listenerPortParam)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 
     public InboundDescription getInboundDescription(String name) {
@@ -245,8 +310,9 @@ public class InboundManagementClient {
     }
 
     public boolean updteInboundEndpoint(String name, String sequence, String onError,
-            String protocol, String classImpl, List<ParamDTO> lParameters) throws Exception {
+            String protocol, String classImpl, String suspended, List<ParamDTO> lParameters) throws Exception {
         try {
+            lParameters = validateParameterList(lParameters);
             ParameterDTO[] parameterDTOs = new ParameterDTO[lParameters.size()];
             int i = 0;
             for (ParamDTO parameter : lParameters) {
@@ -260,24 +326,116 @@ public class InboundManagementClient {
                 parameterDTOs[i++] = parameterDTO;
             }
 
-            InboundEndpointDTO inboundEndpointDTO = stub.getInboundEndpointbyName(name);
-            if(inboundEndpointDTO != null){
-                stub.removeInboundEndpoint(name);
-            }
-            if(canAdd(name,protocol,parameterDTOs)) {
-                stub.addInboundEndpoint(name, sequence, onError, protocol, classImpl, parameterDTOs);
+            if (canAdd(name,protocol,parameterDTOs, false)) {
+                stub.updateInboundEndpoint(name, sequence, onError, protocol, classImpl, suspended, parameterDTOs);
                 return true;
-            }else if(inboundEndpointDTO != null){
-                stub.addInboundEndpoint(inboundEndpointDTO.getName(), inboundEndpointDTO.getInjectingSeq(),
-                                        inboundEndpointDTO.getOnErrorSeq(), inboundEndpointDTO.getProtocol(),
-                                        inboundEndpointDTO.getClassImpl(), inboundEndpointDTO.getParameters());
+            } else {
                 return false;
             }
         } catch (Exception e) {
             log.error(e);
-            return false;
+            throw e;
         }
-        return false;
     }
 
+    private List<ParamDTO> validateParameterList(List<ParamDTO> paramDTOList) {
+        List<ParamDTO> paramDTOs = new ArrayList<ParamDTO>();
+        for (ParamDTO paramDTO : paramDTOList) {
+            if (paramDTO.getValue() != null && paramDTO.getValue().trim().length() > 0) {
+                paramDTOs.add(paramDTO);
+            }
+        }
+        return paramDTOs;
+    }
+
+    public String[] getAllInboundNames() {
+        String[] inboundNameList = null;
+        try {
+            InboundEndpointDTO[] inboundEndpointDTOs = stub.getAllInboundEndpointNames();
+            if (inboundEndpointDTOs != null) {
+                inboundNameList = new String[inboundEndpointDTOs.length];
+                if (inboundEndpointDTOs != null) {
+                    for (int i = 0; i < inboundEndpointDTOs.length; i++) {
+                        inboundNameList[i] = inboundEndpointDTOs[i].getName();
+                    }
+                }
+            }
+        } catch (RemoteException e) {
+            log.error(e);
+        } catch (InboundAdminInboundManagementException e) {
+            log.error(e);
+        }
+        return inboundNameList;
+    }
+
+    public String getKAFKASpecialParameters() {
+        String specialParamsList = "";
+        loadProperties();
+        if (prop != null) {
+            String strKey = "kafka.mandatory";
+            String strLength = prop.getProperty(strKey);
+            Integer iLength = null;
+            if (strLength != null) {
+                try {
+                    iLength = Integer.parseInt(strLength);
+                } catch (Exception e) {
+                    iLength = null;
+                }
+            }
+            if (iLength != null) {
+                for (int i = 1; i <= iLength; i++) {
+                    String tmpString = strKey + "." + i;
+                    String strVal = prop.getProperty(tmpString);
+                    if (strVal.contains("highlevel.") || strVal.contains("simple.")) {
+                        if(specialParamsList.equals("")){
+                            if (strVal.contains("highlevel.")){
+                                specialParamsList = strVal.replace("highlevel.", "");
+                            } else {
+                                specialParamsList = strVal;
+                            }
+                        } else {
+                            if (strVal.contains("highlevel.")){
+                                specialParamsList = strVal.replace("highlevel.", "");
+                            } else {
+                                specialParamsList = specialParamsList + "," + strVal;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return specialParamsList;
+    }
+
+    public String getKAFKATopicListParameters() {
+        String topicListParams = "";
+        loadProperties();
+        if (prop != null) {
+            String strKey = "kafka.mandatory";
+            String strLength = prop.getProperty(strKey);
+            Integer iLength = null;
+            if (strLength != null) {
+                try {
+                    iLength = Integer.parseInt(strLength);
+                } catch (Exception e) {
+                    iLength = null;
+                }
+            }
+            if (iLength != null) {
+                for (int i = 1; i <= iLength; i++) {
+                    String tmpString = strKey + "." + i;
+                    String strVal = prop.getProperty(tmpString);
+                    if (strVal.contains("filter.from ~:~ ")) {
+                        if (topicListParams.equals("")) {
+                            topicListParams = strVal;
+                        } else {
+                            topicListParams = topicListParams + "," + strVal;
+                        }
+                    }
+                }
+            }
+        }
+        return topicListParams;
+    }
 }
+

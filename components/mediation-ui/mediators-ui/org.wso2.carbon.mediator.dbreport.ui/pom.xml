@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediators-ui</artifactId>
-        <version>4.4.1-SNAPSHOT</version>
+        <version>4.4.11-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediator.dbreport.ui</artifactId>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.11-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - DBReport Mediator UI</name>
     <url>http://wso2.org</url>
@@ -59,6 +59,8 @@
                             org.apache.synapse.util.xpath,
                             org.apache.axiom.om; version="${axiom.osgi.version.range}",
                             org.jaxen,
+                            javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
+                            javax.servlet;version="${imp.pkg.version.javax.servlet}",
                             *;resolution:=optional,
                             org.wso2.carbon.ndatasource.ui.stub.*
                         </Import-Package>

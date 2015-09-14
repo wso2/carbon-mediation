@@ -17,6 +17,7 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ page import="org.apache.axiom.om.OMElement" %>
 <%@ page import="org.apache.axiom.om.util.AXIOMUtil" %>
+
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.message.processor.ui.MessageProcessorAdminServiceClient" %>
@@ -142,6 +143,9 @@
     }
 
     function addServiceParams() {
+    	// When an invalid value is given, then the user is redirected to the same page. Then if the user deletes that value, the empty value
+    	// is appended to the previous value leading to errors. This is used to solve that. The append takes place inside the addServiceParameter function.
+    	document.getElementById("tableParams").value = "";
         addServiceParameter("interval", document.getElementById('retry_interval').value);
         addServiceParameter("client.retry.interval", document.getElementById('client_retry_interval').value);
         addServiceParameter("max.delivery.attempts", document.getElementById('max_delivery_attempts').value);
@@ -149,14 +153,13 @@
         addServiceParameter("axis2.config", document.getElementById('axis2_config').value);
         addServiceParameter("message.processor.reply.sequence", document.getElementById('message_processor_reply_sequence').value);
         addServiceParameter("message.processor.fault.sequence", document.getElementById('message_processor_fault_sequence').value);
+        addServiceParameter("message.processor.deactivate.sequence", document.getElementById('message_processor_deactivate_sequence').value);
         addServiceParameter("quartz.conf", document.getElementById('quartz_conf').value);
         addServiceParameter("cronExpression", document.getElementById('cron_expression').value);
-        addServiceParameter("pinnedServers", document.getElementById('pinnedServers').value);
         addServiceParameter("is.active", document.getElementById('mp_state').value);
         addServiceParameter("non.retry.status.codes", document.getElementById('non_retry_status_codes').value);
         addServiceParameter("max.delivery.drop",document.getElementById('max_delivery_drop').value);
         addServiceParameter("member.count", document.getElementById('member_count').value);
-
     }
 
     function addServiceParameter(parameter, value) {
@@ -394,9 +397,10 @@
                         <td><fmt:message key="message.processor.state"/><span class="required"> *</span></td>
                         <td>
                             <select id="mp_state" name="mp_state">
-                                <% if (null!=processorData && processorData.getParams() != null) {
-                                     if (!processorData.getParams().isEmpty()&&(processorData.getParams().get("is.active")!=null)
-                                             && Boolean.valueOf(processorData.getParams().get("is.active"))) { %>
+                                <% if (null != processorData && processorData.getParams() != null &&
+                                       !processorData.getParams().isEmpty() &&
+                                       (processorData.getParams().get("is.active") != null)) {
+                                     if (Boolean.valueOf(processorData.getParams().get("is.active"))) { %>
                                         <option value="false">Deactivate</option>
                                         <option value="true" selected>Activate</option>
                                      <% } else { %>
@@ -439,7 +443,7 @@
                         <td><fmt:message key="max.delivery.attempts"/></td>
                         <td><input type="text" id="max_delivery_attempts" name="max_delivery_attempts"
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("max.delivery.attempts")!=null))?processorData.getParams().get("max.delivery.attempts"):""%>"
+                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("max.delivery.attempts")!=null))?processorData.getParams().get("max.delivery.attempts"):"4"%>"
                                 />
                         </td>
                     </tr>
@@ -507,6 +511,19 @@
                
                     </tr>
                     <tr>
+                        <td><fmt:message key="message.processor.deactivate.sequence"/></td>
+                        <td><input type="text" id="message_processor_deactivate_sequence"
+                                    name="message_processor_deactivate_sequence" style="float: left; position: relative;"
+                                    value="<%=((null!=processorData)&& processorData.getParams() != null
+                                         && !processorData.getParams().isEmpty()&&(processorData.getParams().get("message.processor.deactivate.sequence")!=null))?processorData.getParams().get("message.processor.deactivate.sequence"):""%>"
+                                    />
+
+                              <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('message_processor_deactivate_sequence','/_system/config')"><fmt:message key="processor.conf.registry.browser"/></a>
+                              <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('message_processor_deactivate_sequence','/_system/governance')"><fmt:message key="processor.gov.registry.browser"/></a>
+                          </td>
+
+                    </tr>
+                    <tr>
                         <td><fmt:message key="quartz.conf"/></td>
                         <td><input type="text" id="quartz_conf" name="quartz_conf"
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
@@ -519,14 +536,6 @@
                         <td><input type="text" id="cron_expression" name="cron_expression"
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
                                         && !processorData.getParams().isEmpty()&&(processorData.getParams().get("cronExpression")!=null))?processorData.getParams().get("cronExpression"):""%>"
-                                   size="75"/>
-                        </td>
-                    </tr>
-                     <tr>
-                        <td><fmt:message key="message.pinned.severs"/></td>
-                        <td><input type="text" id="pinnedServers" name="pinnedServers"
-                                   value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("pinnedServers")!=null))?processorData.getParams().get("pinnedServers"):""%>"
                                    size="75"/>
                         </td>
                     </tr>

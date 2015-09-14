@@ -657,23 +657,20 @@ public class WSO2Registry extends AbstractRegistry {
 
         if (log.isDebugEnabled()) {
             log.debug("The resource at the specified path does not contain " +
-                    "well-formed XML - Processing as text");
+                      "well-formed XML - Processing as text");
         }
 
         if (resource != null) {
-            if (resource.getMediaType().equals("text/plain")) {
-                // for non-xml text content
-                return OMAbstractFactory.getOMFactory().createOMText(
-                        new String((byte[]) resource.getContent()));
+            if (resource.getMediaType() == null || resource.getMediaType().equals("text/plain")) {
+                // for non-xml text content	or no media type defined
+                return OMAbstractFactory.getOMFactory().createOMText(new String((byte[]) resource.getContent()));
             }
-
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(
-                    (byte[]) resource.getContent());
+            //For media types other than text/plain
+            ByteArrayInputStream inputStream = new ByteArrayInputStream((byte[]) resource.getContent());
             try {
                 OMFactory omFactory = OMAbstractFactory.getOMFactory();
                 return omFactory.createOMText(
-                        new DataHandler(new SynapseBinaryDataSource(inputStream,
-                                resource.getMediaType())), true);
+                        new DataHandler(new SynapseBinaryDataSource(inputStream, resource.getMediaType())), true);
             } catch (IOException e) {
                 handleException("Error while getting a stream from resource content ", e);
             } finally {
@@ -718,9 +715,14 @@ public class WSO2Registry extends AbstractRegistry {
      *  Carbon Kernel mandates to set Threadlocal before calling anything in kernel
      */
     private void setTenantInfo() {
-    	PrivilegedCarbonContext.destroyCurrentContext();
+        // Preserve user name
+        String username = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
+        PrivilegedCarbonContext.destroyCurrentContext();
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         cc.setTenantDomain(domain);
         cc.setTenantId(tenantId);
+        if (username != null) {         // Set back the user name
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(username);
+        }
     }
 }

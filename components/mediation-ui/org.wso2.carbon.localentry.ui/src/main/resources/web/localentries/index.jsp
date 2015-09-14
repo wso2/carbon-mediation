@@ -92,7 +92,7 @@
         return this.replace(/\s+$/, "");
     }
 
-    function editRow(i) {
+    function editRow(i, name) {
         var table = document.getElementById("myTable");
         var row = table.rows[i];
         var cell = row.cells[0];
@@ -101,14 +101,37 @@
         var endType = type.firstChild.nodeValue;
 
         if (endType.trim() == 'Inline Text') {
-            document.location.href = "inlinedText.jsp?" + "entryName=" + content;
+            document.location.href = "inlinedText.jsp?" + "entryName=" + name;
         }
         else if (endType.trim() == 'Inline XML') {
-            document.location.href = "inlinedXML.jsp?" + "entryName=" + content
+            document.location.href = "inlinedXML.jsp?" + "entryName=" + name
         }
         else {
-            document.location.href = "sourceURL.jsp?" + "entryName=" + content;
+            document.location.href = "sourceURL.jsp?" + "entryName=" + name;
         }
+    }
+
+    function editCAppEntry(i,name) {
+        var table = document.getElementById("myTable");
+        var row = table.rows[i];
+        var cell = row.cells[0];
+        var type = row.cells[1];
+        var content = cell.firstChild.nodeValue;
+        var endType = type.firstChild.nodeValue;
+        CARBON.showConfirmationDialog("The changes will not persist to the CAPP after restart or redeploy. Do you want to Edit?", function() {
+            $.ajax({
+                type: 'POST',
+                success: function() {
+                    if (endType.trim() == 'Inline Text') {
+                        document.location.href = "inlinedText.jsp?" + "entryName=" + name;
+                    } else if (endType.trim() == 'Inline XML') {
+                        document.location.href = "inlinedXML.jsp?" + "entryName=" + name
+                    } else {
+                        document.location.href = "sourceURL.jsp?" + "entryName=" + name;
+                    }
+                }
+            });
+        });
     }
 
     function redirect(selNode) {
@@ -204,20 +227,40 @@
                     %>
 
                     <tr>
-                        <td><%= entry.getName()%>
+                        <td>
+                            <% if (entry.getArtifactContainerName() != null) { %>
+                                <img src="images/applications.gif">
+                                <%= entry.getName()%>
+                                <% if(entry.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                            <% } else { %>
+                                <%= entry.getName()%>
+                            <% } %>
                         </td>
                         <td><%= entry.getType()%>
                         </td>
                         <td><%= entry.getDescription() != null ? entry.getDescription() : "" %>
                         </td>
-                        <td><a onclick="editRow(this.parentNode.parentNode.rowIndex)" href="#"
-                               class="icon-link"
-                               style="background-image:url(../admin/images/edit.gif);"><fmt:message
-                                key="edit"/></a>
-                            <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
-                               id="delete_link" class="icon-link"
-                               style="background-image:url(../admin/images/delete.gif);"><fmt:message
-                                    key="delete"/></a>
+
+                        <td>
+                            <% if (entry.getArtifactContainerName() != null) { %>
+                                <a onclick="editCAppEntry(this.parentNode.parentNode.rowIndex,
+                                        '<%=entry.getName()%>' )" href="#" class="icon-link"
+                                        style="background-image:url(../admin/images/edit.gif);">
+                                        <fmt:message key="edit"/></a>
+                                <a href="#" onclick="#"
+                                   id="delete_link" class="icon-link"
+                                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
+                                        key="delete"/></a>
+                            <% } else { %>
+                                <a onclick="editRow(this.parentNode.parentNode.rowIndex,
+                                        '<%=entry.getName()%>' )" href="#" class="icon-link"
+                                        style="background-image:url(../admin/images/edit.gif);"><fmt:message
+                                        key="edit"/></a>
+                                <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+                                   id="delete_link" class="icon-link"
+                                   style="background-image:url(../admin/images/delete.gif);"><fmt:message
+                                        key="delete"/></a>
+                            <% } %>
                         </td>
                     </tr>
                     <%}%>

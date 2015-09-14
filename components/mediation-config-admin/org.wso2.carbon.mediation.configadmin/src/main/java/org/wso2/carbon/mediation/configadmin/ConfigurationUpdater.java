@@ -48,6 +48,7 @@ import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.eventing.SynapseEventSource;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.libraries.imports.SynapseImport;
 import org.apache.synapse.libraries.model.Library;
 import org.apache.synapse.libraries.util.LibDeployerUtils;
@@ -64,6 +65,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.configadmin.util.ConfigHolder;
 import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
+import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationInitilizerException;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationUtils;
@@ -81,6 +83,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -369,6 +372,7 @@ public class ConfigurationUpdater {
             Endpoint oldEndpoint = currentConfig.getDefinedEndpoints().get(name);
             if (oldEndpoint != null) {
                 newEndpoint.setFileName(oldEndpoint.getFileName());
+                newEndpoint.setArtifactContainerName(oldEndpoint.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.ENDPOINTS_DIR, oldEndpoint.getFileName(), name, newConfig);
             } else {
                 newEndpoint.setFileName(name + XML);
@@ -381,6 +385,7 @@ public class ConfigurationUpdater {
             SequenceMediator oldSequence = currentConfig.getDefinedSequences().get(name);
             if (oldSequence != null) {
                 sequences.get(name).setFileName(oldSequence.getFileName());
+                sequences.get(name).setArtifactContainerName(oldSequence.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, oldSequence.getFileName(), name, newConfig);
             } else {
                 SequenceMediator newSequence = sequences.get(name);
@@ -394,6 +399,7 @@ public class ConfigurationUpdater {
             ProxyService oldProxy = currentConfig.getProxyService(proxy.getName());
             if (oldProxy != null) {
                 proxy.setFileName(oldProxy.getFileName());
+                proxy.setArtifactContainerName(oldProxy.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR, oldProxy.getFileName(), proxy.getName(), newConfig);
             } else {
                 proxy.setFileName(proxy.getName() + XML);
@@ -407,6 +413,7 @@ public class ConfigurationUpdater {
             Entry oldEntry = currentConfig.getDefinedEntries().get(name);
             if (oldEntry != null) {
                 newEntry.setFileName(oldEntry.getFileName());
+                newEntry.setArtifactContainerName(oldEntry.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR, oldEntry.getFileName(), name, newConfig);
             } else {
                 newEntry.setFileName(name + XML);
@@ -419,6 +426,7 @@ public class ConfigurationUpdater {
             Startup oldTask = currentConfig.getStartup(task.getName());
             if (oldTask != null) {
                 task.setFileName(oldTask.getFileName());
+                task.setArtifactContainerName(oldTask.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.TASKS_DIR, oldTask.getFileName(), task.getName(), newConfig);
             } else {
                 task.setFileName(task.getName() + XML);
@@ -456,6 +464,7 @@ public class ConfigurationUpdater {
             MessageStore oldStore = currentConfig.getMessageStore(store.getName());
             if (oldStore != null) {
                 store.setFileName(oldStore.getFileName());
+                store.setArtifactContainerName(oldStore.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR, oldStore.getFileName(), store.getName(), newConfig);
             } else {
                 store.setFileName(store.getName() + XML);
@@ -470,6 +479,7 @@ public class ConfigurationUpdater {
                     currentConfig.getMessageProcessors().get(processor.getName());
             if (oldProcessor != null) {
                 processor.setFileName(oldProcessor.getFileName());
+                processor.setArtifactContainerName(oldProcessor.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR, oldProcessor.getFileName(), processor.getName(), newConfig);
             } else {
                 processor.setFileName(processor.getName() + XML);
@@ -482,6 +492,7 @@ public class ConfigurationUpdater {
             TemplateMediator oldSequenceTempl = currentConfig.getSequenceTemplates().get(name);
             if (oldSequenceTempl != null) {
                 sequenceTemplates.get(name).setFileName(oldSequenceTempl.getFileName());
+                sequenceTemplates.get(name).setArtifactContainerName(oldSequenceTempl.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, oldSequenceTempl.getFileName(), name, newConfig);
             } else {
                 TemplateMediator newSeqTemplate = sequenceTemplates.get(name);
@@ -495,6 +506,7 @@ public class ConfigurationUpdater {
             Template oldEndpointTempl = currentConfig.getEndpointTemplates().get(name);
             if (oldEndpointTempl != null) {
                 endpointTemplates.get(name).setFileName(oldEndpointTempl.getFileName());
+                endpointTemplates.get(name).setArtifactContainerName(oldEndpointTempl.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, oldEndpointTempl.getFileName(), name, newConfig);
             } else {
                 Template newTemplate = endpointTemplates.get(name);
@@ -508,10 +520,19 @@ public class ConfigurationUpdater {
             API oldAPI = currentConfig.getAPI(api.getName());
             if (oldAPI != null) {
                 api.setFileName(oldAPI.getFileName());
+                api.setArtifactContainerName(oldAPI.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
             } else {
                 api.setFileName(api.getName() + XML);
                 addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
+            }
+        }
+
+        Collection<InboundEndpoint> inboundEndpoints = newConfig.getInboundEndpoints();
+        for (InboundEndpoint inboundEndpoint : inboundEndpoints) {
+            InboundEndpoint oldInbound = currentConfig.getInboundEndpoint(inboundEndpoint.getName());
+            if (oldInbound != null) {
+                inboundEndpoint.setArtifactContainerName(oldInbound.getArtifactContainerName());
             }
         }
 

@@ -92,6 +92,18 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
 
             SequenceInfo[] info = SequenceInfoFactory.getSortedSequenceInfoArray(sequences);
             SequenceInfo[] ret;
+
+            if (info != null && info.length > 0) {
+                for (SequenceInfo seqInfo : info) {
+                    SequenceMediator seq = getSynapseConfiguration().getDefinedSequences().get(seqInfo.getName());
+                    if (seq.getArtifactContainerName() != null) {
+                        seqInfo.setArtifactContainerName(seq.getArtifactContainerName());
+                    }
+                    if (seq.isEdited()) {
+                        seqInfo.setIsEdited(true);
+                    }
+                }
+            }
             if (info.length >= (sequencePerPage * pageNumber + sequencePerPage)) {
                 ret = new SequenceInfo[sequencePerPage];
             } else {
@@ -203,7 +215,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             lock.lock();
             SynapseConfiguration synCfg = getSynapseConfiguration();
             SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
-            if (sequence != null) {
+            if (sequence != null && sequence.getArtifactContainerName() == null) {
                 synCfg.removeSequence(sequenceName);
                 MediationPersistenceManager pm = getMediationPersistenceManager();
                 pm.deleteItem(sequenceName, sequence.getFileName(),
@@ -260,7 +272,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             sequenceNames = list.toArray(new String[list.size()]);
             for (String sequenceName : sequenceNames) {
                 SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
-                if (sequence != null) {
+                if (sequence != null && sequence.getArtifactContainerName() == null) {
                     synCfg.removeSequence(sequenceName);
                     MediationPersistenceManager pm = getMediationPersistenceManager();
                     pm.deleteItem(sequenceName, sequence.getFileName(),
@@ -289,7 +301,8 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             SynapseConfiguration synCfg = getSynapseConfiguration();
             for (SequenceMediator sequence : sequences) {
                 if (sequence != null) {
-                    if ((!sequence.getName().equals("main")) && (!sequence.getName().equals("fault"))) {
+                    if ((!sequence.getName().equals("main")) && (!sequence.getName().equals("fault"))
+                            && sequence.getArtifactContainerName() == null) {
                         synCfg.removeSequence(sequence.getName());
                         MediationPersistenceManager pm = getMediationPersistenceManager();
                         pm.deleteItem(sequence.getName(), sequence.getFileName(),
@@ -500,7 +513,18 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     SequenceMediator seq = config.getDefinedSequences().get(sequenceName);
                     if (seq != null) {
                         seq.init(getSynapseEnvironment());
-                        persistSequence(seq);
+                        if (preSeq.getArtifactContainerName() != null) {
+                            seq.setArtifactContainerName(preSeq.getArtifactContainerName());
+                            seq.setIsEdited(true);
+                            Collection<SequenceMediator> sequenceMediators = new ArrayList<>();
+                            sequenceMediators.add(seq);
+                            SequenceInfo[] sequenceInfoTemp =
+                                    SequenceInfoFactory.getSortedSequenceInfoArray(sequenceMediators);
+                            sequenceInfoTemp[0].setIsEdited(true);
+                            sequenceInfoTemp[0].setArtifactContainerName(preSeq.getArtifactContainerName());
+                        } else {
+                            persistSequence(seq);
+                        }
                     }
                 }
             } else {
@@ -521,7 +545,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
                 sequence.enableStatistics();
-                persistSequence(sequence);
+
+                if (sequence.getArtifactContainerName() == null) {
+                    persistSequence(sequence);
+                }
+
                 return sequenceName;
             } else {
                 handleException("No defined sequence with name " + sequenceName
@@ -544,7 +572,9 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
                 sequence.disableStatistics();
-                persistSequence(sequence);
+                if (sequence.getArtifactContainerName() == null) {
+                    persistSequence(sequence);
+                }
                 return sequenceName;
             } else {
                 handleException("No defined sequence with name " + sequenceName
@@ -567,7 +597,9 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
                 sequence.setTraceState(SynapseConstants.TRACING_ON);
-                persistSequence(sequence);
+                if (sequence.getArtifactContainerName() == null) {
+                    persistSequence(sequence);
+                }
                 return sequenceName;
             } else {
                 handleException("No defined sequence with name " + sequenceName
@@ -590,7 +622,9 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
                 sequence.setTraceState(SynapseConstants.TRACING_OFF);
-                persistSequence(sequence);
+                if (sequence.getArtifactContainerName() == null) {
+                    persistSequence(sequence);
+                }
                 return sequenceName;
             } else {
                 handleException("No defined sequence with name " + sequenceName

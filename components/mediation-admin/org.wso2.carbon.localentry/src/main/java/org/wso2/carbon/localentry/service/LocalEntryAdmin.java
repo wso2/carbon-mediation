@@ -109,6 +109,12 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                         }
                     }
 
+                    if (value.getArtifactContainerName() != null) {
+                        data.setArtifactContainerName(value.getArtifactContainerName());
+                    }
+                    if (value.getIsEdited()) {
+                        data.setIsEdited(true);
+                    }
                     globalEntryList.add(data);
                 }
             }
@@ -189,7 +195,19 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                 entryKey = entryKey.trim();
                 log.debug("Adding local entry with key : " + entryKey);
 
+                // Fix for ESBJAVA-2641
+                boolean cont = true;
                 if (getSynapseConfiguration().getLocalRegistry().containsKey(entryKey)) {
+                    Entry e = (Entry) getSynapseConfiguration().getLocalRegistry().get(entryKey);
+                    if (e.getValue() == null) {
+                        getSynapseConfiguration().getLocalRegistry().remove(entryKey);
+                    } else {
+                        cont = false;
+                    }
+                }
+                // End Fix for ESBJAVA-2641
+
+                if (!cont) {
                     handleFault(log, "An Entry with key " + entryKey +
                             " is already used within the configuration");
                 } else {
@@ -256,9 +274,16 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                     getSynapseConfiguration().removeEntry(key);
                     getSynapseConfiguration().addEntry(key, entry);
                     entry.setFileName(oldEntry.getFileName());
-                    MediationPersistenceManager pm
-                            = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-                    pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
+
+                    if (oldEntry.getArtifactContainerName() != null) {
+                        entry.setArtifactContainerName(oldEntry.getArtifactContainerName());
+                        entry.setIsEdited(true);
+                    }
+                    else {
+                        MediationPersistenceManager pm
+                                = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+                        pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    }
 
                     if (log.isDebugEnabled()) {
                         log.debug("Added local entry : " + key + " into the configuration");

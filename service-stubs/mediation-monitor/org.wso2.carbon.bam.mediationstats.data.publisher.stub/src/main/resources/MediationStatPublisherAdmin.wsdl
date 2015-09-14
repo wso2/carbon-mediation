@@ -1,0 +1,231 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax29="http://conf.publisher.data.mediationstats.bam.carbon.wso2.org/xsd" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:tns="http://services.publisher.data.mediationstats.bam.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://services.publisher.data.mediationstats.bam.carbon.wso2.org">
+    <wsdl:documentation>MediationStatPublisherAdmin</wsdl:documentation>
+    <wsdl:types>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://conf.publisher.data.mediationstats.bam.carbon.wso2.org/xsd">
+            <xs:complexType name="MediationStatConfig">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="enableMediationStats" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="loadBalancingEnabled" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="nickName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="properties" nillable="true" type="ax29:Property"/>
+                    <xs:element minOccurs="0" name="statisticsReporterDisable" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="streamName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="url" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Property">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="value" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:ns="http://org.apache.axis2/xsd" xmlns:ax210="http://conf.publisher.data.mediationstats.bam.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
+            <xs:import namespace="http://conf.publisher.data.mediationstats.bam.carbon.wso2.org/xsd"/>
+            <xs:element name="isCloudDeployment">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isCloudDeploymentResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getServerConfigBAMServerURL">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getServerConfigBAMServerURLResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEventingConfigData">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEventingConfigDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax29:MediationStatConfig"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="configureEventing">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="mediationStatConfig" nillable="true" type="ax29:MediationStatConfig"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="configureEventingRequest">
+        <wsdl:part name="parameters" element="ns1:configureEventing"/>
+    </wsdl:message>
+    <wsdl:message name="getServerConfigBAMServerURLRequest">
+        <wsdl:part name="parameters" element="ns1:getServerConfigBAMServerURL"/>
+    </wsdl:message>
+    <wsdl:message name="getServerConfigBAMServerURLResponse">
+        <wsdl:part name="parameters" element="ns1:getServerConfigBAMServerURLResponse"/>
+    </wsdl:message>
+    <wsdl:message name="isCloudDeploymentRequest">
+        <wsdl:part name="parameters" element="ns1:isCloudDeployment"/>
+    </wsdl:message>
+    <wsdl:message name="isCloudDeploymentResponse">
+        <wsdl:part name="parameters" element="ns1:isCloudDeploymentResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getEventingConfigDataRequest">
+        <wsdl:part name="parameters" element="ns1:getEventingConfigData"/>
+    </wsdl:message>
+    <wsdl:message name="getEventingConfigDataResponse">
+        <wsdl:part name="parameters" element="ns1:getEventingConfigDataResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="MediationStatPublisherAdminPortType">
+        <wsdl:operation name="configureEventing">
+            <wsdl:input message="tns:configureEventingRequest" wsaw:Action="urn:configureEventing"/>
+        </wsdl:operation>
+        <wsdl:operation name="getServerConfigBAMServerURL">
+            <wsdl:input message="tns:getServerConfigBAMServerURLRequest" wsaw:Action="urn:getServerConfigBAMServerURL"/>
+            <wsdl:output message="tns:getServerConfigBAMServerURLResponse" wsaw:Action="urn:getServerConfigBAMServerURLResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="isCloudDeployment">
+            <wsdl:input message="tns:isCloudDeploymentRequest" wsaw:Action="urn:isCloudDeployment"/>
+            <wsdl:output message="tns:isCloudDeploymentResponse" wsaw:Action="urn:isCloudDeploymentResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="getEventingConfigData">
+            <wsdl:input message="tns:getEventingConfigDataRequest" wsaw:Action="urn:getEventingConfigData"/>
+            <wsdl:output message="tns:getEventingConfigDataResponse" wsaw:Action="urn:getEventingConfigDataResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="MediationStatPublisherAdminSoap11Binding" type="tns:MediationStatPublisherAdminPortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="configureEventing">
+            <soap:operation soapAction="urn:configureEventing" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getServerConfigBAMServerURL">
+            <soap:operation soapAction="urn:getServerConfigBAMServerURL" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isCloudDeployment">
+            <soap:operation soapAction="urn:isCloudDeployment" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventingConfigData">
+            <soap:operation soapAction="urn:getEventingConfigData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="MediationStatPublisherAdminSoap12Binding" type="tns:MediationStatPublisherAdminPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="configureEventing">
+            <soap12:operation soapAction="urn:configureEventing" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getServerConfigBAMServerURL">
+            <soap12:operation soapAction="urn:getServerConfigBAMServerURL" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isCloudDeployment">
+            <soap12:operation soapAction="urn:isCloudDeployment" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventingConfigData">
+            <soap12:operation soapAction="urn:getEventingConfigData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="MediationStatPublisherAdminHttpBinding" type="tns:MediationStatPublisherAdminPortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="configureEventing">
+            <http:operation location="configureEventing"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getServerConfigBAMServerURL">
+            <http:operation location="getServerConfigBAMServerURL"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="isCloudDeployment">
+            <http:operation location="isCloudDeployment"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEventingConfigData">
+            <http:operation location="getEventingConfigData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="MediationStatPublisherAdmin">
+        <wsdl:port name="MediationStatPublisherAdminHttpsSoap11Endpoint" binding="tns:MediationStatPublisherAdminSoap11Binding">
+            <soap:address location="https://10.225.67.117:9443/services/MediationStatPublisherAdmin.MediationStatPublisherAdminHttpsSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="MediationStatPublisherAdminHttpsSoap12Endpoint" binding="tns:MediationStatPublisherAdminSoap12Binding">
+            <soap12:address location="https://10.225.67.117:9443/services/MediationStatPublisherAdmin.MediationStatPublisherAdminHttpsSoap12Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="MediationStatPublisherAdminHttpsEndpoint" binding="tns:MediationStatPublisherAdminHttpBinding">
+            <http:address location="https://10.225.67.117:9443/services/MediationStatPublisherAdmin.MediationStatPublisherAdminHttpsEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

@@ -27,7 +27,7 @@
 
     <groupId>org.wso2.carbon.mediation</groupId>
 	<artifactId>carbon-mediation</artifactId>
- 	<version>4.4.1-SNAPSHOT</version>
+ 	<version>4.4.11-SNAPSHOT</version>
 	<packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -42,6 +42,7 @@
                 <module>service-stubs/mediation-admin</module>
                 <module>service-stubs/mediation-monitor</module>
                 <module>service-stubs/application-mgt</module>
+                <module>service-stubs/mediation-cg</module>
                 <module>components/mediation-registry</module>
                 <module>components/mediation-initializer</module>
                 <module>components/mediation-monitor</module>
@@ -50,12 +51,16 @@
                 <module>components/mediation-admin</module>
                 <!--module>components/mediation-connector</module-->
                 <module>components/mediators</module>
+                <module>components/event-sink</module>
                 <module>components/mediation-ui</module>
                 <module>components/mediation-ntask</module>
                 <module>components/inbound-endpoints</module>
                 <module>components/mediation-clustering</module>
                 <module>components/application-deployers</module>
                 <module>components/application-mgt</module>
+                <module>components/mediation-throttle</module>
+                <module>components/mediation-cg</module>
+		<module>features/event-sink</module>
                 <module>features/scheduled-tasks</module>
                 <module>features/business-adaptors</module>
                 <module>features/mediation-config-admin-features</module>
@@ -70,6 +75,9 @@
                 <module>features/mediation-clustering</module>
                 <module>features/application-deployers</module>
                 <module>features/application-mgt</module>
+                <module>features/mediation-throttle-features</module>
+                <module>features/mediation-cg-features</module>
+                <module>components/mediation-message-processor</module>
             </modules>
         </profile>
     </profiles>
@@ -505,6 +513,11 @@
                 <artifactId>org.wso2.carbon.server.admin</artifactId>
                 <version>${carbon.kernel.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>org.wso2.carbon.core.services</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
 
             <!--5 Carbon-Registry -->
             <dependency>
@@ -524,6 +537,11 @@
             </dependency>
 
             <!--6 Carbon-Commons -->
+             <dependency>
+                <groupId>org.wso2.carbon.commons</groupId>
+                <artifactId>org.wso2.carbon.statistics</artifactId>
+                <version>${carbon.commons.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
                 <artifactId>org.wso2.carbon.ntask.core</artifactId>
@@ -567,6 +585,11 @@
             </dependency>
 
             <!--7  Carbon-Identity -->
+            <dependency>
+                <groupId>org.wso2.carbon.identity</groupId>
+                <artifactId>org.wso2.carbon.user.mgt</artifactId>
+                <version>${carbon.identity.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity</groupId>
                 <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
@@ -643,6 +666,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.deployment</groupId>
+                <artifactId>org.wso2.carbon.service.mgt.ui</artifactId>
+                <version>${carbon.deployment.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.deployment</groupId>
                 <artifactId>org.wso2.carbon.jaxws.webapp.mgt</artifactId>
                 <version>${carbon.deployment.version}</version>
             </dependency>
@@ -696,6 +724,21 @@
             <!--10.1 Service Stubs-->
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.service.data.publisher.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.service.data.publisher.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.mediationstats.data.publisher.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.artifactuploader.stub</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -707,6 +750,16 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.statistics.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.stub</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
@@ -809,8 +862,43 @@
                 <artifactId>org.wso2.carbon.application.mgt.synapse.stub</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediators.throttle.admin.stub</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
 
             <!--10.2 Components-->
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.service.data.publisher</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency> 
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.service.data.publisher.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>     
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.mediationstats.data.publisher.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.mediationstats.data.publisher</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.data.publisher.util</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.security</artifactId>
@@ -845,7 +933,32 @@
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.inbound.endpoint.osgi</artifactId>
                 <version>${carbon.mediation.version}</version>
-            </dependency>           
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.common</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.proxyadmin.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>  
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>       
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>                 
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.application.deployer.synapse</artifactId>
@@ -859,6 +972,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.ntask</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediation.throttle</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
@@ -909,6 +1027,11 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.message.processor</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediation.message.processor</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
@@ -1278,6 +1401,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.foreach.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediator.throttle.ui</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -1416,8 +1544,71 @@
                 <artifactId>org.wso2.carbon.identity.entitlement.mediator</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
 
             <!--10.3 Features -->
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.service.agent.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+	    </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.service.agent.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+	    </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.mediation.agent.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+	    </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.bam.mediation.agent.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+	    </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.agent.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.cloud.gateway.proxyadmin.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.application.mgt.synapse.server.feature</artifactId>
@@ -1563,6 +1754,72 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.apache.synapse.wso2.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.publishevent.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.publishevent.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.publishevent.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.apache.synapse.wso2.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink.config.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.cache.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.cache.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.cache.ui.feature</artifactId>
                 <version>${carbon.mediation.version}</version>
                 <type>zip</type>
             </dependency>
@@ -1854,14 +2111,14 @@
                 <version>${org.wso2.caching.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.throttle</groupId>
-                <artifactId>wso2throttle-core</artifactId>
-                <version>${org.wso2.throttle.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
+                <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
                 <artifactId>com.jayway.jsonpath</artifactId>
                 <version>${jsonpath.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>${json.smart.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.damnhandy.wso2</groupId>
@@ -1869,17 +2126,12 @@
                 <version>${damnhandy.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.staxon</groupId>
-                <artifactId>staxon-core</artifactId>
-                <version>${staxon.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>quickfixj.wso2</groupId>
                 <artifactId>quickfixj</artifactId>
                 <version>${quickfixj.wso2.version}</version>
             </dependency>
             <dependency>
-                <groupId>commons-net.wso2</groupId>
+                <groupId>org.wso2.orbit.commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${commons.net.wso2.version}</version>
             </dependency>
@@ -1894,42 +2146,130 @@
                 <version>${netty.version}</version>
             </dependency>
 
+            <!-- Cache mediatoer dependencies -->
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-saaj</artifactId>
+                <version>${axis2-saaj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon</groupId>
+                <artifactId>javax.cache.wso2</artifactId>
+                <version>${carbon.kernel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-saaj_1.3_spec</artifactId>
+                <version>${org.apache.geronimo.specs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xmlunit</groupId>
+                <artifactId>xmlunit</artifactId>
+                <version>${xmlunit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.cache</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+
+            <!-- publishEvent mediator dependencies -->
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.event.sink</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.framework</artifactId>
+                <version>${org.apache.felix.framework.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.publishevent</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.publishevent.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.aries.blueprint</groupId>
+                <artifactId>org.apache.aries.blueprint</artifactId>
+                <version>${aries.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.aries.proxy</groupId>
+                <artifactId>org.apache.aries.proxy</artifactId>
+                <version>${aries.proxy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.aries</groupId>
+                <artifactId>org.apache.aries.util</artifactId>
+                <version>${aries.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xerces.wso2</groupId>
+                <artifactId>xercesImpl</artifactId>
+                <version>${xercesImpl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.security.wso2</groupId>
+                <artifactId>wss4j</artifactId>
+                <version>${wss4j.version}</version>
+            </dependency>
+            <dependency>
+            <groupId>org.wso2.orbit.org.apache.cxf</groupId>
+            <artifactId>cxf-bundle</artifactId>
+            <version>${cxf.wso2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.eclipse.jetty</groupId>
+            <artifactId>jetty-bundle</artifactId>
+            <version>${jetty.wso2.version}</version>
+        </dependency>
+	        <dependency>
+	            <groupId>libthrift.wso2</groupId>
+	            <artifactId>libthrift</artifactId>
+	            <version>${libthrift.version}</version>
+	        </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
 
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.4.1-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.4.11-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 4.5.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.4.0</carbon.kernel.version>
+        <carbon.kernel.version>4.4.1</carbon.kernel.version>
         <carbon.kernel.imp.pkg.version>[4.4.0, 4.5.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.4.0</carbon.commons.version>
+        <carbon.commons.version>4.4.7</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.4.0, 4.5.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
-        <carbon.deployment.version>4.4.0</carbon.deployment.version>
+        <carbon.deployment.version>4.5.0</carbon.deployment.version>
 
         <!-- Carbon Registry version-->
-        <carbon.registry.version>4.4.0</carbon.registry.version>
+        <carbon.registry.version>4.4.5</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.4.0, 4.5.0)</carbon.registry.imp.pkg.version>
 
         <!-- Carbon Identity version-->
-        <carbon.identity.version>4.4.0</carbon.identity.version>
-        <carbon.identity.imp.pkg.version>[4.4.0, 4.5.0)</carbon.identity.imp.pkg.version>
+        <carbon.identity.version>4.5.6</carbon.identity.version>
+        <carbon.identity.imp.pkg.version>[4.5.0, 4.6.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->
-        <carbon.rule.version>4.4.0</carbon.rule.version>
+        <carbon.rule.version>4.4.1</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.3-wso2v4-SNAPSHOT</synapse.version>
+        <synapse.version>2.1.3-wso2v11</synapse.version>
 
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1.wso2v12</orbit.version.axis2>
@@ -1950,12 +2290,13 @@
         <rampart.mar.version>1.6.1-wso2v12</rampart.mar.version>
         <neethi.version>3.0.2</neethi.version>
         <neethi.osgi.version>2.0.4.wso2v4</neethi.osgi.version>
+        <wss4j.version>1.5.11.wso2v10</wss4j.version>
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>1.6.1.wso2v12</rampart.wso2.version>
         <httpcore.wso2.version>4.3.3.wso2v1</httpcore.wso2.version>
         <httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>
-        <org.apache.commons.wso2.version>2.0.wso2v8</org.apache.commons.wso2.version>
+        <org.apache.commons.wso2.version>2.0-wso2v12</org.apache.commons.wso2.version>
         <httpcore.nio.version>4.3.3</httpcore.nio.version>
         <httpcore.version>4.3.3</httpcore.version>
         <httpclient.version>4.2.5</httpclient.version>
@@ -1964,7 +2305,6 @@
         <!--Misc-->
         <org.wso2.uri.template.version>1.6.4</org.wso2.uri.template.version>
         <org.wso2.caching.version>4.0.3</org.wso2.caching.version>
-        <org.wso2.throttle.version>3.3.0</org.wso2.throttle.version>
         <ec2.client.version>4.2.0</ec2.client.version>
         <carbon.startup.version>4.2.0</carbon.startup.version>
         <org.wso2.carbon.caching.core.version>4.2.0</org.wso2.carbon.caching.core.version>
@@ -1975,7 +2315,7 @@
         <ca.uhn.hapi.wso2.version>2.1.0.wso2v1</ca.uhn.hapi.wso2.version>
         <org.wso2.securevault.version>1.0.0-wso2v2</org.wso2.securevault.version>
         <jsch.wso2.version>0.1.49.wso2v1</jsch.wso2.version>
-        <commons.net.wso2.version>2.0.wso2v1</commons.net.wso2.version>
+        <commons.net.wso2.version>3.3.wso2v1</commons.net.wso2.version>
         <jcifs.wso2.version>1.3.17.wso2v1</jcifs.wso2.version>
         <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
 
@@ -2007,7 +2347,7 @@
         <jaxen.version>1.1.1</jaxen.version>
         <orbit.version.infinispan>5.1.2.wso2v1</orbit.version.infinispan>
         <orbit.version.h2.engine>1.2.140.wso2v3</orbit.version.h2.engine>
-        <orbit.version.spring>3.1.0.wso2v1</orbit.version.spring>
+        <orbit.version.spring>3.2.9.wso2v1</orbit.version.spring>
         <orbit.version.commons.fileuploader>1.2.0.wso2v1</orbit.version.commons.fileuploader>
         <orbit.version.woden>1.0.0.M8-wso2v1</orbit.version.woden>
         <libthrift.wso2.version>0.8.0.wso2v1</libthrift.wso2.version>
@@ -2018,16 +2358,16 @@
         <wsdl4j.version>1.6.3</wsdl4j.version>
         <xmlsec.version>1.5.5</xmlsec.version>
         <xml.resolver.version>1.2</xml.resolver.version>
-        <stax2.version>3.1.1</stax2.version>
+        <stax2.version>3.1.4</stax2.version>
         <woodstox.core.version>4.2.0</woodstox.core.version>
         <jaxb.xjc.version>2.1.13</jaxb.xjc.version>
         <jaxb.impl.version>2.1.13</jaxb.impl.version>
         <javax.ws.rs.version>2.0-m10</javax.ws.rs.version>
         <ehcache.core.version>2.5.1</ehcache.core.version>
-        <cxf.version>2.6.2</cxf.version>
+        <aries.proxy.version>1.0.1</aries.proxy.version>
+        <aries.version>1.1.0</aries.version>
         <velocity.version>1.7</velocity.version>
         <commons.lang.version>2.6</commons.lang.version>
-
         <myfaces.version>2.1.11</myfaces.version>
         <jpa-commons-pool.version>1.5.4</jpa-commons-pool.version>
         <commons-xmlschema.version>1.4.7</commons-xmlschema.version>
@@ -2037,8 +2377,8 @@
         <geronimo-jta.version>1.1.1</geronimo-jta.version>
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
         <jsonpath.version>0.8.1.wso2v1</jsonpath.version>
+        <json.smart.version>1.2</json.smart.version>
         <damnhandy.version>1.1.7.wso2v1</damnhandy.version>
-        <staxon.version>1.2.0.wso2v2</staxon.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
         <netty.version>4.0.0.Final</netty.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
@@ -2049,6 +2389,20 @@
         <org.apache.commons.logging.version>1.1.1</org.apache.commons.logging.version>
         <project.scm.id>wso2-scm-server</project.scm.id>
 
+        <!-- Cache mediator dependency versions -->
+        <axis2-saaj.version>1.6.1-wso2v11</axis2-saaj.version>
+        <org.apache.geronimo.specs.version>1.0.0</org.apache.geronimo.specs.version>
+        <xmlunit.version>1.1</xmlunit.version>
+        <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
+
+        <!-- publishEvent mediator versions -->
+        <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
+        <org.apache.axiom.om.version>0.0.0</org.apache.axiom.om.version>
+        <org.apache.felix.framework.version>1.0.3</org.apache.felix.framework.version>
+        <xercesImpl.version>2.8.1.wso2v2</xercesImpl.version>
+	<cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
+        <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
+        <libthrift.version>0.8.0.wso2v1</libthrift.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>

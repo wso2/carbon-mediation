@@ -20,6 +20,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.message.store.ui.MessageStoreAdminServiceClient" %>
+<%@ page import="org.wso2.carbon.message.store.ui.utils.MessageStoreData" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.message.store.ui.i18n.Resources">
@@ -67,14 +68,14 @@
 </script>
 
 <script type="text/javascript">
-    function deleteRow(i) {
+    function deleteRow(i, name) {
         var table = document.getElementById("myTable");
         var row = table.rows[i];
         var cell = row.cells[0];
-        var content = cell.firstChild.innerHTML;
+        var content = cell.firstElementChild.innerHTML;
 
         function delEp() {
-            document.location.href = "deleteMessageStoresHandler.jsp?" + "messageStoreName=" + content;
+            document.location.href = "deleteMessageStoresHandler.jsp?" + "messageStoreName=" + name;
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message.store"/>", delEp);
@@ -92,21 +93,39 @@
         return this.replace(/\s+$/, "");
     }
 
-    function editRow(i, storeType) {
+    function editRow(i, storeType, name) {
         var table = document.getElementById("myTable");
         var row = table.rows[i];
         var cell = row.cells[0];
         var type = row.cells[1];
-        var content = cell.firstChild.innerHTML;
         if (storeType == "org.apache.synapse.message.store.impl.jms.JmsStore") {
-            document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + content;
+            document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + name;
+        } else if (storeType == "org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore") {
+            document.location.href = "rabbitmqMessageStore.jsp?" + "messageStoreName=" + name;
         } else if (storeType == "org.apache.synapse.message.store.impl.memory.InMemoryStore") {
-            document.location.href = "inMemoryMessageStore.jsp?" + "messageStoreName=" + content;
+            document.location.href = "inMemoryMessageStore.jsp?" + "messageStoreName=" + name;
         } else if (storeType == "org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore") {
-            document.location.href = "jdbcMessageStore.jsp?" + "messageStoreName=" + content;
+            document.location.href = "jdbcMessageStore.jsp?" + "messageStoreName=" + name;
         } else {
-            document.location.href = "customMessageStore.jsp?" + "messageStoreName=" + content;
+            document.location.href = "customMessageStore.jsp?" + "messageStoreName=" + name;
         }
+    }
+
+    function editCAppStore(i, storeType,name) {
+        CARBON.showConfirmationDialog('<fmt:message key="edit.artifactContainer.store.on.page.prompt"/>', function() {
+            $.ajax({
+                type: 'POST',
+                success: function() {
+                    if (storeType == "org.apache.synapse.message.store.impl.jms.JmsStore") {
+                        document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + name;
+                    } else if (storeType == "org.apache.synapse.message.store.impl.memory.InMemoryStore") {
+                        document.location.href = "inMemoryMessageStore.jsp?" + "messageStoreName=" + name;
+                    } else {
+                        document.location.href = "customMessageStore.jsp?" + "messageStoreName=" + name;
+                    }
+                }
+            });
+        });
     }
 
     function redirect(selNode) {
@@ -143,7 +162,7 @@
                         (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
                 String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
                 MessageStoreAdminServiceClient client = null;
-                String[] messageStoreNames = null;
+                MessageStoreData[] messageStoreData = null;
                 int numberOfMessageStores = 0;
                 int numberOfPages = 1;
                 String pageNumber = request.getParameter("pageNumber");
@@ -158,12 +177,11 @@
 
                 try {
                     client = new MessageStoreAdminServiceClient(cookie, url, configContext);
-                    messageStoreNames = client.getPaginatedMessageStoreNames(pageNumberInt);
+                    messageStoreData = client.getPaginatedMessageStoreData(pageNumberInt);
 
-
-                    if (messageStoreNames != null) {
-                        if (client.getMessageStoreNames() != null) {
-                            numberOfMessageStores = client.getMessageStoreNames().length;
+                    if (messageStoreData != null) {
+                        if (client.getMessageStoreData() != null) {
+                            numberOfMessageStores = client.getMessageStoreData().length;
                         }
                     }
 
@@ -179,7 +197,7 @@
             </script>
             <%
                 }
-                if (messageStoreNames == null) {
+                if (messageStoreData == null) {
             %>
             <div id="tabs-1" class="ui-tabs-panel">
                 <script type="text/javascript"> emtpyEntries = true</script>
@@ -189,7 +207,7 @@
 
             <%}%>
 
-            <%if (messageStoreNames != null) {%>
+            <%if (messageStoreData != null) {%>
             <div id="tabs-1">
                 <carbon:paginator pageNumber="<%=pageNumberInt%>" numberOfPages="<%=numberOfPages%>"
                                   page="index.jsp" pageNumberParameterName="pageNumber"
@@ -209,8 +227,8 @@
                     <tbody>
 
                     <%
-                        for (String name : messageStoreNames) {
-
+                        for (MessageStoreData msData : messageStoreData) {
+                            String name = msData.getName();
                             String type = "Not defined";
                             int size = 0;
                             try {
@@ -223,12 +241,31 @@
                     %>
 
                     <tr>
-                        <td><a href="viewMessageStore.jsp?messageStoreName=<%=name%>"><%=name%>
-                        </a>
+                        <td> <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore") && !type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
+                            <a href="viewMessageStore.jsp?messageStoreName=<%=name%>">
+                                <% if (msData.getArtifactContainerName() != null) { %>
+                                    <img src="images/applications.gif">
+                                    <%=name%>
+                                    <% if(msData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                                <% } else {%>
+                                    <%=name%>
+                                <%}%>
+                            </a>
+                        <%} else {%>
+                            <a>
+                                <% if (msData.getArtifactContainerName() != null) { %>
+                                    <img src="images/applications.gif">
+                                    <%=name%>
+                                <% if(msData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
+                                <% } else {%>
+                                    <%=name%>
+                                <%}%>
+                            </a>
+                        <%}%>
                         </td>
                         <td><%= type%>
                         </td>
-                        <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")) { %>
+                        <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
                         <td><%= size%>
                         </td>
                         <%} else {%>
@@ -236,14 +273,28 @@
                         <%}%>
 
                         <td>
-                            <a onclick="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"return false":"editRow(this.parentNode.parentNode.rowIndex,"+"'" + type + "');"%>"
+                            <% if (msData.getArtifactContainerName() != null) { %>
+                            <a onclick="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"return false":"editCAppStore(this.parentNode.parentNode.rowIndex,"+"'" + type + "',"+"'" + name + "');"%>"
                                class="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"icon-link-disabled":"icon-link"%>"
                                style="background-image:url(../admin/images/edit.gif);" href="#"><fmt:message
                                     key="edit"/></a>
-                            <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex)"
+
+                            <a href="#" onclick="#"
+                               id="delete_link" class="icon-link"
+                               style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
+                                    key="delete"/></a>
+                            <% } else {%>
+                            <a onclick="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"return false":"editRow(this.parentNode.parentNode.rowIndex,"+"'" + type + "',"+"'" + name + "');"%>"
+                               class="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"icon-link-disabled":"icon-link"%>"
+                               style="background-image:url(../admin/images/edit.gif);" href="#"><fmt:message
+                                    key="edit"/></a>
+
+                            <a href="#" onclick="deleteRow(this.parentNode.parentNode.rowIndex,'<%= name %>')"
                                id="delete_link" class="icon-link"
                                style="background-image:url(../admin/images/delete.gif);"><fmt:message
                                     key="delete"/></a>
+                            <% } %>
+
                         </td>
                     </tr>
                     <%}%>
@@ -293,6 +344,18 @@
                         </td>
                         <td>
                             <fmt:message key="jms.message.store.desc"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a class="icon-link"
+                               href="rabbitmqMessageStore.jsp"
+                               style="background-image: url(../admin/images/add.gif);">
+                                <fmt:message key="rabbitmq.message.store"/>
+                            </a>
+                        </td>
+                        <td>
+                            <fmt:message key="rabbitmq.message.store.desc"/>
                         </td>
                     </tr>
                     <tr>

@@ -186,7 +186,14 @@
                         <td class="buttonRow" colspan="3">
                             <input class="button" type="button"
                                    value="<fmt:message key="task.button.schedule.text"/>"
-                                   onclick="tasksave('<fmt:message key="task.name.cannotfound.msg"/>','<fmt:message key="task.classname.cannotfound.msg"/>','<fmt:message key="task.cron.cannotfound.msg"/>','<fmt:message key="task.count.cannotfound.msg"/>','<fmt:message key="task.interval.cannotfound.msg"/>',document.taskcreationform); return false;"/>
+                                   onclick="tasksave('<fmt:message key="task.name.cannotfound.msg"/>',
+                                           '<fmt:message key="task.classname.cannotfound.msg"/>',
+                                           '<fmt:message key="task.cron.cannotfound.msg"/>',
+                                           '<fmt:message key="task.count.cannotfound.msg"/>',
+                                           '<fmt:message key="task.interval.cannotfound.msg"/>',
+                                           '<fmt:message key="task.message.null.msg"/>',
+                                           '<fmt:message key="task.property.table.error.msg"/>',
+                                           document.taskcreationform); return false;"/>
                             <input class="button" type="button"
                                    value="<fmt:message key="task.canccel.button.text"/>"
                                    onclick="document.location.href='index.jsp?ordinal=0';"/>

@@ -9,6 +9,13 @@
                     <xs:element minOccurs="0" name="soapXml" nillable="true" type="xs:string" />
                 </xs:sequence>
             </xs:complexType>
+            <xs:complexType name="MessageStoreMetaData">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="artifactContainerName" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="isEdited" nillable="true" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
         </xs:schema>
         <xs:schema xmlns:ax2232="http://service.store.message.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.synapse/xsd">
             <xs:import namespace="http://service.store.message.carbon.wso2.org/xsd" />
@@ -57,6 +64,18 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageStoreData">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getMessageStoreDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2232:MessageStoreMetaData" />
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -185,6 +204,12 @@
     <wsdl:message name="deleteMessageStoreRequest">
         <wsdl:part name="parameters" element="ns:deleteMessageStore" />
     </wsdl:message>
+    <wsdl:message name="getMessageStoreDataRequest">
+        <wsdl:part name="parameters" element="ns:getMessageStoreData"/>
+    </wsdl:message>
+    <wsdl:message name="getMessageStoreDataResponse">
+        <wsdl:part name="parameters" element="ns:getMessageStoreDataResponse"/>
+    </wsdl:message>
     <wsdl:message name="getEnvelopeRequest">
         <wsdl:part name="parameters" element="ns:getEnvelope" />
     </wsdl:message>
@@ -244,6 +269,10 @@
         </wsdl:operation>
         <wsdl:operation name="deleteMessageStore">
             <wsdl:input message="tns:deleteMessageStoreRequest" wsaw:Action="urn:deleteMessageStore" />
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStoreData">
+            <wsdl:input message="tns:getMessageStoreDataRequest" wsaw:Action="urn:getMessageStoreData"/>
+            <wsdl:output message="tns:getMessageStoreDataResponse" wsaw:Action="urn:getMessageStoreDataResponse"/>
         </wsdl:operation>
         <wsdl:operation name="getEnvelope">
             <wsdl:input message="tns:getEnvelopeRequest" wsaw:Action="urn:getEnvelope" />
@@ -310,6 +339,15 @@
             <wsdl:input>
                 <soap:body use="literal" />
             </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStoreData">
+            <soap:operation soapAction="urn:getMessageStoreData" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="getEnvelope">
             <soap:operation soapAction="urn:getEnvelope" style="document" />
@@ -416,6 +454,15 @@
                 <soap12:body use="literal" />
             </wsdl:input>
         </wsdl:operation>
+        <wsdl:operation name="getMessageStoreData">
+            <soap12:operation soapAction="urn:getMessageStoreData" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
         <wsdl:operation name="getEnvelope">
             <soap12:operation soapAction="urn:getEnvelope" style="document" />
             <wsdl:input>
@@ -520,6 +567,15 @@
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters" />
             </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getMessageStoreData">
+            <http:operation location="getMessageStoreData"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="getEnvelope">
             <http:operation location="getEnvelope" />

@@ -1,6 +1,5 @@
 package org.wso2.carbon.inbound.endpoint.protocol.hl7.util;
 
-import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.HL7Configuration;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLPConstants;
 
 import java.util.concurrent.Executors;

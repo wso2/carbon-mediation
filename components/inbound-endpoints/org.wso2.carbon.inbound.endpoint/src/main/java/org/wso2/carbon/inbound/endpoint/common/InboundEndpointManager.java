@@ -26,16 +26,17 @@ public interface InboundEndpointManager {
      * Start Listener on a particular port
      * @param port  port
      * @param name  endpoint name
+     * @param inboundParameters Inbound endpoint parameters
      */
-    public void startListener(int port, String name);
-
+    public boolean startListener(int port, String name, InboundProcessorParams inboundParameters);
 
     /**
      * Start Inbound endpoint on a particular port
      * @param port  port
      * @param name  endpoint name
+     * @param inboundParameters Inbound endpoint parameters
      */
-    public void startEndpoint(int port, String name);
+    public boolean startEndpoint(int port, String name, InboundProcessorParams inboundParameters);
 
     /**
      * Stop Inbound Endpoint

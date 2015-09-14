@@ -80,6 +80,20 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 
             TemplateInfo[] info = TemplateInfoFactory.getSortedTemplateInfoArrayByTemplateMediator(templates);
             TemplateInfo[] ret;
+
+            if (info != null && info.length > 0) {
+                for (TemplateInfo templateInfo : info) {
+                    TemplateMediator templateMediator = getSynapseConfiguration().getSequenceTemplates()
+                            .get(templateInfo.getName());
+                    if (templateMediator.getArtifactContainerName() != null) {
+                        templateInfo.setArtifactContainerName(templateMediator.getArtifactContainerName());
+                    }
+                    if (templateMediator.isEdited()) {
+                        templateInfo.setIsEdited(true);
+                    }
+                }
+            }
+
             if (info.length >= (templatePerPage * pageNumber + templatePerPage)) {
                 ret = new TemplateInfo[templatePerPage];
             } else {
@@ -337,7 +351,14 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
                     TemplateMediator templ = config.getSequenceTemplates().get(templateName);
                     if (templ != null) {
                         templ.init(getSynapseEnvironment());
-                        persistTemplate(templ);
+                        if (preSeq.getArtifactContainerName() != null) {
+                            templ.setArtifactContainerName(preSeq.getArtifactContainerName());
+                            templ.setIsEdited(true);
+                            // TODO check for the setIsEdited in TemplateInfo
+                        }
+                        else {
+                            persistTemplate(templ);
+                        }
                     }
                 }
             } else {
@@ -378,10 +399,12 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
         try {
             lock.lock();
             TemplateMediator template;
-            template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
+            template = getSynapseConfiguration().getSequenceTemplate(templateName);
             if (template != null) {
                 template.disableStatistics();
-                persistTemplate(template);
+                if (template.getArtifactContainerName() == null) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
@@ -404,7 +427,9 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_ON);
-                persistTemplate(template);
+                if (template.getArtifactContainerName() == null) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
@@ -427,7 +452,9 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
             if (template != null) {
                 template.setTraceState(SynapseConstants.TRACING_OFF);
-                persistTemplate(template);
+                if (template.getArtifactContainerName() == null) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName

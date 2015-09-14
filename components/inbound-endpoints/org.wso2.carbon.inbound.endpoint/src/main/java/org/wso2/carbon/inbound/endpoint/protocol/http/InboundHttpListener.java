@@ -20,13 +20,16 @@ package org.wso2.carbon.inbound.endpoint.protocol.http;
 
 import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
+import org.wso2.carbon.inbound.endpoint.protocol.http.config.WorkerPoolConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Collection;
 
 
 /**
@@ -39,8 +42,10 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
     private String name;
     private int port;
+    private InboundProcessorParams processorParams;
 
     public InboundHttpListener(InboundProcessorParams params) {
+        processorParams = params;
         String portParam = params.getProperties().getProperty(
                 InboundHttpConstants.INBOUND_ENDPOINT_PARAMETER_HTTP_PORT);
         try {
@@ -53,12 +58,13 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
     @Override
     public void init() {
-        if(isPortUsedByAnotherApplication(port)){
+        if (isPortUsedByAnotherApplication(port)) {
             log.warn("Port " + port + " used by inbound endpoint " + name + " is already used by another application " +
                      "hence undeploying inbound endpoint");
-            this.destroy();
-        }else {
-            HTTPEndpointManager.getInstance().startEndpoint(port, name);
+            throw new SynapseException("Port " + port + " used by inbound endpoint " + name + " is already used by " +
+                    "another application.");
+        } else {
+            HTTPEndpointManager.getInstance().startEndpoint(port, name, processorParams);
         }
     }
 
@@ -74,9 +80,9 @@ public class InboundHttpListener implements InboundRequestProcessor {
 
 
     protected boolean isPortUsedByAnotherApplication(int port) {
-        if (PassThroughInboundEndpointHandler.isEndpointRunning(port)) {
+        if (PassThroughInboundEndpointHandler.isEndpointRunning(port) ){
             return false;
-        } else {
+        }  else {
             try {
                 ServerSocket srv = new ServerSocket(port);
                 srv.close();
@@ -84,6 +90,22 @@ public class InboundHttpListener implements InboundRequestProcessor {
                 return false;
             } catch (IOException e) {
                 return true;
+            }
+        }
+    }
+
+    protected void destoryInbound(){
+        if (processorParams.getSynapseEnvironment() != null) {
+            Collection<InboundEndpoint> inboundEndpoints = processorParams.getSynapseEnvironment().
+                       getSynapseConfiguration().getInboundEndpoints();
+            {
+                for (InboundEndpoint inboundEndpoint : inboundEndpoints) {
+                    if (inboundEndpoint.getName().equals(name)) {
+                        processorParams.getSynapseEnvironment().
+                                   getSynapseConfiguration().removeInboundEndpoint(name);
+                        break;
+                    }
+                }
             }
         }
     }

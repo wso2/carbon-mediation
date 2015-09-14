@@ -37,10 +37,13 @@ public class SynapseConfigAdmin extends AbstractServiceBusAdmin {
 
     // Constants to identify
     private final String ADDRESS_EP = "address";
-    private final String FAILOVER_EP = "failOver";
+    private final String FAILOVER_EP = "failover";
     private final String WSDL_EP = "WSDL";
     private final String LOADBALANCE_EP = "loadBalance";
     private final String DEFAULT_EP = "default";
+    private final String HTTP_EP = "http";
+    private final String TEMPLATE_EP = "template";
+    private final String RECIPIENTLIST_EP = "recipientlist";
 
     public SynapseConfigAdmin() {
         synapseConfiguration = getSynapseConfiguration();
@@ -109,6 +112,12 @@ public class SynapseConfigAdmin extends AbstractServiceBusAdmin {
             epType = FAILOVER_EP;
         } else if (ep instanceof LoadbalanceEndpoint) {
             epType = LOADBALANCE_EP;
+        } else if (ep instanceof HTTPEndpoint) {
+            epType = HTTP_EP;
+        } else if (ep instanceof TemplateEndpoint) {
+            epType = TEMPLATE_EP;
+        } else if (ep instanceof RecipientListEndpoint) {
+            epType = RECIPIENTLIST_EP;
         }
         return epType;
     }

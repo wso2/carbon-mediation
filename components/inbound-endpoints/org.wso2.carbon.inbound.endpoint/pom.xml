@@ -44,7 +44,6 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-nhttp-transport</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -74,8 +73,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-
-
         </plugins>
     </build>
 

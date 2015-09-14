@@ -11,10 +11,14 @@ import org.wso2.carbon.mediator.bam.config.stream.Property;
 import org.wso2.carbon.mediator.bam.config.stream.StreamConfiguration;
 import org.wso2.carbon.mediator.bam.util.BamMediatorConstants;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class PayloadDataBuilder {
 
     private static final Log log = LogFactory.getLog(MetaDataBuilder.class);
     private PropertyTypeConverter propertyTypeConverter = new PropertyTypeConverter();
+    private Map<String, SynapseXPath> synapseXPathMap = new ConcurrentHashMap<String, SynapseXPath>();
 
     public PayloadDataBuilder(){
         //propertyTypeConverter = new PropertyTypeConverter();
@@ -43,7 +47,7 @@ public class PayloadDataBuilder {
             throw new BamMediatorException(errorMsg, e);
         }
     }
-    
+
     private void produceAndSetConstantValues(MessageContext messageContext, org.apache.axis2.context.MessageContext msgCtx,
                                              Object[] payloadData) throws BamMediatorException {
         int i = 0;
@@ -87,7 +91,17 @@ public class PayloadDataBuilder {
             String stringProperty;
             String propertyType;
             if(property.isExpression()){
-                SynapseXPath synapseXPath = new SynapseXPath(property.getValue());
+                SynapseXPath synapseXPath = synapseXPathMap.get(property.getKey());
+                if(synapseXPath == null) {
+                    synchronized (this) {
+                        if(synapseXPathMap.get(property.getKey()) == null) {
+                            synapseXPath = new SynapseXPath(property.getValue());
+                            synapseXPathMap.put(property.getKey(), synapseXPath);
+                        } else {
+                            synapseXPath = synapseXPathMap.get(property.getKey());
+                        }
+                    }
+                }
                 stringProperty = synapseXPath.stringValueOf(messageContext);
             } else {
                 stringProperty =  property.getValue();

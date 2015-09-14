@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.wso2.carbon.mediation</groupId>
+        <artifactId>data-agents</artifactId>
+        <version>4.4.11-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.wso2.carbon.mediation</groupId>
+    <artifactId>org.wso2.carbon.bam.service.data.publisher.ui</artifactId>
+    <version>4.4.11-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+    <name>WSO2 Carbon - BAM - Service Stat publisher UI</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Import-Package>
+                            org.osgi.framework,
+                            org.osgi.service.http,
+                            org.wso2.carbon.ui,
+                            javax.servlet;version="${imp.pkg.version.javax.servlet}",
+                            javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
+                            javax.servlet.jsp;version="${imp.pkg.version.javax.servlet.jsp}",
+                            javax.servlet.jsp.el;version="${imp.pkg.version.javax.servlet.jsp}",
+                            javax.servlet.jsp.jstl.core;version="${imp.pkg.version.javax.servlet.jsp.jstl}",
+                            javax.servlet.jsp.jstl.fmt;version="${imp.pkg.version.javax.servlet.jsp.jstl}",
+                            javax.servlet.jsp.jstl.sql;version="${imp.pkg.version.javax.servlet.jsp.jstl}",
+                            javax.servlet.jsp.jstl.tlv;version="${imp.pkg.version.javax.servlet.jsp.jstl}",
+                            javax.servlet.jsp.resources;version="${imp.pkg.version.javax.servlet.jsp}",
+                            javax.servlet.jsp.tagext;version="${imp.pkg.version.javax.servlet.jsp}",
+                            javax.servlet.resources;version="${imp.pkg.version.javax.servlet}",
+                            org.apache.taglibs.standard,
+                            org.apache.taglibs.standard.extra.spath,
+                            org.apache.taglibs.standard.functions,
+                            org.apache.taglibs.standard.lang.jstl,
+                            org.apache.taglibs.standard.lang.jstl.parser,
+                            org.apache.taglibs.standard.lang.jstl.test,
+                            org.apache.taglibs.standard.lang.jstl.test.beans,
+                            org.apache.taglibs.standard.lang.support,
+                            org.apache.taglibs.standard.resources,
+                            org.apache.taglibs.standard.tag.common.core,
+                            org.apache.taglibs.standard.tag.common.fmt,
+                            org.apache.taglibs.standard.tag.common.sql,
+                            org.apache.taglibs.standard.tag.common.xml,
+                            org.apache.taglibs.standard.tag.el.core,
+                            org.apache.taglibs.standard.tag.el.fmt,
+                            org.apache.taglibs.standard.tag.el.sql,
+                            org.apache.taglibs.standard.tag.el.xml,
+                            org.apache.taglibs.standard.tag.rt.core,
+                            org.apache.taglibs.standard.tag.rt.fmt,
+                            org.apache.taglibs.standard.tag.rt.sql,
+                            org.apache.taglibs.standard.tag.rt.xml,
+                            org.apache.taglibs.standard.tei,
+                            org.apache.taglibs.standard.tlv,
+                            org.eclipse.equinox.http.helper,
+                            org.eclipse.equinox.jsp.jasper,
+                            org.wso2.carbon.bam.service.data.publisher.stub.*;version="${carbon.mediation.imp.pkg.version}",
+                            org.wso2.carbon.bam.service.data.publisher.stub.axis2.*;version="${carbon.mediation.imp.pkg.version}",
+                            org.wso2.carbon.bam.service.data.publisher.stub.config.*;version="${carbon.mediation.imp.pkg.version}",
+                            *;resolution:=optional
+                        </Import-Package>
+                        <Fragment-Host>org.wso2.carbon.ui</Fragment-Host>
+                        <Carbon-Component>UIBundle</Carbon-Component>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.bam.service.data.publisher.stub</artifactId>
+        </dependency>
+    </dependencies>
+</project>

@@ -8,7 +8,6 @@
     String store = request.getParameter("MessageStore");
     String params = request.getParameter("tableParams");
     String targetEndpoint = request.getParameter("TargetEndpoint");
-
     if (params != null) {
         params = params.trim();
     }

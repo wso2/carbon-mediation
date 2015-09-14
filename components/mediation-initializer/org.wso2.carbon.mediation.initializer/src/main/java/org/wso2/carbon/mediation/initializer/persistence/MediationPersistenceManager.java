@@ -19,11 +19,27 @@
 
 package org.wso2.carbon.mediation.initializer.persistence;
 
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.description.Parameter;
+import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.Startup;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
 import org.apache.synapse.config.xml.XMLConfigurationSerializer;
+import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.ProxyService;
+import org.apache.synapse.endpoints.Endpoint;
+import org.apache.synapse.endpoints.Template;
+import org.apache.synapse.inbound.InboundEndpoint;
+import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.mediators.template.TemplateMediator;
+import org.apache.synapse.message.processor.MessageProcessor;
+import org.apache.synapse.message.store.MessageStore;
+import org.apache.synapse.rest.API;
 import org.wso2.carbon.mediation.initializer.RegistryBasedSynapseConfigSerializer;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.registry.core.session.UserRegistry;
@@ -33,9 +49,12 @@ import javax.xml.stream.XMLStreamException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Manages all persistence activities related to mediation configuration. Takes care
@@ -504,6 +523,7 @@ public class MediationPersistenceManager {
             log.debug("Serializing full mediation configuration to the file system");
         }
 
+        SynapseConfiguration deployedArtifacts = removeCAppArtifactsBeforePersist(config);
         MultiXMLConfigurationSerializer serializer = new MultiXMLConfigurationSerializer(configPath);
         serializer.serialize(config);
 
@@ -515,6 +535,90 @@ public class MediationPersistenceManager {
             RegistryBasedSynapseConfigSerializer registrySerializer =
                     new RegistryBasedSynapseConfigSerializer(registry, configName);
             registrySerializer.serializeConfiguration(config);
+        }
+
+        addCAppArtifactsAfterPersist(config, deployedArtifacts);
+    }
+
+    /**
+     * Add the CApp artifact configuration to the current configuration, after persist the other artifacts into the default location
+     *
+     * @param synapseConfiguration Current Configuration
+     * @param cAppConfig           CApp artifact configuration
+     */
+    public void addCAppArtifactsAfterPersist(SynapseConfiguration synapseConfiguration,
+                                             SynapseConfiguration cAppConfig) {
+        final Lock lock = getLock(synapseConfiguration.getAxisConfiguration());
+
+        try {
+            lock.lock();
+            Map<String, Endpoint> endpoints = cAppConfig.getDefinedEndpoints();
+            for (String name : endpoints.keySet()) {
+                Endpoint newEndpoint = endpoints.get(name);
+                synapseConfiguration.addEndpoint(name, newEndpoint);
+            }
+            Map<String, SequenceMediator> sequences = cAppConfig.getDefinedSequences();
+            for (String name : sequences.keySet()) {
+                SequenceMediator newSequences = sequences.get(name);
+                synapseConfiguration.addSequence(name, newSequences);
+            }
+
+            Collection<ProxyService> proxyServices = cAppConfig.getProxyServices();
+            for (ProxyService proxy : proxyServices) {
+                ProxyService newProxy = proxy;
+                // Delete the persisted proxy service
+                deleteItem(proxy.getName(), proxy.getFileName(), ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+            }
+
+            Map<String, Entry> localEntries = cAppConfig.getDefinedEntries();
+            for (String name : localEntries.keySet()) {
+                Entry newEntry = localEntries.get(name);
+                synapseConfiguration.addEntry(name, newEntry);
+            }
+
+            Collection<MessageStore> messageStores = cAppConfig.getMessageStores().values();
+            for (MessageStore store : messageStores) {
+                synapseConfiguration.addMessageStore(store.getName(), store);
+            }
+
+            Collection<MessageProcessor> messageProcessors = cAppConfig.getMessageProcessors().values();
+            for (MessageProcessor processor : messageProcessors) {
+                synapseConfiguration.addMessageProcessor(processor.getName(), processor);
+            }
+
+            Map<String, TemplateMediator> sequenceTemplates = cAppConfig.getSequenceTemplates();
+            for (String name : sequenceTemplates.keySet()) {
+                TemplateMediator newTemplate = sequenceTemplates.get(name);
+                synapseConfiguration.addSequenceTemplate(name, newTemplate);
+            }
+
+            Map<String, Template> endpointTemplates = cAppConfig.getEndpointTemplates();
+            for (String name : endpointTemplates.keySet()) {
+                Template newEndpointTemplate = endpointTemplates.get(name);
+                synapseConfiguration.addEndpointTemplate(name, newEndpointTemplate);
+            }
+
+            Collection<API> apiCollection = cAppConfig.getAPIs();
+            for (API api : apiCollection) {
+                API newApi = api;
+                synapseConfiguration.addAPI(api.getName(), api);
+                api.init((SynapseEnvironment) synapseConfiguration.getAxisConfiguration()
+                        .getParameter(SynapseConstants.SYNAPSE_ENV).getValue());
+            }
+
+            Collection<Startup> tasks = cAppConfig.getStartups();
+            for (Startup task : tasks) {
+                Startup newTask = task;
+                synapseConfiguration.addStartup(task);
+            }
+
+            Collection<InboundEndpoint> inboundEndpoints = cAppConfig.getInboundEndpoints();
+            for (InboundEndpoint inboundEndpoint : inboundEndpoints) {
+                InboundEndpoint newInbound = inboundEndpoint;
+                synapseConfiguration.addInboundEndpoint(newInbound.getName(), newInbound);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -560,6 +664,149 @@ public class MediationPersistenceManager {
             result = 31 * result + (subjectId != null ? subjectId.hashCode() : 0);
             return result;
         }
+    }
+
+    /**
+     * @param synapseConfiguration Contains all the configuration includes CApp artifact configs
+     * @return new Configuration which removes all the CApp related configs
+     */
+    public SynapseConfiguration removeCAppArtifactsBeforePersist(
+            SynapseConfiguration synapseConfiguration) {
+
+        HashMap<String, SynapseConfiguration> returnMap = new HashMap<>();
+        final Lock lock = getLock(synapseConfiguration.getAxisConfiguration());
+        SynapseConfiguration cAppArtifactConfig = new SynapseConfiguration();
+
+        try {
+            lock.lock();
+            Map<String, Endpoint> endpoints = synapseConfiguration.getDefinedEndpoints();
+            for (String name : endpoints.keySet()) {
+                Endpoint ep = endpoints.get(name);
+                if (ep != null && ep.getArtifactContainerName() != null) {
+                    ep.setIsEdited(true);
+                    cAppArtifactConfig.addEndpoint(name, ep);
+                    synapseConfiguration.removeEndpoint(name);
+                }
+            }
+
+            Map<String, SequenceMediator> sequences = synapseConfiguration.getDefinedSequences();
+            for (String name : sequences.keySet()) {
+                SequenceMediator seq = sequences.get(name);
+                if (seq != null && seq.getArtifactContainerName() != null) {
+                    seq.setIsEdited(true);
+                    cAppArtifactConfig.addSequence(name, seq);
+                    synapseConfiguration.removeSequence(name);
+                }
+            }
+
+            Collection<ProxyService> proxyServices = synapseConfiguration.getProxyServices();
+            for (ProxyService proxy : proxyServices) {
+                if (proxy != null && proxy.getArtifactContainerName() != null) {
+                    proxy.setIsEdited(true);
+                    cAppArtifactConfig.addProxyService(proxy.getName(), proxy);
+                    // Do not remove proxy service from the synapseConfiguration since the CGAgentAdminService will
+                    // Throw an error while it try to find the service
+                    // Therefore remove the persisted config xml after persisting
+                }
+            }
+
+            Map<String, Entry> localEntries = synapseConfiguration.getDefinedEntries();
+            for (String name : localEntries.keySet()) {
+                Entry e = localEntries.get(name);
+                if (e != null && e.getArtifactContainerName() != null) {
+                    e.setIsEdited(true);
+                    cAppArtifactConfig.addEntry(name, e);
+                    synapseConfiguration.removeEntry(name);
+                }
+            }
+
+            Collection<MessageStore> messageStores = synapseConfiguration.getMessageStores().values();
+            for (MessageStore store : messageStores) {
+                if (store != null && store.getArtifactContainerName() != null) {
+                    store.setIsEdited(true);
+                    cAppArtifactConfig.addMessageStore(store.getName(), store);
+                    synapseConfiguration.removeMessageStore(store.getName());
+                }
+            }
+
+            Collection<MessageProcessor> messageProcessors = synapseConfiguration.getMessageProcessors().values();
+            for (MessageProcessor processor : messageProcessors) {
+                if (processor != null && processor.getArtifactContainerName() != null) {
+                    processor.setIsEdited(true);
+                    cAppArtifactConfig.addMessageProcessor(processor.getName(), processor);
+                    synapseConfiguration.removeMessageProcessor(processor.getName());
+                }
+            }
+
+            Map<String, TemplateMediator> sequenceTemplates = synapseConfiguration.getSequenceTemplates();
+            for (String name : sequenceTemplates.keySet()) {
+                TemplateMediator seqTemplate = sequenceTemplates.get(name);
+                if (seqTemplate != null && seqTemplate.getArtifactContainerName() != null) {
+                    seqTemplate.setIsEdited(true);
+                    cAppArtifactConfig.addSequenceTemplate(name, seqTemplate);
+                    synapseConfiguration.removeSequenceTemplate(name);
+                }
+            }
+
+            Map<String, Template> endpointTemplates = synapseConfiguration.getEndpointTemplates();
+            for (String name : endpointTemplates.keySet()) {
+                Template template = endpointTemplates.get(name);
+                if (template != null && template.getArtifactContainerName() != null) {
+                    template.setIsEdited(true);
+                    cAppArtifactConfig.addEndpointTemplate(name, template);
+                    synapseConfiguration.removeEndpointTemplate(name);
+                }
+            }
+
+            Collection<API> apiCollection = synapseConfiguration.getAPIs();
+            for (API api : apiCollection) {
+                if (api != null && api.getArtifactContainerName() != null) {
+                    api.setIsEdited(true);
+                    cAppArtifactConfig.addAPI(api.getName(), api);
+                    synapseConfiguration.removeAPI(api.getName());
+                }
+            }
+
+            Collection<Startup> tasks = synapseConfiguration.getStartups();
+            for (Startup task : tasks) {
+                if (task != null && task.getArtifactContainerName() != null) {
+                    task.setIsEdited(true);
+                    cAppArtifactConfig.addStartup(task);
+                    synapseConfiguration.removeStartup(task.getName());
+                }
+
+            }
+
+            Collection<InboundEndpoint> inboundEndpoints = synapseConfiguration.getInboundEndpoints();
+            for (InboundEndpoint inboundEndpoint : inboundEndpoints) {
+                if (inboundEndpoint != null && inboundEndpoint.getArtifactContainerName() != null) {
+                    inboundEndpoint.setIsEdited(true);
+                    cAppArtifactConfig.addInboundEndpoint(inboundEndpoint.getName(), inboundEndpoint);
+                    synapseConfiguration.removeInboundEndpoint(inboundEndpoint.getName());
+                }
+            }
+             return cAppArtifactConfig;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    protected Lock getLock(AxisConfiguration axisConfig) {
+        Parameter p = axisConfig.getParameter(ServiceBusConstants.SYNAPSE_CONFIG_LOCK);
+        if (p != null) {
+            return (Lock) p.getValue();
+        } else {
+            log.warn(ServiceBusConstants.SYNAPSE_CONFIG_LOCK + " is null, Recreating a new lock");
+            Lock lock = new ReentrantLock();
+            try {
+                axisConfig.addParameter(ServiceBusConstants.SYNAPSE_CONFIG_LOCK, lock);
+                return lock;
+            } catch (AxisFault axisFault) {
+                log.error("Error while setting " + ServiceBusConstants.SYNAPSE_CONFIG_LOCK);
+            }
+        }
+
+        return null;
     }
 
 }

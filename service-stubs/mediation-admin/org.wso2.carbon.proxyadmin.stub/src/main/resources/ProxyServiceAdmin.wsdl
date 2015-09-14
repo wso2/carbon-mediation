@@ -24,6 +24,7 @@
             </xs:complexType>
             <xs:complexType name="ProxyData">
                 <xs:sequence>
+                    <xs:element minOccurs="0" name="artifactContainerName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="enableSecurity" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="enableStatistics" type="xs:boolean"/>
@@ -34,6 +35,7 @@
                     <xs:element minOccurs="0" name="faultSeqXML" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="inSeqKey" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="inSeqXML" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="isEdited" nillable="true" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="outSeqKey" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="outSeqXML" nillable="true" type="xs:string"/>

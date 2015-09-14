@@ -19,6 +19,11 @@
 <%@ page import="org.wso2.carbon.mediator.switchm.SwitchDefaultMediator" %>
 <%@ page import="org.wso2.carbon.mediator.switchm.SwitchMediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
+<%@ page import="org.apache.synapse.util.xpath.SynapseJsonPath" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
+<%@ page import="java.net.URLDecoder" %>
+
 <%--
 ~  Copyright (c) 2008, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 ~
@@ -43,7 +48,27 @@
     }
     SwitchMediator switchMediator = (SwitchMediator) mediator;
     switchMediator.addChild(new SwitchDefaultMediator());
-%>
+
+    String source = URLDecoder.decode(request.getParameter("src"), "UTF-8");
+
+    if (source != null) {
+        boolean error = false;
+        XPathFactory xPathFactory = XPathFactory.getInstance();
+        if(!source.equals("")){
+            try{
+                if(request.getParameter("src").trim().startsWith("json-eval(")) {
+                    SynapsePath path = new SynapseJsonPath(request.getParameter("src").trim()
+                            .substring(10, request.getParameter("src").trim().length() - 1));
+                    switchMediator.setSource(path);
+                } else {
+                    switchMediator.setSource(xPathFactory.createSynapseXPath("src", request, session));
+                }
+            }
+            catch(Exception e){
+                error=true;
+            }
+        }
+    }%>
 
 <script type="text/javascript">
     document.location.href = "../sequences/design_sequence.jsp?ordinal=1";

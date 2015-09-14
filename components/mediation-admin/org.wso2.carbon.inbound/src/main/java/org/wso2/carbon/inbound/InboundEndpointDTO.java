@@ -34,6 +34,8 @@ public class InboundEndpointDTO {
     private String onErrorSeq;
     private ParameterDTO[]parameters;
     private String fileName;
+    private String artifactContainerName;
+    private boolean isEdited;
 
     public InboundEndpointDTO(InboundEndpoint inboundEndpoint) {
         this.name = inboundEndpoint.getName();
@@ -43,6 +45,8 @@ public class InboundEndpointDTO {
         this.injectingSeq = inboundEndpoint.getInjectingSeq();
         this.onErrorSeq = inboundEndpoint.getOnErrorSeq();
         this.fileName = inboundEndpoint.getFileName();
+        this.artifactContainerName = inboundEndpoint.getArtifactContainerName();
+        this.isEdited = inboundEndpoint.getIsEdited();
         Map<String, String> mParams = inboundEndpoint.getParametersMap();        
         if (mParams != null && !mParams.isEmpty()) {
             parameters = new ParameterDTO[mParams.keySet().size()];
@@ -125,5 +129,21 @@ public class InboundEndpointDTO {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public boolean getIsEdited() {
+        return isEdited;
+    }
+
+    public void setIsEdited(boolean isEdited) {
+        this.isEdited = isEdited;
+    }
+
+    public String getArtifactContainerName() {
+        return artifactContainerName;
+    }
+
+    public void setArtifactContainerName(String artifactContainerName) {
+        this.artifactContainerName = artifactContainerName;
     }
 }

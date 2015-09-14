@@ -19,6 +19,7 @@
 package org.wso2.carbon.inbound.endpoint.common;
 
 import org.apache.log4j.Logger;
+import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
 
 public abstract class AbstractInboundEndpointManager implements InboundEndpointManager {
@@ -32,7 +33,8 @@ public abstract class AbstractInboundEndpointManager implements InboundEndpointM
 
     @Override
     public String getEndpointName(int port, String domain) {
-        return dataStore.getEndpointName(port, domain);
+        return dataStore.getListeningEndpointName(port, domain);
     }
+
 
 }

@@ -19,6 +19,7 @@
 
 package org.wso2.carbon.mediation.statistics.persistence;
 
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.statistics.*;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
@@ -26,6 +27,7 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.core.RegistryResources;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.Queue;
 import java.util.LinkedList;
@@ -102,16 +104,26 @@ public final class PersistingStatisticsObserver implements MediationStatisticsOb
     }
 
     private void persistRecord(StatisticsRecord record) throws RegistryException {
-        String path = calculatePath(record);
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext privilegedCarbonContext =
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext();
 
-        Resource recordResource = registry.newResource();
-        recordResource.setProperty("totalCount", String.valueOf(record.getTotalCount()));
-        recordResource.setProperty("faultCount", String.valueOf(record.getFaultCount()));
-        recordResource.setProperty("maxTime", String.valueOf(record.getMaxTime()));
-        recordResource.setProperty("minTime", String.valueOf(record.getMinTime()));
-        recordResource.setProperty("avgTime", String.valueOf(record.getAvgTime()));
-        registry.put(path, recordResource);
-        recordResource.discard();
+            privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
+            privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+            String path = calculatePath(record);
+
+            Resource recordResource = registry.newResource();
+            recordResource.setProperty("totalCount", String.valueOf(record.getTotalCount()));
+            recordResource.setProperty("faultCount", String.valueOf(record.getFaultCount()));
+            recordResource.setProperty("maxTime", String.valueOf(record.getMaxTime()));
+            recordResource.setProperty("minTime", String.valueOf(record.getMinTime()));
+            recordResource.setProperty("avgTime", String.valueOf(record.getAvgTime()));
+            registry.put(path, recordResource);
+            recordResource.discard();
+        }finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 
     private String calculatePath(StatisticsRecord entityRecord) {

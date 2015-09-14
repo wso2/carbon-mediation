@@ -31,6 +31,7 @@ import org.apache.synapse.task.TaskDescriptionSerializer;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.task.stub.TaskAdminStub;
 import org.wso2.carbon.task.stub.TaskManagementException;
+import org.wso2.carbon.task.stub.types.carbon.TaskData;
 import org.wso2.carbon.ui.CarbonUIUtil;
 import org.wso2.carbon.utils.ServerConstants;
 
@@ -153,7 +154,7 @@ public class TaskManagementClient {
 
     public List<TaskDescription> getAllTaskDescriptions() throws Exception {
 
-        OMElement element = stub.getAllTaskDescriptions();
+        OMElement element = stub.getAllTaskDescriptions(null);
         if (log.isDebugEnabled()) {
             log.debug("All TasKs configurations :" + element);
         }
@@ -181,6 +182,16 @@ public class TaskManagementClient {
             log.debug("All TasKs Descriptions :" + descriptions);
         }
         return descriptions;
+    }
+
+    public TaskData[] getAllTaskData() throws Exception {
+        TaskData[] taskData = null;
+        try {
+            taskData = stub.getAllTaskData();
+        } catch (Exception e) {
+            handleException(e.getLocalizedMessage());
+        }
+        return taskData;
     }
 
     public TaskDescription getTaskDescription(String name, String group) throws Exception {
@@ -231,7 +242,7 @@ public class TaskManagementClient {
         }
         ResponseInformation responseInformation = new ResponseInformation();
         try {
-            OMElement returnElement = stub.loadTaskClassProperties(className.trim(), group);
+            OMElement returnElement = (OMElement) stub.loadTaskClassProperties(className.trim(), group);
             if (log.isDebugEnabled()) {
                 log.debug("Loaded class properties as XML : " + returnElement);
             }
