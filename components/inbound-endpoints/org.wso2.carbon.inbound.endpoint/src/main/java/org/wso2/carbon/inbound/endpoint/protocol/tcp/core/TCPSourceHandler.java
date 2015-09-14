@@ -18,10 +18,9 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.log4j.Logger;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.context.TCPContext;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.context.TCPContextFactory;
@@ -37,7 +36,7 @@ import java.util.Map;
  */
 
 public class TCPSourceHandler implements IOEventDispatch {
-    private static final Log log = LogFactory.getLog(TCPSourceHandler.class);
+    private static final Logger log = Logger.getLogger(TCPSourceHandler.class);
 
     private Map<String, String> sessionIdToPort;
     private volatile TCPProcessor tcpProcessor;

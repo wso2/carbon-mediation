@@ -36,8 +36,7 @@ import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.http.ApplicationXMLFormatter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundProcessorParams;
@@ -55,7 +54,7 @@ import java.io.ByteArrayOutputStream;
  *
  */
 public class TCPMessageUtils {
-    private static final Log log = LogFactory.getLog(TCPMessageUtils.class);
+    private static final Logger log = Logger.getLogger(TCPMessageUtils.class);
 
     private static ConfigurationContext context;
     private static SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
@@ -150,7 +149,7 @@ public class TCPMessageUtils {
         return Integer.valueOf(params.getProperties().getProperty(key));
     }
 
-    public static byte [] payloadToTCPMessage(MessageContext messageContext, InboundProcessorParams params) {
+    public static byte[] payloadToTCPMessage(MessageContext messageContext, InboundProcessorParams params) {
         // public byte[] getBytes(MessageContext msgCtxt, OMOutputFormat format) method is used to
         //get the msg content type get a new formatter.
         String contentType = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_CONTENT_TYPE);

@@ -18,9 +18,8 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.log4j.Logger;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class TCPMultiIOHandler extends TCPSourceHandler {
-    private static final Log log = LogFactory.getLog(TCPMultiIOHandler.class);
+    private static final Logger log = Logger.getLogger(TCPMultiIOHandler.class);
 
     public ConcurrentHashMap<Integer, TCPSourceHandler> handlers = new ConcurrentHashMap<Integer, TCPSourceHandler>();
 

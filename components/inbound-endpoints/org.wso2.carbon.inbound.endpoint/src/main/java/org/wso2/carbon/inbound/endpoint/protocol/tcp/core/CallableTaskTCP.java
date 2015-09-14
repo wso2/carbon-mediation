@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
+ * <p/>
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,8 +18,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -30,7 +29,7 @@ import java.util.concurrent.Callable;
  *
  */
 public class CallableTaskTCP implements Callable<Boolean> {
-    private static final Log log = LogFactory.getLog(CallableTaskTCP.class);
+    private static final Logger log = Logger.getLogger(CallableTaskTCP.class);
 
     private MessageContext requestMessageContext;
 
@@ -44,7 +43,7 @@ public class CallableTaskTCP implements Callable<Boolean> {
     }
 
     @Override public Boolean call() throws Exception {
-        // inject to synapse here, call synchronously.
+        // inject incoming message to synapse here
         return synapseEnvironment.injectInbound(requestMessageContext, injectingSequence, true);
 
     }

@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
+ * <p/>
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,9 +18,8 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.log4j.Logger;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.management.TCPEndpointManager;
@@ -29,12 +28,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 
 /**
- *
+ * Listener class for TCP Inbound Endpoint.which is triggered by inbound core
+ * and responsible for start listening for TCP connections on given port.
  */
 
 public class InboundTCPListener implements InboundRequestProcessor {
 
-    private static final Log log = LogFactory.getLog(InboundTCPListener.class);
+    private static final Logger log = Logger.getLogger(InboundTCPListener.class);
+
     private int port;
     private InboundProcessorParams params;
 
@@ -52,7 +53,6 @@ public class InboundTCPListener implements InboundRequestProcessor {
     @Override public void init() {
         if (isPortAvailable(this.port)) {
             if (!InboundTCPIOReactor.isStarted()) {
-                //log.info("Starting TCP Inbound IO Reactor...");
                 try {
                     InboundTCPIOReactor.start();
                 } catch (IOReactorException e) {
@@ -67,7 +67,6 @@ public class InboundTCPListener implements InboundRequestProcessor {
     }
 
     public void start() {
-        //log.info("Starting TCP Inbound Endpoint on port " + this.port);
         TCPEndpointManager.getInstance().startEndpoint(port, params.getName(), params);
     }
 
@@ -79,7 +78,6 @@ public class InboundTCPListener implements InboundRequestProcessor {
         try {
             ServerSocket ss = new ServerSocket(port);
             ss.close();
-            ss = null;
             return true;
         } catch (IOException e) {
             log.error("Port : " + port + " is used by another application. Please select a different port for the " +

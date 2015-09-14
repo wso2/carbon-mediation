@@ -18,8 +18,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.codec;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.context.TCPContext;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.core.InboundTCPConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.core.TCPContextException;
@@ -33,7 +32,8 @@ import java.nio.charset.CharsetDecoder;
  */
 
 public class TCPCodec {
-    private static final Log log = LogFactory.getLog(TCPCodec.class);
+    
+    private static final Logger log = Logger.getLogger(TCPCodec.class);
 
     public static final int READ_HEADER = 0;
     public static final int READ_CONTENT = 1;

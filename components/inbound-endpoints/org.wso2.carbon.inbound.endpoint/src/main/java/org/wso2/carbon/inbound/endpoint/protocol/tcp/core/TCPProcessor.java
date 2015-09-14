@@ -19,8 +19,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
 
 import org.apache.axis2.AxisFault;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.inbound.InboundEndpointConstants;
@@ -44,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class TCPProcessor implements InboundResponseSender {
-    private static final Log log = LogFactory.getLog(TCPProcessor.class);
+    private static final Logger log = Logger.getLogger(TCPProcessor.class);
 
     private ScheduledExecutorService executorService;
 
@@ -212,7 +211,6 @@ public class TCPProcessor implements InboundResponseSender {
 
     @Override public void sendBack(MessageContext messageContext) {
         TCPContext tcpContext = (TCPContext) messageContext.getProperty(InboundTCPConstants.TCP_CONTEXT);
-
 
         if (messageContext.getProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID) != null &&
             !tcpContext.getMessageId().equals(messageContext.getProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID))) {

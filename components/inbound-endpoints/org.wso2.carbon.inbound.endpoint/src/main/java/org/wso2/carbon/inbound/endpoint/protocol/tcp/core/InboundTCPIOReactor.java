@@ -18,14 +18,13 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.impl.nio.reactor.DefaultListeningIOReactor;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.nio.reactor.IOReactorStatus;
 import org.apache.http.nio.reactor.ListenerEndpoint;
 import org.apache.http.nio.reactor.ListeningIOReactor;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -39,29 +38,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InboundTCPIOReactor {
 
-    private static final Log log = LogFactory.getLog(InboundTCPIOReactor.class);
+    private static final Logger log = Logger.getLogger(InboundTCPIOReactor.class);
 
     private static volatile boolean isStarted = false;
 
     private static ListeningIOReactor reactor;
 
-    private static ConcurrentHashMap<Integer, ListenerEndpoint> endpointMap =
-            new ConcurrentHashMap<Integer, ListenerEndpoint>();
+    private static ConcurrentHashMap<Integer, ListenerEndpoint> endpointMap = new ConcurrentHashMap<>();
 
-    private static ConcurrentHashMap<Integer, TCPProcessor> processorMap =
-            new ConcurrentHashMap<Integer, TCPProcessor>();
+    private static ConcurrentHashMap<Integer, TCPProcessor> processorMap = new ConcurrentHashMap<>();
 
     public static boolean isStarted() {
         return isStarted;
     }
 
     public static void start() throws IOReactorException {
+
         if (reactor != null && reactor.getStatus().equals(IOReactorStatus.ACTIVE)) {
             return;
         }
 
         IOReactorConfig config = getDefaultReactorConfig();
-
         reactor = new DefaultListeningIOReactor(config);
 
         Thread reactorThread = new Thread(new Runnable() {
@@ -144,8 +141,7 @@ public class InboundTCPIOReactor {
     }
 
     private static SocketAddress getSocketAddress(int port) {
-        InetSocketAddress isa = new InetSocketAddress(port);
-        return isa;
+        return new InetSocketAddress(port);
     }
 
     private static IOReactorConfig getDefaultReactorConfig() {

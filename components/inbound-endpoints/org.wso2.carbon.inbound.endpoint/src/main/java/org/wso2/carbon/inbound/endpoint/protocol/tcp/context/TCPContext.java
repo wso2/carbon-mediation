@@ -22,10 +22,9 @@ package org.wso2.carbon.inbound.endpoint.protocol.tcp.context;
  * TCP message related parameters are stored here.
  */
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.EventMask;
 import org.apache.http.nio.reactor.IOSession;
+import org.apache.log4j.Logger;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.codec.TCPCodec;
@@ -35,7 +34,8 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.CharsetDecoder;
 
 public class TCPContext {
-    private static final Log log = LogFactory.getLog(TCPContext.class);
+
+    private static final Logger log = Logger.getLogger(TCPContext.class);
 
     private InboundProcessorParams params;
 
@@ -47,7 +47,7 @@ public class TCPContext {
 
     private String tcpMessage;
 
-    private byte [] tcpResponseMsg;
+    private byte[] tcpResponseMsg;
 
     private volatile TCPCodec codec;
 
