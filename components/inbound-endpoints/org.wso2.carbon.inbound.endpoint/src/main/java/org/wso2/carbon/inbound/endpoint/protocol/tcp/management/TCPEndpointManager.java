@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
+ * <p/>
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -53,33 +53,26 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
         return instance;
     }
 
-    @Override public void startListener(int port, String name) {
-        return;
-    }
-
     //new endpoints will be bound to IO Reactor
-    public void startListener(int port, String name, InboundProcessorParams params) {
+    public boolean startListener(int port, String name, InboundProcessorParams params) {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
         if (params.getProperties().getProperty(InboundTCPConstants.TCP_INBOUND_TENANT_DOMAIN) == null) {
             params.getProperties().put(InboundTCPConstants.TCP_INBOUND_TENANT_DOMAIN, tenantDomain);
         }
 
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put(InboundTCPConstants.INBOUND_PARAMS, params);
         parameters.put(InboundTCPConstants.INBOUND_TCP_BUFFER_FACTORY,
                        new BufferFactory(8 * 1024, new HeapByteBufferAllocator(), 1024));
         validateParameters(params, parameters);
         TCPProcessor tcpProcessor = new TCPProcessor(parameters);
         parameters.put(InboundTCPConstants.TCP_REQ_PROC, tcpProcessor);
-        InboundTCPIOReactor.bind(port, tcpProcessor);
+        return InboundTCPIOReactor.bind(port, tcpProcessor);
+
     }
 
-    @Override public void startEndpoint(int port, String name) {
-        return;
-    }
-
-    public void startEndpoint(int port, String name, InboundProcessorParams params) {
+    public boolean startEndpoint(int port, String name, InboundProcessorParams params) {
         log.info("Starting TCP Inbound Endpoint on port " + port);
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
@@ -87,7 +80,7 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
 
         params.getProperties().setProperty(InboundTCPConstants.TCP_INBOUND_TENANT_DOMAIN, tenantDomain);
 
-        String epName = dataStore.getEndpointName(port, tenantDomain);
+        String epName = dataStore.getListeningEndpointName(port, tenantDomain);
         if (epName != null) {
             if (epName.equalsIgnoreCase(name)) {
                 log.info(epName + ": TCP Inbound Endpoint is already started in port : " + port);
@@ -97,21 +90,22 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
                 throw new SynapseException(msg);
             }
         } else {
-            dataStore.registerEndpoint(port, tenantDomain, InboundRequestProcessorFactoryImpl.Protocols.tcp.toString(),
-                                       name, params);
-            startListener(port, name, params);
+            dataStore.registerListeningEndpoint(port, tenantDomain,
+                                                InboundRequestProcessorFactoryImpl.Protocols.tcp.toString(), name,
+                                                params);
+            return startListener(port, name, params);
         }
 
+        return false;
     }
 
     @Override public void closeEndpoint(int port) {
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = cc.getTenantDomain();
-        dataStore.unregisterEndpoint(port, tenantDomain);
+        dataStore.unregisterListeningEndpoint(port, tenantDomain);
 
         if (!InboundTCPIOReactor.isEndpointRunning(port)) {
             log.info("Listener Endpoint is not started");
-            return;
         } else if (dataStore.isEndpointRegistryEmpty(port)) {
             // if no other endpoint is working on this port. close the listening endpoint
             InboundTCPIOReactor.unbind(port);

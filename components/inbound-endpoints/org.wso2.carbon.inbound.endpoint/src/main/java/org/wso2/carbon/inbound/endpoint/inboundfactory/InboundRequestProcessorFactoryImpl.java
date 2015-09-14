@@ -38,7 +38,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.tcp.core.InboundTCPListener;
  */
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
-    public static enum Protocols {jms, file, http, https, hl7, kafka, mqtt, rabbitmq, tcp}
+    public static enum Protocols {jms, file, http, https, hl7, tcp, kafka, mqtt, rabbitmq}
 
     /**
      * return underlying Request Processor Implementation according to protocol
