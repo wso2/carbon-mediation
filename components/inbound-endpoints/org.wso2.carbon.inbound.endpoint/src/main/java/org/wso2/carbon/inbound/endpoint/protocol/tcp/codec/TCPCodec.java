@@ -64,10 +64,10 @@ public class TCPCodec {
     private int currentPosition = 0;
     private int initialBufferLimit;
 
-    public TCPCodec() {
+/*    public TCPCodec() {
         this.state = READ_HEADER;
         this.charsetDecoder = InboundTCPConstants.UTF8_CHARSET.newDecoder();
-    }
+    }*/
 
     public TCPCodec(CharsetDecoder charsetDecoder) {
         this.state = READ_HEADER;
@@ -174,7 +174,7 @@ public class TCPCodec {
                 }
 
             }
-            case InboundTCPConstants.DECODE_BY_LENGTH: {
+            /*case InboundTCPConstants.DECODE_BY_LENGTH: {
                 //This method must test
                 if (this.state >= READ_COMPLETE || dst.position() < 0) {
                     return -1;
@@ -220,7 +220,7 @@ public class TCPCodec {
 
                     return InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED;
                 }
-            }
+            }*/
         }
 
         return 0;
@@ -322,13 +322,13 @@ public class TCPCodec {
                     this.state = WRITE_COMPLETE;
                 }
             }
-            case InboundTCPConstants.DECODE_BY_LENGTH: {
+/*            case InboundTCPConstants.DECODE_BY_LENGTH: {
                 if (this.state == WRITE_HEADER) {
                     byteBuffer.put(responseBytes);
                     count = responseBytes.length;
                     this.state = WRITE_COMPLETE;
                 }
-            }
+            }*/
         }
 
         byteBuffer.flip();
@@ -341,27 +341,15 @@ public class TCPCodec {
     }
 
     public boolean isReadComplete() {
-        if (this.state >= READ_COMPLETE) {
-            return true;
-        }
-
-        return false;
+        return this.state >= READ_COMPLETE;
     }
 
     public boolean isWriteTrailer() {
-        if (this.state == WRITE_TRAILER) {
-            return true;
-        }
-
-        return false;
+        return this.state == WRITE_TRAILER;
     }
 
     public boolean isWriteComplete() {
-        if (this.state == WRITE_COMPLETE) {
-            return true;
-        }
-
-        return false;
+        return this.state == WRITE_COMPLETE;
     }
 
     public int getState() {

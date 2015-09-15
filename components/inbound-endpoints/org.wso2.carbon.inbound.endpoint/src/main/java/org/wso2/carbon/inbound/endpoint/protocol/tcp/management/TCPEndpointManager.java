@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This is responsible to manage Inbound end points individually each end point is bind to InboundTCPIOReactor
+ * This is responsible to manage Inbound end points individually each end point is bind to InboundTCPIOReactor.
  */
 
 public class TCPEndpointManager extends AbstractInboundEndpointManager {
@@ -113,10 +113,9 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
     }
 
     private void validateParameters(InboundProcessorParams params, Map<String, Object> parameters) {
-        //auto ack is not using in TCP
         try {
             Integer.valueOf(params.getProperties().getProperty(InboundTCPConstants.PARAM_TCP_TIMEOUT));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException numberFormatException) {
             log.warn("Parameter inbound.tcp.TimeOut is not valid. Default timeout " +
                      "of " + InboundTCPConstants.DEFAULT_TCP_TIMEOUT + " milliseconds will be used.");
             params.getProperties().setProperty(InboundTCPConstants.PARAM_TCP_TIMEOUT,
@@ -132,12 +131,12 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
                 parameters.put(InboundTCPConstants.TCP_CHARSET_DECODER, Charset.forName(
                         params.getProperties().getProperty(InboundTCPConstants.PARAM_TCP_CHARSET)).newDecoder());
             }
-        } catch (UnsupportedCharsetException e) {
+        } catch (UnsupportedCharsetException unsupportedCharsetException) {
             parameters.put(InboundTCPConstants.TCP_CHARSET_DECODER, InboundTCPConstants.UTF8_CHARSET.newDecoder());
             log.error("Unsupported charset '" +
                       params.getProperties().getProperty(InboundTCPConstants.PARAM_TCP_CHARSET) + "' " +
                       "specified. Default " +
-                      "UTF-8 will be used instead.", e);
+                      "UTF-8 will be used instead.", unsupportedCharsetException);
         }
     }
 

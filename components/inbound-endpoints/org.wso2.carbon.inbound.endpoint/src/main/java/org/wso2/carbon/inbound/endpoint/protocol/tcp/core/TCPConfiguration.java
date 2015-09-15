@@ -28,7 +28,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- *
+ * loading the tcp.config file.
  */
 public class TCPConfiguration {
     private static final Logger log = Logger.getLogger(TCPConfiguration.class);
@@ -40,10 +40,8 @@ public class TCPConfiguration {
     private TCPConfiguration() {
         try {
             props = loadProperties("tcp.properties");
-            //log.info("so_timeout : "+getIntProperty(InboundTCPConstants.TCPConstants.SO_TIMEOUT));
-        } catch (Exception e) {
+        } catch (Exception exception) {
             log.info("could not load the properties from tcp.properties file...");
-            //Customer can set manual location for configuration file. If it is not found we ignore it
         }
     }
 
@@ -69,7 +67,7 @@ public class TCPConfiguration {
             int intVal;
             try {
                 intVal = Integer.valueOf(val);
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException numberFormatException) {
                 log.warn("Invalid TCP tuning property value. " + name +
                          " must be an integer");
                 return def;
@@ -151,21 +149,17 @@ public class TCPConfiguration {
     private static Properties loadProperties(String filePath) {
 
         Properties properties = new Properties();
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         log.info("Loading the TCP config file '" + filePath + "' from classpath");
         if (log.isDebugEnabled()) {
             log.debug("Loading the TCP config file '" + filePath + "' from classpath");
         }
-
         InputStream in = null;
-
-        //if we reach to this assume that the we may have to looking to the customer provided external location for the
-        //given properties
 
         if (System.getProperty(CONF_LOCATION) != null) {
             try {
                 in = new FileInputStream(System.getProperty(CONF_LOCATION) + File.separator + filePath);
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException fileNotFoundException) {
                 String msg = "Error loading TCP inbound properties from a file at from the System defined location: " +
                              filePath;
                 log.warn(msg);
@@ -173,7 +167,7 @@ public class TCPConfiguration {
         }
 
         if (in == null) {
-            in = cl.getResourceAsStream(filePath);
+            in = classLoader.getResourceAsStream(filePath);
             if (log.isDebugEnabled()) {
                 log.debug("Unable to load file  '" + filePath + "'");
             }
@@ -183,7 +177,7 @@ public class TCPConfiguration {
                 log.debug("Loading the file '" + filePath + "'");
             }
 
-            in = cl.getResourceAsStream(filePath);
+            in = classLoader.getResourceAsStream(filePath);
             if (in == null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Unable to load file  '" + filePath + "'");
@@ -193,9 +187,9 @@ public class TCPConfiguration {
         if (in != null) {
             try {
                 properties.load(in);
-            } catch (IOException e) {
+            } catch (IOException ioException) {
                 String msg = "Error loading properties from a file at : " + filePath;
-                log.error(msg, e);
+                log.error(msg, ioException);
             }
         }
         return properties;

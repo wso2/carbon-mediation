@@ -25,7 +25,8 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * per connection/session IO event handler
+ * per connection/session IO event handler. IO reactor triggers each
+ * event accordingly
  */
 
 public class TCPMultiIOHandler extends TCPSourceHandler {
@@ -41,34 +42,26 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
     }
 
     @Override public void connected(IOSession session) {
-
         InetSocketAddress remoteIsa = (InetSocketAddress) session.getRemoteAddress();
         InetSocketAddress localIsa = (InetSocketAddress) session.getLocalAddress();
-
         TCPSourceHandler handler = new TCPSourceHandler(processorMap.get(localIsa.getPort()));
         handlers.put(remoteIsa.getPort(), handler);
-
         handler.connected(session);
     }
 
     @Override public void inputReady(IOSession session) {
-
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.inputReady(session);
-
     }
 
     @Override public void outputReady(IOSession session) {
-
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.outputReady(session);
-
     }
 
     @Override public void timeout(IOSession session) {
-        //log.info("Time out method called...");
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.timeout(session);
@@ -77,8 +70,6 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
     }
 
     @Override public void disconnected(IOSession session) {
-        //log.info("Disconnected method called...");
-
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         if (isa == null) {
             return;
@@ -86,6 +77,5 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.disconnected(session);
         handlers.remove(handler);
-
     }
 }

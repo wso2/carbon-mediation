@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * IO event handler
+ * IO event handler.
  */
 
 public class TCPSourceHandler implements IOEventDispatch {
@@ -50,7 +50,7 @@ public class TCPSourceHandler implements IOEventDispatch {
 
     public TCPSourceHandler(TCPProcessor tcpProcessor) {
         super();
-        sessionIdToPort = new HashMap<String, String>();
+        sessionIdToPort = new HashMap<>();
         this.tcpProcessor = tcpProcessor;
         this.bufferFactory = (BufferFactory) tcpProcessor.getInboundParameterMap()
                                                          .get(InboundTCPConstants.INBOUND_TCP_BUFFER_FACTORY);
@@ -64,20 +64,17 @@ public class TCPSourceHandler implements IOEventDispatch {
     @Override public void connected(IOSession session) {
 
         sessionIdToPort.put(String.valueOf(session.hashCode()), String.valueOf(session.getRemoteAddress()));
-
         if (session.getAttribute(InboundTCPConstants.TCP_CONTEXT) == null) {
             session.setAttribute(InboundTCPConstants.TCP_CONTEXT,
                                  TCPContextFactory.createTCPContext(session, tcpProcessor));
         }
-
         inputBuffer = bufferFactory.getBuffer();
         outputBuffer = bufferFactory.getBuffer();
-
     }
 
     @Override public void inputReady(IOSession session) {
 
-        ReadableByteChannel ch = (ReadableByteChannel) session.channel();
+        ReadableByteChannel readableByteChannel = session.channel();
 
         TCPContext tcpContext = (TCPContext) session.getAttribute(InboundTCPConstants.TCP_CONTEXT);
 
@@ -87,13 +84,14 @@ public class TCPSourceHandler implements IOEventDispatch {
 
             //buffer size = 8192
             //here we read data from the channel and write in to the inputBuffer+there can be existing data in buffer
-            while ((read = ch.read(inputBuffer)) > 0 || inputBuffer.position() > 0) {
+            while ((read = readableByteChannel.read(inputBuffer)) > 0 || inputBuffer.position() > 0) {
 
                 inputBuffer.flip();
 
                 try {
-                    //here we send the input byte buffer, tcpContext, inboundPoint parameters to decode the message
+                    //here we send the input byte buffer & tcpContext to decode the message
                     int status = tcpContext.getCodec().decode(inputBuffer, tcpContext);
+
 
                     if (status == InboundTCPConstants.ONE_TCP_MESSAGE_IS_DECODED) {
 
@@ -107,10 +105,10 @@ public class TCPSourceHandler implements IOEventDispatch {
                         }
                     }
 
-                } catch (TCPContextException e) {
-                    shutdownConnection(session, tcpContext, e);
-                } catch (IOException e) {
-                    shutdownConnection(session, tcpContext, e);
+                } catch (TCPContextException tcpContextException) {
+                    shutdownConnection(session, tcpContext, tcpContextException);
+                } catch (IOException ioException) {
+                    shutdownConnection(session, tcpContext, ioException);
                 }
             }
 
@@ -120,8 +118,8 @@ public class TCPSourceHandler implements IOEventDispatch {
                 session.close();
             }
 
-        } catch (IOException e) {
-            shutdownConnection(session, tcpContext, e);
+        } catch (IOException ioException) {
+            shutdownConnection(session, tcpContext, ioException);
         }
     }
 
@@ -150,8 +148,8 @@ public class TCPSourceHandler implements IOEventDispatch {
         try {
             session.channel().write(outputBuffer);
 
-        } catch (IOException e) {
-            shutdownConnection(session, tcpContext, e);
+        } catch (IOException ioException) {
+            shutdownConnection(session, tcpContext, ioException);
         }
 
         if (tcpContext.getCodec().isWriteComplete()) {
@@ -168,27 +166,25 @@ public class TCPSourceHandler implements IOEventDispatch {
     }
 
     @Override public void timeout(IOSession session) {
-
         TCPContext tcpContext = (TCPContext) session.getAttribute(InboundTCPConstants.TCP_CONTEXT);
         shutdownConnection(session, tcpContext, null);
     }
 
     @Override public void disconnected(IOSession session) {
-
         TCPContext tcpContext = (TCPContext) session.getAttribute(InboundTCPConstants.TCP_CONTEXT);
         shutdownConnection(session, tcpContext, null);
     }
 
-    private void shutdownConnection(IOSession session, TCPContext tcpContext, Exception e) {
-        if (e != null) {
-            handleException(session, tcpContext, e);
+    private void shutdownConnection(IOSession session, TCPContext tcpContext, Exception exception) {
+        if (exception != null) {
+            handleException(session, tcpContext, exception);
         }
         bufferFactory.release(inputBuffer);
         bufferFactory.release(outputBuffer);
         session.close();
     }
 
-    private void handleException(IOSession session, TCPContext tcpContext, Exception e) {
-        log.error("Exception caught while in Inbound TCP IO handler. Cause: ", e);
+    private void handleException(IOSession session, TCPContext tcpContext, Exception exception) {
+        log.error("Exception caught while in Inbound TCP IO handler. Cause: ", exception);
     }
 }

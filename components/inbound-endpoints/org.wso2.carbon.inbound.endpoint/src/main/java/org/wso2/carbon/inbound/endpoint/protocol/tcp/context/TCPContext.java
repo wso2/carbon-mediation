@@ -43,6 +43,7 @@ public class TCPContext {
     private StringBuffer requestBuffer;
     private StringBuffer responseBuffer;
 
+    //stores the tcp payload
     private ByteArrayOutputStream baos;
 
     private String tcpMessage;
@@ -53,7 +54,7 @@ public class TCPContext {
 
     private long requestTime;
     private int expiry;
-    private boolean validateMessage;
+    //private boolean validateMessage;
 
     private volatile boolean markForClose = false;
 
@@ -143,10 +144,7 @@ public class TCPContext {
     }
 
     public boolean isExpired() {
-        if (System.currentTimeMillis() > requestTime + expiry) {
-            return true;
-        }
-        return false;
+        return System.currentTimeMillis() > requestTime + expiry;
     }
 
     public BufferFactory getBufferFactory() {

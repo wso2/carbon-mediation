@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is responsible for monitor all IO events regarding to TCP Inbound endpoints
+ * each IO event is notified to TCPMultiIOHandler.
  */
 
 public class InboundTCPIOReactor {
@@ -65,11 +66,11 @@ public class InboundTCPIOReactor {
             @Override public void run() {
                 try {
                     isStarted = true;
-                    log.info("TCP Inbound Transport IO Reactor Started");
                     reactor.execute(new TCPMultiIOHandler(processorMap));
-                } catch (IOException e) {
+                    log.info("TCP Inbound Transport IO Reactor Started");
+                } catch (IOException ioException) {
                     isStarted = false;
-                    log.error("Error while starting the TCP Inbound Transport IO Reactor.", e);
+                    log.error("Error while starting the TCP Inbound Transport IO Reactor.", ioException);
                 }
             }
         });
@@ -82,16 +83,16 @@ public class InboundTCPIOReactor {
             reactor.shutdown();
             endpointMap.clear();
             isStarted = false;
-        } catch (IOException e) {
-            log.error("Error while shutting down TCP Inbound Transport IO Reactor. ", e);
+        } catch (IOException ioException) {
+            log.error("Error while shutting down TCP Inbound Transport IO Reactor. ", ioException);
         }
     }
 
     public static void pause() {
         try {
             reactor.pause();
-        } catch (IOException e) {
-            log.error("Error while pausing TCP Inbound Transport IO Reactor. ", e);
+        } catch (IOException ioException) {
+            log.error("Error while pausing TCP Inbound Transport IO Reactor. ", ioException);
         }
     }
 
@@ -102,37 +103,37 @@ public class InboundTCPIOReactor {
             return false;
         }
 
-        ListenerEndpoint ep = reactor.listen(getSocketAddress(port));
+        ListenerEndpoint listenerEndpoint = reactor.listen(getSocketAddress(port));
 
         try {
-            ep.waitFor();
-            endpointMap.put(port, ep);
+            listenerEndpoint.waitFor();
+            endpointMap.put(port, listenerEndpoint);
             processorMap.put(port, processor);
             return true;
-        } catch (InterruptedException e) {
-            log.error("Error while starting a new TCP Inbound Listener on port " + port + ". ", e);
+        } catch (InterruptedException interruptedException) {
+            log.error("Error while starting a new TCP Inbound Listener on port " + port + ". ", interruptedException);
             return false;
         }
     }
 
     private static boolean isPortAvailable(int port) {
         try {
-            ServerSocket ss = new ServerSocket(port);
-            ss.close();
+            ServerSocket serverSocket = new ServerSocket(port);
+            serverSocket.close();
             return true;
-        } catch (IOException e) {
+        } catch (IOException ioException) {
             return false;
         }
     }
 
     public static boolean unbind(int port) {
-        ListenerEndpoint ep = endpointMap.get(port);
+        ListenerEndpoint listenerEndpoint = endpointMap.get(port);
         endpointMap.remove(port);
         processorMap.remove(port);
-        if (ep == null) {
+        if (listenerEndpoint == null) {
             return false;
         }
-        ep.close();
+        listenerEndpoint.close();
         return true;
     }
 

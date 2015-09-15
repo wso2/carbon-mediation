@@ -138,7 +138,7 @@ public class TCPProcessor implements InboundResponseSender {
                     decodeMode = InboundTCPConstants.DECODE_BY_LENGTH;
                     log.info("decode by message length");
                 }
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException numberFormatException) {
                 msgLength = -1;
             }
 
@@ -162,32 +162,40 @@ public class TCPProcessor implements InboundResponseSender {
 
         try {
             synCtx = TCPMessageUtils.createSynapseMessageContext(tcpContext, params);
-        } catch (AxisFault e) {
-            log.error("Could not generate Synapse Message Context", e);
+        } catch (AxisFault axisFault) {
+            log.error("Could not generate Synapse Message Context", axisFault);
         }
 
-        tcpContext.setMessageId(synCtx.getMessageID());
-        synCtx.setProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID, synCtx.getMessageID());
+        if (synCtx != null) {
+            tcpContext.setMessageId(synCtx.getMessageID());
+            synCtx.setProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID, synCtx.getMessageID());
+            //We need response invocation through this processor. set tcpContext and inbound response worker
+            synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
 
-        //We need response invocation through this processor. set tcpContext and inbound response worker
-        synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
+            if (!oneWayMessaging) {
+                synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
+                synCtx.setProperty(InboundTCPConstants.TCP_CONTEXT, tcpContext);
+            }
 
-        if (!oneWayMessaging) {
-            synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
-            synCtx.setProperty(InboundTCPConstants.TCP_CONTEXT, tcpContext);
         }
 
         //addProperties(synCtx, tcpContext);
 
-        SequenceMediator injectSeq =
-                (SequenceMediator) synCtx.getEnvironment().getSynapseConfiguration().getSequence(inSequence);
-        injectSeq.setErrorHandler(onErrorSequence);
+        SequenceMediator injectSeq = null;
+        if (synCtx != null) {
+            injectSeq = (SequenceMediator) synCtx.getEnvironment().getSynapseConfiguration().getSequence(inSequence);
+        }
+        if (injectSeq != null) {
+            injectSeq.setErrorHandler(onErrorSequence);
+        }
 
         executorService = TCPExecutorServiceFactory.getExecutorService();
 
         if (timeOut > 0 && !oneWayMessaging) {
-            executorService
-                    .schedule(new TimeoutHandler(tcpContext, synCtx.getMessageID()), timeOut, TimeUnit.MILLISECONDS);
+            if (synCtx != null) {
+                executorService.schedule(new TimeoutHandler(tcpContext, synCtx.getMessageID()), timeOut,
+                                         TimeUnit.MILLISECONDS);
+            }
         }
 
         CallableTaskTCP task = new CallableTaskTCP(synCtx, injectSeq);
@@ -204,8 +212,8 @@ public class TCPProcessor implements InboundResponseSender {
 
         if (parameters.get(InboundTCPConstants.TCP_CHARSET_DECODER) != null) {
             axis2MsgCtx.setProperty(Axis2TCPConstants.TCP_MESSAGE_CHARSET,
-                                    ((CharsetDecoder) parameters.get(InboundTCPConstants.TCP_CHARSET_DECODER)).charset()
-                                                                                                              .displayName());
+                                    ((CharsetDecoder) parameters.get(InboundTCPConstants.TCP_CHARSET_DECODER))
+                                            .charset().displayName());
         }
     }
 

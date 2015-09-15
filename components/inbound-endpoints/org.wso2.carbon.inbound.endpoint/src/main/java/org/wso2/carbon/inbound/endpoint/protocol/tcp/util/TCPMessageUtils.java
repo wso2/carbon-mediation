@@ -18,17 +18,10 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.util;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMOutputFormat;
-import org.apache.axiom.om.impl.dom.factory.OMDOMFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
-import org.apache.axis2.builder.ApplicationXMLBuilder;
-import org.apache.axis2.builder.Builder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
@@ -56,9 +49,9 @@ import java.io.ByteArrayOutputStream;
 public class TCPMessageUtils {
     private static final Logger log = Logger.getLogger(TCPMessageUtils.class);
 
-    private static ConfigurationContext context;
+/*    private static ConfigurationContext context;
     private static SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
-    private static OMFactory omFactory = new OMDOMFactory();
+    private static OMFactory omFactory = new OMDOMFactory();*/
 
     public static MessageContext createSynapseMessageContext(TCPContext tcpContext, InboundProcessorParams params)
             throws AxisFault {
@@ -121,7 +114,7 @@ public class TCPMessageUtils {
         org.apache.axis2.context.MessageContext axis2MsgCtx =
                 ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx).getAxis2MessageContext();
 
-        Builder builder;
+/*        Builder builder;
 
         //Select message builder based on the message content type
         if (contentType == null || contentType.contains("xml")) {
@@ -131,15 +124,15 @@ public class TCPMessageUtils {
             builder = new ApplicationXMLBuilder();
         }
 
-        OMElement documentElement = null;
+        OMElement documentElement = null;*/
 
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
         SOAPEnvelope envelope = null;
         try {
             envelope = TransportUtils.createSOAPMessage(axis2MsgCtx, bais, contentType);
-        } catch (XMLStreamException e) {
-            log.error(e);
+        } catch (XMLStreamException xmlStreamException) {
+            log.error(xmlStreamException);
         }
 
         return envelope;

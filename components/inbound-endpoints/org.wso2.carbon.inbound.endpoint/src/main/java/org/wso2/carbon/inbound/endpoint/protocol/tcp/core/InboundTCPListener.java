@@ -45,8 +45,9 @@ public class InboundTCPListener implements InboundRequestProcessor {
         try {
             tcpPort = params.getProperties().getProperty(InboundTCPConstants.INBOUND_TCP_PORT);
             this.port = Integer.parseInt(tcpPort);
-        } catch (NumberFormatException e) {
-            log.error("The port number : " + tcpPort + " is not an integer. TCP inbound endpoint not started.", e);
+        } catch (NumberFormatException numberFormatException) {
+            log.error("The port number : " + tcpPort + " is not an integer. TCP inbound endpoint not started.",
+                      numberFormatException);
         }
     }
 
@@ -55,8 +56,8 @@ public class InboundTCPListener implements InboundRequestProcessor {
             if (!InboundTCPIOReactor.isStarted()) {
                 try {
                     InboundTCPIOReactor.start();
-                } catch (IOReactorException e) {
-                    log.error("Inbound TCP IOReactor startup error: ", e);
+                } catch (IOReactorException ioReactorException) {
+                    log.error("Inbound TCP IOReactor startup error: ", ioReactorException);
                     return;
                 }
             }
@@ -79,9 +80,9 @@ public class InboundTCPListener implements InboundRequestProcessor {
             ServerSocket ss = new ServerSocket(port);
             ss.close();
             return true;
-        } catch (IOException e) {
+        } catch (IOException ioException) {
             log.error("Port : " + port + " is used by another application. Please select a different port for the " +
-                      "TCP inbound endpoint.", e);
+                      "TCP inbound endpoint.", ioException);
             return false;
         }
     }
