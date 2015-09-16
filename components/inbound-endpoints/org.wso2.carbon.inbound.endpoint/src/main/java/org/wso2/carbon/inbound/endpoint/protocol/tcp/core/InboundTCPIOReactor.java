@@ -67,7 +67,6 @@ public class InboundTCPIOReactor {
                 try {
                     isStarted = true;
                     reactor.execute(new TCPMultiIOHandler(processorMap));
-                    log.info("TCP Inbound Transport IO Reactor Started");
                 } catch (IOException ioException) {
                     isStarted = false;
                     log.error("Error while starting the TCP Inbound Transport IO Reactor.", ioException);

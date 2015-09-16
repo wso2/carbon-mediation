@@ -121,14 +121,14 @@ public class TCPProcessor implements InboundResponseSender {
 
                 if (header[0] > 0 && trailer1[0] > 0 && trailer2[0] > 0) {
                     decodeMode = InboundTCPConstants.DECODE_BY_HEADER_TRAILER;
-                    log.info("decode by header & trailer");
+                    log.info("Decode by header & trailer");
                 }
             }
             //tag mode
             tag = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_TAG);
             if (!tag.isEmpty() && decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
                 decodeMode = InboundTCPConstants.DECODE_BY_TAG;
-                log.info("decode by enclosure tag : " + tag);
+                log.info("Decode by enclosure tag : " + tag);
             }
 
             //length mode
@@ -136,7 +136,7 @@ public class TCPProcessor implements InboundResponseSender {
                 msgLength = Integer.parseInt(params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_LENGTH));
                 if (msgLength > 0 && decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
                     decodeMode = InboundTCPConstants.DECODE_BY_LENGTH;
-                    log.info("decode by message length");
+                    log.info("Decode by message length : " + msgLength);
                 }
             } catch (NumberFormatException numberFormatException) {
                 msgLength = -1;

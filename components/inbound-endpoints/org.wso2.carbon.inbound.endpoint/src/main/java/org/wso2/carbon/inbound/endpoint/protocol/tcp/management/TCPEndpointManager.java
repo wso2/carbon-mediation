@@ -73,7 +73,6 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
     }
 
     public boolean startEndpoint(int port, String name, InboundProcessorParams params) {
-        log.info("Starting TCP Inbound Endpoint on port " + port);
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
@@ -83,7 +82,7 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
         String epName = dataStore.getListeningEndpointName(port, tenantDomain);
         if (epName != null) {
             if (epName.equalsIgnoreCase(name)) {
-                log.info(epName + ": TCP Inbound Endpoint is already started in port : " + port);
+                log.info(": TCP Inbound Endpoint : " + epName + " is already started in port : " + port);
             } else {
                 String msg = "Another endpoint named : " + epName + " is currently using this port: " + port;
                 log.warn(msg);
@@ -93,6 +92,7 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
             dataStore.registerListeningEndpoint(port, tenantDomain,
                                                 InboundRequestProcessorFactoryImpl.Protocols.tcp.toString(), name,
                                                 params);
+            log.info("TCP Endpoint : " + name + " is starting on port : " + port);
             return startListener(port, name, params);
         }
 
