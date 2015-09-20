@@ -451,7 +451,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 		try {
 			MBeanServer mserver = getMBeanServer();
 			ObjectName cacheMBeanObjName = new ObjectName(objectName);
-			Set set = mserver.queryNames(new ObjectName(objectName), null);
+			Set<ObjectName> set = mserver.queryNames(new ObjectName(objectName), null);
 			if (set.isEmpty()) {
 				MediatorCacheInvalidator cacheMBean = new MediatorCacheInvalidator(
 						PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(),

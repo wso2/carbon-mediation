@@ -199,8 +199,8 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
 				}
 			}
 
-			for (Iterator itr = elem.getChildrenWithName(IMPLEMENTATION_Q); itr.hasNext(); ) {
-				OMElement implElem = (OMElement) itr.next();
+			for (Iterator<OMElement> itr = elem.getChildrenWithName(IMPLEMENTATION_Q); itr.hasNext(); ) {
+				OMElement implElem = itr.next();
 				OMAttribute typeAttr = implElem.getAttribute(ATT_TYPE);
 				OMAttribute sizeAttr = implElem.getAttribute(ATT_SIZE);
 				if (typeAttr != null && typeAttr.getAttributeValue() != null) {

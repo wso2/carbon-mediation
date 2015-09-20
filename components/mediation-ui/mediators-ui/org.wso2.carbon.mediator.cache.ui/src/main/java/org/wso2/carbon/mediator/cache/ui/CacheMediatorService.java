@@ -24,22 +24,56 @@ import org.wso2.carbon.mediator.service.ui.Mediator;
  */
 public class CacheMediatorService extends AbstractMediatorService {
 
+	/**
+	 * This gives the mediator serialization tag local name.
+	 *
+	 * @return tag local name of the mediator tag QName
+	 */
     public String getTagLocalName() {
         return "cache";
     }
 
+	/**
+	 * This gives the display name for the mediator in the add mediator menu, and this can
+	 * be any {@link String}. It is recommended to put a meaning full descriptive short name
+	 * as the display name
+	 *
+	 * @return display name in the add mediator menu of the mediator
+	 */
     public String getDisplayName() {
         return "Cache";
     }
 
+	/**
+	 * This should be equivalent to {@link org.apache.synapse.Mediator#getType()} of the
+	 * mediator. The value of this is generally the class name without the package declaration.
+	 *
+	 * @return logical name of the mediator
+	 */
     public String getLogicalName() {
         return "CacheMediator";
     }
 
+	/**
+	 * Gives the mediator categorization in the add mediator menu. This should be a descriptive
+	 * meaning full and short text and it is recommended to use existing group names if possible,
+	 * to reduce the number of groups in the add mediator menu. it is possible to add a new group by putting any
+	 * String to this.
+	 *
+	 * @return group name of the mediator to which this mediator is categorized in the
+	 *      add mediator menu
+	 */
     public String getGroupName() {
         return "Advanced";
     }
 
+	/**
+	 * Retrieves a default new mediator instances of the representing mediator. This method
+	 * is used by the mediator addition and will be called to get a new instance of the
+	 * mediator.
+	 *
+	 * @return new instance of the mediator with the default values filled
+	 */
     public Mediator getMediator() {
         return new CacheMediator();
     }
