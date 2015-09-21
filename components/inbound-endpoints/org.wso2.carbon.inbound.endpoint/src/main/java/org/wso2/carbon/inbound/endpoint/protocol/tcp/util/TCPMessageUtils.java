@@ -28,7 +28,7 @@ import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportUtils;
-import org.apache.axis2.transport.http.ApplicationXMLFormatter;
+import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
@@ -44,27 +44,29 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 /**
- *
+ * Message Transformation between TCPMessageContext & SynapseMessageContext
  */
 public class TCPMessageUtils {
     private static final Logger log = Logger.getLogger(TCPMessageUtils.class);
 
-/*    private static ConfigurationContext context;
-    private static SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
-    private static OMFactory omFactory = new OMDOMFactory();*/
-
+    /**
+     * Create synapse message context from TCPMessageContext
+     *
+     * @param tcpContext TCP Message related parameters per client basis
+     * @param params     TCP message processing parameters
+     * @return Synapse Message context
+     * @throws AxisFault
+     */
     public static MessageContext createSynapseMessageContext(TCPContext tcpContext, InboundProcessorParams params)
             throws AxisFault {
         MessageContext synCtx = createSynapseMessageContext(
                 params.getProperties().getProperty(InboundTCPConstants.TCP_INBOUND_TENANT_DOMAIN));
         synCtx.setEnvelope(createEnvelope(synCtx, tcpContext.getBaos(), params));
-
         return synCtx;
     }
 
     // Create Synapse Message Context
     private static org.apache.synapse.MessageContext createSynapseMessageContext(String tenantDomain) throws AxisFault {
-
         // Create super tenant message context
         org.apache.axis2.context.MessageContext axis2MsgCtx = createAxis2MessageContext();
         ServiceContext svcCtx = new ServiceContext();
@@ -76,11 +78,8 @@ public class TCPMessageUtils {
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
             ConfigurationContext tenantConfigCtx =
                     TenantAxisUtils.getTenantConfigurationContext(tenantDomain, axis2MsgCtx.getConfigurationContext());
-
             axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
-
             axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
-
         }
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }
@@ -92,12 +91,9 @@ public class TCPMessageUtils {
         axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
         axis2MsgCtx.setConfigurationContext(
                 ServiceReferenceHolder.getInstance().getConfigurationContextService().getServerConfigContext());
-
         // Axis2 spawns a new threads to send a message if this is TRUE
         axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING, Boolean.FALSE);
-
         axis2MsgCtx.setServerSide(true);
-
         return axis2MsgCtx;
     }
 
@@ -106,35 +102,18 @@ public class TCPMessageUtils {
                                                InboundProcessorParams params) throws AxisFault {
 
         String contentType = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_CONTENT_TYPE);
-
         if (log.isDebugEnabled()) {
             log.debug("Starting TCP Message Building, message content type : " + contentType);
         }
-
         org.apache.axis2.context.MessageContext axis2MsgCtx =
                 ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx).getAxis2MessageContext();
-
-/*        Builder builder;
-
-        //Select message builder based on the message content type
-        if (contentType == null || contentType.contains("xml")) {
-            log.debug("No content type specified. Using ApplicationXMLBuilder.");
-            builder = new ApplicationXMLBuilder();
-        } else {
-            builder = new ApplicationXMLBuilder();
-        }
-
-        OMElement documentElement = null;*/
-
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-
         SOAPEnvelope envelope = null;
         try {
             envelope = TransportUtils.createSOAPMessage(axis2MsgCtx, bais, contentType);
         } catch (XMLStreamException xmlStreamException) {
             log.error(xmlStreamException);
         }
-
         return envelope;
     }
 
@@ -142,34 +121,30 @@ public class TCPMessageUtils {
         return Integer.valueOf(params.getProperties().getProperty(key));
     }
 
+    /**
+     * Convert synapse response message to byte array
+     *
+     * @param messageContext synapse msg context
+     * @param params         Inbound End point parameters
+     * @return response message in bytes
+     */
     public static byte[] payloadToTCPMessage(MessageContext messageContext, InboundProcessorParams params) {
-        // public byte[] getBytes(MessageContext msgCtxt, OMOutputFormat format) method is used to
-        //get the msg content type get a new formatter.
         String contentType = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_CONTENT_TYPE);
-
-        MessageFormatter formatter;
-        if (contentType.equals("application/xml")) {
-            formatter = new ApplicationXMLFormatter();
-        } else {
-            formatter = new ApplicationXMLFormatter();
-        }
-
-        OMOutputFormat format = new OMOutputFormat();
+        org.apache.axis2.context.MessageContext axis2MsgCtx =
+                ((org.apache.synapse.core.axis2.Axis2MessageContext) messageContext).getAxis2MessageContext();
+        MessageFormatter formatter = BaseUtils.getMessageFormatter(axis2MsgCtx);
+        OMOutputFormat format = BaseUtils.getOMOutputFormat(axis2MsgCtx);
         format.setContentType(contentType);
         format.setDoOptimize(false);
         format.setDoingSWA(false);
 
-        org.apache.axis2.context.MessageContext axis2MsgCtx =
-                ((org.apache.synapse.core.axis2.Axis2MessageContext) messageContext).getAxis2MessageContext();
-
-        byte[] message_bytes = new byte[0];
+        byte[] message_bytes;
         try {
             message_bytes = formatter.getBytes(axis2MsgCtx, format);
         } catch (AxisFault axisFault) {
+            message_bytes = new byte[0];
             axisFault.printStackTrace();
         }
-
         return message_bytes;
-
     }
 }

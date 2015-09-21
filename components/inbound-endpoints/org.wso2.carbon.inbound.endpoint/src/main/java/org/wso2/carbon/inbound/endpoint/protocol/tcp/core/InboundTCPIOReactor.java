@@ -111,6 +111,8 @@ public class InboundTCPIOReactor {
             return true;
         } catch (InterruptedException interruptedException) {
             log.error("Error while starting a new TCP Inbound Listener on port " + port + ". ", interruptedException);
+            //TODO
+            Thread.currentThread().interrupt();
             return false;
         }
     }

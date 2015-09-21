@@ -33,6 +33,9 @@ import org.wso2.carbon.inbound.endpoint.protocol.tcp.core.InboundTCPConstants;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.CharsetDecoder;
 
+/**
+ *
+ */
 public class TCPContext {
 
     private static final Logger log = Logger.getLogger(TCPContext.class);

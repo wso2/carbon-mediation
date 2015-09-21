@@ -28,11 +28,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * per connection/session IO event handler. IO reactor triggers each
  * event accordingly
  */
-
 public class TCPMultiIOHandler extends TCPSourceHandler {
     private static final Logger log = Logger.getLogger(TCPMultiIOHandler.class);
 
-    public ConcurrentHashMap<Integer, TCPSourceHandler> handlers = new ConcurrentHashMap<Integer, TCPSourceHandler>();
+    public ConcurrentHashMap<Integer, TCPSourceHandler> handlers = new ConcurrentHashMap<>();
 
     private ConcurrentHashMap<Integer, TCPProcessor> processorMap;
 
@@ -41,6 +40,11 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
         this.processorMap = processorMap;
     }
 
+    /**
+     * Invoked by IOReactor when a client is connected.
+     *
+     * @param session contain the client information unique to one client
+     */
     @Override public void connected(IOSession session) {
         InetSocketAddress remoteIsa = (InetSocketAddress) session.getRemoteAddress();
         InetSocketAddress localIsa = (InetSocketAddress) session.getLocalAddress();
@@ -49,12 +53,22 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
         handler.connected(session);
     }
 
+    /**
+     * Invoked by IOReactor when a client data is available.
+     *
+     * @param session contain the client information unique to one client
+     */
     @Override public void inputReady(IOSession session) {
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.inputReady(session);
     }
 
+    /**
+     * Invoked by IOReactor when a client data is ready to write.
+     *
+     * @param session contain the client information unique to one client
+     */
     @Override public void outputReady(IOSession session) {
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         TCPSourceHandler handler = handlers.get(isa.getPort());
@@ -66,9 +80,13 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.timeout(session);
         handlers.remove(handler);
-
     }
 
+    /**
+     * Invoked by IOReactor when a client is disconnected.
+     *
+     * @param session contain the client information unique to one client
+     */
     @Override public void disconnected(IOSession session) {
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         if (isa == null) {

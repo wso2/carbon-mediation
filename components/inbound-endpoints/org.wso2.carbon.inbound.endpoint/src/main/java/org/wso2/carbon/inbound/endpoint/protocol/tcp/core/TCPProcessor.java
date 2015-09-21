@@ -41,7 +41,6 @@ import java.util.concurrent.TimeUnit;
  * Decoded inbound TCP messages are handled here. messages will inject to the sequence,
  * send back message encoding is also done here.
  */
-
 public class TCPProcessor implements InboundResponseSender {
     private static final Logger log = Logger.getLogger(TCPProcessor.class);
 
@@ -89,22 +88,19 @@ public class TCPProcessor implements InboundResponseSender {
 
     public TCPProcessor(Map<String, Object> parameters) {
         this.parameters = parameters;
-
         params = (InboundProcessorParams) parameters.get(InboundTCPConstants.INBOUND_PARAMS);
         decideDecodeMode(params);
         inSequence = params.getInjectingSeq();
         onErrorSequence = params.getOnErrorSeq();
-
         timeOut = TCPMessageUtils.getInt(InboundTCPConstants.PARAM_TCP_TIMEOUT, params);
     }
 
     private void decideDecodeMode(InboundProcessorParams params) {
-
         if (Boolean.parseBoolean(params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_ONE_WAY))) {
             this.oneWayMessaging = true;
         }
 
-        //we have to decide the decode Mode which are (DECODE_BY_HEADER_TRAILER/DECODE_BY_TAG/DECODE_BY_LENGTH)
+        //we have to decide the decode Mode which are (DECODE_BY_HEADER_TRAILER/DECODE_BY_TAG)
         if (decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
             //header trailer mode
             String h = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_HEADER);
@@ -153,8 +149,11 @@ public class TCPProcessor implements InboundResponseSender {
         return parameters;
     }
 
-    // Prepare Synapse Context for message injection
-    // in tcpContext we have the decoded message as string,character encoding,tcp Message Content type
+    /**
+     * in TCPContext we have the decoded message as a stream,character encoding,tcp Message Content type
+     *
+     * @param tcpContext Stores the TCP message parameters per client
+     */
     public void processRequest(TCPContext tcpContext) {
         tcpContext.setRequestTime(System.currentTimeMillis());
 
@@ -176,10 +175,7 @@ public class TCPProcessor implements InboundResponseSender {
                 synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
                 synCtx.setProperty(InboundTCPConstants.TCP_CONTEXT, tcpContext);
             }
-
         }
-
-        //addProperties(synCtx, tcpContext);
 
         SequenceMediator injectSeq = null;
         if (synCtx != null) {
@@ -188,16 +184,13 @@ public class TCPProcessor implements InboundResponseSender {
         if (injectSeq != null) {
             injectSeq.setErrorHandler(onErrorSequence);
         }
-
         executorService = TCPExecutorServiceFactory.getExecutorService();
-
         if (timeOut > 0 && !oneWayMessaging) {
             if (synCtx != null) {
                 executorService.schedule(new TimeoutHandler(tcpContext, synCtx.getMessageID()), timeOut,
                                          TimeUnit.MILLISECONDS);
             }
         }
-
         CallableTaskTCP task = new CallableTaskTCP(synCtx, injectSeq);
         executorService.submit(task);
 
@@ -217,15 +210,19 @@ public class TCPProcessor implements InboundResponseSender {
         }
     }
 
+    /**
+     * When the response is available synapse will invoke sendBack method
+     *
+     * @param messageContext synapse message context
+     */
     @Override public void sendBack(MessageContext messageContext) {
-        TCPContext tcpContext = (TCPContext) messageContext.getProperty(InboundTCPConstants.TCP_CONTEXT);
 
+        TCPContext tcpContext = (TCPContext) messageContext.getProperty(InboundTCPConstants.TCP_CONTEXT);
         if (messageContext.getProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID) != null &&
             !tcpContext.getMessageId().equals(messageContext.getProperty(InboundTCPConstants.TCP_INBOUND_MSG_ID))) {
             log.warn("TCP Response ID does not match request ID. Response may have been received after timeout.");
             return;
         }
-
         tcpContext.setTcpResponseMsg(TCPMessageUtils.payloadToTCPMessage(messageContext, params));
         tcpContext.requestOutput();
     }
