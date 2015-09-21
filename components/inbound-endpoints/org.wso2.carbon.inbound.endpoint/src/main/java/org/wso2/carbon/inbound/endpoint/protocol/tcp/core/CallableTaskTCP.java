@@ -26,13 +26,12 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import java.util.concurrent.Callable;
 
 /**
- *
+ * Callable task which handle the message injection to synapse
  */
 public class CallableTaskTCP implements Callable<Boolean> {
     private static final Logger log = Logger.getLogger(CallableTaskTCP.class);
 
     private MessageContext requestMessageContext;
-
     private SequenceMediator injectingSequence;
     private SynapseEnvironment synapseEnvironment;
 
@@ -45,6 +44,5 @@ public class CallableTaskTCP implements Callable<Boolean> {
     @Override public Boolean call() throws Exception {
         // inject incoming message to synapse here
         return synapseEnvironment.injectInbound(requestMessageContext, injectingSequence, true);
-
     }
 }

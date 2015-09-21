@@ -64,9 +64,9 @@ public class TCPCodec {
         setCharsetDecoder(charsetDecoder);
     }
 
-    //here we decode the byte stream
-
     /**
+     * decoding messasges from byte stream
+     *
      * @param byteBuffer received byte buffer from
      * @param context    tcp message context
      * @return if one tcp message is decoded return 1
@@ -278,7 +278,6 @@ public class TCPCodec {
 
     public void resetState() {
         this.state = READ_HEADER;
-
     }
 
     public boolean isReadComplete() {

@@ -19,7 +19,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
 
 /**
- *
+ * TCP Context Exception
  */
 public class TCPContextException extends Exception {
     public TCPContextException() {

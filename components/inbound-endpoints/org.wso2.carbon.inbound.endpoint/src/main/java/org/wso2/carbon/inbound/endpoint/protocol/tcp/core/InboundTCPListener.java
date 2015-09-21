@@ -31,7 +31,6 @@ import java.net.ServerSocket;
  * Listener class for TCP Inbound Endpoint.which is triggered by inbound core
  * and responsible for start listening for TCP connections on given port.
  */
-
 public class InboundTCPListener implements InboundRequestProcessor {
 
     private static final Logger log = Logger.getLogger(InboundTCPListener.class);

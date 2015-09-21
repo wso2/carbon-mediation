@@ -36,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * This is responsible for monitor all IO events regarding to TCP Inbound endpoints
  * each IO event is notified to TCPMultiIOHandler.
  */
-
 public class InboundTCPIOReactor {
 
     private static final Logger log = Logger.getLogger(InboundTCPIOReactor.class);
@@ -54,11 +53,9 @@ public class InboundTCPIOReactor {
     }
 
     public static void start() throws IOReactorException {
-
         if (reactor != null && reactor.getStatus().equals(IOReactorStatus.ACTIVE)) {
             return;
         }
-
         IOReactorConfig config = getDefaultReactorConfig();
         reactor = new DefaultListeningIOReactor(config);
 
@@ -73,7 +70,6 @@ public class InboundTCPIOReactor {
                 }
             }
         });
-
         reactorThread.start();
     }
 

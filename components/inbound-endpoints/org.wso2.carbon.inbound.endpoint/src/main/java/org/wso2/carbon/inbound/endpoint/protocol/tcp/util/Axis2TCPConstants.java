@@ -19,7 +19,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.util;
 
 /**
- *
+ * Axis2 & TCPContext message convertion
  */
 public class Axis2TCPConstants {
     public static final String TCP_MESSAGE_OBJECT = "TCP_MESSAGE_OBJECT";

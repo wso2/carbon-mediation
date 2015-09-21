@@ -29,25 +29,19 @@ import java.nio.charset.CharsetDecoder;
 /**
  * Create TCP context to store TCP message parameters
  */
-
 public class TCPContextFactory {
     public static TCPContext createTCPContext(IOSession session, TCPProcessor processor) {
-        InboundProcessorParams inboundParams =
-                (InboundProcessorParams) processor.getInboundParameterMap().get(InboundTCPConstants.INBOUND_PARAMS);
-
         CharsetDecoder decoder =
                 (CharsetDecoder) processor.getInboundParameterMap().get(InboundTCPConstants.TCP_CHARSET_DECODER);
-
         BufferFactory bufferFactory =
                 (BufferFactory) processor.getInboundParameterMap().get(InboundTCPConstants.INBOUND_TCP_BUFFER_FACTORY);
 
         //adding inbound params to TCPContext
         InboundProcessorParams params =
                 (InboundProcessorParams) processor.getInboundParameterMap().get(InboundTCPConstants.INBOUND_PARAMS);
-
         TCPContext tcpContext = new TCPContext(session, decoder, bufferFactory, params);
 
-        //setting the TCP decoding mode parameters loaded at the startup
+        //setting the TCP decoding mode parameters
         tcpContext.getCodec().setDecodeMode(processor.getDecodeMode());
         switch (processor.getDecodeMode()) {
             case InboundTCPConstants.DECODE_BY_HEADER_TRAILER: {
@@ -63,7 +57,6 @@ public class TCPContextFactory {
                 tcpContext.getCodec().setMsgLength(processor.getMsgLength());
             }
         }
-
         return tcpContext;
     }
 }

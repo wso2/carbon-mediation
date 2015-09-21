@@ -28,7 +28,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * loading the tcp.config file.
+ * loading the tcp.properties file from repository/conf
  */
 public class TCPConfiguration {
     private static final Logger log = Logger.getLogger(TCPConfiguration.class);

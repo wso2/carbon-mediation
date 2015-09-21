@@ -36,9 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This is responsible to manage Inbound end points individually each end point is bind to InboundTCPIOReactor.
+ * This is responsible to manage TCP inbound end points individually each end point is bind to InboundTCPIOReactor.
  */
-
 public class TCPEndpointManager extends AbstractInboundEndpointManager {
 
     private static final Logger log = Logger.getLogger(TCPEndpointManager.class);
@@ -60,7 +59,6 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
         if (params.getProperties().getProperty(InboundTCPConstants.TCP_INBOUND_TENANT_DOMAIN) == null) {
             params.getProperties().put(InboundTCPConstants.TCP_INBOUND_TENANT_DOMAIN, tenantDomain);
         }
-
         Map<String, Object> parameters = new HashMap<>();
         parameters.put(InboundTCPConstants.INBOUND_PARAMS, params);
         parameters.put(InboundTCPConstants.INBOUND_TCP_BUFFER_FACTORY,
@@ -68,8 +66,8 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
         validateParameters(params, parameters);
         TCPProcessor tcpProcessor = new TCPProcessor(parameters);
         parameters.put(InboundTCPConstants.TCP_REQ_PROC, tcpProcessor);
-        return InboundTCPIOReactor.bind(port, tcpProcessor);
 
+        return InboundTCPIOReactor.bind(port, tcpProcessor);
     }
 
     public boolean startEndpoint(int port, String name, InboundProcessorParams params) {
@@ -121,7 +119,6 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
             params.getProperties().setProperty(InboundTCPConstants.PARAM_TCP_TIMEOUT,
                                                String.valueOf(InboundTCPConstants.DEFAULT_TCP_TIMEOUT));
         }
-
         try {
             if (params.getProperties().getProperty(InboundTCPConstants.PARAM_TCP_CHARSET) == null) {
                 params.getProperties().setProperty(InboundTCPConstants.PARAM_TCP_CHARSET,
@@ -139,5 +136,4 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
                       "UTF-8 will be used instead.", unsupportedCharsetException);
         }
     }
-
 }

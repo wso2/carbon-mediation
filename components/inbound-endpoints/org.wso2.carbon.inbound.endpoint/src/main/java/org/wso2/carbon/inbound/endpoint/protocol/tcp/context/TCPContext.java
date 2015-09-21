@@ -18,10 +18,6 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.context;
 
-/**
- * TCP message related parameters are stored here.
- */
-
 import org.apache.http.nio.reactor.EventMask;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.log4j.Logger;
@@ -34,7 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.CharsetDecoder;
 
 /**
- *
+ * TCP message related parameters are stored here.
  */
 public class TCPContext {
 
@@ -57,7 +53,6 @@ public class TCPContext {
 
     private long requestTime;
     private int expiry;
-    //private boolean validateMessage;
 
     private volatile boolean markForClose = false;
 
