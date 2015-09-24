@@ -307,11 +307,11 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                                         String libraryPackage = artifactName.substring(1, artifactName.lastIndexOf("}"));
                                         updateStatus(artifactName, libName, libraryPackage, ServiceBusConstants.ENABLED, axisConfig);
                                     }
-                                } else {
-                                    log.error("Error while getting qualified name of the synapse library.");
                                 }
                             } catch (AxisFault axisFault) {
                                 log.error("Unable to update status for the synapse library : " + axisFault.getMessage());
+                            } catch (NullPointerException nullException) {
+                                log.error("Error while getting qualified name of the synapse library : " + nullException.getMessage());
                             }
                         } catch (DeploymentException e) {
                             artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
@@ -467,14 +467,17 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 }
                 MediationPersistenceManager mp = getMediationPersistenceManager(axisConfig);
                 mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
+
             } else {
                 String message = "Unable to create a Synapse Import for :  " + xml;
                 handleException(log, message, null);
             }
+
         } catch (XMLStreamException e) {
             String message = "Unable to create a Synapse Import for :  " + xml;
             handleException(log, message, e);
         }
+
     }
 
     /**
@@ -666,6 +669,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 log.error("Error while setting " + ServiceBusConstants.SYNAPSE_CONFIG_LOCK);
             }
         }
+
         return null;
     }
 
@@ -775,6 +779,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             FileUtils.deleteQuietly(new File(faultXMLPath));
             FileUtils.writeStringToFile(new File(faultXMLPath), FAULT_XML);
         }
+
         return isMainOrFault;
     }
 
@@ -819,6 +824,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                       "be deployed. But " + files.size() + " files found.");
             return false;
         }
+
         return true;
     }
 
@@ -962,6 +968,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             ((AbstractSynapseArtifactDeployer) deployer).setCustomLogContentNull();
         }
     }
+
 }
 
 
