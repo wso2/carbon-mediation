@@ -1,19 +1,19 @@
-/**
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+/*
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ * /
  */
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.management;
@@ -52,7 +52,14 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
         return instance;
     }
 
-    //new endpoints will be bound to IO Reactor
+    /**
+     * New endpoint port will be bound to IO Reactor
+     *
+     * @param port   port
+     * @param name   endpoint name
+     * @param params endpoint parameters
+     * @return true if reactor binding is successful
+     */
     public boolean startListener(int port, String name, InboundProcessorParams params) {
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
@@ -70,6 +77,14 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
         return InboundTCPIOReactor.bind(port, tcpProcessor);
     }
 
+    /**
+     * Registering & starting endpoint
+     *
+     * @param port  port
+     * @param name  endpoint name
+     * @param params
+     * @return
+     */
     public boolean startEndpoint(int port, String name, InboundProcessorParams params) {
 
         PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
@@ -97,7 +112,13 @@ public class TCPEndpointManager extends AbstractInboundEndpointManager {
         return false;
     }
 
-    @Override public void closeEndpoint(int port) {
+    /**
+     * when endpoint is closing remove endpoint from the map
+     *
+     * @param port  port of the endpoint
+     */
+    @Override
+    public void closeEndpoint(int port) {
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = cc.getTenantDomain();
         dataStore.unregisterListeningEndpoint(port, tenantDomain);

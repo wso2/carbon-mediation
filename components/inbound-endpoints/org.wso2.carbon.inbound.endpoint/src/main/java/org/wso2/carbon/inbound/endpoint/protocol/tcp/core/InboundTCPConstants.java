@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ * /
  */
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
@@ -50,8 +50,6 @@ public class InboundTCPConstants {
 
     public final static String TCP_CONTEXT = "TCP_CONTEXT";
 
-    public final static int ONE_TCP_MESSAGE_IS_DECODED = 1;
-
     public final static String TCP_INBOUND_TENANT_DOMAIN = "TCP_INBOUND_TENANT_DOMAIN";
 
     public final static String INBOUND_PARAMS = "TCP_INBOUND_PARAMS";
@@ -70,6 +68,12 @@ public class InboundTCPConstants {
 
     public final static String TCP_INBOUND_MSG_ID = "TCP_INBOUND_MSG_ID";
 
+    public final static int ONE_TCP_MESSAGE_IS_DECODED = 1;
+
+    public final static int STILL_WORKING_ON_MESSAGE = 0;
+
+    public final static int NOTHING_TO_DECODE = -1;
+
     //TCP message decoding mode
     public final static int NOT_DECIDED_YET = 0;
 
@@ -86,13 +90,12 @@ public class InboundTCPConstants {
 
         public final static String CONNECT_TIMEOUT = "connect_timeout";
 
-        public final static String TCP_NO_DELAY = "tcp_no_delay";
         //Whether to send available data immediately rather than buffering it
-
-        public final static String SO_KEEP_ALIVE = "so_keep_alive";
+        public final static String TCP_NO_DELAY = "tcp_no_delay";
         //How long to keep the socket open to allow pending sends to complete
-
-        public final static String SO_TIMEOUT = "so_timeout";//The timeout for blocking socket operations.
+        public final static String SO_KEEP_ALIVE = "so_keep_alive";
+        //The timeout for blocking socket operations.
+        public final static String SO_TIMEOUT = "so_timeout";
 
         public final static String SELECT_INTERVAL = "select_interval";
 

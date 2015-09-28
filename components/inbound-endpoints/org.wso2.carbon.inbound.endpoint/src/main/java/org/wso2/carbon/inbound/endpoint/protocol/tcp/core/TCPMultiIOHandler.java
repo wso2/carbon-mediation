@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ * /
  */
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
@@ -30,9 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TCPMultiIOHandler extends TCPSourceHandler {
     private static final Logger log = Logger.getLogger(TCPMultiIOHandler.class);
-
     public ConcurrentHashMap<Integer, TCPSourceHandler> handlers = new ConcurrentHashMap<>();
-
     private ConcurrentHashMap<Integer, TCPProcessor> processorMap;
 
     public TCPMultiIOHandler(ConcurrentHashMap<Integer, TCPProcessor> processorMap) {
@@ -45,7 +43,8 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
      *
      * @param session contain the client information unique to one client
      */
-    @Override public void connected(IOSession session) {
+    @Override
+    public void connected(IOSession session) {
         InetSocketAddress remoteIsa = (InetSocketAddress) session.getRemoteAddress();
         InetSocketAddress localIsa = (InetSocketAddress) session.getLocalAddress();
         TCPSourceHandler handler = new TCPSourceHandler(processorMap.get(localIsa.getPort()));
@@ -58,7 +57,8 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
      *
      * @param session contain the client information unique to one client
      */
-    @Override public void inputReady(IOSession session) {
+    @Override
+    public void inputReady(IOSession session) {
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.inputReady(session);
@@ -69,13 +69,15 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
      *
      * @param session contain the client information unique to one client
      */
-    @Override public void outputReady(IOSession session) {
+    @Override
+    public void outputReady(IOSession session) {
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.outputReady(session);
     }
 
-    @Override public void timeout(IOSession session) {
+    @Override
+    public void timeout(IOSession session) {
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         TCPSourceHandler handler = handlers.get(isa.getPort());
         handler.timeout(session);
@@ -87,7 +89,8 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
      *
      * @param session contain the client information unique to one client
      */
-    @Override public void disconnected(IOSession session) {
+    @Override
+    public void disconnected(IOSession session) {
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
         if (isa == null) {
             return;

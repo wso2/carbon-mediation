@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
+ *  Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ * /
  */
 
 package org.wso2.carbon.inbound.endpoint.protocol.tcp.core;
@@ -32,9 +32,7 @@ import java.net.ServerSocket;
  * and responsible for start listening for TCP connections on given port.
  */
 public class InboundTCPListener implements InboundRequestProcessor {
-
     private static final Logger log = Logger.getLogger(InboundTCPListener.class);
-
     private int port;
     private InboundProcessorParams params;
 
@@ -50,7 +48,11 @@ public class InboundTCPListener implements InboundRequestProcessor {
         }
     }
 
-    @Override public void init() {
+    /**
+     * Initialise the inbound endpoint listener
+     */
+    @Override
+    public void init() {
         if (isPortAvailable(this.port)) {
             if (!InboundTCPIOReactor.isStarted()) {
                 try {
@@ -70,7 +72,8 @@ public class InboundTCPListener implements InboundRequestProcessor {
         TCPEndpointManager.getInstance().startEndpoint(port, params.getName(), params);
     }
 
-    @Override public void destroy() {
+    @Override
+    public void destroy() {
         TCPEndpointManager.getInstance().closeEndpoint(port);
     }
 
