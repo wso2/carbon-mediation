@@ -148,7 +148,7 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 		OMElement impEl = SynapseImportSerializer.serializeImport(synImport);
 		if (impEl != null) {
 			try {
-				SynapseImport synapseImport = configuration.getSynapseImports().get("{"+packageName+"}"+libName);
+				SynapseImport synapseImport = configuration.getSynapseImports().get("{" + packageName + "}" + libName);
 				OMElement imprtElem = createElement(impEl.toString());
 				if(synapseImport == null) {
 					synapseImport = SynapseImportFactory.createImport(imprtElem, null);
