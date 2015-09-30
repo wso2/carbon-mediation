@@ -122,19 +122,25 @@ public class SmooksMediator extends AbstractMediator {
 				if(disableResultPayload ==null || (disableResultPayload !=null && !disableResultPayload.equalsIgnoreCase("true")) ){
 					output.process(null, synCtx, synLog, result);
 				}
-				
-			} else {
-				// create an output stream for store the result
-				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-				StreamResult streamResult = new StreamResult(outputStream);
-				// filter the message through smooks
-				smooks.filterSource(executionContext, streamSource, streamResult);
-				// add result
-				if(disableResultPayload ==null || (disableResultPayload !=null && !disableResultPayload.equalsIgnoreCase("true")) ){
-					output.process(outputStream, synCtx, synLog, null);
-				}
-			}
-			if (transactionStarted) {
+
+            } else {
+                if (disableResultPayload == null ||
+                    (disableResultPayload != null && !disableResultPayload.equalsIgnoreCase("true"))) {
+                    // create an output stream for store the result
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    StreamResult streamResult = new StreamResult(outputStream);
+                    // filter the message through smooks with stream result
+                    smooks.filterSource(executionContext, streamSource, streamResult);
+
+                    // add result
+                    output.process(outputStream, synCtx, synLog, null);
+                } else {
+                    // filter the message through smooks without stream result
+                    smooks.filterSource(executionContext, streamSource);
+                }
+            }
+
+            if (transactionStarted) {
 				commitTransaction();
 				transactionStarted = false;
 			}
