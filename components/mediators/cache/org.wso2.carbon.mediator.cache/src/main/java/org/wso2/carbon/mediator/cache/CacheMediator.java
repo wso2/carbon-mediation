@@ -18,6 +18,7 @@
 package org.wso2.carbon.mediator.cache;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.cache.CacheBuilder;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -267,6 +268,12 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
 			} catch (XMLStreamException e) {
 				handleException("Unable to set the response to the Cache", e, synCtx);
+			} finally {
+				try {
+					outStream.close();
+				} catch (IOException e) {
+					handleException("Error occurred while closing the FixedByteArrayOutputStream ", e, synCtx);
+				}
 			}
 
 			if (response.getTimeout() > 0) {
@@ -339,20 +346,17 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 					if (msgCtx.isDoingREST()) {
 						if ((headerProperties = cachedResponse.getHeaderProperties()) != null) {
 
-							omSOAPEnv = SOAPMessageHelper
-									.buildSOAPEnvelopeFromBytes(responseEnvelop, cachedResponse.isSOAP11());
+							omSOAPEnv = SOAPMessageHelper.buildSOAPEnvelopeFromBytes(responseEnvelop, cachedResponse.isSOAP11());
 							msgCtx.removeProperty("NO_ENTITY_BODY");
 							msgCtx.removeProperty(Constants.Configuration.CONTENT_TYPE);
 							msgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
-							                   headerProperties
-									                   .get(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
+							                   headerProperties.get(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
 							msgCtx.setProperty(Constants.Configuration.MESSAGE_TYPE,
 							                   headerProperties.get(Constants.Configuration.MESSAGE_TYPE));
 						}
 
 					} else {
-						omSOAPEnv = SOAPMessageHelper
-								.buildSOAPEnvelopeFromBytes(responseEnvelop, msgCtx.isSOAP11());
+						omSOAPEnv = SOAPMessageHelper.buildSOAPEnvelopeFromBytes(responseEnvelop, msgCtx.isSOAP11());
 						//finally set soap envelope by obtaining built response envelope
 						cachedResponse.setResponseEnvelope(omSOAPEnv.toString().getBytes());
 					}
@@ -462,7 +466,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 		} catch (MalformedObjectNameException e) {
 			handleException("The format of the string does not correspond to a valid ObjectName.", e, msgCtx);
 		} catch (InstanceAlreadyExistsException e) {
-			handleException("MBean with the name "+objectName+" is already registered.", e, msgCtx);
+			handleException("MBean with the name " + objectName + " is already registered.", e, msgCtx);
 		} catch (NotCompliantMBeanException e) {
 			handleException("MBean implementation is not compliant with JMX specification standard MBean.", e, msgCtx);
 		} catch (MBeanRegistrationException e) {
@@ -495,15 +499,15 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 			return Caching.getCacheManagerFactory().getCacheManager(CachingConstants.CACHE_MANAGER)
 			              .getCache(CachingConstants.MEDIATOR_CACHE);
 		} else {
-			CacheManager cacheManager =
-					Caching.getCacheManagerFactory().getCacheManager(CachingConstants.CACHE_MANAGER);
+			CacheManager cacheManager = Caching.getCacheManagerFactory().getCacheManager(CachingConstants.CACHE_MANAGER);
 			mediatorCacheInit.getAndSet(true);
-
-			return cacheManager.<String, CachableResponse>createCacheBuilder(CachingConstants.MEDIATOR_CACHE).
-					setExpiry(CacheConfiguration.ExpiryType.MODIFIED, new CacheConfiguration.Duration(TimeUnit.SECONDS,
-					CachingConstants.CACHE_INVALIDATION_TIME)).setExpiry(CacheConfiguration.ExpiryType.ACCESSED,
-			        new CacheConfiguration.Duration(TimeUnit.SECONDS,CachingConstants.CACHE_INVALIDATION_TIME))
-			        .setStoreByValue(false).build();
+			CacheBuilder<String, CachableResponse> mediatorCacheBuilder = cacheManager.createCacheBuilder(CachingConstants.MEDIATOR_CACHE);
+			Cache<String, CachableResponse> cache = mediatorCacheBuilder.setExpiry(CacheConfiguration.ExpiryType.MODIFIED,
+			                                        new CacheConfiguration.Duration(TimeUnit.SECONDS, CachingConstants.CACHE_INVALIDATION_TIME))
+			                                        .setExpiry(CacheConfiguration.ExpiryType.ACCESSED,
+					                        new CacheConfiguration.Duration(TimeUnit.SECONDS, CachingConstants.CACHE_INVALIDATION_TIME))
+			                                        .setStoreByValue(false).build();
+			return cache;
 		}
 	}
 

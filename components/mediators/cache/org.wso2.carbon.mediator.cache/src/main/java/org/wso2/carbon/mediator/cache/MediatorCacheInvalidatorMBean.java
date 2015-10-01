@@ -26,6 +26,6 @@ public interface MediatorCacheInvalidatorMBean {
 	/**
 	 * This abstract method should be implemented to invalidate the total mediator Cache.
 	 */
-	public void invalidateMediatorCache();
+	void invalidateMediatorCache();
 
 }
