@@ -187,16 +187,14 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         try {
             if (jmsSpec11) {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-                	connection = ((QueueConnectionFactory) (this.connectionFactory))
-                            .createQueueConnection();
+                    connection = ((QueueConnectionFactory) (this.connectionFactory)).createQueueConnection();
                 } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-                	connection = ((TopicConnectionFactory) (this.connectionFactory))
-                            .createTopicConnection();
+                    connection = ((TopicConnectionFactory) (this.connectionFactory)).createTopicConnection();
                 }
                 if (isDurable) {
                     connection.setClientID(clientId);
-                }                
-	            return connection;
+                }
+                return connection;
             } else {
                 QueueConnectionFactory qConFac = null;
                 TopicConnectionFactory tConFac = null;                
