@@ -274,16 +274,13 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
     private void deploySynapseLibrary(List<Artifact.Dependency> artifacts,
                                       AxisConfiguration axisConfig) throws DeploymentException {
         for (Artifact.Dependency dependency : artifacts) {
-
             Artifact artifact = dependency.getArtifact();
             if (!validateArtifact(artifact)) {
                 continue;
             }
 
             if (SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE.equals(artifact.getType())) {
-
                 Deployer deployer = getSynapseLibraryDeployer(axisConfig);
-
                 if (deployer != null) {
                     artifact.setRuntimeObjectName(artifact.getName());
                     String fileName = artifact.getFiles().get(0).getName();
@@ -378,12 +375,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     synLib.unLoadLibrary();
                     undeployingLocalEntries(synLib, synapseConfiguration, axisConfig);
                 }
-
                 // update synapse configuration.
                 MediationPersistenceManager mp = getMediationPersistenceManager(axisConfig);
                 mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
             }
-
         } catch (Exception e) {
             String message = "Unable to update status for :  " + libQName;
             handleException(log, message, e);
@@ -492,13 +487,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
     }
 
     private void handleException(Log log, String message, Exception e) throws AxisFault {
-
         if (e == null) {
-
             AxisFault exception = new AxisFault(message);
             log.error(message, exception);
             throw exception;
-
         } else {
             message = message + " :: " + e.getMessage();
             log.error(message, e);
@@ -554,7 +546,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             }
 
             if (elem.getQName().getLocalPart().equals(XMLConfigConstants.ENTRY_ELT.getLocalPart())) {
-
                 String entryKey = elem.getAttributeValue(new QName("key"));
                 entryKey = entryKey.trim();
                 SynapseConfiguration synapseConfiguration = getSynapseConfiguration(axisConfig);
@@ -600,7 +591,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * @param axisConfig AxisConfiguration of the current tenant
      * */
     public boolean deleteEntry(String ele, AxisConfiguration axisConfig) {
-
         final Lock lock = getLock(axisConfig);
         String entryKey = null;
         try {
@@ -614,11 +604,9 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             }
 
             if (elem.getQName().getLocalPart().equals(XMLConfigConstants.ENTRY_ELT.getLocalPart())) {
-
                 entryKey = elem.getAttributeValue(new QName("key"));
                 entryKey = entryKey.trim();
                 log.debug("Adding local entry with key : " + entryKey);
-
                 SynapseConfiguration synapseConfiguration = getSynapseConfiguration(axisConfig);
                 Entry entry = synapseConfiguration.getDefinedEntries().get(entryKey);
                 if (entry != null) {
@@ -682,7 +670,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
     public void deleteImport(String importQualifiedName, AxisConfiguration axisConfig) throws AxisFault {
         try {
             SynapseConfiguration configuration = getSynapseConfiguration(axisConfig);
-
             assert configuration != null;
             if (configuration.getSynapseImports().containsKey(importQualifiedName)) {
                 SynapseImport synapseImport = configuration.removeSynapseImport(importQualifiedName);
@@ -697,10 +684,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     synLib.unLoadLibrary();
                     undeployingLocalEntries(synLib, configuration, axisConfig);
                 }
-
                 MediationPersistenceManager pm = getMediationPersistenceManager(axisConfig);
                 pm.deleteItem(synapseImport.getName(), fileName, ServiceBusConstants.ITEM_TYPE_IMPORT);
-
             }
         } catch (Exception e) {
             log.error("Error occured while deleting the synapse library import");
