@@ -389,7 +389,7 @@ public class ConfigurationUpdater {
                             newConfig.addEndpoint(oldName, oldEndpoints.get(oldName));
                         }
                     }
-                    log.info("The endpoint which you are updating is created as a new endpoint.");
+                    log.info("The endpoint which you are updating is created as a new endpoint: "+name);
                     newEndpoint.setFileName(name + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.ENDPOINTS_DIR, newEndpoint.getFileName(), name, newConfig);
                 }
@@ -420,7 +420,7 @@ public class ConfigurationUpdater {
                             newConfig.addSequence(oldName, oldSequences.get(oldName));
                         }
                     }
-                    log.info("The sequence which you are updating is created as a new sequence.");
+                    log.info("The sequence which you are updating is created as a new sequence: "+name);
                     SequenceMediator newSequence = sequences.get(name);
                     newSequence.setFileName(name + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, newSequence.getFileName(), name, newConfig);
@@ -452,9 +452,9 @@ public class ConfigurationUpdater {
                             newConfig.addProxyService(eachOldProxy.getName(), eachOldProxy);
                         }
                     }
-                    log.info("The proxy service which you are updating is created as a new proxy service.");
+                    log.info("The proxy service which you are updating is created as a new proxy service: "+proxy.getName());
                     proxy.setFileName(proxy.getName() + XML);
-                    addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, proxy.getFileName(), proxy.getName(), newConfig);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR, proxy.getFileName(), proxy.getName(), newConfig);
                 }
             }
         }
@@ -484,7 +484,7 @@ public class ConfigurationUpdater {
                             newConfig.addEntry(oldName, oldEntries.get(oldName));
                         }
                     }
-                    log.info("The local entry which you are updating is created as a new local entry.");
+                    log.info("The local entry which you are updating is created as a new local entry: "+name);
                     newEntry.setFileName(name + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR, newEntry.getFileName(), name, newConfig);
                 }
@@ -527,7 +527,7 @@ public class ConfigurationUpdater {
                             newConfig.addEventSource(eachOldEventSource.getName(), eachOldEventSource);
                         }
                     }
-                    log.info("The event source which you are updating is created as a new event source.");
+                    log.info("The event source which you are updating is created as a new event source: "+eventSource.getName());
                     eventSource.setFileName(eventSource.getName() + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.EVENTS_DIR, eventSource.getFileName(), eventSource.getName(), newConfig);
                 }
@@ -571,7 +571,7 @@ public class ConfigurationUpdater {
                             newConfig.addMessageStore(eachOldStore.getName(), eachOldStore);
                         }
                     }
-                    log.info("The message store which you are updating is created as a new message store.");
+                    log.info("The message store which you are updating is created as a new message store: "+store.getName());
                     store.setFileName(store.getName() + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR, store.getFileName(), store.getName(), newConfig);
                 }
@@ -604,7 +604,7 @@ public class ConfigurationUpdater {
                             newConfig.addMessageProcessor(eachOldProcessor.getName(), eachOldProcessor);
                         }
                     }
-                    log.info("The synapse import which you are updating is created as a new synapse import.");
+                    log.info("The message processor which you are updating is created as a new message processor: "+processor.getName());
                     processor.setFileName(processor.getName() + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR, processor.getFileName(), processor.getName(), newConfig);
                 }
@@ -635,7 +635,7 @@ public class ConfigurationUpdater {
                             newConfig.addSequenceTemplate(oldName, oldSequenceTemplates.get(oldName));
                         }
                     }
-                    log.info("The sequence template which you are updating is created as a new sequence template.");
+                    log.info("The sequence template which you are updating is created as a new sequence template: "+name);
                     TemplateMediator newSeqTemplate = sequenceTemplates.get(name);
                     newSeqTemplate.setFileName(name + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newSeqTemplate.getFileName(), name, newConfig);
@@ -667,7 +667,7 @@ public class ConfigurationUpdater {
                             newConfig.addEndpointTemplate(oldName, oldEndpointTemplates.get(oldName));
                         }
                     }
-                    log.info("The endpoint template which you are updating is created as a new endpoint template.");
+                    log.info("The endpoint template which you are updating is created as a new endpoint template: "+name);
                     Template newTemplate = endpointTemplates.get(name);
                     newTemplate.setFileName(name + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newTemplate.getFileName(), name, newConfig);
@@ -699,7 +699,7 @@ public class ConfigurationUpdater {
                             newConfig.addAPI(eachOldApi.getName(), eachOldApi);
                         }
                     }
-                    log.info("The API which you are updating is created as a new API.");
+                    log.info("The API which you are updating is created as a new API: "+api.getName());
                     api.setFileName(api.getName() + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
                 }
@@ -729,7 +729,7 @@ public class ConfigurationUpdater {
                             newConfig.addSynapseImport(oldName, oldImports.get(oldName));
                         }
                     }
-                    log.info("The synapse import which you are updating is created as a new synapse import.");
+                    log.info("The synapse import which you are updating is created as a new synapse import: "+name);
                     SynapseImport newImport = imports.get(name);
                     newImport.setFileName(name + XML);
                     addToDeploymentStore(MultiXMLConfigurationBuilder.SYNAPSE_IMPORTS_DIR, newImport.getFileName(), name, newConfig);
