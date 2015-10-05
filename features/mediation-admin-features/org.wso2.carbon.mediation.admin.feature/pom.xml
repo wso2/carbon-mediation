@@ -104,14 +104,14 @@
          <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.sequences.common</artifactId>
       </dependency>
-      <!--<dependency>-->
-         <!--<groupId>org.wso2.carbon.mediation</groupId>-->
-         <!--<artifactId>org.wso2.carbon.task</artifactId>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-         <!--<groupId>org.wso2.carbon.mediation</groupId>-->
-         <!--<artifactId>org.wso2.carbon.task.services</artifactId>-->
-      <!--</dependency>-->
+      <dependency>
+         <groupId>org.wso2.carbon.mediation</groupId>
+         <artifactId>org.wso2.carbon.task</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.wso2.carbon.mediation</groupId>
+         <artifactId>org.wso2.carbon.task.services</artifactId>
+      </dependency>
       <dependency>
          <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.mediation.ntask</artifactId>
@@ -171,8 +171,8 @@
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.rest.api</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences.common</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.sequences</bundleDef>
-                         <!--<bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.task</bundleDef>-->
-                         <!--<bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.task.services</bundleDef>-->
+                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.task</bundleDef>
+                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.task.services</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.ntask</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.ntaskadmin</bundleDef>
                          <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.inbound</bundleDef>
