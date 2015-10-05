@@ -378,7 +378,7 @@ public class InboundManagementClient {
             if (strLength != null) {
                 try {
                     iLength = Integer.parseInt(strLength);
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
                     iLength = null;
                 }
             }
@@ -417,7 +417,7 @@ public class InboundManagementClient {
             if (strLength != null) {
                 try {
                     iLength = Integer.parseInt(strLength);
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
                     iLength = null;
                 }
             }
