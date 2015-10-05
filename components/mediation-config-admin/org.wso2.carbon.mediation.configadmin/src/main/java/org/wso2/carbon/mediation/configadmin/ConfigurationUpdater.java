@@ -19,14 +19,11 @@
 package org.wso2.carbon.mediation.configadmin;
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerContextInformation;
@@ -36,9 +33,7 @@ import org.apache.synapse.commons.executors.PriorityExecutor;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
-import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
 import org.apache.synapse.config.xml.XMLConfigurationBuilder;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
@@ -58,14 +53,12 @@ import org.apache.synapse.message.processor.MessageProcessor;
 import org.apache.synapse.message.store.MessageStore;
 import org.apache.synapse.rest.API;
 import org.apache.synapse.task.TaskDescriptionRepository;
-import org.apache.synapse.task.TaskScheduler;
 import org.osgi.framework.ServiceRegistration;
 import org.wso2.carbon.CarbonConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.configadmin.util.ConfigHolder;
 import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
-import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationInitilizerException;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationUtils;
@@ -80,10 +73,7 @@ import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -107,7 +97,7 @@ public class ConfigurationUpdater {
     private AxisConfiguration axisCfg;
 
     private TaskDescriptionRepository taskRepository;
-    private TaskScheduler taskScheduler;
+    //private TaskScheduler taskScheduler;
     private static final String XML = ".xml";
 
     public ConfigurationUpdater(ServerContextInformation serverContextInformation,
@@ -156,16 +146,16 @@ public class ConfigurationUpdater {
 
         // We must get references to following task objects at this point
         // Once the SynapseConfiguration is destroyed they become unreachable
-        if (currentEnvironment.getTaskManager().isInitialized()) {
-            taskRepository = currentEnvironment.getTaskManager().getTaskDescriptionRepository();
-            taskScheduler = currentEnvironment.getTaskManager().getTaskScheduler();
-            TaskDescriptionRepository repository = currentEnvironment.getTaskManager()
-                    .getTaskDescriptionRepository();
-            if (repository != null) {
-                repository.clear();
-            }
-            currentEnvironment.getTaskManager().cleanup();
-        }
+//        if (currentEnvironment.getTaskManager().isInitialized()) {
+//            taskRepository = currentEnvironment.getTaskManager().getTaskDescriptionRepository();
+//            taskScheduler = currentEnvironment.getTaskManager().getTaskScheduler();
+//            TaskDescriptionRepository repository = currentEnvironment.getTaskManager()
+//                    .getTaskDescriptionRepository();
+//            if (repository != null) {
+//                repository.clear();
+//            }
+//            currentEnvironment.getTaskManager().cleanup();
+//        }
 
         log.trace("Stopping and undeploying proxy services");
         for (ProxyService proxyService : currentConfig.getProxyServices()) {
@@ -270,7 +260,7 @@ public class ConfigurationUpdater {
                     "to the AxisConfiguration", axisFault);
         }
 
-        synEnv.getTaskManager().init(taskRepository, taskScheduler, newConfig.getTaskManager());
+        //synEnv.getTaskManager().init(taskRepository, taskScheduler, newConfig.getTaskManager());
         Parameter suspendPersistence = new Parameter(ServiceBusConstants.SUSPEND_PERSISTENCE, "true");
         try {
             axisCfg.addParameter(suspendPersistence);
