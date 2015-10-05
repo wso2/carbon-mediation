@@ -73,9 +73,9 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <SYNAPSE_DEPLOYER-RequiredServices>
-                            org.wso2.carbon.task.service.TaskDeployerService
-                        </SYNAPSE_DEPLOYER-RequiredServices>
+                        <!--<SYNAPSE_DEPLOYER-RequiredServices>-->
+                            <!--org.wso2.carbon.task.service.TaskDeployerService-->
+                        <!--</SYNAPSE_DEPLOYER-RequiredServices>-->
                         <Private-Package>org.wso2.carbon.task.internal</Private-Package>
                         <Export-Package>
                             org.wso2.carbon.task.*
