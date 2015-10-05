@@ -146,10 +146,10 @@ public class ConfigurationManager {
             SynapseConfiguration oldSynapseConfiguration = getSynapseConfiguration();
             SynapseEnvironment oldSynapseEnvironment = getSynapseEnvironment();
 
-//            TaskDescriptionRepository repository = getSynapseEnvironment().getTaskManager().
-//                    getTaskDescriptionRepository();
-//            TaskScheduler taskScheduler = getSynapseEnvironment().getTaskManager().
-//                    getTaskScheduler();
+            TaskDescriptionRepository repository = getSynapseEnvironment().getTaskManager().
+                    getTaskDescriptionRepository();
+            TaskScheduler taskScheduler = getSynapseEnvironment().getTaskManager().
+                    getTaskScheduler();
 
             int loadLocation = 0;
 
@@ -254,7 +254,7 @@ public class ConfigurationManager {
 
             // initilze the configuration
             initializeConfiguration(synpaseConfigurationsRoot + File.separator + name,
-                    oldSynapseConfiguration, newSynapseConfiguration);
+                    oldSynapseConfiguration, newSynapseConfiguration, repository, taskScheduler);
 
             // initialize the persistence
             ConfigurationUtils.initPersistence(newSynapseConfiguration, registry,
@@ -436,12 +436,16 @@ public class ConfigurationManager {
      * @param configurationLocation file path which this configuration is based on
      * @param oldSynapseConfiguration previous synapse configuration
      * @param newSynapseConfiguration newly created synapse configuration     
+     * @param repository task repository
+     * @param taskScheduler @throws ConfigurationInitilizerException if an error occurs
      * @throws org.apache.axis2.AxisFault if an error occurs
      * @throws ConfigurationInitilizerException if an error occurs
      */
     private void initializeConfiguration(String configurationLocation,
                                          SynapseConfiguration oldSynapseConfiguration,
-                                         SynapseConfiguration newSynapseConfiguration)
+                                         SynapseConfiguration newSynapseConfiguration,
+                                         TaskDescriptionRepository repository,
+                                         TaskScheduler taskScheduler)
             throws ConfigurationInitilizerException, AxisFault {
         AxisConfiguration axisConfiguration = configurationContext.getAxisConfiguration();
         // Set the Axis2 ConfigurationContext to the SynapseConfiguration
@@ -539,8 +543,8 @@ public class ConfigurationManager {
             }
         }
 
-//		synEnv.getTaskManager().init(repository, taskScheduler,
-//				newSynapseConfiguration.getTaskManager());
+		synEnv.getTaskManager().init(repository, taskScheduler,
+				newSynapseConfiguration.getTaskManager());
         // init the synapse configuration
         newSynapseConfiguration.init(synEnv);
         synEnv.setInitialized(true);
