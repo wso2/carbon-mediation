@@ -33,6 +33,9 @@ import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.registry.Registry;
 import org.apache.synapse.registry.RegistryEntry;
+import org.apache.synapse.task.TaskConstants;
+import org.apache.synapse.task.TaskDescriptionRepository;
+import org.apache.synapse.task.TaskScheduler;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
@@ -59,6 +62,8 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.securevault.SecretCallbackHandlerService;
+import org.wso2.carbon.task.services.TaskDescriptionRepositoryService;
+import org.wso2.carbon.task.services.TaskSchedulerService;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -92,6 +97,14 @@ import java.util.concurrent.locks.ReentrantLock;
  * cardinality="1..1" policy="dynamic"
  * bind="setSynapseRegistryService" unbind="unsetSynapseRegistryService"
  * cardinality="1..1" policy="dynamic"
+ * @scr.reference name="task.description.repository.service"
+ * interface="org.wso2.carbon.task.services.TaskDescriptionRepositoryService"
+ * cardinality="1..1" policy="dynamic"
+ * bind="setTaskDescriptionRepositoryService" unbind="unsetTaskDescriptionRepositoryService"
+ * @scr.reference name="task.scheduler.service"
+ * interface="org.wso2.carbon.task.services.TaskSchedulerService"
+ * cardinality="1..1" policy="dynamic"
+ * bind="setTaskSchedulerService" unbind="unsetTaskSchedulerService"
  * @scr.reference name="secret.callback.handler.service"
  * interface="org.wso2.carbon.securevault.SecretCallbackHandlerService"
  * cardinality="1..1" policy="dynamic"
@@ -124,8 +137,8 @@ public class ServiceBusInitializer {
     private ConfigurationContextService configCtxSvc;
     private SynapseRegistryService synRegSvc;
     //    private DataSourceInformationRepositoryService dataSourceInformationRepositoryService;
-    //private TaskDescriptionRepositoryService repositoryService;
-    //private TaskSchedulerService taskSchedulerService;
+    private TaskDescriptionRepositoryService repositoryService;
+    private TaskSchedulerService taskSchedulerService;
     private SecretCallbackHandlerService secretCallbackHandlerService;
     private static EventBroker eventBroker;
 
@@ -404,16 +417,16 @@ public class ServiceBusInitializer {
             //                        repository);
             //            }
 
-//            if (taskSchedulerService != null) {
-//                TaskScheduler scheduler = taskSchedulerService.getTaskScheduler();
-//                contextInfo.addProperty(TaskConstants.TASK_SCHEDULER, scheduler);
-//            }
+            if (taskSchedulerService != null) {
+                TaskScheduler scheduler = taskSchedulerService.getTaskScheduler();
+                contextInfo.addProperty(TaskConstants.TASK_SCHEDULER, scheduler);
+            }
 
-//            if (repositoryService != null) {
-//                TaskDescriptionRepository repository
-//                        = repositoryService.getTaskDescriptionRepository();
-//                contextInfo.addProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY, repository);
-//            }
+            if (repositoryService != null) {
+                TaskDescriptionRepository repository
+                        = repositoryService.getTaskDescriptionRepository();
+                contextInfo.addProperty(TaskConstants.TASK_DESCRIPTION_REPOSITORY, repository);
+            }
 
             if (secretCallbackHandlerService != null) {
                 contextInfo.addProperty(SecurityConstants.PROP_SECRET_CALLBACK_HANDLER,
@@ -579,37 +592,37 @@ public class ServiceBusInitializer {
     //        this.dataSourceInformationRepositoryService = null;
     //    }
 
-//    protected void setTaskDescriptionRepositoryService(
-//            TaskDescriptionRepositoryService repositoryService) {
-//        if (log.isDebugEnabled()) {
-//            log.debug("TaskDescriptionRepositoryService bound to the ESB initialization process");
-//        }
-//        this.repositoryService = repositoryService;
-//    }
-//
-//    protected void unsetTaskDescriptionRepositoryService(
-//            TaskDescriptionRepositoryService repositoryService) {
-//        if (log.isDebugEnabled()) {
-//            log.debug("TaskDescriptionRepositoryService unbound from the ESB environment");
-//        }
-//        this.repositoryService = null;
-//    }
+    protected void setTaskDescriptionRepositoryService(
+            TaskDescriptionRepositoryService repositoryService) {
+        if (log.isDebugEnabled()) {
+            log.debug("TaskDescriptionRepositoryService bound to the ESB initialization process");
+        }
+        this.repositoryService = repositoryService;
+    }
 
-//    protected void setTaskSchedulerService(
-//            TaskSchedulerService schedulerService) {
-//        if (log.isDebugEnabled()) {
-//            log.debug("TaskSchedulerService bound to the ESB initialization process");
-//        }
-//        this.taskSchedulerService = schedulerService;
-//    }
-//
-//    protected void unsetTaskSchedulerService(
-//            TaskSchedulerService schedulerService) {
-//        if (log.isDebugEnabled()) {
-//            log.debug("TaskSchedulerService unbound from the ESB environment");
-//        }
-//        this.taskSchedulerService = null;
-//    }
+    protected void unsetTaskDescriptionRepositoryService(
+            TaskDescriptionRepositoryService repositoryService) {
+        if (log.isDebugEnabled()) {
+            log.debug("TaskDescriptionRepositoryService unbound from the ESB environment");
+        }
+        this.repositoryService = null;
+    }
+
+    protected void setTaskSchedulerService(
+            TaskSchedulerService schedulerService) {
+        if (log.isDebugEnabled()) {
+            log.debug("TaskSchedulerService bound to the ESB initialization process");
+        }
+        this.taskSchedulerService = schedulerService;
+    }
+
+    protected void unsetTaskSchedulerService(
+            TaskSchedulerService schedulerService) {
+        if (log.isDebugEnabled()) {
+            log.debug("TaskSchedulerService unbound from the ESB environment");
+        }
+        this.taskSchedulerService = null;
+    }
 
     protected void setSecretCallbackHandlerService(
             SecretCallbackHandlerService secretCallbackHandlerService) {
