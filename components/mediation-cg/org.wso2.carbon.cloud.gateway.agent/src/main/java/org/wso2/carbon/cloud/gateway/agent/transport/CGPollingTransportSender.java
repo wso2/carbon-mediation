@@ -15,6 +15,7 @@
  */
 package org.wso2.carbon.cloud.gateway.agent.transport;
 
+import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
@@ -27,11 +28,17 @@ import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.base.AbstractTransportSender;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.util.MessageProcessorSelector;
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 import org.wso2.carbon.cloud.gateway.common.CGConstant;
 import org.wso2.carbon.cloud.gateway.common.thrift.gen.Message;
 
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 
 /**
  * CSG Polling transport sender implementation
@@ -74,13 +81,24 @@ public class CGPollingTransportSender extends AbstractTransportSender {
         try {
             if (msgCtx.isDoingREST()) {
                 // result comes as the body of envelope
-                msgCtx.getEnvelope().getBody().getFirstElement().serialize(out);
+                MappedNamespaceConvention mnc = new MappedNamespaceConvention();
+                XMLStreamWriter jsonWriter = new MappedXMLStreamWriter(mnc, new OutputStreamWriter(out, format.getCharSetEncoding()));
+                jsonWriter.writeStartDocument();
+                OMElement element = msgCtx.getEnvelope().getBody().getFirstElement();
+                Iterator<OMElement> iterator = element.getChildElements();
+                while (iterator.hasNext()) {
+                    OMElement childElement = iterator.next();
+                    childElement.serializeAndConsume(jsonWriter);
+                }
+                jsonWriter.writeEndDocument();
             } else {
                 thriftMsg.setIsDoingMTOM(msgCtx.isDoingMTOM());
                 thriftMsg.setIsDoingSwA(msgCtx.isDoingSwA());
                 msgCtx.getEnvelope().serialize(out);
             }
         } catch (XMLStreamException e) {
+            handleException("Cloud not serialize the request message", e);
+        } catch (UnsupportedEncodingException e) {
             handleException("Cloud not serialize the request message", e);
         }
         thriftMsg.setMessage(out.toByteArray());
