@@ -187,5 +187,14 @@ public class HL7EndpointManager extends AbstractInboundEndpointManager {
                 params.getProperties().setProperty(MLLPConstants.PARAM_HL7_PASS_THROUGH_INVALID_MESSAGES, "false");
             }
         }
+
+        if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_VERSION) == null) {
+            params.getProperties().setProperty(MLLPConstants.PARAM_HL7_VERSION, "2");
+        } else {
+            if (!params.getProperties().getProperty(MLLPConstants.PARAM_HL7_VERSION).equalsIgnoreCase("3") &&
+                !params.getProperties().getProperty(MLLPConstants.PARAM_HL7_VERSION).equalsIgnoreCase("2")) {
+                params.getProperties().setProperty(MLLPConstants.PARAM_HL7_VERSION, "2");
+            }
+        }
     }
 }

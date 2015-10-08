@@ -38,8 +38,9 @@ public class MLLPContextFactory {
         boolean validate = Boolean.valueOf(inboundParams.getProperties().getProperty(MLLPConstants.PARAM_HL7_VALIDATE));
         Parser preParser = (Parser) processor.getInboundParameterMap().get(MLLPConstants.HL7_PRE_PROC_PARSER_CLASS);
         BufferFactory bufferFactory = (BufferFactory) processor.getInboundParameterMap().get(MLLPConstants.INBOUND_HL7_BUFFER_FACTORY);
+        int version = Integer.valueOf(inboundParams.getProperties().getProperty(MLLPConstants.PARAM_HL7_VERSION));
 
-        return new MLLPContext(session, decoder, autoAck, validate, preParser, bufferFactory);
+        return new MLLPContext(session, decoder, autoAck, validate, preParser, bufferFactory, version);
     }
 
 }

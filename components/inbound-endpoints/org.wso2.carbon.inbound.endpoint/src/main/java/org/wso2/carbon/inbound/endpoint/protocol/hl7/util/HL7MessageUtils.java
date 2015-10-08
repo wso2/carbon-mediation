@@ -88,11 +88,44 @@ public class HL7MessageUtils {
         }
     }
 
+    /**
+     * @deprecated : Use method <i> parse(String msg, boolean validate, int version) </i> instead
+     */
     public static Message parse(String msg, boolean validate) throws HL7Exception {
         if (validate) {
             return pipeParser.parse(msg);
         } else {
             return noValidationPipeParser.parse(msg);
+        }
+    }
+
+    /**
+     * Parse incoming HL7 string message to build a Message object
+     *
+     * @param msg       String value of HL7 message
+     * @param validate  Whether message should be validated
+     * @param version   HL7 version (Supporting v2 & v3)
+     * @return Parsed HL7 Message
+     * @throws HL7Exception
+     */
+    public static Message parse(String msg, boolean validate, int version) throws HL7Exception {
+        switch (version) {
+            case 3:
+            {
+                if (validate) {
+                    return xmlParser.parse(msg);
+                } else {
+                    return noValidationXmlParser.parse(msg);
+                }
+            }
+            default:
+            {
+                if (validate) {
+                    return pipeParser.parse(msg);
+                } else {
+                    return noValidationPipeParser.parse(msg);
+                }
+            }
         }
     }
 
