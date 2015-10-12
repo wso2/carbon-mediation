@@ -717,7 +717,9 @@ public class WSO2Registry extends AbstractRegistry {
     private void setTenantInfo() {
         // Preserve user name
         String username = PrivilegedCarbonContext.getThreadLocalCarbonContext().getUsername();
-        PrivilegedCarbonContext.destroyCurrentContext();
+        //Removing the below code segment due to empty stack exception coming from kernel
+        //Current context does not need to be destroyed at this level.
+        //PrivilegedCarbonContext.destroyCurrentContext();
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         cc.setTenantDomain(domain);
         cc.setTenantId(tenantId);

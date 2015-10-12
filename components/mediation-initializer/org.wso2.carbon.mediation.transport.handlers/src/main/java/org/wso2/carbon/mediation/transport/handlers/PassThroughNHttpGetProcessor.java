@@ -305,7 +305,9 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
                     if (axisService == null && !loadBalancer && serviceName != null) {
                     	// Try to see whether the service is available in a tenant
                     	try {
-                            PrivilegedCarbonContext.destroyCurrentContext();
+                            //Removing the below code segment due to empty stack exception coming from kernel
+                            //Current context does not need to be destroyed at this level.
+                            //PrivilegedCarbonContext.destroyCurrentContext();
                     	    axisService = TenantAxisUtils.getAxisService(serviceName, cfgCtx);
                     	} catch (AxisFault axisFault) {
                     	    log.error("Error while retrieving Axis Service for Service name: "+serviceName,
