@@ -62,7 +62,9 @@ public class CarbonTenantInfoConfigurator implements TenantInfoConfigurator {
         if (p != null && p instanceof Integer) {
             tenantId = (Integer) p;
         }
-        PrivilegedCarbonContext.destroyCurrentContext();
+        //Removing the below code segment due to empty stack exception coming from kernel
+        //Current context does not need to be destroyed at this level.
+        //PrivilegedCarbonContext.destroyCurrentContext();
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         cc.setTenantDomain(tenantDomain);
         cc.setTenantId(tenantId);
