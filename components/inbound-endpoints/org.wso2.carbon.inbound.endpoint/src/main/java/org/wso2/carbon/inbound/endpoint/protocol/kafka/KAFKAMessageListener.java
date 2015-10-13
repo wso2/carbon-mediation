@@ -152,9 +152,9 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
     }
 
     @Override
-    public void injectMessageToESB(String sequenceName) {
+    public void injectMessageToESB(String name) {
         if (consumerIte.size() == 1) {
-            injectMessageToESB(sequenceName, consumerIte.get(0));
+            injectMessageToESB(name, consumerIte.get(0));
         } else {
             log.debug("There are multiple topics to consume from not a single topic");
         }
@@ -203,10 +203,10 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
     }
 
     @Override
-    public void consumeMultipleTopics(String sequenceName){
+    public void consumeMultipleTopics(String name){
         for (ConsumerIterator<byte[], byte[]> consumerIterator : consumerIte) {
             if (hasNext(consumerIterator)) {
-                injectMessageToESB(sequenceName, consumerIterator);
+                injectMessageToESB(name, consumerIterator);
             }
         }
     }
