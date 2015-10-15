@@ -305,7 +305,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                                         updateStatus(artifactName, libName, libraryPackage, ServiceBusConstants.ENABLED, axisConfig);
                                     }
                                 } else {
-                                    log.error("Error while getting qualified name of the synapse library.");
+                                    log.error("The qualified name of the synapse library is empty.");
                                 }
                             } catch (AxisFault axisFault) {
                                 log.error("Unable to update status for the synapse library : " + axisFault.getMessage());
