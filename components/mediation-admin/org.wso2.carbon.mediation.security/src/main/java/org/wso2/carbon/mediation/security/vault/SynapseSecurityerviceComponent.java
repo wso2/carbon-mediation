@@ -20,6 +20,7 @@ package org.wso2.carbon.mediation.security.vault;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
@@ -50,6 +51,9 @@ public class SynapseSecurityerviceComponent {
 		if (log.isDebugEnabled()) {
 			log.debug("Synapse mediation security component activated");
 		}
+        BundleContext bundleCtx = ctxt.getBundleContext();
+        bundleCtx.registerService(MediationSecurityAdminService.class.getName(),
+                new MediationSecurityAdminService(), null);
 		try {
 			SecureVaultLookupHandlerImpl.getDefaultSecurityService();
 		} catch (RegistryException e) {

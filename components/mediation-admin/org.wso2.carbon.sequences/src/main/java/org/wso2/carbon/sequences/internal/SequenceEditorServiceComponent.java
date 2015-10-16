@@ -38,6 +38,8 @@ import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServic
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.sequences.SequenceDeploymentInterceptor;
 import org.wso2.carbon.sequences.common.SequenceEditorException;
+import org.wso2.carbon.sequences.services.SequenceAdmin;
+import org.wso2.carbon.sequences.services.SequenceAdminService;
 import org.wso2.carbon.sequences.services.SequenceDeployerService;
 import org.wso2.carbon.sequences.services.SequenceDeployerServiceImpl;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
@@ -90,6 +92,8 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
             bndCtx.registerService(SequenceDeployerService.class.getName(),
                                    new SequenceDeployerServiceImpl(), null);
+            bndCtx.registerService(SequenceAdminService.class.getName(), new SequenceAdminService(), null);
+
             SynapseEnvironmentService synEnvService =
                     ConfigHolder.getInstance().getSynapseEnvironmentService(
                             MultitenantConstants.SUPER_TENANT_ID);
