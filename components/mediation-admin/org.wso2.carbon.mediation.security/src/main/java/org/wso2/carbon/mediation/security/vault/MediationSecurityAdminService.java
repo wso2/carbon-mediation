@@ -47,27 +47,23 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 		try {
 			Cipher cipher = ciperInitializer.getEncryptionProvider();
 			if (cipher == null) {
-				if (cipher == null) {
-					log.error("Either Configuration properties can not be loaded or No secret"
-					          + " repositories have been configured please check PRODUCT_HOME/repository/conf/security "
-					          + " refer links related to configure WSO2 Secure vault");
-					handleException(log,
-					                "Failed to load security key store information ," +
-					                "Configure secret-conf.properties properly by referring to http://docs.wso2.org/display/Carbon402/WSO2+Carbon+Secure+Vault",
-					                null);
-				}
-			}
-			byte[] encryptedPassword =cipher .doFinal(plainTextPassByte);
+                log.error("Either Configuration properties can not be loaded or No secret"
+                          + " repositories have been configured please check PRODUCT_HOME/repository/conf/security "
+                          + " refer links related to configure WSO2 Secure vault");
+                handleException(log,
+                                "Failed to load security key store information ," +
+                                "Configure secret-conf.properties properly by referring to " +
+                                        "http://docs.wso2.org/display/Carbon402/WSO2+Carbon+Secure+Vault",
+                                null);
+            }
+			byte[] encryptedPassword = cipher.doFinal(plainTextPassByte);
 			BASE64Encoder encoder = new BASE64Encoder();
-			String encodedValue = encoder.encode(encryptedPassword);
-			return encodedValue;
-		} catch (IllegalBlockSizeException e) {
-			handleException(log, "Error encrypting password ", e);
-		} catch (BadPaddingException e) {
+            return encoder.encode(encryptedPassword);
+		} catch (IllegalBlockSizeException | BadPaddingException e) {
 			handleException(log, "Error encrypting password ", e);
 		}
 
-		return null;
+        return null;
 
 	}
 
