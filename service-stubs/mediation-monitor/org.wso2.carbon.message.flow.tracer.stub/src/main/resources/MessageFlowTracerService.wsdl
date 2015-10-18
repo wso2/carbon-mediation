@@ -1,0 +1,344 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://tracer.flow.message.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax2299="http://data.flowtracer.synapse.apache.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ax2301="http://data.tracer.flow.message.carbon.wso2.org/xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tracer.flow.message.carbon.wso2.org">
+   <wsdl:documentation>MessageFlowTracerService</wsdl:documentation>
+   <wsdl:types>
+      <xs:schema xmlns:ax2302="http://data.tracer.flow.message.carbon.wso2.org/xsd" xmlns:ax2300="http://data.flowtracer.synapse.apache.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://tracer.flow.message.carbon.wso2.org">
+         <xs:import namespace="http://data.flowtracer.synapse.apache.org/xsd"/>
+         <xs:import namespace="http://data.tracer.flow.message.carbon.wso2.org/xsd"/>
+         <xs:element name="getComponentInfo">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="componentId" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getComponentInfoResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2299:MessageFlowComponentEntry"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getMessageFlows">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getMessageFlowsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2299:MessageFlowTraceEntry"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getMessageFlowInLevels">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getMessageFlowInLevelsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllEdges">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllEdgesResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2302:Edge"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllComponents">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllComponentsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="clearAll">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+      </xs:schema>
+      <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://data.tracer.flow.message.carbon.wso2.org/xsd">
+         <xs:complexType name="Edge">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="node1" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="node2" nillable="true" type="xs:string"/>
+            </xs:sequence>
+         </xs:complexType>
+      </xs:schema>
+      <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://data.flowtracer.synapse.apache.org/xsd">
+         <xs:complexType name="MessageFlowComponentEntry">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="componentId" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="componentName" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="payload" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="propertySet" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="response" type="xs:boolean"/>
+               <xs:element minOccurs="0" name="start" type="xs:boolean"/>
+               <xs:element minOccurs="0" name="timestamp" nillable="true" type="xs:string"/>
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="MessageFlowTraceEntry">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="entryType" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="messageFlow" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="messageId" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="timeStamp" nillable="true" type="xs:string"/>
+            </xs:sequence>
+         </xs:complexType>
+      </xs:schema>
+   </wsdl:types>
+   <wsdl:message name="clearAllRequest">
+      <wsdl:part name="parameters" element="ns:clearAll"/>
+   </wsdl:message>
+   <wsdl:message name="getMessageFlowInLevelsRequest">
+      <wsdl:part name="parameters" element="ns:getMessageFlowInLevels"/>
+   </wsdl:message>
+   <wsdl:message name="getMessageFlowInLevelsResponse">
+      <wsdl:part name="parameters" element="ns:getMessageFlowInLevelsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getAllComponentsRequest">
+      <wsdl:part name="parameters" element="ns:getAllComponents"/>
+   </wsdl:message>
+   <wsdl:message name="getAllComponentsResponse">
+      <wsdl:part name="parameters" element="ns:getAllComponentsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getMessageFlowsRequest">
+      <wsdl:part name="parameters" element="ns:getMessageFlows"/>
+   </wsdl:message>
+   <wsdl:message name="getMessageFlowsResponse">
+      <wsdl:part name="parameters" element="ns:getMessageFlowsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getComponentInfoRequest">
+      <wsdl:part name="parameters" element="ns:getComponentInfo"/>
+   </wsdl:message>
+   <wsdl:message name="getComponentInfoResponse">
+      <wsdl:part name="parameters" element="ns:getComponentInfoResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getAllEdgesRequest">
+      <wsdl:part name="parameters" element="ns:getAllEdges"/>
+   </wsdl:message>
+   <wsdl:message name="getAllEdgesResponse">
+      <wsdl:part name="parameters" element="ns:getAllEdgesResponse"/>
+   </wsdl:message>
+   <wsdl:portType name="MessageFlowTracerServicePortType">
+      <wsdl:operation name="clearAll">
+         <wsdl:input message="ns:clearAllRequest" wsaw:Action="urn:clearAll"/>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlowInLevels">
+         <wsdl:input message="ns:getMessageFlowInLevelsRequest" wsaw:Action="urn:getMessageFlowInLevels"/>
+         <wsdl:output message="ns:getMessageFlowInLevelsResponse" wsaw:Action="urn:getMessageFlowInLevelsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getAllComponents">
+         <wsdl:input message="ns:getAllComponentsRequest" wsaw:Action="urn:getAllComponents"/>
+         <wsdl:output message="ns:getAllComponentsResponse" wsaw:Action="urn:getAllComponentsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlows">
+         <wsdl:input message="ns:getMessageFlowsRequest" wsaw:Action="urn:getMessageFlows"/>
+         <wsdl:output message="ns:getMessageFlowsResponse" wsaw:Action="urn:getMessageFlowsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getComponentInfo">
+         <wsdl:input message="ns:getComponentInfoRequest" wsaw:Action="urn:getComponentInfo"/>
+         <wsdl:output message="ns:getComponentInfoResponse" wsaw:Action="urn:getComponentInfoResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEdges">
+         <wsdl:input message="ns:getAllEdgesRequest" wsaw:Action="urn:getAllEdges"/>
+         <wsdl:output message="ns:getAllEdgesResponse" wsaw:Action="urn:getAllEdgesResponse"/>
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="MessageFlowTracerServiceSoap11Binding" type="ns:MessageFlowTracerServicePortType">
+      <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+      <wsdl:operation name="clearAll">
+         <soap:operation soapAction="urn:clearAll" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlowInLevels">
+         <soap:operation soapAction="urn:getMessageFlowInLevels" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllComponents">
+         <soap:operation soapAction="urn:getAllComponents" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlows">
+         <soap:operation soapAction="urn:getMessageFlows" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getComponentInfo">
+         <soap:operation soapAction="urn:getComponentInfo" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEdges">
+         <soap:operation soapAction="urn:getAllEdges" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="MessageFlowTracerServiceSoap12Binding" type="ns:MessageFlowTracerServicePortType">
+      <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+      <wsdl:operation name="clearAll">
+         <soap12:operation soapAction="urn:clearAll" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlowInLevels">
+         <soap12:operation soapAction="urn:getMessageFlowInLevels" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllComponents">
+         <soap12:operation soapAction="urn:getAllComponents" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlows">
+         <soap12:operation soapAction="urn:getMessageFlows" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getComponentInfo">
+         <soap12:operation soapAction="urn:getComponentInfo" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEdges">
+         <soap12:operation soapAction="urn:getAllEdges" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="MessageFlowTracerServiceHttpBinding" type="ns:MessageFlowTracerServicePortType">
+      <http:binding verb="POST"/>
+      <wsdl:operation name="clearAll">
+         <http:operation location="clearAll"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlowInLevels">
+         <http:operation location="getMessageFlowInLevels"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllComponents">
+         <http:operation location="getAllComponents"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlows">
+         <http:operation location="getMessageFlows"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getComponentInfo">
+         <http:operation location="getComponentInfo"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEdges">
+         <http:operation location="getAllEdges"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="MessageFlowTracerService">
+      <wsdl:port name="MessageFlowTracerServiceHttpsSoap11Endpoint" binding="ns:MessageFlowTracerServiceSoap11Binding">
+         <soap:address location="https://Chanakas-MacBook-Pro.local:8243/services/MessageFlowTracerService.MessageFlowTracerServiceHttpsSoap11Endpoint"/>
+      </wsdl:port>
+      <wsdl:port name="MessageFlowTracerServiceHttpsSoap12Endpoint" binding="ns:MessageFlowTracerServiceSoap12Binding">
+         <soap12:address location="https://Chanakas-MacBook-Pro.local:8243/services/MessageFlowTracerService.MessageFlowTracerServiceHttpsSoap12Endpoint"/>
+      </wsdl:port>
+      <wsdl:port name="MessageFlowTracerServiceHttpsEndpoint" binding="ns:MessageFlowTracerServiceHttpBinding">
+         <http:address location="https://Chanakas-MacBook-Pro.local:8243/services/MessageFlowTracerService.MessageFlowTracerServiceHttpsEndpoint"/>
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>
