@@ -40,6 +40,8 @@ import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.rest.api.service.RestAPIDeployerService;
 import org.wso2.carbon.rest.api.service.RestAPIDeployerServiceImpl;
+import org.wso2.carbon.rest.api.service.RestApiAdmin;
+import org.wso2.carbon.rest.api.service.RestApiAdminService;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
 import org.wso2.carbon.utils.ConfigurationContextService;
@@ -88,6 +90,8 @@ public class APIServiceComponent extends AbstractAxis2ConfigurationContextObserv
             bndCtx.registerService(Axis2ConfigurationContextObserver.class.getName(), this, null);
             bndCtx.registerService(RestAPIDeployerService.class.getName(),
                                    new RestAPIDeployerServiceImpl(), null);
+            bndCtx.registerService(RestApiAdminService.class.getName(), new RestApiAdminService(), null);
+
             SynapseEnvironmentService synEnvService =
                     ConfigHolder.getInstance().getSynapseEnvironmentService(
                             MultitenantConstants.SUPER_TENANT_ID);
