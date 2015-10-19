@@ -79,7 +79,7 @@
 		           sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));
 		        }else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")
 		              || strKey.startsWith("topic.filter")|| strKey.equals("topics")||strKey.startsWith("filter.from")
-		              ||strKey.startsWith("consumer.type") || strKey.startsWith("thread.count")|| strKey.startsWith("simple.")
+		              || strKey.startsWith("consumer.type") || strKey.startsWith("thread.count") || strKey.startsWith("simple.")
 		              || strKey.startsWith("content.type") || strKey.startsWith("offsets.") || strKey.startsWith("socket.")
 		              || strKey.startsWith("fetch.") || strKey.startsWith("consumer.") || strKey.startsWith("num.consumer.fetchers")
 		              || strKey.startsWith("queued.max.message.chunks") || strKey.startsWith("rebalance.") || strKey.startsWith("exclude.internal.topics")
