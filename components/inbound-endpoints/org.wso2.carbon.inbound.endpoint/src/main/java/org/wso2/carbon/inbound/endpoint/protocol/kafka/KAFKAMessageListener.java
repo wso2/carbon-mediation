@@ -50,12 +50,10 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
                 log.info("Creating Kafka Consumer Connector...");
 
                 //set default consumer timeout to 3000ms if it is not set by the user
-                if(!kafkaProperties.containsKey(KAFKAConstants.CONSUMER_TIMEOUT)){
-                    kafkaProperties.put(KAFKAConstants.CONSUMER_TIMEOUT,"3000");
+                if (!kafkaProperties.containsKey(KAFKAConstants.CONSUMER_TIMEOUT)) {
+                    kafkaProperties.put(KAFKAConstants.CONSUMER_TIMEOUT, "3000");
                 }
-                consumerConnector = Consumer
-                        .createJavaConsumerConnector(new ConsumerConfig(
-                                kafkaProperties));
+                consumerConnector = Consumer.createJavaConsumerConnector(new ConsumerConfig(kafkaProperties));
                 log.info("Kafka Consumer Connector is created");
                 start();
             }
@@ -139,13 +137,10 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
 
     /**
      * Use one stream from kafka stream iterator
+     *
      * @param streams
      */
     protected void startConsumers(List<KafkaStream<byte[], byte[]>> streams) {
-//        for (KafkaStream<byte[], byte[]> stream : streams) {
-//            consumerIte = stream.iterator();
-//            break;
-//        }
         if (streams.size() >= 1) {
             consumerIte.add(streams.get(0).iterator());
         }
@@ -203,7 +198,7 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
     }
 
     @Override
-    public void consumeMultipleTopics(String name){
+    public void consumeMultipleTopics(String name) {
         for (ConsumerIterator<byte[], byte[]> consumerIterator : consumerIte) {
             if (hasNext(consumerIterator)) {
                 injectMessageToESB(name, consumerIterator);
