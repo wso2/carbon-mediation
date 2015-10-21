@@ -84,50 +84,6 @@ public class RestApiAdminService {
         }
     }
 
-    /**
-     * Set the tenant domain when a publisher publishes his API in MT mode. When publisher publishes
-     * the API, we login the gateway as super tenant. But we need to publish the API in the particular
-     * tenant domain.
-     *
-     * @param apiData
-     * @param tenantDomain
-     * @return
-     * @throws APIException
-     */
-    public boolean addApiForTenant(String apiData, String tenantDomain) throws APIException {
-
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
-                    true);
-            return addApiFromString(apiData);
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
-        }
-    }
-
-    /**
-     * Set the tenant domain when a publisher tries to retrieve API his API in MT mode. When
-     * publisher gets
-     * the API, we login the gateway as super tenant. But we need to get the
-     * API,which is in the particular tenant domain.
-     *
-     * @param apiName
-     * @param tenantDomain
-     * @return
-     * @throws APIException
-     */
-    public APIData getApiForTenant(String apiName, String tenantDomain) throws APIException {
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
-                    true);
-            return getApiByName(apiName);
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
-        }
-    }
-
     public APIData getApiByName(String apiName) throws APIException {
         final Lock lock = getLock();
         try {
@@ -186,27 +142,6 @@ public class RestApiAdminService {
             return false;
         } finally {
             lock.unlock();
-        }
-    }
-
-    /**
-     * Set the tenant domain when a publisher updates his API in MT mode. When
-     * publisher updates the API, we login the gateway as super tenant. But we need to update the
-     * API,which is in the particular tenant domain.
-     *
-     * @param apiName
-     * @param apiData
-     * @return
-     * @throws APIException
-     */
-    public boolean updateApiForTenant(String apiName, String apiData, String tenantDomain) throws APIException {
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
-                    true);
-            return updateApiFromString(apiName, apiData);
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
         }
     }
 

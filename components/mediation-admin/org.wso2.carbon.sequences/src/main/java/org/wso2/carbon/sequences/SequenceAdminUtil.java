@@ -47,6 +47,12 @@ public class SequenceAdminUtil {
                 SynapseConstants.SYNAPSE_CONFIG).getValue();
     }
 
+    public static SynapseConfiguration getSynapseConfigFromConfigCtx() throws SequenceEditorException {
+        return (SynapseConfiguration) ConfigHolder.getInstance().getConfigurationContextService().
+                getServerConfigContext().getAxisConfiguration().getParameter(
+                SynapseConstants.SYNAPSE_CONFIG).getValue();
+    }
+
     /**
      * Helper method to retrieve the Synapse environment from the relevant axis configuration
      *
@@ -54,6 +60,11 @@ public class SequenceAdminUtil {
      */
     public static SynapseEnvironment getSynapseEnvironment() throws SequenceEditorException {
         return getSynapseEnvironment(ConfigHolder.getInstance().getAxisConfiguration());
+    }
+
+    public static SynapseEnvironment getSynapseEnvironmentFromConfigCtx() throws SequenceEditorException {
+        return getSynapseEnvironment(ConfigHolder.getInstance().getConfigurationContextService().
+                getServerConfigContext().getAxisConfiguration());
     }
 
     public static SynapseEnvironment getSynapseEnvironment(AxisConfiguration axisCfg) {
