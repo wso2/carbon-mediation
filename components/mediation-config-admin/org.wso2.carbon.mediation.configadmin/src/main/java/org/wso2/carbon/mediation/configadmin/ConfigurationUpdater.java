@@ -375,7 +375,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getDefinedEndpoints().size() >= newConfig.getDefinedEndpoints().size()) {
                     newConfig.removeEndpoint(name);
-                    log.error("Unable to update the endpoints.");
+                    log.error("Updation failed: The endpoint can't be renamed.");
                     Map<String, Endpoint> oldEndpoints = currentConfig.getDefinedEndpoints();
                     for (String oldName : oldEndpoints.keySet()) {
                         if (newConfig.getDefinedEndpoints().get(oldName) == null) {
@@ -406,7 +406,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getDefinedSequences().size() >= newConfig.getDefinedSequences().size()) {
                     newConfig.removeSequence(name);
-                    log.error("Unable to update the sequences.");
+                    log.error("Updation failed: The sequence can't be renamed");
                     Map<String, SequenceMediator> oldSequences = currentConfig.getDefinedSequences();
                     for (String oldName : oldSequences.keySet()) {
                         if (newConfig.getDefinedSequences().get(oldName) == null) {
@@ -438,7 +438,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getProxyServices().size() >= newConfig.getProxyServices().size()) {
                     newConfig.removeProxyService(proxy.getName());
-                    log.error("Unable to update the proxy services.");
+                    log.error("Updation failed: The proxy service can't be renamed.");
                     Collection<ProxyService> oldProxies = currentConfig.getProxyServices();
                     for (ProxyService eachOldProxy : oldProxies) {
                         if (newConfig.getProxyService(eachOldProxy.getName()) == null) {
@@ -470,7 +470,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getDefinedEntries().size() >= newConfig.getDefinedEntries().size()) {
                     newConfig.removeEntry(name);
-                    log.error("Unable to update the local entries.");
+                    log.error("Updation failed: The local entry can't be renamed.");
                     Map<String, Entry> oldEntries = currentConfig.getDefinedEntries();
                     for (String oldName : oldEntries.keySet()) {
                         if (newConfig.getDefinedEntries().get(oldName) == null) {
@@ -513,7 +513,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getEventSources().size() >= newConfig.getEventSources().size()) {
                     newConfig.removeEventSource(eventSource.getName());
-                    log.error("Unable to update the event sources.");
+                    log.error("Updation failed: The event source can't be renamed.");
                     Collection<SynapseEventSource> oldEventSources = currentConfig.getEventSources();
                     for (SynapseEventSource eachOldEventSource : oldEventSources) {
                         if (newConfig.getEventSource(eachOldEventSource.getName()) == null) {
@@ -557,7 +557,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getMessageStores().values().size() >= newConfig.getMessageStores().values().size()) {
                     newConfig.removeMessageStore(store.getName());
-                    log.error("Unable to update the message stores.");
+                    log.error("Updation failed: The message store can't be renamed.");
                     Collection<MessageStore> oldMessageStores = currentConfig.getMessageStores().values();
                     for (MessageStore eachOldStore : oldMessageStores) {
                         if (newConfig.getMessageStore(eachOldStore.getName()) == null) {
@@ -590,7 +590,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getMessageProcessors().values().size() >= newConfig.getMessageProcessors().values().size()) {
                     newConfig.removeMessageProcessor(processor.getName());
-                    log.error("Unable to update the message processors.");
+                    log.error("Updation failed: The message processor can't be renamed.");
                     Collection<MessageProcessor> oldMessageProcessors = currentConfig.getMessageProcessors().values();
                     for (MessageProcessor eachOldProcessor : oldMessageProcessors) {
                         if (newConfig.getMessageProcessors().get(eachOldProcessor.getName()) == null) {
@@ -621,7 +621,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getSequenceTemplates().size() >= newConfig.getSequenceTemplates().size()) {
                     newConfig.removeSequenceTemplate(name);
-                    log.error("Unable to update the sequence templates.");
+                    log.error("Updation failed: The sequence template can't be renamed.");
                     Map<String, TemplateMediator> oldSequenceTemplates = currentConfig.getSequenceTemplates();
                     for (String oldName : oldSequenceTemplates.keySet()) {
                         if (newConfig.getSequenceTemplates().get(oldName) == null) {
@@ -653,7 +653,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getEndpointTemplates().size() >= newConfig.getEndpointTemplates().size()) {
                     newConfig.removeEndpointTemplate(name);
-                    log.error("Unable to update the endpoint templates.");
+                    log.error("Updation failed: The endpoint template can't be renamed.");
                     Map<String, Template> oldEndpointTemplates = currentConfig.getEndpointTemplates();
                     for (String oldName : oldEndpointTemplates.keySet()) {
                         if (newConfig.getEndpointTemplates().get(oldName) == null) {
@@ -685,7 +685,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getAPIs().size() >= newConfig.getAPIs().size()) {
                     newConfig.removeAPI(api.getName());
-                    log.error("Unable to update the APIs.");
+                    log.error("Updation failed: The API can't be renamed.");
                     Collection<API> oldApiCollection = currentConfig.getAPIs();
                     for (API eachOldApi : oldApiCollection) {
                         if (newConfig.getAPI(eachOldApi.getName()) == null) {
@@ -715,7 +715,7 @@ public class ConfigurationUpdater {
             } else {
                 if (currentConfig.getSynapseImports().size() >= newConfig.getSynapseImports().size()) {
                     newConfig.removeSynapseImport(name);
-                    log.error("Unable to update the synapse imports.");
+                    log.error("Updation failed: The synapse import can't be renamed.");
                     Map<String, SynapseImport> oldImports = currentConfig.getSynapseImports();
                     for (String oldName : oldImports.keySet()) {
                         if (newConfig.getSynapseImports().get(oldName) == null) {
