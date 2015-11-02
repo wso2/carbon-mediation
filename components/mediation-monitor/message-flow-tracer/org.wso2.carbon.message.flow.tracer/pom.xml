@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>message-flow-tracer</artifactId>
+        <groupId>org.wso2.carbon.mediation</groupId>
+        <version>4.4.11-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>org.wso2.carbon.message.flow.tracer</artifactId>
+    <groupId>org.wso2.carbon.mediation</groupId>
+    <packaging>bundle</packaging>
+    <name>WSO2 Carbon - Message Flow Tracer BE</name>
+    <version>4.4.11-SNAPSHOT</version>
+    <url>http://wso2.org</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.9.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.9.13</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Export-Package>org.wso2.carbon.message.flow.tracer.*,
+                                        org.wso2.carbon.message.flow.tracer.data.*</Export-Package>
+                        <Import-Package>org.apache.synapse.flowtracer.*,
+                                        org.codehaus.jackson.*,
+                                        javax.xml.*,
+                                        org.joda.time.*,
+                                        org.w3c.dom.*,
+                                        org.xml.sax.*,
+                        </Import-Package>
+                        <Embed-Dependency>
+                            json-simple;scope=compile|runtime;inline=false,
+                            jackson-core-asl;scope=compile|runtime;inline=false,
+                            jackson-mapper-asl;scope=compile|runtime;inline=false,
+                        </Embed-Dependency>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
