@@ -55,13 +55,11 @@ public class RabbitMQConnectionFactory {
      * Digest a AMQP CF definition from the configuration and construct
      */
     public RabbitMQConnectionFactory(Properties properties) {
-
         this.name = properties.getProperty(RabbitMQConstants.RABBITMQ_CON_FAC);
 
         for (final String name : properties.stringPropertyNames())
             parameters.put(name, properties.getProperty(name));
         initConnectionFactory();
-
     }
 
     /**

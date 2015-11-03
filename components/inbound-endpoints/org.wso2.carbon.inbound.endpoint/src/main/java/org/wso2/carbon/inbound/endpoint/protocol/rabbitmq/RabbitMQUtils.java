@@ -81,7 +81,6 @@ public class RabbitMQUtils {
      */
     public static void declareQueue(Connection connection, String queueName, boolean isDurable,
                                     boolean isExclusive, boolean isAutoDelete) throws IOException {
-
         boolean queueAvailable = isQueueAvailable(connection, queueName);
         Channel channel = connection.createChannel();
 

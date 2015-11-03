@@ -18,7 +18,12 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.rabbitmq;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConsumerCancelledException;
+import com.rabbitmq.client.ShutdownSignalException;
+import com.rabbitmq.client.QueueingConsumer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,7 +67,6 @@ public class RabbitMQConnectionConsumer {
     }
 
     public void execute() {
-
         try {
             workerState = STATE_STARTED;
             initConsumer();

@@ -60,7 +60,6 @@ public class RabbitMQInjectHandler {
      * inject the message.
      */
     public boolean invoke(RabbitMQMessage message) {
-
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
         log.debug("Processed RabbitMQ Message ");
         MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
