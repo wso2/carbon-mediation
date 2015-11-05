@@ -103,21 +103,17 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             isSharedSubscription = false;
         }
 
+        noPubSubLocal = Boolean.valueOf(properties.getProperty(JMSConstants.PARAM_PUBSUB_NO_LOCAL));
+        
+        clientId = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
+        subscriptionName = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_NAME);
+
         if (isSharedSubscription) {
-            if ( properties.getProperty(JMSConstants.PARAM_SUBSCRIPTION_NAME) != null ){
-                subscriptionName = properties.getProperty(JMSConstants.PARAM_SUBSCRIPTION_NAME);
-            }
-            else {
+            if ( subscriptionName == null ){
                 logger.info( "Subscription name is not given. Therefor declaring a non-shared subscription" );
                 isSharedSubscription = false;
             }
         }
-
-        noPubSubLocal = Boolean.valueOf(properties.getProperty(JMSConstants.PARAM_PUBSUB_NO_LOCAL));
-        
-        clientId = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
-        subscriptionName = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_NAME);        
-
 
         String subDurable = properties.getProperty(JMSConstants.PARAM_SUB_DURABLE);
         if (subDurable != null) {

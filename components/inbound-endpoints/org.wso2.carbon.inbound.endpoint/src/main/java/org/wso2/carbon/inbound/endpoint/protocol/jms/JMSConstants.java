@@ -186,8 +186,6 @@ public class JMSConstants {
      */
     public static final String PARAM_IS_SHARED_SUBSCRIPTION = "transport.jms.SharedSubscription";
 
-    public static final String PARAM_SUBSCRIPTION_NAME = "transport.jms.SubscriptionName";
-
     public static final String DELIVERY_COUNT = "jms.message.delivery.count";
 
     public static final String JMS_SPEC_VERSION_1_0 = "1.0";
