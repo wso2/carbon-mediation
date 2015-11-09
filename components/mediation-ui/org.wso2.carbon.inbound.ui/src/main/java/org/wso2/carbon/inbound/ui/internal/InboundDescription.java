@@ -25,17 +25,18 @@ import org.wso2.carbon.inbound.stub.types.carbon.ParameterDTO;
 
 public class InboundDescription {
 
-	private String name;
+    private String name;
 	private String type;
 	private String classImpl;
-   private long interval;
-   private boolean suspend;
-   private String injectingSeq;
-   private String onErrorSeq;
-   private Map<String, String> parameters;
-   private String fileName;
-   public static final String REGISTRY_KEY_PREFIX = "$registry:";
-	private String artifactContainerName;
+	private String interval;
+	private boolean suspend;
+    private String injectingSeq;
+    private String onErrorSeq;
+    private Map<String, String> parameters;
+    private String fileName;
+    public static final String REGISTRY_KEY_PREFIX = "$registry:";
+    private static final String INTERVAL_PARAM = "interval";
+    private String artifactContainerName;
 	private boolean isEdited;
     
 	public InboundDescription(InboundEndpointDTO inboundEndpoint){
@@ -59,7 +60,9 @@ public class InboundDescription {
 			for(ParameterDTO parameterDTO :inboundEndpoint.getParameters()){
 				if(parameterDTO.getKey() != null){
 					this.parameters.put(parameterDTO.getName(), REGISTRY_KEY_PREFIX + parameterDTO.getKey());
-				}else	if(parameterDTO.getValue() != null){
+				}else if (INTERVAL_PARAM.equals(parameterDTO.getName())) {
+				    setInterval(parameterDTO.getValue());
+				}else if(parameterDTO.getValue() != null){
 					this.parameters.put(parameterDTO.getName(), parameterDTO.getValue());
 				}else{
 					this.parameters.put(parameterDTO.getName(), "");
@@ -96,11 +99,11 @@ public class InboundDescription {
 		this.classImpl = classImpl;
 	}
 
-	public long getInterval() {
+	public String getInterval() {
 		return interval;
 	}
 
-	public void setInterval(long interval) {
+	public void setInterval(String interval) {
 		this.interval = interval;
 	}
 

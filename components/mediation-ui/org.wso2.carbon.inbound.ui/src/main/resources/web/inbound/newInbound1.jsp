@@ -170,6 +170,7 @@ var kafkaSpecialParameters = null;
                         <td>
                             <input type="radio" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')" checked><fmt:message key="inbound.polling"/>
                             <input type="radio" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
+                            <input type="radio" name="inbound.behavior" value="busy-waiting" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.waiting"/>
                         </td>
                         <td></td>
                     </tr>

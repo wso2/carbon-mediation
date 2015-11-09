@@ -129,10 +129,12 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
         CARBON.showWarningDialog(msg4);
         return false;
     }
-    if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
-        CARBON.showWarningDialog(msg3);
-        return false;
-    }
+    if(!document.getElementById("inbound.behavior.waiting").checked && !document.getElementById("inbound.behavior.listening").checked){
+	    if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
+	        CARBON.showWarningDialog(msg3);
+	        return false;
+	    }
+	}
     
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
