@@ -181,7 +181,7 @@ var kafkaSpecialParameters = null;
                         <td>
                             <input type="radio" id="inbound.behavior.polling" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')"><fmt:message key="inbound.polling"/>
                             <input type="radio" id="inbound.behavior.listening" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
-                            <input type="radio" id="inbound.behavior.waiting" name="inbound.behavior" value="busy-waiting" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.waiting"/>
+                            <input type="radio" id="inbound.behavior.waiting" name="inbound.behavior" value="busy-waiting" onclick="toggleInboundInterval('waiting')" ><fmt:message key="inbound.waiting"/>
                         </td>
                         <td></td>
                     </tr>
@@ -193,12 +193,53 @@ var kafkaSpecialParameters = null;
                         </td>
                         <td></td>
                     </tr>
+                    <tr id="inboundSequentialRow">
+                        <td style="width:150px"><fmt:message key="inbound.sequential"/><span class="required">*</span></td>
+                        <td align="left">
+                            <select name="sequential" id="sequential">
+                                <%if("true".equals(inboundDescription.getSequential())){%>
+	                            	<option value="true" selected>true</option>
+	                            	<option value="false">false</option>
+	                            <% } else {%>
+	                            	<option value="true">true</option>
+	                            	<option value="false" selected>false</option>	                            
+	                            <% } %>
+                            </select>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr id="inboundCoordinationRow">
+                        <td style="width:150px"><fmt:message key="inbound.coordination"/><span class="required">*</span></td>
+                        <td align="left">
+                            <select name="coordination" id="coordination">
+                                <%if("true".equals(inboundDescription.getCoordination())){%>
+	                            	<option value="true" selected>true</option>
+	                            	<option value="false">false</option>
+	                            <% } else {%>
+	                            	<option value="true">true</option>
+	                            	<option value="false" selected>false</option>	                            
+	                            <% } %>
+                            </select>                            
+                        </td>
+                        <td></td>
+                    </tr>                        
                     <script language="javascript">
                         function toggleInboundInterval(event){
                             if (event == "listening"){
                                 document.getElementById("inboundIntervalRow").style.display="none";
+                                document.getElementById("inboundSequentialRow").style.display="none";
+                                document.getElementById("inboundCoordinationRow").style.display="none";
+                                intervalRequired = false;
+                            }else if (event == "waiting"){
+                                document.getElementById("inboundIntervalRow").style.display="none";
+                                document.getElementById("inboundSequentialRow").style.display="table-row";
+                                document.getElementById("inboundCoordinationRow").style.display="table-row";
+                                intervalRequired = false;
                             } else {
                                 document.getElementById("inboundIntervalRow").style.display="table-row";
+                                document.getElementById("inboundSequentialRow").style.display="table-row";
+                                document.getElementById("inboundCoordinationRow").style.display="table-row";
+                                intervalRequired = true;
                             }
                         }
                     </script>
@@ -360,6 +401,8 @@ var kafkaSpecialParameters = null;
                                         <script language="javascript">
                                             document.getElementById("inbound.behavior.listening").checked = true;
                                             document.getElementById("inboundIntervalRow").style.display="none";
+                                            document.getElementById("inboundSequentialRow").style.display="none";
+                                            document.getElementById("inboundCoordinationRow").style.display="none";
                                         </script>
 
                                     <%

@@ -29,6 +29,8 @@ public class InboundDescription {
 	private String type;
 	private String classImpl;
 	private String interval;
+	private String sequential;
+	private String coordination;
 	private boolean suspend;
     private String injectingSeq;
     private String onErrorSeq;
@@ -36,6 +38,8 @@ public class InboundDescription {
     private String fileName;
     public static final String REGISTRY_KEY_PREFIX = "$registry:";
     private static final String INTERVAL_PARAM = "interval";
+    private static final String SEQUENTIAL_PARAM = "sequential";
+    private static final String COORDINATION_PARAM = "coordination";
     private String artifactContainerName;
 	private boolean isEdited;
     
@@ -56,12 +60,17 @@ public class InboundDescription {
 		this.parameters = new HashMap<String, String>();
 		this.artifactContainerName = inboundEndpoint.getArtifactContainerName();
 		this.isEdited = inboundEndpoint.getIsEdited();
+		this.interval = "";
 		if(inboundEndpoint.getParameters() != null){
 			for(ParameterDTO parameterDTO :inboundEndpoint.getParameters()){
 				if(parameterDTO.getKey() != null){
 					this.parameters.put(parameterDTO.getName(), REGISTRY_KEY_PREFIX + parameterDTO.getKey());
 				}else if (INTERVAL_PARAM.equals(parameterDTO.getName())) {
-				    setInterval(parameterDTO.getValue());
+				    setInterval(((parameterDTO.getValue()==null||"null".equals(parameterDTO.getValue()))?"":parameterDTO.getValue()));
+                }else if (SEQUENTIAL_PARAM.equals(parameterDTO.getName())) {
+                    setSequential(((parameterDTO.getValue()==null||"null".equals(parameterDTO.getValue()))?"":parameterDTO.getValue()));
+                }else if (COORDINATION_PARAM.equals(parameterDTO.getName())) {
+                    setCoordination(((parameterDTO.getValue()==null||"null".equals(parameterDTO.getValue()))?"":parameterDTO.getValue()));                    
 				}else if(parameterDTO.getValue() != null){
 					this.parameters.put(parameterDTO.getName(), parameterDTO.getValue());
 				}else{
@@ -105,9 +114,25 @@ public class InboundDescription {
 
 	public void setInterval(String interval) {
 		this.interval = interval;
-	}
+	}	
+	
+	public String getSequential() {
+        return sequential;
+    }
 
-	public boolean isSuspend() {
+    public void setSequential(String sequential) {
+        this.sequential = sequential;
+    }
+
+    public String getCoordination() {
+        return coordination;
+    }
+
+    public void setCoordination(String coordination) {
+        this.coordination = coordination;
+    }
+
+    public boolean isSuspend() {
 		return suspend;
 	}
 

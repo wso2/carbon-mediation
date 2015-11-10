@@ -1,3 +1,4 @@
+var intervalRequired = false;
 function isNameValid(namestring) {
     if (namestring != null && namestring != "") {
         for (var j = 0; j < namestring.length; j++)
@@ -87,6 +88,10 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
         CARBON.showWarningDialog(msg4);
         return false;
     }
+    if (intervalRequired == true && document.getElementById('interval').value == "") {
+        CARBON.showWarningDialog(msg3);
+        return false;
+    }    
     if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
         CARBON.showWarningDialog(msg3);
         return false;
@@ -129,11 +134,13 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
         CARBON.showWarningDialog(msg4);
         return false;
     }
-    if(!document.getElementById("inbound.behavior.waiting").checked && !document.getElementById("inbound.behavior.listening").checked){
-	    if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
-	        CARBON.showWarningDialog(msg3);
-	        return false;
-	    }
+    if (intervalRequired == true && document.getElementById('interval').value == "") {
+	    CARBON.showWarningDialog(msg3);
+	    return false;
+	}
+    if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
+	    CARBON.showWarningDialog(msg3);
+	    return false;
 	}
     
     if(requiredParams != null){

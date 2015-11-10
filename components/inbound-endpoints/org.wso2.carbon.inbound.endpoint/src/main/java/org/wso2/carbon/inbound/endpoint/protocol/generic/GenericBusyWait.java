@@ -39,7 +39,7 @@ public class GenericBusyWait extends InboundOneTimeTriggerRequestProcessor
     private String onErrorSeq;    
     private String classImpl;
     private boolean sequential;
-    private static final Log log = LogFactory.getLog(GenericProcessor.class);
+    private static final Log log = LogFactory.getLog(GenericBusyWait.class);
     
     private static final String ENDPOINT_POSTFIX = "CLASS" +
                                                    COMMON_ENDPOINT_POSTFIX;
