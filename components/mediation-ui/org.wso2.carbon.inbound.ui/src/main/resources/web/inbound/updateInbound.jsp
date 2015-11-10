@@ -57,7 +57,7 @@
 					if(paramKey != null && !paramKey.trim().equals("")){
 						sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO(paramKey, request.getParameter("paramval" + strKey.replaceAll("paramkey","")))));	
 					}	
-				}else if(strKey.startsWith("interval")){
+				}else if(strKey.startsWith("interval") && request.getParameter("interval") != null){
 				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("interval",request.getParameter("interval"))));
 				}else if(strKey.startsWith("sequential")){
 				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("sequential",request.getParameter("sequential"))));				    

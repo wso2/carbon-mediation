@@ -179,8 +179,9 @@ var kafkaSpecialParameters = null;
                     <tr>
                         <td style="width:150px"><fmt:message key="inbound.isListening"/></td>
                         <td>
-                            <input type="radio" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')"><fmt:message key="inbound.polling"/>
+                            <input type="radio" id="inbound.behavior.polling" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')"><fmt:message key="inbound.polling"/>
                             <input type="radio" id="inbound.behavior.listening" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
+                            <input type="radio" id="inbound.behavior.waiting" name="inbound.behavior" value="busy-waiting" onclick="toggleInboundInterval('waiting')" ><fmt:message key="inbound.waiting"/>
                         </td>
                         <td></td>
                     </tr>
@@ -188,16 +189,57 @@ var kafkaSpecialParameters = null;
                     <tr id="inboundIntervalRow">
                         <td style="width:150px"><fmt:message key="inbound.interval"/><span class="required">*</span></td>
                         <td align="left">
-                            <input name="interval" id="interval" class="longInput" type="text"/>
+                            <input name="interval" id="interval" class="longInput" type="text" value="<%=inboundDescription.getInterval()%>"/>
                         </td>
                         <td></td>
                     </tr>
+                    <tr id="inboundSequentialRow">
+                        <td style="width:150px"><fmt:message key="inbound.sequential"/><span class="required">*</span></td>
+                        <td align="left">
+                            <select name="sequential" id="sequential">
+                                <%if("true".equals(inboundDescription.getSequential())){%>
+	                            	<option value="true" selected>true</option>
+	                            	<option value="false">false</option>
+	                            <% } else {%>
+	                            	<option value="true">true</option>
+	                            	<option value="false" selected>false</option>	                            
+	                            <% } %>
+                            </select>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr id="inboundCoordinationRow">
+                        <td style="width:150px"><fmt:message key="inbound.coordination"/><span class="required">*</span></td>
+                        <td align="left">
+                            <select name="coordination" id="coordination">
+                                <%if("true".equals(inboundDescription.getCoordination())){%>
+	                            	<option value="true" selected>true</option>
+	                            	<option value="false">false</option>
+	                            <% } else {%>
+	                            	<option value="true">true</option>
+	                            	<option value="false" selected>false</option>	                            
+	                            <% } %>
+                            </select>                            
+                        </td>
+                        <td></td>
+                    </tr>                        
                     <script language="javascript">
                         function toggleInboundInterval(event){
                             if (event == "listening"){
                                 document.getElementById("inboundIntervalRow").style.display="none";
+                                document.getElementById("inboundSequentialRow").style.display="none";
+                                document.getElementById("inboundCoordinationRow").style.display="none";
+                                intervalRequired = false;
+                            }else if (event == "waiting"){
+                                document.getElementById("inboundIntervalRow").style.display="none";
+                                document.getElementById("inboundSequentialRow").style.display="table-row";
+                                document.getElementById("inboundCoordinationRow").style.display="table-row";
+                                intervalRequired = false;
                             } else {
                                 document.getElementById("inboundIntervalRow").style.display="table-row";
+                                document.getElementById("inboundSequentialRow").style.display="table-row";
+                                document.getElementById("inboundCoordinationRow").style.display="table-row";
+                                intervalRequired = true;
                             }
                         }
                     </script>
@@ -359,11 +401,27 @@ var kafkaSpecialParameters = null;
                                         <script language="javascript">
                                             document.getElementById("inbound.behavior.listening").checked = true;
                                             document.getElementById("inboundIntervalRow").style.display="none";
+                                            document.getElementById("inboundSequentialRow").style.display="none";
+                                            document.getElementById("inboundCoordinationRow").style.display="none";
+                                        </script>
+
+                                    <%
+                                }else if(inboundDescription.getParameters().get(strKey).equalsIgnoreCase("busy-waiting")){
+                                    %>
+                                        <script language="javascript">
+                                            document.getElementById("inbound.behavior.waiting").checked = true;
+                                            document.getElementById("inboundIntervalRow").style.display="none";
+                                        </script>
+
+                                    <%                                    
+                                }else if(inboundDescription.getParameters().get(strKey).equalsIgnoreCase("polling")){
+                                    %>
+                                        <script language="javascript">
+                                            document.getElementById("inbound.behavior.polling").checked = true;
                                         </script>
 
                                     <%
                                 }
-
                                 continue;
                             }
 

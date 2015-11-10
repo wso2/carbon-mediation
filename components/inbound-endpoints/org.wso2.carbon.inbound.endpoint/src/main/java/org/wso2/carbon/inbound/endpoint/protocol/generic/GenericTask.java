@@ -35,7 +35,7 @@ public class GenericTask extends InboundTask {
     }
 
     protected void taskExecute() {
-    	logger.debug("File Task executing.");
+    	logger.debug("Generic Task executing.");
     	pollingConsumer.poll();
     }
 

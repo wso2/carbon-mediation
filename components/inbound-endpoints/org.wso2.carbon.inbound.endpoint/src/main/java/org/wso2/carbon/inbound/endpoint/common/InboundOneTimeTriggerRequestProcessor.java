@@ -89,7 +89,9 @@ public abstract class InboundOneTimeTriggerRequestProcessor implements InboundRe
                 }
             }
             inboundRunner = new OneTimeTriggerInboundRunner(task, tenantDomain);
-            task.getCallback().setInboundRunnerMode(true);
+            if(task.getCallback() != null){
+                task.getCallback().setInboundRunnerMode(true);
+            }
             if (task.getCallback() != null) {
                 //this logic introduced if message injection happens in different thread than this
                 //where we do not have access to the carbon context, this is the case for all
