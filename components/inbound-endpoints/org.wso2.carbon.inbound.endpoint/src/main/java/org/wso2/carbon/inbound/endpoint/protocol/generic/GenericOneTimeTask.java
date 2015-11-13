@@ -45,4 +45,8 @@ public class GenericOneTimeTask extends OneTimeTriggerInboundTask{
         logger.debug("Destroying Task. ");
     }
 
+    public GenericEventBasedConsumer getEventBasedConsumer(){
+        return eventBasedConsumer;
+    }
+    
 }

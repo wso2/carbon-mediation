@@ -27,10 +27,10 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.task.TaskStartupObserver;
-import org.wso2.carbon.inbound.endpoint.common.InboundOneTimeTriggerRequestProcessor;
+import org.wso2.carbon.inbound.endpoint.common.InboundOneTimeTriggerEventBasedProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
-public class GenericEventBasedListener extends InboundOneTimeTriggerRequestProcessor
+public class GenericEventBasedListener extends InboundOneTimeTriggerEventBasedProcessor
                               implements TaskStartupObserver {
 
     private GenericEventBasedConsumer eventConsumer;

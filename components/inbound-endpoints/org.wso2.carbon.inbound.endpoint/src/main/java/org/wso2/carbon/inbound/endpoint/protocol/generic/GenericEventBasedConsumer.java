@@ -54,6 +54,12 @@ public abstract class GenericEventBasedConsumer {
      * This methods needs to be implemented when implementing the custom inbound
      * */
     public abstract void listen();
+
+    /**
+     * 
+     * This methods needs to be implemented when terminating the inbound
+     * */
+    public abstract void destroy();    
     
     /**
      * States whether generic endpoint is a eventBased
