@@ -33,6 +33,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
+import org.apache.synapse.flowtracer.MessageFlowTracerConstants;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.MediatorFaultHandler;
@@ -135,6 +136,12 @@ public class InboundHttpServerWorker extends ServerWorker {
                         }
                         continueDispatch = false;
                     }
+                }
+
+                if (synCtx.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
+                    synCtx.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID, synCtx.getMessageID());
+                    synCtx.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ENTRY_TYPE, "Inbound Endpoint:" +
+                                                                                           endpointName);
                 }
 
                 if (continueDispatch && dispatchPattern != null) {
