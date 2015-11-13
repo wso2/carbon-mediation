@@ -181,7 +181,7 @@ var kafkaSpecialParameters = null;
                         <td>
                             <input type="radio" id="inbound.behavior.polling" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')"><fmt:message key="inbound.polling"/>
                             <input type="radio" id="inbound.behavior.listening" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
-                            <input type="radio" id="inbound.behavior.waiting" name="inbound.behavior" value="busy-waiting" onclick="toggleInboundInterval('waiting')" ><fmt:message key="inbound.waiting"/>
+                            <input type="radio" id="inbound.behavior.waiting" name="inbound.behavior" value="eventBased" onclick="toggleInboundInterval('waiting')" ><fmt:message key="inbound.waiting"/>
                         </td>
                         <td></td>
                     </tr>
@@ -406,7 +406,7 @@ var kafkaSpecialParameters = null;
                                         </script>
 
                                     <%
-                                }else if(inboundDescription.getParameters().get(strKey).equalsIgnoreCase("busy-waiting")){
+                                }else if(inboundDescription.getParameters().get(strKey).equalsIgnoreCase("eventBased")){
                                     %>
                                         <script language="javascript">
                                             document.getElementById("inbound.behavior.waiting").checked = true;

@@ -24,9 +24,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 
-public abstract class GenericWaitingConsumer {
+public abstract class GenericEventBasedConsumer {
 
-    public static final String PARAM_INBOUND_ENDPOINT_BEHAVIOR_BUSY_WAITING = "busy-waiting";
+    public static final String PARAM_INBOUND_ENDPOINT_BEHAVIOR_EVENT_BASED = "eventBased";
 
     protected Properties properties;
     protected String name;
@@ -36,9 +36,9 @@ public abstract class GenericWaitingConsumer {
     protected boolean coordination;
     protected boolean sequential;
 
-    private static final Log log = LogFactory.getLog(GenericPollingConsumer.class);
+    private static final Log log = LogFactory.getLog(GenericEventBasedConsumer.class);
     
-    public GenericWaitingConsumer(Properties properties, String name,
+    public GenericEventBasedConsumer(Properties properties, String name,
             SynapseEnvironment synapseEnvironment, String injectingSeq,
             String onErrorSeq, boolean coordination, boolean sequential) {
         this.properties = properties;
@@ -49,21 +49,30 @@ public abstract class GenericWaitingConsumer {
         this.coordination = coordination;
         this.sequential = sequential;
     }
-    
+    /**
+     * 
+     * This methods needs to be implemented when implementing the custom inbound
+     * */
     public abstract void listen();
+
+    /**
+     * 
+     * This methods needs to be implemented when terminating the inbound
+     * */
+    public abstract void destroy();    
     
     /**
-     * States whether generic endpoint is a busy-waiting
-     * Return true; if busy-waiting
+     * States whether generic endpoint is a eventBased
+     * Return true; if eventBased
      *
      * @param inboundParameters
      *            Inbound Parameters for endpoint
      * @return boolean
      */
-    public static boolean isBusyWaitingInboundEndpoint(InboundProcessorParams inboundParameters) {
+    public static boolean isEventBasedInboundEndpoint(InboundProcessorParams inboundParameters) {
         return inboundParameters.getProperties()
                                 .containsKey(GenericInboundListener.PARAM_INBOUND_ENDPOINT_BEHAVIOR) &&
-               PARAM_INBOUND_ENDPOINT_BEHAVIOR_BUSY_WAITING.equals(inboundParameters.getProperties()
+               PARAM_INBOUND_ENDPOINT_BEHAVIOR_EVENT_BASED.equals(inboundParameters.getProperties()
                                 .getProperty(GenericInboundListener.PARAM_INBOUND_ENDPOINT_BEHAVIOR));
     }
     

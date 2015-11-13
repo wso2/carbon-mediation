@@ -27,24 +27,24 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.task.TaskStartupObserver;
-import org.wso2.carbon.inbound.endpoint.common.InboundOneTimeTriggerRequestProcessor;
+import org.wso2.carbon.inbound.endpoint.common.InboundOneTimeTriggerEventBasedProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
-public class GenericBusyWait extends InboundOneTimeTriggerRequestProcessor
+public class GenericEventBasedListener extends InboundOneTimeTriggerEventBasedProcessor
                               implements TaskStartupObserver {
 
-    private GenericWaitingConsumer waitingConsumer;
+    private GenericEventBasedConsumer eventConsumer;
     private Properties properties;
     private String injectingSeq;
     private String onErrorSeq;    
     private String classImpl;
     private boolean sequential;
-    private static final Log log = LogFactory.getLog(GenericBusyWait.class);
+    private static final Log log = LogFactory.getLog(GenericEventBasedListener.class);
     
     private static final String ENDPOINT_POSTFIX = "CLASS" +
                                                    COMMON_ENDPOINT_POSTFIX;
 
-    public GenericBusyWait(String name, String classImpl,
+    public GenericEventBasedListener(String name, String classImpl,
                             Properties properties,
                             String injectingSeq, String onErrorSeq,
                             SynapseEnvironment synapseEnvironment,
@@ -59,7 +59,7 @@ public class GenericBusyWait extends InboundOneTimeTriggerRequestProcessor
         this.sequential = sequential;
     }
 
-    public GenericBusyWait(InboundProcessorParams params) {
+    public GenericEventBasedListener(InboundProcessorParams params) {
         this.name = params.getName();
         this.properties = params.getProperties();
         this.coordination = true;
@@ -77,7 +77,7 @@ public class GenericBusyWait extends InboundOneTimeTriggerRequestProcessor
     }
 
     public void init() {
-        log.info("Inbound listener " + name + " for class " + classImpl +
+        log.info("Inbound event based listener " + name + " for class " + classImpl +
                  " starting ...");
         try {
             Class c = Class.forName(classImpl);
@@ -86,7 +86,7 @@ public class GenericBusyWait extends InboundOneTimeTriggerRequestProcessor
                                                 String.class,
                                                 String.class, boolean.class,
                                                 boolean.class);
-            waitingConsumer = (GenericWaitingConsumer) cons.newInstance(properties,
+            eventConsumer = (GenericEventBasedConsumer) cons.newInstance(properties,
                                                                         name,
                                                                         synapseEnvironment,
                                                                         injectingSeq,
@@ -114,10 +114,10 @@ public class GenericBusyWait extends InboundOneTimeTriggerRequestProcessor
 
     public void start() {
         try {
-            GenericOneTimeTask task = new GenericOneTimeTask(waitingConsumer);
+            GenericOneTimeTask task = new GenericOneTimeTask(eventConsumer);
             start(task, ENDPOINT_POSTFIX);
         } catch (Exception e) {
-            log.error("Could not start Generic Processor. Error starting up scheduler. Error: " +
+            log.error("Could not start Generic Event Based Processor. Error starting up scheduler. Error: " +
                       e.getLocalizedMessage());
         }
     }

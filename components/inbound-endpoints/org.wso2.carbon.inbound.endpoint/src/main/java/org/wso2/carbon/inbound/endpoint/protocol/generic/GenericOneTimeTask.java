@@ -25,18 +25,17 @@ import org.wso2.carbon.inbound.endpoint.common.OneTimeTriggerInboundTask;
 public class GenericOneTimeTask extends OneTimeTriggerInboundTask{
 
     private static final Log logger = LogFactory.getLog(GenericOneTimeTask.class.getName());
-    private GenericWaitingConsumer waitingConsumer;
+    private GenericEventBasedConsumer eventBasedConsumer;
     
-    public GenericOneTimeTask(GenericWaitingConsumer waitingConsumer) {
+    public GenericOneTimeTask(GenericEventBasedConsumer waitingConsumer) {
         logger.debug("Generic One time Task initalize.");
-        this.waitingConsumer = waitingConsumer;
+        this.eventBasedConsumer = waitingConsumer;
     }
 
     protected void taskExecute() {
         logger.debug("One time task executing.");
-        waitingConsumer.listen();
+        eventBasedConsumer.listen();
     }
-
 
     public void init(SynapseEnvironment synapseEnvironment) {
         logger.debug("Initializing Task.");
@@ -46,4 +45,8 @@ public class GenericOneTimeTask extends OneTimeTriggerInboundTask{
         logger.debug("Destroying Task. ");
     }
 
+    public GenericEventBasedConsumer getEventBasedConsumer(){
+        return eventBasedConsumer;
+    }
+    
 }
