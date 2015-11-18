@@ -31,6 +31,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.aspects.ComponentType;
+import org.apache.synapse.aspects.newstatistics.RuntimeStatisticCollector;
+import org.apache.synapse.aspects.newstatistics.event.reader.StatisticEventReceiver;
+import org.apache.synapse.aspects.newstatistics.log.templates.CreateEntryStatisticLog;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -86,9 +90,11 @@ public class InboundHttpServerWorker extends ServerWorker {
                 //create Synapse Message Context
                 org.apache.synapse.MessageContext synCtx =
                         createSynapseMessageContext(request, axis2MsgContext);
+
                 updateAxis2MessageContextForSynapse(synCtx);
 
                 setInboundProperties(synCtx);
+
                 String method = request.getRequest() != null ? request.getRequest().
                         getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axis2MsgContext, method);
@@ -105,6 +111,12 @@ public class InboundHttpServerWorker extends ServerWorker {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
                     return;
                 }
+                //Setting Statistic Trace ID for statistic Collection
+                RuntimeStatisticCollector.setStatisticsTraceId(synCtx);
+                CreateEntryStatisticLog createEntryStatisticLog =
+                        new CreateEntryStatisticLog(synCtx, endpointName, ComponentType.INBOUNDENDPOINT, "",
+                                                    System.currentTimeMillis());
+                StatisticEventReceiver.receive(createEntryStatisticLog);
 
                 CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
