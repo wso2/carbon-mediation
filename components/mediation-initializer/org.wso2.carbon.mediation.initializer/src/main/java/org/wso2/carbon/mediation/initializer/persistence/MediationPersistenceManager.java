@@ -565,7 +565,6 @@ public class MediationPersistenceManager {
 
             Collection<ProxyService> proxyServices = cAppConfig.getProxyServices();
             for (ProxyService proxy : proxyServices) {
-                ProxyService newProxy = proxy;
                 // Delete the persisted proxy service
                 deleteItem(proxy.getName(), proxy.getFileName(), ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
             }
@@ -600,7 +599,6 @@ public class MediationPersistenceManager {
 
             Collection<API> apiCollection = cAppConfig.getAPIs();
             for (API api : apiCollection) {
-                API newApi = api;
                 synapseConfiguration.addAPI(api.getName(), api);
                 api.init((SynapseEnvironment) synapseConfiguration.getAxisConfiguration()
                         .getParameter(SynapseConstants.SYNAPSE_ENV).getValue());
@@ -608,7 +606,6 @@ public class MediationPersistenceManager {
 
             Collection<Startup> tasks = cAppConfig.getStartups();
             for (Startup task : tasks) {
-                Startup newTask = task;
                 synapseConfiguration.addStartup(task);
             }
 
@@ -712,10 +709,10 @@ public class MediationPersistenceManager {
 
             Map<String, Entry> localEntries = synapseConfiguration.getDefinedEntries();
             for (String name : localEntries.keySet()) {
-                Entry e = localEntries.get(name);
-                if (e != null && e.getArtifactContainerName() != null) {
-                    e.setIsEdited(true);
-                    cAppArtifactConfig.addEntry(name, e);
+                Entry localEntry = localEntries.get(name);
+                if (localEntry != null && localEntry.getArtifactContainerName() != null) {
+                    localEntry.setIsEdited(true);
+                    cAppArtifactConfig.addEntry(name, localEntry);
                     synapseConfiguration.removeEntry(name);
                 }
             }

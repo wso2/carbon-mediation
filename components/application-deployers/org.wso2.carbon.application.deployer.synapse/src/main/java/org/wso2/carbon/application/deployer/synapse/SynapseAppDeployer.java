@@ -959,6 +959,12 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                File.separator + SynapseAppDeployerConstants.FAULT_SEQ_FILE;
     }
 
+    /**
+     * Set the custom log content if the per Artifact container logging is enabled
+     *
+     * @param deployer Application Deployer
+     * @param carbonApp carbon application
+     */
     public void setCustomLogContent (Deployer deployer, CarbonApplication carbonApp) {
         if ((deployer instanceof AbstractSynapseArtifactDeployer) && carbonApp != null) {
             ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApp.getAppName(),

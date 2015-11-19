@@ -65,6 +65,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
     private static String SUCCESSFUL = "successful";
     private static String FAILED = "failed";
     private static Log log = LogFactory.getLog(ProxyServiceAdmin.class);
+    private static final String FILE_TYPE_EXTENSION_XML = ".xml";
 
     /**
      * Enables statistics for the specified proxy service
@@ -368,7 +369,7 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                             proxy.setArtifactContainerName(currentProxy.getArtifactContainerName());
                             proxy.setIsEdited(true);
                             MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-                            pm.deleteItem(proxy.getName(), proxy.getName() + ".xml", ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+                            pm.deleteItem(proxy.getName(), proxy.getName() + FILE_TYPE_EXTENSION_XML, ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
                         }
                     } catch (Exception e) {
 
