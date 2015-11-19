@@ -114,6 +114,16 @@ public class GenericProcessor extends InboundRequestProcessorImpl implements Tas
         }
     }
 
+    /**
+     * Stop the inbound polling processor This will be called when inbound is
+     * undeployed/redeployed or when server stop
+     */
+    public void destroy() {        
+        super.destroy();
+        //Terminate polling events
+        pollingConsumer.destroy();
+    }    
+    
     public String getName() {
         return name;
     }

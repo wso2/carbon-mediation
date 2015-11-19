@@ -69,6 +69,10 @@ public abstract class GenericPollingConsumer {
     }
 
     public abstract Object poll();
+    
+    public void destroy() {
+        log.info("Default destroy invoked. Not overwritten.");
+    }
 
     protected boolean injectMessage(String strMessage, String contentType){  
         InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(strMessage.getBytes()));
