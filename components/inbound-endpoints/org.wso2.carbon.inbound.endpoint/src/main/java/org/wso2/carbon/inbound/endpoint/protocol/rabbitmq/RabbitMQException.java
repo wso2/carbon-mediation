@@ -19,7 +19,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.rabbitmq;
 
 /**
- * This class represents RabbitMQ specific exceptions
+ * This class represents RabbitMQ specific exceptions.
  */
 public class RabbitMQException extends RuntimeException {
     public RabbitMQException(String msg) {

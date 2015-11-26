@@ -38,7 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 /**
- * RabbitMQInjectHandler uses to mediate the received RabbitMQ message
+ * RabbitMQInjectHandler uses to mediate the received RabbitMQ message.
  */
 public class RabbitMQInjectHandler {
     private static final Log log = LogFactory.getLog(RabbitMQInjectHandler.class);
@@ -143,7 +143,7 @@ public class RabbitMQInjectHandler {
     }
 
     /**
-     * Create the initial message context for rabbitmq
+     * Create the initial message context for rabbitmq.
      */
     private org.apache.synapse.MessageContext createMessageContext() {
         org.apache.synapse.MessageContext msgCtx = synapseEnvironment

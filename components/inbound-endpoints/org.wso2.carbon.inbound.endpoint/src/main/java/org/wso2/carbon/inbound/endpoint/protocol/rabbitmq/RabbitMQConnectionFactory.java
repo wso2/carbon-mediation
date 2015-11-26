@@ -38,7 +38,7 @@ import java.util.Properties;
  * Encapsulate a RabbitMQ AMQP Connection factory definition within an inbound configuration
  * <p/>
  * Connection Factory definitions, allows service level parameters to be defined,
- * and re-used by each service that binds to it
+ * and re-used by each service that binds to it.
  */
 public class RabbitMQConnectionFactory {
 
@@ -52,7 +52,7 @@ public class RabbitMQConnectionFactory {
 
 
     /**
-     * Digest a AMQP CF definition from the configuration and construct
+     * Digest a AMQP CF definition from the configuration and construct.
      */
     public RabbitMQConnectionFactory(Properties properties) {
         this.name = properties.getProperty(RabbitMQConstants.RABBITMQ_CON_FAC);
@@ -63,7 +63,7 @@ public class RabbitMQConnectionFactory {
     }
 
     /**
-     * Create a connection factory based on given parameters
+     * Create a connection factory based on given parameters.
      *
      * @param name       Name of the connection factory
      * @param parameters parameters containing the required to create the connection factory
@@ -98,7 +98,7 @@ public class RabbitMQConnectionFactory {
     }
 
     /**
-     * Catch an exception an throw a AxisRabbitMQException with message
+     * Catch an exception an throw a AxisRabbitMQException with message.
      *
      * @param msg message to set for the exception
      * @param e   throwable to set
@@ -109,7 +109,7 @@ public class RabbitMQConnectionFactory {
     }
 
     /**
-     * Catch an exception an throw a RabbitMQException with message
+     * Catch an exception an throw a RabbitMQException with message.
      *
      * @param msg message to set for the exception
      */
@@ -262,7 +262,7 @@ public class RabbitMQConnectionFactory {
     }
 
     /**
-     * Create a rabbit mq connection
+     * Create a rabbit mq connection.
      *
      * @return a connection to the server
      */
