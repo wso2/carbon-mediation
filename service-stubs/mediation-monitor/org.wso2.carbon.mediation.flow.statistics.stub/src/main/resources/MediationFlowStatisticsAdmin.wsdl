@@ -1,0 +1,202 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://service.statistics.flow.mediation.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax2297="http://service.statistics.flow.mediation.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax2299="http://store.statistics.flow.mediation.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ax2300="http://aspects.synapse.apache.org/xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
+   <wsdl:documentation>MediationFlowStatisticsAdmin</wsdl:documentation>
+   <wsdl:types>
+      <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org/xsd">
+         <xs:complexType name="AdminData">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="componetID" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="componetType" nillable="true" type="xs:string"/>
+            </xs:sequence>
+         </xs:complexType>
+      </xs:schema>
+      <xs:schema xmlns:ax2302="http://store.statistics.flow.mediation.carbon.wso2.org/xsd" xmlns:ax2298="http://service.statistics.flow.mediation.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
+         <xs:import namespace="http://service.statistics.flow.mediation.carbon.wso2.org/xsd"/>
+         <xs:import namespace="http://store.statistics.flow.mediation.carbon.wso2.org/xsd"/>
+         <xs:element name="getAllStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getComponentStatitics">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="componentID" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getComponentStatiticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2299:StatisticsTree"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="startCollectionManually">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+      </xs:schema>
+      <xs:schema xmlns:ax2301="http://aspects.synapse.apache.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://store.statistics.flow.mediation.carbon.wso2.org/xsd">
+         <xs:import namespace="http://aspects.synapse.apache.org/xsd"/>
+         <xs:complexType name="StatisticsTree">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="root" nillable="true" type="ax2299:IndividualStatistics"/>
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="IndividualStatistics">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="avgProcessingTime" type="xs:long"/>
+               <xs:element minOccurs="0" name="children" nillable="true" type="xs:anyType"/>
+               <xs:element minOccurs="0" name="componentId" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="componentType" nillable="true" type="ax2300:ComponentType"/>
+               <xs:element minOccurs="0" name="count" type="xs:int"/>
+               <xs:element minOccurs="0" name="faultCount" type="xs:int"/>
+               <xs:element minOccurs="0" name="isResponse" type="xs:boolean"/>
+               <xs:element minOccurs="0" name="maxProcessingTime" type="xs:long"/>
+               <xs:element minOccurs="0" name="minProcessingTime" type="xs:long"/>
+               <xs:element minOccurs="0" name="msgId" type="xs:int"/>
+               <xs:element minOccurs="0" name="parentId" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="parentMsgId" type="xs:int"/>
+               <xs:element minOccurs="0" name="response" type="xs:boolean"/>
+            </xs:sequence>
+         </xs:complexType>
+      </xs:schema>
+      <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://aspects.synapse.apache.org/xsd">
+         <xs:complexType name="ComponentType">
+            <xs:complexContent>
+               <xs:extension base="xs:Enum">
+                  <xs:sequence/>
+               </xs:extension>
+            </xs:complexContent>
+         </xs:complexType>
+      </xs:schema>
+   </wsdl:types>
+   <wsdl:message name="startCollectionManuallyRequest">
+      <wsdl:part name="parameters" element="ns:startCollectionManually"/>
+   </wsdl:message>
+   <wsdl:message name="getAllStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getAllStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getAllStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getAllStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getComponentStatiticsRequest">
+      <wsdl:part name="parameters" element="ns:getComponentStatitics"/>
+   </wsdl:message>
+   <wsdl:message name="getComponentStatiticsResponse">
+      <wsdl:part name="parameters" element="ns:getComponentStatiticsResponse"/>
+   </wsdl:message>
+   <wsdl:portType name="MediationFlowStatisticsAdminPortType">
+      <wsdl:operation name="startCollectionManually">
+         <wsdl:input message="ns:startCollectionManuallyRequest" wsaw:Action="urn:startCollectionManually"/>
+      </wsdl:operation>
+      <wsdl:operation name="getAllStatistics">
+         <wsdl:input message="ns:getAllStatisticsRequest" wsaw:Action="urn:getAllStatistics"/>
+         <wsdl:output message="ns:getAllStatisticsResponse" wsaw:Action="urn:getAllStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getComponentStatitics">
+         <wsdl:input message="ns:getComponentStatiticsRequest" wsaw:Action="urn:getComponentStatitics"/>
+         <wsdl:output message="ns:getComponentStatiticsResponse" wsaw:Action="urn:getComponentStatiticsResponse"/>
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="MediationFlowStatisticsAdminSoap11Binding" type="ns:MediationFlowStatisticsAdminPortType">
+      <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+      <wsdl:operation name="startCollectionManually">
+         <soap:operation soapAction="urn:startCollectionManually" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllStatistics">
+         <soap:operation soapAction="urn:getAllStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getComponentStatitics">
+         <soap:operation soapAction="urn:getComponentStatitics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="MediationFlowStatisticsAdminSoap12Binding" type="ns:MediationFlowStatisticsAdminPortType">
+      <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+      <wsdl:operation name="startCollectionManually">
+         <soap12:operation soapAction="urn:startCollectionManually" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllStatistics">
+         <soap12:operation soapAction="urn:getAllStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getComponentStatitics">
+         <soap12:operation soapAction="urn:getComponentStatitics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="MediationFlowStatisticsAdminHttpBinding" type="ns:MediationFlowStatisticsAdminPortType">
+      <http:binding verb="POST"/>
+      <wsdl:operation name="startCollectionManually">
+         <http:operation location="startCollectionManually"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="getAllStatistics">
+         <http:operation location="getAllStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getComponentStatitics">
+         <http:operation location="getComponentStatitics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="MediationFlowStatisticsAdmin">
+      <wsdl:port name="MediationFlowStatisticsAdminHttpsSoap11Endpoint" binding="ns:MediationFlowStatisticsAdminSoap11Binding">
+         <soap:address location="https://virajrs-ThinkPad-T540p:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsSoap11Endpoint"/>
+      </wsdl:port>
+      <wsdl:port name="MediationFlowStatisticsAdminHttpsSoap12Endpoint" binding="ns:MediationFlowStatisticsAdminSoap12Binding">
+         <soap12:address location="https://virajrs-ThinkPad-T540p:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsSoap12Endpoint"/>
+      </wsdl:port>
+      <wsdl:port name="MediationFlowStatisticsAdminHttpsEndpoint" binding="ns:MediationFlowStatisticsAdminHttpBinding">
+         <http:address location="https://virajrs-ThinkPad-T540p:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsEndpoint"/>
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>

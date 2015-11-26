@@ -37,15 +37,7 @@ public class MediationFlowStatisticsAdminService {
 	}
 
 	public void startCollectionManually(){
-		int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 
-		StatisticNotifier statisticNotifier = new StatisticNotifier();
-
-		StatisticCollectingThread reporterThread = new StatisticCollectingThread(statisticNotifier);
-
-		reporterThread.setName("mediation-stat-collector-new-" + tenantId);
-
-		reporterThread.start();
 	}
 
 

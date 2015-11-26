@@ -1,9 +1,8 @@
 package org.wso2.carbon.mediation.flow.statistics;
 
 import org.apache.log4j.Logger;
-import org.apache.synapse.aspects.newstatistics.RuntimeStatisticCollector;
-import org.apache.synapse.aspects.newstatistics.StatisticsLog;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+import org.apache.synapse.aspects.newstatistics.StatisticsLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,15 +13,15 @@ public class StatisticCollectingThread extends Thread {
 	/**
 	 * The reference to the synapse environment service
 	 */
-	//private SynapseEnvironmentService synapseEnvironmentService;
+	private SynapseEnvironmentService synapseEnvironmentService;
 
 	private boolean shutdownRequested = false;
 	private long delay = 5 * 1000;
 
 	private StatisticNotifier statisticNotifier;
 
-	public StatisticCollectingThread(StatisticNotifier statisticNotifier) {
-		//this.synapseEnvironmentService = synEnvSvc;
+	public StatisticCollectingThread(SynapseEnvironmentService synEnvService, StatisticNotifier statisticNotifier) {
+		this.synapseEnvironmentService = synEnvService;
 		this.statisticNotifier = statisticNotifier;
 	}
 
@@ -34,9 +33,10 @@ public class StatisticCollectingThread extends Thread {
 	}
 
 	private void reportStatistics() {
-		List<ArrayList<StatisticsLog>> statitisticEntries = RuntimeStatisticCollector.getCompletedStatisticStore()
-		                                                                             .getCompletedStatitisticEntries();
-		for (ArrayList<StatisticsLog> statisticsLogs : statitisticEntries) {
+		List<ArrayList<StatisticsLog>> statisticEntries =
+				synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore()
+				                         .getCompletedStatitisticEntries();
+		for (ArrayList<StatisticsLog> statisticsLogs : statisticEntries) {
 			statisticNotifier.updateStatistics(statisticsLogs);
 		}
 	}
