@@ -768,6 +768,10 @@ public class ESBRegistry extends AbstractRegistry {
         }
     }
 
+    public void newNonEmptyResource(String key, boolean isDirectory, String mediaType, String content, String propertyName) {
+        //TODO
+    }
+
 
     private void fillDescendants(RegistryEntry parent, ArrayList<RegistryEntry> list) {
 
