@@ -35,40 +35,41 @@
         <module>org.wso2.carbon.bam.mediationstats.data.publisher.stub</module>
         <module>org.wso2.carbon.bam.service.data.publisher.stub</module>
         <module>org.wso2.carbon.mediation.statistics.stub</module>
-	<module>org.wso2.carbon.mediation.tracer.stub</module>
+        <module>org.wso2.carbon.mediation.tracer.stub</module>
+        <module>org.wso2.carbon.mediation.flow.statistics.stub</module>
     </modules>
-  <dependencies>
-    <dependency>
-                <groupId>wsdl4j.wso2</groupId>
-                <artifactId>wsdl4j</artifactId>
-               
-    </dependency>
-            <dependency>
-                <groupId>org.apache.axis2.wso2</groupId>
-                <artifactId>axis2</artifactId>
-            </dependency>
-                        <dependency>
-                <groupId>org.apache.neethi.wso2</groupId>
-                <artifactId>neethi</artifactId>
-                                <exclusions>
-                                        <exclusion>
-                                                <groupId>org.apache.neethi</groupId>
-                                                <artifactId>neethi</artifactId>
-                                        </exclusion>
-                                </exclusions>
-            </dependency>
-                        <dependency>
-                <groupId>org.apache.ws.commons.schema.wso2</groupId>
-                <artifactId>XmlSchema</artifactId>
-            </dependency>
-                        <dependency>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-            </dependency>
-                        <dependency>
-                <groupId>org.apache.ws.commons.axiom.wso2</groupId>
-                <artifactId>axiom</artifactId>
-            </dependency>
-  </dependencies>
-    
+    <dependencies>
+        <dependency>
+            <groupId>wsdl4j.wso2</groupId>
+            <artifactId>wsdl4j</artifactId>
+
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis2.wso2</groupId>
+            <artifactId>axis2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.neethi.wso2</groupId>
+            <artifactId>neethi</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.neethi</groupId>
+                    <artifactId>neethi</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.schema.wso2</groupId>
+            <artifactId>XmlSchema</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ws.commons.axiom.wso2</groupId>
+            <artifactId>axiom</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

@@ -34,5 +34,6 @@
             <module>mediation-statistics</module>
             <module>mediation-tracer</module>
             <module>mediation-data-publisher</module>
+            <module>mediation-flow-statistics</module>
          </modules>
   </project>
