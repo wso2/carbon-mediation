@@ -13,6 +13,9 @@ public class FlowPath {
         nodeMap = new HashMap<>();
 
         for (MessageFlowComponentEntry messageFlowComponentEntry:componentNodes){
+//            if(!isValidMediatorForUI(messageFlowComponentEntry.getComponentName())){
+//                continue;
+//            }
             if(nodeMap.containsKey(messageFlowComponentEntry.getComponentId())){
                 nodeMap.get(messageFlowComponentEntry.getComponentId()).getEntries().add(messageFlowComponentEntry);
             }
