@@ -33,6 +33,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
+import org.apache.synapse.flowtracer.MessageFlowDataHolder;
 import org.apache.synapse.flowtracer.MessageFlowTracerConstants;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
@@ -138,16 +139,17 @@ public class InboundHttpServerWorker extends ServerWorker {
                     }
                 }
 
-                if (synCtx.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
-                    synCtx.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID, synCtx.getMessageID());
-                    synCtx.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ENTRY_TYPE, "Inbound Endpoint:" +
-                                                                                           endpointName);
-                }
-
                 if (continueDispatch && dispatchPattern != null) {
 
                     boolean processedByAPI = false;
 
+                    if (MessageFlowDataHolder.isMessageFlowTraceEnable()) {
+                        if (synCtx.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
+                            synCtx.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID, synCtx.getMessageID());
+                            synCtx.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ENTRY_TYPE, "Inbound Endpoint:" +
+                                                                                                            endpointName);
+                        }
+                    }
                     // Trying to dispatch to an API
                     processedByAPI = restHandler.process(synCtx);
                     if (log.isDebugEnabled()) {
@@ -168,13 +170,20 @@ public class InboundHttpServerWorker extends ServerWorker {
                             //set inbound properties for axis2 context
                             setInboundProperties(axis2MsgContext);
 
+                            if (MessageFlowDataHolder.isMessageFlowTraceEnable()) {
+                                if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
+                                    axis2MsgContext.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID, synCtx.getMessageID());
+                                    axis2MsgContext.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ENTRY_TYPE, "Inbound Endpoint:" +
+                                                                                                                    endpointName);
+                                }
+                            }
                             if (!isRESTRequest(axis2MsgContext, method)) {
                                 if (request.isEntityEnclosing()) {
                                     processEntityEnclosingRequest(axis2MsgContext, isAxis2Path);
                                 } else {
                                     processNonEntityEnclosingRESTHandler(null, axis2MsgContext, isAxis2Path);
                                 }
-                            }else {
+                            } else {
                                 String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
                                 SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
                                 processNonEntityEnclosingRESTHandler(soapEnvelope,axis2MsgContext,true);
