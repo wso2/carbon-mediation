@@ -21,25 +21,26 @@ package org.wso2.carbon.mediation.flow.statistics.service;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.mediation.flow.statistics.StatisticNotifier;
+import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 public class MediationStatisticsServiceImpl implements MediationStatisticsService {
 
-	private StatisticNotifier tenantStatisticNotifier;
+	private StatisticsStore tenantStatisticsStore;
 
 	private int tenantId = MultitenantConstants.SUPER_TENANT_ID;
 
 	private ConfigurationContext configurationContext;
 
-	public MediationStatisticsServiceImpl(StatisticNotifier statisticNotifier, int tenantId,
+	public MediationStatisticsServiceImpl(StatisticsStore statisticsStore, int tenantId,
 	                                      ConfigurationContext configurationContext) {
-		this.tenantStatisticNotifier = statisticNotifier;
+		this.tenantStatisticsStore = statisticsStore;
 		this.tenantId = tenantId;
 		this.configurationContext = configurationContext;
 	}
 
-	public StatisticNotifier getTenetantNotifier() {
-		return tenantStatisticNotifier;
+	public StatisticsStore getTenetantStatisticsStore() {
+		return tenantStatisticsStore;
 	}
 
 	public int getTenantId() {

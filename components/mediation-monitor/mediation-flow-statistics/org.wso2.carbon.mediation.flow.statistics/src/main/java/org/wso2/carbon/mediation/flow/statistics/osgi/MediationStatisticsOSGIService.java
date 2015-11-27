@@ -1,14 +1,16 @@
 package org.wso2.carbon.mediation.flow.statistics.osgi;
 
+import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
+import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.mediation.flow.statistics.StatisticCollectingThread;
-import org.wso2.carbon.mediation.flow.statistics.StatisticNotifier;
 import org.wso2.carbon.mediation.flow.statistics.service.MediationStatisticsService;
 import org.wso2.carbon.mediation.flow.statistics.service.MediationStatisticsServiceImpl;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -33,7 +35,7 @@ public class MediationStatisticsOSGIService {
 
 	private static final Log log = LogFactory.getLog(MediationStatisticsOSGIService.class);
 
-	private Map<Integer, StatisticNotifier> notifierHashMap = new HashMap<>();
+	private Map<Integer, StatisticsStore> statisticsStoreHashMap = new HashMap<>();
 
 	private Map<Integer, StatisticCollectingThread> reporterThreads = new HashMap<>();
 
@@ -52,9 +54,9 @@ public class MediationStatisticsOSGIService {
 
 			if (synapseEnvService != null) {
 				createStatisticsStore(synapseEnvService);
-				StatisticNotifier statisticNotifier = notifierHashMap.get(MultitenantConstants.SUPER_TENANT_ID);
+				StatisticsStore statisticsStore = statisticsStoreHashMap.get(MultitenantConstants.SUPER_TENANT_ID);
 				MediationStatisticsService service =
-						new MediationStatisticsServiceImpl(statisticNotifier, MultitenantConstants.SUPER_TENANT_ID,
+						new MediationStatisticsServiceImpl(statisticsStore, MultitenantConstants.SUPER_TENANT_ID,
 						                                   synapseEnvService.getConfigurationContext());
 
 				services.put(MultitenantConstants.SUPER_TENANT_ID, service);
@@ -78,8 +80,12 @@ public class MediationStatisticsOSGIService {
 
 		//TODO Do we need to use old stat reporter enable in xml
 		int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-		StatisticNotifier statisticNotifier = new StatisticNotifier();
-		StatisticCollectingThread reporterThread = new StatisticCollectingThread(synEnvService, statisticNotifier);
+		ConfigurationContext cfgCtx = synEnvService.getConfigurationContext();
+
+		StatisticsStore statisticsStore = new StatisticsStore();
+		cfgCtx.setProperty(MessageFlowStatisticConstants.MESSAGE_FLOW_STATISTIC_STORE, statisticsStore);
+
+		StatisticCollectingThread reporterThread = new StatisticCollectingThread(synEnvService, statisticsStore);
 		reporterThread.setName("mediation-stat-collector-new-" + tenantId);
 
 		//TODO Do we need this
@@ -92,7 +98,7 @@ public class MediationStatisticsOSGIService {
 			log.debug("Registering the new mediation statistics service");
 		}
 		reporterThreads.put(tenantId, reporterThread);
-		notifierHashMap.put(tenantId, statisticNotifier);
+		statisticsStoreHashMap.put(tenantId, statisticsStore);
 	}
 
 	protected void deactivate(ComponentContext compCtx) throws Exception {
@@ -148,10 +154,10 @@ public class MediationStatisticsOSGIService {
 						synEnvSvcRegistration.getReference());
 				createStatisticsStore(synEnvSvc);
 				int tenantId = registrationsService.getTenantId();
-				StatisticNotifier store = notifierHashMap.get(tenantId);
-				if (store != null) {
+				StatisticsStore statisticsStore = statisticsStoreHashMap.get(tenantId);
+				if (statisticsStore != null) {
 					MediationStatisticsService service =
-							new MediationStatisticsServiceImpl(store, registrationsService.getTenantId(),
+							new MediationStatisticsServiceImpl(statisticsStore, registrationsService.getTenantId(),
 							                                   registrationsService.getConfigurationContext());
 
 					services.put(registrationsService.getTenantId(), service);

@@ -1,23 +1,18 @@
 package org.wso2.carbon.mediation.flow.statistics.service;
 
-
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.mediation.flow.statistics.StatisticCollectingThread;
-import org.wso2.carbon.mediation.flow.statistics.StatisticNotifier;
+import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsTree;
+import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 
 import java.util.*;
 
-public class MediationFlowStatisticsAdminService {
-
-	StatisticsStore statisticsStore;
-
-	public MediationFlowStatisticsAdminService(StatisticsStore statisticsStore) {
-		this.statisticsStore = statisticsStore;
-	}
+public class MediationFlowStatisticsAdminService extends AbstractServiceBusAdmin {
 
 	public List<AdminData> getAllStatistics() {
+		StatisticsStore statisticsStore = ((StatisticsStore) getConfigContext()
+				.getProperty(MessageFlowStatisticConstants.MESSAGE_FLOW_STATISTIC_STORE));
+
 		Set<Map.Entry<String, StatisticsTree>> statRecords = statisticsStore.getElementsWithValue();
 
 		Iterator iterator = statRecords.iterator();
@@ -31,14 +26,15 @@ public class MediationFlowStatisticsAdminService {
 		return outputList;
 	}
 
-	public StatisticsTree getComponentStatitics(String componentID){
+	public StatisticsTree getComponentStatitics(String componentID) {
+		StatisticsStore statisticsStore = ((StatisticsStore) getConfigContext()
+				.getProperty(MessageFlowStatisticConstants.MESSAGE_FLOW_STATISTIC_STORE));
 		return statisticsStore.getStatisticTree(componentID);
 
 	}
 
-	public void startCollectionManually(){
+	public void startCollectionManually() {
 
 	}
-
 
 }

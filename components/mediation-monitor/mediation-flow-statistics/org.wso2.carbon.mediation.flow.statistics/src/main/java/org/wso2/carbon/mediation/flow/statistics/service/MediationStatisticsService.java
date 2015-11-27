@@ -20,11 +20,11 @@
 package org.wso2.carbon.mediation.flow.statistics.service;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.mediation.flow.statistics.StatisticNotifier;
+import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 
 public interface MediationStatisticsService {
 
-    public StatisticNotifier getTenetantNotifier();
+    public StatisticsStore getTenetantStatisticsStore();
 
 
     public int getTenantId();

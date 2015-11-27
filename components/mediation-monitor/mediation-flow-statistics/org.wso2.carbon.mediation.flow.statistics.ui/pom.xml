@@ -22,7 +22,6 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.flow.statistics.stub</artifactId>
-            <version>4.4.12-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -38,9 +37,13 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Export-Package>
-                            org.wso2.carbon.mediation.statistics.ui.*;
+                            org.wso2.carbon.mediation.flow.statistics.ui.*;
                         </Export-Package>
                         <Import-Package>
+                            org.wso2.carbon.mediation.flow.statistics.stub.*;
+                            version="${carbon.mediation.imp.pkg.version}",
+                            org.wso2.carbon.mediation.flow.statistics.stub.aspect.*;
+                            version="${carbon.mediation.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <Carbon-Component>UIBundle</Carbon-Component>

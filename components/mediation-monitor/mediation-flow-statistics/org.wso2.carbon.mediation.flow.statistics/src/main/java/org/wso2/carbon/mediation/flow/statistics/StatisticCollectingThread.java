@@ -1,6 +1,7 @@
 package org.wso2.carbon.mediation.flow.statistics;
 
 import org.apache.log4j.Logger;
+import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.apache.synapse.aspects.newstatistics.StatisticsLog;
 
@@ -18,11 +19,11 @@ public class StatisticCollectingThread extends Thread {
 	private boolean shutdownRequested = false;
 	private long delay = 5 * 1000;
 
-	private StatisticNotifier statisticNotifier;
+	private StatisticsStore statisticsStore;
 
-	public StatisticCollectingThread(SynapseEnvironmentService synEnvService, StatisticNotifier statisticNotifier) {
+	public StatisticCollectingThread(SynapseEnvironmentService synEnvService, StatisticsStore statisticsStore) {
 		this.synapseEnvironmentService = synEnvService;
-		this.statisticNotifier = statisticNotifier;
+		this.statisticsStore = statisticsStore;
 	}
 
 	public void setDelay(long delay) {
@@ -37,7 +38,7 @@ public class StatisticCollectingThread extends Thread {
 				synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore()
 				                         .getCompletedStatitisticEntries();
 		for (ArrayList<StatisticsLog> statisticsLogs : statisticEntries) {
-			statisticNotifier.updateStatistics(statisticsLogs);
+			statisticsStore.update(statisticsLogs);
 		}
 	}
 
