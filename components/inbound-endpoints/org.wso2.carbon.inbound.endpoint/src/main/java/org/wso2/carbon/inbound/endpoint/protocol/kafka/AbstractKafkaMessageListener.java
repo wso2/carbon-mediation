@@ -22,7 +22,6 @@ import kafka.javaapi.consumer.ConsumerConnector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,7 +31,7 @@ public abstract class AbstractKafkaMessageListener {
     protected ConsumerConnector consumerConnector;
     protected InjectHandler injectHandler;
     protected Properties kafkaProperties;
-    protected ArrayList<ConsumerIterator<byte[], byte[]>> consumerIte;
+    protected List<ConsumerIterator<byte[], byte[]>> consumerIte;
     protected static final Log log = LogFactory
             .getLog(KAFKAMessageListener.class.getName());
 
