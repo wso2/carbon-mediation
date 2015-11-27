@@ -142,10 +142,6 @@ public class KAFKAMessageListener extends AbstractKafkaMessageListener {
      * @param streams
      */
     protected void startConsumers(List<KafkaStream<byte[], byte[]>> streams) {
-//        for (KafkaStream<byte[], byte[]> stream : streams) {
-//            consumerIte = stream.iterator();
-//            break;
-//        }
         if (streams.size() >= 1) {
             consumerIte.add(streams.get(0).iterator());
         }
