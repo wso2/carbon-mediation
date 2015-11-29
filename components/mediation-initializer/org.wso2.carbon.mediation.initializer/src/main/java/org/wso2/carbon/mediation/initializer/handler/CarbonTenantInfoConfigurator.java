@@ -66,8 +66,12 @@ public class CarbonTenantInfoConfigurator implements TenantInfoConfigurator {
         //Current context does not need to be destroyed at this level.
         //PrivilegedCarbonContext.destroyCurrentContext();
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        cc.setTenantDomain(tenantDomain);
-        cc.setTenantId(tenantId);
+        if (cc.getTenantDomain() == null) {
+            cc.setTenantDomain(tenantDomain);
+        }
+        if (cc.getTenantId() == MultitenantConstants.INVALID_TENANT_ID) {
+            cc.setTenantId(tenantId);
+        }
         if (logger.isDebugEnabled()) {
             logger.info("      tenant domain: " + cc.getTenantDomain());
             logger.info("      tenant id: " + cc.getTenantId());
