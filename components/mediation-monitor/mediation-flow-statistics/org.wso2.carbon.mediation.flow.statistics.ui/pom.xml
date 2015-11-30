@@ -42,8 +42,6 @@
                         <Import-Package>
                             org.wso2.carbon.mediation.flow.statistics.stub.*;
                             version="${carbon.mediation.imp.pkg.version}",
-                            org.wso2.carbon.mediation.flow.statistics.stub.aspect.*;
-                            version="${carbon.mediation.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <Carbon-Component>UIBundle</Carbon-Component>

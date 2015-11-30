@@ -19,10 +19,10 @@
     <menus>
         <menu>
             <id>mediation_flow_statistics_menu</id>
-            <i18n-key>mediation.flow.statistics.menu</i18n-key>
+            <i18n-key>Mediation Flow Statistics</i18n-key>
             <i18n-bundle>org.wso2.carbon.mediation.flow.statistics.ui.i18n.Resources</i18n-bundle>
             <parent-menu>monitor_menu</parent-menu>
-            <link>../mediationflowstats/statistics_main.jsp</link>
+            <link>../mediationflowstats/index.jsp</link>
             <region>region4</region>
             <order>6</order>
             <style-class>monitor</style-class>
