@@ -64,12 +64,15 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     protected boolean transactedSession = false;
     protected int sessionAckMode = 0;
-    protected boolean jmsSpec11;
-    protected boolean isDurable;    
+
+    protected String jmsSpec;
+    protected boolean isDurable;
     protected boolean noPubSubLocal;
+
     protected String clientId;
     protected String subscriptionName;
     protected String messageSelector;
+    protected boolean isSharedSubscription;
 
     public JMSConnectionFactory(Properties properties) {
         try {
@@ -85,16 +88,32 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             this.destinationType = JMSConstants.JMSDestinationType.QUEUE;
         }
 
-        if (properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER) == null
-                || "1.1".equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))) {
-            jmsSpec11 = true;
+        if(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER) == null || JMSConstants.JMS_SPEC_VERSION_1_1.equals(properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
+        	jmsSpec = JMSConstants.JMS_SPEC_VERSION_1_1;
+        }else if(JMSConstants.JMS_SPEC_VERSION_2_0.equals(
+                properties.getProperty(JMSConstants.PARAM_JMS_SPEC_VER))){
+            jmsSpec = JMSConstants.JMS_SPEC_VERSION_2_0;
+        }else{
+            jmsSpec = JMSConstants.JMS_SPEC_VERSION_1_0;
+        }
+
+        if( "true".equalsIgnoreCase(properties.getProperty(JMSConstants.PARAM_IS_SHARED_SUBSCRIPTION))){
+            isSharedSubscription = true;
+        } else{
+            isSharedSubscription = false;
         }
 
         noPubSubLocal = Boolean.valueOf(properties.getProperty(JMSConstants.PARAM_PUBSUB_NO_LOCAL));
         
         clientId = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_CLIENT_ID);
-        subscriptionName = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_NAME);        
+        subscriptionName = properties.getProperty(JMSConstants.PARAM_DURABLE_SUB_NAME);
 
+        if (isSharedSubscription) {
+            if ( subscriptionName == null ){
+                logger.info( "Subscription name is not given. Therefor declaring a non-shared subscription" );
+                isSharedSubscription = false;
+            }
+        }
 
         String subDurable = properties.getProperty(JMSConstants.PARAM_SUB_DURABLE);
         if (subDurable != null) {
@@ -185,7 +204,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         }
         Connection connection = null;
         try {
-            if (jmsSpec11) {
+            if ( "1.1".equals(jmsSpec) ) {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                 	connection = ((QueueConnectionFactory) (this.connectionFactory))
                             .createQueueConnection();
@@ -233,7 +252,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     public Connection createConnection(String userName, String password) {
         Connection connection = null;
         try {
-            if (jmsSpec11) {
+            if ( JMSConstants.JMS_SPEC_VERSION_1_1.equals(jmsSpec) ) {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
                     connection = ((QueueConnectionFactory) (this.connectionFactory))
                             .createQueueConnection(userName, password);
@@ -335,7 +354,15 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     public MessageConsumer createMessageConsumer(Session session, Destination destination) {
         try {
-            if (jmsSpec11) {
+            if ( JMSConstants.JMS_SPEC_VERSION_2_0.equals(jmsSpec) && isSharedSubscription ){
+                if (isDurable) {
+                    return session.createSharedDurableConsumer((Topic) destination,
+                                                               subscriptionName, messageSelector);
+                } else {
+                    return session.createSharedConsumer((Topic) destination, subscriptionName, messageSelector);
+                }
+            } else if( (JMSConstants.JMS_SPEC_VERSION_1_1.equals(jmsSpec)) || ( JMSConstants.JMS_SPEC_VERSION_2_0.equals(
+                    jmsSpec) && !isSharedSubscription ) ){
                 if (isDurable) {
                     return session.createDurableSubscriber((Topic) destination, subscriptionName,
                                                            messageSelector, noPubSubLocal);
@@ -376,7 +403,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
      * @throws JMSException on errors, to be handled and logged by the caller
      */
     public MessageProducer createProducer(Session session, Destination destination, Boolean isQueue) throws JMSException {
-        if (jmsSpec11 || isQueue == null) {
+        if ( "2.0".equals(jmsSpec)  ||  "1.1".equals(jmsSpec) || isQueue == null) {
             return session.createProducer(destination);
         } else {
             if (isQueue) {
@@ -445,7 +472,8 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     protected Session createSession(Connection connection) {
         try {
-            if (jmsSpec11) {
+            if ( JMSConstants.JMS_SPEC_VERSION_1_1.equals(jmsSpec) || JMSConstants.JMS_SPEC_VERSION_2_0.equals(
+                    jmsSpec) ) {
                 return connection.createSession(transactedSession, sessionAckMode);
             } else {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
@@ -511,6 +539,22 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     public int getSessionAckMode() {
         return sessionAckMode;
+    }
+
+    public javax.jms.JMSContext createContext() {
+        return connectionFactory.createContext();
+    }
+
+    public javax.jms.JMSContext createContext(int sessionMode) {
+        return connectionFactory.createContext(sessionMode);
+    }
+
+    public javax.jms.JMSContext createContext(String userName, String password) {
+        return connectionFactory.createContext(userName, password);
+    }
+
+    public javax.jms.JMSContext createContext(String userName, String password, int sessionMode) {
+        return connectionFactory.createContext(userName, password, sessionMode);
     }
 
 }
