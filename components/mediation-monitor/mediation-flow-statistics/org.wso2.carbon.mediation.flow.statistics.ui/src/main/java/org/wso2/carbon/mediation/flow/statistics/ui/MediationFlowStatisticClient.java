@@ -7,7 +7,9 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediation.flow.statistics.stub.AdminData;
+
 import org.wso2.carbon.mediation.flow.statistics.stub.MediationFlowStatisticsAdminStub;
+import org.wso2.carbon.mediation.flow.statistics.stub.StatisticTreeWrapper;
 
 public class MediationFlowStatisticClient {
 
@@ -24,11 +26,81 @@ public class MediationFlowStatisticClient {
 		options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
 	}
 
-	public AdminData[] getCollectedStatistic() throws AxisFault {
+	public AdminData[] getAllApiStatistics() throws AxisFault {
 		try {
-			return stub.getAllStatistics();
+			return stub.getAllApiStatistics();
 		}catch (Exception e) {
-			String msg = "Cannot get graph data. Backepnd service may be unvailable";
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
+	public AdminData[] getAllProxyStatistics() throws AxisFault {
+		try {
+			return stub.getAllProxyStatistics();
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
+	public AdminData[] getAllSequenceStatistics() throws AxisFault {
+		try {
+			return stub.getAllSequenceStatistics();
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
+	public AdminData[] getAllInboundEndpointStatistics() throws AxisFault {
+		try {
+			return stub.getAllInboundEndpointStatistics();
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
+	public StatisticTreeWrapper getProxyStatistic(String componentId) throws AxisFault {
+		try {
+			return stub.getProxyStatistics(componentId);
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
+	public StatisticTreeWrapper getApiStatistic(String componentId) throws AxisFault {
+		try {
+			return stub.getApiStatistics(componentId);
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
+	public StatisticTreeWrapper getSequenceStatistic(String componentId) throws AxisFault {
+		try {
+			return stub.getSequenceStatistics(componentId);
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
+	public StatisticTreeWrapper getInboundEndpointStatistic(String componentId) throws AxisFault {
+		try {
+			return stub.getInboundEndpointStatistics(componentId);
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
 			handleException(msg, e);
 		}
 		return null;

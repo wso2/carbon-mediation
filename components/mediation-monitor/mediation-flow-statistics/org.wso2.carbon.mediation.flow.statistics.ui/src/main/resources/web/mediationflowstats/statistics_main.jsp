@@ -58,19 +58,62 @@
 
     %>
 
-    <h1>Message Flow Statistics Examples</h1>
+    <h1>Message Flow Statistics</h1>
 
-    <%
-        AdminData[] collectedStatistic = mediationFlowStatisticClient.getCollectedStatistic();
+    <%--<table>--%>
 
-        if (collectedStatistic != null) {
-            for (AdminData adminData : collectedStatistic) {
-    %>
-    <p><%=adminData.getComponetID()%></p>
-    <%
+    <%--<tr>--%>
+    <%--<td><img class="enlarge" src="images/proxy.png" alt="Proxy Service Statistics"></td>--%>
+    <%--<td><img class="enlarge" src="images/Inbound.png" alt="Inbound Endpoint Statistics"></td>--%>
+    <%--</tr>--%>
+
+    <%--<tr>--%>
+    <%--<td><img class="enlarge" src="images/API.png" alt="Inbound Endpoint Statistics"></td>--%>
+    <%--<td><img class="enlarge" src="images/Sequence.png" alt="Inbound Endpoint Statistics"></td>--%>
+    <%--</tr>--%>
+
+
+    <%--</table>--%>
+
+    <table>
+        <tbody>
+
+        <tr>
+            <th>
+                <a href="">Available Message Flows
+                </a>
+            </th>
+        </tr>
+
+        <%
+            AdminData[] collectedSequenceStatistic = mediationFlowStatisticClient.getAllSequenceStatistics();
+            int iCount = 0;
+            if (collectedSequenceStatistic != null) {
+                for (AdminData adminData : collectedSequenceStatistic) {
+                    iCount = iCount + 1;
+        %>
+        <p><%=adminData.getComponentID()%>
+        </p>
+
+        <tr>
+            <td>
+
+
+                <form name='Form1_<%=iCount%>' method="POST" action="tree.jsp">
+                    <input type="hidden" name="componentID"
+                           value='<%=adminData.getComponentID()%>'>
+                    <a href="javascript:document.Form1_<%=iCount%>.submit()"><%=adminData.getComponentID()%></a>
+                </form>
+
+            </td>
+        </tr>
+        <%
+                }
             }
-        }
-    %>
+        %>
+        </tbody>
+    </table>
+
 
 
 </fmt:bundle>
