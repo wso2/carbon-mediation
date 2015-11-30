@@ -503,8 +503,11 @@ public class ServiceBusInitializer {
      * creates TCP channels using command and event ports which initializes the interface to outer debugger
      * set the relevant information in the server configuration so that it can be used when Synapse environment
      * initializes
+     *
+     * @param contextInfo Server Context Information
      */
     public void createSynapseDebugEnvironment(ServerContextInformation contextInfo) {
+
         try {
             String carbonHome = System.getProperty(ServerConstants.CARBON_HOME);
             File synapseProperties = new File(carbonHome + File.separator + "repository" + File.separator + "conf" +
@@ -527,7 +530,6 @@ public class ServiceBusInitializer {
         } catch (InterruptedException ex) {
             log.error("Error while creating Synapse debug environment ", ex);
         }
-
     }
 
     private void createDefaultRegistryStructure(Registry registry) {
