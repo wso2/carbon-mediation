@@ -1,6 +1,26 @@
-package org.wso2.carbon.mediation.flow.statistics.store;
+/*
+ *   Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
+package org.wso2.carbon.mediation.flow.statistics.store.tree.data;
 
 import org.apache.synapse.aspects.ComponentType;
+import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
+import org.wso2.carbon.mediation.flow.statistics.service.data.TreeNodeData;
 
 import java.util.ArrayList;
 
@@ -85,7 +105,7 @@ public class IndividualStatistics {
 	 */
 	public IndividualStatistics(String componentId, ComponentType componentType, int msgId, String parentId,
 	                            int parentMsgId, long duration, int faultCount) {
-		children = new ArrayList<IndividualStatistics>();
+		children = new ArrayList<>();
 		this.componentType = componentType;
 		this.componentId = componentId;
 		this.faultCount = faultCount;
@@ -166,11 +186,40 @@ public class IndividualStatistics {
 		return parentId;
 	}
 
-	public boolean isResponse() {
+	public boolean getIsResponse() {
 		return isResponse;
 	}
 
 	public void setIsResponse(boolean isResponse) {
 		this.isResponse = isResponse;
+	}
+
+	public TreeNodeData getTreeNodeData() {
+		return new TreeNodeData(componentId, getComponentTypeToString(), count, maxProcessingTime, avgProcessingTime,
+		                        minProcessingTime, faultCount, isResponse);
+	}
+
+	public String getComponentTypeToString() {
+		switch (componentType) {
+			case PROXYSERVICE:
+				return MessageFlowStatisticConstants.PROXYSERVICE;
+			case ENDPOINT:
+				return MessageFlowStatisticConstants.ENDPOINT;
+			case INBOUNDENDPOINT:
+				return MessageFlowStatisticConstants.INBOUNDENDPOINT;
+			case SEQUENCE:
+				return MessageFlowStatisticConstants.SEQUENCE;
+			case MEDIATOR:
+				return MessageFlowStatisticConstants.MEDIATOR;
+			case FAULTHANDLER:
+				return MessageFlowStatisticConstants.FAULTHANDLER;
+			case API:
+				return MessageFlowStatisticConstants.API;
+			case RESOURCE:
+				return MessageFlowStatisticConstants.RESOURCE;
+			default:
+				return MessageFlowStatisticConstants.ANY;
+		}
+
 	}
 }

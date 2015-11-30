@@ -16,17 +16,24 @@
  *  under the License.
  */
 
-package org.wso2.carbon.mediation.flow.statistics.service;
+package org.wso2.carbon.mediation.flow.statistics.service.data;
 
-import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
+public class AdminData {
 
-public interface MediationStatisticsService {
+	private String componentID;
 
-	public StatisticsStore getTenetantStatisticsStore();
+	private TreeNodeData treeNodeData;
 
-	public int getTenantId();
+	public AdminData(String componentID, TreeNodeData treeNodeData) {
+		this.componentID = componentID;
+		this.treeNodeData = treeNodeData;
+	}
 
-	public ConfigurationContext getConfigurationContext();
+	public TreeNodeData getTreeNodeData() {
+		return treeNodeData;
+	}
+
+	public String getcomponentID() {
+		return componentID;
+	}
 }
-

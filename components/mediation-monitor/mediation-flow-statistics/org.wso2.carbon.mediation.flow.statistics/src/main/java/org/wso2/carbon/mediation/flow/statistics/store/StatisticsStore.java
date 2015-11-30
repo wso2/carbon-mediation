@@ -23,6 +23,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.newstatistics.StatisticsLog;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
+import org.wso2.carbon.mediation.flow.statistics.service.data.StatisticTreeWrapper;
+import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticCollectionViewMXBean;
+import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticsCompositeObject;
+import org.wso2.carbon.mediation.flow.statistics.store.tree.data.StatisticsTree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,20 +38,20 @@ import java.util.Set;
  * data structure where root of each of these trees belong to the trigger points of the ESB i.e.
  * PROXY, API or SEQUENCES
  */
-public class StatisticsStore {
+public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	private static final Log log = LogFactory.getLog(StatisticsStore.class);
 
-	private final HashMap<String, StatisticsTree> statistics = new HashMap<String, StatisticsTree>();
+	private final Map<String, StatisticsTree> proxyStatistics = new HashMap<>();
+
+	private final Map<String, StatisticsTree> apiStatistics = new HashMap<>();
+
+	private final Map<String, StatisticsTree> sequenceStatistics = new HashMap<>();
+
+	private final Map<String, StatisticsTree> inboundEndpointStatistics = new HashMap<>();
 
 	public StatisticsStore() {
-
-		//TODO Make this to mediation
-		MBeanRegistrar registrar = MBeanRegistrar.getInstance();
-		synchronized (registrar) {
-			registrar.registerMBean(new StatisticCollectionView(statistics), "StatisticsCollectionView",
-			                        "StatisticsCollectionView");
-		}
+		MBeanRegistrar.getInstance().registerMBean(this, "MediationFlowStatisticView", "MediationFlowStatisticView");
 	}
 
 	/**
@@ -57,15 +61,37 @@ public class StatisticsStore {
 	 * @param statisticsLogs Collected statistics logs for a message flow
 	 */
 	public void update(ArrayList<StatisticsLog> statisticsLogs) {
+
+		switch (statisticsLogs.get(0).getComponentType()) {
+			case PROXYSERVICE:
+				updateTree(statisticsLogs, proxyStatistics);
+				break;
+			case INBOUNDENDPOINT:
+				updateTree(statisticsLogs, inboundEndpointStatistics);
+				break;
+			case SEQUENCE:
+				updateTree(statisticsLogs, sequenceStatistics);
+				break;
+			case API:
+				updateTree(statisticsLogs, apiStatistics);
+				break;
+			default:
+				log.error("Unidentified component type reported statistics : " +
+				          statisticsLogs.get(0).getComponentType());
+		}
+
+	}
+
+	private void updateTree(ArrayList<StatisticsLog> statisticsLogs, Map<String, StatisticsTree> statisticsTreeMap) {
 		if (!statisticsLogs.isEmpty()) {
 			StatisticsTree tree;
-			if (statistics.containsKey(statisticsLogs.get(0).getComponentId())) {
-				tree = statistics.get(statisticsLogs.get(0).getComponentId());
+			if (statisticsTreeMap.containsKey(statisticsLogs.get(0).getComponentId())) {
+				tree = statisticsTreeMap.get(statisticsLogs.get(0).getComponentId());
 				tree.getRoot().update(statisticsLogs.get(0).getNoOfFaults(),
 				                      statisticsLogs.get(0).getEndTime() - statisticsLogs.get(0).getStartTime());
 			} else {
 				tree = new StatisticsTree(statisticsLogs.get(0));
-				statistics.put(statisticsLogs.get(0).getComponentId(), tree);
+				statisticsTreeMap.put(statisticsLogs.get(0).getComponentId(), tree);
 				if (log.isDebugEnabled()) {
 					log.debug("Created New statistics tree in the store for Root: " +
 					          statisticsLogs.get(0).getComponentId());
@@ -80,186 +106,127 @@ public class StatisticsStore {
 					          statisticsLog.getParent());
 				}
 			}
-			buildTree(tree, statisticsLogs); //build tree with these statistic logs
+			tree.buildTree(statisticsLogs); //build tree with these statistic logs
 		}
 	}
 
-	/**
-	 * Creates a new statistic log or updates the existing statistics log for the given statistics
-	 * logs
-	 *
-	 * @param tree           statistics tree
-	 * @param statisticsLogs statistics logs relating to a message flow
-	 */
-	private void buildTree(StatisticsTree tree, ArrayList<StatisticsLog> statisticsLogs) {
-
-		IndividualStatistics currentStat = tree.getRoot();
-		//send root node of the tree as parent to next element and recursively find children
-		for (int i = 0; i < statisticsLogs.size(); i++) {
-			if (statisticsLogs.get(i) != null) {
-				currentStat = buildTree(statisticsLogs, currentStat, statisticsLogs.get(i).getNoOfChildren(),
-				                        currentStat.getComponentId(), statisticsLogs.get(i).getParentMsgId(), i + 1);
-			}
-		}
-		if (log.isDebugEnabled()) { //this will be removed in actual implementation for testing only
-			StringBuilder sb = new StringBuilder();
-			sb.append("\nStatistics Tree\n");
-			print(tree.getRoot(), sb);
-			log.debug(sb.toString());
-		}
+	public Set<Map.Entry<String, StatisticsTree>> getSequencesWithValues() {
+		return sequenceStatistics.entrySet();
 	}
 
-	/**
-	 * This method recursively build and update the statistics tree
-	 *
-	 * @param statisticsLogs statistic logs corresponding to the message flow
-	 * @param currentStat    current node of the statistics tree
-	 * @param noOfChildren   no of children to be search for this parent
-	 * @param parentId       parents name
-	 * @param parentMsgId    parent's msg Id
-	 * @param offset         from where to start searching for children
-	 * @return reference to the child
-	 */
-	private IndividualStatistics buildTree(ArrayList<StatisticsLog> statisticsLogs, IndividualStatistics currentStat,
-	                                       int noOfChildren, String parentId, int parentMsgId, int offset) {
-		int count = 0;
-		for (int index = offset; index < statisticsLogs.size(); index++) {
-			if (!(statisticsLogs.get(index) == null)) {
-				if (statisticsLogs.get(index).getParent().equals(parentId) &&
-				    (statisticsLogs.get(index).getParentMsgId() == parentMsgId)) {
-					count++;
-					//if parent is equal to current stat log get child corresponding to this log
-					currentStat = getChild(currentStat.getChildren(), statisticsLogs.get(index));
-
-					//if that children have children find them recursively
-					if (statisticsLogs.get(index).isHasChildren()) {
-						currentStat =
-								buildTree(statisticsLogs, currentStat, statisticsLogs.get(index).getNoOfChildren(),
-								          currentStat.getComponentId(), statisticsLogs.get(index).getMsgId(),
-								          index + 1);
-					}
-					statisticsLogs.set(index, null);
-					if (count == noOfChildren) {
-						break;
-					}
-				}
-			}
-		}
-		return currentStat; //as next sb child will be placed under above child
+	public Set<Map.Entry<String, StatisticsTree>> getProxiesWithValues() {
+		return proxyStatistics.entrySet();
 	}
 
-	/**
-	 * find the child in the tree node child list which matched with the statistics log componentId
-	 * . If no child matches with the log create a new child in the tree.
-	 *
-	 * @param childList     child list of the corresponding tree node
-	 * @param statisticsLog current statistic log
-	 * @return refrence to the child element
-	 */
-	private IndividualStatistics getChild(ArrayList<IndividualStatistics> childList, StatisticsLog statisticsLog) {
-		//if child present get it otherwise create a child
-		for (IndividualStatistics statisticsNode : childList) {
-			if (statisticsLog.getParent().equals(statisticsNode.getParentId()) &&
-			    statisticsLog.getComponentId().equals(statisticsNode.getComponentId()) &&
-			    (statisticsNode.getMsgId() == statisticsLog.getMsgId()) &&
-			    (statisticsNode.getParentMsgId() == statisticsLog.getParentMsgId())) {
-				statisticsNode.update(statisticsLog.getNoOfFaults(),
-				                      statisticsLog.getEndTime() - statisticsLog.getStartTime());
-				return statisticsNode;
-			}
-		}
-		IndividualStatistics statisticsNode = createNewNodeForLog(statisticsLog);
-		childList.add(statisticsNode);
-		return statisticsNode;
+	public Set<Map.Entry<String, StatisticsTree>> getApisWithValues() {
+		return apiStatistics.entrySet();
 	}
 
-	/**
-	 * Create a new tree node for the statistic log
-	 *
-	 * @param statisticsLog current statistics log
-	 * @return tree node for the log
-	 */
-	private IndividualStatistics createNewNodeForLog(StatisticsLog statisticsLog) {
-		IndividualStatistics statisticsNode =
-				new IndividualStatistics(statisticsLog.getComponentId(), statisticsLog.getComponentType(),
-				                         statisticsLog.getMsgId(), statisticsLog.getParent(),
-				                         statisticsLog.getParentMsgId(),
-				                         statisticsLog.getEndTime() - statisticsLog.getStartTime(),
-				                         statisticsLog.getNoOfFaults());
-		statisticsNode.setIsResponse(statisticsLog.isResponse());
-		return statisticsNode;
+	public Set<Map.Entry<String, StatisticsTree>> getInboundEndpointsWithValues() {
+		return inboundEndpointStatistics.entrySet();
 	}
 
-	/**
-	 * Temporary method to print statistics tree recursively
-	 *
-	 * @param treeNode treeNode
-	 * @param sb       StringBuilder object
-	 */
-	private void print(IndividualStatistics treeNode, StringBuilder sb) {
-		printNode(sb, treeNode);
-		for (IndividualStatistics individualStatistics : treeNode.getChildren()) {
-			if (treeNode.getChildren().size() >= 2) {
-				//Workaround to get logs printed correctly
-//				sb.append("\n----------Printing a new Branch From ").append(treeNode.getComponentId())
-//				  .append("---------------\n");
-				if(log.isDebugEnabled()){
-					log.debug("----------Printing a new Branch From "+treeNode.getComponentId()+"---------------");
-				}
-			}
-			print(individualStatistics, sb);
+	public StatisticTreeWrapper getApiStatistics(String apiName) {
+		return sequenceStatistics.get(apiName).getComponentTree();
+	}
+
+	public StatisticTreeWrapper getProxyStatistics(String proxyName) {
+		return proxyStatistics.get(proxyName).getComponentTree();
+	}
+
+	public StatisticTreeWrapper getInboundEndpointStatistics(String inboundEndpointName) {
+		return inboundEndpointStatistics.get(inboundEndpointName).getComponentTree();
+	}
+
+	public StatisticTreeWrapper getSequenceStatistics(String sequenceName) {
+		return sequenceStatistics.get(sequenceName).getComponentTree();
+	}
+
+	@Override public void resetAPIStatistics() {
+		apiStatistics.clear();
+	}
+
+	@Override public void resetProxyStatistics() {
+		proxyStatistics.clear();
+	}
+
+	@Override public void resetSequenceStatistics() {
+		sequenceStatistics.clear();
+	}
+
+	@Override public void resetInboundEndpointStatistics() {
+		inboundEndpointStatistics.clear();
+	}
+
+	@Override public void resetAllStatistics() {
+		resetProxyStatistics();
+		resetAPIStatistics();
+		resetInboundEndpointStatistics();
+		resetSequenceStatistics();
+	}
+
+	@Override public StatisticsCompositeObject getProxyServiceJmxStatistics(String proxyName) {
+		if (proxyStatistics.containsKey(proxyName)) {
+			return proxyStatistics.get(proxyName).getStatisticOfTheRoot();
+		} else {
+			return null;
 		}
 	}
 
-	/**
-	 * Temporary method to print statistics node details
-	 *
-	 * @param sb             StringBuilder object
-	 * @param statisticsNode tree node
-	 */
-	private void printNode(StringBuilder sb, IndividualStatistics statisticsNode) {
-		if(log.isDebugEnabled()) {
-			//Workaround to get logs printed correctly
-//			sb.append(statisticsNode.getComponentId()).append("[Count : ").append(statisticsNode.getCount())
-//			  .append("]\n");
-//
-//			sb.append("\t\t Response Path: ").append(statisticsNode.isResponse()).append("\n");
-//			sb.append("\t\t Component Id: ").append(statisticsNode.getComponentId()).append("\n");
-//			sb.append("\t\t Component Type: ").append(statisticsNode.getComponentType()).append("\n");
-//			sb.append("\t\t Parent: ").append(statisticsNode.getParentId()).append("\n");
-//			sb.append("\t\t Parent MsgID: ").append(statisticsNode.getParentId()).append("\n");
-//			sb.append("\t\t Message Id(if > -1 cloned): ").append(statisticsNode.getMsgId()).append("\n");
-//			sb.append("\t\t Minimum Response Time: ").append(statisticsNode.getMinProcessingTime()).append("\n");
-//			sb.append("\t\t Maximum Response Time: ").append(statisticsNode.getMaxProcessingTime()).append("\n");
-//			sb.append("\t\t Average Response Time: ").append(statisticsNode.getAvgProcessingTime()).append("\n");
-//			sb.append("\t\t Number of Faults: ").append(statisticsNode.getFaultCount()).append("\n");
-
-			log.debug(statisticsNode.getComponentId() + "[Count : " + statisticsNode.getCount());
-			log.debug("\t\t Response Path: " + statisticsNode.isResponse());
-			log.debug("\t\t Component Id: " + statisticsNode.getComponentId());
-			log.debug("\t\t Component Type: " + statisticsNode.getComponentType());
-			log.debug("\t\t Parent: " + statisticsNode.getParentId());
-			log.debug("\t\t Parent MsgID: " + statisticsNode.getParentId());
-			log.debug("\t\t Message Id(if > -1 cloned): " + statisticsNode.getMsgId());
-			log.debug("\t\t Minimum Response Time: " + statisticsNode.getMinProcessingTime());
-			log.debug("\t\t Maximum Response Time: " + statisticsNode.getMaxProcessingTime());
-			log.debug("\t\t Average Response Time: " + statisticsNode.getAvgProcessingTime());
-			log.debug("\t\t Number of Faults: "+statisticsNode.getFaultCount());
+	@Override public StatisticsCompositeObject getSequenceJmxStatistics(String sequenceName) {
+		if (proxyStatistics.containsKey(sequenceName)) {
+			return proxyStatistics.get(sequenceName).getStatisticOfTheRoot();
+		} else {
+			return null;
 		}
 	}
 
-	/**
-	 * Clean statistics collected
-	 */
-	public void cleanStatistics() {
-		statistics.clear();
+	@Override public StatisticsCompositeObject getApiJmxStatistics(String APIName) {
+		if (proxyStatistics.containsKey(APIName)) {
+			return proxyStatistics.get(APIName).getStatisticOfTheRoot();
+		} else {
+			return null;
+		}
 	}
 
-	public Set<Map.Entry<String, StatisticsTree>> getElementsWithValue(){
-		return statistics.entrySet();
+	@Override public StatisticsCompositeObject getInboundEndpointJmxStatistics(String inboundEndpointName) {
+		if (proxyStatistics.containsKey(inboundEndpointName)) {
+			return proxyStatistics.get(inboundEndpointName).getStatisticOfTheRoot();
+		} else {
+			return null;
+		}
 	}
 
-	public StatisticsTree getStatisticTree(String componentID){
-		return statistics.get(componentID);
+	@Override public StatisticsCompositeObject[] getProxyServiceJmxStatisticsTree(String proxyName) {
+		if (proxyStatistics.containsKey(proxyName)) {
+			return proxyStatistics.get(proxyName).getFullTree();
+		} else {
+			return null;
+		}
 	}
+
+	@Override public StatisticsCompositeObject[] getSequenceJmxStatisticsTree(String sequenceName) {
+		if (proxyStatistics.containsKey(sequenceName)) {
+			return proxyStatistics.get(sequenceName).getFullTree();
+		} else {
+			return null;
+		}
+	}
+
+	@Override public StatisticsCompositeObject[] getInboundEndpointJmxStatisticsTree(String inboundEndpointName) {
+		if (proxyStatistics.containsKey(inboundEndpointName)) {
+			return proxyStatistics.get(inboundEndpointName).getFullTree();
+		} else {
+			return null;
+		}
+	}
+
+	@Override public StatisticsCompositeObject[] getApiJmxStatisticsTree(String apiName) {
+		if (proxyStatistics.containsKey(apiName)) {
+			return proxyStatistics.get(apiName).getFullTree();
+		} else {
+			return null;
+		}
+	}
+
 }

@@ -16,7 +16,7 @@
  *  under the License.
  */
 
-package org.wso2.carbon.mediation.flow.statistics.jmx;
+package org.wso2.carbon.mediation.flow.statistics.store.jmx;
 
 import java.beans.ConstructorProperties;
 
@@ -113,3 +113,4 @@ public class StatisticsCompositeObject {
 		return numberOfInvocations;
 	}
 }
+

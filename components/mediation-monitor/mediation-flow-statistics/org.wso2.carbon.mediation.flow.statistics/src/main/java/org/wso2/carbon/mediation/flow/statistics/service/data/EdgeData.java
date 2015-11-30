@@ -16,17 +16,24 @@
  *  under the License.
  */
 
-package org.wso2.carbon.mediation.flow.statistics.service;
+package org.wso2.carbon.mediation.flow.statistics.service.data;
 
-import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
+public class EdgeData {
 
-public interface MediationStatisticsService {
+	int parentNodeIndex;
+	int childNodeIndex;
 
-	public StatisticsStore getTenetantStatisticsStore();
+	public EdgeData(int parent, int childNodeIndex) {
 
-	public int getTenantId();
+		this.parentNodeIndex = parent;
+		this.childNodeIndex = childNodeIndex;
+	}
 
-	public ConfigurationContext getConfigurationContext();
+	public int getParentNodeIndex() {
+		return parentNodeIndex;
+	}
+
+	public int getNodeIndex() {
+		return childNodeIndex;
+	}
 }
-

@@ -38,7 +38,7 @@
                                 </path>
                                 <java classname="org.apache.axis2.wsdl.WSDL2Java" fork="true">
                                     <arg
-                                            line="-uri src/main/resources/MediationFlowStatisticsAdmin.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.mediation.flow.statistics.stub -ns2p http://aspects.synapse.apache.org/xsd=org.wso2.carbon.mediation.flow.statistics.stub.aspect,http://service.statistics.flow.mediation.carbon.wso2.org=org.wso2.carbon.mediation.flow.statistics.stub,http://service.statistics.flow.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.flow.statistics.stub,http://store.statistics.flow.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.flow.statistics.stub"/>
+                                            line="-uri src/main/resources/MediationFlowStatisticsAdmin.wsdl -u -uw -o target/generated-code -p org.wso2.carbon.mediation.flow.statistics.stub -ns2p http://aspects.synapse.apache.org/xsd=org.wso2.carbon.mediation.flow.statistics.stub.aspect,http://service.statistics.flow.mediation.carbon.wso2.org=org.wso2.carbon.mediation.flow.statistics.stub,http://service.statistics.flow.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.flow.statistics.stub,http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.flow.statistics.stub,http://store.statistics.flow.mediation.carbon.wso2.org/xsd=org.wso2.carbon.mediation.flow.statistics.stub"/>
                                     <classpath refid="wsdl2java.classpath"/>
                                 </java>
                             </tasks>

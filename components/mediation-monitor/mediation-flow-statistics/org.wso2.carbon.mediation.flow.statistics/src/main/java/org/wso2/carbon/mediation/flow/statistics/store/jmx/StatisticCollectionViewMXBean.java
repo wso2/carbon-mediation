@@ -16,7 +16,7 @@
  *  under the License.
  */
 
-package org.wso2.carbon.mediation.flow.statistics.jmx;
+package org.wso2.carbon.mediation.flow.statistics.store.jmx;
 
 /**
  * MBean interface to expose collected statistic data using JMX
@@ -24,16 +24,29 @@ package org.wso2.carbon.mediation.flow.statistics.jmx;
 public interface StatisticCollectionViewMXBean {
 
 	/**
-	 * Returns number of statistic tree in StatisticStore
-	 *
-	 * @return number of statistic trees
+	 * reset in memory API statistic collection in StatisticStore
 	 */
-	int getNumberOfStatisticTrees();
+	void resetAPIStatistics();
 
 	/**
-	 * reset in memory statistic collection in StatisticStore
+	 * reset in memory Proxy statistic collection in StatisticStore
 	 */
-	void resetStatistics();
+	void resetProxyStatistics();
+
+	/**
+	 * reset in memory Sequence statistic collection in StatisticStore
+	 */
+	void resetSequenceStatistics();
+
+	/**
+	 * reset in memory Inbound Endpoint statistic collection in StatisticStore
+	 */
+	void resetInboundEndpointStatistics();
+
+	/**
+	 * reset in memory Inbound Endpoint statistic collection in StatisticStore
+	 */
+	void resetAllStatistics();
 
 	/**
 	 * Returns statistics related to a Proxy Service
@@ -41,7 +54,7 @@ public interface StatisticCollectionViewMXBean {
 	 * @param proxyName name of the proxy service
 	 * @return Composite Data Object that contains Proxy Statistics
 	 */
-	StatisticsCompositeObject getProxyServiceStatistics(String proxyName);
+	StatisticsCompositeObject getProxyServiceJmxStatistics(String proxyName);
 
 	/**
 	 * Returns statistics related to a Sequence
@@ -49,7 +62,7 @@ public interface StatisticCollectionViewMXBean {
 	 * @param sequenceName name of the Sequence
 	 * @return Composite Data Object that contains Sequence Statistics
 	 */
-	StatisticsCompositeObject getSequenceStatistics(String sequenceName);
+	StatisticsCompositeObject getSequenceJmxStatistics(String sequenceName);
 
 	/**
 	 * Returns statistics related to a API
@@ -57,7 +70,15 @@ public interface StatisticCollectionViewMXBean {
 	 * @param APIName name of the API
 	 * @return Composite Data Object that contains API Statistics
 	 */
-	StatisticsCompositeObject getAPIStatistics(String APIName);
+	StatisticsCompositeObject getApiJmxStatistics(String APIName);
+
+	/**
+	 * Returns statistics related to a Inbound Endpoint
+	 *
+	 * @param inboundEndpointName name of the Inbound Endpoint
+	 * @return Composite Data Object that contains Inbound Endpoint Statistics
+	 */
+	StatisticsCompositeObject getInboundEndpointJmxStatistics(String inboundEndpointName);
 
 	/**
 	 * Returns statistics tree related to a Proxy Service
@@ -65,7 +86,7 @@ public interface StatisticCollectionViewMXBean {
 	 * @param proxyName name of the proxy service
 	 * @return Composite Data Data Array that contains API Statistics Tree
 	 */
-	StatisticsCompositeObject[] getProxyServiceStatisticsTree(String proxyName);
+	StatisticsCompositeObject[] getProxyServiceJmxStatisticsTree(String proxyName);
 
 	/**
 	 * Returns statistics tree related to a Sequence
@@ -73,7 +94,15 @@ public interface StatisticCollectionViewMXBean {
 	 * @param sequenceName name of the Sequence
 	 * @return Composite Data Data Array that contains API Statistics Tree
 	 */
-	StatisticsCompositeObject[] getSequenceStatisticsTree(String sequenceName);
+	StatisticsCompositeObject[] getSequenceJmxStatisticsTree(String sequenceName);
+
+	/**
+	 * Returns statistics tree related to a Inbound Endpoint
+	 *
+	 * @param inboundEndpointName name of the Inbound Endpoint
+	 * @return Composite Data Data Array that contains Inbound Endpoint Statistics Tree
+	 */
+	StatisticsCompositeObject[] getInboundEndpointJmxStatisticsTree(String inboundEndpointName);
 
 	/**
 	 * Returns statistics tree related to a API
@@ -81,6 +110,5 @@ public interface StatisticCollectionViewMXBean {
 	 * @param APIName name of the API
 	 * @return Composite Data Array that contains API Statistics Tree
 	 */
-	StatisticsCompositeObject[] getAPIStatisticsTree(String APIName);
+	StatisticsCompositeObject[] getApiJmxStatisticsTree(String APIName);
 }
-
