@@ -158,6 +158,9 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
         start();
     }
 
+    /**
+     * Initializes the MQTT Asynchronous client.
+     */
     public void initAsyncClient() {
 
         mqttAsyncClient = confac.getMqttAsyncClient(this.name);
@@ -202,16 +205,27 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
         }
     }
 
+
     public void start() {
         MqttTask mqttTask = new MqttTask(connectionConsumer);
         mqttTask.setCallback(mqttAsyncCallback);
         start(mqttTask, ENDPOINT_POSTFIX);
     }
 
+    /**
+     * get Inbound Endpoint name
+     *
+     * @return name inbound endpoint name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * set Inbound Endpoint name
+     *
+     * @param name inbound endpoint name
+     */
     public void setName(String name) {
         this.name = name;
     }
