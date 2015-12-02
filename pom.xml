@@ -27,7 +27,7 @@
 
     <groupId>org.wso2.carbon.mediation</groupId>
 	<artifactId>carbon-mediation</artifactId>
- 	<version>4.4.12-SNAPSHOT</version>
+ 	<version>4.5.0</version>
 	<packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -86,7 +86,7 @@
         <connection>scm:git:https://github.com/wso2/carbon-mediation.git</connection>
         <url>https://github.com/wso2/carbon-mediation.git</url>
         <developerConnection>scm:git:https://github.com/wso2/carbon-mediation.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>carbon-mediation-4.5.0</tag>
     </scm>
 
     <build>
@@ -2240,7 +2240,7 @@
     <properties>
 
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.4.12-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.5.0</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 4.5.0)</carbon.mediation.imp.pkg.version>
 
