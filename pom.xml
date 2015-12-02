@@ -2242,7 +2242,7 @@
         <!-- Carbon mediation version -->
         <carbon.mediation.version>4.4.12-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
-        <carbon.mediation.imp.pkg.version>[4.3.0, 4.5.0)</carbon.mediation.imp.pkg.version>
+        <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
         <carbon.kernel.version>4.4.2</carbon.kernel.version>
