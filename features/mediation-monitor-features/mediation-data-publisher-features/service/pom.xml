@@ -19,13 +19,13 @@
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.4.12-SNAPSHOT</version>
+        <version>4.5.1-SNAPSHOT</version>
         <artifactId>data-agents-features</artifactId>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.4.12-SNAPSHOT</version>
+    <version>4.5.1-SNAPSHOT</version>
     <artifactId>bam-service-data-agent-feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - BAM Service Data Agent Feature Aggregator Module</name>
