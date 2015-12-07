@@ -33,6 +33,7 @@
                     <xs:element minOccurs="0" name="wsRmEnabled" type="xs:boolean" />
                     <xs:element minOccurs="0" name="wsSecEnabled" type="xs:boolean" />
                     <xs:element minOccurs="0" name="wsdlLocation" nillable="true" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="enabledTransports" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="CGServiceDependencyBean">

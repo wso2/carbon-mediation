@@ -19,6 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.cloud.gateway.agent.observer.CGAgentSubject;
 import org.wso2.carbon.cloud.gateway.common.CGUtils;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 /**
  * Represent a heat beat task which check the health of a remote server, and also notify the
@@ -30,6 +32,7 @@ public class CGAgentHeartBeatTask implements Runnable {
     private String host;
     private int port;
     private CGAgentSubject subject;
+    private CarbonContext carbonContext;
 
     private Log log = LogFactory.getLog(CGAgentHeartBeatTask.class);
 
@@ -37,15 +40,18 @@ public class CGAgentHeartBeatTask implements Runnable {
                                 double reconnectionProgressionFactor,
                                 int initialReconnectDuration,
                                 String remoteHost,
-                                int port) {
+                                int port, CarbonContext carbonContext) {
         this.subject = subject;
         this.reconnectionProgressionFactor = reconnectionProgressionFactor;
         this.initialReconnectDuration = initialReconnectDuration;
         this.host = remoteHost;
         this.port = port;
+        this.carbonContext = carbonContext;
     }
 
     public void run() {
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(carbonContext.getTenantDomain());
+        PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(carbonContext.getTenantId());
         long retryDuration = initialReconnectDuration;
         log.info("A heart beat task for the remote server '" + host + ":" + port + "' has been " +
                 "added");

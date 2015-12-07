@@ -52,6 +52,7 @@
                     <xs:sequence>
                         <xs:element minOccurs="0" name="serviceName" nillable="true" type="xs:string"/>
                         <xs:element minOccurs="0" name="serverName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="isCheckBackend" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>

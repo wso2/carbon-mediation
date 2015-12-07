@@ -23,7 +23,7 @@ import java.util.List;
  * Implementation for {@link CGAgentSubject}
  */
 public class CGAgentSubjectImpl implements CGAgentSubject {
-    private List<CGAgentObserver> observers =
+    private static List<CGAgentObserver> observers =
             Collections.synchronizedList(new ArrayList<CGAgentObserver>());
     
     public void addObserver(CGAgentObserver o) {

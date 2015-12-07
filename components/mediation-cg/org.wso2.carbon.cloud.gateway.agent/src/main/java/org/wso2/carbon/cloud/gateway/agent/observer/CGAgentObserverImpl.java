@@ -42,15 +42,18 @@ public class CGAgentObserverImpl implements CGAgentObserver {
 
     public void update(CGAgentSubject subject) {
         try {
-            // do the re-publishing of the service again
-            boolean isAutomatic = true;
             CGAgentAdminService service = new CGAgentAdminService();
             String status = service.getServiceStatus(serviceName);
-            if (!status.equals(CGConstant.CG_SERVICE_STATUS_AUTO_MATIC)) {
+            if (status.equals(CGConstant.CG_SERVICE_STATUS_UNPUBLISHED)) {
+                return;
+            }
+            // do the re-publishing of the service again
+            boolean isAutomatic = true;
+            if (!status.equals(CGConstant.CG_SERVICE_STATUS_PUBLISHED)) {
                 isAutomatic = false;
             }
             String serverName = service.getPublishedServer(serviceName);
-            service.unPublishService(serviceName, serverName);
+            service.unPublishService(serviceName, serverName, true);
             service.publishService(serviceName, serverName, isAutomatic);
         } catch (CGException e) {
             log.error("Error while re-publishing the service '" + serviceName + "' via " +
