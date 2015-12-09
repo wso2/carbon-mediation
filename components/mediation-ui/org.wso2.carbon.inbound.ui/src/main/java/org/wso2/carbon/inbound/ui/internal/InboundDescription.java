@@ -25,25 +25,25 @@ import org.wso2.carbon.inbound.stub.types.carbon.ParameterDTO;
 
 public class InboundDescription {
 
-    private String name;
+	private String name;
 	private String type;
 	private String classImpl;
 	private String interval;
 	private String sequential;
 	private String coordination;
 	private boolean suspend;
-    private String injectingSeq;
-    private String onErrorSeq;
-    private Map<String, String> parameters;
-    private String fileName;
-    public static final String REGISTRY_KEY_PREFIX = "$registry:";
-    private static final String INTERVAL_PARAM = "interval";
-    private static final String SEQUENTIAL_PARAM = "sequential";
-    private static final String COORDINATION_PARAM = "coordination";
+	private String injectingSeq;
+	private String onErrorSeq;
+	private Map<String, String> parameters;
+	private String fileName;
+	public static final String REGISTRY_KEY_PREFIX = "$registry:";
+	private static final String INTERVAL_PARAM = "interval";
+	private static final String SEQUENTIAL_PARAM = "sequential";
+	private static final String COORDINATION_PARAM = "coordination";
 	private static final String CLASS_TYPE = "class";
-    private String artifactContainerName;
+	private String artifactContainerName;
 	private boolean isEdited;
-    
+
 	public InboundDescription(InboundEndpointDTO inboundEndpoint){
 		this.name = inboundEndpoint.getName();
 		String protocol = inboundEndpoint.getProtocol();
