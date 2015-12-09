@@ -119,8 +119,8 @@ public final class ServiceBusConstants {
 
 
     public static final String ESB_DEBUG_SYSTEM_PROPERTY = "esb.debug";
-    public static final String ESB_DEBUG_EVENT_PORT = "SynapseDebugger.PortEvent";
-    public static final String ESB_DEBUG_COMMAND_PORT = "SynapseDebugger.PortCommand";
+    public static final String ESB_DEBUG_EVENT_PORT = "synapse.debugger.port.event";
+    public static final String ESB_DEBUG_COMMAND_PORT = "synapse.debugger.port.command";
 
 }
 
