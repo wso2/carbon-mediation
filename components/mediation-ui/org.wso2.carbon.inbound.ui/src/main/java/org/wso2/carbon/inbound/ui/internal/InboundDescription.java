@@ -25,24 +25,25 @@ import org.wso2.carbon.inbound.stub.types.carbon.ParameterDTO;
 
 public class InboundDescription {
 
-    private String name;
+	private String name;
 	private String type;
 	private String classImpl;
 	private String interval;
 	private String sequential;
 	private String coordination;
 	private boolean suspend;
-    private String injectingSeq;
-    private String onErrorSeq;
-    private Map<String, String> parameters;
-    private String fileName;
-    public static final String REGISTRY_KEY_PREFIX = "$registry:";
-    private static final String INTERVAL_PARAM = "interval";
-    private static final String SEQUENTIAL_PARAM = "sequential";
-    private static final String COORDINATION_PARAM = "coordination";
-    private String artifactContainerName;
+	private String injectingSeq;
+	private String onErrorSeq;
+	private Map<String, String> parameters;
+	private String fileName;
+	public static final String REGISTRY_KEY_PREFIX = "$registry:";
+	private static final String INTERVAL_PARAM = "interval";
+	private static final String SEQUENTIAL_PARAM = "sequential";
+	private static final String COORDINATION_PARAM = "coordination";
+	private static final String CLASS_TYPE = "class";
+	private String artifactContainerName;
 	private boolean isEdited;
-    
+
 	public InboundDescription(InboundEndpointDTO inboundEndpoint){
 		this.name = inboundEndpoint.getName();
 		String protocol = inboundEndpoint.getProtocol();
@@ -61,21 +62,29 @@ public class InboundDescription {
 		this.artifactContainerName = inboundEndpoint.getArtifactContainerName();
 		this.isEdited = inboundEndpoint.getIsEdited();
 		this.interval = "";
-		if(inboundEndpoint.getParameters() != null){
-			for(ParameterDTO parameterDTO :inboundEndpoint.getParameters()){
-				if(parameterDTO.getKey() != null){
+		if (inboundEndpoint.getParameters() != null) {
+			for (ParameterDTO parameterDTO : inboundEndpoint.getParameters()) {
+				if (parameterDTO.getKey() != null) {
 					this.parameters.put(parameterDTO.getName(), REGISTRY_KEY_PREFIX + parameterDTO.getKey());
-				}else if (INTERVAL_PARAM.equals(parameterDTO.getName())) {
-				    setInterval(((parameterDTO.getValue()==null||"null".equals(parameterDTO.getValue()))?"":parameterDTO.getValue()));
-                }else if (SEQUENTIAL_PARAM.equals(parameterDTO.getName())) {
-                    setSequential(((parameterDTO.getValue()==null||"null".equals(parameterDTO.getValue()))?"":parameterDTO.getValue()));
-                }else if (COORDINATION_PARAM.equals(parameterDTO.getName())) {
-                    setCoordination(((parameterDTO.getValue()==null||"null".equals(parameterDTO.getValue()))?"":parameterDTO.getValue()));                    
-				}else if(parameterDTO.getValue() != null){
-					this.parameters.put(parameterDTO.getName(), parameterDTO.getValue());
-				}else{
-					this.parameters.put(parameterDTO.getName(), "");
-				}			
+				} else {
+					if (parameterDTO.getValue() == null) {
+						this.parameters.put(parameterDTO.getName(), "");
+					} else {
+						if(getType().equals(CLASS_TYPE)) {
+							if (INTERVAL_PARAM.equals(parameterDTO.getName())) {
+								setInterval(("null".equals(parameterDTO.getValue())) ? "" : parameterDTO.getValue());
+								continue;
+							} else if (SEQUENTIAL_PARAM.equals(parameterDTO.getName())) {
+								setSequential(("null".equals(parameterDTO.getValue())) ? "" : parameterDTO.getValue());
+								continue;
+							} else if (COORDINATION_PARAM.equals(parameterDTO.getName())) {
+								setCoordination(("null".equals(parameterDTO.getValue())) ? "" : parameterDTO.getValue());
+								continue;
+							}
+						}
+						this.parameters.put(parameterDTO.getName(), parameterDTO.getValue());
+					}
+				}
 			}
 		}
 	}
