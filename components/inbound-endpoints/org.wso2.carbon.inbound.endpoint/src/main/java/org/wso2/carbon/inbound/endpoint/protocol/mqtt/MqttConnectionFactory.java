@@ -372,10 +372,10 @@ public class MqttConnectionFactory {
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(trustStore);
 
-        SSLContext c = SSLContext.getInstance(sslVersion);
-        c.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
+        SSLContext sslContext = SSLContext.getInstance(sslVersion);
+        sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
 
-        return c.getSocketFactory();
+        return sslContext.getSocketFactory();
     }
 
 }
