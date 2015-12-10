@@ -52,10 +52,10 @@ public class StatisticCollectingThread extends Thread {
 	}
 
 	private void reportStatistics() {
-		List<ArrayList<StatisticsLog>> statisticEntries =
+		List<List<StatisticsLog>> statisticEntries =
 				synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore()
-				                         .getCompletedStatitisticEntries();
-		for (ArrayList<StatisticsLog> statisticsLogs : statisticEntries) {
+				                         .getCompletedStatisticEntries();
+		for (List<StatisticsLog> statisticsLogs : statisticEntries) {
 			statisticsStore.update(statisticsLogs);
 		}
 	}

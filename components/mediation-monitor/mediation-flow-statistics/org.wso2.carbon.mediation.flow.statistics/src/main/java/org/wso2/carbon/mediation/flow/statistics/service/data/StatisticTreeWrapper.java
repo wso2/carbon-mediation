@@ -26,22 +26,7 @@ public class StatisticTreeWrapper {
 	public StatisticTreeWrapper(EdgeData[] treeEdges, TreeNodeData[] treeNodes) {
 		this.treeEdges = treeEdges;
 		this.treeNodes = treeNodes;
-		//print();
 	}
-
-	//	private void print() {
-	//		System.out.println("Node List:" + treeNodes.length);
-	//		for (TreeNodeData treeNodeData : treeNodes) {
-	//			System.out.println(treeNodeData.getComponentId());
-	//		}
-	//
-	//		System.out.println("EdgeData List:" + treeEdges.length);
-	//		for (EdgeData edge : treeEdges) {
-	//			System.out.println(edge.getParentNodeIndex() + "|" + edge.getNodeIndex());
-	//		}
-	//
-	//	}
-
 	public EdgeData[] getTreeEdges() {
 		return treeEdges;
 	}

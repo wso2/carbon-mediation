@@ -16,60 +16,174 @@
  *  under the License.
  */
 
-text {
+@-webkit-keyframes flash {
+    0%, 50%, 100% {
+        opacity: 1;
+    }
+
+    25%, 75% {
+        opacity: 0.2;
+    }
+}
+
+@keyframes flash {
+    0%, 50%, 100% {
+        opacity: 1;
+    }
+
+    25%, 75% {
+        opacity: 0.2;
+    }
+}
+
+.warn {
+    -webkit-animation-duration: 5s;
+    animation-duration: 5s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    -webkit-animation-iteration-count: 1;
+    animation-iteration-count: 1;
+}
+
+.live.map {
+    width: 100%;
+    height: 100%;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.live.map text {
     font-weight: 300;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
     font-size: 14px;
 }
 
-.node rect {
-    stroke: #333;
+.live.map .node rect {
+    stroke-width: 2px;
+    stroke: #bbb;
+    fill: #666;
+}
+
+.live.map .type {
+    height: 100%;
+    width: 15px;
+    display: block;
+    float: left;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-right: 4px;
+}
+
+.live.map .sequence .type {
+    background-color: #7f7;
+}
+
+.live.map .api .type {
+    background-color: #fffd6f;
+}
+
+.live.map .mediator .type {
+    background-color: #f736ff;
+}
+
+.live.map .inbound .type {
+    background-color: #3bf0ff;
+}
+
+.live.map .proxy .type {
+    background-color: #0e63ff;
+}
+
+.live.map .fault .type {
+    background-color: #ff0000;
+}
+
+.live.map .endpoint .type {
+    background-color: #cbffa5;
+}
+
+.live.map .resource .type {
+    background-color: #5c4926;
+}
+
+
+.live.map .name {
+    clear: left;
+    margin: 5px;
+    font-size: 18px;
+    color: white;
+}
+
+.live.map .detail_table{
+    width:100%;
+}
+.live.map .name_underlined {
+    margin: 5px;
+    display: inline-block;
+    border-bottom: solid 2px #fff;
+    font-size: 18px;
+    padding-bottom: 5px;
+    color: white;
+}
+
+.live.map .description {
+    margin-left: 5px;
+    padding-top: 2px
+    display: inline-block;
+    font-size: 15px;
+    color: white;
+}
+
+.live.map .name_column{
+    color: white;
+}
+
+
+div .heading {
+    text-align: center;
+}
+
+div .data {
+    text-align: left;
+}
+
+div .small {
+    min-width: 250px;
+    height: 40px;
+    display: inline-block;
+    color: #fff;
+    line-height: 40px;
+}
+
+div .large {
+    min-width: 250px;
+    height: 150px;
+    display: inline-block;
+    color: #fff;
+    padding-right: 10px;
+
+}
+
+.live.map .node .small g div span.consumers {
+    display: inline-block;
+    width: 20px;
+}
+
+.live.map .edgeLabel text {
+    width: 50px;
     fill: #fff;
 }
 
-.edgePath path {
-    stroke: #333;
-    fill: #333;
-    stroke-width: 1.5px;
+.live.map .edgePath path {
+    stroke: #999;
+    stroke-width: 2px;
+    fill: #999;
 }
 
-.node text {
-    pointer-events: none;
-}
 
-table#t01 {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
 
-table#t01 th {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
 
-table#t01 td {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
 
-/* This styles the title of the tooltip */
-.tipsy .name {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #000;
-    margin: 0;
-}
-
-.tipsy .tipsy-inner {
-    background-color: #FFF;
-    color: #000;
-    resize: horizontal;
-    max-width: 900px;
-    min-width: 100px;
-}
-
-/* This styles the body of the tooltip */
-.tipsy .description {
-    font-size: 1.2em;
-    color: #000;
-}

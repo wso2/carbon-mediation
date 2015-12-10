@@ -86,6 +86,20 @@
             <%
                 if ((collectedSequenceStatistic != null) && (collectedSequenceStatistic.length > 0)) {
             %>
+
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                        <a href="overall_stat.jsp?statisticCategory=<%=statisticCategory%>&categoryName=<%=categoryName%>&compare=1"
+                           style="cursor:pointer">
+                            Compare Proxy Service Statistics
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
             <table id="myTable" class="styledLeft">
                 <thead>
                 <tr>
@@ -104,7 +118,7 @@
                 %>
                 <tr>
                     <td>
-                        <a href="tree.jsp?componentID=<%=adminData.getComponentID()%>&statisticCategory=<%=statisticCategory%>">
+                        <a href="newtree.jsp?componentID=<%=adminData.getComponentID()%>&statisticCategory=<%=statisticCategory%>&categoryName=<%=categoryName%>">
                             <%=adminData.getComponentID()%>
                         </a>
                     </td>
@@ -115,13 +129,13 @@
                         <%=adminData.getTreeNodeData().getCount()%>
                     </td>
                     <td>
-                        <%=adminData.getTreeNodeData().getMinProcessingTime()%>
-                    </td>
-                    <td>
                         <%=adminData.getTreeNodeData().getAvgProcessingTime()%>
                     </td>
                     <td>
                         <%=adminData.getTreeNodeData().getMaxProcessingTime()%>
+                    </td>
+                    <td>
+                        <%=adminData.getTreeNodeData().getMinProcessingTime()%>
                     </td>
                     <td>
                         <%=adminData.getTreeNodeData().getFaultCount()%>

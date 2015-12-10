@@ -53,7 +53,7 @@
                 <thead>
                 <tr>
                     <th><fmt:message key="inbound.name"/></th>
-                    <th><fmt:message key="inbound.action"/></th>
+                    <th colspan="2"><fmt:message key="inbound.action"/></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -92,6 +92,39 @@
                                     key="inbound.property.delete"/></a>
                         <% } %>
                     </td>
+                    <% if (inboundDescription.getStatisticsEnable()) { %>
+                    <td style="border-right:none;border-left:none;width:200px">
+                        <div class="inlineDiv">
+                            <div id="disableStat<%= inboundDescription.getName()%>">
+                                <a href="#" onclick="disableStat('<%= inboundDescription.getName() %>')"
+                                   class="icon-link"
+                                   style="background-image:url(../admin/images/static-icon.gif);">Disable Statistics</a>
+                            </div>
+                            <div id="enableStat<%= inboundDescription.getName()%>" style="display:none;">
+                                <a href="#" onclick="enableStat('<%= inboundDescription.getName() %>')"
+                                   class="icon-link"
+                                   style="background-image:url(../admin/images/static-icon-disabled.gif);">Enable
+                                    Statistics</a>
+                            </div>
+                        </div>
+                    </td>
+                    <% } else { %>
+                    <td style="border-right:none;border-left:none;width:200px">
+                        <div class="inlineDiv">
+                            <div id="enableStat<%= inboundDescription.getName()%>">
+                                <a href="#" onclick="enableStat('<%=inboundDescription.getName()%>')"
+                                   class="icon-link"
+                                   style="background-image:url(../admin/images/static-icon-disabled.gif);">Enable
+                                    Statistics</a>
+                            </div>
+                            <div id="disableStat<%= inboundDescription.getName()%>" style="display:none">
+                                <a href="#" onclick="disableStat('<%=inboundDescription.getName()%>')"
+                                   class="icon-link"
+                                   style="background-image:url(../admin/images/static-icon.gif);">Disable Statistics</a>
+                            </div>
+                        </div>
+                    </td>
+                    <% } %>
 
                 </tr>
                 <%

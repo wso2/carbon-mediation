@@ -49,18 +49,18 @@ import org.apache.axis2.description.TransportInDescription;
 import org.wso2.carbon.CarbonConstants;
 
 public class RestApiAdminClient {
-	
+
 	private static final Log log = LogFactory.getLog(RestApiAdminClient.class);
-	
+
 	private static final String BUNDLE = "org.wso2.carbon.rest.api.ui.i18n.Resources";
-    
+
 	private ResourceBundle bundle;
 
 	private RestApiAdminStub stub;
-	
+
 	public RestApiAdminClient(ConfigurationContext configCtx, String backendServerURL,
             String cookie, Locale locale) throws AxisFault {
-		
+
 		bundle = ResourceBundle.getBundle(BUNDLE, locale);
         String serviceURL = backendServerURL + "RestApiAdmin";
         stub = new RestApiAdminStub(configCtx, serviceURL);
@@ -72,7 +72,7 @@ public class RestApiAdminClient {
         options.setManageSession(true);
         options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
 	}
-	
+
 	public String[] getApiNames() throws AxisFault{
 		try {
             String [] result = stub.getApiNames();
@@ -85,7 +85,7 @@ public class RestApiAdminClient {
 		}
 		return null;
 	}
-	
+
 	public APIData getApiByNane(String apiName) throws AxisFault{
 		try {
 			return stub.getApiByName(apiName);
@@ -94,7 +94,7 @@ public class RestApiAdminClient {
 		}
 		return null;
 	}
-	
+
 	public APIData[] getAPIsForListing(int pageNumber, int itemsPerPage) throws AxisFault{
 		try {
 			return stub.getAPIsForListing(pageNumber, itemsPerPage);
@@ -158,8 +158,8 @@ public class RestApiAdminClient {
 			handleException(bundle.getString("failed.to.get.api.count"), e);
 		}
 		return 0;
-	} 
-	
+	}
+
 	public void deleteApi(String apiName) throws AxisFault{
 		try {
 			stub.deleteApi(apiName);
@@ -167,7 +167,7 @@ public class RestApiAdminClient {
 			handleException(bundle.getString("could.not.delete.api"), e);
 		}
 	}
-	
+
 	public void addApi(APIData apiData) throws AxisFault{
 		try {
 			stub.addApi(apiData);
@@ -175,7 +175,7 @@ public class RestApiAdminClient {
 			handleException(bundle.getString("could.not.add.api"), e);
 		}
 	}
-	
+
 	public void updateApi(APIData apiData) throws AxisFault{
 		try {
 			stub.updateApi(apiData.getName(), apiData);
@@ -183,7 +183,7 @@ public class RestApiAdminClient {
 			handleException(bundle.getString("could.not.update.api"), e);
 		}
 	}
-	
+
 	public String[] getDefinedSequences() throws AxisFault{
 		try {
 			String[] sequences = stub.getSequences();
@@ -196,7 +196,7 @@ public class RestApiAdminClient {
 		}
 		return null;
 	}
-	
+
 	public String getApiSource(APIData apiData) throws AxisFault{
 		try {
 			return stub.getApiSource(apiData);
@@ -217,19 +217,19 @@ public class RestApiAdminClient {
 
 	public void addApiFromString(String apiData) throws AxisFault{
 		try {
-			stub.addApiFromString(apiData);			
+			stub.addApiFromString(apiData);
 		} catch (AxisFault af) {
-			handleException(af.getMessage(), af);			
+			handleException(af.getMessage(), af);
 		} catch (Exception e) {
 			handleException(bundle.getString("could.not.add.api"), e);
 		}
 	}
-	
+
 	public void updateApiFromString(String apiName, String apiData) throws AxisFault{
 		try {
 			stub.updateApiFromString(apiName, apiData);
 		} catch (AxisFault af) {
-			handleException(af.getMessage(), af);			
+			handleException(af.getMessage(), af);
 		} catch (Exception e) {
 			handleException(bundle.getString("could.not.update.api"), e);
 		}
@@ -272,7 +272,7 @@ public class RestApiAdminClient {
            }
          return null;
      }
-	
+
 	private void handleException(String msg, Exception e) throws AxisFault {
         log.error(msg, e);
         throw new AxisFault(msg, e);
@@ -294,4 +294,22 @@ public class RestApiAdminClient {
             handleException(bundle.getString("could.not.All.delete.api"),e);
         }
     }
+
+	public String enableStatistics(String apiName) throws AxisFault {
+		try {
+			stub.enableStatistics(apiName);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.enable.api.statistics"), e);
+		}
+		return null;
+	}
+
+	public String disableStatistics(String apiName) throws AxisFault {
+		try {
+			stub.disableStatistics(apiName);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.disable.api.statistics"), e);
+		}
+		return null;
+	}
 }

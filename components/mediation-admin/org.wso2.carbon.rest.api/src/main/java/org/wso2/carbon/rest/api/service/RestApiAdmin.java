@@ -25,6 +25,7 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.SequenceMediatorSerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
@@ -339,7 +340,12 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     APIData apiData = new APIData();
                     apiData.setName(api.getName());
                     apiData.setContext(api.getContext());
-
+                    if (api.getAspectConfiguration() != null
+                        && api.getAspectConfiguration().isStatisticsEnable()) {
+                        apiData.setStatisticsEnable(true);
+                    } else {
+                        apiData.setStatisticsEnable(false);
+                    }
                     if (api.getArtifactContainerName() != null) {
                         apiData.setArtifactContainerName(api.getArtifactContainerName());
                     }
@@ -495,8 +501,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
 		try {
 			PrivilegedCarbonContext.startTenantFlow();
-			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
-			                                                                      true);
+			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
 			APIData data = getApiByName(apiName);
 			return data;
 		} finally {
@@ -523,6 +528,72 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 			lock.unlock();
 		}
 	}
+
+    public String enableStatistics(String apiName) throws APIException {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            API api = synapseConfiguration.getAPI(apiName);
+            if (api != null) {
+                if (api.getAspectConfiguration() == null) {
+                    AspectConfiguration config = new AspectConfiguration(apiName);
+                    config.enableStatistics();
+                    api.configure(config);
+                } else {
+                    api.getAspectConfiguration().enableStatistics();
+                }
+
+                /** Persist the api service if it is not deployed via an artifact container */
+                if (api.getArtifactContainerName() == null) {
+                    persistApi(api);
+                }
+                return apiName;
+            } else {
+                handleException(log, "No defined API with name " + apiName +
+                                     " found to enable statistics in the Synapse configuration", null);
+            }
+        } catch (Exception fault) {
+            handleException(log, "Couldn't enable statistics of the API " + apiName + " : " + fault.getMessage(),
+                            fault);
+        } finally {
+            lock.unlock();
+        }
+        return null;
+    }
+
+    public String disableStatistics(String apiName) throws APIException {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            API api = synapseConfiguration.getAPI(apiName);
+            if (api != null) {
+                if (api.getAspectConfiguration() == null) {
+                    AspectConfiguration config = new AspectConfiguration(apiName);
+                    config.disableStatistics();
+                    api.configure(config);
+                } else {
+                    api.getAspectConfiguration().disableStatistics();
+                }
+
+                /** Persist the api service if it is not deployed via an artifact container */
+                if (api.getArtifactContainerName() == null) {
+                    persistApi(api);
+                }
+                return apiName;
+            } else {
+                handleException(log, "No defined API with name " + apiName +
+                                     " found to disable statistics in the Synapse configuration", null);
+            }
+        } catch (Exception fault) {
+            handleException(log, "Couldn't disable statistics of the API " + apiName + " : " + fault.getMessage(),
+                            fault);
+        } finally {
+            lock.unlock();
+        }
+        return null;
+    }
 
 	public String getApiSource(APIData apiData){
 		return RestApiAdminUtils.retrieveAPIOMElement(apiData).toString();

@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -34,6 +35,7 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -267,6 +269,72 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 
     }
 
+    public String enableStatistics(String inboundEndpointName) throws InboundManagementException {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            InboundEndpoint inboundEndpoint = synapseConfiguration.getInboundEndpoint(inboundEndpointName);
+            if (inboundEndpoint != null) {
+                if (inboundEndpoint.getAspectConfiguration() == null) {
+                    AspectConfiguration config = new AspectConfiguration(inboundEndpointName);
+                    config.enableStatistics();
+                    inboundEndpoint.configure(config);
+                } else {
+                    inboundEndpoint.getAspectConfiguration().enableStatistics();
+                }
+
+                /** Persist the api service if it is not deployed via an artifact container */
+                if (inboundEndpoint.getArtifactContainerName() == null) {
+                    persistInboundEndpoint(inboundEndpoint);
+                }
+                return inboundEndpointName;
+            } else {
+                handleException(log, "No defined Inbound Endpoint with name " + inboundEndpointName +
+                                     " found to enable statistics in the Synapse configuration", null);
+            }
+        } catch (Exception fault) {
+            handleException(log, "Couldn't enable statistics of the Inbound Endpoint " + inboundEndpointName + " : " +
+                                 fault.getMessage(), fault);
+        } finally {
+            lock.unlock();
+        }
+        return null;
+    }
+
+    public String disableStatistics(String inboundEndpointName) throws InboundManagementException {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            InboundEndpoint inboundEndpoint = synapseConfiguration.getInboundEndpoint(inboundEndpointName);
+            if (inboundEndpoint != null) {
+                if (inboundEndpoint.getAspectConfiguration() == null) {
+                    AspectConfiguration config = new AspectConfiguration(inboundEndpointName);
+                    config.disableStatistics();
+                    inboundEndpoint.configure(config);
+                } else {
+                    inboundEndpoint.getAspectConfiguration().disableStatistics();
+                }
+
+                /** Persist the api service if it is not deployed via an artifact container */
+                if (inboundEndpoint.getArtifactContainerName() == null) {
+                    persistInboundEndpoint(inboundEndpoint);
+                }
+                return inboundEndpointName;
+            } else {
+                handleException(log, "No defined Inbound Endpoint with name " + inboundEndpointName +
+                                     " found to disable statistics in the Synapse configuration", null);
+            }
+        } catch (Exception fault) {
+            handleException(log, "Couldn't disable statistics of the Inbound Endpoint " + inboundEndpointName + " : " +
+                                 fault.getMessage(), fault);
+        } finally {
+            lock.unlock();
+        }
+        return null;
+    }
+
     private void persistInboundEndpoint(InboundEndpoint inboundEndpoint) {
         MediationPersistenceManager pm = getMediationPersistenceManager();
         if (pm == null) {
@@ -285,5 +353,17 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             }
         }
         return null;
+    }
+
+    private void handleException(Log log, String message, Exception e) throws InboundManagementException {
+        if (e == null) {
+            InboundManagementException inboundManagementException = new InboundManagementException(message);
+            log.error(message, inboundManagementException);
+            throw inboundManagementException;
+        } else {
+            message = message + " :: " + e.getMessage();
+            log.error(message, e);
+            throw new InboundManagementException(message, e);
+        }
     }
 }

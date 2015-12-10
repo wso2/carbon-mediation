@@ -61,22 +61,18 @@
 
             String statisticCategory = request.getParameter("statisticCategory");
             StatisticTreeWrapper statisticTreeWrapper = null;
-            String categoryName = null;
+            String categoryName = request.getParameter("categoryName");
 
             if (statisticCategory.equals("proxy")) {
-                categoryName = "Proxy Service";
                 statisticTreeWrapper = mediationFlowStatisticClient.getProxyStatistic(componentID);
 
             } else if (statisticCategory.equals("api")) {
-                categoryName = "API";
                 statisticTreeWrapper = mediationFlowStatisticClient.getApiStatistic(componentID);
 
             } else if (statisticCategory.equals("inbound")) {
-                categoryName = "Inbound Endpoint";
                 statisticTreeWrapper = mediationFlowStatisticClient.getInboundEndpointStatistic(componentID);
 
             } else if (statisticCategory.equals("sequence")) {
-                categoryName = "Sequence";
                 statisticTreeWrapper = mediationFlowStatisticClient.getSequenceStatistic(componentID);
             }
             EdgeData[] edges = null;

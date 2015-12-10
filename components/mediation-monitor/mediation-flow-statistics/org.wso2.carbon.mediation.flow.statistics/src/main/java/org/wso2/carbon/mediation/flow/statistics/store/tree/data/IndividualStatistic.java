@@ -19,22 +19,25 @@
 package org.wso2.carbon.mediation.flow.statistics.store.tree.data;
 
 import org.apache.synapse.aspects.ComponentType;
+import org.apache.synapse.aspects.newstatistics.StatisticsLog;
 import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
 import org.wso2.carbon.mediation.flow.statistics.service.data.TreeNodeData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * IndividualStatistics represent a node in the statistics tree in the statistics store. It is
+ * IndividualStatistic represent a node in the statistics tree in the statistics store. It is
  * responsible for maintaining statistics about a component and updating statistics of the
  * component when new data comes
  */
-public class IndividualStatistics {
+public class IndividualStatistic {
 
 	/**
 	 * holds references to the branches that starts from its node
 	 */
-	private final ArrayList<IndividualStatistics> children;
+	private final Map<String, Integer> children;
 
 	/**
 	 * statistic owners component Id
@@ -49,12 +52,12 @@ public class IndividualStatistics {
 	/**
 	 * parentId of this Individual Statistics Node
 	 */
-	private final String parentId;
+	//private final String parentId;
 
 	/**
 	 * message Identification number of this Individual Statistics Node's parentId
 	 */
-	private final int parentMsgId;
+	//private final int parentMsgId;
 
 	/**
 	 * message identification number in the message flow
@@ -94,36 +97,25 @@ public class IndividualStatistics {
 
 	/**
 	 * Overloaded constructor to set variables for the node
-	 *
-	 * @param componentId   Node owner's component
-	 * @param componentType Node component type
-	 * @param msgId         message Id of the statistic reported component
-	 * @param parentId      statistics tree parents component Id
-	 * @param parentMsgId   statistics tree parents message Id
-	 * @param duration      Execution time for this statistics reporting component
-	 * @param faultCount    Number of faults encountered during execution
 	 */
-	public IndividualStatistics(String componentId, ComponentType componentType, int msgId, String parentId,
-	                            int parentMsgId, long duration, int faultCount) {
-		children = new ArrayList<>();
-		this.componentType = componentType;
-		this.componentId = componentId;
-		this.faultCount = faultCount;
-		this.parentId = parentId;
-		this.msgId = msgId;
-		this.parentMsgId = parentMsgId;
-		setDuration(duration);
+	public IndividualStatistic(StatisticsLog statisticsLog) {
+		//children = new ArrayList<>();
+		this.componentType = statisticsLog.getComponentType();
+		this.componentId = statisticsLog.getComponentId();
+		this.faultCount = statisticsLog.getNoOfFaults();
+		//this.parentId = statisticsLog.;
+		this.msgId = statisticsLog.getMsgId();
+		//this.parentMsgId = statisticsLog.getParentMsgId();
+		setDuration(statisticsLog.getEndTime() - statisticsLog.getStartTime());
+		this.children = new HashMap<>();
 	}
 
 	/**
 	 * Updates statistics record for new statistics information
-	 *
-	 * @param faultCount fault count for the component
-	 * @param duration   execution time for the component
 	 */
-	public void update(int faultCount, long duration) {
-		this.faultCount += faultCount;
-		setDuration(duration);
+	public void update(StatisticsLog statisticsLog) {
+		this.faultCount += statisticsLog.getNoOfFaults();
+		setDuration(statisticsLog.getEndTime() - statisticsLog.getStartTime());
 	}
 
 	/**
@@ -142,9 +134,9 @@ public class IndividualStatistics {
 		count += 1;
 	}
 
-	public int getParentMsgId() {
-		return parentMsgId;
-	}
+	//public int getParentMsgId() {
+	//		return parentMsgId;
+	//	}
 
 	public long getMaxProcessingTime() {
 		return maxProcessingTime;
@@ -178,13 +170,28 @@ public class IndividualStatistics {
 		return msgId;
 	}
 
-	public ArrayList<IndividualStatistics> getChildren() {
+	public void setChild(String key, int childIndex) {
+		children.put(key, childIndex);
+	}
+
+	public Integer getChild(String key) {
+		if (children.containsKey(key)) {
+			return children.get(key);
+		}
+		return null;
+	}
+
+	public Map<String, Integer> getChildrenMap() {
 		return children;
 	}
 
-	public String getParentId() {
-		return parentId;
-	}
+	//public ArrayList<IndividualStatistic> getChildren() {
+	//		return children;
+	//	}
+
+	//	public String getParentId() {
+	//		return parentId;
+	//	}
 
 	public boolean getIsResponse() {
 		return isResponse;
@@ -195,8 +202,8 @@ public class IndividualStatistics {
 	}
 
 	public TreeNodeData getTreeNodeData() {
-		return new TreeNodeData(componentId, getComponentTypeToString(), count, maxProcessingTime, avgProcessingTime,
-		                        minProcessingTime, faultCount, isResponse);
+		return new TreeNodeData(componentId, getComponentTypeToString(), count, maxProcessingTime, minProcessingTime,
+		                        avgProcessingTime, faultCount, isResponse);
 	}
 
 	public String getComponentTypeToString() {

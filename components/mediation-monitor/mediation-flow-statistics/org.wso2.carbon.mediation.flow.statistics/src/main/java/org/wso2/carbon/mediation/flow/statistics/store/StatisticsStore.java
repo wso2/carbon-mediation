@@ -28,10 +28,7 @@ import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticCollectionVi
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticsCompositeObject;
 import org.wso2.carbon.mediation.flow.statistics.store.tree.data.StatisticsTree;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * StatisticsStore holds collected statistics in the memory. It stores these statistics in a tree
@@ -60,7 +57,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 	 *
 	 * @param statisticsLogs Collected statistics logs for a message flow
 	 */
-	public void update(ArrayList<StatisticsLog> statisticsLogs) {
+	public void update(List<StatisticsLog> statisticsLogs) {
 
 		switch (statisticsLogs.get(0).getComponentType()) {
 			case PROXYSERVICE:
@@ -82,29 +79,14 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	}
 
-	private void updateTree(ArrayList<StatisticsLog> statisticsLogs, Map<String, StatisticsTree> statisticsTreeMap) {
+	private void updateTree(List<StatisticsLog> statisticsLogs, Map<String, StatisticsTree> statisticsTreeMap) {
 		if (!statisticsLogs.isEmpty()) {
 			StatisticsTree tree;
-			if (statisticsTreeMap.containsKey(statisticsLogs.get(0).getComponentId())) {
-				tree = statisticsTreeMap.get(statisticsLogs.get(0).getComponentId());
-				tree.getRoot().update(statisticsLogs.get(0).getNoOfFaults(),
-				                      statisticsLogs.get(0).getEndTime() - statisticsLogs.get(0).getStartTime());
-			} else {
-				tree = new StatisticsTree(statisticsLogs.get(0));
+			if (!statisticsTreeMap.containsKey(statisticsLogs.get(0).getComponentId())) {
+				tree = new StatisticsTree();
 				statisticsTreeMap.put(statisticsLogs.get(0).getComponentId(), tree);
-				if (log.isDebugEnabled()) {
-					log.debug("Created New statistics tree in the store for Root: " +
-					          statisticsLogs.get(0).getComponentId());
-				}
-			}
-			if (log.isDebugEnabled()) {
-				for (StatisticsLog statisticsLog : statisticsLogs) {
-					log.debug(statisticsLog.getComponentId() + "::NoOfChildren: " +
-					          statisticsLog.getNoOfChildren() + "::Msg ID: " +
-					          statisticsLog.getMsgId() + ": Parent MSG ID: " +
-					          statisticsLog.getParentMsgId() + "::Parent id: " +
-					          statisticsLog.getParent());
-				}
+			} else {
+				tree = statisticsTreeMap.get(statisticsLogs.get(0).getComponentId());
 			}
 			tree.buildTree(statisticsLogs); //build tree with these statistic logs
 		}
@@ -127,7 +109,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 	}
 
 	public StatisticTreeWrapper getApiStatistics(String apiName) {
-		return sequenceStatistics.get(apiName).getComponentTree();
+		return apiStatistics.get(apiName).getComponentTree();
 	}
 
 	public StatisticTreeWrapper getProxyStatistics(String proxyName) {
@@ -167,7 +149,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject getProxyServiceJmxStatistics(String proxyName) {
 		if (proxyStatistics.containsKey(proxyName)) {
-			return proxyStatistics.get(proxyName).getStatisticOfTheRoot();
+			//return proxyStatistics.get(proxyName).getStatisticOfTheRoot();
+			return null;
 		} else {
 			return null;
 		}
@@ -175,7 +158,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject getSequenceJmxStatistics(String sequenceName) {
 		if (proxyStatistics.containsKey(sequenceName)) {
-			return proxyStatistics.get(sequenceName).getStatisticOfTheRoot();
+			//return proxyStatistics.get(sequenceName).getStatisticOfTheRoot();
+			return null;
 		} else {
 			return null;
 		}
@@ -183,7 +167,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject getApiJmxStatistics(String APIName) {
 		if (proxyStatistics.containsKey(APIName)) {
-			return proxyStatistics.get(APIName).getStatisticOfTheRoot();
+			return null;
+			//return proxyStatistics.get(APIName).getStatisticOfTheRoot();
 		} else {
 			return null;
 		}
@@ -191,7 +176,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject getInboundEndpointJmxStatistics(String inboundEndpointName) {
 		if (proxyStatistics.containsKey(inboundEndpointName)) {
-			return proxyStatistics.get(inboundEndpointName).getStatisticOfTheRoot();
+			return null;
+			//return proxyStatistics.get(inboundEndpointName).getStatisticOfTheRoot();
 		} else {
 			return null;
 		}
@@ -199,7 +185,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject[] getProxyServiceJmxStatisticsTree(String proxyName) {
 		if (proxyStatistics.containsKey(proxyName)) {
-			return proxyStatistics.get(proxyName).getFullTree();
+			//return proxyStatistics.get(proxyName).getFullTree();
+			return null;
 		} else {
 			return null;
 		}
@@ -207,7 +194,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject[] getSequenceJmxStatisticsTree(String sequenceName) {
 		if (proxyStatistics.containsKey(sequenceName)) {
-			return proxyStatistics.get(sequenceName).getFullTree();
+			//return proxyStatistics.get(sequenceName).getFullTree();
+			return null;
 		} else {
 			return null;
 		}
@@ -215,7 +203,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject[] getInboundEndpointJmxStatisticsTree(String inboundEndpointName) {
 		if (proxyStatistics.containsKey(inboundEndpointName)) {
-			return proxyStatistics.get(inboundEndpointName).getFullTree();
+			//return proxyStatistics.get(inboundEndpointName).getFullTree();
+			return null;
 		} else {
 			return null;
 		}
@@ -223,7 +212,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject[] getApiJmxStatisticsTree(String apiName) {
 		if (proxyStatistics.containsKey(apiName)) {
-			return proxyStatistics.get(apiName).getFullTree();
+			//return proxyStatistics.get(apiName).getFullTree();
+			return null;
 		} else {
 			return null;
 		}
