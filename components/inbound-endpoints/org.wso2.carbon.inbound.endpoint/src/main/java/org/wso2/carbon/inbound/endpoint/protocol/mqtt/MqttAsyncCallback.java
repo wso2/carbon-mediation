@@ -98,6 +98,12 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
         }
     }
 
+    /**
+     * handles the incoming messages from broker and inject to Synapse mediation
+     *
+     * @param topic topic on which message received
+     * @param mqttMessage mqtt message
+     */
     public void messageArrived(String topic, MqttMessage mqttMessage) throws MqttException {
         if (log.isDebugEnabled()) {
             log.debug("Received Message: Topic:" + topic + "  Message: " + mqttMessage);
@@ -136,10 +142,18 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
         this.connectionConsumer = connectionConsumer;
     }
 
+    /**
+     * get the connection consumer reference
+     * @return connectionConsumer reference
+     */
     public MqttConnectionConsumer getMqttConnectionConsumer() {
         return this.connectionConsumer;
     }
 
+    /**
+     * get the options for the MQTT connection
+     * @return connectOptions reference
+     */
     public MqttConnectOptions getMqttConnectionOptions() {
         return this.connectOptions;
     }
@@ -148,6 +162,9 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
         this.injectHandler = injectHandler;
     }
 
+    /**
+     * Shutdowns the connection listener.
+     */
     public void shutdown() {
         super.shutdown();
         if (connectionListener != null) {

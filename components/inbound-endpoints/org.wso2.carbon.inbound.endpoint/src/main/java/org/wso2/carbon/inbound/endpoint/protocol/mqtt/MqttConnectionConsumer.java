@@ -46,6 +46,9 @@ public class MqttConnectionConsumer {
         this.mqttProperties = mqttProperties;
     }
 
+    /**
+     * handles the subscription to the broker on topic.
+     */
     public void execute() {
         if (mqttAsyncClient != null) {
             if (mqttAsyncClient.isConnected()) {
@@ -78,6 +81,9 @@ public class MqttConnectionConsumer {
         }
     }
 
+    /**
+     * Shutdowns the connection consumer.
+     */
     public void shutdown() {
         taskSuspensionSemaphore.release();
         if (connectionListener != null) {
@@ -85,10 +91,20 @@ public class MqttConnectionConsumer {
         }
     }
 
+    /**
+     * get MQTT connection options for client
+     *
+     * @return connectOptions reference to connection Options
+     */
     public MqttConnectOptions getConnectOptions() {
         return connectOptions;
     }
 
+    /**
+     * get MQTT asynchronous client
+     *
+     * @return mqttAsyncClient MQTT client
+     */
     public MqttAsyncClient getMqttAsyncClient() {
         return mqttAsyncClient;
     }
@@ -101,10 +117,18 @@ public class MqttConnectionConsumer {
         return mqttProperties;
     }
 
+    /**
+     * Related to task suspension related semaphore. When released task suspension is removed and
+     * lead to task completion
+     */
     public void releaseTaskSuspension() {
         taskSuspensionSemaphore.release();
     }
 
+    /**
+     * Related to task suspension related semaphore. When acquired task get suspended
+     * before completion.
+     */
     public void acquireTaskSuspension() throws InterruptedException {
         taskSuspensionSemaphore.acquire();
     }

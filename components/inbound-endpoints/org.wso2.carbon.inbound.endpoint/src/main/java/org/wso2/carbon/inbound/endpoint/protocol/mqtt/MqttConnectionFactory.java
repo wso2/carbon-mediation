@@ -177,6 +177,11 @@ public class MqttConnectionFactory {
         return parameters.get(MqttConstants.MQTT_SERVER_PORT);
     }
 
+    /**
+     * returns the interval which reconnection attempts make if broker is down
+     *
+     * @return interval reconnection interval in milliseconds
+     */
     public int getReconnectionInterval() {
         if (parameters.get(MqttConstants.MQTT_RECONNECTION_INTERVAL) != null) {
             return Integer.parseInt(parameters.get(MqttConstants.MQTT_RECONNECTION_INTERVAL));
@@ -185,6 +190,12 @@ public class MqttConnectionFactory {
         }
     }
 
+    /**
+     * creates a MQTT asynchronous client object for the inbound endpoint
+     *
+     * @param name inbound name
+     * @return MqttAsyncClient client
+     */
     private MqttAsyncClient createMqttAsyncClient(String name) {
 
         MqttClientManager clientManager = MqttClientManager.getInstance();
@@ -272,6 +283,12 @@ public class MqttConnectionFactory {
         return mqttClient;
     }
 
+    /**
+     * validates a given port number whether it contains special characters or bounded to valid port
+     * range (0-65535)  in operating system
+     *
+     * @param port port number
+     */
     protected void validatePortField(String port) {
         try {
             int portInteger = Integer.parseInt(port);
@@ -295,6 +312,11 @@ public class MqttConnectionFactory {
         }
     }
 
+    /**
+     * clears the all related state maintained in data store files
+     *
+     * @param isClientConnected whether client has connected previously or not
+     */
     public void shutdown(boolean isClientConnected) {
         //need to clear the resources if and only if client holds the lock for the resource
         //that is client has made a successful connection to the server

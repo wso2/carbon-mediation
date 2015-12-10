@@ -56,10 +56,22 @@ public class MqttClientManager {
         return instance;
     }
 
+    /**
+     * register MQTT client for identifier
+     *
+     * @param identifier inbound identifier
+     * @param mqttClient MQTT client
+     */
     public void registerMqttClient(String identifier, MqttAsyncClient mqttClient) {
         mqttClientMap.put(identifier, mqttClient);
     }
 
+    /**
+     * unregister MQTT client for identifier
+     *
+     * @param identifier inbound identifier
+     * @param name inbound name
+     */
     public void unregisterMqttClient(String identifier, String name) {
         mqttClientMap.remove(identifier);
         mqttCallbackMap.remove(identifier);
@@ -68,10 +80,21 @@ public class MqttClientManager {
         mqttClientDataStoreMap.remove(identifier);
     }
 
+    /**
+     * check whether MQTT client for identifier has already created before so that we could reuse
+     *
+     * @param identifier inbound identifier
+     */
     public boolean hasMqttClient(String identifier) {
         return mqttClientMap.containsKey(identifier);
     }
 
+    /**
+     * get the MQTT client for the unique identifier
+     *
+     * @param identifier inbound identifier
+     * @return MqttAsyncClient returns the reference for inbound identifier
+     */
     public MqttAsyncClient getMqttClient(String identifier) {
         if (tenantLoadingFlagMap.containsKey(identifier)) {
             //this is manually tenant loading case should return the client
@@ -92,6 +115,12 @@ public class MqttClientManager {
         }
     }
 
+    /**
+     * register the callback handler for inbound identifier
+     *
+     * @param identifier inbound identifier
+     * @param mqttCallback asynchronous message callback that we register on client
+     */
     public void registerMqttCallback(String identifier, MqttAsyncCallback mqttCallback) {
         mqttCallbackMap.put(identifier, mqttCallback);
     }

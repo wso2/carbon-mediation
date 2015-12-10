@@ -63,6 +63,9 @@ public class MqttConnectionListener implements IMqttActionListener {
         }
     }
 
+    /**
+     * shutdowns the connection listener from issuing reconnection attempts
+     */
     public void shutdown() {
         this.execute = false;
     }
