@@ -966,12 +966,13 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
      * @param carbonApp carbon application
      */
     public void setCustomLogContent (Deployer deployer, CarbonApplication carbonApp) {
-        if ((deployer instanceof AbstractSynapseArtifactDeployer) && carbonApp != null) {
-            ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApp.getAppName(),
-                    AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
-        }
-        else if ((deployer instanceof AbstractSynapseArtifactDeployer) && carbonApp == null) {
-            ((AbstractSynapseArtifactDeployer) deployer).setCustomLogContentNull();
+        if ((deployer instanceof AbstractSynapseArtifactDeployer)) {
+            if (carbonApp != null) {
+                ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(carbonApp.getAppName(),
+                        AppDeployerUtils.getTenantIdLogString(AppDeployerUtils.getTenantId()));
+            } else {
+                ((AbstractSynapseArtifactDeployer) deployer).setCustomLog(null, null);
+            }
         }
     }
 
