@@ -17,32 +17,70 @@ package org.wso2.carbon.cloud.gateway.agent.observer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Implementation for {@link CGAgentSubject}
  */
 public class CGAgentSubjectImpl implements CGAgentSubject {
-    private static List<CGAgentObserver> observers =
-            Collections.synchronizedList(new ArrayList<CGAgentObserver>());
-    
+    private static CGAgentSubjectImpl instance;
+    private List<CGAgentObserver> observers;
+    private Lock lock = new ReentrantLock();
+
+    private CGAgentSubjectImpl() {
+        observers = Collections.synchronizedList(new ArrayList<CGAgentObserver>());
+    }
+
+    public static CGAgentSubjectImpl getInstance() {
+        if (instance == null) {
+            synchronized (CGAgentSubjectImpl.class) {
+                if (instance == null) {
+                    instance = new CGAgentSubjectImpl();
+                }
+            }
+        }
+        return instance;
+    }
+
     public void addObserver(CGAgentObserver o) {
-        observers.add(o);
+        lock.lock();
+        try {
+            if (!observers.contains(o)) {
+                observers.add(o);
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void removeObserver(CGAgentObserver o) {
-        observers.remove(o);
+        lock.lock();
+        try {
+            observers.remove(o);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public void connected(String host, int port) {
-        notifyObservers(host, port);
+        lock.lock();
+        try {
+            notifyObservers(host, port);
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void notifyObservers(String host, int port) {
-        for (Object observer : observers) {
-            CGAgentObserver o = (CGAgentObserver) observer;
-            if (host != null && host.equals(o.getHostName()) && port == o.getPort()) {
-                o.update(this);
+        Iterator<CGAgentObserver> cgAgentObserverIterator = observers.iterator();
+        while (cgAgentObserverIterator.hasNext()) {
+            CGAgentObserver observer = cgAgentObserverIterator.next();
+            if (host != null && host.equals(observer.getHostName()) && port == observer.getPort()) {
+                observer.update(this);
+                cgAgentObserverIterator.remove();
             }
         }
     }

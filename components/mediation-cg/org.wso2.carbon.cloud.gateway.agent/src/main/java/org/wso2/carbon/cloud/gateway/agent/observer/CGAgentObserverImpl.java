@@ -68,4 +68,36 @@ public class CGAgentObserverImpl implements CGAgentObserver {
     public int getPort(){
         return port;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CGAgentObserverImpl that = (CGAgentObserverImpl) o;
+
+        if (port != that.port) {
+            return false;
+        }
+        if (host != null ? !host.equals(that.host) : that.host != null) {
+            return false;
+        }
+        if (serviceName != null ? !serviceName.equals(that.serviceName) : that.serviceName != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = host != null ? host.hashCode() : 0;
+        result = 31 * result + port;
+        result = 31 * result + (serviceName != null ? serviceName.hashCode() : 0);
+        return result;
+    }
 }
