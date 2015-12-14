@@ -806,7 +806,7 @@ public class CGAgentAdminService extends AbstractAdmin {
     private void populateExposedTransports(AxisService service, CGServiceMetaDataBean privateServiceMetaData) {
         if (service.getExposedTransports() != null && service.getExposedTransports().size() > 0) {
             List<String> exposedTransports = service.getExposedTransports();
-            exposedTransports.remove(CGConstant.CG_POLLING_CGAgentSubjectImplTRANSPORT_NAME);
+            exposedTransports.remove(CGConstant.CG_POLLING_TRANSPORT_NAME);
             privateServiceMetaData.setEnabledTransports(exposedTransports.toArray(new String[exposedTransports.size()]));
         }
     }
