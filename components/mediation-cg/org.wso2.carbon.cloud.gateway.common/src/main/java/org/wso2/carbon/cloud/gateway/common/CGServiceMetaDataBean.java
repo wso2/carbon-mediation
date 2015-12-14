@@ -71,6 +71,11 @@ public class CGServiceMetaDataBean {
 
     private boolean hasInOutMEP = false;
 
+    /**
+     * Enabled transports
+     */
+    private String[] enabledTransports;
+
     private CGServiceDependencyBean[] serviceDependencies;
     
     public String getInLineWSDL() {
@@ -159,6 +164,14 @@ public class CGServiceMetaDataBean {
 
     public void setServiceDependencies(CGServiceDependencyBean[] serviceDependencies) {
         this.serviceDependencies = serviceDependencies;
+    }
+
+    public String[] getEnabledTransports() {
+        return enabledTransports;
+    }
+
+    public void setEnabledTransports(String[] enabledTransports) {
+        this.enabledTransports = enabledTransports;
     }
 }
 

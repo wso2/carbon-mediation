@@ -27,7 +27,11 @@ public class CGAgentPollingTaskFlags {
             Collections.synchronizedMap(new HashMap<String, Boolean>());
 
     public static boolean isFlaggedForShutDown(String serviceName) {
-        return requestShutDownPollingTaskList.get(serviceName);
+        Boolean status = requestShutDownPollingTaskList.get(serviceName);
+        if (status == null) {
+            return false;
+        }
+        return status;
     }
 
     public static void flagForShutDown(String serviceName, boolean flag) {

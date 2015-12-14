@@ -44,7 +44,7 @@ public class CGPollingTransportReceiver
     @Override
     protected void doInit() throws AxisFault {
 
-        subject = new CGAgentSubjectImpl();
+        subject = CGAgentSubjectImpl.getInstance();
 
         csgWorkerPool = WorkerPoolFactory.getWorkerPool(
                 CGUtils.getIntProperty(
