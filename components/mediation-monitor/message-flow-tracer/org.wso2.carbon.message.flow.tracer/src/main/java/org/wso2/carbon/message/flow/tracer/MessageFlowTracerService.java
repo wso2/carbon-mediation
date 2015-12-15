@@ -1,19 +1,22 @@
 package org.wso2.carbon.message.flow.tracer;
 
-import org.apache.synapse.flowtracer.MessageFlowDataHolder;
+import net.minidev.json.JSONObject;
 import org.apache.synapse.flowtracer.data.MessageFlowComponentEntry;
 import org.apache.synapse.flowtracer.data.MessageFlowTraceEntry;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.message.flow.tracer.data.*;
 
-import java.io.IOException;
 import java.util.*;
 
-public class MessageFlowTracerService {
+public class MessageFlowTracerService extends AbstractServiceBusAdmin {
+
 
     public MessageFlowTraceEntry[] getMessageFlows() {
+        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
+                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
+
         List<MessageFlowTraceEntry> entries = new ArrayList<>();
-        Map<String, List<MessageFlowTraceEntry>> messageFlows = MessageFlowDataHolder.getMessageFlows();
+        Map<String, List<MessageFlowTraceEntry>> messageFlows = mediationTraceDataStore.getMessageFlowDataHolder().getMessageFlows();
         for (Map.Entry<String, List<MessageFlowTraceEntry>> entry : messageFlows.entrySet()) {
             if (entry.getValue() != null && entry.getValue().size() > 0) {
                 entries.add(entry.getValue().get(0));
@@ -32,8 +35,11 @@ public class MessageFlowTracerService {
     }
 
     public String[] getMessageFlowInLevels(String messageId) {
-        String[] messageFlows = MessageFlowDataHolder.getMessageFlowTrace(messageId);
-        MessageFlowComponentEntry[] messageFlowComponentEntries = MessageFlowDataHolder.getComponentInfo(messageId);
+        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
+                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
+
+        String[] messageFlows = mediationTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
+        MessageFlowComponentEntry[] messageFlowComponentEntries = mediationTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
         FlowPath flowPath = new FlowPath(messageFlows, messageFlowComponentEntries);
         Map<Integer, List<String>> levelMap = new TreeMap<>();
         List<String> initialList = new ArrayList<>();
@@ -48,27 +54,32 @@ public class MessageFlowTracerService {
         return levels;
     }
 
-    public Edge[] getAllEdges(String messageId){
+    public Edge[] getAllEdges(String messageId) {
+        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
+                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
 
-        String[] messageFlows = MessageFlowDataHolder.getMessageFlowTrace(messageId);
-        MessageFlowComponentEntry[] messageFlowComponentEntries = MessageFlowDataHolder.getComponentInfo(messageId);
-        FlowPath flowPath = new FlowPath(messageFlows,messageFlowComponentEntries);
+        String[] messageFlows = mediationTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
+        MessageFlowComponentEntry[] messageFlowComponentEntries = mediationTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
+        FlowPath flowPath = new FlowPath(messageFlows, messageFlowComponentEntries);
 
         Map<String, ComponentNode> componentNodeHashMap = flowPath.getNodeMap();
 
         Set<Edge> edges = new HashSet<>();
 
-        for(ComponentNode node1:componentNodeHashMap.values()){
-            for(ComponentNode node2:node1.getNodeList()){
-                edges.add(new Edge(node1.getComponentId(),node2.getComponentId()));
+        for (ComponentNode node1 : componentNodeHashMap.values()) {
+            for (ComponentNode node2 : node1.getNodeList()) {
+                edges.add(new Edge(node1.getComponentId(), node2.getComponentId()));
             }
         }
         return edges.toArray(new Edge[edges.size()]);
     }
 
-    public String getAllComponents(String messageId){
-        String[] messageFlows = MessageFlowDataHolder.getMessageFlowTrace(messageId);
-        MessageFlowComponentEntry[] messageFlowComponentEntries = MessageFlowDataHolder.getComponentInfo(messageId);
+    public String getAllComponents(String messageId) {
+        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
+                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
+
+        String[] messageFlows = mediationTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
+        MessageFlowComponentEntry[] messageFlowComponentEntries = mediationTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
         FlowPath flowPath = new FlowPath(messageFlows, messageFlowComponentEntries);
         String jsonString = null;
         Map<String, ComponentNode> componentNodeHashMap = flowPath.getNodeMap();
@@ -105,16 +116,13 @@ public class MessageFlowTracerService {
             hoverNodeMap.put(node.getComponentId(), propertyMap);
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            jsonString = mapper.writeValueAsString(hoverNodeMap);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        jsonString = JSONObject.toJSONString(hoverNodeMap);
         return jsonString;
     }
 
-    public void clearAll(){
-        MessageFlowDataHolder.clearDataStores();
+    public void clearAll() {
+        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
+                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
+        mediationTraceDataStore.getMessageFlowDataHolder().clearDataStores();
     }
 }

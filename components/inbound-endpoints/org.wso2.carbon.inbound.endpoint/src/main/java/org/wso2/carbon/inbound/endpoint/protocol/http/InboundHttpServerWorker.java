@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.aspects.data.tracing.MediationTracingDataCollector;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.flowtracer.MessageFlowDataHolder;
@@ -143,11 +144,11 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                     boolean processedByAPI = false;
 
-                    if (MessageFlowDataHolder.isMessageFlowTraceEnable()) {
-                        if (synCtx.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
-                            synCtx.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID, synCtx.getMessageID());
-                            synCtx.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ENTRY_TYPE, "Inbound Endpoint:" +
-                                                                                                            endpointName);
+                    if (synCtx.getEnvironment().getMessageFlowDataHolder().isMessageFlowTraceEnable()) {
+                        if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
+                            MediationTracingDataCollector.setEntryPoint(synCtx, (MessageFlowTracerConstants
+                                                                                         .ENTRY_TYPE_INBOUND_ENDPOINT
+                                                                                 + endpointName), synCtx.getMessageID());
                         }
                     }
                     // Trying to dispatch to an API
@@ -170,11 +171,12 @@ public class InboundHttpServerWorker extends ServerWorker {
                             //set inbound properties for axis2 context
                             setInboundProperties(axis2MsgContext);
 
-                            if (MessageFlowDataHolder.isMessageFlowTraceEnable()) {
+                            if (synCtx.getEnvironment().getMessageFlowDataHolder().isMessageFlowTraceEnable()) {
                                 if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
-                                    axis2MsgContext.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID, synCtx.getMessageID());
-                                    axis2MsgContext.setProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ENTRY_TYPE, "Inbound Endpoint:" +
-                                                                                                                    endpointName);
+                                    MediationTracingDataCollector.setEntryPoint(synCtx,
+                                                                                (MessageFlowTracerConstants
+                                                                                         .ENTRY_TYPE_INBOUND_ENDPOINT
+                                                                                 + endpointName), synCtx.getMessageID());
                                 }
                             }
                             if (!isRESTRequest(axis2MsgContext, method)) {

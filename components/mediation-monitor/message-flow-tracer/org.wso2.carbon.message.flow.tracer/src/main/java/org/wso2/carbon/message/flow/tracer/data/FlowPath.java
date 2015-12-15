@@ -54,16 +54,13 @@ public class FlowPath {
     }
 
     public void buildFlowWithLevels(Map<Integer,List<String>> map, int level, ComponentNode currentNode){
-
         for(ComponentNode node:currentNode.getNodeList()){
-
-            if(map.containsKey(level)){
+            if (map.containsKey(level)) {
                 map.get(level).add(node.getEntries().get(0).getComponentName());
-            }
-            else{
+            } else {
                 List<String> list = new ArrayList<>();
                 list.add(node.getEntries().get(0).getComponentName());
-                map.put(level,list);
+                map.put(level, list);
             }
 
             buildFlowWithLevels(map,level+1,node);

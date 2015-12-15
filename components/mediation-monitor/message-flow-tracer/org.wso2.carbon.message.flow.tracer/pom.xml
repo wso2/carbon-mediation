@@ -22,14 +22,12 @@
             <artifactId>synapse-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.9.13</version>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-            <version>1.9.13</version>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediation.initializer</artifactId>
         </dependency>
     </dependencies>
 
@@ -37,26 +35,29 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
-                        <Export-Package>org.wso2.carbon.message.flow.tracer.*,
-                                        org.wso2.carbon.message.flow.tracer.data.*</Export-Package>
-                        <Import-Package>org.apache.synapse.flowtracer.*,
-                                        org.codehaus.jackson.*,
-                                        javax.xml.*,
-                                        org.joda.time.*,
-                                        org.w3c.dom.*,
-                                        org.xml.sax.*,
+                        <Export-Package>
+                            org.wso2.carbon.message.flow.tracer.*;version="${carbon.mediation.exp.pkg.version}",
+                        </Export-Package>
+                        <Import-Package>
+                            !org.wso2.carbon.message.flow.tracer.*,
+                            org.apache.synapse.flowtracer.*,
+                            javax.xml.*,
+                            org.joda.time.*,
+                            org.w3c.dom.*,
+                            org.xml.sax.*,
+                            *;resolution:=optional
                         </Import-Package>
-                        <Embed-Dependency>
-                            json-simple;scope=compile|runtime;inline=false,
-                            jackson-core-asl;scope=compile|runtime;inline=false,
-                            jackson-mapper-asl;scope=compile|runtime;inline=false,
-                        </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>

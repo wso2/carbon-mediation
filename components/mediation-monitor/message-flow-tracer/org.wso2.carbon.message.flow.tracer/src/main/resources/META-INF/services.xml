@@ -1,12 +1,12 @@
 <serviceGroup>
-    <service name="MessageFlowTracerService" scope="transportsession">
+    <service name="MessageFlowTracerService">
         <transports>
             <transport>https</transport>
         </transports>
-        <parameter name="ServiceClass">org.wso2.carbon.message.flow.tracer.MessageFlowTracerService</parameter>
+        <parameter name="ServiceClass" locked="false">org.wso2.carbon.message.flow.tracer.MessageFlowTracerService</parameter>
     </service>
 
     <parameter name="adminService" locked="true">true</parameter>
     <parameter name="hiddenService" locked="true">true</parameter>
-    <parameter name="AuthorizationAction" locked="true">/permission/admin/monitor/mediation</parameter>
+    <parameter name="AuthorizationAction" locked="true">/permission/protected/manage</parameter>
 </serviceGroup>
