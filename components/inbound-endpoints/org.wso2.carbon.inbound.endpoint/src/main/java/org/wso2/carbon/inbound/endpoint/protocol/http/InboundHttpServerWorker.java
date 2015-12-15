@@ -144,7 +144,7 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                     boolean processedByAPI = false;
 
-                    if (synCtx.getEnvironment().getMessageFlowDataHolder().isMessageFlowTraceEnable()) {
+                    if (MediationTracingDataCollector.isMessageFlowTracingEnabled()) {
                         if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
                             MediationTracingDataCollector.setEntryPoint(synCtx, (MessageFlowTracerConstants
                                                                                          .ENTRY_TYPE_INBOUND_ENDPOINT
@@ -171,7 +171,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                             //set inbound properties for axis2 context
                             setInboundProperties(axis2MsgContext);
 
-                            if (synCtx.getEnvironment().getMessageFlowDataHolder().isMessageFlowTraceEnable()) {
+                            if (MediationTracingDataCollector.isMessageFlowTracingEnabled()) {
                                 if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
                                     MediationTracingDataCollector.setEntryPoint(synCtx,
                                                                                 (MessageFlowTracerConstants
