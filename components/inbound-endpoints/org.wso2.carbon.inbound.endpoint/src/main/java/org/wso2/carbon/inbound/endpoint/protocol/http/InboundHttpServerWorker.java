@@ -31,11 +31,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.aspects.data.tracing.MediationTracingDataCollector;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.flowtracer.MessageFlowDataHolder;
 import org.apache.synapse.flowtracer.MessageFlowTracerConstants;
+import org.apache.synapse.flowtracer.data.MessageFlowTracingDataCollector;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.MediatorFaultHandler;
@@ -144,9 +144,9 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                     boolean processedByAPI = false;
 
-                    if (MediationTracingDataCollector.isMessageFlowTracingEnabled()) {
+                    if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled()) {
                         if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
-                            MediationTracingDataCollector.setEntryPoint(synCtx, (MessageFlowTracerConstants
+                            MessageFlowTracingDataCollector.setEntryPoint(synCtx, (MessageFlowTracerConstants
                                                                                          .ENTRY_TYPE_INBOUND_ENDPOINT
                                                                                  + endpointName), synCtx.getMessageID());
                         }
@@ -171,9 +171,9 @@ public class InboundHttpServerWorker extends ServerWorker {
                             //set inbound properties for axis2 context
                             setInboundProperties(axis2MsgContext);
 
-                            if (MediationTracingDataCollector.isMessageFlowTracingEnabled()) {
+                            if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled()) {
                                 if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
-                                    MediationTracingDataCollector.setEntryPoint(synCtx,
+                                    MessageFlowTracingDataCollector.setEntryPoint(synCtx,
                                                                                 (MessageFlowTracerConstants
                                                                                          .ENTRY_TYPE_INBOUND_ENDPOINT
                                                                                  + endpointName), synCtx.getMessageID());

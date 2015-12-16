@@ -45,7 +45,6 @@ public class FlowPath {
     }
 
     public void processPath(List<String> flow, int position, ComponentNode previous){
-
         if(position>=flow.size())
             return;
 
@@ -62,10 +61,8 @@ public class FlowPath {
                 list.add(node.getEntries().get(0).getComponentName());
                 map.put(level, list);
             }
-
             buildFlowWithLevels(map,level+1,node);
         }
-
     }
 
     public Map<String, ComponentNode> getNodeMap() {

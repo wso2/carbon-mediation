@@ -12,11 +12,11 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
 
 
     public MessageFlowTraceEntry[] getMessageFlows() {
-        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
+        MessageFlowTraceDataStore messageFlowTraceDataStore = (MessageFlowTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
                                                                                                                            .MESSAGE_FLOW_TRACE_STORE);
 
         List<MessageFlowTraceEntry> entries = new ArrayList<>();
-        Map<String, List<MessageFlowTraceEntry>> messageFlows = mediationTraceDataStore.getMessageFlowDataHolder().getMessageFlows();
+        Map<String, List<MessageFlowTraceEntry>> messageFlows = messageFlowTraceDataStore.getMessageFlowDataHolder().getMessageFlows();
         for (Map.Entry<String, List<MessageFlowTraceEntry>> entry : messageFlows.entrySet()) {
             if (entry.getValue() != null && entry.getValue().size() > 0) {
                 entries.add(entry.getValue().get(0));
@@ -35,7 +35,7 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
     }
 
     public String[] getMessageFlowInLevels(String messageId) {
-        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
+        MessageFlowTraceDataStore mediationTraceDataStore = (MessageFlowTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
                                                                                                                            .MESSAGE_FLOW_TRACE_STORE);
 
         String[] messageFlows = mediationTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
@@ -55,11 +55,11 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
     }
 
     public Edge[] getAllEdges(String messageId) {
-        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
+        MessageFlowTraceDataStore messageFlowTraceDataStore = (MessageFlowTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
                                                                                                                            .MESSAGE_FLOW_TRACE_STORE);
 
-        String[] messageFlows = mediationTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
-        MessageFlowComponentEntry[] messageFlowComponentEntries = mediationTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
+        String[] messageFlows = messageFlowTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
+        MessageFlowComponentEntry[] messageFlowComponentEntries = messageFlowTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
         FlowPath flowPath = new FlowPath(messageFlows, messageFlowComponentEntries);
 
         Map<String, ComponentNode> componentNodeHashMap = flowPath.getNodeMap();
@@ -75,11 +75,11 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
     }
 
     public String getAllComponents(String messageId) {
-        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
+        MessageFlowTraceDataStore messageFlowTraceDataStore = (MessageFlowTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
                                                                                                                            .MESSAGE_FLOW_TRACE_STORE);
 
-        String[] messageFlows = mediationTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
-        MessageFlowComponentEntry[] messageFlowComponentEntries = mediationTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
+        String[] messageFlows = messageFlowTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
+        MessageFlowComponentEntry[] messageFlowComponentEntries = messageFlowTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
         FlowPath flowPath = new FlowPath(messageFlows, messageFlowComponentEntries);
         String jsonString = null;
         Map<String, ComponentNode> componentNodeHashMap = flowPath.getNodeMap();
@@ -89,17 +89,25 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
             Map<String, String> propertyMap = new HashMap<>();
             propertyMap.put("label", node.getComponentName());
             if (node.getEntries().size() > 1) {
-                propertyMap.put("description", node.getEntries().get(0).isStart() + "<br>" + node.getEntries().get(1).isStart());
-                propertyMap.put("beforepayload", (node.getEntries().get(0).isStart() ? node.getEntries().get(0).getPayload() : node.getEntries().get(1).getPayload()));
-                propertyMap.put("afterpayload", (node.getEntries().get(0).isStart() ? node.getEntries().get(1).getPayload() : node.getEntries().get(0).getPayload()));
+                propertyMap.put("description", node.getEntries().get(0).isStart() + "<br>" + node.getEntries().get(1)
+                        .isStart());
+                propertyMap.put("beforepayload", (node.getEntries().get(0).isStart() ? node.getEntries().get(0)
+                        .getPayload() : node.getEntries().get(1).getPayload()));
+                propertyMap.put("afterpayload", (node.getEntries().get(0).isStart() ? node.getEntries().get(1)
+                        .getPayload() : node.getEntries().get(0).getPayload()));
 
-                propertyMap.put("beforeproperties", (node.getEntries().get(0).isStart() ? node.getEntries().get(0).getPropertySet() : node.getEntries().get(1).getPropertySet()));
-                propertyMap.put("afterproperties", (node.getEntries().get(0).isStart() ? node.getEntries().get(1).getPropertySet() : node.getEntries().get(0).getPropertySet()));
+                propertyMap.put("beforeproperties", (node.getEntries().get(0).isStart() ? constructPropertyString(
+                        node.getEntries().get(0).getPropertyMap()): constructPropertyString(
+                        node.getEntries().get(1).getPropertyMap())));
+                propertyMap.put("afterproperties", (node.getEntries().get(0).isStart() ? constructPropertyString(
+                        node.getEntries().get(1).getPropertyMap()) : constructPropertyString(
+                        node.getEntries().get(0).getPropertyMap())));
             } else if (node.getEntries().size() == 1) {
                 propertyMap.put("description", node.getEntries().get(0).isStart() + "");
                 propertyMap.put("beforepayload", node.getEntries().get(0).getPayload());
 
-                propertyMap.put("beforeproperties", node.getEntries().get(0).getPropertySet());
+                propertyMap.put("beforeproperties", constructPropertyString(
+                        node.getEntries().get(0).getPropertyMap()));
             } else {
                 propertyMap.put("description", "N/A");
             }
@@ -121,8 +129,19 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
     }
 
     public void clearAll() {
-        MediationTraceDataStore mediationTraceDataStore = (MediationTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
-                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
-        mediationTraceDataStore.getMessageFlowDataHolder().clearDataStores();
+        MessageFlowTraceDataStore messageFlowTraceDataStore = (MessageFlowTraceDataStore) getConfigContext().getProperty
+                (MessageFlowTraceConstants.MESSAGE_FLOW_TRACE_STORE);
+        messageFlowTraceDataStore.getMessageFlowDataHolder().clearDataStores();
+    }
+
+    private String constructPropertyString(Map<String, String> propertyMap){
+        StringBuilder properties = new StringBuilder();
+        for(String property : propertyMap.keySet()){
+            properties.append(property)
+                    .append("=")
+                    .append(propertyMap.get(property))
+                    .append(",");
+        }
+        return properties.toString();
     }
 }
