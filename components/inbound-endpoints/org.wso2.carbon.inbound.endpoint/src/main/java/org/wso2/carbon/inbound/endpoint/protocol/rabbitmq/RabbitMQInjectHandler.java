@@ -125,12 +125,15 @@ public class RabbitMQInjectHandler {
             return false;
         }
         SequenceMediator seq = (SequenceMediator) synapseEnvironment
-                .getSynapseConfiguration().getSequence(injectingSeq);
-        seq.setErrorHandler(onErrorSeq);
+                .getSynapseConfiguration().getSequence(injectingSeq);        
         if (seq != null) {
             if (log.isDebugEnabled()) {
                 log.debug("injecting message to sequence : " + injectingSeq);
             }
+            if (!seq.isInitialized()) {
+                seq.init(synapseEnvironment);
+            }
+            seq.setErrorHandler(onErrorSeq);
             synapseEnvironment.injectInbound(msgCtx, seq, sequential);
         } else {
             log.error("Sequence: " + injectingSeq + " not found");

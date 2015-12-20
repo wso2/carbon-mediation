@@ -222,6 +222,9 @@ public class JMSInjectHandler {
                 if (log.isDebugEnabled()) {
                     log.debug("injecting message to sequence : " + injectingSeq);
                 }
+                if (!seq.isInitialized()) {
+                    seq.init(synapseEnvironment);
+                }                
                 seq.setErrorHandler(onErrorSeq);
                 if (!synapseEnvironment.injectInbound(msgCtx, seq, sequential)) {
                     return false;
