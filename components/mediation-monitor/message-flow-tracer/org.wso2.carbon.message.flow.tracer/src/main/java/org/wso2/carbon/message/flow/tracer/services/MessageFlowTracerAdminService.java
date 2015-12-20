@@ -18,6 +18,7 @@
 package org.wso2.carbon.message.flow.tracer.services;
 
 import net.minidev.json.JSONObject;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.synapse.messageflowtracer.data.MessageFlowComponentEntry;
 import org.apache.synapse.messageflowtracer.data.MessageFlowTraceEntry;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
@@ -110,10 +111,10 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
             if (node.getEntries().size() > 1) {
                 propertyMap.put("description", node.getEntries().get(0).isStart() + "<br>" + node.getEntries().get(1)
                         .isStart());
-                propertyMap.put("beforepayload", (node.getEntries().get(0).isStart() ? node.getEntries().get(0)
-                        .getPayload() : node.getEntries().get(1).getPayload()));
-                propertyMap.put("afterpayload", (node.getEntries().get(0).isStart() ? node.getEntries().get(1)
-                        .getPayload() : node.getEntries().get(0).getPayload()));
+                propertyMap.put("beforepayload", StringEscapeUtils.escapeHtml((node.getEntries().get(0).isStart() ? node.getEntries().get(0)
+                        .getPayload() : node.getEntries().get(1).getPayload())));
+                propertyMap.put("afterpayload", StringEscapeUtils.escapeHtml((node.getEntries().get(0).isStart() ? node.getEntries().get(1)
+                        .getPayload() : node.getEntries().get(0).getPayload())));
 
                 propertyMap.put("beforeproperties", (node.getEntries().get(0).isStart() ? constructPropertyString(
                         node.getEntries().get(0).getPropertyMap()) : constructPropertyString(
@@ -143,8 +144,7 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
             hoverNodeMap.put(node.getComponentId(), propertyMap);
         }
 
-        jsonString = JSONObject.toJSONString(hoverNodeMap);
-        return jsonString;
+        return JSONObject.toJSONString(hoverNodeMap);
     }
 
     public void clearAll() {
