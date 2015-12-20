@@ -103,13 +103,13 @@ public class MessageFlowTracerServiceComponent {
                                                                                        .getMessageFlowDataHolder());
         cfgCtx.setProperty(MessageFlowTraceConstants.MESSAGE_FLOW_TRACE_STORE, statisticsStore);
 
-//        MessageFlowTraceReporterThread reporterThread = new MessageFlowTraceReporterThread(synEnvService, statisticsStore);
-//        reporterThread.setName("mediation-flow-tracer-" + tenantId);
-//        reporterThread.start();
+        MessageFlowTraceReporterThread reporterThread = new MessageFlowTraceReporterThread(synEnvService, statisticsStore);
+        reporterThread.setName("mediation-flow-tracer-" + tenantId);
+        reporterThread.start();
         if (log.isDebugEnabled()) {
             log.debug("Registering the new mediation flow tracer service");
         }
-//        reporterThreads.put(tenantId, reporterThread);
+        reporterThreads.put(tenantId, reporterThread);
         stores.put(tenantId, statisticsStore);
     }
 

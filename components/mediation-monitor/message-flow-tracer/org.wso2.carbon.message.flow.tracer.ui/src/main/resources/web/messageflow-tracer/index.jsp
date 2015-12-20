@@ -4,7 +4,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.message.flow.tracer.ui.MessageFlowTracerClient" %>
-<%@ page import="org.apache.synapse.flowtracer.data.xsd.MessageFlowTraceEntry" %>
+<%@ page import="org.apache.synapse.messageflowtracer.data.xsd.MessageFlowTraceEntry" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <script type="text/javascript" src="flowtracercommon.js"></script>

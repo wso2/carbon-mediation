@@ -51,7 +51,7 @@
                         </Export-Package>
                         <Import-Package>
                             !org.wso2.carbon.message.flow.tracer.*,
-                            org.apache.synapse.flowtracer.*,
+                            org.apache.synapse.messageflowtracer.*,
                             javax.xml.*,
                             org.joda.time.*,
                             org.w3c.dom.*,

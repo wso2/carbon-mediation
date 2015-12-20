@@ -3,8 +3,8 @@ package org.wso2.carbon.message.flow.tracer.ui;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.synapse.flowtracer.data.xsd.MessageFlowComponentEntry;
-import org.apache.synapse.flowtracer.data.xsd.MessageFlowTraceEntry;
+import org.apache.synapse.messageflowtracer.data.xsd.MessageFlowComponentEntry;
+import org.apache.synapse.messageflowtracer.data.xsd.MessageFlowTraceEntry;
 import org.wso2.carbon.message.flow.tracer.data.xsd.Edge;
 import org.wso2.carbon.message.flow.tracer.stub.MessageFlowTracerServiceStub;
 

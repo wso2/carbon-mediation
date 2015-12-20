@@ -40,7 +40,7 @@
                         <Carbon-Component>UIBundle</Carbon-Component>
                         <Export-Package>org.wso2.carbon.message.flow.tracer.ui.*</Export-Package>
                         <Import-Package>org.wso2.carbon.message.flow.tracer.stub.*,
-                                        org.apache.synapse.flowtracer.*,
+                                        org.apache.synapse.messageflowtracer.*,
                                         java.util.xsd.*,
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
