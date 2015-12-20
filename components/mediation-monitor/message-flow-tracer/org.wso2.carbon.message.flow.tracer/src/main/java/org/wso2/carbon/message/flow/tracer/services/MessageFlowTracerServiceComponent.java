@@ -1,4 +1,21 @@
-package org.wso2.carbon.message.flow.tracer;
+/*
+* Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* WSO2 Inc. licenses this file to you under the Apache License,
+* Version 2.0 (the "License"); you may not use this file except
+* in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+package org.wso2.carbon.message.flow.tracer.services;
 
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
@@ -8,8 +25,10 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
-import org.wso2.carbon.message.flow.tracer.services.MessageFlowTraceService;
-import org.wso2.carbon.message.flow.tracer.services.MessageFlowTraceServiceImpl;
+import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
+import org.wso2.carbon.message.flow.tracer.services.tenant.MessageFlowTraceService;
+import org.wso2.carbon.message.flow.tracer.services.tenant.MessageFlowTraceServiceImpl;
+import org.wso2.carbon.message.flow.tracer.util.MessageFlowTraceConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.util.HashMap;
@@ -29,7 +48,7 @@ import java.util.Set;
  */
 public class MessageFlowTracerServiceComponent {
 
-    private static final Log log = LogFactory.getLog(MessageFlowTracerService.class);
+    private static final Log log = LogFactory.getLog(MessageFlowTracerAdminService.class);
 
     private Map<Integer, MessageFlowTraceDataStore> stores =
             new HashMap<Integer, MessageFlowTraceDataStore>();
@@ -77,8 +96,6 @@ public class MessageFlowTracerServiceComponent {
      * @param synEnvService information about synapse runtime
      */
     private void createStatisticsStore(SynapseEnvironmentService synEnvService) {
-
-        //TODO Do we need to use old stat reporter enable in xml
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConfigurationContext cfgCtx = synEnvService.getConfigurationContext();
 
@@ -86,19 +103,13 @@ public class MessageFlowTracerServiceComponent {
                                                                                        .getMessageFlowDataHolder());
         cfgCtx.setProperty(MessageFlowTraceConstants.MESSAGE_FLOW_TRACE_STORE, statisticsStore);
 
-        MessageFlowTraceReporterThread reporterThread = new MessageFlowTraceReporterThread(synEnvService, statisticsStore);
-        reporterThread.setName("mediation-flow-tracer-" + tenantId);
-
-        //TODO Do we need this
-        //Set a custom interval value if required
-        //TODO Engage the persisting stat observer if required OR Engage custom observer implementations (user
-        // written extensions)
-
-        reporterThread.start();
+//        MessageFlowTraceReporterThread reporterThread = new MessageFlowTraceReporterThread(synEnvService, statisticsStore);
+//        reporterThread.setName("mediation-flow-tracer-" + tenantId);
+//        reporterThread.start();
         if (log.isDebugEnabled()) {
             log.debug("Registering the new mediation flow tracer service");
         }
-        reporterThreads.put(tenantId, reporterThread);
+//        reporterThreads.put(tenantId, reporterThread);
         stores.put(tenantId, statisticsStore);
     }
 
@@ -126,8 +137,6 @@ public class MessageFlowTracerServiceComponent {
                 }
             }
         }
-
-        //TODO if observers are registered unregister them
     }
 
     protected void setSynapseEnvironmentService(SynapseEnvironmentService synEnvService) {
@@ -197,7 +206,6 @@ public class MessageFlowTracerServiceComponent {
                     }
                 }
             }
-            //TODO unregister observers
         } catch (Throwable t) {
             log.error("Fatal error occured at the osgi service method", t);
         }

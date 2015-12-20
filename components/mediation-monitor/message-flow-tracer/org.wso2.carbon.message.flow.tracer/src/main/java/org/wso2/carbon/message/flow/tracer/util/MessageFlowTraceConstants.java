@@ -15,33 +15,8 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.message.flow.tracer.data;
+package org.wso2.carbon.message.flow.tracer.util;
 
-/**
- * Represents the connection betwen two nodes
- */
-public class Edge{
-
-    private String node1;
-    private String node2;
-
-    public Edge(String node1, String node2) {
-        this.node1 = node1;
-        this.node2 = node2;
-    }
-
-    public String getNode1() {
-        return node1;
-    }
-
-    public String getNode2() {
-        return node2;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        Edge other = (Edge) obj;
-
-        return this.node1.equals(other.getNode1()) && this.node2.equals(other.getNode2());
-    }
+public class MessageFlowTraceConstants {
+    public static final String MESSAGE_FLOW_TRACE_STORE = "mediation.flow.trace.store";
 }

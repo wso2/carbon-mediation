@@ -1,19 +1,38 @@
-package org.wso2.carbon.message.flow.tracer;
+/*
+* Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+* WSO2 Inc. licenses this file to you under the Apache License,
+* Version 2.0 (the "License"); you may not use this file except
+* in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied. See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+package org.wso2.carbon.message.flow.tracer.services;
 
 import net.minidev.json.JSONObject;
-import org.apache.synapse.flowtracer.data.MessageFlowComponentEntry;
-import org.apache.synapse.flowtracer.data.MessageFlowTraceEntry;
+import org.apache.synapse.messageflowtracer.data.MessageFlowComponentEntry;
+import org.apache.synapse.messageflowtracer.data.MessageFlowTraceEntry;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.message.flow.tracer.data.*;
+import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
+import org.wso2.carbon.message.flow.tracer.util.MessageFlowTraceConstants;
 
 import java.util.*;
 
-public class MessageFlowTracerService extends AbstractServiceBusAdmin {
+public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
 
 
     public MessageFlowTraceEntry[] getMessageFlows() {
         MessageFlowTraceDataStore messageFlowTraceDataStore = (MessageFlowTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
-                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
+                                                                                                                                 .MESSAGE_FLOW_TRACE_STORE);
 
         List<MessageFlowTraceEntry> entries = new ArrayList<>();
         Map<String, List<MessageFlowTraceEntry>> messageFlows = messageFlowTraceDataStore.getMessageFlowDataHolder().getMessageFlows();
@@ -36,7 +55,7 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
 
     public String[] getMessageFlowInLevels(String messageId) {
         MessageFlowTraceDataStore mediationTraceDataStore = (MessageFlowTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
-                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
+                                                                                                                               .MESSAGE_FLOW_TRACE_STORE);
 
         String[] messageFlows = mediationTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
         MessageFlowComponentEntry[] messageFlowComponentEntries = mediationTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
@@ -56,7 +75,7 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
 
     public Edge[] getAllEdges(String messageId) {
         MessageFlowTraceDataStore messageFlowTraceDataStore = (MessageFlowTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
-                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
+                                                                                                                                 .MESSAGE_FLOW_TRACE_STORE);
 
         String[] messageFlows = messageFlowTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
         MessageFlowComponentEntry[] messageFlowComponentEntries = messageFlowTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
@@ -76,7 +95,7 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
 
     public String getAllComponents(String messageId) {
         MessageFlowTraceDataStore messageFlowTraceDataStore = (MessageFlowTraceDataStore) getConfigContext().getProperty(MessageFlowTraceConstants
-                                                                                                                           .MESSAGE_FLOW_TRACE_STORE);
+                                                                                                                                 .MESSAGE_FLOW_TRACE_STORE);
 
         String[] messageFlows = messageFlowTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
         MessageFlowComponentEntry[] messageFlowComponentEntries = messageFlowTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
@@ -97,7 +116,7 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
                         .getPayload() : node.getEntries().get(0).getPayload()));
 
                 propertyMap.put("beforeproperties", (node.getEntries().get(0).isStart() ? constructPropertyString(
-                        node.getEntries().get(0).getPropertyMap()): constructPropertyString(
+                        node.getEntries().get(0).getPropertyMap()) : constructPropertyString(
                         node.getEntries().get(1).getPropertyMap())));
                 propertyMap.put("afterproperties", (node.getEntries().get(0).isStart() ? constructPropertyString(
                         node.getEntries().get(1).getPropertyMap()) : constructPropertyString(
@@ -134,9 +153,9 @@ public class MessageFlowTracerService extends AbstractServiceBusAdmin {
         messageFlowTraceDataStore.getMessageFlowDataHolder().clearDataStores();
     }
 
-    private String constructPropertyString(Map<String, String> propertyMap){
+    private String constructPropertyString(Map<String, String> propertyMap) {
         StringBuilder properties = new StringBuilder();
-        for(String property : propertyMap.keySet()){
+        for (String property : propertyMap.keySet()) {
             properties.append(property)
                     .append("=")
                     .append(propertyMap.get(property))

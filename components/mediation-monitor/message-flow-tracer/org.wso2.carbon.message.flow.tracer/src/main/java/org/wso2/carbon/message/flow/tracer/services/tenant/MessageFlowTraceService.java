@@ -15,33 +15,16 @@
 * specific language governing permissions and limitations
 * under the License.
 */
-package org.wso2.carbon.message.flow.tracer.data;
+package org.wso2.carbon.message.flow.tracer.services.tenant;
 
-/**
- * Represents the connection betwen two nodes
- */
-public class Edge{
+import org.apache.axis2.context.ConfigurationContext;
+import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
 
-    private String node1;
-    private String node2;
+public interface MessageFlowTraceService {
 
-    public Edge(String node1, String node2) {
-        this.node1 = node1;
-        this.node2 = node2;
-    }
+    public MessageFlowTraceDataStore getTraceDataStore();
 
-    public String getNode1() {
-        return node1;
-    }
+    public int getTenantId();
 
-    public String getNode2() {
-        return node2;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        Edge other = (Edge) obj;
-
-        return this.node1.equals(other.getNode1()) && this.node2.equals(other.getNode2());
-    }
+    public ConfigurationContext getConfigurationContext();
 }
