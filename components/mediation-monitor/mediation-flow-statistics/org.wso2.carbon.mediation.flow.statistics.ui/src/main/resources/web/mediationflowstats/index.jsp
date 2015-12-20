@@ -54,6 +54,7 @@
                                 <option value="api">API Statistic</option>
                                 <option value="inbound">Inbound Endpoint Statistics</option>
                                 <option value="sequence">Sequence Statistics</option>
+                                <option value="endpoint">Endpoint Statistics</option>
                             </select>
                         </td>
                     </tr>

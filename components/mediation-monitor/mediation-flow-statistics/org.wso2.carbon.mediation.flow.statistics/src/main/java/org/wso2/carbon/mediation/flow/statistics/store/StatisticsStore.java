@@ -21,11 +21,13 @@ package org.wso2.carbon.mediation.flow.statistics.store;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.aspects.newstatistics.EndpointStatisticLog;
 import org.apache.synapse.aspects.newstatistics.StatisticsLog;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.wso2.carbon.mediation.flow.statistics.service.data.StatisticTreeWrapper;
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticCollectionViewMXBean;
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticsCompositeObject;
+import org.wso2.carbon.mediation.flow.statistics.store.tree.data.EndpointDataHolder;
 import org.wso2.carbon.mediation.flow.statistics.store.tree.data.StatisticsTree;
 
 import java.util.*;
@@ -46,6 +48,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 	private final Map<String, StatisticsTree> sequenceStatistics = new HashMap<>();
 
 	private final Map<String, StatisticsTree> inboundEndpointStatistics = new HashMap<>();
+
+	private final Map<String, EndpointDataHolder> endpointStatistics = new HashMap<>();
 
 	public StatisticsStore() {
 		MBeanRegistrar.getInstance().registerMBean(this, "MediationFlowStatisticView", "MediationFlowStatisticView");
@@ -79,6 +83,15 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	}
 
+	public void updateEndpoint(EndpointStatisticLog endpointStatisticLog) {
+		if (endpointStatistics.containsKey(endpointStatisticLog.getComponentId())) {
+			endpointStatistics.get(endpointStatisticLog.getComponentId()).update(endpointStatisticLog);
+		} else {
+			EndpointDataHolder endpointDataHolder = new EndpointDataHolder(endpointStatisticLog);
+			endpointStatistics.put(endpointStatisticLog.getComponentId(), endpointDataHolder);
+		}
+	}
+
 	private void updateTree(List<StatisticsLog> statisticsLogs, Map<String, StatisticsTree> statisticsTreeMap) {
 		if (!statisticsLogs.isEmpty()) {
 			StatisticsTree tree;
@@ -106,6 +119,10 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	public Set<Map.Entry<String, StatisticsTree>> getInboundEndpointsWithValues() {
 		return inboundEndpointStatistics.entrySet();
+	}
+
+	public Set<Map.Entry<String, EndpointDataHolder>> getEndpoint() {
+		return endpointStatistics.entrySet();
 	}
 
 	public StatisticTreeWrapper getApiStatistics(String apiName) {

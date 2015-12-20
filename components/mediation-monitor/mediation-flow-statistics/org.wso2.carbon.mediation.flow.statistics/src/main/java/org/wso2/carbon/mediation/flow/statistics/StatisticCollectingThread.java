@@ -19,6 +19,7 @@
 package org.wso2.carbon.mediation.flow.statistics;
 
 import org.apache.log4j.Logger;
+import org.apache.synapse.aspects.newstatistics.EndpointStatisticLog;
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.apache.synapse.aspects.newstatistics.StatisticsLog;
@@ -55,8 +56,14 @@ public class StatisticCollectingThread extends Thread {
 		List<List<StatisticsLog>> statisticEntries =
 				synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore()
 				                         .getCompletedStatisticEntries();
+		List<EndpointStatisticLog> endpointStatisticEntries =
+				synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore()
+				                         .getCompletedEndpointStatisticEntries();
 		for (List<StatisticsLog> statisticsLogs : statisticEntries) {
 			statisticsStore.update(statisticsLogs);
+		}
+		for (EndpointStatisticLog endpointStatisticLog : endpointStatisticEntries) {
+			statisticsStore.updateEndpoint(endpointStatisticLog);
 		}
 	}
 

@@ -115,7 +115,7 @@
             %>
 
             <div class="live map">
-                <svg></svg>
+                <svg width=960 height=1000></svg>
             </div>
 
             <script>

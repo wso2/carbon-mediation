@@ -75,7 +75,9 @@
             } else if (statisticCategory.equals("sequence")) {
                 categoryName = "Sequence";
                 collectedSequenceStatistic = mediationFlowStatisticClient.getAllSequenceStatistics();
-
+            }else if (statisticCategory.equals("endpoint")) {
+                categoryName = "Endpoint";
+                collectedSequenceStatistic = mediationFlowStatisticClient.getAllEndpointStatistics();
             }
     %>
     <div id="middle">
@@ -129,13 +131,13 @@
                         <%=adminData.getTreeNodeData().getCount()%>
                     </td>
                     <td>
-                        <%=adminData.getTreeNodeData().getAvgProcessingTime()%>
+                        <%=adminData.getTreeNodeData().getMinProcessingTime()%>
                     </td>
                     <td>
                         <%=adminData.getTreeNodeData().getMaxProcessingTime()%>
                     </td>
                     <td>
-                        <%=adminData.getTreeNodeData().getMinProcessingTime()%>
+                        <%=adminData.getTreeNodeData().getAvgProcessingTime()%>
                     </td>
                     <td>
                         <%=adminData.getTreeNodeData().getFaultCount()%>

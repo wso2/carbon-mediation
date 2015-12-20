@@ -1,15 +1,26 @@
-
 <wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://service.statistics.flow.mediation.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax2297="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
    <wsdl:documentation>MediationFlowStatisticsAdmin</wsdl:documentation>
    <wsdl:types>
       <xs:schema xmlns:ax2298="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
          <xs:import namespace="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd"/>
-         <xs:element name="getAllSequenceStatistics">
+         <xs:element name="getAllInboundEndpointStatistics">
             <xs:complexType>
                <xs:sequence/>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getAllSequenceStatisticsResponse">
+         <xs:element name="getAllInboundEndpointStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllApiStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllApiStatisticsResponse">
             <xs:complexType>
                <xs:sequence>
                   <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
@@ -28,12 +39,12 @@
                </xs:sequence>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getAllInboundEndpointStatistics">
+         <xs:element name="getAllEndpointStatistics">
             <xs:complexType>
                <xs:sequence/>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getAllInboundEndpointStatisticsResponse">
+         <xs:element name="getAllEndpointStatisticsResponse">
             <xs:complexType>
                <xs:sequence>
                   <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
@@ -96,12 +107,12 @@
                </xs:sequence>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getAllApiStatistics">
+         <xs:element name="getAllSequenceStatistics">
             <xs:complexType>
                <xs:sequence/>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getAllApiStatisticsResponse">
+         <xs:element name="getAllSequenceStatisticsResponse">
             <xs:complexType>
                <xs:sequence>
                   <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
@@ -184,6 +195,12 @@
    <wsdl:message name="getApiStatisticsResponse">
       <wsdl:part name="parameters" element="ns:getApiStatisticsResponse"/>
    </wsdl:message>
+   <wsdl:message name="getAllEndpointStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getAllEndpointStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getAllEndpointStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getAllEndpointStatisticsResponse"/>
+   </wsdl:message>
    <wsdl:message name="getAllInboundEndpointStatisticsRequest">
       <wsdl:part name="parameters" element="ns:getAllInboundEndpointStatistics"/>
    </wsdl:message>
@@ -218,6 +235,10 @@
       <wsdl:operation name="getApiStatistics">
          <wsdl:input message="ns:getApiStatisticsRequest" wsaw:Action="urn:getApiStatistics"/>
          <wsdl:output message="ns:getApiStatisticsResponse" wsaw:Action="urn:getApiStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEndpointStatistics">
+         <wsdl:input message="ns:getAllEndpointStatisticsRequest" wsaw:Action="urn:getAllEndpointStatistics"/>
+         <wsdl:output message="ns:getAllEndpointStatisticsResponse" wsaw:Action="urn:getAllEndpointStatisticsResponse"/>
       </wsdl:operation>
       <wsdl:operation name="getAllInboundEndpointStatistics">
          <wsdl:input message="ns:getAllInboundEndpointStatisticsRequest" wsaw:Action="urn:getAllInboundEndpointStatistics"/>
@@ -282,6 +303,15 @@
       </wsdl:operation>
       <wsdl:operation name="getApiStatistics">
          <soap:operation soapAction="urn:getApiStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEndpointStatistics">
+         <soap:operation soapAction="urn:getAllEndpointStatistics" style="document"/>
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
@@ -364,6 +394,15 @@
             <soap12:body use="literal"/>
          </wsdl:output>
       </wsdl:operation>
+      <wsdl:operation name="getAllEndpointStatistics">
+         <soap12:operation soapAction="urn:getAllEndpointStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
       <wsdl:operation name="getAllInboundEndpointStatistics">
          <soap12:operation soapAction="urn:getAllInboundEndpointStatistics" style="document"/>
          <wsdl:input>
@@ -432,6 +471,15 @@
       </wsdl:operation>
       <wsdl:operation name="getApiStatistics">
          <http:operation location="getApiStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEndpointStatistics">
+         <http:operation location="getAllEndpointStatistics"/>
          <wsdl:input>
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>

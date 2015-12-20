@@ -22,6 +22,7 @@ import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
 import org.wso2.carbon.mediation.flow.statistics.service.data.AdminData;
 import org.wso2.carbon.mediation.flow.statistics.service.data.StatisticTreeWrapper;
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
+import org.wso2.carbon.mediation.flow.statistics.store.tree.data.EndpointDataHolder;
 import org.wso2.carbon.mediation.flow.statistics.store.tree.data.StatisticsTree;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 
@@ -59,6 +60,12 @@ public class MediationFlowStatisticsAdminService extends AbstractServiceBusAdmin
 		return getAdminData(statisticsStore.getInboundEndpointsWithValues());
 	}
 
+	public AdminData[] getAllEndpointStatistics() {
+		StatisticsStore statisticsStore = ((StatisticsStore) getConfigContext()
+				.getProperty(MessageFlowStatisticConstants.MESSAGE_FLOW_STATISTIC_STORE));
+		return getAdminDataForEndpoint(statisticsStore.getEndpoint());
+	}
+
 	public StatisticTreeWrapper getProxyStatistics(String componentID) {
 		StatisticsStore statisticsStore = ((StatisticsStore) getConfigContext()
 				.getProperty(MessageFlowStatisticConstants.MESSAGE_FLOW_STATISTIC_STORE));
@@ -86,6 +93,14 @@ public class MediationFlowStatisticsAdminService extends AbstractServiceBusAdmin
 	private AdminData[] getAdminData(Set<Map.Entry<String, StatisticsTree>> statRecords) {
 		List<AdminData> outputList = new LinkedList<>();
 		for (Map.Entry<String, StatisticsTree> entry : statRecords) {
+			outputList.add(new AdminData(entry.getKey(), entry.getValue().getInfo()));
+		}
+		return outputList.toArray(new AdminData[outputList.size()]);
+	}
+
+	private AdminData[] getAdminDataForEndpoint(Set<Map.Entry<String, EndpointDataHolder>> statRecords) {
+		List<AdminData> outputList = new LinkedList<>();
+		for (Map.Entry<String, EndpointDataHolder> entry : statRecords) {
 			outputList.add(new AdminData(entry.getKey(), entry.getValue().getInfo()));
 		}
 		return outputList.toArray(new AdminData[outputList.size()]);

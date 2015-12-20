@@ -46,6 +46,16 @@ public class MediationFlowStatisticClient {
 		return null;
 	}
 
+	public AdminData[] getAllEndpointStatistics() throws AxisFault {
+		try {
+			return stub.getAllEndpointStatistics();
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
 	public AdminData[] getAllSequenceStatistics() throws AxisFault {
 		try {
 			return stub.getAllSequenceStatistics();

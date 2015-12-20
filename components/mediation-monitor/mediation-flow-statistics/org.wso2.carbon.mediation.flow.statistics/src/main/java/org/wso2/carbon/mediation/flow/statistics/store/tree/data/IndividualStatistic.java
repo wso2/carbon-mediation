@@ -19,6 +19,7 @@
 package org.wso2.carbon.mediation.flow.statistics.store.tree.data;
 
 import org.apache.synapse.aspects.ComponentType;
+import org.apache.synapse.aspects.newstatistics.EndpointStatisticLog;
 import org.apache.synapse.aspects.newstatistics.StatisticsLog;
 import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
 import org.wso2.carbon.mediation.flow.statistics.service.data.TreeNodeData;
@@ -36,7 +37,7 @@ public class IndividualStatistic {
 	/**
 	 * holds references to the branches that starts from its node
 	 */
-	private final Map<String, Integer> children;
+	private Map<String, Integer> children;
 
 	/**
 	 * statistic owners component Id
@@ -51,7 +52,7 @@ public class IndividualStatistic {
 	/**
 	 * message identification number in the message flow
 	 */
-	private final int msgId;
+	private int msgId;
 
 	/**
 	 * Maximum processing time for the component
@@ -97,12 +98,28 @@ public class IndividualStatistic {
 		this.isResponse = statisticsLog.isResponse();
 	}
 
+	public IndividualStatistic(EndpointStatisticLog endpointStatisticLog) {
+		this.componentId = endpointStatisticLog.getComponentId();
+		if (endpointStatisticLog.isHasFault()) {
+			this.faultCount += 1;
+		}
+		this.componentType = ComponentType.ENDPOINT;
+		setDuration(endpointStatisticLog.getEndTime() - endpointStatisticLog.getStartTime());
+	}
+
 	/**
 	 * Updates statistics record for new statistics information
 	 */
 	public void update(StatisticsLog statisticsLog) {
 		this.faultCount += statisticsLog.getNoOfFaults();
 		setDuration(statisticsLog.getEndTime() - statisticsLog.getStartTime());
+	}
+
+	public void update(EndpointStatisticLog endpointStatisticLog) {
+		if(endpointStatisticLog.isHasFault()) {
+			this.faultCount += 1;
+		}
+		setDuration(endpointStatisticLog.getEndTime() - endpointStatisticLog.getStartTime());
 	}
 
 	/**
