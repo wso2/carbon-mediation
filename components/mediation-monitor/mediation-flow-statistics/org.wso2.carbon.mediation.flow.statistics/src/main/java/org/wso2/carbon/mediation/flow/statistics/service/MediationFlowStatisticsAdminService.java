@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This is the admin service class that will expose to the UI.
+ */
 public class MediationFlowStatisticsAdminService extends AbstractServiceBusAdmin {
 
 	public AdminData[] getAllSequenceStatistics() {

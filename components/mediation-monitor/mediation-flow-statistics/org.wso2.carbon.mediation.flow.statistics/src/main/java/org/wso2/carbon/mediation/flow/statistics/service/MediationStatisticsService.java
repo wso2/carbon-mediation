@@ -21,12 +21,30 @@ package org.wso2.carbon.mediation.flow.statistics.service;
 import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 
+/**
+ * Interface to hold Mediation statistic Service.
+ */
 public interface MediationStatisticsService {
 
-	public StatisticsStore getTenetantStatisticsStore();
+	/**
+	 * Returns statistic store for the tenant.
+	 *
+	 * @return Tenant statistic store.
+	 */
+	public StatisticsStore getTenantStatisticsStore();
 
+	/**
+	 * Returns the tenant Id which belongs this service.
+	 *
+	 * @return Tenant Id.
+	 */
 	public int getTenantId();
 
+	/**
+	 * Returns configurations context.
+	 *
+	 * @return Configuration Context
+	 */
 	public ConfigurationContext getConfigurationContext();
 }
 

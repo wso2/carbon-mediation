@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.mediation.flow.statistics.service.data;
 
+/**
+ * This Object holds all the information needed for UI to construct the statistic tree.
+ */
 public class StatisticTreeWrapper {
 
 	EdgeData[] treeEdges;
@@ -27,6 +30,7 @@ public class StatisticTreeWrapper {
 		this.treeEdges = treeEdges;
 		this.treeNodes = treeNodes;
 	}
+
 	public EdgeData[] getTreeEdges() {
 		return treeEdges;
 	}

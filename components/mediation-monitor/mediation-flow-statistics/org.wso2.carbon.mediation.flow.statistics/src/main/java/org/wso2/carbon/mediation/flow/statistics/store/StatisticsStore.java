@@ -149,8 +149,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject getProxyServiceJmxStatistics(String proxyName) {
 		if (proxyStatistics.containsKey(proxyName)) {
-			//return proxyStatistics.get(proxyName).getStatisticOfTheRoot();
-			return null;
+			return proxyStatistics.get(proxyName).getStatisticOfTheRoot();
 		} else {
 			return null;
 		}
@@ -158,8 +157,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject getSequenceJmxStatistics(String sequenceName) {
 		if (proxyStatistics.containsKey(sequenceName)) {
-			//return proxyStatistics.get(sequenceName).getStatisticOfTheRoot();
-			return null;
+			return proxyStatistics.get(sequenceName).getStatisticOfTheRoot();
 		} else {
 			return null;
 		}
@@ -167,8 +165,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject getApiJmxStatistics(String APIName) {
 		if (proxyStatistics.containsKey(APIName)) {
-			return null;
-			//return proxyStatistics.get(APIName).getStatisticOfTheRoot();
+			return proxyStatistics.get(APIName).getStatisticOfTheRoot();
 		} else {
 			return null;
 		}
@@ -176,8 +173,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject getInboundEndpointJmxStatistics(String inboundEndpointName) {
 		if (proxyStatistics.containsKey(inboundEndpointName)) {
-			return null;
-			//return proxyStatistics.get(inboundEndpointName).getStatisticOfTheRoot();
+			return proxyStatistics.get(inboundEndpointName).getStatisticOfTheRoot();
 		} else {
 			return null;
 		}
@@ -185,8 +181,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject[] getProxyServiceJmxStatisticsTree(String proxyName) {
 		if (proxyStatistics.containsKey(proxyName)) {
-			//return proxyStatistics.get(proxyName).getFullTree();
-			return null;
+			return proxyStatistics.get(proxyName).getFullTree();
 		} else {
 			return null;
 		}
@@ -194,8 +189,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject[] getSequenceJmxStatisticsTree(String sequenceName) {
 		if (proxyStatistics.containsKey(sequenceName)) {
-			//return proxyStatistics.get(sequenceName).getFullTree();
-			return null;
+			return proxyStatistics.get(sequenceName).getFullTree();
 		} else {
 			return null;
 		}
@@ -203,8 +197,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject[] getInboundEndpointJmxStatisticsTree(String inboundEndpointName) {
 		if (proxyStatistics.containsKey(inboundEndpointName)) {
-			//return proxyStatistics.get(inboundEndpointName).getFullTree();
-			return null;
+			return proxyStatistics.get(inboundEndpointName).getFullTree();
 		} else {
 			return null;
 		}
@@ -212,8 +205,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	@Override public StatisticsCompositeObject[] getApiJmxStatisticsTree(String apiName) {
 		if (proxyStatistics.containsKey(apiName)) {
-			//return proxyStatistics.get(apiName).getFullTree();
-			return null;
+			return proxyStatistics.get(apiName).getFullTree();
 		} else {
 			return null;
 		}

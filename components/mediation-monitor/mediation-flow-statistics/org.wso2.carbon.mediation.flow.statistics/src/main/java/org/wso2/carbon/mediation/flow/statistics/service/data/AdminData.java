@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.mediation.flow.statistics.service.data;
 
+/**
+ * Data object that carries information about the root of tree to UI.
+ */
 public class AdminData {
 
 	private String componentID;

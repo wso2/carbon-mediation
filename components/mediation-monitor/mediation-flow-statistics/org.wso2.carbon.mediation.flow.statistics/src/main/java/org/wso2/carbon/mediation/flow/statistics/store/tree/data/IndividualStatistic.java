@@ -23,7 +23,6 @@ import org.apache.synapse.aspects.newstatistics.StatisticsLog;
 import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
 import org.wso2.carbon.mediation.flow.statistics.service.data.TreeNodeData;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,16 +47,6 @@ public class IndividualStatistic {
 	 * statistic owners component Id Component Type
 	 */
 	private final ComponentType componentType;
-
-	/**
-	 * parentId of this Individual Statistics Node
-	 */
-	//private final String parentId;
-
-	/**
-	 * message Identification number of this Individual Statistics Node's parentId
-	 */
-	//private final int parentMsgId;
 
 	/**
 	 * message identification number in the message flow
@@ -99,15 +88,13 @@ public class IndividualStatistic {
 	 * Overloaded constructor to set variables for the node
 	 */
 	public IndividualStatistic(StatisticsLog statisticsLog) {
-		//children = new ArrayList<>();
 		this.componentType = statisticsLog.getComponentType();
 		this.componentId = statisticsLog.getComponentId();
 		this.faultCount = statisticsLog.getNoOfFaults();
-		//this.parentId = statisticsLog.;
 		this.msgId = statisticsLog.getMsgId();
-		//this.parentMsgId = statisticsLog.getParentMsgId();
 		setDuration(statisticsLog.getEndTime() - statisticsLog.getStartTime());
 		this.children = new HashMap<>();
+		this.isResponse = statisticsLog.isResponse();
 	}
 
 	/**
@@ -133,10 +120,6 @@ public class IndividualStatistic {
 		}
 		count += 1;
 	}
-
-	//public int getParentMsgId() {
-	//		return parentMsgId;
-	//	}
 
 	public long getMaxProcessingTime() {
 		return maxProcessingTime;
@@ -185,20 +168,8 @@ public class IndividualStatistic {
 		return children;
 	}
 
-	//public ArrayList<IndividualStatistic> getChildren() {
-	//		return children;
-	//	}
-
-	//	public String getParentId() {
-	//		return parentId;
-	//	}
-
 	public boolean getIsResponse() {
 		return isResponse;
-	}
-
-	public void setIsResponse(boolean isResponse) {
-		this.isResponse = isResponse;
 	}
 
 	public TreeNodeData getTreeNodeData() {

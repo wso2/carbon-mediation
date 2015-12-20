@@ -29,10 +29,6 @@ public class StatisticsCompositeObject {
 
 	private final String componentType;
 
-	private final String parentId;
-
-	private final int parentMsgId;
-
 	private final int msgId;
 
 	private long maxProcessingTime = 0;
@@ -50,7 +46,6 @@ public class StatisticsCompositeObject {
 	@ConstructorProperties({ "componentId", "componentType", "parentId", "parentMsgId", "msgId", "maxProcessingTime",
 	                         "maxProcessingTime", "minProcessingTime", "avgProcessingTime", "inResponsePath",
 	                         "faultCount" }) public StatisticsCompositeObject(String componentId, String componentType,
-	                                                                          String parentId, int parentMsgId,
 	                                                                          int msgId, long maxProcessingTime,
 	                                                                          long minProcessingTime,
 	                                                                          long avgProcessingTime,
@@ -59,8 +54,6 @@ public class StatisticsCompositeObject {
 		this.faultCount = faultCount;
 		this.componentId = componentId;
 		this.componentType = componentType;
-		this.parentId = parentId;
-		this.parentMsgId = parentMsgId;
 		this.msgId = msgId;
 		this.maxProcessingTime = maxProcessingTime;
 		this.minProcessingTime = minProcessingTime;
@@ -79,14 +72,6 @@ public class StatisticsCompositeObject {
 
 	public String getComponentType() {
 		return componentType;
-	}
-
-	public String getParentId() {
-		return parentId;
-	}
-
-	public int getParentMsgId() {
-		return parentMsgId;
 	}
 
 	public int getMsgId() {

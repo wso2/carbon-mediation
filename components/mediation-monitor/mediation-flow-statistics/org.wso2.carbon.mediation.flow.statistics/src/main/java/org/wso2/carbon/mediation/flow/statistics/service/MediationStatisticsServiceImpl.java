@@ -22,6 +22,9 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+/**
+ * This class holds reference to statistic store in tenant environment.
+ */
 public class MediationStatisticsServiceImpl implements MediationStatisticsService {
 
 	private StatisticsStore tenantStatisticsStore;
@@ -37,7 +40,7 @@ public class MediationStatisticsServiceImpl implements MediationStatisticsServic
 		this.configurationContext = configurationContext;
 	}
 
-	public StatisticsStore getTenetantStatisticsStore() {
+	public StatisticsStore getTenantStatisticsStore() {
 		return tenantStatisticsStore;
 	}
 

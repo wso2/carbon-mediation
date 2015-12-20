@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.mediation.flow.statistics.service.data;
 
+import org.wso2.carbon.mediation.flow.statistics.store.tree.data.IndividualStatistic;
+
 public class TreeNodeData {
 
 	/**
@@ -61,7 +63,18 @@ public class TreeNodeData {
 	 */
 	private int faultCount = 0;
 
-	public TreeNodeData(String componentId, String componentType, int count, long maxProcessingTime,
+	public TreeNodeData(IndividualStatistic individualStatistic) {
+		this.maxProcessingTime = individualStatistic.getMaxProcessingTime();
+		this.minProcessingTime = individualStatistic.getMinProcessingTime();
+		this.avgProcessingTime = individualStatistic.getAvgProcessingTime();
+		this.isResponse = individualStatistic.getIsResponse();
+		this.count = individualStatistic.getCount();
+		this.faultCount = individualStatistic.getFaultCount();
+		this.componentType = individualStatistic.getComponentTypeToString();
+		this.componentId = individualStatistic.getComponentId();
+	}
+
+	public TreeNodeData(String componentId, String componentTypeToString, int count, long maxProcessingTime,
 	                    long minProcessingTime, long avgProcessingTime, int faultCount, boolean isResponse) {
 		this.maxProcessingTime = maxProcessingTime;
 		this.minProcessingTime = minProcessingTime;
@@ -69,7 +82,7 @@ public class TreeNodeData {
 		this.isResponse = isResponse;
 		this.count = count;
 		this.faultCount = faultCount;
-		this.componentType = componentType;
+		this.componentType = componentTypeToString;
 		this.componentId = componentId;
 	}
 

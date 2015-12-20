@@ -18,6 +18,9 @@
 
 package org.wso2.carbon.mediation.flow.statistics.service.data;
 
+/**
+ * Object that is created for each edge in the statistic tree when sending data to UI.
+ */
 public class EdgeData {
 
 	int parentNodeIndex;
