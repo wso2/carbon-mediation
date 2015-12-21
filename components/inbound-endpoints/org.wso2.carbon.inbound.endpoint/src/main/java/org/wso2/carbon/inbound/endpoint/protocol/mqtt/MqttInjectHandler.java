@@ -140,8 +140,9 @@ public class MqttInjectHandler {
                     .getSynapseConfiguration().getSequence(injectingSeq);
 
             if (seq != null) {
-                if (!seq.isInitialized())
+                if (!seq.isInitialized()) {
                     seq.init(synapseEnvironment);
+                }
                 seq.setErrorHandler(onErrorSeq);
                 if (log.isDebugEnabled()) {
                     log.debug("injecting message to sequence : " + injectingSeq);
