@@ -86,7 +86,7 @@
                         t.$tip.stop();
                         t.tipHovered = set_hover;
                         if (!set_hover){
-                            if (t.options.delayOut === 0) {
+                            if (t.options.delayOut == 0) {
                                 t.hide();
                             } else {
                                 setTimeout(function() { 
