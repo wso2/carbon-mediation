@@ -137,9 +137,9 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
                 propertyMap.put("style", "fill: #F00");
             } else {
                 if (!node.getEntries().get(0).isResponse()) {
-                    propertyMap.put("style", "fill: #666");
+                    propertyMap.put("style", "fill: #D3D3D3");
                 } else {
-                    propertyMap.put("style", "fill: #660");
+                    propertyMap.put("style", "fill: #D3D3E3");
                 }
             }
             hoverNodeMap.put(node.getComponentId(), propertyMap);
