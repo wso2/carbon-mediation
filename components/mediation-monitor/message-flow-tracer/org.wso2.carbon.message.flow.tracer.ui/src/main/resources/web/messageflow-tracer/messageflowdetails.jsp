@@ -105,7 +105,7 @@
     /* This styles the body of the tooltip */
     .tipsy .description {
         font-size: 1.2em;
-        color: #000;
+        color: #fff;
     }
 
     </style>
@@ -180,7 +180,7 @@
     inner.selectAll("g.node")
             .attr("title", function(v) { return styleTooltip(g.node(v).beforepayload, g.node(v).afterpayload, g.node(v).beforeproperties, g.node(v).afterproperties) })
             .each(function(v) {
-                $(this).tipsy({ trigger: 'focus', fade:true, gravity: 'n' , opacity: 1, html: true, offset: 10 });
+                $(this).tipsy({ trigger: 'focus', fade:false, gravity: 'n' , opacity: 1, html: true, offset: 10 });
             });
 
 //    inner.selectAll("g.node")

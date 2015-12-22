@@ -9,7 +9,7 @@
             <region>region4</region>
             <order>55</order>
             <style-class>manage</style-class>
-            <icon>../messageflow-tracer/images/students.gif</icon>
+            <icon>../messageflow-tracer/images/tracer.gif</icon>
             <require-permission>/permission/admin/monitor/mediation</require-permission>
         </menu>
     </menus>

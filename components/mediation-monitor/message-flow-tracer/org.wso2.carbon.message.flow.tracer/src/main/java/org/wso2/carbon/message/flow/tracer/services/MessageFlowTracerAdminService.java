@@ -101,7 +101,6 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
         String[] messageFlows = messageFlowTraceDataStore.getMessageFlowDataHolder().getMessageFlowTrace(messageId);
         MessageFlowComponentEntry[] messageFlowComponentEntries = messageFlowTraceDataStore.getMessageFlowDataHolder().getComponentInfo(messageId);
         FlowPath flowPath = new FlowPath(messageFlows, messageFlowComponentEntries);
-        String jsonString = null;
         Map<String, ComponentNode> componentNodeHashMap = flowPath.getNodeMap();
         Map<String, Map<String, String>> hoverNodeMap = new HashMap<>();
 
@@ -117,17 +116,19 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
                         .getPayload() : node.getEntries().get(0).getPayload())));
 
                 propertyMap.put("beforeproperties", (node.getEntries().get(0).isStart() ? constructPropertyString(
-                        node.getEntries().get(0).getPropertyMap()) : constructPropertyString(
-                        node.getEntries().get(1).getPropertyMap())));
+                        node.getEntries().get(0).getPropertyMap(), node.getEntries().get(0).getTransportPropertyMap()) :
+                                                     constructPropertyString(
+                                                             node.getEntries().get(1).getPropertyMap(), node.getEntries().get(1).getTransportPropertyMap())));
                 propertyMap.put("afterproperties", (node.getEntries().get(0).isStart() ? constructPropertyString(
-                        node.getEntries().get(1).getPropertyMap()) : constructPropertyString(
-                        node.getEntries().get(0).getPropertyMap())));
+                        node.getEntries().get(1).getPropertyMap(), node.getEntries().get(1).getTransportPropertyMap()) :
+                                                    constructPropertyString(
+                                                            node.getEntries().get(0).getPropertyMap(), node.getEntries().get(0).getTransportPropertyMap())));
             } else if (node.getEntries().size() == 1) {
                 propertyMap.put("description", node.getEntries().get(0).isStart() + "");
                 propertyMap.put("beforepayload", node.getEntries().get(0).getPayload());
 
                 propertyMap.put("beforeproperties", constructPropertyString(
-                        node.getEntries().get(0).getPropertyMap()));
+                        node.getEntries().get(0).getPropertyMap(), node.getEntries().get(0).getTransportPropertyMap()));
             } else {
                 propertyMap.put("description", "N/A");
             }
@@ -136,9 +137,9 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
                 propertyMap.put("style", "fill: #F00");
             } else {
                 if (!node.getEntries().get(0).isResponse()) {
-                    propertyMap.put("style", "fill: #0FF");
+                    propertyMap.put("style", "fill: #666");
                 } else {
-                    propertyMap.put("style", "fill: #0F0");
+                    propertyMap.put("style", "fill: #660");
                 }
             }
             hoverNodeMap.put(node.getComponentId(), propertyMap);
@@ -153,8 +154,19 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
         messageFlowTraceDataStore.getMessageFlowDataHolder().clearDataStores();
     }
 
-    private String constructPropertyString(Map<String, String> propertyMap) {
+    private String constructPropertyString(Map<String, Object> propertyMap, Map<String, Object> transportPropertyMap) {
         StringBuilder properties = new StringBuilder();
+        //transport properties
+        for (String transportProperty : transportPropertyMap.keySet()) {
+            if (transportPropertyMap.get(transportProperty) instanceof String) {
+                properties.append(transportProperty)
+                        .append("=")
+                        .append(transportPropertyMap.get(transportProperty))
+                        .append(",");
+            }
+        }
+        properties.append("=,");
+        //general properties
         for (String property : propertyMap.keySet()) {
             properties.append(property)
                     .append("=")
