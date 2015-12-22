@@ -5,14 +5,14 @@
     <parent>
         <artifactId>mediation-monitor-stub</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.4.11-SNAPSHOT</version>
+        <version>4.5.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>org.wso2.carbon.message.flow.tracer.stub</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Message Flow Tracer Stub</name>
-    <version>4.4.11-SNAPSHOT</version>
+    <version>4.5.2-SNAPSHOT</version>
     <url>http://wso2.org</url>
 
     <build>
