@@ -250,6 +250,9 @@
                         <option value="operation" <%=propertyMediator.getScope() != null && propertyMediator.getScope().equals("operation") ? "selected=\"selected\"" : ""%>>
                             <fmt:message key="operation"/>
                         </option>
+                        <option value="registry" <%=propertyMediator.getScope() != null && propertyMediator.getScope().equals("registry") ? "selected=\"selected\"" : ""%>>
+                            <fmt:message key="registry"/>
+                        </option>
                     </select>
                 </td>
             </tr>

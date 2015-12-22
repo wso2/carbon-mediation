@@ -15,15 +15,24 @@
  */
 package org.wso2.carbon.cloud.gateway.agent.transport;
 
+import org.apache.axiom.om.util.Base64;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.transport.base.threads.WorkerPool;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.cloud.gateway.common.CGConstant;
 import org.wso2.carbon.cloud.gateway.common.CGUtils;
 import org.wso2.carbon.cloud.gateway.stub.types.common.CGThriftServerBean;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.context.RegistryType;
 import org.wso2.carbon.core.util.CryptoException;
+import org.wso2.carbon.registry.api.Resource;
+import org.wso2.carbon.registry.core.Registry;
+
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
 
 /**
  * The factory for {@link CGPollingTransportTaskManager}
@@ -44,9 +53,14 @@ public class CGPollingTransportTaskManagerFactory {
             throws AxisFault {
         String serviceName = service.getName();
 
-        String encryptedToken = (String) service.getParameterValue(CGConstant.TOKEN);
-        String token;
+        String encryptedToken;
+        try {
+            encryptedToken = getEncryptedToken(service);
+        } catch (Exception e) {
+            throw new AxisFault("Exception occurred while getting encrypted token", e);
+        }
 
+        String token;
         try {
             token = CGUtils.getPlainToken(encryptedToken);
         } catch (CryptoException e) {
@@ -84,7 +98,12 @@ public class CGPollingTransportTaskManagerFactory {
             messageProcessingBlockSize = CGConstant.DEFAULT_MESSAGE_PROCESSING_BLOCK_SIZE;
         }
 
-        CGThriftServerBean bean = (CGThriftServerBean) service.getParameterValue(CGConstant.CG_SERVER_BEAN);
+        CGThriftServerBean bean;
+        try {
+            bean = getCGThriftServerBean(service);
+        } catch (Exception e) {
+            throw new AxisFault("Exception occurred while getting remote CG server information", e);
+        }
         if (bean == null) {
             throw new AxisFault("Remote CSG server information is missing");
         }
@@ -114,5 +133,48 @@ public class CGPollingTransportTaskManagerFactory {
         stm.setTaskBuffers(new CGPollingTransportBuffers());
 
         return stm;
+    }
+
+    private static CGThriftServerBean getCGThriftServerBean(AxisService service) throws Exception {
+        String cgServerResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" +
+                                      service.getName() + ".cgserver";
+        Registry registry = (Registry) PrivilegedCarbonContext.getThreadLocalCarbonContext().getRegistry
+                (RegistryType.SYSTEM_CONFIGURATION);
+
+        Resource cgServer = registry.get(cgServerResourcePath);
+        if (cgServer == null || cgServer.getContent() == null) {
+            return null;
+        }
+
+        String content = IOUtils.toString(cgServer.getContentStream());
+        Object thriftServerBean = fromString(content);
+        if (thriftServerBean == null) {
+            return null;
+        }
+        return (CGThriftServerBean) thriftServerBean;
+    }
+
+    private static String getEncryptedToken(AxisService service) throws Exception {
+        String tokenResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + service.getName() + ".token";
+        Registry registry = (Registry) PrivilegedCarbonContext.getThreadLocalCarbonContext().getRegistry(RegistryType
+                                                                                                                 .SYSTEM_CONFIGURATION);
+        Resource token = registry.get(tokenResourcePath);
+        if (token == null || token.getContent() == null) {
+            return null;
+        }
+        return IOUtils.toString(token.getContentStream());
+    }
+
+    private static Object fromString(String content) {
+        Object object = null;
+        try {
+            byte[] data = Base64.decode(content);
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+            object = ois.readObject();
+            ois.close();
+        } catch (Exception e) {
+            log.error("Exception occurred while writing string to the object", e);
+        }
+        return object;
     }
 }

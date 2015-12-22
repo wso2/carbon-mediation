@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
@@ -25,6 +26,12 @@ import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+import java.io.FileInputStream;
+import java.security.KeyStore;
 import java.util.Hashtable;
 import java.util.Properties;
 
@@ -38,6 +45,7 @@ public class MqttConnectionFactory {
     private String factoryName;
     private Hashtable<String, String> parameters = new Hashtable<String, String>();
     private MqttDefaultFilePersistence dataStore;
+    private SSLSocketFactory socketFactory;
     private static final int PORT_MIN_BOUND = 0;
     private static final int PORT_MAX_BOUND = 65535;
 
@@ -122,6 +130,35 @@ public class MqttConnectionFactory {
             if (passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE) != null) {
                 parameters.put(MqttConstants.MQTT_SSL_ENABLE,
                         passedInParameter.getProperty(MqttConstants.MQTT_SSL_ENABLE));
+                if (parameters.get(MqttConstants.MQTT_SSL_ENABLE).equalsIgnoreCase("true")) {
+                    String keyStoreLocation = passedInParameter
+                            .getProperty(MqttConstants.MQTT_SSL_KEYSTORE_LOCATION);
+                    String keyStoreType = passedInParameter
+                            .getProperty(MqttConstants.MQTT_SSL_KEYSTORE_TYPE);
+                    String keyStorePassword = passedInParameter
+                            .getProperty(MqttConstants.MQTT_SSL_KEYSTORE_PASSWORD);
+                    String trustStoreLocation = passedInParameter
+                            .getProperty(MqttConstants.MQTT_SSL_TRUSTSTORE_LOCATION);
+                    String trustStoreType = passedInParameter
+                            .getProperty(MqttConstants.MQTT_SSL_TRUSTSTORE_TYPE);
+                    String trustStorePassword = passedInParameter
+                            .getProperty(MqttConstants.MQTT_SSL_TRUSTSTORE_PASSWORD);
+                    String sslVersion = passedInParameter
+                            .getProperty(MqttConstants.MQTT_SSL_VERSION);
+
+                    if (StringUtils.isEmpty(keyStoreLocation) || StringUtils.isEmpty(keyStoreType)
+                            || StringUtils.isEmpty(keyStorePassword) ||
+                            StringUtils.isEmpty(trustStoreLocation) || StringUtils.isEmpty(trustStoreType)
+                            || StringUtils.isEmpty(trustStorePassword)
+                            || StringUtils.isEmpty(sslVersion)) {
+                        String msg = "Configuration for Truststore and Keystore is insufficient to enable SSL";
+                        log.error(msg);
+                        throw new SynapseException(msg);
+                    } else {
+                        socketFactory = getSocketFactory(keyStoreLocation, keyStoreType,
+                                keyStorePassword, trustStoreLocation, trustStoreType, trustStorePassword, sslVersion);
+                    }
+                }
             } else {
                 log.warn("Default value is used for the parameter : "
                         + MqttConstants.MQTT_SSL_ENABLE);
@@ -175,6 +212,10 @@ public class MqttConnectionFactory {
 
     public String getServerPort() {
         return parameters.get(MqttConstants.MQTT_SERVER_PORT);
+    }
+
+    public SSLSocketFactory getSSLSocketFactory(){
+        return socketFactory;
     }
 
     public int getReconnectionInterval() {
@@ -308,4 +349,33 @@ public class MqttConnectionFactory {
             }
         }
     }
+
+    protected SSLSocketFactory getSocketFactory(String keyStoreLocation,
+                                                String keyStoreType,
+                                                String keyStorePassword,
+                                                String trustStoreLocation,
+                                                String trustStoreType,
+                                                String trustStorePassword,
+                                                String sslVersion) throws Exception {
+
+        char[] keyPassphrase = keyStorePassword.toCharArray();
+        KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+        keyStore.load(new FileInputStream(keyStoreLocation), keyPassphrase);
+
+        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyManagerFactory.init(keyStore, keyPassphrase);
+
+        char[] trustPassphrase = trustStorePassword.toCharArray();
+        KeyStore trustStore = KeyStore.getInstance(trustStoreType);
+        trustStore.load(new FileInputStream(trustStoreLocation), trustPassphrase);
+
+        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init(trustStore);
+
+        SSLContext sslContext = SSLContext.getInstance(sslVersion);
+        sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
+
+        return sslContext.getSocketFactory();
+    }
+
 }

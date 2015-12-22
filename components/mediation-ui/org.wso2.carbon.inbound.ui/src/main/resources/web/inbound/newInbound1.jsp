@@ -170,6 +170,7 @@ var kafkaSpecialParameters = null;
                         <td>
                             <input type="radio" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')" checked><fmt:message key="inbound.polling"/>
                             <input type="radio" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
+                            <input type="radio" name="inbound.behavior" value="eventBased" onclick="toggleInboundInterval('waiting')" ><fmt:message key="inbound.waiting"/>
                         </td>
                         <td></td>
                     </tr>
@@ -181,12 +182,44 @@ var kafkaSpecialParameters = null;
                         </td>
                         <td></td>
                     </tr>
+                    <tr id="inboundSequentialRow">
+                        <td style="width:150px"><fmt:message key="inbound.sequential"/><span class="required">*</span></td>
+                        <td align="left">
+                            <select name="sequential" id="sequential">
+                            	<option value="true">true</option>
+                            	<option value="false">false</option>
+                            </select>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr id="inboundCoordinationRow">
+                        <td style="width:150px"><fmt:message key="inbound.coordination"/><span class="required">*</span></td>
+                        <td align="left">
+                            <select name="coordination" id="coordination">
+                            	<option value="true">true</option>
+                            	<option value="false">false</option>
+                            </select>                            
+                        </td>
+                        <td></td>
+                    </tr>                                        
                     <script language="javascript">
+                        intervalRequired = true;
                         function toggleInboundInterval(event){
                             if (event == "listening"){
                                 document.getElementById("inboundIntervalRow").style.display="none";
+                                document.getElementById("inboundSequentialRow").style.display="none";
+                                document.getElementById("inboundCoordinationRow").style.display="none";
+                                intervalRequired = false;
+                            } else if (event == "waiting"){
+                                document.getElementById("inboundIntervalRow").style.display="none";
+                                document.getElementById("inboundSequentialRow").style.display="table-row";
+                                document.getElementById("inboundCoordinationRow").style.display="table-row";
+                                intervalRequired = false;
                             } else {
                                 document.getElementById("inboundIntervalRow").style.display="table-row";
+                                document.getElementById("inboundSequentialRow").style.display="table-row";
+                                document.getElementById("inboundCoordinationRow").style.display="table-row"
+                                intervalRequired = true;
                             }
                         }
                     </script>

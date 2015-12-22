@@ -25,8 +25,10 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.InboundOneTimeTriggerRequestProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
+
 import java.util.Properties;
 
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * This is the listener which directly interacts with the external MQTT server. Every MQTT
@@ -57,6 +59,8 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
     protected boolean cleanSession;
 
     private InboundProcessorParams params;
+
+    private SSLSocketFactory socketFactory;
 
 
     /**
@@ -96,7 +100,7 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
                 new MqttInjectHandler(injectingSeq, onErrorSeq, sequential,
                         synapseEnvironment, contentType);
         this.synapseEnvironment = params.getSynapseEnvironment();
-
+        this.socketFactory = confac.getSSLSocketFactory();
 
         //mqtt connection options
         if (mqttProperties.getProperty(MqttConstants.MQTT_USERNAME) != null) {
@@ -173,6 +177,9 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
             if (userName != null && password != null) {
                 connectOptions.setUserName(userName);
                 connectOptions.setPassword(password.toCharArray());
+            }
+            if (socketFactory != null) {
+                connectOptions.setSocketFactory(socketFactory);
             }
             mqttAsyncCallback = new MqttAsyncCallback(mqttAsyncClient, injectHandler,
                     confac, connectOptions, mqttProperties);

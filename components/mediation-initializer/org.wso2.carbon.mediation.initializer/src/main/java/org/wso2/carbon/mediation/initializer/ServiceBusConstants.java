@@ -117,5 +117,10 @@ public final class ServiceBusConstants {
     public static final String SUSPEND_PERSISTENCE = "suspend.mediation.persistence";
     public static final String CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY = "/repository/components/secure-vault";
 
+
+    public static final String ESB_DEBUG_SYSTEM_PROPERTY = "esb.debug";
+    public static final String ESB_DEBUG_EVENT_PORT = "synapse.debugger.port.event";
+    public static final String ESB_DEBUG_COMMAND_PORT = "synapse.debugger.port.command";
+
 }
 

@@ -200,6 +200,16 @@ public class JMSInjectHandler {
                 documentElement = convertJMSMapToXML((MapMessage) msg);
             }
 
+            // Setting JMSXDeliveryCount header on the message context
+            try {
+                int deliveryCount = msg.getIntProperty("JMSXDeliveryCount");
+                axis2MsgCtx.setProperty(JMSConstants.DELIVERY_COUNT, deliveryCount);
+            } catch (NumberFormatException nfe) {
+                if (log.isDebugEnabled()) {
+                    log.debug("JMSXDeliveryCount is not set in the received message");
+                }
+            }
+
             // Inject the message to the sequence.
             msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
             if (injectingSeq == null || injectingSeq.equals("")) {
@@ -212,6 +222,9 @@ public class JMSInjectHandler {
                 if (log.isDebugEnabled()) {
                     log.debug("injecting message to sequence : " + injectingSeq);
                 }
+                if (!seq.isInitialized()) {
+                    seq.init(synapseEnvironment);
+                }                
                 seq.setErrorHandler(onErrorSeq);
                 if (!synapseEnvironment.injectInbound(msgCtx, seq, sequential)) {
                     return false;

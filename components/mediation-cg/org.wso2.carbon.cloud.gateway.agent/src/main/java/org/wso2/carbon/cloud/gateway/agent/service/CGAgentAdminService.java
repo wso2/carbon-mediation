@@ -17,7 +17,7 @@ package org.wso2.carbon.cloud.gateway.agent.service;
 
 
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.util.Base64;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
@@ -28,6 +28,7 @@ import org.apache.axis2.description.TransportOutDescription;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.AxisEvent;
 import org.apache.axis2.wsdl.WSDLConstants;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.CarbonConstants;
@@ -65,6 +66,9 @@ import org.wso2.carbon.cloud.gateway.stub.types.common.CGServiceDependencyBean;
 import org.wso2.carbon.utils.ServerConstants;
 
 import javax.xml.namespace.QName;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -104,11 +108,12 @@ public class CGAgentAdminService extends AbstractAdmin {
             }
             handleServicePublishing(serviceName, serverName, isAutomatic, csgAdminClient, csgServer);
             // deploy proxy
-            csgAdminClient.deployProxy(getCGServiceMetaData(
-                    getAxisConfig().getService(serviceName),
-                    csgServer.getDomainName(),
-                    serverName));
-            flagServiceStatus(serviceName, serverName, true, isAutomatic);
+            CGServiceMetaDataBean cgServiceMetaData = getCGServiceMetaData(getAxisConfig().getService(serviceName),
+                                                                           csgServer.getDomainName(), serverName);
+            csgAdminClient.deployProxy(cgServiceMetaData);
+            flagServiceStatus(serviceName, serverName, cgServiceMetaData, true, isAutomatic);
+            AxisService service = getAxisConfig().getService(serviceName);
+            service.removeExposedTransport(CGConstant.CG_POLLING_TRANSPORT_NAME);
         } catch (Exception e) {
             handleException("Could not publish service '" + serviceName + "'. " + e.getMessage(), e);
         }
@@ -126,7 +131,7 @@ public class CGAgentAdminService extends AbstractAdmin {
                 handleException("CGAdminClient is null");
             }
             handleServicePublishing(serviceName, serverName, isAutomatic, csgAdminClient, csgServer);
-            flagServiceStatus(serviceName, serverName, true, isAutomatic);
+            flagServiceStatus(serviceName, serverName, null, true, isAutomatic);
         } catch (CGException e) {
             handleException("Cloud not republish service '" + serviceName + "'", e);
         }
@@ -137,34 +142,37 @@ public class CGAgentAdminService extends AbstractAdmin {
      *
      * @param serviceName the service to un-deploy
      * @param serverName  the server name to publish
+     * @param isCheckBackend check the backend availability
      * @throws org.wso2.carbon.cloud.gateway.common.CGException
      *          throws in case of an error
      */
-    public void unPublishService(String serviceName, String serverName) throws CGException {
+    public void unPublishService(String serviceName, String serverName, boolean isCheckBackend) throws CGException {
         if (serviceName == null) {
             handleException("The service name is not supplied for un-publishing");
         }
         try {
-            // remove csg polling transport from exposed list
-            this.removeExposedTransports(serviceName,
-                    CGConstant.CG_POLLING_TRANSPORT_NAME);
             AxisService service = getAxisConfig().getService(serviceName);
             if (service == null) {
                 handleException("No service is found with the name '" + serviceName + "'");
             }
+            service.removeExposedTransport(CGConstant.CG_POLLING_TRANSPORT_NAME);
             CGServerBean csgServer = getCGServerBean(serverName);
             if (csgServer == null) {
                 throw new CGException("No CG server information found with the name '" +
                         serverName + "'");
             }
             CGAdminClient csgAdminClient = getCGAdminClient(csgServer);
-            if (csgAdminClient == null) {
+            if (csgAdminClient == null && isCheckBackend) {
                 handleException("CGAdminClient is null");
             }
             // flag this service's polling task for shutdown
             CGAgentPollingTaskFlags.flagForShutDown(serviceName, true);
-            csgAdminClient.unDeployProxy(serviceName);
-            flagServiceStatus(serviceName, serverName, false, false);
+            if (csgAdminClient != null) {
+                csgAdminClient.unDeployProxy(serviceName);
+            } else {
+                log.warn("Could not un-publish the service in the remote CG server, You need to manually un-publish ");
+            }
+            flagServiceStatus(serviceName, serverName, null, false, false);
         } catch (Exception e) {
             handleException("Could not un-publish the service '" + serviceName + "'", e);
         }
@@ -202,7 +210,7 @@ public class CGAgentAdminService extends AbstractAdmin {
         org.wso2.carbon.registry.core.Registry registry = getConfigSystemRegistry();
         String resourcePath = CGConstant.REGISTRY_SERVER_RESOURCE_PATH + "/" + csgServerName;
         try {
-            if (registry.resourceExists(resourcePath)) {
+            if (registry != null && registry.resourceExists(resourcePath)) {
                 Resource resource = registry.get(resourcePath);
                 return CGAgentUtils.getCGServerBean(resource);
             }
@@ -223,7 +231,7 @@ public class CGAgentAdminService extends AbstractAdmin {
     public CGServerBean[] getCGServerList() throws CGException {
         try {
             org.wso2.carbon.registry.core.Registry registry = getConfigSystemRegistry();
-            if (registry.resourceExists(CGConstant.REGISTRY_SERVER_RESOURCE_PATH)) {
+            if (registry != null && registry.resourceExists(CGConstant.REGISTRY_SERVER_RESOURCE_PATH)) {
                 Resource resource = registry.get(CGConstant.REGISTRY_SERVER_RESOURCE_PATH);
                 if (resource instanceof Collection) {
                     Collection collection = (Collection) resource;
@@ -267,7 +275,7 @@ public class CGAgentAdminService extends AbstractAdmin {
                 registry.beginTransaction();
             }
 
-            if (registry.resourceExists(resource)) {
+            if (registry != null && registry.resourceExists(resource)) {
                 // delete the resource and add it again
                 registry.delete(resource);
                 CGAgentUtils.persistServer(registry, csgServer);
@@ -317,7 +325,7 @@ public class CGAgentAdminService extends AbstractAdmin {
             }
 
             String resource = CGConstant.REGISTRY_SERVER_RESOURCE_PATH + "/" + csgServerName;
-            if (registry.resourceExists(resource)) {
+            if (registry != null && registry.resourceExists(resource)) {
                 if (!isHasPublishedServices(csgServerName)) {
                     registry.delete(resource);
                 } else {
@@ -362,7 +370,7 @@ public class CGAgentAdminService extends AbstractAdmin {
             org.wso2.carbon.registry.core.Registry registry = getConfigSystemRegistry();
             String resourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName +
                     ".flag";
-            if (registry.resourceExists(resourcePath)) {
+            if (registry != null && registry.resourceExists(resourcePath)) {
                 Resource resource = registry.get(resourcePath);
                 return new String((byte[]) resource.getContent());
             }
@@ -418,11 +426,16 @@ public class CGAgentAdminService extends AbstractAdmin {
                 handleException("No persist information found for the server'" + publishedServer + "'");
             }
             try {
-                CGAdminClient csgAdminClient = getCGAdminClient(csgServer);
                 if (eventType == AxisEvent.SERVICE_REMOVE) {
-                    flagServiceStatus(serviceName, csgServer.getName(), false, false);
+                    CGAdminClient csgAdminClient = getCGAdminClient(csgServer);
+                    if (csgAdminClient == null) {
+                        handleException("CGAdminClient is null");
+                    }
+                    // flag this service's polling task for shutdown
+                    CGAgentPollingTaskFlags.flagForShutDown(serviceName, true);
+                    csgAdminClient.unDeployProxy(serviceName);
+                    flagServiceStatus(serviceName, publishedServer, null, false, false);
                 }
-                csgAdminClient.updateProxy(serviceName, eventType);
             } catch (Exception e) {
                 handleException("Cloud not update service the service '" + serviceName + "'");
             }
@@ -442,7 +455,7 @@ public class CGAgentAdminService extends AbstractAdmin {
             org.wso2.carbon.registry.core.Registry registry = getConfigSystemRegistry();
             String serverResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName
                     + ".server";
-            if (registry.resourceExists(serverResourcePath)) {
+            if (registry != null && registry.resourceExists(serverResourcePath)) {
                 Resource serverResource = registry.get(serverResourcePath);
                 if (serverResource != null && serverResource.getContent() != null) {
                     return new String((byte[]) serverResource.getContent());
@@ -497,7 +510,7 @@ public class CGAgentAdminService extends AbstractAdmin {
         boolean isHasServices = false;
         try {
             org.wso2.carbon.registry.core.Registry registry = getConfigSystemRegistry();
-            if (registry.resourceExists(CGConstant.REGISTRY_FLAG_RESOURCE_PATH)) {
+            if (registry != null && registry.resourceExists(CGConstant.REGISTRY_FLAG_RESOURCE_PATH)) {
                 Resource resource = registry.get(CGConstant.REGISTRY_FLAG_RESOURCE_PATH);
 
                 if (resource instanceof Collection) {
@@ -544,6 +557,7 @@ public class CGAgentAdminService extends AbstractAdmin {
                 handleException("No service found with the name '" + serviceName + "'");
             }
 
+            service.addExposedTransport(CGConstant.CG_POLLING_TRANSPORT_NAME);
             String domainName = csgServer.getDomainName();
             String passWord = csgServer.getPassWord();
             String userName = CGUtils.getFullUserName(csgServer.getUserName(), domainName);
@@ -574,13 +588,9 @@ public class CGAgentAdminService extends AbstractAdmin {
             String queueName = CGUtils.getCGEPR(domainName, serverName, serviceName);
             String token = csgThriftClient.login(userName, passWord, queueName);
 
-            // expose on csgthrift transport
-            addExposedTransports(serviceName, CGConstant.CG_POLLING_TRANSPORT_NAME);
-
             // encrypt and embed, so nobody can steal
-            CryptoUtil cryptoUtil = CryptoUtil.getDefaultCryptoUtil();
-            service.addParameter(CGConstant.TOKEN, cryptoUtil.encryptAndBase64Encode(token.getBytes()));
-            service.addParameter(CGConstant.CG_SERVER_BEAN, bean);
+            persistToken(serviceName, token);
+            persistCGServerDetails(serviceName, bean);
 
             CGAgentPollingTaskFlags.flagForShutDown(serviceName, false);
             if (hasInOutOperations(service)) {
@@ -611,7 +621,7 @@ public class CGAgentAdminService extends AbstractAdmin {
         try {
             org.wso2.carbon.registry.core.Registry registry = getConfigSystemRegistry();
             String resourceName = CGConstant.REGISTRY_SERVER_RESOURCE_PATH + "/" + csgServerName;
-            if (registry.resourceExists(resourceName)) {
+            if (registry != null && registry.resourceExists(resourceName)) {
                 org.wso2.carbon.registry.core.Resource resource = registry.get(resourceName);
                 try {
                     bean = new CGServerBean();
@@ -657,7 +667,8 @@ public class CGAgentAdminService extends AbstractAdmin {
         return false;
     }
 
-    private void flagServiceStatus(String serviceName, String serverName, boolean isPublished,
+    private void flagServiceStatus(String serviceName, String serverName, CGServiceMetaDataBean cgServiceMetaData,
+                                   boolean isPublished,
                                    boolean isAutoMatic)
             throws CGException {
         boolean isTransactionAlreadyStarted = Transaction.isStarted();
@@ -669,15 +680,18 @@ public class CGAgentAdminService extends AbstractAdmin {
                 registry.beginTransaction(); // start a transaction if none exists currently.
             }
 
-            if (!registry.resourceExists(CGConstant.REGISTRY_CG_RESOURCE_PATH)) {
+            if (registry != null && !registry.resourceExists(CGConstant.REGISTRY_CG_RESOURCE_PATH)) {
                 org.wso2.carbon.registry.core.Collection collection = registry.newCollection();
                 registry.put(CGConstant.REGISTRY_CG_RESOURCE_PATH, collection);
             }
 
             org.wso2.carbon.registry.core.Resource resource = registry.newResource();
             org.wso2.carbon.registry.core.Resource serverResource = registry.newResource();
-            String serverResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" +
-                    serviceName + ".server";
+            String serverResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName + ".server";
+            String wsdlResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName + ".wsdl";
+            String cgServerResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName + ".cgserver";
+            String tokenResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName + ".token";
+
             if (isPublished) {
                 if (isAutoMatic) {
                     resource.setContent(CGConstant.CG_SERVICE_STATUS_AUTO_MATIC);
@@ -686,17 +700,30 @@ public class CGAgentAdminService extends AbstractAdmin {
                 }
 
                 serverResource.setContent(serverName);
+                if (cgServiceMetaData != null && cgServiceMetaData.getInLineWSDL() != null) {
+                    org.wso2.carbon.registry.core.Resource wsdlResource = registry.newResource();
+                    wsdlResource.setContent(cgServiceMetaData.getInLineWSDL());
+                    registry.put(wsdlResourcePath, wsdlResource);
+                }
             } else {
                 resource.setContent(CGConstant.CG_SERVICE_STATUS_UNPUBLISHED);
                 // remove the published server from the list
                 if (registry.resourceExists(serverResourcePath)) {
                     registry.delete(serverResourcePath);
                 }
+                if (registry.resourceExists(wsdlResourcePath)) {
+                    registry.delete(wsdlResourcePath);
+                }
+                if (registry.resourceExists(cgServerResourcePath)) {
+                    registry.delete(cgServerResourcePath);
+                }
+                if (registry.resourceExists(tokenResourcePath)) {
+                    registry.delete(tokenResourcePath);
+                }
             }
             registry.put(CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName + ".flag",
                     resource);
-            registry.put(CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName + ".server",
-                    serverResource);
+            registry.put(serverResourcePath, serverResource);
 
         } catch (org.wso2.carbon.registry.core.exceptions.RegistryException e) {
             isTransactionSuccess = false;
@@ -737,7 +764,13 @@ public class CGAgentAdminService extends AbstractAdmin {
                 List<CGServiceDependencyBean> dependencies = new ArrayList<CGServiceDependencyBean>();
                 CGAgentWsdlDependencyResolver dependencyResolver =
                         new CGAgentWsdlDependencyResolver(service, serviceAdminMetaData.getWsdlURLs()[0]);
-                OMElement adjustedWsdl = dependencyResolver.parseWsdlDependencies(dependencies);
+                OMElement adjustedWsdl = null;
+                String persistedWsdlContent = null;
+                try {
+                    adjustedWsdl = dependencyResolver.parseWsdlDependencies(dependencies);
+                } catch (CGException e) {
+                    persistedWsdlContent = getPersistedWsdlContent(service.getName());
+                }
 
                 if (!dependencies.isEmpty()) {
                     // Service has dependencies
@@ -745,17 +778,20 @@ public class CGAgentAdminService extends AbstractAdmin {
                             dependencies.toArray(new CGServiceDependencyBean[dependencies.size()]));
                 }
 
-                if (adjustedWsdl == null) {
+                if (adjustedWsdl == null && persistedWsdlContent == null) {
                     privateServiceMetaData.setInLineWSDL(null);
-                } else {
+                } else if (adjustedWsdl != null && persistedWsdlContent == null) {
                     String wsdlString = adjustedWsdl.toStringWithConsume();
                     if (log.isDebugEnabled()) {
                         log.debug("Adjusted wsdl : " + wsdlString);
                     }
                     privateServiceMetaData.setInLineWSDL(wsdlString);
+                } else {
+                    privateServiceMetaData.setInLineWSDL(persistedWsdlContent);
                 }
             }
 
+            populateExposedTransports(service, privateServiceMetaData);
             if (hasInOutOperations(service)) {
                 privateServiceMetaData.setHasInOutMEP(true);
             }
@@ -765,6 +801,59 @@ public class CGAgentAdminService extends AbstractAdmin {
                     service.getName() + "'", e);
         }
         return null;
+    }
+
+    private void populateExposedTransports(AxisService service, CGServiceMetaDataBean privateServiceMetaData) {
+        if (service.getExposedTransports() != null && service.getExposedTransports().size() > 0) {
+            List<String> exposedTransports = service.getExposedTransports();
+            exposedTransports.remove(CGConstant.CG_POLLING_TRANSPORT_NAME);
+            privateServiceMetaData.setEnabledTransports(exposedTransports.toArray(new String[exposedTransports.size()]));
+        }
+    }
+
+    private String getPersistedWsdlContent(String serviceName) throws Exception {
+        Registry registry = getConfigSystemRegistry();
+        String wsdlResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName + ".wsdl";
+        if (registry.resourceExists(wsdlResourcePath)) {
+            Resource resource = registry.get(wsdlResourcePath);
+
+            if (resource != null && resource.getContent() != null) {
+                return IOUtils.toString(resource.getContentStream());
+            }
+        }
+        return null;
+    }
+
+    private void persistCGServerDetails(String serviceName, CGThriftServerBean thriftConnectionBean) throws Exception {
+        if (thriftConnectionBean == null) {
+            handleException("Remote CG server information not found");
+        }
+        Registry registry = getConfigSystemRegistry();
+        if (!registry.resourceExists(CGConstant.REGISTRY_CG_RESOURCE_PATH)) {
+            org.wso2.carbon.registry.core.Collection collection = registry.newCollection();
+            registry.put(CGConstant.REGISTRY_CG_RESOURCE_PATH, collection);
+        }
+        String cgServerResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName + ".cgserver";
+        org.wso2.carbon.registry.core.Resource cgServerResource = registry.newResource();
+        cgServerResource.setContent(toString(thriftConnectionBean));
+        registry.put(cgServerResourcePath, cgServerResource);
+    }
+
+    private void persistToken(String serviceName, String token) throws Exception {
+        if (token == null) {
+            handleException("Token cannot be null");
+        }
+
+        Registry registry = getConfigSystemRegistry();
+        if (!registry.resourceExists(CGConstant.REGISTRY_CG_RESOURCE_PATH)) {
+            org.wso2.carbon.registry.core.Collection collection = registry.newCollection();
+            registry.put(CGConstant.REGISTRY_CG_RESOURCE_PATH, collection);
+        }
+        String tokenResourcePath = CGConstant.REGISTRY_FLAG_RESOURCE_PATH + "/" + serviceName + ".token";
+        org.wso2.carbon.registry.core.Resource tokenResource = registry.newResource();
+        CryptoUtil cryptoUtil = CryptoUtil.getDefaultCryptoUtil();
+        tokenResource.setContent(cryptoUtil.encryptAndBase64Encode(token.getBytes()));
+        registry.put(tokenResourcePath, tokenResource);
     }
 
     private CGAdminClient getCGAdminClient(CGServerBean bean) throws CGException {
@@ -783,7 +872,7 @@ public class CGAgentAdminService extends AbstractAdmin {
             }
             return csgAdminClient;
         } catch (Exception e) {
-            handleException(e.getMessage(), e);
+            log.error("Exception occurred while construct the CGAgentAdmin client", e);
         }
         return null;
     }
@@ -990,5 +1079,19 @@ public class CGAgentAdminService extends AbstractAdmin {
         return transCollection.toArray(new TransportSummary[transCollection.size()]);
     }
 
-
+    /**
+     * Write the object to a Base64 string.
+     */
+    private static String toString(Serializable object) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(object);
+            objectOutputStream.close();
+            return Base64.encode(outputStream.toByteArray());
+        } catch (Exception e) {
+            log.error("Exception occurred while writing object to the base64 String", e);
+        }
+        return null;
+    }
 }

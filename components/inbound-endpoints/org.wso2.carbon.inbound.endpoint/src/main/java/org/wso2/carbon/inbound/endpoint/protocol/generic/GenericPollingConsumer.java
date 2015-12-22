@@ -69,6 +69,10 @@ public abstract class GenericPollingConsumer {
     }
 
     public abstract Object poll();
+    
+    public void destroy() {
+        log.info("Default destroy invoked. Not overwritten.");
+    }
 
     protected boolean injectMessage(String strMessage, String contentType){  
         InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(strMessage.getBytes()));
@@ -99,25 +103,27 @@ public abstract class GenericPollingConsumer {
                     builder = new SOAPBuilder();
                 }
             }           
-
-            OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);           
-        
+            OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);                   
             //Inject the message to the sequence.             
             msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
             if (injectingSeq == null || injectingSeq.equals("")) {
                 log.error("Sequence name not specified. Sequence : " + injectingSeq);
                 return false;
             }
-            SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(injectingSeq);
-            seq.setErrorHandler(onErrorSeq);
+            SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration()
+                    .getSequence(injectingSeq);            
             if (seq != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("injecting message to sequence : " + injectingSeq);
-                }               
-                if(!synapseEnvironment.injectInbound(msgCtx, seq, sequential)){
+                }
+                seq.setErrorHandler(onErrorSeq);
+                if (!seq.isInitialized()) {
+                    seq.init(synapseEnvironment);
+                }
+                if (!synapseEnvironment.injectInbound(msgCtx, seq, sequential)) {
                     return false;
                 }
-            } else {
+            }else{
                 log.error("Sequence: " + injectingSeq + " not found");
             }                          
         } catch (Exception e) {

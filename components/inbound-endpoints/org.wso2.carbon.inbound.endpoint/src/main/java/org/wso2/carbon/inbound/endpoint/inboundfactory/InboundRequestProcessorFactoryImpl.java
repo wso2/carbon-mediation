@@ -22,8 +22,10 @@ import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.apache.synapse.inbound.InboundRequestProcessorFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.file.VFSProcessor;
+import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericEventBasedListener;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
+import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericEventBasedConsumer;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.InboundHL7Listener;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
 import org.wso2.carbon.inbound.endpoint.protocol.https.InboundHttpsListener;
@@ -70,6 +72,8 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
         } else if (params.getClassImpl() != null) {
             if (GenericInboundListener.isListeningInboundEndpoint(params)) {
                 inboundRequestProcessor = GenericInboundListener.getInstance(params);
+            }else if (GenericEventBasedConsumer.isEventBasedInboundEndpoint(params)) {
+                inboundRequestProcessor = new GenericEventBasedListener(params);
             } else {
                 inboundRequestProcessor = new GenericProcessor(params);
             }

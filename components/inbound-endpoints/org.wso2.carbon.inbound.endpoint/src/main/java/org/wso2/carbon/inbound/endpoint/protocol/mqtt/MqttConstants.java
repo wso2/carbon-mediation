@@ -20,6 +20,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
  * MQTT Constants
  */
 public class MqttConstants {
+
     public static final String PARAM_MQTT_CONFAC = "mqtt.connection.factory";
     public static final String DEFAULT_CONFAC_NAME = "default";
     public static final String CONTENT_TYPE = "content.type";
@@ -28,10 +29,21 @@ public class MqttConstants {
     public static final String MQTT_TOPIC_NAME = "mqtt.topic.name";
     public static final String MQTT_QOS = "mqtt.subscription.qos";
     public static final String MQTT_SESSION_CLEAN = "mqtt.session.clean";
-    public static final String MQTT_SSL_ENABLE = "mqtt.ssl.enable";
     public static final String MQTT_USERNAME = "mqtt.subscription.username";
     public static final String MQTT_PASSWORD = "mqtt.subscription.password";
     public static final String MQTT_TEMP_STORE = "mqtt.temporary.store.directory";
     public static final String MQTT_CLIENT_ID = "mqtt.client.id";
     public static final String MQTT_RECONNECTION_INTERVAL = "mqtt.reconnection.interval";
+
+    //SSL related parameters
+    public static final String MQTT_SSL_ENABLE = "mqtt.ssl.enable";
+    public static final String MQTT_SSL_KEYSTORE_LOCATION = "mqtt.ssl.keystore.location";
+    public static final String MQTT_SSL_KEYSTORE_TYPE = "mqtt.ssl.keystore.type";
+    public static final String MQTT_SSL_KEYSTORE_PASSWORD = "mqtt.ssl.keystore.password";
+    public static final String MQTT_SSL_TRUSTSTORE_LOCATION = "mqtt.ssl.truststore.location";
+    public static final String MQTT_SSL_TRUSTSTORE_TYPE = "mqtt.ssl.truststore.type";
+    public static final String MQTT_SSL_TRUSTSTORE_PASSWORD = "mqtt.ssl.truststore.password";
+    public static final String MQTT_SSL_VERSION = "mqtt.ssl.version";
+    public static final String MQTT_SSL_SOCKET_FACTORY = "mqtt.ssl.socket.factory";
+
 }

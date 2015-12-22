@@ -107,8 +107,9 @@ public class HL7Processor implements InboundResponseSender {
             log.error("Could not find inbound sequence '" + inSequence + "'.");
             handleException(mllpContext, "Could not find inbound sequence.");
             return;
+        } else if (!injectSeq.isInitialized()){
+            injectSeq.init(synCtx.getEnvironment());
         }
-
         injectSeq.setErrorHandler(onErrorSequence);
 
         if (!autoAck && timeOut > 0) {

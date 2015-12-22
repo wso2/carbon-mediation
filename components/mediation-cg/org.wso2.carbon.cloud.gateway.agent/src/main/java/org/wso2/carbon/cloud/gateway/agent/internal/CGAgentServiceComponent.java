@@ -27,6 +27,8 @@ import org.wso2.carbon.cloud.gateway.agent.service.CGAgentAdminService;
 import org.wso2.carbon.cloud.gateway.common.CGConstant;
 import org.wso2.carbon.cloud.gateway.common.CGException;
 import org.wso2.carbon.cloud.gateway.common.CGUtils;
+import org.wso2.carbon.context.CarbonContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.util.SystemFilter;
 import org.wso2.carbon.user.api.AuthorizationManager;
 import org.wso2.carbon.user.api.UserStoreManager;
@@ -70,11 +72,6 @@ public class CGAgentServiceComponent {
 
     private double reconnectionProgressionFactor;
 
-    /**
-     * Keep track of published services to re-publish
-     */
-    private List<String> pendingServices = new ArrayList<String>();
-
     protected void activate(ComponentContext context) {
         if (this.configurationContextService == null) {
             log.error("Cloud not activated the CGAgentServiceComponent. " +
@@ -84,12 +81,6 @@ public class CGAgentServiceComponent {
 
         initialReconnectDuration = CGUtils.getLongProperty(CGConstant.INITIAL_RECONNECT_DURATION, 10000);
         reconnectionProgressionFactor = CGUtils.getDoubleProperty(CGConstant.PROGRESSION_FACTOR, 2.0);
-
-        // register observers for automatic published services
-        AxisConfiguration axisConfig =
-                this.configurationContextService.getServerConfigContext().getAxisConfiguration();
-        CGServiceObserver observer = new CGServiceObserver();
-        axisConfig.addObservers(observer);
 
         String[] publishOptimizedList = UserCoreUtil.optimizePermissions(
                 CGConstant.CG_PUBLISH_PERMISSION_LIST);
@@ -135,21 +126,7 @@ public class CGAgentServiceComponent {
                 manager.addRole(unpublisherRole, new String[]{realm.getRealmConfiguration().getAdminUserName()}, null);
             }
 
-            // look for any published service and published them again
-            for (Map.Entry<String, AxisService> entry : axisConfig.getServices().entrySet()) {
-                AxisService axisService = entry.getValue();
-                CGAgentAdminService service = new CGAgentAdminService();
-                String status = service.getServiceStatus(axisService.getName());
-
-                if (SystemFilter.isAdminService(axisService) || SystemFilter.isHiddenService(axisService) ||
-                        axisService.isClientSide() || status.equals(CGConstant.CG_SERVICE_STATUS_UNPUBLISHED)) {
-                    continue;
-                }
-                pendingServices.add(axisService.getName());
-            }
-            if (pendingServices.size() > 0) {
-                new Thread(new ServiceRePublishingTask(), "Cloud-Gateway-re-publishing-thread").start();
-            }
+            new Thread(new ServiceRePublishingTask(), "Cloud-Gateway-re-publishing-thread").start();
         } catch (Exception e) {
             log.error("Cloud not activated the CGAgentServiceComponent. ", e);
             return;
@@ -184,19 +161,28 @@ public class CGAgentServiceComponent {
     }
 
     private class ServiceRePublishingTask implements Runnable {
+        private CarbonContext carbonContext;
+
+        public ServiceRePublishingTask() {
+            this.carbonContext = CarbonContext.getThreadLocalCarbonContext();
+        }
 
         public void run() {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(carbonContext.getTenantDomain());
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(carbonContext.getTenantId());
             long retryDuration = initialReconnectDuration;
             while (true) {
                 if (CGUtils.isServerAlive("localhost",
                         CarbonUtils.getTransportPort(configurationContextService, "http"))) {
+                    List<String> pendingServices = getPendingService();
                     CGAgentAdminService adminService = new CGAgentAdminService();
                     for (String serviceName : pendingServices) {
                         try {
                             boolean isAutomatic = adminService.getServiceStatus(serviceName).equals(
                                     CGConstant.CG_SERVICE_STATUS_AUTO_MATIC);
                             String serverName = adminService.getPublishedServer(serviceName);
-                            adminService.rePublishService(serviceName, serverName, isAutomatic);
+                            adminService.unPublishService(serviceName, serverName, true);
+                            adminService.publishService(serviceName, serverName, isAutomatic);
                         } catch (CGException e) {
                             log.error("Error while re-publishing the previously published service '" + serviceName + "'," +
                                     " you will need to re-publish the service manually!", e);
@@ -204,6 +190,9 @@ public class CGAgentServiceComponent {
                         log.info("Service '" + serviceName + "', re-published successfully");
                     }
 
+                    // register observers for automatic published services
+                    CGServiceObserver observer = new CGServiceObserver();
+                    configurationContextService.getServerConfigContext().getAxisConfiguration().addObservers(observer);
                     break;
                 } else {
                     // re-try until success
@@ -214,6 +203,28 @@ public class CGAgentServiceComponent {
                     }
                 }
             }
+        }
+
+        private List<String> getPendingService() {
+            AxisConfiguration axisConfig = configurationContextService.getServerConfigContext().getAxisConfiguration();
+            List<String> pendingServices = new ArrayList<String>();
+            for (Map.Entry<String, AxisService> entry : axisConfig.getServices().entrySet()) {
+                AxisService axisService = entry.getValue();
+                CGAgentAdminService service = new CGAgentAdminService();
+                String status = null;
+                try {
+                    status = service.getServiceStatus(axisService.getName());
+                } catch (CGException e) {
+                    log.error("Exception occurred while retrieving status for the " + axisService.getName());
+                }
+
+                if (SystemFilter.isAdminService(axisService) || SystemFilter.isHiddenService(axisService) ||
+                    axisService.isClientSide() || status.equals(CGConstant.CG_SERVICE_STATUS_UNPUBLISHED)) {
+                    continue;
+                }
+                pendingServices.add(axisService.getName());
+            }
+            return pendingServices;
         }
     }
 }

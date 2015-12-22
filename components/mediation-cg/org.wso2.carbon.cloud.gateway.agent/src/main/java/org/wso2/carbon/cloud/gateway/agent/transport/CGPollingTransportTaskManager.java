@@ -20,6 +20,7 @@ import org.apache.axiom.om.OMDocument;
 import org.apache.axiom.soap.*;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.AddressingConstants;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.transport.TransportUtils;
@@ -41,6 +42,7 @@ import org.wso2.carbon.cloud.gateway.common.CGUtils;
 import org.wso2.carbon.cloud.gateway.common.thrift.CGThriftClient;
 import org.wso2.carbon.cloud.gateway.common.thrift.gen.Message;
 import org.wso2.carbon.cloud.gateway.common.thrift.gen.NotAuthorizedException;
+import org.wso2.carbon.context.CarbonContext;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
@@ -59,6 +61,8 @@ import java.util.Map;
 public class CGPollingTransportTaskManager {
 
     private static final Log log = LogFactory.getLog(CGPollingTransportTaskManager.class);
+
+    private static final String WSA_TO = "To";
 
     public enum STATE {STOPPED, STARTED, FAILURE}
 
@@ -271,6 +275,8 @@ public class CGPollingTransportTaskManager {
 
         private CGPollingTransportBuffers buffers;
 
+        private CarbonContext carbonContext;
+
         private MessageExchangeTask(CGThriftClient client,
                                     int requestBlockSize,
                                     int responseBlockSize,
@@ -279,6 +285,7 @@ public class CGPollingTransportTaskManager {
             this.requestBlockSize = requestBlockSize;
             this.responseBlockSize = responseBlockSize;
             this.buffers = buffers;
+            this.carbonContext = CarbonContext.getThreadLocalCarbonContext();
 
             // add the created task to the task store
             synchronized (pollingTasks) {
@@ -366,7 +373,7 @@ public class CGPollingTransportTaskManager {
                         reconnectionProgressionFactor,
                         initialReconnectDuration,
                         host,
-                        port));
+                        port, carbonContext));
             }
         }
     }
@@ -479,6 +486,7 @@ public class CGPollingTransportTaskManager {
                                         gzipInputStream,
                                         contentType));
                         isSOAP11 = msgContext.isSOAP11();
+                        populateIncomingTransporterName(msgContext);
 
                         AxisEngine.receive(msgContext);
                     }
@@ -519,6 +527,27 @@ public class CGPollingTransportTaskManager {
             faultEnvelope.serialize(out);
             thriftMsg.setMessage(out.toByteArray());
             buffers.addResponseMessage(thriftMsg);
+        }
+    }
+
+    private void populateIncomingTransporterName(MessageContext messageContext) {
+        SOAPHeader header = messageContext.getEnvelope().getHeader();
+        if (header != null) {
+            ArrayList<SOAPHeaderBlock> addressingHeaders = header.getHeaderBlocksWithNSURI(AddressingConstants.Final.WSA_NAMESPACE);
+            if (addressingHeaders != null && addressingHeaders.size() > 0) {
+                for (SOAPHeaderBlock addressingHeader : addressingHeaders) {
+                    if (WSA_TO.equals(addressingHeader.getLocalName())) {
+
+                        String toAddress = addressingHeader.getText();
+                        String[] address = toAddress.split(":");
+                        if (address.length > 0) {
+                            messageContext.setIncomingTransportName(address[0]);
+                        }
+                        break;
+                    }
+                }
+            }
+
         }
     }
 }

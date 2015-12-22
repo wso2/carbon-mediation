@@ -87,7 +87,7 @@ public class CGAgentAdminClient {
      */
     public void unPublish(String serviceName, String serverName) throws AxisFault {
         try {
-            stub.unPublishService(serviceName, serverName);
+            stub.unPublishService(serviceName, serverName, false);
         } catch (RemoteException e) {
             handleException(getI18nString("connect.error", e), e);
         } catch (CGAgentAdminServiceCGException e) {
