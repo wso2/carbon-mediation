@@ -143,6 +143,7 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                     boolean processedByAPI = false;
 
+                    //Enabled inbound-api tracing
                     if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled()) {
                         if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
                             MessageFlowTracingDataCollector.setEntryPoint(synCtx, (MessageFlowTracerConstants
@@ -170,6 +171,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                             //set inbound properties for axis2 context
                             setInboundProperties(axis2MsgContext);
 
+                            //Enabled inbound-proxy/sequence tracing
                             if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled()) {
                                 if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
                                     MessageFlowTracingDataCollector.setEntryPoint(synCtx,

@@ -18,6 +18,7 @@
 package org.wso2.carbon.message.flow.tracer.data;
 
 import org.apache.synapse.messageflowtracer.data.MessageFlowComponentEntry;
+import org.apache.synapse.messageflowtracer.util.MessageFlowTracerConstants;
 
 import java.util.*;
 
@@ -48,7 +49,7 @@ public class FlowPath {
                 flowList[i] = new ArrayList<>();
             }
 
-            String[] componentIds = flows[i].split("->");
+            String[] componentIds = flows[i].split(MessageFlowTracerConstants.FLOW_PATH_SEPARATOR);
 
             for (String c:componentIds){
                 if(!c.trim().equals("")){
