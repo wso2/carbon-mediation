@@ -36,6 +36,7 @@ public class InboundEndpointDTO {
     private String fileName;
     private String artifactContainerName;
     private boolean isEdited;
+    private boolean isStatisticsEnable;
 
     public InboundEndpointDTO(InboundEndpoint inboundEndpoint) {
         this.name = inboundEndpoint.getName();
@@ -47,6 +48,8 @@ public class InboundEndpointDTO {
         this.fileName = inboundEndpoint.getFileName();
         this.artifactContainerName = inboundEndpoint.getArtifactContainerName();
         this.isEdited = inboundEndpoint.getIsEdited();
+        isStatisticsEnable = ((inboundEndpoint.getAspectConfiguration() != null) &&
+                              inboundEndpoint.getAspectConfiguration().isStatisticsEnable());
         Map<String, String> mParams = inboundEndpoint.getParametersMap();        
         if (mParams != null && !mParams.isEmpty()) {
             parameters = new ParameterDTO[mParams.keySet().size()];
@@ -145,5 +148,13 @@ public class InboundEndpointDTO {
 
     public void setArtifactContainerName(String artifactContainerName) {
         this.artifactContainerName = artifactContainerName;
+    }
+
+    public void setStatisticsEnable(boolean enableStatistics) {
+        this.isStatisticsEnable = enableStatistics;
+    }
+
+    public boolean getStatisticsEnable() {
+        return isStatisticsEnable;
     }
 }

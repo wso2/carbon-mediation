@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>mediation-monitor-features</artifactId>
+        <groupId>org.wso2.carbon.mediation</groupId>
+        <version>4.5.2-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>mediation-flow-statistics-feature</artifactId>
+    <packaging>pom</packaging>
+    <name>WSO2 Carbon - Mediation Flow Statistic Feature Aggregator Module</name>
+    <url>http://wso2.org</url>
+    <modules>
+        <module>org.wso2.carbon.mediation.flow.statistics.ui.feature</module>
+        <module>org.wso2.carbon.mediation.flow.statistics.feature</module>
+        <module>org.wso2.carbon.mediation.flow.statistics.server.feature</module>
+    </modules>
+
+
+</project>

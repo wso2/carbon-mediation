@@ -173,6 +173,8 @@
 %>
 <script type="text/javascript">
     var allServicesSelected = false;
+    var ENABLE = "enable";
+    var DISABLE = "disable";
 
     function selectAllInThisPage(isSelected) {
         allServicesSelected = false;
@@ -333,6 +335,51 @@
         }
         return false;
     }
+
+    function disableStat(apiName) {
+        $.ajax({
+            type: 'POST',
+            url: 'stat-ajaxprocessor.jsp',
+            data: 'apiName=' + apiName + '&action=disableStat',
+            success: function (msg) {
+                handleCallback(apiName, DISABLE);
+            },
+            error: function (msg) {
+                CARBON.showErrorDialog('<fmt:message key="api.stat.disable.error"/>' + ' ' + apiName);
+            }
+        });
+    }
+
+    function enableStat(apiName) {
+        $.ajax({
+            type: 'POST',
+            url: 'stat-ajaxprocessor.jsp',
+            data: 'apiName=' + apiName + '&action=enableStat',
+            success: function (msg) {
+                handleCallback(apiName, ENABLE);
+            },
+            error: function (msg) {
+                CARBON.showErrorDialog('<fmt:message key="api.stat.enable.error"/>' + ' ' + apiName);
+            }
+        });
+    }
+
+    function handleCallback(apiName, action) {
+        var element;
+        if (action == "enable") {
+            element = document.getElementById("disableStat" + apiName);
+            element.style.display = "";
+            element = document.getElementById("enableStat" + apiName);
+            element.style.display = "none";
+
+        } else {
+            element = document.getElementById("disableStat" + apiName);
+            element.style.display = "none";
+            element = document.getElementById("enableStat" + apiName);
+            element.style.display = "";
+        }
+    }
+
 </script>
 <%
     }
@@ -419,7 +466,7 @@
             <th><fmt:message key="api.select"/></th>
         	<th><fmt:message key="api.name"/></th>
         	<th><fmt:message key="api.invocation.url"/></th>
-        	<th colspan="2"><fmt:message key="apis.table.action.header"/></th>
+        	<th colspan="3"><fmt:message key="apis.table.action.header"/></th>
         </tr>
         </thead>
         <tbody>
@@ -459,6 +506,41 @@
                     <%=serverContext + apiData.getContext()%>
                 </nobr>
             </td>
+            <% if (apiData.getStatisticsEnable()) { %>
+            <td style="border-right:none;border-left:none;width:200px">
+                <div class="inlineDiv">
+                    <div id="disableStat<%= apiData.getName()%>">
+                        <a href="#" onclick="disableStat('<%= apiData.getName() %>')"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
+                                key="api.stat.disable.link"/></a>
+                    </div>
+                    <div id="enableStat<%= apiData.getName()%>" style="display:none;">
+                        <a href="#" onclick="enableStat('<%= apiData.getName() %>')"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
+                                key="api.stat.enable.link"/></a>
+                    </div>
+                </div>
+            </td>
+            <% } else { %>
+            <td style="border-right:none;border-left:none;width:200px">
+                <div class="inlineDiv">
+                    <div id="enableStat<%= apiData.getName()%>">
+                        <a href="#" onclick="enableStat('<%=apiData.getName()%>')"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
+                                key="api.stat.enable.link"/></a>
+                    </div>
+                    <div id="disableStat<%= apiData.getName()%>" style="display:none">
+                        <a href="#" onclick="disableStat('<%=apiData.getName()%>')"
+                           class="icon-link"
+                           style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
+                                key="api.stat.disable.link"/></a>
+                    </div>
+                </div>
+            </td>
+            <% } %>
             <td width="20px" style="text-align:left;border-left:none;border-right:none;width:100px;">
                 <div class="inlineDiv">
                     <% if (apiData.getArtifactContainerName() != null) { %>

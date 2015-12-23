@@ -35,6 +35,8 @@ public class APIData {
 	
 	private ResourceData[] resources;
 
+	private boolean isStatisticsEnable;
+
 	public String getName() {
 		return name;
 	}
@@ -113,5 +115,13 @@ public class APIData {
 	 */
 	public void setIsEdited(boolean isEdited) {
 		this.isEdited = isEdited;
+	}
+
+	public void setStatisticsEnable(boolean enableStatistics) {
+		this.isStatisticsEnable = enableStatistics;
+	}
+
+	public boolean getStatisticsEnable() {
+		return isStatisticsEnable;
 	}
 }
