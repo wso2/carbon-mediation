@@ -19,9 +19,9 @@
 package org.wso2.carbon.mediation.flow.statistics.store.tree.data;
 
 import org.apache.synapse.aspects.ComponentType;
-import org.apache.synapse.aspects.newstatistics.EndpointStatisticLog;
-import org.apache.synapse.aspects.newstatistics.StatisticsLog;
-import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
+import org.apache.synapse.aspects.flow.statistics.data.raw.EndpointStatisticLog;
+import org.apache.synapse.aspects.flow.statistics.data.raw.StatisticsLog;
+import org.wso2.carbon.mediation.flow.statistics.service.data.MessageFlowStatisticConstants;
 import org.wso2.carbon.mediation.flow.statistics.service.data.TreeNodeData;
 
 import java.util.HashMap;
@@ -206,8 +206,6 @@ public class IndividualStatistic {
 				return MessageFlowStatisticConstants.SEQUENCE;
 			case MEDIATOR:
 				return MessageFlowStatisticConstants.MEDIATOR;
-			case FAULTHANDLER:
-				return MessageFlowStatisticConstants.FAULTHANDLER;
 			case API:
 				return MessageFlowStatisticConstants.API;
 			case RESOURCE:

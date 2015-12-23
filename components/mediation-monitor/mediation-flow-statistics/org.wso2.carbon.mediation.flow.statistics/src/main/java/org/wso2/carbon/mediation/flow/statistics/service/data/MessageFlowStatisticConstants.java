@@ -16,7 +16,26 @@
  *  under the License.
  */
 
-/**
- * Created by virajrs on 12/1/15.
- */
-staticChart=igviz.setUp("#stss",config,chart);
+package org.wso2.carbon.mediation.flow.statistics.service.data;
+
+public class MessageFlowStatisticConstants {
+
+	public static final String MESSAGE_FLOW_STATISTIC_STORE = "mediation.flow.statistics.store";
+
+	public static final String PROXYSERVICE = "Proxy Service";
+
+	public static final String ENDPOINT = "Endpoint";
+
+	public static final String INBOUNDENDPOINT = "Inbound EndPoint";
+
+	public static final String SEQUENCE = "Sequence";
+
+	public static final String MEDIATOR = "Mediator";
+
+	public static final String API = "API";
+
+	public static final String RESOURCE = "API Resource";
+
+	public static final String ANY = "Other Type";
+
+}

@@ -39,7 +39,6 @@
 <link rel="stylesheet" href="vzGrammer/igviz.css">
 <script src="vzGrammer/vega.js"></script>
 <script src="vzGrammer/igviz.js"></script>
-<script src="dagre/d3.v3.min.js" charset="utf-8"></script>
 
 
 <fmt:bundle basename="org.wso2.carbon.mediation.flow.statistics.ui.i18n.Resources">
@@ -65,7 +64,6 @@
 
             String statisticCategory = request.getParameter("statisticCategory");
             String categoryName = request.getParameter("categoryName");
-            int compareInt = Integer.parseInt(request.getParameter("compare"));
             AdminData[] collectedSequenceStatistic = null;
             if (statisticCategory.equals("proxy")) {
                 collectedSequenceStatistic = mediationFlowStatisticClient.getAllProxyStatistics();
@@ -78,26 +76,6 @@
 
             } else if (statisticCategory.equals("sequence")) {
                 collectedSequenceStatistic = mediationFlowStatisticClient.getAllSequenceStatistics();
-
-            }
-
-            String compareAttribute = null;
-            switch (compareInt) {
-                case 1:
-                    compareAttribute = "Count";
-                    break;
-                case 2:
-                    compareAttribute = "Min Time";
-                    break;
-                case 3:
-                    compareAttribute = "Avg Time";
-                    break;
-                case 4:
-                    compareAttribute = "Max Time";
-                    break;
-                case 5:
-                    compareAttribute = "Fault Count";
-                    break;
             }
     %>
 
@@ -111,43 +89,37 @@
                 if ((collectedSequenceStatistic != null) && (collectedSequenceStatistic.length > 0)) {
             %>
 
-            <form method="POST" name="inboundcreationform" id="inboundcreationform"
-                  action="overall_stat.jsp?statisticCategory=<%=statisticCategory%>&categoryName=<%=categoryName%>">
-                <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
-                    <thead>
-                    <tr>
-                        <th colspan="3">Type of the Statistic</th>
-                    </tr>
-                    </thead>
-                    <tbody>
 
-                    <tr>
-                        <td style="width:150px"><label for="compare">Select Statistic Parameter
-                            to Compare</label><span
-                                class="required">*</span></td>
-                        <td align="left">
-                            <select id="compare" name="compare" class="longInput">
-                                <option value="1">Hit Count</option>
-                                <option value="2">Min. Processing Time</option>
-                                <option value="3">Avg. Processing Time</option>
-                                <option value="4">Max. Processing Time</option>
-                                <option value="5">Fault Count</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="buttonRow" colspan="3">
-                            <input class="button" type="Submit" value="Next">
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </form>
+            <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
+                <thead>
+                <tr>
+                    <th colspan="3">Type of the Statistic</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr>
+                    <td style="width:150px"><label for="compare">Select Statistic Parameter
+                        to Compare</label><span
+                            class="required">*</span></td>
+                    <td align="left">
+                        <select id="compare" name="compare" class="longInput" onchange="onChange()">
+                            <option value="1" selected="selected">Hit Count</option>
+                            <option value="2">Min. Processing Time</option>
+                            <option value="3">Avg. Processing Time</option>
+                            <option value="4">Max. Processing Time</option>
+                            <option value="5">Fault Count</option>
+                        </select>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
 
             <br/>
             <br/>
 
-            <h2> Comparing <%=statisticCategory%> by <%=compareAttribute%>
+            <h2 id="heading">
             </h2>
             <br/>
             <br/>
@@ -155,78 +127,93 @@
             <div id="staticBar"></div>
             <script>
 
-                jsonObject = createJSONObject();
-
-                var width = document.getElementById("staticBar").offsetWidth; //canvas width
-                var height = 270;   //canvas height
-
-                var config = {
-                    "title": "Comparison By Count",
-                    "yAxis": 1,
-                    "xAxis": 0,
-                    "width": width,
-                    "height": height,
-                    "chartType": "bar"
+                window.onload = function () {
+                    onChange();
                 };
 
+                function onChange() {
+                    var selectedValue = document.getElementById("compare").value;
+                    var compareAttribute;
+                    var compareInt = parseInt(selectedValue);
+                    switch (compareInt) {
+                        case 1:
+                            compareAttribute = "Count";
+                            break;
+                        case 2:
+                            compareAttribute = "Minimum Time";
+                            break;
+                        case 3:
+                            compareAttribute = "Average Time";
+                            break;
+                        case 4:
+                            compareAttribute = "Maximum Time";
+                            break;
+                        case 5:
+                            compareAttribute = "Fault Count";
+                            break;
+                    }
+                    document.getElementById("heading").innerHTML = "Comparing <%=statisticCategory%> by " + compareAttribute;
+                    createJSONObject(compareAttribute, compareInt);
+                }
 
-                staticChart = igviz.setUp("#staticBar", config, jsonObject);
-                staticChart
-                        .setXAxis(
-                        {
-                            "labelAngle": -35,
-                            "labelAlign": "right",
-                            "labelDy": 0,
-                            "labelDx": 0,
-                            "titleDy": 50
-                        })
-                        .setYAxis(
-                        {
-                            "titleDy": -30
-                        })
-                        .setDimension(
-                        {
-                            height: 270
-                        });
 
-
-                staticChart.plot(jsonObject.data);
-
-
-                function createJSONObject() {
-                    //alert("came");
-                    //Same for all
+                function createJSONObject(compareAttribute, value) {
                     jsonObject = {};
+
+
                     metaDataObject = {};
-                    metaDataObject["names"] = ["Proxy Service Name", "<%=compareAttribute%>"];
+                    metaDataObject["names"] = ["<%=statisticCategory%> Name", compareAttribute];
                     metaDataObject["types"] = ['C', 'N'];
 
                     jsonObject ["metadata"] = metaDataObject;
                     jsonString = JSON.stringify(jsonObject);
-                    //alert(jsonString);
-                    //alert(populateData());
-                    ///
-                    jsonObject ["data"] = populateData();
+                    jsonObject ["data"] = populateData(value);
                     jsonString = JSON.stringify(jsonObject);
 
-                    //alert(jsonString);
+                    var width = document.getElementById("staticBar").offsetWidth; //canvas width
+                    var height = 270;   //canvas height
 
-                    return jsonObject;
+                    var config = {
+                        "title": "Comparison By Count",
+                        "yAxis": 1,
+                        "xAxis": 0,
+                        "width": width,
+                        "height": height,
+                        "chartType": "bar"
+                    };
+
+
+                    staticChart = igviz.setUp("#staticBar", config, jsonObject);
+                    staticChart
+                            .setXAxis(
+                            {
+                                "labelAngle": -35,
+                                "labelAlign": "right",
+                                "labelDy": 0,
+                                "labelDx": 0,
+                                "titleDy": 50
+                            })
+                            .setYAxis(
+                            {
+                                "titleDy": -30
+                            })
+                            .setDimension(
+                            {
+                                height: 270
+                            });
+
+
+                    staticChart.plot(jsonObject.data);
 
                 }
 
 
-                function populateData() {
+                function populateData(type) {
                     dataObject = [];
                     <%
                     for (AdminData adminData : collectedSequenceStatistic) {
                     %>
-                    //alert("came switch");
 
-
-                    var type = 0;
-                    type = <%=compareInt%>;
-                    //alert(type);
                     switch (type) {
                         case 1:
                             dataObject.push(["<%=adminData.getComponentID()%>", "<%=adminData.getTreeNodeData().getCount()%>"]);
@@ -253,7 +240,6 @@
                     <%
                         }
                     %>
-                    //alert(dataObject);
                     return dataObject;
                 }
 

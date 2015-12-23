@@ -16,15 +16,14 @@
  *  under the License.
  */
 
-package org.wso2.carbon.mediation.flow.statistics;
+package org.wso2.carbon.mediation.flow.statistics.collector;
 
 import org.apache.log4j.Logger;
-import org.apache.synapse.aspects.newstatistics.EndpointStatisticLog;
+import org.apache.synapse.aspects.flow.statistics.data.raw.EndpointStatisticLog;
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
-import org.apache.synapse.aspects.newstatistics.StatisticsLog;
+import org.apache.synapse.aspects.flow.statistics.data.raw.StatisticsLog;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class StatisticCollectingThread extends Thread {

@@ -5,7 +5,7 @@
   if (typeof define === 'function' && define.amd) {
     // Support AMD. Register as an anonymous module.
     // NOTE: List all dependencies in AMD style
-    define(['../jslibs/d3', 'topojson'], factory);
+    define(['../dagre/dagre-d3.js', 'topojson'], factory);
   } else {
     // No AMD. Set module as a global variable
     // NOTE: Pass dependencies to factory function

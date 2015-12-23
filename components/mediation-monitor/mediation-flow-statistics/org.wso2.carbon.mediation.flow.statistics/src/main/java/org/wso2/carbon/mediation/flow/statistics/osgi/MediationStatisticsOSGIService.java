@@ -24,11 +24,11 @@ import org.apache.commons.logging.LogFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
+import org.wso2.carbon.mediation.flow.statistics.service.data.MessageFlowStatisticConstants;
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
-import org.wso2.carbon.mediation.flow.statistics.StatisticCollectingThread;
+import org.wso2.carbon.mediation.flow.statistics.collector.StatisticCollectingThread;
 import org.wso2.carbon.mediation.flow.statistics.service.MediationStatisticsService;
 import org.wso2.carbon.mediation.flow.statistics.service.MediationStatisticsServiceImpl;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -96,7 +96,7 @@ public class MediationStatisticsOSGIService {
 	 */
 	private void createStatisticsStore(SynapseEnvironmentService synEnvService) {
 
-		//TODO Do we need to use old stat reporter enable in xml
+		//TODO  we need to use old stat reporter enable in xml
 		int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
 		ConfigurationContext cfgCtx = synEnvService.getConfigurationContext();
 
@@ -106,10 +106,8 @@ public class MediationStatisticsOSGIService {
 		StatisticCollectingThread reporterThread = new StatisticCollectingThread(synEnvService, statisticsStore);
 		reporterThread.setName("mediation-stat-collector-new-" + tenantId);
 
-		//TODO Do we need this
-		//Set a custom interval value if required
-		//TODO Engage the persisting stat observer if required OR Engage custom observer implementations (user
-		// written extensions)
+		//TODO Set a custom interval value if required
+		//TODO Engage the persisting stat observer if required OR Engage custom observer implementations
 
 		reporterThread.start();
 		if (log.isDebugEnabled()) {

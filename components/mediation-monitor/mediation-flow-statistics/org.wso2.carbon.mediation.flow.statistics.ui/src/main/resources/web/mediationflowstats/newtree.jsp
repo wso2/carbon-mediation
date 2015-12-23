@@ -248,6 +248,9 @@
                         case PROXY_SERVICE:
                             nodeClass = PROXY_SERVICE_NODE_CLASS;
                             break;
+                        case RESOURCE:
+                            nodeClass = RESOURCE_NODE_CLASS;
+                            break;
                         case API:
                             nodeClass = API_NODE_CLASS;
                             break;

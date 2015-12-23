@@ -21,14 +21,14 @@ package org.wso2.carbon.mediation.flow.statistics.store;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.aspects.newstatistics.EndpointStatisticLog;
-import org.apache.synapse.aspects.newstatistics.StatisticsLog;
+import org.apache.synapse.aspects.flow.statistics.data.raw.EndpointStatisticLog;
+import org.apache.synapse.aspects.flow.statistics.data.raw.StatisticsLog;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.wso2.carbon.mediation.flow.statistics.service.data.StatisticTreeWrapper;
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticCollectionViewMXBean;
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticsCompositeObject;
 import org.wso2.carbon.mediation.flow.statistics.store.tree.data.EndpointDataHolder;
-import org.wso2.carbon.mediation.flow.statistics.store.tree.data.StatisticsTree;
+import org.wso2.carbon.mediation.flow.statistics.store.tree.StatisticsTree;
 
 import java.util.*;
 

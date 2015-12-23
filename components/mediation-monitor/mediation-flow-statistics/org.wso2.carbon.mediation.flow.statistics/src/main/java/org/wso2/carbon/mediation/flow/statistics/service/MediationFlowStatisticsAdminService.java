@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.mediation.flow.statistics.service;
 
-import org.wso2.carbon.mediation.flow.statistics.MessageFlowStatisticConstants;
+import org.wso2.carbon.mediation.flow.statistics.service.data.MessageFlowStatisticConstants;
 import org.wso2.carbon.mediation.flow.statistics.service.data.AdminData;
 import org.wso2.carbon.mediation.flow.statistics.service.data.StatisticTreeWrapper;
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.mediation.flow.statistics.store.tree.data.EndpointDataHolder;
-import org.wso2.carbon.mediation.flow.statistics.store.tree.data.StatisticsTree;
+import org.wso2.carbon.mediation.flow.statistics.store.tree.StatisticsTree;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 
 import java.util.LinkedList;

@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.mediation.flow.statistics.store.tree.data;
 
-import org.apache.synapse.aspects.newstatistics.EndpointStatisticLog;
+import org.apache.synapse.aspects.flow.statistics.data.raw.EndpointStatisticLog;
 import org.wso2.carbon.mediation.flow.statistics.service.data.TreeNodeData;
 
 public class EndpointDataHolder {
@@ -29,7 +29,7 @@ public class EndpointDataHolder {
 		this.endpointStatistics = new IndividualStatistic(endpointStatisticLog);
 	}
 
-	public void update(EndpointStatisticLog endpointStatisticLog){
+	public void update(EndpointStatisticLog endpointStatisticLog) {
 		this.endpointStatistics.update(endpointStatisticLog);
 	}
 

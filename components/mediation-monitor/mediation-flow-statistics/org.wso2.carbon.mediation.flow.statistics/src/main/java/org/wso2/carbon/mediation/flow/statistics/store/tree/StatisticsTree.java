@@ -16,15 +16,16 @@
  *  under the License.
  */
 
-package org.wso2.carbon.mediation.flow.statistics.store.tree.data;
+package org.wso2.carbon.mediation.flow.statistics.store.tree;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.aspects.newstatistics.StatisticsLog;
+import org.apache.synapse.aspects.flow.statistics.data.raw.StatisticsLog;
 import org.wso2.carbon.mediation.flow.statistics.service.data.EdgeData;
 import org.wso2.carbon.mediation.flow.statistics.service.data.StatisticTreeWrapper;
 import org.wso2.carbon.mediation.flow.statistics.service.data.TreeNodeData;
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticsCompositeObject;
+import org.wso2.carbon.mediation.flow.statistics.store.tree.data.IndividualStatistic;
 
 import java.util.ArrayList;
 import java.util.List;

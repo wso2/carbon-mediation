@@ -32,9 +32,8 @@ import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.ComponentType;
-import org.apache.synapse.aspects.newstatistics.RuntimeStatisticCollector;
-import org.apache.synapse.aspects.newstatistics.event.reader.StatisticEventReceiver;
-import org.apache.synapse.aspects.newstatistics.log.templates.CreateEntryStatisticLog;
+import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
+import org.apache.synapse.aspects.flow.statistics.log.templates.CreateEntryStatisticLog;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -116,7 +115,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                 CreateEntryStatisticLog createEntryStatisticLog =
                         new CreateEntryStatisticLog(synCtx, endpointName, ComponentType.INBOUNDENDPOINT, "",
                                                     System.currentTimeMillis());
-                StatisticEventReceiver.receive(createEntryStatisticLog);
+                RuntimeStatisticCollector.enQueueStatisticLog(createEntryStatisticLog);
 
                 CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
