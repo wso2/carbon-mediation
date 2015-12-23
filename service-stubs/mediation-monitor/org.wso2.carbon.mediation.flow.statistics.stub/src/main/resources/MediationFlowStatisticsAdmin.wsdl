@@ -1,0 +1,511 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://service.statistics.flow.mediation.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax2297="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
+   <wsdl:documentation>MediationFlowStatisticsAdmin</wsdl:documentation>
+   <wsdl:types>
+      <xs:schema xmlns:ax2298="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
+         <xs:import namespace="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd"/>
+         <xs:element name="getAllInboundEndpointStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllInboundEndpointStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllApiStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllApiStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllProxyStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllProxyStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllEndpointStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllEndpointStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getProxyStatistics">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="componentID" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getProxyStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2297:StatisticTreeWrapper"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getInboundEndpointStatistics">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="componentID" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getInboundEndpointStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2297:StatisticTreeWrapper"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getSequenceStatistics">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="componentID" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getSequenceStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2297:StatisticTreeWrapper"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getApiStatistics">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="componentID" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getApiStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2297:StatisticTreeWrapper"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllSequenceStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllSequenceStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+      </xs:schema>
+      <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd">
+         <xs:complexType name="AdminData">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="componentID" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="treeNodeData" nillable="true" type="ax2297:TreeNodeData"/>
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="TreeNodeData">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="avgProcessingTime" type="xs:long"/>
+               <xs:element minOccurs="0" name="componentId" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="componentType" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="count" type="xs:int"/>
+               <xs:element minOccurs="0" name="faultCount" type="xs:int"/>
+               <xs:element minOccurs="0" name="maxProcessingTime" type="xs:long"/>
+               <xs:element minOccurs="0" name="minProcessingTime" type="xs:long"/>
+               <xs:element minOccurs="0" name="response" type="xs:boolean"/>
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="StatisticTreeWrapper">
+            <xs:sequence>
+               <xs:element maxOccurs="unbounded" minOccurs="0" name="treeEdges" nillable="true" type="ax2297:EdgeData"/>
+               <xs:element maxOccurs="unbounded" minOccurs="0" name="treeNodes" nillable="true" type="ax2297:TreeNodeData"/>
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="EdgeData">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="nodeIndex" type="xs:int"/>
+               <xs:element minOccurs="0" name="parentNodeIndex" type="xs:int"/>
+            </xs:sequence>
+         </xs:complexType>
+      </xs:schema>
+   </wsdl:types>
+   <wsdl:message name="getAllApiStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getAllApiStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getAllApiStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getAllApiStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getInboundEndpointStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getInboundEndpointStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getInboundEndpointStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getInboundEndpointStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getAllSequenceStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getAllSequenceStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getAllSequenceStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getAllSequenceStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getSequenceStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getSequenceStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getSequenceStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getSequenceStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getProxyStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getProxyStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getProxyStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getProxyStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getAllProxyStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getAllProxyStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getAllProxyStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getAllProxyStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getApiStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getApiStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getApiStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getApiStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getAllEndpointStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getAllEndpointStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getAllEndpointStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getAllEndpointStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getAllInboundEndpointStatisticsRequest">
+      <wsdl:part name="parameters" element="ns:getAllInboundEndpointStatistics"/>
+   </wsdl:message>
+   <wsdl:message name="getAllInboundEndpointStatisticsResponse">
+      <wsdl:part name="parameters" element="ns:getAllInboundEndpointStatisticsResponse"/>
+   </wsdl:message>
+   <wsdl:portType name="MediationFlowStatisticsAdminPortType">
+      <wsdl:operation name="getAllApiStatistics">
+         <wsdl:input message="ns:getAllApiStatisticsRequest" wsaw:Action="urn:getAllApiStatistics"/>
+         <wsdl:output message="ns:getAllApiStatisticsResponse" wsaw:Action="urn:getAllApiStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getInboundEndpointStatistics">
+         <wsdl:input message="ns:getInboundEndpointStatisticsRequest" wsaw:Action="urn:getInboundEndpointStatistics"/>
+         <wsdl:output message="ns:getInboundEndpointStatisticsResponse" wsaw:Action="urn:getInboundEndpointStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getAllSequenceStatistics">
+         <wsdl:input message="ns:getAllSequenceStatisticsRequest" wsaw:Action="urn:getAllSequenceStatistics"/>
+         <wsdl:output message="ns:getAllSequenceStatisticsResponse" wsaw:Action="urn:getAllSequenceStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getSequenceStatistics">
+         <wsdl:input message="ns:getSequenceStatisticsRequest" wsaw:Action="urn:getSequenceStatistics"/>
+         <wsdl:output message="ns:getSequenceStatisticsResponse" wsaw:Action="urn:getSequenceStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getProxyStatistics">
+         <wsdl:input message="ns:getProxyStatisticsRequest" wsaw:Action="urn:getProxyStatistics"/>
+         <wsdl:output message="ns:getProxyStatisticsResponse" wsaw:Action="urn:getProxyStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getAllProxyStatistics">
+         <wsdl:input message="ns:getAllProxyStatisticsRequest" wsaw:Action="urn:getAllProxyStatistics"/>
+         <wsdl:output message="ns:getAllProxyStatisticsResponse" wsaw:Action="urn:getAllProxyStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getApiStatistics">
+         <wsdl:input message="ns:getApiStatisticsRequest" wsaw:Action="urn:getApiStatistics"/>
+         <wsdl:output message="ns:getApiStatisticsResponse" wsaw:Action="urn:getApiStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEndpointStatistics">
+         <wsdl:input message="ns:getAllEndpointStatisticsRequest" wsaw:Action="urn:getAllEndpointStatistics"/>
+         <wsdl:output message="ns:getAllEndpointStatisticsResponse" wsaw:Action="urn:getAllEndpointStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getAllInboundEndpointStatistics">
+         <wsdl:input message="ns:getAllInboundEndpointStatisticsRequest" wsaw:Action="urn:getAllInboundEndpointStatistics"/>
+         <wsdl:output message="ns:getAllInboundEndpointStatisticsResponse" wsaw:Action="urn:getAllInboundEndpointStatisticsResponse"/>
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="MediationFlowStatisticsAdminSoap11Binding" type="ns:MediationFlowStatisticsAdminPortType">
+      <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+      <wsdl:operation name="getAllApiStatistics">
+         <soap:operation soapAction="urn:getAllApiStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getInboundEndpointStatistics">
+         <soap:operation soapAction="urn:getInboundEndpointStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllSequenceStatistics">
+         <soap:operation soapAction="urn:getAllSequenceStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getSequenceStatistics">
+         <soap:operation soapAction="urn:getSequenceStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getProxyStatistics">
+         <soap:operation soapAction="urn:getProxyStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllProxyStatistics">
+         <soap:operation soapAction="urn:getAllProxyStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getApiStatistics">
+         <soap:operation soapAction="urn:getApiStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEndpointStatistics">
+         <soap:operation soapAction="urn:getAllEndpointStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllInboundEndpointStatistics">
+         <soap:operation soapAction="urn:getAllInboundEndpointStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="MediationFlowStatisticsAdminSoap12Binding" type="ns:MediationFlowStatisticsAdminPortType">
+      <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+      <wsdl:operation name="getAllApiStatistics">
+         <soap12:operation soapAction="urn:getAllApiStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getInboundEndpointStatistics">
+         <soap12:operation soapAction="urn:getInboundEndpointStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllSequenceStatistics">
+         <soap12:operation soapAction="urn:getAllSequenceStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getSequenceStatistics">
+         <soap12:operation soapAction="urn:getSequenceStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getProxyStatistics">
+         <soap12:operation soapAction="urn:getProxyStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllProxyStatistics">
+         <soap12:operation soapAction="urn:getAllProxyStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getApiStatistics">
+         <soap12:operation soapAction="urn:getApiStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEndpointStatistics">
+         <soap12:operation soapAction="urn:getAllEndpointStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllInboundEndpointStatistics">
+         <soap12:operation soapAction="urn:getAllInboundEndpointStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="MediationFlowStatisticsAdminHttpBinding" type="ns:MediationFlowStatisticsAdminPortType">
+      <http:binding verb="POST"/>
+      <wsdl:operation name="getAllApiStatistics">
+         <http:operation location="getAllApiStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getInboundEndpointStatistics">
+         <http:operation location="getInboundEndpointStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllSequenceStatistics">
+         <http:operation location="getAllSequenceStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getSequenceStatistics">
+         <http:operation location="getSequenceStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getProxyStatistics">
+         <http:operation location="getProxyStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllProxyStatistics">
+         <http:operation location="getAllProxyStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getApiStatistics">
+         <http:operation location="getApiStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllEndpointStatistics">
+         <http:operation location="getAllEndpointStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllInboundEndpointStatistics">
+         <http:operation location="getAllInboundEndpointStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="MediationFlowStatisticsAdmin">
+      <wsdl:port name="MediationFlowStatisticsAdminHttpsSoap11Endpoint" binding="ns:MediationFlowStatisticsAdminSoap11Binding">
+         <soap:address location="https://virajrs-ThinkPad-T540p:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsSoap11Endpoint"/>
+      </wsdl:port>
+      <wsdl:port name="MediationFlowStatisticsAdminHttpsSoap12Endpoint" binding="ns:MediationFlowStatisticsAdminSoap12Binding">
+         <soap12:address location="https://virajrs-ThinkPad-T540p:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsSoap12Endpoint"/>
+      </wsdl:port>
+      <wsdl:port name="MediationFlowStatisticsAdminHttpsEndpoint" binding="ns:MediationFlowStatisticsAdminHttpBinding">
+         <http:address location="https://virajrs-ThinkPad-T540p:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsEndpoint"/>
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>

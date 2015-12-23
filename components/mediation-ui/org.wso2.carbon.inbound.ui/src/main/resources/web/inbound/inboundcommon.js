@@ -1,4 +1,7 @@
 var intervalRequired = false;
+var ENABLE = "enable";
+var DISABLE = "disable";
+
 function isNameValid(namestring) {
     if (namestring != null && namestring != "") {
         for (var j = 0; j < namestring.length; j++)
@@ -408,5 +411,49 @@ function showTopicsOrTopicFilterFields(inboundDescriptionOfParams, topicListPara
     tFieldsArea = tFieldsArea + '<tr><td style="width:157px">'+tField.trim()+' name<span class="required">*</span></td><td align="left"><input id="'+tField.trim()+'" name="'+tField.trim()+'" class="longInput" type="text" value="'+val+'"/></td><td></td></tr>';
     tFieldsArea = tFieldsArea + '</table>';
     document.getElementById('tDiv').innerHTML = tFieldsArea;
+}
+
+function disableStat(inboundEndpointName) {
+    $.ajax({
+        type: 'POST',
+        url: 'stat-ajaxprocessor.jsp',
+        data: 'inboundEndpointName=' + inboundEndpointName + '&action=disableStat',
+        success: function (msg) {
+            handleCallback(inboundEndpointName, DISABLE);
+        },
+        error: function (msg) {
+            CARBON.showErrorDialog('Error occurred when disabling statistics for the inbound Endpoint :' + inboundEndpointName);
+        }
+    });
+}
+
+function enableStat(inboundEndpointName) {
+    $.ajax({
+        type: 'POST',
+        url: 'stat-ajaxprocessor.jsp',
+        data: 'inboundEndpointName=' + inboundEndpointName + '&action=enableStat',
+        success: function (msg) {
+            handleCallback(inboundEndpointName, ENABLE);
+        },
+        error: function (msg) {
+            CARBON.showErrorDialog('Error occurred when enabling statistics for the inbound Endpoint :' + inboundEndpointName);
+        }
+    });
+}
+
+function handleCallback(apiName, action) {
+    var element;
+    if (action == "enable") {
+        element = document.getElementById("disableStat" + apiName);
+        element.style.display = "";
+        element = document.getElementById("enableStat" + apiName);
+        element.style.display = "none";
+
+    } else {
+        element = document.getElementById("disableStat" + apiName);
+        element.style.display = "none";
+        element = document.getElementById("enableStat" + apiName);
+        element.style.display = "";
+    }
 }
 

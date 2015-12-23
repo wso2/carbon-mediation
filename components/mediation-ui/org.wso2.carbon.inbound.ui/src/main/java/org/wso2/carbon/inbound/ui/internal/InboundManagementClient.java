@@ -104,6 +104,7 @@ public class InboundManagementClient {
                 inboundDescription.setArtifactContainerName(inboundEndpointDTO.getArtifactContainerName());
                 inboundDescription.setIsEdited(inboundEndpointDTO.getIsEdited());
             }
+            inboundDescription.setStatisticsEnable(inboundEndpointDTO.getStatisticsEnable());
             descriptions.add(inboundDescription);
         }
         if (log.isDebugEnabled()) {
@@ -436,6 +437,24 @@ public class InboundManagementClient {
             }
         }
         return topicListParams;
+    }
+
+    public String enableStatistics(String inboundName) throws AxisFault {
+        try {
+            stub.enableStatistics(inboundName);
+        } catch (Exception e) {
+            log.error("Could not enable statistics for the selected Inbound Endpoint", e);
+        }
+        return null;
+    }
+
+    public String disableStatistics(String inboundName) throws AxisFault {
+        try {
+            stub.disableStatistics(inboundName);
+        } catch (Exception e) {
+            log.error("Could not disable statistics for the selected Inbound Endpoint", e);
+        }
+        return null;
     }
 }
 

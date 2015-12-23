@@ -43,6 +43,7 @@ public class InboundDescription {
 	private static final String CLASS_TYPE = "class";
 	private String artifactContainerName;
 	private boolean isEdited;
+	private boolean isStatisticsEnable;
 
 	public InboundDescription(InboundEndpointDTO inboundEndpoint){
 		this.name = inboundEndpoint.getName();
@@ -95,6 +96,14 @@ public class InboundDescription {
 	
 	public String getName() {
 		return name;
+	}
+
+	public boolean getStatisticsEnable() {
+		return isStatisticsEnable;
+	}
+
+	public void setStatisticsEnable(boolean isStatisticsEnable) {
+		this.isStatisticsEnable = isStatisticsEnable;
 	}
 
 	public void setName(String name) {
