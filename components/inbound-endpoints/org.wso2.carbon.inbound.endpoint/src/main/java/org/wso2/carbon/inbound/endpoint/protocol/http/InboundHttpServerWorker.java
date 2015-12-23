@@ -34,6 +34,8 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
+import org.apache.synapse.messageflowtracer.util.MessageFlowTracerConstants;
+import org.apache.synapse.messageflowtracer.processors.MessageFlowTracingDataCollector;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.MediatorFaultHandler;
@@ -145,6 +147,14 @@ public class InboundHttpServerWorker extends ServerWorker {
 
                     boolean processedByAPI = false;
 
+                    //Enabled inbound-api tracing
+                    if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled()) {
+                        if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
+                            MessageFlowTracingDataCollector.setEntryPoint(synCtx, (MessageFlowTracerConstants
+                                                                                         .ENTRY_TYPE_INBOUND_ENDPOINT
+                                                                                 + endpointName), synCtx.getMessageID());
+                        }
+                    }
                     // Trying to dispatch to an API
                     processedByAPI = restHandler.process(synCtx);
                     if (log.isDebugEnabled()) {
@@ -165,13 +175,22 @@ public class InboundHttpServerWorker extends ServerWorker {
                             //set inbound properties for axis2 context
                             setInboundProperties(axis2MsgContext);
 
+                            //Enabled inbound-proxy/sequence tracing
+                            if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled()) {
+                                if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
+                                    MessageFlowTracingDataCollector.setEntryPoint(synCtx,
+                                                                                (MessageFlowTracerConstants
+                                                                                         .ENTRY_TYPE_INBOUND_ENDPOINT
+                                                                                 + endpointName), synCtx.getMessageID());
+                                }
+                            }
                             if (!isRESTRequest(axis2MsgContext, method)) {
                                 if (request.isEntityEnclosing()) {
                                     processEntityEnclosingRequest(axis2MsgContext, isAxis2Path);
                                 } else {
                                     processNonEntityEnclosingRESTHandler(null, axis2MsgContext, isAxis2Path);
                                 }
-                            }else {
+                            } else {
                                 String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
                                 SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader);
                                 processNonEntityEnclosingRESTHandler(soapEnvelope,axis2MsgContext,true);
