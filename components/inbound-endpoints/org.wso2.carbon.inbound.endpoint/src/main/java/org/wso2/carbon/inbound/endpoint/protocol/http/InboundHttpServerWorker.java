@@ -110,12 +110,9 @@ public class InboundHttpServerWorker extends ServerWorker {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
                     return;
                 }
-                //Setting Statistic Trace ID for statistic Collection
-                RuntimeStatisticCollector.setStatisticsTraceId(synCtx);
-                CreateEntryStatisticLog createEntryStatisticLog =
-                        new CreateEntryStatisticLog(synCtx, endpointName, ComponentType.INBOUNDENDPOINT, "",
-                                                    System.currentTimeMillis());
-                RuntimeStatisticCollector.enQueueStatisticLog(createEntryStatisticLog);
+
+                RuntimeStatisticCollector.reportStatisticsForInbound(synCtx,endpointName,endpoint
+                        .getAspectConfiguration().isStatisticsEnable(),true);
 
                 CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
