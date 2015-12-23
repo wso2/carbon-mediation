@@ -501,7 +501,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
 		try {
 			PrivilegedCarbonContext.startTenantFlow();
-			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
+			                                                                      true);
 			APIData data = getApiByName(apiName);
 			return data;
 		} finally {

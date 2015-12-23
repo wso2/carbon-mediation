@@ -31,9 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.aspects.ComponentType;
 import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
-import org.apache.synapse.aspects.flow.statistics.log.templates.CreateEntryStatisticLog;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -89,11 +87,9 @@ public class InboundHttpServerWorker extends ServerWorker {
                 //create Synapse Message Context
                 org.apache.synapse.MessageContext synCtx =
                         createSynapseMessageContext(request, axis2MsgContext);
-
                 updateAxis2MessageContextForSynapse(synCtx);
 
                 setInboundProperties(synCtx);
-
                 String method = request.getRequest() != null ? request.getRequest().
                         getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axis2MsgContext, method);
