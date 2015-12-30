@@ -275,13 +275,13 @@ var kafkaSpecialParameters = null;
                             <script type="text/javascript">var kafkaSpecialParameters = new Array(<%=allSpecialParams.length + parentLevelParameters.length - 1%>);</script>
                             <%
                             int specialParameterCount = 0;
-                            for(int s = 0;s<parentLevelParameters.length;s++){
+                            for (int s = 0; s < parentLevelParameters.length; s++) {
                             %>
                                 <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=parentLevelParameters[s]%>';</script>
                             <%
                                 specialParameterCount++;
                             }
-                            for(int s = 1;s<allSpecialParams.length;s++){
+                            for (int s = 1; s < allSpecialParams.length; s++) {
                             %>
                                 <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=allSpecialParams[s]%>';</script>
                             <%

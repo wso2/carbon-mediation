@@ -151,23 +151,21 @@ public class KAFKAPollingConsumer {
         }
         //Inject the messages to the sequence
         try {
-            if(messageListener.hasMultipleTopicsToConsume()) {
+            if (messageListener.hasMultipleTopicsToConsume()) {
                 if (injectHandler != null) {
                     messageListener.consumeMultipleTopics(name);
-                }else {
+                } else {
                     return null;
                 }
-            }else{
+            } else {
                 if (injectHandler != null && messageListener.hasNext()) {
                     messageListener.injectMessageToESB(name);
                 } else {
                     return null;
                 }
             }
-
         } catch (Exception e) {
-            log.error("Error while receiving KAFKA message."
-                    + e.getMessage(), e);
+            log.error("Error while receiving KAFKA message." + e.getMessage(), e);
         }
         return null;
     }

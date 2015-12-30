@@ -106,13 +106,10 @@ public final class PersistingStatisticsObserver implements MediationStatisticsOb
     private void persistRecord(StatisticsRecord record) throws RegistryException {
         try {
             PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext privilegedCarbonContext =
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext();
-
+            PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
             privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
             privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
             String path = calculatePath(record);
-
             Resource recordResource = registry.newResource();
             recordResource.setProperty("totalCount", String.valueOf(record.getTotalCount()));
             recordResource.setProperty("faultCount", String.valueOf(record.getFaultCount()));
@@ -121,7 +118,7 @@ public final class PersistingStatisticsObserver implements MediationStatisticsOb
             recordResource.setProperty("avgTime", String.valueOf(record.getAvgTime()));
             registry.put(path, recordResource);
             recordResource.discard();
-        }finally {
+        } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
     }
