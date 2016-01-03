@@ -85,6 +85,12 @@ public class BamMediator extends AbstractMediator {
 
     public boolean mediate(MessageContext messageContext) {
 
+        if (messageContext.getEnvironment().isDebugEnabled()) {
+            if (super.divertMediationRoute(messageContext)) {
+                return true;
+            }
+        }
+
         SynapseLog synLog = getLog(messageContext);
 
         if (synLog.isTraceOrDebugEnabled()) {
