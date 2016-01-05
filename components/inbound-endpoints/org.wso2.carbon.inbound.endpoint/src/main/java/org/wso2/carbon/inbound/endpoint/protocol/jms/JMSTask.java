@@ -24,20 +24,21 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 
 /**
- * 
+ *
  * JMSTask class is used to schedule the inbound execution when the coordination
  * is required
- * 
+ *
  */
 public class JMSTask extends InboundTask {
     private static final Log logger = LogFactory.getLog(JMSTask.class.getName());
 
     private JMSPollingConsumer jmsPollingConsumer;
 
-    public JMSTask(JMSPollingConsumer jmsPollingConsumer, long interval) {
+    public JMSTask(JMSPollingConsumer jmsPollingConsumer, long interval, String cron) {
         logger.debug("Initializing JMS Task.");
         this.jmsPollingConsumer = jmsPollingConsumer;
         this.interval = interval;
+        this.cron = cron;
     }
 
     protected void taskExecute() {

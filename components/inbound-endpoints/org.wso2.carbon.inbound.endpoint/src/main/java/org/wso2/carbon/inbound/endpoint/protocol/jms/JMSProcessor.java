@@ -30,6 +30,8 @@ import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 
+import static org.wso2.carbon.inbound.endpoint.common.InboundTask.TASK_THRESHOLD_INTERVAL;
+
 public class JMSProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
 
     private static final Log log = LogFactory.getLog(JMSProcessor.class.getName());
@@ -47,12 +49,16 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
         this.jmsProperties = params.getProperties();
 
         String inboundEndpointInterval = jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL);
-        if (inboundEndpointInterval != null) {
+        if(inboundEndpointInterval!=null){
             try {
                 this.interval = Long.parseLong(inboundEndpointInterval);
             } catch (NumberFormatException nfe) {
                 throw new SynapseException("Invalid numeric value for interval.", nfe);
+            } catch (Exception e) {
+                throw new SynapseException("Invalid value for interval.", e);
             }
+        } else{
+            this.cron = jmsProperties.getProperty(PollingConstants.INBOUND_CRON);;
         }
         this.sequential = true;
         String inboundEndpointSequential = jmsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL);
@@ -74,7 +80,7 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
      * This will be called at the time of synapse artifact deployment.
      */
     public void init() {
-        log.info("Initializing inbound JMS listener for inbound endpoint " + name);        
+        log.info("Initializing inbound JMS listener for inbound endpoint " + name);
         pollingConsumer = new JMSPollingConsumer( jmsProperties, interval, name);
         pollingConsumer.registerHandler(new JMSInjectHandler(injectingSeq, onErrorSeq, sequential,
                 synapseEnvironment, jmsProperties));
@@ -92,7 +98,7 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
      * Register/start the schedule service
      * */
     public void start() {
-        InboundTask task = new JMSTask(pollingConsumer, interval);
+        InboundTask task = new JMSTask(pollingConsumer, interval, cron);
         start(task, ENDPOINT_POSTFIX);
     }
 

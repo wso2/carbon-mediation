@@ -28,6 +28,8 @@ import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
 import java.util.Properties;
 
+import static org.wso2.carbon.inbound.endpoint.common.InboundTask.TASK_THRESHOLD_INTERVAL;
+
 
 public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
     private static final Log log = LogFactory.getLog(KAFKAProcessor.class.getName());
@@ -44,15 +46,17 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
 
         this.name = params.getName();
         this.kafkaProperties = params.getProperties();
-
         String inboundEndpointInterval = kafkaProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL);
-        if (inboundEndpointInterval != null) {
+        if(inboundEndpointInterval!=null){
             try {
                 this.interval = Long.parseLong(inboundEndpointInterval);
             } catch (NumberFormatException nfe) {
-                log.error("Invalid numeric value for interval." + nfe.getMessage(), nfe);
                 throw new SynapseException("Invalid numeric value for interval.", nfe);
+            } catch (Exception e) {
+                throw new SynapseException("Invalid value for interval.", e);
             }
+        } else{
+            this.cron =  kafkaProperties.getProperty(PollingConstants.INBOUND_CRON);;
         }
         this.sequential = true;
         String inboundEndpointSequential = kafkaProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL);
@@ -104,7 +108,7 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
      * Register/start the schedule service
      */
     public void start() {
-        InboundTask task = new KAFKATask(pollingConsumer, interval);
+        InboundTask task = new KAFKATask(pollingConsumer, interval, cron);
         start(task, ENDPOINT_POSTFIX);
     }
 
@@ -124,7 +128,7 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
     public void destroy() {
         try {
             if (pollingConsumer != null && pollingConsumer.messageListener != null &&
-                pollingConsumer.messageListener.consumerConnector != null) {
+                    pollingConsumer.messageListener.consumerConnector != null) {
                 pollingConsumer.messageListener.consumerConnector.shutdown();
                 log.info("Shutdown the kafka consumer connector");
             }

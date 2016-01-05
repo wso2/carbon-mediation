@@ -47,6 +47,7 @@ var sequenceRequired=false;
 var onErrorRequired=false;
 var requiredParams = null;
 var kafkaSpecialParameters = null;
+var intervalRequired = false;
 </script>
     <carbon:jsi18n
         resourceBundle="org.wso2.carbon.inbound.ui.i18n.Resources"
@@ -59,7 +60,7 @@ var kafkaSpecialParameters = null;
     <% InboundManagementClient client;
         try {
             client = InboundManagementClient.getInstance(config, session);
-            List<String>defaultParams = client.getDefaultParameters(request.getParameter("inboundType"));            
+            List<String>defaultParams = client.getDefaultParameters(request.getParameter("inboundType"));
             List<String>advParams = client.getAdvParameters(request.getParameter("inboundType"));
             String specialParams = client.getKAFKASpecialParameters();
             String topicListParams = client.getKAFKATopicListParameters();
@@ -83,8 +84,8 @@ var kafkaSpecialParameters = null;
                     <tr>
                         <td style="width:150px"><fmt:message key="inbound.name"/></td>
                         <td align="left">
-                            <%=request.getParameter("inboundName")%>      
-                            <input name="inboundName" id="inboundName" type="hidden" value="<%=request.getParameter("inboundName")%>"/>                      
+                            <%=request.getParameter("inboundName")%>
+                            <input name="inboundName" id="inboundName" type="hidden" value="<%=request.getParameter("inboundName")%>"/>
                         </td>
                         <td></td>
                     </tr>
@@ -92,143 +93,252 @@ var kafkaSpecialParameters = null;
                         <td style="width:150px"><fmt:message key="inbound.type"/></td>
                         <td align="left">
                             <%=request.getParameter("inboundType")%>
-                            <input name="inboundType" id="inboundType" type="hidden" value="<%=request.getParameter("inboundType")%>"/>                      
+                            <input name="inboundType" id="inboundType" type="hidden" value="<%=request.getParameter("inboundType")%>"/>
                         </td>
                         <td></td>
                     </tr>
                     <%
                        if(!(InboundClientConstants.TYPE_HTTP.equals(request.getParameter("inboundType")) || InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType"))) ) { %>
-                    <script type="text/javascript">sequenceRequired = true;</script>
-                    <script type="text/javascript">onErrorRequired = true;</script>
-                    <tr>
-                        <td style="width:150px"><fmt:message key="inbound.sequence"/><span
-                                class="required">*</span></td>
-                        <td align="left">
-                            <input id="inboundSequence" name="inboundSequence" class="longInput" type="text"/>
-                        </td>
-                        <td align="left">
-	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
-	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
-                        </td>                        
-                    </tr>                    
-                    <tr>
-                        <td style="width:150px"><fmt:message key="inbound.error.sequence"/><span
-                                class="required">*</span></td>
-                        <td align="left">
-                            <input id="inboundErrorSequence" name="inboundErrorSequence" class="longInput" type="text"/>
-                        </td>
-                        <td align="left">
-	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
-	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
-                        </td>                        
-                    </tr>
-                    <tr>
-                        <td style="width:150px"><fmt:message key="inbound.error.suspend"/><span
-                                class="required">*</span></td>
-                        <td align="left">
-                            <select id="inboundSuspend" name="inboundSuspend" class="longInput">                                
-                                <option value="true">true</option>     
-                                <option value="false" selected>false</option>           
-                            </select>                            
-                        </td>
-                        <td></td>
-                    </tr>
-                     <% } else { %>
+                        <script type="text/javascript">sequenceRequired = true;</script>
+                        <script type="text/javascript">onErrorRequired = true;</script>
                         <tr>
-                                                <td style="width:150px"><fmt:message key="inbound.sequence"/></td>
-                                                <td align="left">
-                                                    <input id="inboundSequence" name="inboundSequence" class="longInput" type="text"/>
-                                                </td>
-                                                <td align="left">
-                        	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
-                        	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width:150px"><fmt:message key="inbound.error.sequence"/></td>
-                                                <td align="left">
-                                                    <input id="inboundErrorSequence" name="inboundErrorSequence" class="longInput" type="text"/>
-                                                </td>
-                                                <td align="left">
-                        	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
-                        	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
-                                                </td>
-                                            </tr>
-
-                               <% } %>
+                            <td style="width:150px"><fmt:message key="inbound.sequence"/><span
+                                    class="required">*</span></td>
+                            <td align="left">
+                                <input id="inboundSequence" name="inboundSequence" class="longInput" type="text"/>
+                            </td>
+                            <td align="left">
+                                <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
+                                <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:150px"><fmt:message key="inbound.error.sequence"/><span
+                                    class="required">*</span></td>
+                            <td align="left">
+                                <input id="inboundErrorSequence" name="inboundErrorSequence" class="longInput" type="text"/>
+                            </td>
+                            <td align="left">
+                                <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
+                                <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:150px"><fmt:message key="inbound.error.suspend"/><span
+                                    class="required">*</span></td>
+                            <td align="left">
+                                <select id="inboundSuspend" name="inboundSuspend" class="longInput">
+                                    <option value="true">true</option>
+                                    <option value="false" selected>false</option>
+                                </select>
+                            </td>
+                            <td></td>
+                        </tr>
+                    <% } else { %>
+                        <tr>
+                            <td style="width:150px"><fmt:message key="inbound.sequence"/></td>
+                            <td align="left">
+                                <input id="inboundSequence" name="inboundSequence" class="longInput" type="text"/>
+                            </td>
+                            <td align="left">
+                                <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
+                                <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:150px"><fmt:message key="inbound.error.sequence"/></td>
+                            <td align="left">
+                                <input id="inboundErrorSequence" name="inboundErrorSequence" class="longInput" type="text"/>
+                            </td>
+                            <td align="left">
+                                <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
+                                <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundErrorSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
+                            </td>
+                        </tr>
+                    <% } %>
                     <% if(InboundClientConstants.TYPE_CLASS.equals(request.getParameter("inboundType"))){ %>
-					<script type="text/javascript">classRequired = true;</script>                    
-                    <tr>
-                        <td style="width:150px"><fmt:message key="inbound.class"/><span class="required">*</span></td>
-                        <td align="left">                        
-                            <input name="inboundClass" id="inboundClass" class="longInput" type="text"/>                                         
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td style="width:150px"><fmt:message key="inbound.isListening"/></td>
-                        <td>
-                            <input type="radio" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')" checked><fmt:message key="inbound.polling"/>
-                            <input type="radio" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
-                            <input type="radio" name="inbound.behavior" value="eventBased" onclick="toggleInboundInterval('waiting')" ><fmt:message key="inbound.waiting"/>
-                        </td>
-                        <td></td>
-                    </tr>
+                        <script type="text/javascript">classRequired = true;</script>
+                        <tr>
+                            <td style="width:150px"><fmt:message key="inbound.class"/><span class="required">*</span></td>
+                            <td align="left">
+                                <input name="inboundClass" id="inboundClass" class="longInput" type="text"/>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td style="width:150px"><fmt:message key="inbound.isListening"/></td>
+                            <td>
+                                <input type="radio" name="inbound.behavior" value="polling" onclick="toggleInboundInterval('polling')" checked><fmt:message key="inbound.polling"/>
+                                <input type="radio" name="inbound.behavior" value="listening" onclick="toggleInboundInterval('listening')" ><fmt:message key="inbound.listening"/>
+                                <input type="radio" name="inbound.behavior" value="eventBased" onclick="toggleInboundInterval('waiting')" ><fmt:message key="inbound.waiting"/>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <script language="javascript">
 
-                    <tr id="inboundIntervalRow">
-                        <td style="width:150px"><fmt:message key="inbound.interval"/><span class="required">*</span></td>
-                        <td align="left">
-                            <input name="interval" id="interval" class="longInput" type="text"/>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr id="inboundSequentialRow">
-                        <td style="width:150px"><fmt:message key="inbound.sequential"/><span class="required">*</span></td>
-                        <td align="left">
-                            <select name="sequential" id="sequential">
-                            	<option value="true">true</option>
-                            	<option value="false">false</option>
-                            </select>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr id="inboundCoordinationRow">
-                        <td style="width:150px"><fmt:message key="inbound.coordination"/><span class="required">*</span></td>
-                        <td align="left">
-                            <select name="coordination" id="coordination">
-                            	<option value="true">true</option>
-                            	<option value="false">false</option>
-                            </select>                            
-                        </td>
-                        <td></td>
-                    </tr>                                        
-                    <script language="javascript">
-                        intervalRequired = true;
-                        function toggleInboundInterval(event){
-                            if (event == "listening"){
-                                document.getElementById("inboundIntervalRow").style.display="none";
-                                document.getElementById("inboundSequentialRow").style.display="none";
-                                document.getElementById("inboundCoordinationRow").style.display="none";
-                                intervalRequired = false;
-                            } else if (event == "waiting"){
-                                document.getElementById("inboundIntervalRow").style.display="none";
-                                document.getElementById("inboundSequentialRow").style.display="table-row";
-                                document.getElementById("inboundCoordinationRow").style.display="table-row";
-                                intervalRequired = false;
-                            } else {
-                                document.getElementById("inboundIntervalRow").style.display="table-row";
-                                document.getElementById("inboundSequentialRow").style.display="table-row";
-                                document.getElementById("inboundCoordinationRow").style.display="table-row"
-                                intervalRequired = true;
+                            function toggleInboundInterval(event){
+                                if (event == "listening"){
+                                    document.getElementById("inboundIntervalRow").style.display="none";
+                                    document.getElementById("intervalTR").style.display="none";
+                                    document.getElementById("cronTR").style.display="none";
+                                    document.getElementById("inboundSequentialRow").style.display="none";
+                                    document.getElementById("inboundCoordinationRow").style.display="none";
+                                    intervalRequired = false;
+                                } else if (event == "waiting"){
+                                    document.getElementById("inboundIntervalRow").style.display="none";
+                                    document.getElementById("intervalTR").style.display="none";
+                                    document.getElementById("cronTR").style.display="none";
+                                    document.getElementById("inboundSequentialRow").style.display="table-row";
+                                    document.getElementById("inboundCoordinationRow").style.display="table-row";
+                                    intervalRequired = false;
+                                } else {
+                                    document.getElementById("inboundIntervalRow").style.display="table-row";
+                                    document.getElementById("intervalTR").style.display="table-row";
+                                    document.getElementById("cronTR").style.display="none";
+                                    document.getElementById("inboundSequentialRow").style.display="table-row";
+                                    document.getElementById("inboundCoordinationRow").style.display="table-row"
+                                    intervalRequired = true;
+                                }
                             }
-                        }
-                    </script>
+                        </script>
+                        <tr id="inboundIntervalRow">
+                            <td><fmt:message key="inbound.interval.type"/></td>
+                            <td>
+                                <input type="radio" name="intervalType" id="intervalType" value="simple"
+                                       onclick="setInterval1('simple');"
+                                       checked="true"/>
+                                <fmt:message key="inbound.interval.simple"/>
 
-                    <% } %>             
-                    <%if(!defaultParams.isEmpty()){                     
+                                <input type="radio" name="intervalType" id="intervalType" value="cron"
+                                       onclick="setInterval1('cron');"/>
+                                <fmt:message key="inbound.interval.cron"/>
+                                <input type="hidden" name="intervalType_hidden" id="intervalType_hidden"
+                                       value="simple"/>
+                            </td>
+                        </tr>
+                        <tr id="intervalTR">
+                            <td><fmt:message key="interval"/><span
+                                    class="required">*</span></td>
+                            <td>
+                                <input id="interval" name="interval" class="longInput"
+                                       type="text"
+                                       value=""/>
+                            </td>
+                        </tr>
+                        <script type="text/javascript">isCron = true;</script>
+                        <tr id="cronTR" style="display:none;">
+                            <td><fmt:message key="cron"/><span
+                                    class="required">*</span></td>
+                            <td>
+                                <input id="cron" name="cron" type="text" class="longInput"
+                                       value=""/>
+                            </td>
+                        </tr>
+
+                        <tr id="inboundSequentialRow">
+                            <td style="width:150px"><fmt:message key="inbound.sequential"/><span class="required">*</span></td>
+                            <td align="left">
+                                <select name="sequential" id="sequential">
+                                    <option value="true">true</option>
+                                    <option value="false">false</option>
+                                </select>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr id="inboundCoordinationRow">
+                            <td style="width:150px"><fmt:message key="inbound.coordination"/><span class="required">*</span></td>
+                            <td align="left">
+                                <select name="coordination" id="coordination">
+                                    <option value="true">true</option>
+                                    <option value="false">false</option>
+                                </select>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <script language="javascript">
+                        function setInterval1(type) {
+                            isCron = true;
+                            var intervalTR = document.getElementById("intervalTR");
+                            var cronTR = document.getElementById("cronTR");
+                            var intervalType_hidden = document.getElementById("intervalType_hidden");
+                            intervalType_hidden.value = type;
+                            if ('cron' == type) {
+                                intervalTR.style.display = "none";
+                                cronTR.style.display = "";
+                            } else if ('simple' == type) {
+                                intervalTR.style.display = "";
+                                cronTR.style.display = "none";
+                            }
+                            return true;
+                        }
+                        </script>
+                    <% } %>
+
+
+
+
+
+                <% if(InboundClientConstants.TYPE_FILE.equals(request.getParameter("inboundType"))
+                        || InboundClientConstants.TYPE_KAFKA.equals(request.getParameter("inboundType"))
+                        || InboundClientConstants.TYPE_JMS.equals(request.getParameter("inboundType"))){ %>
+                     <script type="text/javascript">intervalRequired = true;</script>
+                     <tr id="inboundIntervalRow">
+                            <td><fmt:message key="inbound.interval.type"/></td>
+                            <td>
+                                <input type="radio" name="intervalType" id="intervalType" value="simple"
+                                       onclick="setInterval1('simple');"
+                                       checked="true"/>
+                                <fmt:message key="inbound.interval.simple"/>
+
+                                <input type="radio" name="intervalType" id="intervalType" value="cron"
+                                       onclick="setInterval1('cron');"/>
+                                <fmt:message key="inbound.interval.cron"/>
+                                <input type="hidden" name="intervalType_hidden" id="intervalType_hidden"
+                                       value="simple"/>
+                            </td>
+                        </tr>
+
+                        <tr id="intervalTR">
+                            <td><fmt:message key="interval"/><span
+                                    class="required">*</span></td>
+                            <td>
+                                <input id="interval" name="interval" class="longInput"
+                                       type="text"
+                                       value=""/>
+                            </td>
+                        </tr>
+
+                        <tr id="cronTR" style="display:none;">
+                            <td><fmt:message key="cron"/><span
+                                    class="required">*</span></td>
+                            <td>
+                                <input id="cron" name="cron" type="text" class="longInput"
+                                       value=""/>
+                            </td>
+                        </tr>
+
+                        <script language="javascript">
+                        function setInterval1(type) {
+                            var intervalTR = document.getElementById("intervalTR");
+                            var cronTR = document.getElementById("cronTR");
+                            var intervalType_hidden = document.getElementById("intervalType_hidden");
+                            intervalType_hidden.value = type;
+                            if ('cron' == type) {
+                                intervalTR.style.display = "none";
+                                cronTR.style.display = "";
+                            } else if ('simple' == type) {
+                                intervalTR.style.display = "";
+                                cronTR.style.display = "none";
+                            }
+                            return true;
+                        }
+                        </script>
+                   <% } %>
+
+                    <%if(!defaultParams.isEmpty()){
                     %>
                     <script type="text/javascript">var requiredParams = new Array(<%=defaultParams.size()%>);</script>
-                    <%} %>       
+                    <%} %>
 					<%  int ctr = -1;
 					    for(String defaultParamOri : defaultParams) {
 						String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
@@ -236,8 +346,8 @@ var kafkaSpecialParameters = null;
                         String defaultVal = "";
                         if (arrParamOri.length == 2) { defaultVal = arrParamOri[1].trim(); }
 						ctr++;
-					%> 	
-					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
+					%>
+					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>
 	                    <tr>
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
 	                        <td align="left">
@@ -251,7 +361,7 @@ var kafkaSpecialParameters = null;
                                 <%}%>
 	                            <%for(int i = 1;i<arrParamOri.length;i++){%>
 	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
-	                            <%}%>                                
+	                            <%}%>
                                 </select>
 							<%}else{ %>
 							        <%if(InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType")) && defaultParam.equals("keystore")){%>
@@ -261,10 +371,10 @@ var kafkaSpecialParameters = null;
 
                                     <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=defaultVal%>"/>
                               <%} %>
-                            <%} %>                       
+                            <%} %>
 	                        </td>
 	                        <td></td>
-	                    </tr>                        
+	                    </tr>
                      <% } %>
                     <% if(InboundClientConstants.TYPE_KAFKA.equals(request.getParameter("inboundType"))){ %>
                         <tr><td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">
@@ -275,13 +385,13 @@ var kafkaSpecialParameters = null;
                             <script type="text/javascript">var kafkaSpecialParameters = new Array(<%=allSpecialParams.length + parentLevelParameters.length - 1%>);</script>
                             <%
                             int specialParameterCount = 0;
-                            for (int s = 0; s < parentLevelParameters.length; s++) {
+                            for(int s = 0;s<parentLevelParameters.length;s++){
                             %>
                                 <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=parentLevelParameters[s]%>';</script>
                             <%
                                 specialParameterCount++;
                             }
-                            for (int s = 1; s < allSpecialParams.length; s++) {
+                            for(int s = 1;s<allSpecialParams.length;s++){
                             %>
                                 <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=allSpecialParams[s]%>';</script>
                             <%
@@ -320,15 +430,15 @@ var kafkaSpecialParameters = null;
                     <%}%>
                      <% if(InboundClientConstants.TYPE_CLASS.equals(request.getParameter("inboundType"))){ %>
                     <tr>
-                        <td class="buttonRow" colspan="3">       
+                        <td class="buttonRow" colspan="3">
 	                            <input class="button" type="button"
 	                                   value='<fmt:message key="inbound.add.param"/>'
-	                                   onclick="addRow('tblInput');"/>   
+	                                   onclick="addRow('tblInput');"/>
 	                            <input class="button" type="button"
 	                                   value='<fmt:message key="inbound.remove.param"/>'
-	                                   onclick="deleteRow('tblInput');"/>                                                                 
+	                                   onclick="deleteRow('tblInput');"/>
                         </td>
-                    </tr>                     
+                    </tr>
                      <%}else{
                      if(!advParams.isEmpty()){%>
 				    <tr>
@@ -338,7 +448,7 @@ var kafkaSpecialParameters = null;
 				                    key="show.advanced.options"/></a>
 				        </span>
 				        </td>
-				    </tr> 
+				    </tr>
 				    <%} }%>
 				    <tr>
 					    <td colspan="3">
@@ -349,7 +459,7 @@ var kafkaSpecialParameters = null;
 									String defaultParam = arrParamOri[0].trim();
                                     String defaultVal = "";
                                     if (arrParamOri.length == 2) { defaultVal = arrParamOri[1].trim(); }
-								%> 					                       
+								%>
 				                    <tr>
 				                        <td style="width:150px"><%=defaultParam %></td>
 				                        <td align="left">
@@ -357,7 +467,7 @@ var kafkaSpecialParameters = null;
 				                            <select id="<%=defaultParam%>" name="<%=defaultParam%>">
 				                            <%for(int i = 1;i<arrParamOri.length;i++){%>
 				                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
-				                            <%}%>                                
+				                            <%}%>
 			                                </select>
 										<%} else{%>
                                         <%if(InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType")) && (defaultParam.equals("truststore") || defaultParam.equals("CertificateRevocationVerifier"))){%>
@@ -367,20 +477,21 @@ var kafkaSpecialParameters = null;
 
 			                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=defaultVal%>"/>
 			                            <%} %>
-			                            <%} %>                       
+			                            <%} %>
 				                        </td>
 				                        <td></td>
-				                    </tr>                        
-			                     <% } %>						    
+				                    </tr>
+			                     <% } %>
 						    	</table>
-						    </div> 			
+						    </div>
 					    </td>
 				    </tr>
                     <tr>
                         <td class="buttonRow" colspan="3">
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.save.button.text"/>"
-                                   onclick="inboundsave2('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>',document.inboundcreationform); return false;"/>
+                                   onclick="inboundsave2('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>',
+                                   '<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.cron.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>',document.inboundcreationform); return false;"/>
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.cancel.button.text"/>"
                                    onclick="document.location.href='index.jsp?ordinal=0';"/>                                                                 

@@ -17,16 +17,17 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
+import org.apache.abdera.i18n.rfc4646.Lang;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 
 /**
- * 
+ *
  * FileTask class is use to schedue tasks for inbound file processor when
  * required (coordination==true)
- * 
+ *
  */
 public class FileTask extends InboundTask {
 
@@ -34,10 +35,11 @@ public class FileTask extends InboundTask {
 
     private FilePollingConsumer fileScanner;
 
-    public FileTask(FilePollingConsumer fileScanner, long interval) {
+    public FileTask(FilePollingConsumer fileScanner,long interval,String cron) {
         logger.debug("File Task initalize.");
-        this.interval = interval;
         this.fileScanner = fileScanner;
+        this.interval = interval;
+        this.cron = cron;
     }
 
     protected void taskExecute() {
