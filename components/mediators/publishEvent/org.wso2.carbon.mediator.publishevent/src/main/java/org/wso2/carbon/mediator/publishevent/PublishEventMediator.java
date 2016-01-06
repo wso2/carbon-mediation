@@ -72,6 +72,12 @@ public class PublishEventMediator extends AbstractMediator {
 	@Override
 	public boolean mediate(MessageContext messageContext) {
 
+		if (messageContext.getEnvironment().isDebugEnabled()) {
+			if (super.divertMediationRoute(messageContext)) {
+				return true;
+			}
+		}
+
 		// first "getEventSink() == null" check is done to avoid synchronized(this) block each time mediate()
 		// gets called (to improve performance).
 		// second "getEventSink() == null" check inside synchronized(this) block is used to ensure only one thread

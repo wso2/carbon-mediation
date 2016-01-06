@@ -77,6 +77,12 @@ public class OAuthMediator extends AbstractMediator {
 	@Override
 	public boolean mediate(MessageContext synCtx) {
 
+		if (synCtx.getEnvironment().isDebugEnabled()) {
+			if (super.divertMediationRoute(synCtx)) {
+				return true;
+			}
+		}
+
 		// checks if the message carries OAuth params
 		boolean isOauth2 = validateRequest(synCtx);
 

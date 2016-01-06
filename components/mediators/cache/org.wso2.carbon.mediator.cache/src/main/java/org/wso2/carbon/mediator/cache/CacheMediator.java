@@ -26,13 +26,16 @@ import org.apache.axis2.clustering.state.Replicator;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.synapse.ManagedLifecycle;
+import org.apache.synapse.Mediator;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.continuation.ContinuationStackManager;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2Sender;
+import org.apache.synapse.debug.constructs.EnclosedInlinedSequence;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.FixedByteArrayOutputStream;
@@ -69,7 +72,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @see org.apache.synapse.Mediator
  */
-public class CacheMediator extends AbstractMediator implements ManagedLifecycle {
+public class CacheMediator extends AbstractMediator implements ManagedLifecycle, EnclosedInlinedSequence {
 
 	/**
 	 * Cache configuration ID.
@@ -162,6 +165,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 
 	@Override
 	public boolean mediate(MessageContext synCtx) {
+
+		if (synCtx.getEnvironment().isDebugEnabled()) {
+			if (super.divertMediationRoute(synCtx)) {
+				return true;
+			}
+		}
+
 		SynapseLog synLog = getLog(synCtx);
 
 		if (synLog.isTraceOrDebugEnabled()) {
@@ -688,6 +698,18 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle 
 	 */
 	public void setMaxMessageSize(int maxMessageSize) {
 		this.maxMessageSize = maxMessageSize;
+	}
+
+	@Override
+	public Mediator getInlineSequence(SynapseConfiguration synCfg, int inlinedSeqIdentifier) {
+		if (inlinedSeqIdentifier == 0) {
+			if (onCacheHitSequence != null) {
+				return onCacheHitSequence;
+			} else if (onCacheHitRef != null) {
+				return synCfg.getSequence(onCacheHitRef);
+			}
+		}
+		return null;
 	}
 
 }

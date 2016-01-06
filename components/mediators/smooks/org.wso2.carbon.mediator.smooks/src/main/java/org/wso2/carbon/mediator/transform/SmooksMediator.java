@@ -78,6 +78,13 @@ public class SmooksMediator extends AbstractMediator {
 	public static String DISABLE_SMOOKS_RESULT_PAYLOAD = "DISABLE_SMOOKS_RESULT_PAYLOAD";
 	
 	public boolean mediate(MessageContext synCtx) {
+
+		if (synCtx.getEnvironment().isDebugEnabled()) {
+			if (super.divertMediationRoute(synCtx)) {
+				return true;
+			}
+		}
+
 		SynapseLog synLog = getLog(synCtx);
 		
 		String disableResultPayload = (String)synCtx.getProperty(SmooksMediator.DISABLE_SMOOKS_RESULT_PAYLOAD);

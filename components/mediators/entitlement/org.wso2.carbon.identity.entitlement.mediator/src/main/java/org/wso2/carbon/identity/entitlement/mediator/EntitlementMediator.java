@@ -37,10 +37,12 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
+import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.continuation.ContinuationStackManager;
 import org.apache.synapse.continuation.ReliantContinuationState;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.debug.constructs.EnclosedInlinedSequence;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.FlowContinuableMediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -64,7 +66,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class EntitlementMediator extends AbstractMediator implements ManagedLifecycle,
-                                                                     FlowContinuableMediator {
+        FlowContinuableMediator, EnclosedInlinedSequence {
 
     private static final Log log = LogFactory.getLog(EntitlementMediator.class);
 
@@ -105,6 +107,12 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
      * {@inheritDoc}
      */
     public boolean mediate(MessageContext synCtx) {
+
+        if (synCtx.getEnvironment().isDebugEnabled()) {
+            if (super.divertMediationRoute(synCtx)) {
+                return true;
+            }
+        }
 
         String decisionString;
         String userName;
@@ -798,5 +806,34 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
         this.adviceSeqKey = adviceSeqKey;
     }
 
+    @Override
+    public Mediator getInlineSequence(SynapseConfiguration synCfg, int inlinedSeqIdentifier) {
+        if (inlinedSeqIdentifier == 0) {
+            if (onRejectMediator != null) {
+                return onRejectMediator;
+            } else if (onRejectSeqKey != null) {
+                return synCfg.getSequence(onRejectSeqKey);
+            }
+        } else if (inlinedSeqIdentifier == 1) {
+            if (onAcceptMediator != null) {
+                return onAcceptMediator;
+            } else if (onAcceptSeqKey != null) {
+                return synCfg.getSequence(onAcceptSeqKey);
+            }
+        } else if (inlinedSeqIdentifier == 2) {
+            if (obligationsMediator != null) {
+                return obligationsMediator;
+            } else if (obligationsSeqKey != null) {
+                return synCfg.getSequence(obligationsSeqKey);
+            }
+        } else if (inlinedSeqIdentifier == 3) {
+            if (adviceMediator != null) {
+                return adviceMediator;
+            } else if (adviceSeqKey != null) {
+                return synCfg.getSequence(adviceSeqKey);
+            }
+        }
+        return null;
+    }
 
 }
