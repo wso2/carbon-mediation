@@ -22,31 +22,32 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
-
+import org.apache.synapse.task.Task;
 /**
- * 
+ *
  * This class provides Generic Task implementation for inbound polling
- * 
+ *
  */
-public abstract class InboundTask implements org.apache.synapse.task.Task, ManagedLifecycle{
+public abstract class InboundTask implements Task, ManagedLifecycle{
 
     private static final Log logger = LogFactory.getLog(InboundTask.class.getName());
-    
+
     protected long interval;
-    
+    protected String cron;
+
     public static final int TASK_THRESHOLD_INTERVAL = 1000;
-    
+
     public void execute() {
         logger.debug("Common Inbound Task executing.");
 
         //If the thresehold value is greater than i second just run the cycle
-        if(interval >= TASK_THRESHOLD_INTERVAL){
+        if(interval >= TASK_THRESHOLD_INTERVAL || cron != null){
             taskExecute();
         }else{
             long lStartTime = (new Date()).getTime();
             long lCurrentTime = lStartTime;
             //Run the cycles within one second (1000ms)
-            while((lCurrentTime - lStartTime) < TASK_THRESHOLD_INTERVAL){                
+            while((lCurrentTime - lStartTime) < TASK_THRESHOLD_INTERVAL){
                 taskExecute();
                 long lEndTime = (new Date()).getTime();
                 long lRequiredSleep = interval - (lEndTime - lCurrentTime);
@@ -56,12 +57,12 @@ public abstract class InboundTask implements org.apache.synapse.task.Task, Manag
                     } catch (InterruptedException e) {
                         logger.debug("Unable to sleep the inbound thread less than 1 second");
                     }
-                }                
+                }
                 lCurrentTime = (new Date()).getTime();
             }
         }
-         
+
     }
-    
+
     protected abstract void taskExecute();
 }

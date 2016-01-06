@@ -29,6 +29,7 @@ public class InboundDescription {
 	private String type;
 	private String classImpl;
 	private String interval;
+	private String cron;
 	private String sequential;
 	private String coordination;
 	private boolean suspend;
@@ -38,12 +39,15 @@ public class InboundDescription {
 	private String fileName;
 	public static final String REGISTRY_KEY_PREFIX = "$registry:";
 	private static final String INTERVAL_PARAM = "interval";
+	private static final String CRON_PARAM = "cron";
 	private static final String SEQUENTIAL_PARAM = "sequential";
 	private static final String COORDINATION_PARAM = "coordination";
 	private static final String CLASS_TYPE = "class";
+	private static final String TYPE_KAFKA= "kafka";
+	private static final String TYPE_JMS= "jms";
+	private static final String TYPE_FILE= "file";
 	private String artifactContainerName;
 	private boolean isEdited;
-	private boolean isStatisticsEnable;
 
 	public InboundDescription(InboundEndpointDTO inboundEndpoint){
 		this.name = inboundEndpoint.getName();
@@ -53,7 +57,7 @@ public class InboundDescription {
 			this.classImpl = null;
 		}else{
 			this.type = InboundClientConstants.TYPE_CLASS;
-			this.classImpl = inboundEndpoint.getClassImpl();	
+			this.classImpl = inboundEndpoint.getClassImpl();
 		}
 		this.suspend = inboundEndpoint.getSuspend();
 		this.injectingSeq = inboundEndpoint.getInjectingSeq();
@@ -63,6 +67,7 @@ public class InboundDescription {
 		this.artifactContainerName = inboundEndpoint.getArtifactContainerName();
 		this.isEdited = inboundEndpoint.getIsEdited();
 		this.interval = "";
+		this.cron = "";
 		if (inboundEndpoint.getParameters() != null) {
 			for (ParameterDTO parameterDTO : inboundEndpoint.getParameters()) {
 				if (parameterDTO.getKey() != null) {
@@ -82,6 +87,14 @@ public class InboundDescription {
 								setCoordination(("null".equals(parameterDTO.getValue())) ? "" : parameterDTO.getValue());
 								continue;
 							}
+						}if(getType().equals(TYPE_FILE) || getType().equals(TYPE_KAFKA) || getType().equals(TYPE_JMS)) {
+							if (INTERVAL_PARAM.equals(parameterDTO.getName())) {
+								setInterval(("null".equals(parameterDTO.getValue())) ? "" : parameterDTO.getValue());
+								continue;
+							} else if (CRON_PARAM.equals(parameterDTO.getName())) {
+								setCron(("null".equals(parameterDTO.getValue())) ? "" : parameterDTO.getValue());
+								continue;
+							}
 						}
 						this.parameters.put(parameterDTO.getName(), parameterDTO.getValue());
 					}
@@ -93,17 +106,9 @@ public class InboundDescription {
 	public InboundDescription(String name){
 		this.name = name;
 	}
-	
+
 	public String getName() {
 		return name;
-	}
-
-	public boolean getStatisticsEnable() {
-		return isStatisticsEnable;
-	}
-
-	public void setStatisticsEnable(boolean isStatisticsEnable) {
-		this.isStatisticsEnable = isStatisticsEnable;
 	}
 
 	public void setName(String name) {
@@ -132,25 +137,33 @@ public class InboundDescription {
 
 	public void setInterval(String interval) {
 		this.interval = interval;
-	}	
-	
+	}
+
+	public String getCron() {
+		return cron;
+	}
+
+	public void setCron(String cron) {
+		this.cron = cron;
+	}
+
 	public String getSequential() {
-        return sequential;
-    }
+		return sequential;
+	}
 
-    public void setSequential(String sequential) {
-        this.sequential = sequential;
-    }
+	public void setSequential(String sequential) {
+		this.sequential = sequential;
+	}
 
-    public String getCoordination() {
-        return coordination;
-    }
+	public String getCoordination() {
+		return coordination;
+	}
 
-    public void setCoordination(String coordination) {
-        this.coordination = coordination;
-    }
+	public void setCoordination(String coordination) {
+		this.coordination = coordination;
+	}
 
-    public boolean isSuspend() {
+	public boolean isSuspend() {
 		return suspend;
 	}
 

@@ -1,7 +1,4 @@
 var intervalRequired = false;
-var ENABLE = "enable";
-var DISABLE = "disable";
-
 function isNameValid(namestring) {
     if (namestring != null && namestring != "") {
         for (var j = 0; j < namestring.length; j++)
@@ -9,7 +6,7 @@ function isNameValid(namestring) {
             var ch = namestring.charAt(j);
             var code = ch.charCodeAt(0);
             if ((code > 47 && code < 59) // number
-                    || (code > 64 && code < 91)// capital 
+                    || (code > 64 && code < 91)// capital
                     || (code > 96 && code < 123)// simple
                     || (code == 46) //dot
                     || (code == 95) // underscore
@@ -27,6 +24,7 @@ function isNameValid(namestring) {
         return false;
     }
 }
+
 
 function isNumber(numberstring) {
     if (numberstring != null && numberstring != "") {
@@ -52,7 +50,7 @@ function forward(destinationJSP) {
 function addParam(form){
 	form.action='newInbound1.jsp?action=addParam';
     form.submit();
-    return false;	
+    return false;
 }
 
 function inboundsave1(namemsg, typemsg, form , existingList){
@@ -75,29 +73,44 @@ function inboundsave1(namemsg, typemsg, form , existingList){
         return false;
     }
     form.submit();
-    return false;	
+    return false;
 }
 
-function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
+function inboundsave2(msg1,msg2,msg3I,msg3C,msg4,msg5,form){
     if (sequenceRequired && document.getElementById('inboundSequence').value == '') {
         CARBON.showWarningDialog(msg1);
         return false;
-    }	
+    }
     if (onErrorRequired && document.getElementById('inboundErrorSequence').value == '') {
         CARBON.showWarningDialog(msg2);
         return false;
-    }        
+    }
     if (classRequired && document.getElementById('inboundClass').value == '') {
         CARBON.showWarningDialog(msg4);
         return false;
     }
-    if (intervalRequired == true && document.getElementById('interval').value == "") {
-        CARBON.showWarningDialog(msg3);
-        return false;
-    }    
-    if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
-        CARBON.showWarningDialog(msg3);
-        return false;
+    if(intervalRequired){
+        var intervalType = document.getElementById("intervalType");
+        var interval = document.getElementById("interval");
+        var cron = document.getElementById("cron");
+        var type = getCheckedValue(intervalType);
+        if (type == 'simple') {
+            cron.value = "";
+            if (interval != undefined && interval != null) {
+                if (!isNumber(interval.value)) {
+                    CARBON.showWarningDialog(msg3I);
+                    return false;
+                }
+            }
+        } else {
+            interval.value = "";
+            if (cron != undefined && cron != null) {
+                if (cron.value == '') {
+                    CARBON.showWarningDialog(msg3C);
+                    return false;
+                }
+            }
+        }
     }
 
     if(requiredParams != null){
@@ -105,13 +118,13 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     	    if (document.getElementById(requiredParams[i]).value.trim() == '') {
     	        CARBON.showWarningDialog(msg5);
     	        return false;
-    	    }    		
+    	    }
     	}
     }
 
-    if (kafkaSpecialParameters != null) {
-        for (var i = 0; i < kafkaSpecialParameters.length; i++) {
-            if (document.getElementById(kafkaSpecialParameters[i]) != null) {
+    if(kafkaSpecialParameters != null){
+        for(var i = 0;i<kafkaSpecialParameters.length;i++){
+            if(document.getElementById(kafkaSpecialParameters[i]) != null) {
                 if (document.getElementById(kafkaSpecialParameters[i]).value.trim() == '') {
                     CARBON.showWarningDialog(msg5);
                     return false;
@@ -119,45 +132,83 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
             }
         }
     }
-    
+
     form.submit();
-    return false;	
+    return false;
 }
 
-function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
+
+function getCheckedValue(radioObj) {
+    if (!radioObj) {
+        return "";
+    }
+    var radioLength = radioObj.length;
+    if (radioLength == undefined) {
+        if (radioObj.checked) {
+            return radioObj.value;
+        } else {
+            return "";
+        }
+    }
+    for (var i = 0; i < radioLength; i++) {
+        if (radioObj[i].checked) {
+            return radioObj[i].value;
+        }
+    }
+    return "";
+}
+
+function inboundUpdate(msg1,msg2,msg3I,msg3C,msg4,msg5,form){
     if (sequenceRequired && document.getElementById('inboundSequence').value == '') {
         CARBON.showWarningDialog(msg1);
         return false;
-    }	
+    }
     if (onErrorRequired && document.getElementById('inboundErrorSequence').value == '') {
         CARBON.showWarningDialog(msg2);
         return false;
-    }         
+    }
     if (classRequired && document.getElementById('inboundClass').value == '') {
         CARBON.showWarningDialog(msg4);
         return false;
     }
-    if (intervalRequired == true && document.getElementById('interval').value == "") {
-	    CARBON.showWarningDialog(msg3);
-	    return false;
-	}
-    if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
-	    CARBON.showWarningDialog(msg3);
-	    return false;
-	}
-    
+
+    if(intervalRequired){
+        var intervalType = document.getElementById("intervalType");
+        var interval = document.getElementById("interval");
+        var cron = document.getElementById("cron");
+            var type = getCheckedValue(intervalType);
+            if (type == 'simple') {
+                cron.value = "";
+                if (interval != undefined && interval != null) {
+                    if (!isNumber(interval.value)) {
+                        CARBON.showWarningDialog(msg3I);
+                        return false;
+                    }
+                }
+            } else {
+                interval.value = "";
+                if (cron != undefined && cron != null) {
+                    if (cron.value == '') {
+                        CARBON.showWarningDialog(msg3C);
+                        return false;
+                    }
+                }
+            }
+    }
+
+
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
     	    if (document.getElementById(requiredParams[i]).value.trim() == '') {
     	        CARBON.showWarningDialog(msg5);
     	        return false;
-    	    }    		
+    	    }
     	}
     }
 
-    if (kafkaSpecialParameters != null) {
-        for (var i = 0; i < kafkaSpecialParameters.length; i++) {
-            if (document.getElementById(kafkaSpecialParameters[i]) != null) {
+    if(kafkaSpecialParameters != null){
+        for(var i = 0;i<kafkaSpecialParameters.length;i++){
+            if(document.getElementById(kafkaSpecialParameters[i]) != null) {
                 if (document.getElementById(kafkaSpecialParameters[i]).value.trim() == '') {
                     CARBON.showWarningDialog(msg5);
                     return false;
@@ -166,7 +217,7 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
         }
     }
     form.submit();
-    return false;	
+    return false;
 }
 
 function isContainRaw(tbody) {
@@ -260,17 +311,18 @@ function goBackTwoPages() {
 
 function autoredioselect() {
     settrigger(document.getElementById("taskTrigger_hidden").value);
+    setInterval1(document.getElementById("intervalType_hidden").value);
 }
 
 function addRow(tableID) {
-	 
+
     var table = document.getElementById(tableID);
 
     var rowCount = table.rows.length;
     var row = table.insertRow((rowCount-1));
 
     iParamCount++;
-    
+
     var cell1 = row.insertCell(0);
     var element1 = document.createElement("input");
     element1.type = "text";
@@ -294,7 +346,7 @@ function deleteRow(tableID) {
 		    		var table = document.getElementById(tableID);
 		    		var rowCount = table.rows.length;
 		    		table.deleteRow((rowCount-2));
-		    		iParamCount--;	    	    	
+		    		iParamCount--;
 	    	    }
 	        }catch(e) {
 	            //alert(e);
@@ -411,49 +463,5 @@ function showTopicsOrTopicFilterFields(inboundDescriptionOfParams, topicListPara
     tFieldsArea = tFieldsArea + '<tr><td style="width:157px">'+tField.trim()+' name<span class="required">*</span></td><td align="left"><input id="'+tField.trim()+'" name="'+tField.trim()+'" class="longInput" type="text" value="'+val+'"/></td><td></td></tr>';
     tFieldsArea = tFieldsArea + '</table>';
     document.getElementById('tDiv').innerHTML = tFieldsArea;
-}
-
-function disableStat(inboundEndpointName) {
-    $.ajax({
-        type: 'POST',
-        url: 'stat-ajaxprocessor.jsp',
-        data: 'inboundEndpointName=' + inboundEndpointName + '&action=disableStat',
-        success: function (msg) {
-            handleCallback(inboundEndpointName, DISABLE);
-        },
-        error: function (msg) {
-            CARBON.showErrorDialog('Error occurred when disabling statistics for the inbound Endpoint :' + inboundEndpointName);
-        }
-    });
-}
-
-function enableStat(inboundEndpointName) {
-    $.ajax({
-        type: 'POST',
-        url: 'stat-ajaxprocessor.jsp',
-        data: 'inboundEndpointName=' + inboundEndpointName + '&action=enableStat',
-        success: function (msg) {
-            handleCallback(inboundEndpointName, ENABLE);
-        },
-        error: function (msg) {
-            CARBON.showErrorDialog('Error occurred when enabling statistics for the inbound Endpoint :' + inboundEndpointName);
-        }
-    });
-}
-
-function handleCallback(apiName, action) {
-    var element;
-    if (action == "enable") {
-        element = document.getElementById("disableStat" + apiName);
-        element.style.display = "";
-        element = document.getElementById("enableStat" + apiName);
-        element.style.display = "none";
-
-    } else {
-        element = document.getElementById("disableStat" + apiName);
-        element.style.display = "none";
-        element = document.getElementById("enableStat" + apiName);
-        element.style.display = "";
-    }
 }
 

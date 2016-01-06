@@ -53,6 +53,7 @@ var sequenceRequired=false;
 var onErrorRequired=false;
 var requiredParams = null;
 var kafkaSpecialParameters = null;
+var intervalRequired = false;
 </script>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
     <carbon:breadcrumb label="inbound.header.update"
@@ -63,14 +64,14 @@ var kafkaSpecialParameters = null;
         try {
             client = InboundManagementClient.getInstance(config, session);
             InboundDescription inboundDescription = client.getInboundDescription(request.getParameter("name"));
-            List<String>defaultParams = client.getDefaultParameters(inboundDescription.getType());            
-            List<String>advParams = client.getAdvParameters(inboundDescription.getType()); 
+            List<String>defaultParams = client.getDefaultParameters(inboundDescription.getType());
+            List<String>advParams = client.getAdvParameters(inboundDescription.getType());
             Set<String>defaultParamNames = new HashSet<String>();
             String specialParams = client.getKAFKASpecialParameters();
             String topicListParams = client.getKAFKATopicListParameters();
             String firstSpecialParam = "";
-    %>       
-    
+    %>
+
     <form method="post" name="inboundupdateform" id="inboundupdateform"
           action="updateInbound.jsp">
 
@@ -89,8 +90,8 @@ var kafkaSpecialParameters = null;
                     <tr>
                         <td style="width:150px"><fmt:message key="inbound.name"/></td>
                         <td align="left">
-                            <%=inboundDescription.getName()%>      
-                            <input name="inboundName" id="inboundName" type="hidden" value="<%=inboundDescription.getName()%>"/>                      
+                            <%=inboundDescription.getName()%>
+                            <input name="inboundName" id="inboundName" type="hidden" value="<%=inboundDescription.getName()%>"/>
                         </td>
                         <td></td>
                     </tr>
@@ -98,8 +99,8 @@ var kafkaSpecialParameters = null;
                         <td style="width:150px"><fmt:message key="inbound.type"/></td>
                         <td align="left">
                             <%=inboundDescription.getType()%>
-                            <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundDescription.getType()%>"/> 
-                            <input name="inboundMode" id="inboundMode" type="hidden" value="edit"/>                                                  
+                            <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundDescription.getType()%>"/>
+                            <input name="inboundMode" id="inboundMode" type="hidden" value="edit"/>
                         </td>
                         <td></td>
                     </tr>
@@ -118,7 +119,7 @@ var kafkaSpecialParameters = null;
 	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/config')"><fmt:message key="inbound.sequence.registry.con"/></a>
 	                        <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('inboundSequence','/_system/governance')"><fmt:message key="inbound.sequence.registry.gov"/></a>
                         </td>
-                    </tr>                    
+                    </tr>
                     <tr>
                         <td style="width:150px"><fmt:message key="inbound.error.sequence"/><span
                                 class="required">*</span></td>
@@ -135,15 +136,15 @@ var kafkaSpecialParameters = null;
                                 class="required">*</span></td>
                         <td align="left">
                             <select id="inboundSuspend" name="inboundSuspend" class="longInput">
-                               <%if(inboundDescription.isSuspend()){%>                                
-                                <option value="true" selected>true</option>  
+                               <%if(inboundDescription.isSuspend()){%>
+                                <option value="true" selected>true</option>
                                 <option value="false">false</option>
                                 <%} else {%>
-                                <option value="true">true</option>  
-                                <option value="false" selected>false</option>                                
-                                <%}%>              
-                            </select>                            
-                        </td>                      
+                                <option value="true">true</option>
+                                <option value="false" selected>false</option>
+                                <%}%>
+                            </select>
+                        </td>
                     </tr>
                      <% } else { %>
                    <tr>
@@ -168,11 +169,11 @@ var kafkaSpecialParameters = null;
                    </tr>
                    <% } %>
                     <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
-                    <script type="text/javascript">classRequired = true;</script>       
+                    <script type="text/javascript">classRequired = true;</script>
                     <tr>
                         <td style="width:150px"><fmt:message key="inbound.class"/><span class="required">*</span></td>
-                        <td align="left">                        
-                            <input name="inboundClass" id="inboundClass" class="longInput" type="text" value="<%=inboundDescription.getClassImpl()%>"/>                                         
+                        <td align="left">
+                            <input name="inboundClass" id="inboundClass" class="longInput" type="text" value="<%=inboundDescription.getClassImpl()%>"/>
                         </td>
                         <td></td>
                     </tr>
@@ -186,13 +187,127 @@ var kafkaSpecialParameters = null;
                         <td></td>
                     </tr>
 
-                    <tr id="inboundIntervalRow">
-                        <td style="width:150px"><fmt:message key="inbound.interval"/><span class="required">*</span></td>
-                        <td align="left">
-                            <input name="interval" id="interval" class="longInput" type="text" value="<%=inboundDescription.getInterval()%>"/>
-                        </td>
-                        <td></td>
-                    </tr>
+                        <script language="javascript">
+                        function toggleInboundInterval(event){
+                          if (event == "listening"){
+                              document.getElementById("inboundIntervalRow").style.display="none";
+                              document.getElementById("intervalTR").style.display="none";
+                              document.getElementById("cronTR").style.display="none";
+                              document.getElementById("inboundSequentialRow").style.display="none";
+                              document.getElementById("inboundCoordinationRow").style.display="none";
+                              intervalRequired = false;
+                          } else if (event == "waiting"){
+                              document.getElementById("inboundIntervalRow").style.display="none";
+                              document.getElementById("intervalTR").style.display="none";
+                              document.getElementById("cronTR").style.display="none";
+                              document.getElementById("inboundSequentialRow").style.display="table-row";
+                              document.getElementById("inboundCoordinationRow").style.display="table-row";
+                              intervalRequired = false;
+                          } else {
+                              document.getElementById("inboundIntervalRow").style.display="table-row";
+                              document.getElementById("intervalTR").style.display="table-row";
+                              document.getElementById("cronTR").style.display="none";
+                              document.getElementById("inboundSequentialRow").style.display="table-row";
+                              document.getElementById("inboundCoordinationRow").style.display="table-row"
+                              intervalRequired = true;
+                          }
+                        }
+                        </script>
+
+                   <%
+                        String cronVal = inboundDescription.getCron();
+                        String intervalVal = inboundDescription.getInterval();
+                        boolean simpleInterval = cronVal == null || "".equals(cronVal);
+                   %>
+                   <tr id="inboundIntervalRow">
+                       <td><fmt:message key="inbound.interval.type"/></td>
+
+                       <% if(simpleInterval) {%>
+                       <td>
+                           <input type="radio" name="intervalType" id="intervalType" value="simple"
+                                  onclick="setInterval1('simple');"
+                                  checked="true"/>
+                           <fmt:message key="inbound.interval.simple"/>
+
+                           <input type="radio" name="intervalType" id="intervalType" value="cron"
+                                  onclick="setInterval1('cron');"/>
+                           <fmt:message key="inbound.interval.cron"/>
+                           <input type="hidden" name="intervalType_hidden" id="intervalType_hidden"
+                                  value="simple"/>
+                       </td>
+                       <% } else {%>
+                       <td>
+                           <input type="radio" name="intervalType" id="intervalType" value="simple"
+                                  onclick="setInterval1('simple');"
+                                  checked="true"/>
+                           <fmt:message key="inbound.interval.simple"/>
+
+                           <input type="radio" name="intervalType" id="intervalType" value="cron"
+                                  onclick="setInterval1('cron');" checked="true"/>
+                           <fmt:message key="inbound.interval.cron"/>
+                           <input type="hidden" name="intervalType_hidden" id="intervalType_hidden"
+                                  value="simple"/>
+                       </td>
+                       <%} %>
+                   </tr>
+
+                   <% if (simpleInterval) {%>
+                   <tr id="intervalTR">
+                       <td><fmt:message key="interval"/><span
+                               class="required">*</span></td>
+                       <td>
+                           <input id="interval" name="interval" class="longInput"
+                                  type="text"
+                                  value="<%=inboundDescription.getInterval()%>"/>
+                       </td>
+                   </tr>
+                   <tr id="cronTR" style="display:none;">
+                       <td><fmt:message key="cron"/><span
+                               class="required">*</span></td>
+                       <td>
+                           <input id="cron" name="cron" type="text" class="longInput"
+                                  value=""/>
+                       </td>
+                   </tr>
+                   <% } else {%>
+                   <tr id="intervalTR" style="display:none;">
+                       <td><fmt:message key="interval"/><span
+                               class="required">*</span></td>
+                       <td>
+                           <input id="interval" name="interval" class="longInput"
+                                  type="text"
+                                  value=""/>
+                       </td>
+                   </tr>
+                   <tr id="cronTR">
+                       <td><fmt:message key="cron"/><span
+                               class="required">*</span></td>
+                       <td>
+                           <input id="cron" name="cron" type="text" class="longInput"
+                                  value="<%=inboundDescription.getCron()%>"/>
+                       </td>
+                   </tr>
+
+                   <%} %>
+                   <script language="javascript">
+                   function setInterval1(type) {
+                       var intervalTR = document.getElementById("intervalTR");
+                       var cronTR = document.getElementById("cronTR");
+                       var intervalType_hidden = document.getElementById("intervalType_hidden");
+
+                       intervalType_hidden.value = type;
+                       if ('cron' == type) {
+                           intervalTR.style.display = "none";
+                           cronTR.style.display = "";
+                       } else if ('simple' == type) {
+                           intervalTR.style.display = "";
+                           cronTR.style.display = "none";
+
+                       }
+                       return true;
+                   }
+                   </script>
+
                     <tr id="inboundSequentialRow">
                         <td style="width:150px"><fmt:message key="inbound.sequential"/><span class="required">*</span></td>
                         <td align="left">
@@ -202,7 +317,7 @@ var kafkaSpecialParameters = null;
 	                            	<option value="false">false</option>
 	                            <% } else {%>
 	                            	<option value="true">true</option>
-	                            	<option value="false" selected>false</option>	                            
+	                            	<option value="false" selected>false</option>
 	                            <% } %>
                             </select>
                         </td>
@@ -217,46 +332,127 @@ var kafkaSpecialParameters = null;
 	                            	<option value="false">false</option>
 	                            <% } else {%>
 	                            	<option value="true">true</option>
-	                            	<option value="false" selected>false</option>	                            
+	                            	<option value="false" selected>false</option>
 	                            <% } %>
-                            </select>                            
+                            </select>
                         </td>
                         <td></td>
-                    </tr>                        
-                    <script language="javascript">
-                        function toggleInboundInterval(event){
-                            if (event == "listening"){
-                                document.getElementById("inboundIntervalRow").style.display="none";
-                                document.getElementById("inboundSequentialRow").style.display="none";
-                                document.getElementById("inboundCoordinationRow").style.display="none";
-                                intervalRequired = false;
-                            }else if (event == "waiting"){
-                                document.getElementById("inboundIntervalRow").style.display="none";
-                                document.getElementById("inboundSequentialRow").style.display="table-row";
-                                document.getElementById("inboundCoordinationRow").style.display="table-row";
-                                intervalRequired = false;
-                            } else {
-                                document.getElementById("inboundIntervalRow").style.display="table-row";
-                                document.getElementById("inboundSequentialRow").style.display="table-row";
-                                document.getElementById("inboundCoordinationRow").style.display="table-row";
-                                intervalRequired = true;
-                            }
-                        }
-                    </script>
+                    </tr>
+                    <%} %>
 
-                    <% } %>
-                    <%if(!defaultParams.isEmpty()){                     
+                    <% if(InboundClientConstants.TYPE_FILE.equals(inboundDescription.getType())
+                        || InboundClientConstants.TYPE_KAFKA.equals(inboundDescription.getType())
+                        || InboundClientConstants.TYPE_JMS.equals(inboundDescription.getType())){ %>
+
+                        <script type="text/javascript">intervalRequired = true;</script>
+                    <%
+                         String cronVal = inboundDescription.getCron();
+                         String intervalVal = inboundDescription.getInterval();
+                         boolean simpleInterval = cronVal == null || "".equals(cronVal);
+                    %>
+                    <tr id="inboundIntervalRow">
+                        <td><fmt:message key="inbound.interval.type"/></td>
+
+                        <% if(simpleInterval) {%>
+                        <td>
+                            <input type="radio" name="intervalType" id="intervalType" value="simple"
+                                   onclick="setInterval1('simple');"
+                                   checked="true"/>
+                            <fmt:message key="inbound.interval.simple"/>
+
+                            <input type="radio" name="intervalType" id="intervalType" value="cron"
+                                   onclick="setInterval1('cron');"/>
+                            <fmt:message key="inbound.interval.cron"/>
+                            <input type="hidden" name="intervalType_hidden" id="intervalType_hidden"
+                                   value="simple"/>
+                        </td>
+                        <% } else {%>
+                        <td>
+                            <input type="radio" name="intervalType" id="intervalType" value="simple"
+                                   onclick="setInterval1('simple');"
+                                   checked="true"/>
+                            <fmt:message key="inbound.interval.simple"/>
+
+                            <input type="radio" name="intervalType" id="intervalType" value="cron"
+                                   onclick="setInterval1('cron');" checked="true"/>
+                            <fmt:message key="inbound.interval.cron"/>
+                            <input type="hidden" name="intervalType_hidden" id="intervalType_hidden"
+                                   value="simple"/>
+                        </td>
+                        <%} %>
+                    </tr>
+
+                    <% if (simpleInterval) {%>
+                    <tr id="intervalTR">
+                        <td><fmt:message key="interval"/><span
+                                class="required">*</span></td>
+                        <td>
+                            <input id="interval" name="interval" class="longInput"
+                                   type="text"
+                                   value="<%=inboundDescription.getInterval()%>"/>
+                        </td>
+                    </tr>
+                    <tr id="cronTR" style="display:none;">
+                        <td><fmt:message key="cron"/><span
+                                class="required">*</span></td>
+                        <td>
+                            <input id="cron" name="cron" type="text" class="longInput"
+                                   value=""/>
+                        </td>
+                    </tr>
+                    <% } else {%>
+                    <tr id="intervalTR" style="display:none;">
+                        <td><fmt:message key="interval"/><span
+                                class="required">*</span></td>
+                        <td>
+                            <input id="interval" name="interval" class="longInput"
+                                   type="text"
+                                   value=""/>
+                        </td>
+                    </tr>
+                    <tr id="cronTR">
+                        <td><fmt:message key="cron"/><span
+                                class="required">*</span></td>
+                        <td>
+                            <input id="cron" name="cron" type="text" class="longInput"
+                                   value="<%=inboundDescription.getCron()%>"/>
+                        </td>
+                    </tr>
+
+                    <%} %>
+                    <script language="javascript">
+                    function setInterval1(type) {
+                        var intervalTR = document.getElementById("intervalTR");
+                        var cronTR = document.getElementById("cronTR");
+                        var intervalType_hidden = document.getElementById("intervalType_hidden");
+
+                        intervalType_hidden.value = type;
+                        if ('cron' == type) {
+                            intervalTR.style.display = "none";
+                            cronTR.style.display = "";
+                        } else if ('simple' == type) {
+                            intervalTR.style.display = "";
+                            cronTR.style.display = "none";
+
+                        }
+                        return true;
+                    }
+                    </script>
+                    <%} %>
+
+
+                    <%if(!defaultParams.isEmpty()){
                     %>
                     <script type="text/javascript">var requiredParams = new Array(<%=defaultParams.size()%>);</script>
-                    <%} %>       
+                    <%} %>
 					<%  int ctr = -1;
 					    for(String defaultParamOri : defaultParams) {
 						String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
 						String defaultParam = arrParamOri[0].trim();
 						defaultParamNames.add(defaultParam);
 						ctr++;
-					%> 	
-					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>				                     
+					%>
+					<script type="text/javascript">requiredParams[<%=ctr%>] = '<%=defaultParam%>';</script>
 	                    <tr>
 	                        <td style="width:150px"><%=defaultParam %><span class="required">*</span></td>
 	                        <td align="left">
@@ -276,8 +472,8 @@ var kafkaSpecialParameters = null;
 	                            %>
 	                                <option value="<%=eleValue%>" selected><%=eleValue%></option>
 	                            <%}else{%>
-	                                <option value="<%=eleValue%>"><%=eleValue%></option>	                                                
-	                            <%}%>  	  
+	                                <option value="<%=eleValue%>"><%=eleValue%></option>
+	                            <%}%>
 	                            <%}%>
                                 </select>
 							<%} else{ %>
@@ -288,10 +484,10 @@ var kafkaSpecialParameters = null;
                              <%}else{ %>
                                 <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
                              <%} %>
-                            <%} %>                       
+                            <%} %>
 	                        </td>
 	                        <td></td>
-	                    </tr>                        
+	                    </tr>
                      <% } %>
                     <% if(InboundClientConstants.TYPE_KAFKA.equals(inboundDescription.getType())){%>
                         <tr><td colspan="3"><div id="specialFieldsForm"><table id="tblSpeInput" name="tblSpeInput" cellspacing="0" cellpadding="0" border="0">
@@ -302,13 +498,13 @@ var kafkaSpecialParameters = null;
                             <script type="text/javascript">var kafkaSpecialParameters = new Array(<%=allSpecialParams.length + parentLevelParameters.length - 1%>);</script>
                             <%
                                 int specialParameterCount = 0;
-                                for (int s = 0; s < parentLevelParameters.length; s++) {
+                                for(int s = 0;s<parentLevelParameters.length;s++){
                             %>
                             <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=parentLevelParameters[s]%>';</script>
                             <%
                                     specialParameterCount++;
                                 }
-                                for (int s = 1; s < allSpecialParams.length; s++) {
+                                for(int s = 1;s<allSpecialParams.length;s++){
                             %>
                             <script type="text/javascript">kafkaSpecialParameters[<%=specialParameterCount%>] = '<%=allSpecialParams[s]%>';</script>
                             <%
@@ -382,15 +578,15 @@ var kafkaSpecialParameters = null;
                     <%}%>
                      <% if(InboundClientConstants.TYPE_CLASS.equals(inboundDescription.getType())){ %>
                     <tr>
-                        <td class="buttonRow" colspan="3">       
+                        <td class="buttonRow" colspan="3">
 	                            <input class="button" type="button"
 	                                   value='<fmt:message key="inbound.add.param"/>'
-	                                   onclick="addRow('tblInput');"/>   
+	                                   onclick="addRow('tblInput');"/>
 	                            <input class="button" type="button"
 	                                   value='<fmt:message key="inbound.remove.param"/>'
-	                                   onclick="deleteRow('tblInput');"/>                                                                 
+	                                   onclick="deleteRow('tblInput');"/>
                         </td>
-                    </tr>  
+                    </tr>
 					<%  int i = 0;
 					    for(String strKey : inboundDescription.getParameters().keySet()) {
 					    if(!defaultParamNames.contains(strKey)){
@@ -413,7 +609,7 @@ var kafkaSpecialParameters = null;
                                             document.getElementById("inboundIntervalRow").style.display="none";
                                         </script>
 
-                                    <%                                    
+                                    <%
                                 }else if(inboundDescription.getParameters().get(strKey).equalsIgnoreCase("polling")){
                                     %>
                                         <script language="javascript">
@@ -426,18 +622,18 @@ var kafkaSpecialParameters = null;
                             }
 
 					    i++;
-					    %>                        
+					    %>
 	                    <tr>
 	                        <td style="width:150px">
-	                            <input id="paramkey<%=i%>" name="paramkey<%=i%>" class="longInput" type="text" value="<%=strKey%>"/>  
+	                            <input id="paramkey<%=i%>" name="paramkey<%=i%>" class="longInput" type="text" value="<%=strKey%>"/>
 	                        </td>
-	                        <td align="left">	                            	                      
-                                <input id="paramval<%=i%>" name="paramval<%=i%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(strKey)%>"/>                       
+	                        <td align="left">
+                                <input id="paramval<%=i%>" name="paramval<%=i%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(strKey)%>"/>
 	                        </td>
 	                        <td></td>
-	                    </tr>                        
-                     <% } %> 
-                     <% } %> 
+	                    </tr>
+                     <% } %>
+                     <% } %>
                      <script type="text/javascript">iParamCount=<%=i%>;iParamMax=<%=i%>;</script>
                      <%}else{
                      if(!advParams.isEmpty()){%>
@@ -448,7 +644,7 @@ var kafkaSpecialParameters = null;
 				                    key="show.advanced.options"/></a>
 				        </span>
 				        </td>
-				    </tr> 
+				    </tr>
 				    <%} }%>
 				    <tr>
 					    <td colspan="3">
@@ -456,8 +652,8 @@ var kafkaSpecialParameters = null;
 						    <table id="tblAdvInput" name="tblAdvInput" class="normal-nopadding" cellspacing="0" cellpadding="0" border="0">
 								<% for(String defaultParamOri : advParams) {
 									String [] arrParamOri = defaultParamOri.split(InboundClientConstants.STRING_SPLITTER);
-									String defaultParam = arrParamOri[0].trim();						
-								%> 					                       
+									String defaultParam = arrParamOri[0].trim();
+								%>
 				                    <tr>
 				                        <td style="width:150px"><%=defaultParam %></td>
 				                        <td align="left">
@@ -470,8 +666,8 @@ var kafkaSpecialParameters = null;
 				                                <option value="<%=eleValue%>" selected><%=eleValue%></option>
 				                                <%} else {%>
 				                                <option value="<%=eleValue%>"><%=eleValue%></option>
-				                                <%} %>					                            				                                
-				                            <%}%>                                
+				                                <%} %>
+				                            <%}%>
 			                                </select>
 										<%}else{%>
                                         <%if(InboundClientConstants.TYPE_HTTPS.equals(inboundDescription.getType()) && (defaultParam.equals("truststore") || defaultParam.equals("CertificateRevocationVerifier"))){%>
@@ -484,17 +680,18 @@ var kafkaSpecialParameters = null;
 			                            <%} %>
 				                        </td>
 				                        <td></td>
-				                    </tr>                        
-			                     <% } %>						    
+				                    </tr>
+			                     <% } %>
 						    	</table>
-						    </div> 			
+						    </div>
 					    </td>
-				    </tr>                     
+				    </tr>
                     <tr>
                         <td class="buttonRow" colspan="3">
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.update.button.text"/>"
-                                   onclick="inboundUpdate('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>',document.inboundupdateform); return false;"/>
+                                   onclick="inboundUpdate('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>',
+                                   '<fmt:message key="inbound.cron.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>',document.inboundupdateform); return false;"/>
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.cancel.button.text"/>"
                                    onclick="document.location.href='index.jsp?ordinal=0';"/>                                                                   

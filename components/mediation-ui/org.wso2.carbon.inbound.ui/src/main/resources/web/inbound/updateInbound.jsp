@@ -55,12 +55,14 @@
 				}else if(strKey.startsWith("paramkey")){
 					String paramKey = request.getParameter("paramkey" + strKey.replaceAll("paramkey",""));
 					if(paramKey != null && !paramKey.trim().equals("")){
-						sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO(paramKey, request.getParameter("paramval" + strKey.replaceAll("paramkey","")))));	
-					}	
+						sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO(paramKey, request.getParameter("paramval" + strKey.replaceAll("paramkey","")))));
+					}
 				}else if(strKey.startsWith("interval") && request.getParameter("interval") != null){
 				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("interval",request.getParameter("interval"))));
+				}else if(strKey.startsWith("cron") && request.getParameter("cron") != null){
+                 	sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("cron",request.getParameter("cron"))));
 				}else if(strKey.startsWith("sequential")){
-				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("sequential",request.getParameter("sequential"))));				    
+				    sParams.add((new org.wso2.carbon.inbound.ui.internal.ParamDTO("sequential",request.getParameter("sequential"))));
 				}else if(strKey.startsWith("keystore")){
                     sParams.add((new ParamDTO("keystore",request.getParameter(strKey))));
                 }else if(strKey.startsWith("truststore")){
@@ -101,7 +103,18 @@
                     	sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
                     }
                 }
+
+
+                           if(protocol.equals("file")){
+                              if(strKey.startsWith("interval") && request.getParameter("interval") != null){
+                                sParams.remove("cron");
+                              }else{
+                                sParams.remove("interval");
+                              }
+                           }
            }
+
+
 		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl,request.getParameter("inboundSuspend"), sParams);
 			if(!added){
             		%>

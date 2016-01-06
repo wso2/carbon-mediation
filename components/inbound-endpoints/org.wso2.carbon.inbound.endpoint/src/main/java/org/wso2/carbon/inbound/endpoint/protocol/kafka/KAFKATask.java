@@ -27,10 +27,11 @@ public class KAFKATask extends InboundTask {
             .getName());
     private KAFKAPollingConsumer kafkaPollingConsumer;
 
-    public KAFKATask(KAFKAPollingConsumer kafkaPollingConsumer, long interval) {
+    public KAFKATask(KAFKAPollingConsumer kafkaPollingConsumer, long interval, String cron) {
         logger.debug("Initializing.");
         this.kafkaPollingConsumer = kafkaPollingConsumer;
         this.interval = interval;
+        this.cron = cron;
     }
 
     public void init(SynapseEnvironment se) {

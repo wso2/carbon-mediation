@@ -28,6 +28,9 @@ import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
+import org.apache.axis2.transport.base.AbstractPollTableEntry;
+
+import static org.wso2.carbon.inbound.endpoint.common.InboundTask.TASK_THRESHOLD_INTERVAL;
 
 public class VFSProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
 
@@ -43,13 +46,17 @@ public class VFSProcessor extends InboundRequestProcessorImpl implements TaskSta
     public VFSProcessor(InboundProcessorParams params) {
         this.name = params.getName();
         this.vfsProperties = params.getProperties();
-        try {
-            this.interval = Long.parseLong(vfsProperties
-                    .getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL));
-        } catch (NumberFormatException nfe) {
-            throw new SynapseException("Invalid numeric value for interval.", nfe);
-        } catch (Exception e) {
-            throw new SynapseException("Invalid value for interval.", e);
+        String inboundEndpointInterval = vfsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_INTERVAL);
+        if(inboundEndpointInterval!=null){
+            try {
+                this.interval = Long.parseLong(inboundEndpointInterval);
+            } catch (NumberFormatException nfe) {
+                throw new SynapseException("Invalid numeric value for interval.", nfe);
+            } catch (Exception e) {
+                throw new SynapseException("Invalid value for interval.", e);
+            }
+        } else{
+            this.cron =  vfsProperties.getProperty(PollingConstants.INBOUND_CRON);
         }
         this.sequential = true;
         if (vfsProperties.getProperty(PollingConstants.INBOUND_ENDPOINT_SEQUENTIAL) != null) {
@@ -64,6 +71,7 @@ public class VFSProcessor extends InboundRequestProcessorImpl implements TaskSta
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
+        log.info("Starting the VFS processor " + name + ", with coordination " + coordination);
     }
 
     /**
@@ -81,7 +89,7 @@ public class VFSProcessor extends InboundRequestProcessorImpl implements TaskSta
      * Register/start the schedule service
      * */
     public void start() {
-        InboundTask task = new FileTask(fileScanner, interval);
+        InboundTask task = new FileTask(fileScanner,interval,cron);
         start(task, ENDPOINT_POSTFIX);
     }
 
@@ -96,4 +104,6 @@ public class VFSProcessor extends InboundRequestProcessorImpl implements TaskSta
     public void update() {
         // This will not be called for inbound endpoints
     }
+
+
 }

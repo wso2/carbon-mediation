@@ -28,14 +28,7 @@ import java.util.Properties;
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.vfs2.FileContent;
-import org.apache.commons.vfs2.FileNotFolderException;
-import org.apache.commons.vfs2.FileNotFoundException;
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.FileSystemOptions;
-import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.*;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
 import org.apache.commons.vfs2.provider.UriParser;
 import org.apache.synapse.SynapseException;
@@ -43,14 +36,13 @@ import org.apache.synapse.commons.vfs.VFSConstants;
 import org.apache.synapse.commons.vfs.VFSParamDTO;
 import org.apache.synapse.commons.vfs.VFSUtils;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 import org.wso2.carbon.mediation.clustering.ClusteringServiceUtil;
 
 /**
- * 
  * This class implement the processing logic related to inbound file protocol.
  * Common functinalities (with synapse vfs transport) are include in synapse
  * util that is found in synapse commons
- * 
  */
 public class FilePollingConsumer {
 
@@ -78,9 +70,9 @@ public class FilePollingConsumer {
     private boolean distributedLock;
     private Long distributedLockTimeout;
     private FileSystemOptions fso;
-    
+
     public FilePollingConsumer(Properties vfsProperties, String name,
-            SynapseEnvironment synapseEnvironment, long scanInterval) {
+                               SynapseEnvironment synapseEnvironment, long scanInterval) {
         this.vfsProperties = vfsProperties;
         this.name = name;
         this.synapseEnvironment = synapseEnvironment;
@@ -99,7 +91,7 @@ public class FilePollingConsumer {
         }
         //Setup SFTP Options
         try {
-            fso = VFSUtils.attachFileSystemOptions(parseSchemeFileOptions(fileURI),fsManager);
+            fso = VFSUtils.attachFileSystemOptions(parseSchemeFileOptions(fileURI), fsManager);
         } catch (Exception e) {
             log.warn("Unable to set the sftp Options", e);
             fso = null;
@@ -109,7 +101,7 @@ public class FilePollingConsumer {
     /**
      * Register a handler to process the file stream after reading from the
      * source
-     * 
+     *
      * @param injectHandler
      */
     public void registerHandler(FileInjectHandler injectHandler) {
@@ -129,7 +121,7 @@ public class FilePollingConsumer {
             // Check if the cycles are running in correct interval and start
             // scan
             long currentTime = (new Date()).getTime();
-            if (lastRanTime == null || ((lastRanTime + (scanInterval)) <= currentTime)) {
+            if (lastRanTime == null || ((lastRanTime + scanInterval) <= currentTime)) {
                 lastRanTime = currentTime;
                 poll();
             } else if (log.isDebugEnabled()) {
@@ -145,11 +137,9 @@ public class FilePollingConsumer {
     }
 
     /**
-     * 
      * Do the file processing operation for the given set of properties. Do the
      * checks and pass the control to processFile method
-     * 
-     * */
+     */
     public FileObject poll() {
         if (fileURI == null || fileURI.trim().equals("")) {
             log.error("Invalid file url. Check the inbound endpoint configuration. Endpoint Name : "
@@ -195,7 +185,7 @@ public class FilePollingConsumer {
                     } else {
                         try {
                             lastCycle = 2;
-                            moveOrDeleteAfterProcessing(fileObject);
+                            actionAfterProcessing(fileObject);
                         } catch (SynapseException synapseException) {
                             log.error("File object '" + VFSUtils.maskURLPassword(fileObject.getURL().toString()) + "' "
                                     + "cloud not be moved after first attempt", synapseException);
@@ -222,7 +212,7 @@ public class FilePollingConsumer {
                         + "."
                         + " Reason: "
                         + (fileObject.exists() ? (fileObject.isReadable() ? "Unknown reason"
-                                : "The file can not be read!") : "The file does not exists!"));
+                        : "The file can not be read!") : "The file does not exists!"));
                 return null;
             }
         } catch (FileSystemException e) {
@@ -252,7 +242,7 @@ public class FilePollingConsumer {
 
     /**
      * If not a folder just a file handle the flow
-     * 
+     *
      * @throws FileSystemException
      */
     private void fileHandler() throws FileSystemException {
@@ -267,12 +257,12 @@ public class FilePollingConsumer {
                 } catch (SynapseException e) {
                     lastCycle = 2;
                     log.error("Error processing File URI : "
-                              + VFSUtils.maskURLPassword(fileObject.getName().toString()), e);
+                            + VFSUtils.maskURLPassword(fileObject.getName().toString()), e);
                 }
 
                 if (runPostProcess) {
                     try {
-                        moveOrDeleteAfterProcessing(fileObject);
+                        actionAfterProcessing(fileObject);
                     } catch (SynapseException synapseException) {
                         lastCycle = 3;
                         log.error("File object '" + VFSUtils.maskURLPassword(fileObject.getURL().toString()) + "' "
@@ -292,7 +282,7 @@ public class FilePollingConsumer {
 
             } else {
                 log.error("Couldn't get the lock for processing the file : " +
-                          VFSUtils.maskURLPassword(fileObject.getName().toString()));
+                        VFSUtils.maskURLPassword(fileObject.getName().toString()));
             }
 
         } else {
@@ -307,9 +297,9 @@ public class FilePollingConsumer {
      * Setup the required parameters
      */
     private void setupParams() {
-        
+
         fileURI = vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_FILE_URI);
-        
+
         String strFileLock = vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_LOCKING);
         if (strFileLock != null
                 && strFileLock.toLowerCase().equals(VFSConstants.TRANSPORT_FILE_LOCKING_DISABLED)) {
@@ -358,7 +348,7 @@ public class FilePollingConsumer {
                 reconnectionTimeout = 1;
             }
         }
-        
+
         String strAutoLock = vfsProperties.getProperty(VFSConstants.TRANSPORT_AUTO_LOCK_RELEASE);
         autoLockRelease = false;
         autoLockReleaseSameNode = true;
@@ -370,7 +360,7 @@ public class FilePollingConsumer {
                 autoLockRelease = false;
                 log.warn("VFS Auto lock removal not set properly. Current value is : "
                         + strAutoLock, e);
-            }      
+            }
             if (autoLockRelease) {
                 String strAutoLockInterval = vfsProperties
                         .getProperty(VFSConstants.TRANSPORT_AUTO_LOCK_RELEASE_INTERVAL);
@@ -398,11 +388,11 @@ public class FilePollingConsumer {
                 }
             }
 
-        }        
+        }
         distributedLock = false;
         distributedLockTimeout = null;
         String strDistributedLock = vfsProperties
-                .getProperty(VFSConstants.TRANSPORT_DISTRIBUTED_LOCK);        
+                .getProperty(VFSConstants.TRANSPORT_DISTRIBUTED_LOCK);
         if (strDistributedLock != null) {
             try {
                 distributedLock = Boolean.parseBoolean(strDistributedLock);
@@ -457,12 +447,11 @@ public class FilePollingConsumer {
                 }
             }
         }
-    }    
-    
+    }
+
     /**
-     * 
      * Handle directory with chile elements
-     * 
+     *
      * @param children
      * @return
      * @throws FileSystemException
@@ -511,8 +500,8 @@ public class FilePollingConsumer {
                 Arrays.sort(children, new FileLastmodifiedtimestampDesComparator());
             }
             log.debug("End Sorting the files.");
-        }      
-        
+        }
+
         for (FileObject child : children) {
             // skipping *.lock / *.fail file
             if (child.getName().getBaseName().endsWith(".lock")
@@ -520,7 +509,7 @@ public class FilePollingConsumer {
                 continue;
             }
             boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child);
-            
+
             // child's file name matches the file name pattern or process all
             // files now we try to get the lock and process
             if ((strFilePattern == null || child.getName().getBaseName().matches(strFilePattern))
@@ -543,19 +532,19 @@ public class FilePollingConsumer {
                         } else {
                             successCount++;
                         }
-                        // tell moveOrDeleteAfterProcessing() file was success
+                        // tell actionAfterProcessing() file was success
                         lastCycle = 1;
                     } catch (Exception e) {
                         if (e.getCause() instanceof FileNotFoundException) {
                             log.warn("Error processing File URI : " +
-                                     VFSUtils.maskURLPassword(child.getName().toString()) +
-                                     ". This can be due to file moved from another process.");
+                                    VFSUtils.maskURLPassword(child.getName().toString()) +
+                                    ". This can be due to file moved from another process.");
                             runPostProcess = false;
                         } else {
                             log.error("Error processing File URI : " +
-                                      VFSUtils.maskURLPassword(child.getName().toString()), e);
+                                    VFSUtils.maskURLPassword(child.getName().toString()), e);
                             failCount++;
-                            // tell moveOrDeleteAfterProcessing() file failed
+                            // tell actionAfterProcessing() file failed
                             lastCycle = 2;
                         }
 
@@ -565,10 +554,10 @@ public class FilePollingConsumer {
                     boolean skipUnlock = false;
                     if (runPostProcess) {
                         try {
-                            moveOrDeleteAfterProcessing(child);
+                            actionAfterProcessing(child);
                         } catch (SynapseException synapseException) {
                             log.error("File object '" + VFSUtils.maskURLPassword(child.getURL().toString())
-                                    + "'cloud not be moved, will remain in \"locked\" state",
+                                            + "'cloud not be moved, will remain in \"locked\" state",
                                     synapseException);
                             skipUnlock = true;
                             failCount++;
@@ -594,7 +583,7 @@ public class FilePollingConsumer {
                 // it is a failed record
                 try {
                     lastCycle = 1;
-                    moveOrDeleteAfterProcessing(child);
+                    actionAfterProcessing(child);
                 } catch (SynapseException synapseException) {
                     log.error("File object '" + VFSUtils.maskURLPassword(child.getURL().toString())
                             + "'cloud not be moved, will remain in \"fail\" state", synapseException);
@@ -611,10 +600,11 @@ public class FilePollingConsumer {
             }
 
             //close the file system after processing
-            try{
+            try {
                 child.close();
-            }catch(Exception e){}
-            
+            } catch (Exception e) {
+            }
+
             // Manage throttling of file processing
             if (iFileProcessingInterval != null && iFileProcessingInterval > 0) {
                 try {
@@ -680,9 +670,8 @@ public class FilePollingConsumer {
     }
 
     /**
-     * 
      * Acquire distributed lock if required first, then do the file level locking
-     * 
+     *
      * @param fsManager
      * @param fileObject
      * @return
@@ -705,12 +694,13 @@ public class FilePollingConsumer {
             // Need to check the source file before processing.
             try {
                 FileObject sourceFile = fsManager.resolveFile(strContext);
+
                 if (!sourceFile.exists()) {
                     return false;
                 }
             } catch (FileSystemException e) {
                 return false;
-            }         
+            }
             VFSParamDTO vfsParamDTO = new VFSParamDTO();
             vfsParamDTO.setAutoLockRelease(autoLockRelease);
             vfsParamDTO.setAutoLockReleaseSameNode(autoLockReleaseSameNode);
@@ -726,7 +716,7 @@ public class FilePollingConsumer {
 
     /**
      * Actual processing of the file/folder
-     * 
+     *
      * @param file
      * @return
      * @throws synapseException
@@ -766,91 +756,100 @@ public class FilePollingConsumer {
 
     /**
      * Do the post processing actions
-     * 
+     *
      * @param fileObject
      * @throws synapseException
      */
-    private void moveOrDeleteAfterProcessing(FileObject fileObject) throws SynapseException {
+    private void actionAfterProcessing(FileObject fileObject) throws SynapseException {
 
-        String moveToDirectoryURI = null;
+        String moveOrCopyDirectoryURI = null;
         try {
             switch (lastCycle) {
-            case 1:
-                if ("MOVE".equals(vfsProperties
-                        .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS))) {
-                    moveToDirectoryURI = vfsProperties
-                            .getProperty(VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
-                    //Postfix the date given timestamp format
-                    String strSubfoldertimestamp = vfsProperties
-                            .getProperty(VFSConstants.SUBFOLDER_TIMESTAMP);
-                    if (strSubfoldertimestamp != null) {
-                        try {
-                            SimpleDateFormat sdf = new SimpleDateFormat(strSubfoldertimestamp);
-                            String strDateformat = sdf.format(new Date());
-                            int iIndex = moveToDirectoryURI.indexOf("?");
-                            if (iIndex > -1) {
-                                moveToDirectoryURI = moveToDirectoryURI.substring(0, iIndex)
-                                        + strDateformat
-                                        + moveToDirectoryURI.substring(iIndex,
-                                                moveToDirectoryURI.length());
-                            }else{
-                                moveToDirectoryURI += strDateformat;
+                case 1:
+                    if ("MOVE".equals(vfsProperties
+                            .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS)) || "COPY".equals(vfsProperties
+                            .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS))) {
+
+                        moveOrCopyDirectoryURI = vfsProperties
+                                .getProperty(VFSConstants.TRANSPORT_FILE_MOVE_AFTER_PROCESS);
+                        //Postfix the date given timestamp format
+                        String strSubfoldertimestamp = vfsProperties
+                                .getProperty(VFSConstants.SUBFOLDER_TIMESTAMP);
+                        if (strSubfoldertimestamp != null) {
+                            try {
+                                SimpleDateFormat sdf = new SimpleDateFormat(strSubfoldertimestamp);
+                                String strDateformat = sdf.format(new Date());
+                                int iIndex = moveOrCopyDirectoryURI.indexOf("?");
+                                if (iIndex > -1) {
+                                    moveOrCopyDirectoryURI = moveOrCopyDirectoryURI.substring(0, iIndex)
+                                            + strDateformat
+                                            + moveOrCopyDirectoryURI.substring(iIndex,
+                                            moveOrCopyDirectoryURI.length());
+                                } else {
+                                    moveOrCopyDirectoryURI += strDateformat;
+                                }
+                            } catch (Exception e) {
+                                log.warn("Error generating subfolder name with date", e);
                             }
-                        } catch (Exception e) {
-                            log.warn("Error generating subfolder name with date", e);
                         }
                     }
-                }
-                break;
+                    break;
 
-            case 2:
-                if ("MOVE".equals(vfsProperties
-                        .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE))) {
-                    moveToDirectoryURI = vfsProperties
-                            .getProperty(VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
-                }
-                break;
+                case 2:
+                    if ("MOVE".equals(vfsProperties
+                            .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE)) || "COPY".equals(vfsProperties
+                            .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_FAILURE))) {
+                        moveOrCopyDirectoryURI = vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_MOVE_AFTER_FAILURE);
+                    }
+                    break;
 
-            default:
-                return;
+                default:
+                    return;
             }
 
-            if (moveToDirectoryURI != null) {                
-                FileObject moveToDirectory = fsManager.resolveFile(moveToDirectoryURI, fso);
+            if (moveOrCopyDirectoryURI != null) {
+                FileObject moveToDirectory = fsManager.resolveFile(moveOrCopyDirectoryURI, fso);
                 String prefix;
                 if (vfsProperties.getProperty(VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT) != null) {
-                    prefix = new SimpleDateFormat(
-                            vfsProperties
-                                    .getProperty(VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT))
-                            .format(new Date());
+                    prefix = new SimpleDateFormat(vfsProperties
+                            .getProperty(VFSConstants.TRANSPORT_FILE_MOVE_TIMESTAMP_FORMAT)).format(new Date());
                 } else {
                     prefix = "";
                 }
-                
+
                 //Forcefully create the folder(s) if does not exists
                 String strForceCreateFolder = vfsProperties.getProperty(VFSConstants.FORCE_CREATE_FOLDER);
-                if(strForceCreateFolder != null && strForceCreateFolder.toLowerCase().equals("true") && !moveToDirectory.exists()){
+                if (strForceCreateFolder != null && strForceCreateFolder.toLowerCase().equals("true") && !moveToDirectory.exists()) {
                     moveToDirectory.createFolder();
                 }
-                
-                FileObject dest = moveToDirectory.resolveFile(prefix
-                        + fileObject.getName().getBaseName());
-                if (log.isDebugEnabled()) {
-                    log.debug("Moving to file :" + VFSUtils.maskURLPassword(dest.getName().getURI()));
-                }
-                try {
-                    fileObject.moveTo(dest);
-                    if (VFSUtils.isFailRecord(fsManager, fileObject)) {
-                        VFSUtils.releaseFail(fsManager, fileObject);
+
+                FileObject dest = moveToDirectory.resolveFile(prefix + fileObject.getName().getBaseName());
+                if ("MOVE".equals(vfsProperties
+                        .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS))) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Moving to file :" + VFSUtils.maskURLPassword(dest.getName().getURI()));
                     }
-                } catch (FileSystemException e) {
-                    if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
-                        VFSUtils.markFailRecord(fsManager, fileObject);
+                    log.info("Moving to file :" + VFSUtils.maskURLPassword(dest.getName().getURI()));
+                    if ("MOVE".equals(vfsProperties
+                            .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS))) {
+                        fileObject.moveTo(dest);
+                        if (VFSUtils.isFailRecord(fsManager, fileObject)) {
+                            VFSUtils.releaseFail(fsManager, fileObject);
+                        }
                     }
-                    log.error("Error moving file : " + VFSUtils.maskURLPassword(fileObject.toString()) + " to " +
-                              VFSUtils.maskURLPassword(moveToDirectoryURI), e);
+                }else if ("COPY".equals(vfsProperties
+                        .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS))) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("copying to file :" + VFSUtils.maskURLPassword(dest.getName().getURI()));
+                    }
+                    if ("COPY".equals(vfsProperties
+                            .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS))) {
+                        dest.copyFrom(fileObject, Selectors.SELECT_ALL);
+                    }
                 }
-            } else {
+            }
+            if ("DELETE".equals(vfsProperties
+                    .getProperty(VFSConstants.TRANSPORT_FILE_ACTION_AFTER_PROCESS))) {
                 try {
                     if (log.isDebugEnabled()) {
                         log.debug("Deleting file :" + VFSUtils.maskURLPassword(fileObject.toString()));
@@ -869,13 +868,14 @@ public class FilePollingConsumer {
             if (!VFSUtils.isFailRecord(fsManager, fileObject)) {
                 VFSUtils.markFailRecord(fsManager, fileObject);
                 log.error("Error resolving directory to move after processing : "
-                        + VFSUtils.maskURLPassword(moveToDirectoryURI), e);
+                        + VFSUtils.maskURLPassword(moveOrCopyDirectoryURI), e);
             }
         }
     }
+
     /**
      * Comparator classed used to sort the files according to user input
-     * */
+     */
     class FileNameAscComparator implements Comparator<FileObject> {
         @Override
         public int compare(FileObject o1, FileObject o2) {
@@ -942,6 +942,6 @@ public class FilePollingConsumer {
             }
             return lDiff.intValue();
         }
-    }     
-    
+    }
+
 }
