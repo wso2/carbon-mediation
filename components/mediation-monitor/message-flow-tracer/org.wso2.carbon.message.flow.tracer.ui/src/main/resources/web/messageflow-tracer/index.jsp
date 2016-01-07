@@ -38,6 +38,11 @@
     if (isOperation) {
         if(operation.equals("clear")){
             client.clearAll();
+            %>
+            <script type="text/javascript">
+                location.href = "index.jsp";
+            </script>
+            <%
         }
     }
 
