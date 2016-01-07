@@ -106,6 +106,24 @@
         </h2>
 
         <div id="workArea">
+
+            <table border="0" class="styledLeft">
+                <tbody>
+                <tr>
+                    <td>
+                        Show Full Statistics Tree :
+                        <button type="button" onclick="showFullTree()">Show Full Tree</button>
+                    </td>
+                    <td>
+                        Show Root Node :
+                        <button type="button" onclick="showRootNode()">Show Root</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <br />
+
             <%
                 if (edges == null || treeNodeData == null) {
             %>
@@ -264,10 +282,24 @@
                     return nodeClass;
                 }
 
-                function destroyerSuccessors(i) {
+                function showFullTree(){
+                    for (var i = 0; i < simpleNodes.length; i++) {
+                        if(stateOfChildren[i] == false){
+                            showImmediateSuccessors(i);
+                        }
+                    }
+                    draw();
+                }
+
+                function showRootNode(){
+                    destroySuccessors(0);
+                    draw();
+                }
+
+                function destroySuccessors(i) {
                     stateOfChildren[i] = false;
                     Object.keys(successor[i]).forEach(function (key) {
-                        destroyerSuccessors(key);
+                        destroySuccessors(key);
                         g.removeNode(key);
                         stateOfChildren[key] = showMoreNodeData[key] = false;
                     });
@@ -306,7 +338,7 @@
                 // Toggle children on click.
                 function nodeClick(d) {
                     if (stateOfChildren[d]) {
-                        destroyerSuccessors(d);
+                        destroySuccessors(d);
                     } else {
                         showImmediateSuccessors(d);
                     }

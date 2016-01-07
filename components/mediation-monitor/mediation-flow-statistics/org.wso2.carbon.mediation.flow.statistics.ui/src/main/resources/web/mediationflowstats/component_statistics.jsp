@@ -75,7 +75,7 @@
             } else if (statisticCategory.equals("sequence")) {
                 categoryName = "Sequence";
                 collectedSequenceStatistic = mediationFlowStatisticClient.getAllSequenceStatistics();
-            }else if (statisticCategory.equals("endpoint")) {
+            } else if (statisticCategory.equals("endpoint")) {
                 categoryName = "Endpoint";
                 collectedSequenceStatistic = mediationFlowStatisticClient.getAllEndpointStatistics();
             }
@@ -95,7 +95,7 @@
                     <td>
                         <a href="overall_stat.jsp?statisticCategory=<%=statisticCategory%>&categoryName=<%=categoryName%>&compare=1"
                            style="cursor:pointer">
-                            Compare Proxy Service Statistics
+                            Compare <%=categoryName%> Statistics
                         </a>
                     </td>
                 </tr>
@@ -106,7 +106,6 @@
                 <thead>
                 <tr>
                     <th><%=categoryName%> Name</th>
-                    <th>Component Type</th>
                     <th>Count</th>
                     <th>Minimum Processing Time (ms)</th>
                     <th>Maximum Processing Time (ms)</th>
@@ -120,13 +119,11 @@
                 %>
                 <tr>
                     <td>
-                        <a href="newtree.jsp?componentID=<%=adminData.getComponentID()%>&statisticCategory=<%=statisticCategory%>&categoryName=<%=categoryName%>">
+                        <a href="statisticstree.jsp?componentID=<%=adminData.getComponentID()%>&statisticCategory=<%=statisticCategory%>&categoryName=<%=categoryName%>">
                             <%=adminData.getComponentID()%>
                         </a>
                     </td>
-                    <td>
-                        <%=adminData.getTreeNodeData().getComponentType()%>
-                    </td>
+
                     <td>
                         <%=adminData.getTreeNodeData().getCount()%>
                     </td>
