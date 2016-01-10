@@ -1,0 +1,189 @@
+/*
+ *   Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
+@-webkit-keyframes flash {
+    0%, 50%, 100% {
+        opacity: 1;
+    }
+
+    25%, 75% {
+        opacity: 0.2;
+    }
+}
+
+@keyframes flash {
+    0%, 50%, 100% {
+        opacity: 1;
+    }
+
+    25%, 75% {
+        opacity: 0.2;
+    }
+}
+
+.warn {
+    -webkit-animation-duration: 5s;
+    animation-duration: 5s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    -webkit-animation-iteration-count: 1;
+    animation-iteration-count: 1;
+}
+
+.live.map {
+    width: 100%;
+    height: 100%;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.live.map text {
+    font-weight: 300;
+    font-size: 14px;
+}
+
+.live.map .node rect {
+    stroke-width: 2px;
+    stroke: #bbb;
+    fill: #666;
+}
+
+.live.map .type {
+    height: 100%;
+    width: 15px;
+    display: block;
+    float: left;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-right: 4px;
+}
+
+.live.map .sequence .type {
+    background-color: #7f7;
+}
+
+.live.map .api .type {
+    background-color: #fffd6f;
+}
+
+.live.map .mediator .type {
+    background-color: #f736ff;
+}
+
+.live.map .inbound .type {
+    background-color: #2c8b13;
+}
+
+.live.map .proxy .type {
+    background-color: #0e63ff;
+}
+
+.live.map .fault .type {
+    background-color: #ff0000;
+}
+
+.live.map .endpoint .type {
+    background-color: #cbffa5;
+}
+
+.live.map .resource .type {
+    background-color: #5c4926;
+}
+
+
+.live.map .name {
+    clear: left;
+    margin: 5px;
+    font-size: 18px;
+    color: white;
+}
+
+.live.map .detail_table{
+    width:100%;
+}
+.live.map .name_underlined {
+    margin: 5px;
+    display: inline-block;
+    border-bottom: solid 2px #fff;
+    font-size: 18px;
+    padding-bottom: 5px;
+    color: white;
+}
+
+.live.map .description {
+    margin-left: 5px;
+    padding-top: 2px
+    display: inline-block;
+    font-size: 15px;
+    color: white;
+}
+
+.live.map .name_column{
+    color: white;
+}
+
+
+div .heading {
+    text-align: center;
+}
+
+div .data {
+    text-align: left;
+}
+
+div .small {
+    min-width: 250px;
+    height: 40px;
+    display: inline-block;
+    color: #fff;
+    line-height: 40px;
+}
+
+div .large {
+    min-width: 250px;
+    height: 150px;
+    display: inline-block;
+    color: #fff;
+    padding-right: 10px;
+
+}
+
+.live.map .node .small g div span.consumers {
+    display: inline-block;
+    width: 20px;
+}
+
+.live.map .edgeLabel text {
+    width: 50px;
+    fill: #fff;
+}
+
+.live.map .edgePath path {
+    stroke: #999;
+    stroke-width: 2px;
+    fill: #999;
+}
+
+
+
+
+
