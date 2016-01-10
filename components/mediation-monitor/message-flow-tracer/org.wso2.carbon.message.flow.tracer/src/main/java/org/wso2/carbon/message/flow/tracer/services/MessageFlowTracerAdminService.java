@@ -26,6 +26,8 @@ import org.wso2.carbon.message.flow.tracer.data.*;
 import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
 import org.wso2.carbon.message.flow.tracer.util.MessageFlowTraceConstants;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
@@ -46,6 +48,23 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
         if (messageFlows.values().size() == 0) {
             return new MessageFlowTraceEntry[1];
         }
+
+        // Sort MessageFlowTraceEntry by date
+        Collections.sort(entries, new Comparator<MessageFlowTraceEntry>() {
+
+            private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+
+            public int compare(MessageFlowTraceEntry o1, MessageFlowTraceEntry o2) {
+                if (o1.getTimeStamp() == null || o2.getTimeStamp() == null)
+                    return 0;
+
+                try {
+                    return dateFormatter.parse(o1.getTimeStamp()).compareTo(dateFormatter.parse(o2.getTimeStamp()));
+                } catch (ParseException e) {
+                    return 0;
+                }
+            }
+        });
 
         return entries.toArray(new MessageFlowTraceEntry[entries.size()]);
     }

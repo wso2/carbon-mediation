@@ -60,9 +60,9 @@
         <table class="styledLeft" id="flowTable">
             <thead>
             <tr>
+                <th width="15%"><fmt:message key="timestamp"/></th>
                 <th width="30%"><fmt:message key="message.flow.id"/></th>
                 <th width="15%"><fmt:message key="EntryType"/></th>
-                <th width="15%"><fmt:message key="timestamp"/></th>
             </tr>
             </thead>
             <tbody>
@@ -71,10 +71,10 @@
                     for(MessageFlowTraceEntry flows:messageFlows){
             %>
             <tr>
+                <td><%= flows.getTimeStamp() %></td>
                 <td><%String messageID = flows.getMessageId();%>
                     <a href="javascript:flowDetails('<%=messageID%>')"><%=messageID%></a></td>
                 <td><%=flows.getEntryType()%></td>
-                <td><%=flows.getTimeStamp()%></td>
             </tr>
             <%
                     }
