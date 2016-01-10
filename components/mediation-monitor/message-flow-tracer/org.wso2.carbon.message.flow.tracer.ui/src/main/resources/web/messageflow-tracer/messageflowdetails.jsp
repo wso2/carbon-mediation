@@ -141,33 +141,26 @@
 
         var beforepayload = data.beforepayload;
         var afterpayload = data.afterpayload;
-        var beforeproperties = data.beforeproperties;
-        var afterproperties = data.afterproperties;
+        var beforeproperties = JSON.parse(data.beforeproperties);
+        var afterproperties = JSON.parse(data.afterproperties);
 
         var x = (beforepayload+"").split("\n").join("<br>");
         x = "<div style='height:200px;overflow: auto;'>" + x + "</div>";
         var y = (afterpayload+"").split("\n").join("<br>");
         y = "<div style='height:200px;overflow: auto;'>" + y + "</div>";
 
-        var a = (beforeproperties+"").split(",");
-        var b = (afterproperties+"").split(",");
 
         var beforePropTable = "<table id = \"t01\" style=\"width:100%\">";
-
-        for (var i in a) {
-            var property = a[i].split("=");
-            beforePropTable = beforePropTable + "<tr><td>"+property[0]+"</td><td>"+property[1]+"</td><tr>";
-        }
-
+        jQuery.each(beforeproperties, function(key, val) {
+          beforePropTable = beforePropTable + "<tr><td>" + key + "</td><td>" + JSON.stringify(val) + "</td><tr>";
+        });
         beforePropTable = beforePropTable + "</table>";
 
+
         var afterPropTable = "<table id = \"t01\" style=\"width:100%\">";
-
-        for (var i in b) {
-            var property = b[i].split("=");
-            afterPropTable = afterPropTable + "<tr><td>"+property[0]+"</td><td>"+property[1]+"</td><tr>";
-        }
-
+        jQuery.each(afterproperties, function(key, val) {
+          afterPropTable = afterPropTable + "<tr><td>" + key + "</td><td>" + JSON.stringify(val) + "</td><tr>";
+        });
         afterPropTable = afterPropTable + "</table>";
 
         var topic = "<br/><h2><b>" + data.label + "</b></h2><br/>"

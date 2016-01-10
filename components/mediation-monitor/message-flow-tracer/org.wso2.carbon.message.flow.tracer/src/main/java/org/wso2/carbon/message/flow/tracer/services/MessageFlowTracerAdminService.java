@@ -174,6 +174,17 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
     }
 
     private String constructPropertyString(Map<String, Object> propertyMap, Map<String, Object> transportPropertyMap) {
+
+        Map<String, Object> allProperties = new LinkedHashMap<String, Object>();
+
+        allProperties.putAll(transportPropertyMap);
+        allProperties.putAll(propertyMap);
+
+        return JSONObject.toJSONString(allProperties);
+
+
+
+/*
         StringBuilder properties = new StringBuilder();
         //transport properties
         for (String transportProperty : transportPropertyMap.keySet()) {
@@ -193,5 +204,7 @@ public class MessageFlowTracerAdminService extends AbstractServiceBusAdmin {
                     .append(",");
         }
         return properties.toString();
+        */
+
     }
 }
