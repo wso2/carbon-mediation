@@ -47,12 +47,6 @@
 
     <link rel="stylesheet" href="css/tree.css">
 
-    <!-- Pull in JQuery dependencies -->
-    <link rel="stylesheet" href="dagre/tipsy.css">
-    <script src="dagre/jquery-1.9.1.min.js"></script>
-    <!--script src="dagre/tipsy.js"></script-->
-
-
     <div style="height: 800px;">
         <div class="live map">
             <svg width=960 height=1000></svg>
@@ -70,7 +64,6 @@
     // Add states to the graph, set labels, and style
     Object.keys(states).forEach(function(state) {
       var value = states[state];
-      value.rx = value.ry = 5;
 
     var html = "<div class=small>";
       html += "<span class=type></span>";
@@ -83,13 +76,10 @@
             rx : 5,
             ry : 5,
             padding: 0,
-            key : state,
             class: nodeStyleClass(value.label)
     };
 
 
-
-      console.log("key: " + state); console.log("value: " + JSON.stringify(value));
 
       g.setNode(state, nodeLabel);
     });
@@ -195,7 +185,6 @@
 
     inner.selectAll("g.node")
             .on("click", function(d) {
-              //  console.log('Clicked on node - ' + JSON.stringify(states[d]));
                 document.getElementById("node_properties").innerHTML = styleTooltip(states[d]);
                 window.location.href="#node_properties";
             });
