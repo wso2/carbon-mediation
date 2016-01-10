@@ -42,75 +42,18 @@
         <h2><fmt:message key="message.flow.chart"/></h2>
 
 
-    <!-- <link rel="stylesheet" href="demo.css"> -->
     <script src="dagre/d3.v3.min.js" charset="utf-8"></script>
     <script src="dagre/dagre-d3.js"></script>
 
-    <!-- Pull in JQuery dependencies -->
-    <link rel="stylesheet" href="dagre/tipsy.css">
-    <script src="dagre/jquery-1.9.1.min.js"></script>
-    <script src="dagre/tipsy.js"></script>
+    <link rel="stylesheet" href="css/tree.css">
 
-    <style id="css">
-    text {
-      font-weight: 300;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
-      font-size: 14px;
-    }
+    <div style="height: 800px;">
+        <div class="live map">
+            <svg width=960 height=1000></svg>
+        </div>
+    </div>
 
-    .node rect {
-      stroke: #333;
-      fill: #fff;
-    }
-
-    .edgePath path {
-      stroke: #333;
-      fill: #333;
-      stroke-width: 1.5px;
-    }
-
-    .node text {
-      pointer-events: none;
-    }
-
-    table#t01 {
-        border: 1px solid black;
-        border-collapse: collapse;
-    }
-
-    table#t01 th{
-        border: 1px solid black;
-        border-collapse: collapse;
-    }
-
-    table#t01 td{
-        border: 1px solid black;
-        border-collapse: collapse;
-    }
-
-    /* This styles the title of the tooltip */
-    .tipsy .name {
-        font-size: 1.5em;
-        font-weight: bold;
-        color: #000;
-        margin: 0;
-    }
-
-    .tipsy .tipsy-inner {
-        background-color: #FFF;
-        color: #000;
-        resize:horizontal; max-width:900px; min-width:100px;
-    }
-
-    /* This styles the body of the tooltip */
-    .tipsy .description {
-        font-size: 1.2em;
-        color: #fff;
-    }
-
-    </style>
-
-    <svg width=960 height=1000></svg>
+    <div id="node_properties" style="display: inline-block;"><i>Select a node to view properties</i></div>
 
     <script id="js">
     // Create a new directed graph
@@ -121,9 +64,24 @@
     // Add states to the graph, set labels, and style
     Object.keys(states).forEach(function(state) {
       var value = states[state];
-//      value.label = state;
-      value.rx = value.ry = 5;
-      g.setNode(state, value);
+
+    var html = "<div class=small>";
+      html += "<span class=type></span>";
+      html += "<span class=name>"+value.label.split(":")[1]+"</span>";
+      html += "</div>";
+
+    var nodeLabel = {
+            labelType : "html",
+            label : html,
+            rx : 5,
+            ry : 5,
+            padding: 0,
+            class: nodeStyleClass(value.label)
+    };
+
+
+
+      g.setNode(state, nodeLabel);
     });
 
     <%for(Edge edge:edges){%>
@@ -144,11 +102,52 @@
       });
     svg.call(zoom);
 
+    function nodeStyleClass(name) {
+        var type = name.split(":")[0];
+        var result = "mediator";
+
+        switch (type) {
+            case "MEDIATOR":
+                result =  "mediator"; break;
+            case "ENDPOINT":
+                result =  "endpoint"; break;
+            case "SEQUENCE":
+                {
+                    var nameValue = name.split(":")[1];
+
+                    if (nameValue == "PROXY_FAULTSEQ" || nameValue == "API_FAULTSEQ")
+                        result =  "fault";
+                    else
+                        return "sequence";
+                    break;
+                }
+            case "REST_API":
+                result =  "api"; break;
+            case "Inbound Endpoint":
+                result =  "inbound"; break;
+            case "Proxy":
+                result =  "proxy"; break;
+
+        }
+
+        return result;
+
+    };
+
+
+
     // Simple function to style the tooltip for the given node.
-    var styleTooltip = function(beforepayload, afterpayload, beforeproperties, afterproperties) {
+    var styleTooltip = function(data) {
+
+        var beforepayload = data.beforepayload;
+        var afterpayload = data.afterpayload;
+        var beforeproperties = data.beforeproperties;
+        var afterproperties = data.afterproperties;
 
         var x = (beforepayload+"").split("\n").join("<br>");
+        x = "<div style='height:200px;overflow: auto;'>" + x + "</div>";
         var y = (afterpayload+"").split("\n").join("<br>");
+        y = "<div style='height:200px;overflow: auto;'>" + y + "</div>";
 
         var a = (beforeproperties+"").split(",");
         var b = (afterproperties+"").split(",");
@@ -171,21 +170,25 @@
 
         afterPropTable = afterPropTable + "</table>";
 
-        return "<h2>Before Payload</h2>"+x+"<br><hr>"+"<h2>Before Properties</h2>"+beforePropTable+"<br><hr>"+"<h2>After Payload</h2>"+y+"<br><hr>"+"<h2>After Properties</h2>"+afterPropTable;
+        var topic = "<br/><h2><b>" + data.label + "</b></h2><br/>"
+
+        return topic + "<table style='width:100%'>"
+                        + "<thead><tr><th style='width:50%'>Before Payload<hr/></th><th style='width:50%'>After Payload<hr/></th></tr></thead>"
+                        + "<tbody><tr><td>" + x + "</td><td>" + y + "</td></tr></tbody>"
+                        + "<thead><tr><th style='width:50%'>Before Properties<hr/></th><th style='width:50%'>After Properties<hr/></th></tr></thead>"
+                        + "<tbody><tr><td>" + beforePropTable + "</td><td>" + afterPropTable + "</td></tr></tbody>"
+                        + "</table>";
     };
 
     // Run the renderer. This is what draws the final graph.
     render(inner, g);
 
     inner.selectAll("g.node")
-            .attr("title", function(v) { return styleTooltip(g.node(v).beforepayload, g.node(v).afterpayload, g.node(v).beforeproperties, g.node(v).afterproperties) })
-            .each(function(v) {
-                $(this).tipsy({ trigger: 'focus', fade:false, gravity: 'n' , opacity: 1, html: true, offset: 10 });
+            .on("click", function(d) {
+                document.getElementById("node_properties").innerHTML = styleTooltip(states[d]);
+                window.location.href="#node_properties";
             });
 
-//    inner.selectAll("g.node")
-//      .attr("title", function(v) { return styleTooltip(g.node(v).label, g.node(v).description) })
-//      .each(function(v) { $(this).tipsy({ gravity: "w", opacity: 1, html: true }); });
 
     // Center the graph
     var initialScale = 1;
