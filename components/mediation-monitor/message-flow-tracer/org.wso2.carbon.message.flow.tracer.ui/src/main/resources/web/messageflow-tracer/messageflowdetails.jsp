@@ -74,7 +74,7 @@
 
     var html = "<div class=small>";
       html += "<span class=type></span>";
-      html += "<span class=name>"+value.label+"</span>";
+      html += "<span class=name>"+value.label.split(":")[1]+"</span>";
       html += "</div>";
 
     var nodeLabel = {
@@ -84,7 +84,7 @@
             ry : 5,
             padding: 0,
             key : state,
-            class: "mediator"
+            class: nodeStyleClass(value.label)
     };
 
 
@@ -111,6 +111,40 @@
                                     "scale(" + d3.event.scale + ")");
       });
     svg.call(zoom);
+
+    function nodeStyleClass(name) {
+        var type = name.split(":")[0];
+        var result = "mediator";
+
+        switch (type) {
+            case "MEDIATOR":
+                result =  "mediator"; break;
+            case "ENDPOINT":
+                result =  "endpoint"; break;
+            case "SEQUENCE":
+                {
+                    var nameValue = name.split(":")[1];
+
+                    if (nameValue == "PROXY_FAULTSEQ" || nameValue == "API_FAULTSEQ")
+                        result =  "fault";
+                    else
+                        return "sequence";
+                    break;
+                }
+            case "REST_API":
+                result =  "api"; break;
+            case "Inbound Endpoint":
+                result =  "inbound"; break;
+            case "Proxy":
+                result =  "proxy"; break;
+
+        }
+
+        return result;
+
+    };
+
+
 
     // Simple function to style the tooltip for the given node.
     var styleTooltip = function(data) {
