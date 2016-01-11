@@ -79,8 +79,6 @@
             class: nodeStyleClass(value.label)
     };
 
-
-
       g.setNode(state, nodeLabel);
     });
 
@@ -131,7 +129,6 @@
         }
 
         return result;
-
     };
 
 
