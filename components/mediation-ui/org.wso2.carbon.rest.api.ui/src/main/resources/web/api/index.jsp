@@ -364,6 +364,37 @@
         });
     }
 
+    function disableTrace(apiName) {
+        $.ajax({
+            type: 'POST',
+            url: 'trace-ajaxprocessor.jsp',
+            data: 'apiName=' + apiName + '&action=disableTrace',
+            success: function (msg) {
+                document.getElementById("disableTrace" + apiName).style.display = "none";
+                document.getElementById("enableTrace" + apiName).style.display = "";
+            },
+            error: function (msg) {
+                CARBON.showErrorDialog('<fmt:message key="api.trace.disable.error"/>' + ' ' + apiName);
+            }
+        });
+    }
+
+    function enableTrace(apiName) {
+        $.ajax({
+            type: 'POST',
+            url: 'trace-ajaxprocessor.jsp',
+            data: 'apiName=' + apiName + '&action=enableTrace',
+            success: function (msg) {
+                document.getElementById("enableTrace" + apiName).style.display = "none";
+                document.getElementById("disableTrace" + apiName).style.display = "";
+            },
+            error: function (msg) {
+                CARBON.showErrorDialog('<fmt:message key="api.trace.enable.error"/>' + ' ' + apiName);
+            }
+        });
+    }
+
+
     function handleCallback(apiName, action) {
         var element;
         if (action == "enable") {
@@ -466,7 +497,7 @@
             <th><fmt:message key="api.select"/></th>
         	<th><fmt:message key="api.name"/></th>
         	<th><fmt:message key="api.invocation.url"/></th>
-        	<th colspan="3"><fmt:message key="apis.table.action.header"/></th>
+        	<th colspan="4"><fmt:message key="apis.table.action.header"/></th>
         </tr>
         </thead>
         <tbody>
@@ -507,7 +538,7 @@
                 </nobr>
             </td>
             <% if (apiData.getStatisticsEnable()) { %>
-            <td style="border-right:none;border-left:none;width:200px">
+            <td style="border-right:none;border-left:none;width:100px">
                 <div class="inlineDiv">
                     <div id="disableStat<%= apiData.getName()%>">
                         <a href="#" onclick="disableStat('<%= apiData.getName() %>')"
@@ -524,7 +555,7 @@
                 </div>
             </td>
             <% } else { %>
-            <td style="border-right:none;border-left:none;width:200px">
+            <td style="border-right:none;border-left:none;width:100px">
                 <div class="inlineDiv">
                     <div id="enableStat<%= apiData.getName()%>">
                         <a href="#" onclick="enableStat('<%=apiData.getName()%>')"
@@ -541,6 +572,43 @@
                 </div>
             </td>
             <% } %>
+
+            <% if (apiData.getTracingEnable()) { %>
+                <td style="border-right:none;border-left:none;width:100px">
+                    <div class="inlineDiv">
+                        <div id="disableTrace<%= apiData.getName()%>">
+                            <a href="#" onclick="disableTrace('<%= apiData.getName() %>')"
+                               class="icon-link"
+                               style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
+                                    key="api.trace.disable.link"/></a>
+                        </div>
+                        <div id="enableTrace<%= apiData.getName()%>" style="display:none;">
+                            <a href="#" onclick="enableTrace('<%= apiData.getName() %>')"
+                               class="icon-link"
+                               style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
+                                    key="api.trace.enable.link"/></a>
+                        </div>
+                    </div>
+                </td>
+                <% } else { %>
+                <td style="border-right:none;border-left:none;width:100px">
+                    <div class="inlineDiv">
+                        <div id="enableTrace<%= apiData.getName()%>">
+                            <a href="#" onclick="enableTrace('<%=apiData.getName()%>')"
+                               class="icon-link"
+                               style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
+                                    key="api.trace.enable.link"/></a>
+                        </div>
+                        <div id="disableTrace<%= apiData.getName()%>" style="display:none">
+                            <a href="#" onclick="disableTrace('<%=apiData.getName()%>')"
+                               class="icon-link"
+                               style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
+                                    key="api.trace.disable.link"/></a>
+                        </div>
+                    </div>
+                </td>
+            <% } %>
+
             <td width="20px" style="text-align:left;border-left:none;border-right:none;width:100px;">
                 <div class="inlineDiv">
                     <% if (apiData.getArtifactContainerName() != null) { %>
