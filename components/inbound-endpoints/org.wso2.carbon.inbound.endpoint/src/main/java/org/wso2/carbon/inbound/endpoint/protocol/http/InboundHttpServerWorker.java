@@ -143,18 +143,24 @@ public class InboundHttpServerWorker extends ServerWorker {
                     }
                 }
 
+                String mediatorId = null;
+                boolean tracing = endpoint.getTraceState() == SynapseConstants.TRACING_ON;
+
+                //Enabled inbound tracing
+                if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled() & tracing) {
+                    if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
+                        MessageFlowTracingDataCollector.setEntryPoint(synCtx, (MessageFlowTracerConstants
+                                                                                       .ENTRY_TYPE_INBOUND_ENDPOINT
+                                                                               + endpointName), synCtx.getMessageID());
+                    }
+
+                    mediatorId = MessageFlowTracingDataCollector.setTraceFlowEvent(synCtx, mediatorId, MessageFlowTracerConstants.ENTRY_TYPE_INBOUND_ENDPOINT + endpointName, true);
+                }
+
                 if (continueDispatch && dispatchPattern != null) {
 
                     boolean processedByAPI = false;
 
-                    //Enabled inbound-api tracing
-                    if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled()) {
-                        if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
-                            MessageFlowTracingDataCollector.setEntryPoint(synCtx, (MessageFlowTracerConstants
-                                                                                         .ENTRY_TYPE_INBOUND_ENDPOINT
-                                                                                 + endpointName), synCtx.getMessageID());
-                        }
-                    }
                     // Trying to dispatch to an API
                     processedByAPI = restHandler.process(synCtx);
                     if (log.isDebugEnabled()) {
@@ -176,7 +182,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                             setInboundProperties(axis2MsgContext);
 
                             //Enabled inbound-proxy/sequence tracing
-                            if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled()) {
+                            if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled() & tracing) {
                                 if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
                                     MessageFlowTracingDataCollector.setEntryPoint(synCtx,
                                                                                 (MessageFlowTracerConstants
@@ -210,6 +216,9 @@ public class InboundHttpServerWorker extends ServerWorker {
                     //should be routed to the main sequence instead inbound defined sequence
                     injectToMainSequence(synCtx, endpoint);
                 }
+
+                MessageFlowTracingDataCollector.setTraceFlowEvent(synCtx, mediatorId, MessageFlowTracerConstants.ENTRY_TYPE_INBOUND_ENDPOINT + endpointName, false);
+
                 // send ack for client if needed
                 sendAck(axis2MsgContext);
             } catch (Exception e) {

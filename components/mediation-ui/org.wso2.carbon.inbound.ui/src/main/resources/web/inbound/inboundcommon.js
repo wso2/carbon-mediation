@@ -457,3 +457,32 @@ function handleCallback(apiName, action) {
     }
 }
 
+function disableTrace(inboundEndpointName) {
+    $.ajax({
+        type: 'POST',
+        url: 'trace-ajaxprocessor.jsp',
+        data: 'inboundEndpointName=' + inboundEndpointName + '&action=disableTrace',
+        success: function (msg) {
+            document.getElementById("disableTrace" + inboundEndpointName).style.display = "none";
+            document.getElementById("enableTrace" + inboundEndpointName).style.display = "";
+        },
+        error: function (msg) {
+            CARBON.showErrorDialog('Error occurred when disabling tracing for the inbound Endpoint :' + inboundEndpointName);
+        }
+    });
+}
+
+function enableTrace(inboundEndpointName) {
+    $.ajax({
+        type: 'POST',
+        url: 'trace-ajaxprocessor.jsp',
+        data: 'inboundEndpointName=' + inboundEndpointName + '&action=enableTrace',
+        success: function (msg) {
+            document.getElementById("disableTrace" + inboundEndpointName).style.display = "";
+            document.getElementById("enableTrace" + inboundEndpointName).style.display = "none";
+        },
+        error: function (msg) {
+            CARBON.showErrorDialog('Error occurred when enabling tracing for the inbound Endpoint :' + inboundEndpointName);
+        }
+    });
+}

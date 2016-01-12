@@ -611,7 +611,9 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.setTraceState(SynapseConstants.TRACING_ON);
 
                 /** Persist the api service if it is not deployed via an artifact container */
-                persistApi(api);
+                if (api.getArtifactContainerName() == null) {
+                    persistApi(api);
+                }
 
                 return apiName;
             } else {
@@ -637,7 +639,9 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.setTraceState(SynapseConstants.TRACING_OFF);
 
                 /** Persist the api service if it is not deployed via an artifact container */
-                persistApi(api);
+                if (api.getArtifactContainerName() == null) {
+                    persistApi(api);
+                }
 
                 return apiName;
             } else {

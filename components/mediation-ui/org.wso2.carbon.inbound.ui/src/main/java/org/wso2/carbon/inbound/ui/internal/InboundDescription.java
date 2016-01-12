@@ -44,6 +44,7 @@ public class InboundDescription {
 	private String artifactContainerName;
 	private boolean isEdited;
 	private boolean isStatisticsEnable;
+	private boolean isTracingEnable;
 
 	public InboundDescription(InboundEndpointDTO inboundEndpoint){
 		this.name = inboundEndpoint.getName();
@@ -104,6 +105,14 @@ public class InboundDescription {
 
 	public void setStatisticsEnable(boolean isStatisticsEnable) {
 		this.isStatisticsEnable = isStatisticsEnable;
+	}
+
+	public boolean getTracingEnable() {
+		return isTracingEnable;
+	}
+
+	public void setTracingEnable(boolean tracingEnable) {
+		isTracingEnable = tracingEnable;
 	}
 
 	public void setName(String name) {

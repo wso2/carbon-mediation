@@ -10,6 +10,33 @@
                </xs:sequence>
             </xs:complexType>
          </xs:element>
+         <xs:element name="getInboundEndpointbyName">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="endointName" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getInboundEndpointbyNameResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2279:InboundEndpointDTO"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="addInboundEndpoint">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="sequence" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="onError" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="classImpl" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="suspend" nillable="true" type="xs:string"/>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="lParameterDTOs" nillable="true" type="ax2279:ParameterDTO"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
          <xs:element name="getAllInboundEndpointNames">
             <xs:complexType>
                <xs:sequence/>
@@ -49,30 +76,31 @@
                </xs:sequence>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getInboundEndpointbyName">
+         <xs:element name="enableTracing">
             <xs:complexType>
                <xs:sequence>
-                  <xs:element minOccurs="0" name="endointName" nillable="true" type="xs:string"/>
+                  <xs:element minOccurs="0" name="inboundEndpointName" nillable="true" type="xs:string"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getInboundEndpointbyNameResponse">
+         <xs:element name="enableTracingResponse">
             <xs:complexType>
                <xs:sequence>
-                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2279:InboundEndpointDTO"/>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
-         <xs:element name="addInboundEndpoint">
+         <xs:element name="disableTracing">
             <xs:complexType>
                <xs:sequence>
-                  <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
-                  <xs:element minOccurs="0" name="sequence" nillable="true" type="xs:string"/>
-                  <xs:element minOccurs="0" name="onError" nillable="true" type="xs:string"/>
-                  <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"/>
-                  <xs:element minOccurs="0" name="classImpl" nillable="true" type="xs:string"/>
-                  <xs:element minOccurs="0" name="suspend" nillable="true" type="xs:string"/>
-                  <xs:element maxOccurs="unbounded" minOccurs="0" name="lParameterDTOs" nillable="true" type="ax2279:ParameterDTO"/>
+                  <xs:element minOccurs="0" name="inboundEndpointName" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="disableTracingResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -122,6 +150,7 @@
                <xs:element minOccurs="0" name="protocol" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="statisticsEnable" type="xs:boolean"/>
                <xs:element minOccurs="0" name="suspend" type="xs:boolean"/>
+               <xs:element minOccurs="0" name="tracingEnable" type="xs:boolean"/>
             </xs:sequence>
          </xs:complexType>
          <xs:complexType name="ParameterDTO">
@@ -145,6 +174,12 @@
    <wsdl:message name="addInboundEndpointFromXMLStringRequest">
       <wsdl:part name="parameters" element="ns1:addInboundEndpointFromXMLString"/>
    </wsdl:message>
+   <wsdl:message name="enableTracingRequest">
+      <wsdl:part name="parameters" element="ns1:enableTracing"/>
+   </wsdl:message>
+   <wsdl:message name="enableTracingResponse">
+      <wsdl:part name="parameters" element="ns1:enableTracingResponse"/>
+   </wsdl:message>
    <wsdl:message name="disableStatisticsRequest">
       <wsdl:part name="parameters" element="ns1:disableStatistics"/>
    </wsdl:message>
@@ -156,6 +191,12 @@
    </wsdl:message>
    <wsdl:message name="removeInboundEndpointRequest">
       <wsdl:part name="parameters" element="ns1:removeInboundEndpoint"/>
+   </wsdl:message>
+   <wsdl:message name="disableTracingRequest">
+      <wsdl:part name="parameters" element="ns1:disableTracing"/>
+   </wsdl:message>
+   <wsdl:message name="disableTracingResponse">
+      <wsdl:part name="parameters" element="ns1:disableTracingResponse"/>
    </wsdl:message>
    <wsdl:message name="getAllInboundEndpointNamesRequest">
       <wsdl:part name="parameters" element="ns1:getAllInboundEndpointNames"/>
@@ -181,6 +222,11 @@
       <wsdl:operation name="addInboundEndpointFromXMLString">
          <wsdl:input message="tns:addInboundEndpointFromXMLStringRequest" wsaw:Action="urn:addInboundEndpointFromXMLString"/>
       </wsdl:operation>
+      <wsdl:operation name="enableTracing">
+         <wsdl:input message="tns:enableTracingRequest" wsaw:Action="urn:enableTracing"/>
+         <wsdl:output message="tns:enableTracingResponse" wsaw:Action="urn:enableTracingResponse"/>
+         <wsdl:fault message="tns:InboundAdminInboundManagementException" name="InboundAdminInboundManagementException" wsaw:Action="urn:enableTracingInboundAdminInboundManagementException"/>
+      </wsdl:operation>
       <wsdl:operation name="disableStatistics">
          <wsdl:input message="tns:disableStatisticsRequest" wsaw:Action="urn:disableStatistics"/>
          <wsdl:output message="tns:disableStatisticsResponse" wsaw:Action="urn:disableStatisticsResponse"/>
@@ -193,6 +239,11 @@
       <wsdl:operation name="removeInboundEndpoint">
          <wsdl:input message="tns:removeInboundEndpointRequest" wsaw:Action="urn:removeInboundEndpoint"/>
          <wsdl:fault message="tns:InboundAdminInboundManagementException" name="InboundAdminInboundManagementException" wsaw:Action="urn:removeInboundEndpointInboundAdminInboundManagementException"/>
+      </wsdl:operation>
+      <wsdl:operation name="disableTracing">
+         <wsdl:input message="tns:disableTracingRequest" wsaw:Action="urn:disableTracing"/>
+         <wsdl:output message="tns:disableTracingResponse" wsaw:Action="urn:disableTracingResponse"/>
+         <wsdl:fault message="tns:InboundAdminInboundManagementException" name="InboundAdminInboundManagementException" wsaw:Action="urn:disableTracingInboundAdminInboundManagementException"/>
       </wsdl:operation>
       <wsdl:operation name="getAllInboundEndpointNames">
          <wsdl:input message="tns:getAllInboundEndpointNamesRequest" wsaw:Action="urn:getAllInboundEndpointNames"/>
@@ -229,6 +280,18 @@
             <soap:body use="literal"/>
          </wsdl:input>
       </wsdl:operation>
+      <wsdl:operation name="enableTracing">
+         <soap:operation soapAction="urn:enableTracing" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="InboundAdminInboundManagementException">
+            <soap:fault use="literal" name="InboundAdminInboundManagementException"/>
+         </wsdl:fault>
+      </wsdl:operation>
       <wsdl:operation name="disableStatistics">
          <soap:operation soapAction="urn:disableStatistics" style="document"/>
          <wsdl:input>
@@ -259,8 +322,32 @@
             <soap:fault use="literal" name="InboundAdminInboundManagementException"/>
          </wsdl:fault>
       </wsdl:operation>
+      <wsdl:operation name="disableTracing">
+         <soap:operation soapAction="urn:disableTracing" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="InboundAdminInboundManagementException">
+            <soap:fault use="literal" name="InboundAdminInboundManagementException"/>
+         </wsdl:fault>
+      </wsdl:operation>
       <wsdl:operation name="getAllInboundEndpointNames">
          <soap:operation soapAction="urn:getAllInboundEndpointNames" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="InboundAdminInboundManagementException">
+            <soap:fault use="literal" name="InboundAdminInboundManagementException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="getInboundEndpointbyName">
+         <soap:operation soapAction="urn:getInboundEndpointbyName" style="document"/>
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
@@ -276,18 +363,6 @@
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
-         <wsdl:fault name="InboundAdminInboundManagementException">
-            <soap:fault use="literal" name="InboundAdminInboundManagementException"/>
-         </wsdl:fault>
-      </wsdl:operation>
-      <wsdl:operation name="getInboundEndpointbyName">
-         <soap:operation soapAction="urn:getInboundEndpointbyName" style="document"/>
-         <wsdl:input>
-            <soap:body use="literal"/>
-         </wsdl:input>
-         <wsdl:output>
-            <soap:body use="literal"/>
-         </wsdl:output>
          <wsdl:fault name="InboundAdminInboundManagementException">
             <soap:fault use="literal" name="InboundAdminInboundManagementException"/>
          </wsdl:fault>
@@ -312,6 +387,18 @@
          <wsdl:input>
             <soap12:body use="literal"/>
          </wsdl:input>
+      </wsdl:operation>
+      <wsdl:operation name="enableTracing">
+         <soap12:operation soapAction="urn:enableTracing" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="InboundAdminInboundManagementException">
+            <soap12:fault use="literal" name="InboundAdminInboundManagementException"/>
+         </wsdl:fault>
       </wsdl:operation>
       <wsdl:operation name="disableStatistics">
          <soap12:operation soapAction="urn:disableStatistics" style="document"/>
@@ -343,8 +430,32 @@
             <soap12:fault use="literal" name="InboundAdminInboundManagementException"/>
          </wsdl:fault>
       </wsdl:operation>
+      <wsdl:operation name="disableTracing">
+         <soap12:operation soapAction="urn:disableTracing" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="InboundAdminInboundManagementException">
+            <soap12:fault use="literal" name="InboundAdminInboundManagementException"/>
+         </wsdl:fault>
+      </wsdl:operation>
       <wsdl:operation name="getAllInboundEndpointNames">
          <soap12:operation soapAction="urn:getAllInboundEndpointNames" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+         <wsdl:fault name="InboundAdminInboundManagementException">
+            <soap12:fault use="literal" name="InboundAdminInboundManagementException"/>
+         </wsdl:fault>
+      </wsdl:operation>
+      <wsdl:operation name="getInboundEndpointbyName">
+         <soap12:operation soapAction="urn:getInboundEndpointbyName" style="document"/>
          <wsdl:input>
             <soap12:body use="literal"/>
          </wsdl:input>
@@ -360,18 +471,6 @@
          <wsdl:input>
             <soap12:body use="literal"/>
          </wsdl:input>
-         <wsdl:fault name="InboundAdminInboundManagementException">
-            <soap12:fault use="literal" name="InboundAdminInboundManagementException"/>
-         </wsdl:fault>
-      </wsdl:operation>
-      <wsdl:operation name="getInboundEndpointbyName">
-         <soap12:operation soapAction="urn:getInboundEndpointbyName" style="document"/>
-         <wsdl:input>
-            <soap12:body use="literal"/>
-         </wsdl:input>
-         <wsdl:output>
-            <soap12:body use="literal"/>
-         </wsdl:output>
          <wsdl:fault name="InboundAdminInboundManagementException">
             <soap12:fault use="literal" name="InboundAdminInboundManagementException"/>
          </wsdl:fault>
@@ -394,6 +493,15 @@
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
       </wsdl:operation>
+      <wsdl:operation name="enableTracing">
+         <http:operation location="enableTracing"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
       <wsdl:operation name="disableStatistics">
          <http:operation location="disableStatistics"/>
          <wsdl:input>
@@ -415,8 +523,26 @@
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
       </wsdl:operation>
+      <wsdl:operation name="disableTracing">
+         <http:operation location="disableTracing"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
       <wsdl:operation name="getAllInboundEndpointNames">
          <http:operation location="getAllInboundEndpointNames"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getInboundEndpointbyName">
+         <http:operation location="getInboundEndpointbyName"/>
          <wsdl:input>
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
@@ -430,25 +556,16 @@
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
       </wsdl:operation>
-      <wsdl:operation name="getInboundEndpointbyName">
-         <http:operation location="getInboundEndpointbyName"/>
-         <wsdl:input>
-            <mime:content type="text/xml" part="parameters"/>
-         </wsdl:input>
-         <wsdl:output>
-            <mime:content type="text/xml" part="parameters"/>
-         </wsdl:output>
-      </wsdl:operation>
    </wsdl:binding>
    <wsdl:service name="InboundAdmin">
       <wsdl:port name="InboundAdminHttpsSoap11Endpoint" binding="tns:InboundAdminSoap11Binding">
-         <soap:address location="https://virajrs-ThinkPad-T540p:8243/services/InboundAdmin.InboundAdminHttpsSoap11Endpoint"/>
+         <soap:address location="https://buddhima-pc:8243/services/InboundAdmin.InboundAdminHttpsSoap11Endpoint"/>
       </wsdl:port>
       <wsdl:port name="InboundAdminHttpsSoap12Endpoint" binding="tns:InboundAdminSoap12Binding">
-         <soap12:address location="https://virajrs-ThinkPad-T540p:8243/services/InboundAdmin.InboundAdminHttpsSoap12Endpoint"/>
+         <soap12:address location="https://buddhima-pc:8243/services/InboundAdmin.InboundAdminHttpsSoap12Endpoint"/>
       </wsdl:port>
       <wsdl:port name="InboundAdminHttpsEndpoint" binding="tns:InboundAdminHttpBinding">
-         <http:address location="https://virajrs-ThinkPad-T540p:8243/services/InboundAdmin.InboundAdminHttpsEndpoint"/>
+         <http:address location="https://buddhima-pc:8243/services/InboundAdmin.InboundAdminHttpsEndpoint"/>
       </wsdl:port>
    </wsdl:service>
 </wsdl:definitions>
