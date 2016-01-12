@@ -105,6 +105,7 @@ public class InboundManagementClient {
                 inboundDescription.setIsEdited(inboundEndpointDTO.getIsEdited());
             }
             inboundDescription.setStatisticsEnable(inboundEndpointDTO.getStatisticsEnable());
+            inboundDescription.setTracingEnable(inboundEndpointDTO.getTracingEnable());
             descriptions.add(inboundDescription);
         }
         if (log.isDebugEnabled()) {
@@ -453,6 +454,24 @@ public class InboundManagementClient {
             stub.disableStatistics(inboundName);
         } catch (Exception e) {
             log.error("Could not disable statistics for the selected Inbound Endpoint", e);
+        }
+        return null;
+    }
+
+    public String enableTracing(String inboundName) throws AxisFault {
+        try {
+            stub.enableTracing(inboundName);
+        } catch (Exception e) {
+            log.error("Could not enable tracing for the selected Inbound Endpoint", e);
+        }
+        return null;
+    }
+
+    public String disableTracing(String inboundName) throws AxisFault {
+        try {
+            stub.disableTracing(inboundName);
+        } catch (Exception e) {
+            log.error("Could not disable tracing for the selected Inbound Endpoint", e);
         }
         return null;
     }

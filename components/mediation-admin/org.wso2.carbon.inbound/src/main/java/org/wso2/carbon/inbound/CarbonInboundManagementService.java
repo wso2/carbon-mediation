@@ -35,6 +35,7 @@ import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.SynapseXMLConfigurationFactory;
@@ -328,6 +329,60 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             }
         } catch (Exception fault) {
             handleException(log, "Couldn't disable statistics of the Inbound Endpoint " + inboundEndpointName + " : " +
+                                 fault.getMessage(), fault);
+        } finally {
+            lock.unlock();
+        }
+        return null;
+    }
+
+    public String enableTracing(String inboundEndpointName) throws InboundManagementException {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            InboundEndpoint inboundEndpoint = synapseConfiguration.getInboundEndpoint(inboundEndpointName);
+            if (inboundEndpoint != null) {
+                inboundEndpoint.setTraceState(SynapseConstants.TRACING_ON);
+
+                /** Persist the api service if it is not deployed via an artifact container */
+                if (inboundEndpoint.getArtifactContainerName() == null) {
+                    persistInboundEndpoint(inboundEndpoint);
+                }
+                return inboundEndpointName;
+            } else {
+                handleException(log, "No defined Inbound Endpoint with name " + inboundEndpointName +
+                                     " found to enable tracing in the Synapse configuration", null);
+            }
+        } catch (Exception fault) {
+            handleException(log, "Couldn't enable tracing of the Inbound Endpoint " + inboundEndpointName + " : " +
+                                 fault.getMessage(), fault);
+        } finally {
+            lock.unlock();
+        }
+        return null;
+    }
+
+    public String disableTracing(String inboundEndpointName) throws InboundManagementException {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            InboundEndpoint inboundEndpoint = synapseConfiguration.getInboundEndpoint(inboundEndpointName);
+            if (inboundEndpoint != null) {
+                inboundEndpoint.setTraceState(SynapseConstants.TRACING_OFF);
+
+                /** Persist the api service if it is not deployed via an artifact container */
+                if (inboundEndpoint.getArtifactContainerName() == null) {
+                    persistInboundEndpoint(inboundEndpoint);
+                }
+                return inboundEndpointName;
+            } else {
+                handleException(log, "No defined Inbound Endpoint with name " + inboundEndpointName +
+                                     " found to disable tracing in the Synapse configuration", null);
+            }
+        } catch (Exception fault) {
+            handleException(log, "Couldn't disable tracing of the Inbound Endpoint " + inboundEndpointName + " : " +
                                  fault.getMessage(), fault);
         } finally {
             lock.unlock();

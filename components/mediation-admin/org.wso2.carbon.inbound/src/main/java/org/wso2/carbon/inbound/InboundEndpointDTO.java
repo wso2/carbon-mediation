@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound;
 
 import java.util.Map;
 
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.inbound.InboundEndpoint;
 
 public class InboundEndpointDTO {
@@ -37,6 +38,7 @@ public class InboundEndpointDTO {
     private String artifactContainerName;
     private boolean isEdited;
     private boolean isStatisticsEnable;
+    private boolean isTracingEnable;
 
     public InboundEndpointDTO(InboundEndpoint inboundEndpoint) {
         this.name = inboundEndpoint.getName();
@@ -50,6 +52,7 @@ public class InboundEndpointDTO {
         this.isEdited = inboundEndpoint.getIsEdited();
         isStatisticsEnable = ((inboundEndpoint.getAspectConfiguration() != null) &&
                               inboundEndpoint.getAspectConfiguration().isStatisticsEnable());
+        isTracingEnable = inboundEndpoint.getTraceState() == SynapseConstants.TRACING_ON;
         Map<String, String> mParams = inboundEndpoint.getParametersMap();        
         if (mParams != null && !mParams.isEmpty()) {
             parameters = new ParameterDTO[mParams.keySet().size()];
@@ -156,5 +159,13 @@ public class InboundEndpointDTO {
 
     public boolean getStatisticsEnable() {
         return isStatisticsEnable;
+    }
+
+    public boolean getTracingEnable() {
+        return isTracingEnable;
+    }
+
+    public void setTracingEnable(boolean tracingEnable) {
+        isTracingEnable = tracingEnable;
     }
 }

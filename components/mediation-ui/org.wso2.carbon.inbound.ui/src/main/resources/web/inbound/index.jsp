@@ -53,7 +53,7 @@
                 <thead>
                 <tr>
                     <th><fmt:message key="inbound.name"/></th>
-                    <th colspan="2"><fmt:message key="inbound.action"/></th>
+                    <th colspan="4"><fmt:message key="inbound.action"/></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -65,7 +65,7 @@
                 %>
                 <tr id="tr_<%=name%>">
 
-                    <td>
+                    <td width="600px">
                         <% if (inboundDescription.getArtifactContainerName() != null) { %>
                             <img src="images/applications.gif">
                         <% } %>
@@ -74,26 +74,9 @@
                             <span style="color:grey"> ( Edited )</span>
                         <% } %>
                     </td>
-                    <td>
-                        <% if (inboundDescription.getArtifactContainerName() !=null) { %>
-                            <a href="javascript:editCAppInbound('<%=name%>')" id="config_link"
-                               class="edit-icon-link"><fmt:message key="inbound.edit"/></a>
-                        <% } else { %>
-                            <a href="javascript:editRecord('<%=name%>')" id="config_link"
-                               class="edit-icon-link"><fmt:message key="inbound.edit"/></a>
-                        <% } %>
 
-                        <% if (inboundDescription.getArtifactContainerName() != null) { %>
-                        <a href="#" id="delete_link" class="delete-icon-link" onclick="return false"><fmt:message
-                                key="inbound.property.delete"/></a>
-                        <% } else { %>
-                            <a href="javascript:deleteRecord('<%=name%>')"
-                               id="delete_link" class="delete-icon-link"><fmt:message
-                                    key="inbound.property.delete"/></a>
-                        <% } %>
-                    </td>
                     <% if (inboundDescription.getStatisticsEnable()) { %>
-                    <td style="border-right:none;border-left:none;width:200px">
+                    <td style="border-right:none;border-left:none;width:100px">
                         <div class="inlineDiv">
                             <div id="disableStat<%= inboundDescription.getName()%>">
                                 <a href="#" onclick="disableStat('<%= inboundDescription.getName() %>')"
@@ -109,7 +92,7 @@
                         </div>
                     </td>
                     <% } else { %>
-                    <td style="border-right:none;border-left:none;width:200px">
+                    <td style="border-right:none;border-left:none;width:100px">
                         <div class="inlineDiv">
                             <div id="enableStat<%= inboundDescription.getName()%>">
                                 <a href="#" onclick="enableStat('<%=inboundDescription.getName()%>')"
@@ -125,6 +108,65 @@
                         </div>
                     </td>
                     <% } %>
+
+                    <% if (inboundDescription.getTracingEnable()) { %>
+                    <td style="border-right:none;border-left:none;width:100px">
+                        <div class="inlineDiv">
+                            <div id="disableTrace<%= inboundDescription.getName()%>">
+                                <a href="#" onclick="disableTrace('<%= inboundDescription.getName() %>')"
+                                   class="icon-link"
+                                   style="background-image:url(../admin/images/trace-icon.gif);">Disable Tracing</a>
+                            </div>
+                            <div id="enableTrace<%= inboundDescription.getName()%>" style="display:none;">
+                                <a href="#" onclick="enableTrace('<%= inboundDescription.getName() %>')"
+                                   class="icon-link"
+                                   style="background-image:url(../admin/images/trace-icon-disabled.gif);">Enable
+                                    Tracing</a>
+                            </div>
+                        </div>
+                    </td>
+                    <% } else { %>
+                    <td style="border-right:none;border-left:none;width:100px">
+                        <div class="inlineDiv">
+                            <div id="enableTrace<%= inboundDescription.getName()%>">
+                                <a href="#" onclick="enableTrace('<%=inboundDescription.getName()%>')"
+                                   class="icon-link"
+                                   style="background-image:url(../admin/images/trace-icon-disabled.gif);">Enable
+                                    Tracing</a>
+                            </div>
+                            <div id="disableTrace<%= inboundDescription.getName()%>" style="display:none">
+                                <a href="#" onclick="disableTrace('<%=inboundDescription.getName()%>')"
+                                   class="icon-link"
+                                   style="background-image:url(../admin/images/trace-icon.gif);">Disable Tracing</a>
+                            </div>
+                        </div>
+                    </td>
+                    <% } %>
+
+                    <td style="border-right:none;border-left:none;width:100px">
+                        <div class="inlineDiv">
+                        <% if (inboundDescription.getArtifactContainerName() !=null) { %>
+                            <a href="javascript:editCAppInbound('<%=name%>')" id="config_link"
+                               class="edit-icon-link"><fmt:message key="inbound.edit"/></a>
+                        <% } else { %>
+                            <a href="javascript:editRecord('<%=name%>')" id="config_link"
+                               class="edit-icon-link"><fmt:message key="inbound.edit"/></a>
+                        <% } %>
+                        </div>
+                    </td>
+
+                    <td style="border-left:none;width:100px">
+                        <div class="inlineDiv">
+                        <% if (inboundDescription.getArtifactContainerName() != null) { %>
+                        <a href="#" id="delete_link" class="delete-icon-link" onclick="return false"><fmt:message
+                                key="inbound.property.delete"/></a>
+                        <% } else { %>
+                            <a href="javascript:deleteRecord('<%=name%>')"
+                               id="delete_link" class="delete-icon-link"><fmt:message
+                                    key="inbound.property.delete"/></a>
+                        <% } %>
+                        </div>
+                    </td>
 
                 </tr>
                 <%
