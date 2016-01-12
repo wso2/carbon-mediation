@@ -37,6 +37,8 @@ public class APIData {
 
 	private boolean isStatisticsEnable;
 
+	private boolean isTracingEnable;
+
 	public String getName() {
 		return name;
 	}
@@ -123,5 +125,13 @@ public class APIData {
 
 	public boolean getStatisticsEnable() {
 		return isStatisticsEnable;
+	}
+
+	public boolean getTracingEnable() {
+		return isTracingEnable;
+	}
+
+	public void setTracingEnable(boolean tracingEnable) {
+		isTracingEnable = tracingEnable;
 	}
 }

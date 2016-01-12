@@ -346,6 +346,11 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     } else {
                         apiData.setStatisticsEnable(false);
                     }
+                    if (SynapseConstants.TRACING_ON == api.getTraceState()) {
+                        apiData.setTracingEnable(true);
+                    } else {
+                        apiData.setTracingEnable(false);
+                    }
                     if (api.getArtifactContainerName() != null) {
                         apiData.setArtifactContainerName(api.getArtifactContainerName());
                     }
@@ -589,6 +594,58 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             }
         } catch (Exception fault) {
             handleException(log, "Couldn't disable statistics of the API " + apiName + " : " + fault.getMessage(),
+                            fault);
+        } finally {
+            lock.unlock();
+        }
+        return null;
+    }
+
+    public String enableTracing(String apiName) throws APIException {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            API api = synapseConfiguration.getAPI(apiName);
+            if (api != null) {
+                api.setTraceState(SynapseConstants.TRACING_ON);
+
+                /** Persist the api service if it is not deployed via an artifact container */
+                persistApi(api);
+
+                return apiName;
+            } else {
+                handleException(log, "No defined API with name " + apiName +
+                                     " found to enable tracing in the Synapse configuration", null);
+            }
+        } catch (Exception fault) {
+            handleException(log, "Couldn't enable tracing of the API " + apiName + " : " + fault.getMessage(),
+                            fault);
+        } finally {
+            lock.unlock();
+        }
+        return null;
+    }
+
+    public String disableTracing(String apiName) throws APIException {
+        final Lock lock = getLock();
+        try {
+            lock.lock();
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            API api = synapseConfiguration.getAPI(apiName);
+            if (api != null) {
+                api.setTraceState(SynapseConstants.TRACING_OFF);
+
+                /** Persist the api service if it is not deployed via an artifact container */
+                persistApi(api);
+
+                return apiName;
+            } else {
+                handleException(log, "No defined API with name " + apiName +
+                                     " found to disable tracing in the Synapse configuration", null);
+            }
+        } catch (Exception fault) {
+            handleException(log, "Couldn't disable tracing of the API " + apiName + " : " + fault.getMessage(),
                             fault);
         } finally {
             lock.unlock();

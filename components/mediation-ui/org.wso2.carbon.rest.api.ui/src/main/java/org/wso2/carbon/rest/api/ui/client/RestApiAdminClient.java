@@ -312,4 +312,22 @@ public class RestApiAdminClient {
 		}
 		return null;
 	}
+
+	public String enableTracing(String apiName) throws AxisFault {
+		try {
+			stub.enableTracing(apiName);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.enable.api.statistics"), e);
+		}
+		return null;
+	}
+
+	public String disableTracing(String apiName) throws AxisFault {
+		try {
+			stub.disableTracing(apiName);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.disable.api.statistics"), e);
+		}
+		return null;
+	}
 }
