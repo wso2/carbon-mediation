@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.nio.reactor.IOEventDispatch;
 import org.apache.http.nio.reactor.IOSession;
 import org.apache.synapse.transport.passthru.util.BufferFactory;
+import org.apache.synapse.transport.passthru.util.ControlledByteBuffer;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.codec.HL7Codec;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContext;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContextFactory;
@@ -38,8 +39,8 @@ public class MLLPSourceHandler implements IOEventDispatch {
 
     private final ByteBuffer hl7TrailerBuf = ByteBuffer.wrap(MLLPConstants.HL7_TRAILER);
     private BufferFactory bufferFactory;
-    private ByteBuffer inputBuffer;
-    private ByteBuffer outputBuffer;
+    private ControlledByteBuffer inputBuffer;
+    private ControlledByteBuffer outputBuffer;
 
     public MLLPSourceHandler() { /* default constructor */ }
 
@@ -72,10 +73,10 @@ public class MLLPSourceHandler implements IOEventDispatch {
         inputBuffer.clear();
         try {
             int read;
-            while ((read = ch.read(inputBuffer)) > 0) {
+            while ((read = ch.read(inputBuffer.getByteBuffer())) > 0) {
                 inputBuffer.flip();
                 try {
-                    mllpContext.getCodec().decode(inputBuffer, mllpContext);
+                    mllpContext.getCodec().decode(inputBuffer.getByteBuffer(), mllpContext);
                 } catch (MLLProtocolException e) {
                     handleException(session, mllpContext, e);
                     clearInputBuffers(mllpContext);
@@ -130,7 +131,7 @@ public class MLLPSourceHandler implements IOEventDispatch {
 
         outputBuffer.clear();
         try {
-            mllpContext.getCodec().encode(outputBuffer, mllpContext);
+            mllpContext.getCodec().encode(outputBuffer.getByteBuffer(), mllpContext);
         } catch (HL7Exception e) {
             shutdownConnection(session, mllpContext, e);
         } catch (IOException e) {
@@ -144,7 +145,7 @@ public class MLLPSourceHandler implements IOEventDispatch {
         }
 
         try {
-            session.channel().write(outputBuffer);
+            session.channel().write(outputBuffer.getByteBuffer());
             if (mllpContext.getCodec().isWriteTrailer()) {
                 session.channel().write(hl7TrailerBuf);
                 hl7TrailerBuf.flip();
