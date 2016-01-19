@@ -24,11 +24,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.data.raw.EndpointStatisticLog;
 import org.apache.synapse.aspects.flow.statistics.data.raw.StatisticsLog;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
+import org.wso2.carbon.mediation.flow.statistics.service.data.MessageFlowStatisticConstants;
 import org.wso2.carbon.mediation.flow.statistics.service.data.StatisticTreeWrapper;
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticCollectionViewMXBean;
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticsCompositeObject;
 import org.wso2.carbon.mediation.flow.statistics.store.tree.data.EndpointDataHolder;
 import org.wso2.carbon.mediation.flow.statistics.store.tree.StatisticsTree;
+import org.wso2.carbon.mediation.flow.statistics.store.tree.data.StatisticDataHolder;
 
 import java.util.*;
 
@@ -139,6 +141,49 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 
 	public StatisticTreeWrapper getSequenceStatistics(String sequenceName) {
 		return sequenceStatistics.get(sequenceName).getComponentTree();
+	}
+
+	public StatisticDataHolder[] getAllMessageFlows(String request) {
+		String[] requestData = request.split(":");
+		if (requestData.length == 2) {
+			switch (Integer.parseInt(requestData[0])) {
+				case 1:
+					return proxyStatistics.get(requestData[1]).getAllMessageFlows();
+				case 2:
+					return apiStatistics.get(requestData[1]).getAllMessageFlows();
+				case 3:
+					return inboundEndpointStatistics.get(requestData[1]).getAllMessageFlows();
+				case 4:
+					return sequenceStatistics.get(requestData[1]).getAllMessageFlows();
+				case 5:
+					return null;//endpointStatistics.get(requestData[1]).getAllMessageFlows();
+				default:
+					log.error("Requested message flow statistics incorrect type");
+			}
+		}
+		return null;
+	}
+
+	public String getMessageFlowTree(String request) {
+		String[] requestData = request.split(":");
+		if (requestData.length == 3) {
+			switch (Integer.parseInt(requestData[0])) {
+				case 1:
+					return proxyStatistics.get(requestData[1]).getMessageFlowStatisticTree(requestData[2]);
+				case 2:
+					return apiStatistics.get(requestData[1]).getMessageFlowStatisticTree(requestData[2]);
+				case 3:
+					return inboundEndpointStatistics.get(requestData[1]).getMessageFlowStatisticTree(requestData[2]);
+				case 4:
+					return sequenceStatistics.get(requestData[1]).getMessageFlowStatisticTree(requestData[2]);
+				case 5:
+					return null;//endpointStatistics.get(requestData[1]).getMessageFlowStatisticTree(requestData[2]);
+				default:
+					log.error("Requested message flow statistics incorrect type");
+			}
+		}
+		return null;
+
 	}
 
 	@Override public void resetAPIStatistics() {

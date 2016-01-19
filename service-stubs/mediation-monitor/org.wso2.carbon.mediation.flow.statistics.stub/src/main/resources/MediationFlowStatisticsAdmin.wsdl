@@ -1,67 +1,31 @@
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://service.statistics.flow.mediation.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax2297="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://service.statistics.flow.mediation.carbon.wso2.org" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:ax2297="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax2299="http://data.tree.store.statistics.flow.mediation.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
    <wsdl:documentation>MediationFlowStatisticsAdmin</wsdl:documentation>
    <wsdl:types>
-      <xs:schema xmlns:ax2298="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
+      <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://data.tree.store.statistics.flow.mediation.carbon.wso2.org/xsd">
+         <xs:complexType name="StatisticDataHolder">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="componentId" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="componentType" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="faultCount" type="xs:int"/>
+               <xs:element minOccurs="0" name="messageFlowId" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="processingTime" type="xs:long"/>
+               <xs:element minOccurs="0" name="statisticTree" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="timeStamp" nillable="true" type="xs:string"/>
+            </xs:sequence>
+         </xs:complexType>
+      </xs:schema>
+      <xs:schema xmlns:ax2300="http://data.tree.store.statistics.flow.mediation.carbon.wso2.org/xsd" xmlns:ax2298="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.statistics.flow.mediation.carbon.wso2.org">
          <xs:import namespace="http://data.service.statistics.flow.mediation.carbon.wso2.org/xsd"/>
-         <xs:element name="getAllInboundEndpointStatistics">
+         <xs:import namespace="http://data.tree.store.statistics.flow.mediation.carbon.wso2.org/xsd"/>
+         <xs:element name="getAllSequenceStatistics">
             <xs:complexType>
                <xs:sequence/>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getAllInboundEndpointStatisticsResponse">
+         <xs:element name="getAllSequenceStatisticsResponse">
             <xs:complexType>
                <xs:sequence>
                   <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getAllApiStatistics">
-            <xs:complexType>
-               <xs:sequence/>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getAllApiStatisticsResponse">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getAllProxyStatistics">
-            <xs:complexType>
-               <xs:sequence/>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getAllProxyStatisticsResponse">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getAllEndpointStatistics">
-            <xs:complexType>
-               <xs:sequence/>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getAllEndpointStatisticsResponse">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getProxyStatistics">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element minOccurs="0" name="componentID" nillable="true" type="xs:string"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getProxyStatisticsResponse">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2297:StatisticTreeWrapper"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -107,15 +71,93 @@
                </xs:sequence>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getAllSequenceStatistics">
+         <xs:element name="getMessageFlows">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="request" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getMessageFlowsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2299:StatisticDataHolder"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllApiStatistics">
             <xs:complexType>
                <xs:sequence/>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getAllSequenceStatisticsResponse">
+         <xs:element name="getAllApiStatisticsResponse">
             <xs:complexType>
                <xs:sequence>
                   <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllProxyStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllProxyStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllInboundEndpointStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllInboundEndpointStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllEndpointStatistics">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllEndpointStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2297:AdminData"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getProxyStatistics">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="componentID" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getProxyStatisticsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2297:StatisticTreeWrapper"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getMessageFlowDetails">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="request" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getMessageFlowDetailsResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -177,6 +219,18 @@
    <wsdl:message name="getSequenceStatisticsResponse">
       <wsdl:part name="parameters" element="ns:getSequenceStatisticsResponse"/>
    </wsdl:message>
+   <wsdl:message name="getMessageFlowsRequest">
+      <wsdl:part name="parameters" element="ns:getMessageFlows"/>
+   </wsdl:message>
+   <wsdl:message name="getMessageFlowsResponse">
+      <wsdl:part name="parameters" element="ns:getMessageFlowsResponse"/>
+   </wsdl:message>
+   <wsdl:message name="getMessageFlowDetailsRequest">
+      <wsdl:part name="parameters" element="ns:getMessageFlowDetails"/>
+   </wsdl:message>
+   <wsdl:message name="getMessageFlowDetailsResponse">
+      <wsdl:part name="parameters" element="ns:getMessageFlowDetailsResponse"/>
+   </wsdl:message>
    <wsdl:message name="getProxyStatisticsRequest">
       <wsdl:part name="parameters" element="ns:getProxyStatistics"/>
    </wsdl:message>
@@ -223,6 +277,14 @@
       <wsdl:operation name="getSequenceStatistics">
          <wsdl:input message="ns:getSequenceStatisticsRequest" wsaw:Action="urn:getSequenceStatistics"/>
          <wsdl:output message="ns:getSequenceStatisticsResponse" wsaw:Action="urn:getSequenceStatisticsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlows">
+         <wsdl:input message="ns:getMessageFlowsRequest" wsaw:Action="urn:getMessageFlows"/>
+         <wsdl:output message="ns:getMessageFlowsResponse" wsaw:Action="urn:getMessageFlowsResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlowDetails">
+         <wsdl:input message="ns:getMessageFlowDetailsRequest" wsaw:Action="urn:getMessageFlowDetails"/>
+         <wsdl:output message="ns:getMessageFlowDetailsResponse" wsaw:Action="urn:getMessageFlowDetailsResponse"/>
       </wsdl:operation>
       <wsdl:operation name="getProxyStatistics">
          <wsdl:input message="ns:getProxyStatisticsRequest" wsaw:Action="urn:getProxyStatistics"/>
@@ -283,8 +345,26 @@
             <soap:body use="literal"/>
          </wsdl:output>
       </wsdl:operation>
+      <wsdl:operation name="getMessageFlows">
+         <soap:operation soapAction="urn:getMessageFlows" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
       <wsdl:operation name="getProxyStatistics">
          <soap:operation soapAction="urn:getProxyStatistics" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlowDetails">
+         <soap:operation soapAction="urn:getMessageFlowDetails" style="document"/>
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
@@ -367,8 +447,26 @@
             <soap12:body use="literal"/>
          </wsdl:output>
       </wsdl:operation>
+      <wsdl:operation name="getMessageFlows">
+         <soap12:operation soapAction="urn:getMessageFlows" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
       <wsdl:operation name="getProxyStatistics">
          <soap12:operation soapAction="urn:getProxyStatistics" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlowDetails">
+         <soap12:operation soapAction="urn:getMessageFlowDetails" style="document"/>
          <wsdl:input>
             <soap12:body use="literal"/>
          </wsdl:input>
@@ -451,8 +549,26 @@
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:output>
       </wsdl:operation>
+      <wsdl:operation name="getMessageFlows">
+         <http:operation location="getMessageFlows"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
       <wsdl:operation name="getProxyStatistics">
          <http:operation location="getProxyStatistics"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getMessageFlowDetails">
+         <http:operation location="getMessageFlowDetails"/>
          <wsdl:input>
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
@@ -499,13 +615,14 @@
    </wsdl:binding>
    <wsdl:service name="MediationFlowStatisticsAdmin">
       <wsdl:port name="MediationFlowStatisticsAdminHttpsSoap11Endpoint" binding="ns:MediationFlowStatisticsAdminSoap11Binding">
-         <soap:address location="https://virajrs-ThinkPad-T540p:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsSoap11Endpoint"/>
+         <soap:address
+                 location="https://localhost:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsSoap11Endpoint"/>
       </wsdl:port>
       <wsdl:port name="MediationFlowStatisticsAdminHttpsSoap12Endpoint" binding="ns:MediationFlowStatisticsAdminSoap12Binding">
-         <soap12:address location="https://virajrs-ThinkPad-T540p:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsSoap12Endpoint"/>
+         <soap12:address location="https://localhost:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsSoap12Endpoint"/>
       </wsdl:port>
       <wsdl:port name="MediationFlowStatisticsAdminHttpsEndpoint" binding="ns:MediationFlowStatisticsAdminHttpBinding">
-         <http:address location="https://virajrs-ThinkPad-T540p:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsEndpoint"/>
+         <http:address location="https://localhost:8243/services/MediationFlowStatisticsAdmin.MediationFlowStatisticsAdminHttpsEndpoint"/>
       </wsdl:port>
    </wsdl:service>
 </wsdl:definitions>
