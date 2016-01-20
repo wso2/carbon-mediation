@@ -17,6 +17,8 @@ package org.wso2.carbon.das.mediationstats.data.publisher.data;
 
 
 
+import net.minidev.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -116,8 +118,8 @@ public class TraceComponentData {
         payloadData.add(this.getTimestamp());
         payloadData.add(this.getResponse());
         payloadData.add(this.getStart());
-        payloadData.add(this.getPropertyMap());
-        payloadData.add(this.getTransportPropertyMap());
+        payloadData.add(JSONObject.toJSONString(this.getPropertyMap()));
+        payloadData.add(JSONObject.toJSONString(this.getTransportPropertyMap()));
 
         return payloadData;
     }

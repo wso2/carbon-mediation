@@ -16,6 +16,7 @@
 package org.wso2.carbon.das.mediationstats.data.publisher.publish;
 
 
+import net.minidev.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
@@ -93,12 +94,12 @@ public class Publisher {
         eventData.add(traceComponentData.getMessageId());
         eventData.add(traceComponentData.getComponentId());
         eventData.add(traceComponentData.getComponentName());
-        eventData.add(traceComponentData.getPayload());
         eventData.add(traceComponentData.getTimestamp());
+        eventData.add(traceComponentData.getPayload());
         eventData.add(traceComponentData.getResponse());
         eventData.add(traceComponentData.getStart());
-        eventData.add(traceComponentData.getPropertyMap().toString());
-        eventData.add(traceComponentData.getTransportPropertyMap().toString());
+        eventData.add(JSONObject.toJSONString(traceComponentData.getPropertyMap()));
+        eventData.add(JSONObject.toJSONString(traceComponentData.getTransportPropertyMap()));
     }
 
 
@@ -119,7 +120,7 @@ public class Publisher {
         String streamId = null;
 
         try {
-            String serverUrl = "tcp://10.100.5.195:7611";
+            String serverUrl = "tcp://127.0.0.1:7611";
             String userName = "admin";
             String passWord = "admin";
             Object[] metaData = metaDataKeyList.toArray();
@@ -201,7 +202,7 @@ public class Publisher {
         String streamId = null;
 
         try {
-            String serverUrl = "tcp://10.100.5.195:7611";
+            String serverUrl = "tcp://127.0.0.1:7611";
             String userName = "admin";
             String passWord = "admin";
             Object[] metaData = metaDataKeyList.toArray();
