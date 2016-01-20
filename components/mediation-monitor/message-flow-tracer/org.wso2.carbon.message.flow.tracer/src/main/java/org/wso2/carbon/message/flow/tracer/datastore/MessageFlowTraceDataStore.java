@@ -17,11 +17,66 @@
 */
 package org.wso2.carbon.message.flow.tracer.datastore;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.messageflowtracer.data.MessageFlowDataHolder;
+import org.wso2.carbon.message.flow.tracer.data.MessageFlowTracingObserver;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class MessageFlowTraceDataStore {
 
+    private static final Log log = LogFactory.getLog(MessageFlowTraceDataStore.class);
+
     private MessageFlowDataHolder messageFlowDataHolder;
+
+    private Set<MessageFlowTracingObserver> observers =
+            new HashSet<MessageFlowTracingObserver>();
+
+    /**
+     * Register a custom statistics consumer to receive updates from this
+     * statistics store
+     *
+     * @param o The MediationStatisticsObserver instance to be notified of data updates
+     */
+    public void registerObserver(MessageFlowTracingObserver o) {
+        observers.add(o);
+    }
+
+    /**
+     * Unregister the custom statistics consumer from the mediation statistics store
+     *
+     * @param o The MediationStatisticsObserver instance to be removed
+     */
+    public void unregisterObserver(MessageFlowTracingObserver o) {
+        if (observers.contains(o)) {
+            observers.remove(o);
+            o.destroy();
+        }
+    }
+
+    void unregisterObservers() {
+        if (log.isDebugEnabled()) {
+            log.debug("Unregistering mediation statistics observers");
+        }
+
+        for (MessageFlowTracingObserver o : observers) {
+            o.destroy();
+        }
+        observers.clear();
+    }
+
+    private void notifyObservers(Object snapshot) {
+
+        for (MessageFlowTracingObserver o : observers) {
+            try {
+                o.updateStatistics(snapshot);
+            } catch (Throwable t) {
+                log.error("Error occured while notifying the statistics observer", t);
+            }
+        }
+    }
 
     public MessageFlowTraceDataStore(MessageFlowDataHolder messageFlowDataHolder) {
         this.messageFlowDataHolder = messageFlowDataHolder;
@@ -29,5 +84,9 @@ public class MessageFlowTraceDataStore {
 
     public MessageFlowDataHolder getMessageFlowDataHolder(){
         return messageFlowDataHolder;
+    }
+
+    public void updateStatistics(Object traceEntry) {
+        notifyObservers(traceEntry);
     }
 }

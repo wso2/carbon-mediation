@@ -203,7 +203,7 @@
                            "                    </td>" +
                            "<td>\n" +
                            "<a onClick='javaScript:removeColumn(\"" + sId + "\")'" +
-                           "style='background-image: url(../bampubsvcstat/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
+                           "style='background-image: url(../daspubsvcstat/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
                            "                    </td>" +
                            "</tr>";
 
@@ -224,7 +224,7 @@
                            "                    </td>" +
                            "<td>\n" +
                            "<a onClick='javaScript:removeColumn(\"" + sId + "\")'" +
-                           "style='background-image: url(../bampubsvcstat/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
+                           "style='background-image: url(../daspubsvcstat/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
                            "                    </td>" +
                            "</tr></table>";
 
@@ -246,7 +246,7 @@
         } else{
             jQuery.ajax({
                             type:"GET",
-                            url:"../bammediationstatpub/test_server_ajaxprocessor.jsp",
+                            url:"../dasmediationstatpub/test_server_ajaxprocessor.jsp",
                             data:{action:"testServer", ip:serverIp, port:authPort},
                             success:function(data){
                                 if(data != null && data != ""){
@@ -371,7 +371,7 @@
                             <tr>
                                 <td colspan="3">
                                     <a onClick='javaScript:addColumn()' style='background-image:
-                                    url(../bammediationstatpub/images/add.gif);' class='icon-link addIcon'>Add
+                                    url(../dasmediationstatpub/images/add.gif);' class='icon-link addIcon'>Add
                                                                                                      Property</a>
                                 </td>
                             </tr>
@@ -393,7 +393,7 @@
 
                                 <td>
                                     <a onClick='javaScript:removeColumn("propertyTable_<%=i%>")' style='background-image:
-                                    url(../bammediationstatpub/images/delete.gif);' class='icon-link addIcon'>Remove
+                                    url(../dasmediationstatpub/images/delete.gif);' class='icon-link addIcon'>Remove
                                                                                                         Property</a>
                                 </td>
 
@@ -413,7 +413,7 @@
                                 <tr>
                                     <td colspan="3">
                                     <a onClick='javaScript:addMetaData()'
-                                    style='background-image: url(../bammediationstatpub/images/add.gif);'
+                                    style='background-image: url(../dasmediationstatpub/images/add.gif);'
                                     class='icon-link addIcon'>Add Property</a>
                                     </td>
                                 </tr>

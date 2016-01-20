@@ -18,8 +18,15 @@
 package org.wso2.carbon.message.flow.tracer.services;
 
 import org.apache.log4j.Logger;
+import org.apache.synapse.aspects.statistics.view.InOutStatisticsView;
+import org.apache.synapse.messageflowtracer.data.MessageFlowComponentEntry;
+import org.apache.synapse.messageflowtracer.data.MessageFlowTraceEntry;
+import org.apache.synapse.messageflowtracer.processors.MessageDataCollector;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
+
+import java.util.List;
+import java.util.Map;
 
 public class MessageFlowTraceReporterThread extends Thread {
     private static Logger log = Logger.getLogger(MessageFlowTraceReporterThread.class);
@@ -82,6 +89,32 @@ public class MessageFlowTraceReporterThread extends Thread {
     }
 
     private void collectDataAndReport(){
+        if (log.isDebugEnabled()) {
+            log.trace("Starting new mediation statistics collection cycle");
+        }
+
+        MessageDataCollector tracingStatisticsCollector =
+                synapseEnvironmentService.getSynapseEnvironment().getMessageDataCollector();
+
+        if (tracingStatisticsCollector == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Statistics collector is not available in the Synapse environment");
+            }
+            delay();
+            return;
+        }
+
+
+        try {
+            while (!tracingStatisticsCollector.isEmpty()){
+
+                Object o = tracingStatisticsCollector.deQueue();
+                messageFlowTraceDataStore.updateStatistics(o);
+            }
+
+        } catch (Exception e) {
+            log.error("Error while obtaining tracing data.", e);
+        }
     }
 
     public void shutdown() {
