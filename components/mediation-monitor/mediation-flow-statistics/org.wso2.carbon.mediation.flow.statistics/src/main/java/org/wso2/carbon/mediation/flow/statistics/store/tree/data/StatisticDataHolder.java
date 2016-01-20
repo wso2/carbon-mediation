@@ -18,7 +18,9 @@
 
 package org.wso2.carbon.mediation.flow.statistics.store.tree.data;
 
+import org.apache.synapse.aspects.flow.statistics.data.raw.EndpointStatisticLog;
 import org.apache.synapse.aspects.flow.statistics.data.raw.StatisticsLog;
+import org.apache.synapse.aspects.flow.statistics.util.StatisticsConstants;
 
 /**
  * This holds statistics for component per message flow
@@ -47,6 +49,18 @@ public class StatisticDataHolder {
 		this.faultCount = statisticsLog.getNoOfFaults();
 		this.statisticTree = statisticTree;
 		this.timeStamp = statisticsLog.getTimeStamp();
+	}
+
+	public StatisticDataHolder(EndpointStatisticLog endpointStatisticLog) {
+		this.messageFlowId = endpointStatisticLog.getMessageFlowId().replace(':', '_');
+		this.componentType = StatisticsConstants.FLOW_STATISTICS_ENDPOINT;
+		this.componentId = endpointStatisticLog.getComponentId();
+		this.processingTime = endpointStatisticLog.getEndTime() - endpointStatisticLog.getStartTime();
+		if (endpointStatisticLog.isHasFault()) {
+			this.faultCount = 1;
+		}
+		this.statisticTree = null;
+		this.timeStamp = endpointStatisticLog.getTimestamp();
 	}
 
 	public String getMessageFlowId() {

@@ -110,9 +110,8 @@
                 var FAULT_HANDLER_NODE_CLASS = "fault";
 
                 //Starting initializing the statistic tree----------------------------------
-                function getLabels(){
-                    for(var i = 0; i<tree.nodeList.length;i++)
-                    {
+                function getLabels() {
+                    for (var i = 0; i < tree.nodeList.length; i++) {
                         var nodeClass = getNodeClass(tree.nodeList[i].componentType);
                         var html = "<div class=small>";
                         html += "<span class=type></span>";
@@ -134,7 +133,7 @@
                         html += "<span class=type></span>";
                         html += "<table>";
                         html += "<tr><td><span class=name_underlined>" + tree.nodeList[i].componentId + "</span></tr></td>";
-                        html += "<tr><td><span class=description>Component Type : " + tree.nodeList[i].componentType +  "</span></tr></td>";
+                        html += "<tr><td><span class=description>Component Type : " + tree.nodeList[i].componentType + "</span></tr></td>";
                         html += "<tr><td><span class=description>ProcessingTime (ms) : " + tree.nodeList[i].processingTime + "</span></tr></td>";
                         html += "<tr><td><span class=description>Fault Count : " + tree.nodeList[i].faultCount + "</span></tr></td>";
                         html += "</table>";
@@ -157,7 +156,7 @@
                 window.onload = function () {
                     g = new dagreD3.graphlib.Graph().setGraph({});
                     getLabels();
-                    for (var i = 0; i < tree.nodeList.length ;i++) {
+                    for (var i = 0; i < tree.nodeList.length; i++) {
                         g.setNode(i, JSON.parse(JSON.stringify(simpleNodes[i])));
                     }
                     for (var j = 0; j < tree.edgeList.length; j++) {

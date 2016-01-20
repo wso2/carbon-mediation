@@ -94,6 +94,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 			EndpointDataHolder endpointDataHolder = new EndpointDataHolder(endpointStatisticLog);
 			endpointStatistics.put(endpointStatisticLog.getComponentId(), endpointDataHolder);
 		}
+		notifyObservers(new StatisticDataHolder(endpointStatisticLog));
 	}
 
 	private void updateTree(List<StatisticsLog> statisticsLogs, Map<String, StatisticsTree> statisticsTreeMap) {
@@ -279,7 +280,7 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 	/**
 	 * Unregister the custom statistics consumer from the mediation statistics store
 	 *
-	 * @param o The MediationStatisticsObserver instance to be removed
+	 * @param o The MediationFlowStatisticsObserver instance to be removed
 	 */
 	public void unregisterObserver(MediationFlowStatisticsObserver o) {
 		if (observers.contains(o)) {
@@ -310,4 +311,13 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 		}
 	}
 
+	/**
+	 * Register a custom statistics consumer to receive updates from this
+	 * statistics store
+	 *
+	 * @param o The MediationFlowStatisticsObserver instance to be notified of data updates
+	 */
+	public void registerObserver(MediationFlowStatisticsObserver o) {
+		observers.add(o);
+	}
 }

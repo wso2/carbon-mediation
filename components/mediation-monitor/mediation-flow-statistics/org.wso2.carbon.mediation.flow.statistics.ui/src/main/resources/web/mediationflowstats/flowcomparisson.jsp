@@ -67,7 +67,7 @@
             String categoryName = request.getParameter("categoryName");
             String categoryId = request.getParameter("categoryId");
 
-            String requestToBE = categoryId+":"+componentID;
+            String requestToBE = categoryId + ":" + componentID;
             StatisticDataHolder[] statisticDataHolders = mediationFlowStatisticClient.getAllMessageFlows(requestToBE);
     %>
 
@@ -152,7 +152,7 @@
                     var height = 270;   //canvas height
 
                     var config = {
-                        "title": "Comparison By "+ compareAttribute,
+                        "title": "Comparison By " + compareAttribute,
                         "yAxis": 1,
                         "xAxis": 0,
                         "width": width,

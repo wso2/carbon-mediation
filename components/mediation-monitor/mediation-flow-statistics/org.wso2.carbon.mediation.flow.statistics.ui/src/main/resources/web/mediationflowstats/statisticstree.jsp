@@ -105,7 +105,7 @@
                 </tbody>
             </table>
 
-            <br />
+            <br/>
 
             <%
                 if (edges == null || treeNodeData == null) {
@@ -265,16 +265,16 @@
                     return nodeClass;
                 }
 
-                function showFullTree(){
+                function showFullTree() {
                     for (var i = 0; i < simpleNodes.length; i++) {
-                        if(stateOfChildren[i] == false){
+                        if (stateOfChildren[i] == false) {
                             showImmediateSuccessors(i);
                         }
                     }
                     draw();
                 }
 
-                function showRootNode(){
+                function showRootNode() {
                     destroySuccessors(0);
                     draw();
                 }
