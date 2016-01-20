@@ -20,6 +20,24 @@ package org.wso2.carbon.mediation.flow.statistics.service.data;
 
 public class MessageFlowStatisticConstants {
 
+	public static final String COMPONENT_ID = "componentId";
+
+	public static final String COMPONENT_TYPE = "componentType";
+
+	public static final String PROCESSING_TIME = "processingTime";
+
+	public static final String FAULT_COUNT = "faultCount";
+
+	public static final String IS_RESPONSE = "isResponse";
+
+	public static final String PARENT_NODE = "parentNode";
+
+	public static final String CHILD_NODE = "childNode";
+
+	public static final String EDGE_LIST = "edgeList";
+
+	public static final String NODE_LIST = "nodeList";
+
 	public static final String MESSAGE_FLOW_STATISTIC_STORE = "mediation.flow.statistics.store";
 
 	public static final String PROXYSERVICE = "Proxy Service";
@@ -37,5 +55,4 @@ public class MessageFlowStatisticConstants {
 	public static final String RESOURCE = "API Resource";
 
 	public static final String ANY = "Other Type";
-
 }

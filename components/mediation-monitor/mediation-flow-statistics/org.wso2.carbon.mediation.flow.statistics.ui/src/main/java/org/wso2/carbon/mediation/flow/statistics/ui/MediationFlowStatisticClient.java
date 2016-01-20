@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediation.flow.statistics.stub.AdminData;
 
 import org.wso2.carbon.mediation.flow.statistics.stub.MediationFlowStatisticsAdminStub;
+import org.wso2.carbon.mediation.flow.statistics.stub.StatisticDataHolder;
 import org.wso2.carbon.mediation.flow.statistics.stub.StatisticTreeWrapper;
 
 public class MediationFlowStatisticClient {
@@ -109,6 +110,26 @@ public class MediationFlowStatisticClient {
 	public StatisticTreeWrapper getInboundEndpointStatistic(String componentId) throws AxisFault {
 		try {
 			return stub.getInboundEndpointStatistics(componentId);
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
+	public StatisticDataHolder[] getAllMessageFlows(String request) throws AxisFault {
+		try {
+			return stub.getMessageFlows(request);
+		}catch (Exception e) {
+			String msg = "Cannot get stat data. Backend service may be unavailable";
+			handleException(msg, e);
+		}
+		return null;
+	}
+
+	public String getMessageFlowDetails(String request) throws AxisFault {
+		try {
+			return stub.getMessageFlowDetails(request);
 		}catch (Exception e) {
 			String msg = "Cannot get stat data. Backend service may be unavailable";
 			handleException(msg, e);

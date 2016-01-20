@@ -25,6 +25,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.mediation.flow.statistics.ui.MediationFlowStatisticClient" %>
 <%@ page import="org.wso2.carbon.mediation.flow.statistics.stub.AdminData" %>
+<%@ page import="org.wso2.carbon.mediation.flow.statistics.stub.StatisticDataHolder" %>
 
 
 <!--[if IE]><script language="javascript" type="text/javascript" src="js/excanvas.min.js"></script><![endif]-->
@@ -57,48 +58,30 @@
             MediationFlowStatisticClient mediationFlowStatisticClient =
                     new MediationFlowStatisticClient(configContext, serverURL, cookie);
 
-            String statisticCategory = request.getParameter("statisticCategory");
-            String categoryName = null;
-            int categoryId = 0;
-            AdminData[] collectedSequenceStatistic = null;
-            if (statisticCategory.equals("proxy")) {
-                categoryName = "Proxy Service";
-                categoryId = 1;
-                collectedSequenceStatistic = mediationFlowStatisticClient.getAllProxyStatistics();
-            } else if (statisticCategory.equals("api")) {
-                categoryName = "API";
-                categoryId = 2;
-                collectedSequenceStatistic = mediationFlowStatisticClient.getAllApiStatistics();
-            } else if (statisticCategory.equals("inbound")) {
-                categoryName = "Inbound Endpoint";
-                categoryId = 3;
-                collectedSequenceStatistic = mediationFlowStatisticClient.getAllInboundEndpointStatistics();
-            } else if (statisticCategory.equals("sequence")) {
-                categoryName = "Sequence";
-                categoryId = 4;
-                collectedSequenceStatistic = mediationFlowStatisticClient.getAllSequenceStatistics();
-            } else if (statisticCategory.equals("endpoint")) {
-                categoryName = "Endpoint";
-                categoryId = 5;
-                collectedSequenceStatistic = mediationFlowStatisticClient.getAllEndpointStatistics();
-            }
+            String componentID = request.getParameter("componentID");
+            String categoryName = request.getParameter("categoryName");
+            String categoryId = request.getParameter("categoryId");
+
+            String requestToBE = categoryId + ":" + componentID;
+            StatisticDataHolder[] statisticDataHolders = mediationFlowStatisticClient.getAllMessageFlows(requestToBE);
+
     %>
     <div id="middle">
-        <h2><%=categoryName%> Mediation Flow Statistics</h2>
+        <h2>Mediation Flows of <%=componentID%></h2>
 
         <div id="workArea">
 
             <%
-                if ((collectedSequenceStatistic != null) && (collectedSequenceStatistic.length > 0)) {
+                if ((statisticDataHolders != null) && (statisticDataHolders.length > 0)) {
             %>
 
             <table>
                 <tbody>
                 <tr>
-                    <td>
-                        <a href="overall_stat.jsp?statisticCategory=<%=statisticCategory%>&categoryName=<%=categoryName%>"
+                    <td><%--correct--%>
+                        <a href="flowcomparisson.jsp?categoryId=<%=categoryId%>&componentID=<%=componentID%>&categoryName=<%=categoryName%>"
                            style="cursor:pointer">
-                            Compare <%=categoryName%> Statistics
+                            Compare <%=componentID%> Message Flows
                         </a>
                     </td>
                 </tr>
@@ -108,45 +91,31 @@
             <table id="statTable" class="styledLeft">
                 <thead>
                 <tr>
-                    <th><%=categoryName%> Name</th>
-                    <th>Count</th>
-                    <th>Minimum Processing Time (ms)</th>
-                    <th>Maximum Processing Time (ms)</th>
-                    <th>Average Processing Time (ms)</th>
+                    <th>Time Stamp</th>
+                    <th>Message Flow Id</th>
+                    <th>Processing Time</th>
                     <th>Fault Count</th>
-                    <th>Overall Statistics Tree</th>
                 </tr>
                 </thead>
                 <tbody>
                 <%
-                    for (AdminData adminData : collectedSequenceStatistic) {
+                    for (StatisticDataHolder statisticDataHolder : statisticDataHolders) {
                 %>
                 <tr>
                     <td>
-                        <a href="messageflowdetails.jsp?componentID=<%=adminData.getComponentID()%>&categoryId=<%=categoryId%>&categoryName=<%=categoryName%>">
-                            <%=adminData.getComponentID()%>
+                        <a href="messageflowtree.jsp?flowId=<%=statisticDataHolder.getMessageFlowId()%>&categoryId=<%=categoryId%>&componentID=<%=componentID%>&categoryName=<%=categoryName%>">
+                            <%=statisticDataHolder.getTimeStamp()%>
                         </a>
                     </td>
 
                     <td>
-                        <%=adminData.getTreeNodeData().getCount()%>
+                        <%=statisticDataHolder.getMessageFlowId()%>
                     </td>
                     <td>
-                        <%=adminData.getTreeNodeData().getMinProcessingTime()%>
+                        <%=statisticDataHolder.getProcessingTime()%>
                     </td>
                     <td>
-                        <%=adminData.getTreeNodeData().getMaxProcessingTime()%>
-                    </td>
-                    <td>
-                        <%=adminData.getTreeNodeData().getAvgProcessingTime()%>
-                    </td>
-                    <td>
-                        <%=adminData.getTreeNodeData().getFaultCount()%>
-                    </td>
-                    <td>
-                        <a href="statisticstree.jsp?componentID=<%=adminData.getComponentID()%>&statisticCategory=<%=statisticCategory%>&categoryName=<%=categoryName%>">
-                            <%=adminData.getComponentID()%> Tree
-                        </a>
+                        <%=statisticDataHolder.getFaultCount()%>
                     </td>
                 </tr>
                 <%
