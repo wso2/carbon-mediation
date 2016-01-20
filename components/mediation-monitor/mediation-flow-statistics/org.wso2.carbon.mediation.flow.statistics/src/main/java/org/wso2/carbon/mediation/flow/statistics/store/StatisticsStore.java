@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.data.raw.EndpointStatisticLog;
 import org.apache.synapse.aspects.flow.statistics.data.raw.StatisticsLog;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
-import org.wso2.carbon.mediation.flow.statistics.service.data.MessageFlowStatisticConstants;
+import org.wso2.carbon.mediation.flow.statistics.MediationFlowStatisticsObserver;
 import org.wso2.carbon.mediation.flow.statistics.service.data.StatisticTreeWrapper;
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticCollectionViewMXBean;
 import org.wso2.carbon.mediation.flow.statistics.store.jmx.StatisticsCompositeObject;
@@ -52,6 +52,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 	private final Map<String, StatisticsTree> inboundEndpointStatistics = new HashMap<>();
 
 	private final Map<String, EndpointDataHolder> endpointStatistics = new HashMap<>();
+
+	private Set<MediationFlowStatisticsObserver> observers = new HashSet<MediationFlowStatisticsObserver>();
 
 	public StatisticsStore() {
 		MBeanRegistrar.getInstance().registerMBean(this, "MediationFlowStatisticView", "MediationFlowStatisticView");
@@ -103,7 +105,8 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 			} else {
 				tree = statisticsTreeMap.get(statisticsLogs.get(0).getComponentId());
 			}
-			tree.buildTree(statisticsLogs); //build tree with these statistic logs
+			StatisticDataHolder statisticDataHolder = tree.buildTree(statisticsLogs); //build tree with these
+			notifyObservers(statisticDataHolder);
 		}
 	}
 
@@ -270,6 +273,40 @@ public class StatisticsStore implements StatisticCollectionViewMXBean {
 			return proxyStatistics.get(apiName).getFullTree();
 		} else {
 			return null;
+		}
+	}
+
+	/**
+	 * Unregister the custom statistics consumer from the mediation statistics store
+	 *
+	 * @param o The MediationStatisticsObserver instance to be removed
+	 */
+	public void unregisterObserver(MediationFlowStatisticsObserver o) {
+		if (observers.contains(o)) {
+			observers.remove(o);
+			o.destroy();
+		}
+	}
+
+	void unregisterObservers() {
+		if (log.isDebugEnabled()) {
+			log.debug("Unregistering mediation statistics observers");
+		}
+
+		for (MediationFlowStatisticsObserver o : observers) {
+			o.destroy();
+		}
+		observers.clear();
+	}
+
+	private void notifyObservers(StatisticDataHolder snapshot) {
+
+		for (MediationFlowStatisticsObserver o : observers) {
+			try {
+				o.updateStatistics(snapshot);
+			} catch (Throwable t) {
+				log.error("Error occured while notifying the statistics observer", t);
+			}
 		}
 	}
 

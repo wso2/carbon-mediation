@@ -62,7 +62,7 @@ public class StatisticsTree {
 	 *
 	 * @param statisticsLogs Statistic Logs belonging to single flow.
 	 */
-	public void buildTree(List<StatisticsLog> statisticsLogs) {
+	public StatisticDataHolder buildTree(List<StatisticsLog> statisticsLogs) {
 		if (statisticTree == null) {
 			statisticTree = new ArrayList<>();
 			IndividualStatistic individualStatistic = new IndividualStatistic(statisticsLogs.get(0));
@@ -72,7 +72,7 @@ public class StatisticsTree {
 			statisticTree.get(0).update(statisticsLogs.get(0));
 			updateTree(statisticsLogs, 0, 0);
 		}
-		getJSONTree(statisticsLogs);
+		return getJSONTree(statisticsLogs);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class StatisticsTree {
 
 	}
 
-	private String getJSONTree(List<StatisticsLog> statisticsLogList) {
+	private StatisticDataHolder getJSONTree(List<StatisticsLog> statisticsLogList) {
 
 		JSONObject jsonStatisticTree = new JSONObject();
 
@@ -167,7 +167,7 @@ public class StatisticsTree {
 		StatisticDataHolder statisticDataHolder =
 				new StatisticDataHolder(statisticsLogList.get(0), jsonStatisticTree.toJSONString());
 		statisticsData.put(statisticDataHolder.getMessageFlowId(), statisticDataHolder);
-		return jsonStatisticTree.toJSONString();
+		return statisticDataHolder;
 	}
 
 	private void updateTree(List<StatisticsLog> statisticsLogList, int statisticLogIndex, int treeIndex) {
