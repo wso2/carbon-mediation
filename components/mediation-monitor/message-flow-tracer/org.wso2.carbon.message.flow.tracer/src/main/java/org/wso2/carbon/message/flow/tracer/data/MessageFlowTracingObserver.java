@@ -45,5 +45,4 @@ public interface MessageFlowTracingObserver {
      */
     public void updateStatistics(Object snapshot);
 
-//    public void notifyTraceLogs(MessageTraceLog[] logs);
 }

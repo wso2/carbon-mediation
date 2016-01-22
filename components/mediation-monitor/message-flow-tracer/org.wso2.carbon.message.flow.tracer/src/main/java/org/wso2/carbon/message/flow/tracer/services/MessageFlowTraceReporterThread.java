@@ -18,40 +18,30 @@
 package org.wso2.carbon.message.flow.tracer.services;
 
 import org.apache.log4j.Logger;
-import org.apache.synapse.aspects.statistics.view.InOutStatisticsView;
-import org.apache.synapse.messageflowtracer.data.MessageFlowComponentEntry;
-import org.apache.synapse.messageflowtracer.data.MessageFlowTraceEntry;
+import org.apache.synapse.messageflowtracer.data.MessageFlowDataEntry;
 import org.apache.synapse.messageflowtracer.processors.MessageDataCollector;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
-import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
-
-import java.util.List;
-import java.util.Map;
+import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceObserverStore;
 
 public class MessageFlowTraceReporterThread extends Thread {
     private static Logger log = Logger.getLogger(MessageFlowTraceReporterThread.class);
 
-    private boolean shutdownRequested = false;
 
+    private boolean shutdownRequested = false;
     private boolean tracingEnabled = false;
 
-    private MessageFlowTraceDataStore messageFlowTraceDataStore;
+    private MessageFlowTraceObserverStore messageFlowTraceObserverStore;
 
     /** The reference to the synapse environment service */
     private SynapseEnvironmentService synapseEnvironmentService;
 
     private long delay = 5 * 1000;
 
-    /**
-     * This flag will be updated according to the carbon.xml defined value, if
-     * setup as 'true' the statistic collector will be disabled.
-     */
-    private boolean statisticsReporterDisabled =false;
 
     public MessageFlowTraceReporterThread(SynapseEnvironmentService synEnvSvc,
-                                          MessageFlowTraceDataStore messageFlowTraceDataStore) {
+                                          MessageFlowTraceObserverStore messageFlowTraceObserverStore) {
         this.synapseEnvironmentService = synEnvSvc;
-        this.messageFlowTraceDataStore = messageFlowTraceDataStore;
+        this.messageFlowTraceObserverStore = messageFlowTraceObserverStore;
     }
 
     public void setDelay(long delay) {
@@ -108,8 +98,8 @@ public class MessageFlowTraceReporterThread extends Thread {
         try {
             while (!tracingStatisticsCollector.isEmpty()){
 
-                Object o = tracingStatisticsCollector.deQueue();
-                messageFlowTraceDataStore.updateStatistics(o);
+                MessageFlowDataEntry dataEntry = tracingStatisticsCollector.deQueue();
+                messageFlowTraceObserverStore.notifyObservers(dataEntry);
             }
 
         } catch (Exception e) {

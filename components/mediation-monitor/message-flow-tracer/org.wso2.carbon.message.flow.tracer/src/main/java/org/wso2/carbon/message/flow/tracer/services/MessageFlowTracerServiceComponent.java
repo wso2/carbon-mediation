@@ -25,7 +25,7 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
-import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
+import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceObserverStore;
 import org.wso2.carbon.message.flow.tracer.services.tenant.MessageFlowTraceService;
 import org.wso2.carbon.message.flow.tracer.services.tenant.MessageFlowTraceServiceImpl;
 import org.wso2.carbon.message.flow.tracer.util.MessageFlowTraceConstants;
@@ -48,10 +48,10 @@ import java.util.Set;
  */
 public class MessageFlowTracerServiceComponent {
 
-    private static final Log log = LogFactory.getLog(MessageFlowTracerAdminService.class);
+    private static final Log log = LogFactory.getLog(MessageFlowTracerServiceComponent.class);
 
-    private Map<Integer, MessageFlowTraceDataStore> stores =
-            new HashMap<Integer, MessageFlowTraceDataStore>();
+    private Map<Integer, MessageFlowTraceObserverStore> stores =
+            new HashMap<Integer, MessageFlowTraceObserverStore>();
 
     private Map<Integer, MessageFlowTraceReporterThread> reporterThreads =
             new HashMap<Integer, MessageFlowTraceReporterThread>();
@@ -72,10 +72,10 @@ public class MessageFlowTracerServiceComponent {
             SynapseEnvironmentService synapseEnvService = synapseEnvServices.get(MultitenantConstants.SUPER_TENANT_ID);
 
             if (synapseEnvService != null) {
-                createStatisticsStore(synapseEnvService);
-                MessageFlowTraceDataStore statisticsStore = stores.get(MultitenantConstants.SUPER_TENANT_ID);
+                createObserversStore(synapseEnvService);
+                MessageFlowTraceObserverStore observerStore = stores.get(MultitenantConstants.SUPER_TENANT_ID);
                 MessageFlowTraceService service =
-                        new MessageFlowTraceServiceImpl(statisticsStore, MultitenantConstants.SUPER_TENANT_ID,
+                        new MessageFlowTraceServiceImpl(observerStore, MultitenantConstants.SUPER_TENANT_ID,
                                                            synapseEnvService.getConfigurationContext());
 
                 services.put(MultitenantConstants.SUPER_TENANT_ID, service);
@@ -91,26 +91,25 @@ public class MessageFlowTracerServiceComponent {
     }
 
     /**
-     * Create the statistics store using the synapse environment and configuration context.
+     * Create the observers store using the synapse environment and configuration context.
      *
      * @param synEnvService information about synapse runtime
      */
-    private void createStatisticsStore(SynapseEnvironmentService synEnvService) {
+    private void createObserversStore(SynapseEnvironmentService synEnvService) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConfigurationContext cfgCtx = synEnvService.getConfigurationContext();
 
-        MessageFlowTraceDataStore statisticsStore = new MessageFlowTraceDataStore( synEnvService.getSynapseEnvironment()
-                                                                                       .getMessageFlowDataHolder());
-        cfgCtx.setProperty(MessageFlowTraceConstants.MESSAGE_FLOW_TRACE_STORE, statisticsStore);
+        MessageFlowTraceObserverStore observerStore = new MessageFlowTraceObserverStore();
+        cfgCtx.setProperty(MessageFlowTraceConstants.MESSAGE_FLOW_TRACE_STORE, observerStore);
 
-        MessageFlowTraceReporterThread reporterThread = new MessageFlowTraceReporterThread(synEnvService, statisticsStore);
+        MessageFlowTraceReporterThread reporterThread = new MessageFlowTraceReporterThread(synEnvService, observerStore);
         reporterThread.setName("mediation-flow-tracer-" + tenantId);
         reporterThread.start();
         if (log.isDebugEnabled()) {
             log.debug("Registering the new mediation flow tracer service");
         }
         reporterThreads.put(tenantId, reporterThread);
-        stores.put(tenantId, statisticsStore);
+        stores.put(tenantId, observerStore);
     }
 
     protected void deactivate(ComponentContext compCtx) throws Exception {
@@ -162,12 +161,12 @@ public class MessageFlowTracerServiceComponent {
             if (initialized && compCtx != null) {
                 SynapseEnvironmentService synEnvSvc = (SynapseEnvironmentService) compCtx.getBundleContext().getService(
                         synEnvSvcRegistration.getReference());
-                createStatisticsStore(synEnvSvc);
+                createObserversStore(synEnvSvc);
                 int tenantId = registrationsService.getTenantId();
-                MessageFlowTraceDataStore statisticsStore = stores.get(tenantId);
-                if (statisticsStore != null) {
+                MessageFlowTraceObserverStore observerStore = stores.get(tenantId);
+                if (observerStore != null) {
                     MessageFlowTraceService service =
-                            new MessageFlowTraceServiceImpl(statisticsStore, registrationsService.getTenantId(),
+                            new MessageFlowTraceServiceImpl(observerStore, registrationsService.getTenantId(),
                                                                registrationsService.getConfigurationContext());
 
                     services.put(registrationsService.getTenantId(), service);

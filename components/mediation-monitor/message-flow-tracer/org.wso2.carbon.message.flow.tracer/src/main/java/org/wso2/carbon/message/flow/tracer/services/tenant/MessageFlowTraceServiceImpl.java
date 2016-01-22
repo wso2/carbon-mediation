@@ -18,25 +18,25 @@
 package org.wso2.carbon.message.flow.tracer.services.tenant;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
+import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceObserverStore;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 public class MessageFlowTraceServiceImpl implements MessageFlowTraceService {
 
-    private MessageFlowTraceDataStore tenantTraceStore;
+    private MessageFlowTraceObserverStore tenantTraceStore;
 
     private int tenantId = MultitenantConstants.SUPER_TENANT_ID;
 
     private ConfigurationContext configurationContext;
 
-    public MessageFlowTraceServiceImpl(MessageFlowTraceDataStore messageFlowTraceDataStore,
+    public MessageFlowTraceServiceImpl(MessageFlowTraceObserverStore messageFlowTraceObserverStore,
                                        int tenantId, ConfigurationContext configurationContext) {
-        tenantTraceStore = messageFlowTraceDataStore;
+        tenantTraceStore = messageFlowTraceObserverStore;
         this.tenantId = tenantId;
         this.configurationContext = configurationContext;
     }
 
-    public MessageFlowTraceDataStore getTraceDataStore() {
+    public MessageFlowTraceObserverStore getTraceDataStore() {
         return tenantTraceStore;
     }
 

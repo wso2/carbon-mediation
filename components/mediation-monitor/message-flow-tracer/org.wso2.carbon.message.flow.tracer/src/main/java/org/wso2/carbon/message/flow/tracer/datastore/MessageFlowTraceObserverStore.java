@@ -19,17 +19,15 @@ package org.wso2.carbon.message.flow.tracer.datastore;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.messageflowtracer.data.MessageFlowDataHolder;
+import org.apache.synapse.messageflowtracer.data.MessageFlowDataEntry;
 import org.wso2.carbon.message.flow.tracer.data.MessageFlowTracingObserver;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class MessageFlowTraceDataStore {
+public class MessageFlowTraceObserverStore {
 
-    private static final Log log = LogFactory.getLog(MessageFlowTraceDataStore.class);
-
-    private MessageFlowDataHolder messageFlowDataHolder;
+    private static final Log log = LogFactory.getLog(MessageFlowTraceObserverStore.class);
 
     private Set<MessageFlowTracingObserver> observers =
             new HashSet<MessageFlowTracingObserver>();
@@ -67,26 +65,18 @@ public class MessageFlowTraceDataStore {
         observers.clear();
     }
 
-    private void notifyObservers(Object snapshot) {
+    public void notifyObservers(MessageFlowDataEntry dataEntry) {
 
         for (MessageFlowTracingObserver o : observers) {
             try {
-                o.updateStatistics(snapshot);
+                o.updateStatistics(dataEntry);
             } catch (Throwable t) {
                 log.error("Error occured while notifying the statistics observer", t);
             }
         }
     }
 
-    public MessageFlowTraceDataStore(MessageFlowDataHolder messageFlowDataHolder) {
-        this.messageFlowDataHolder = messageFlowDataHolder;
+    public MessageFlowTraceObserverStore() {
     }
 
-    public MessageFlowDataHolder getMessageFlowDataHolder(){
-        return messageFlowDataHolder;
-    }
-
-    public void updateStatistics(Object traceEntry) {
-        notifyObservers(traceEntry);
-    }
 }
