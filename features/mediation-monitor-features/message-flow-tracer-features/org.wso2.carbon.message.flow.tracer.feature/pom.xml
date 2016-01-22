@@ -38,11 +38,6 @@
             <artifactId>org.wso2.carbon.message.flow.tracer.server.feature</artifactId>
             <type>zip</type>
         </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.message.flow.tracer.ui.feature</artifactId>
-            <type>zip</type>
-        </dependency>
     </dependencies>
 
     <build>
@@ -66,7 +61,6 @@
                             </importFeatures>
                             <includedFeatures>
                                 <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.message.flow.tracer.server.feature</includedFeatureDef>
-                                <includedFeatureDef>org.wso2.carbon.mediation:org.wso2.carbon.message.flow.tracer.ui.feature</includedFeatureDef>
                             </includedFeatures>
                         </configuration>
                     </execution>
