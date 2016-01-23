@@ -27,7 +27,7 @@ import org.wso2.carbon.das.mediationstats.data.publisher.util.CommonConstants;
 import org.wso2.carbon.das.mediationstats.data.publisher.util.PublisherUtils;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
-import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
+import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceObserverStore;
 import org.wso2.carbon.message.flow.tracer.services.tenant.MessageFlowTraceService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -76,7 +76,7 @@ public class MediationStatisticsComponent {
 
             PublisherUtils.setMediationStatPublisherAdmin(bamMediationStatsPublisherAdmin);
 
-            MessageFlowTraceDataStore mediationStatisticsStore = mediationStatisticsService.getTraceDataStore();
+            MessageFlowTraceObserverStore mediationStatisticsStore = mediationStatisticsService.getTraceDataStore();
             int tenantId = mediationStatisticsService.getTenantId();
 
             if(mediationStatisticsStore!= null){
@@ -159,7 +159,7 @@ public class MediationStatisticsComponent {
             log.debug("Mediation statistics service bound to the DAS mediation statistics component");
         }
         if (activated && mediationStatisticsService != null) {
-            MessageFlowTraceDataStore mediationStatisticsStore =
+            MessageFlowTraceObserverStore mediationStatisticsStore =
                     mediationStatisticsService.getTraceDataStore();
             DASMediationStatisticsObserver observer = new DASMediationStatisticsObserver();
             mediationStatisticsStore.registerObserver(observer);
