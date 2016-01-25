@@ -18,11 +18,11 @@
 package org.wso2.carbon.message.flow.tracer.services.tenant;
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceDataStore;
+import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceObserverStore;
 
 public interface MessageFlowTraceService {
 
-    public MessageFlowTraceDataStore getTraceDataStore();
+    public MessageFlowTraceObserverStore getTraceDataStore();
 
     public int getTenantId();
 
