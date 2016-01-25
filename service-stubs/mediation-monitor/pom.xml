@@ -33,6 +33,7 @@
 
     <modules>
         <module>org.wso2.carbon.bam.mediationstats.data.publisher.stub</module>
+        <module>org.wso2.carbon.das.mediationstats.data.publisher.stub</module>
         <module>org.wso2.carbon.bam.service.data.publisher.stub</module>
         <module>org.wso2.carbon.mediation.statistics.stub</module>
         <module>org.wso2.carbon.mediation.tracer.stub</module>
