@@ -50,7 +50,7 @@ public class RegistryPersistenceManager {
 
         MediationStatConfig mediationStatConfig = new MediationStatConfig();
         // First set it to defaults, but do not persist
-        mediationStatConfig.setStatisticsReporterDisable(PublisherUtils.getStatisticsReporterDisable());
+//        mediationStatConfig.setStatisticsReporterDisable(PublisherUtils.getStatisticsReporterDisable());
         mediationStatConfig.setEnableMediationStats(false);
         mediationStatConfig.setUrl(EMPTY_STRING);
         mediationStatConfig.setUserName(EMPTY_STRING);

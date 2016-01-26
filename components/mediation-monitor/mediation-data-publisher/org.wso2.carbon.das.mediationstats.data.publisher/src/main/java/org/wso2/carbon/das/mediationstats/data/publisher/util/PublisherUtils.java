@@ -45,13 +45,13 @@ public class PublisherUtils {
 
     private static boolean isStatisticsReporterDisable = false;
 
-    public static void setStatisticsReporterDisable(boolean isStatisticsReporterDisabled) {
-        PublisherUtils.isStatisticsReporterDisable = isStatisticsReporterDisabled;
-    }
-
-    public static boolean getStatisticsReporterDisable() {
-        return isStatisticsReporterDisable;
-    }
+//    public static void setStatisticsReporterDisable(boolean isStatisticsReporterDisabled) {
+//        PublisherUtils.isStatisticsReporterDisable = isStatisticsReporterDisabled;
+//    }
+//
+//    public static boolean getStatisticsReporterDisable() {
+//        return isStatisticsReporterDisable;
+//    }
 
     private static Map<String,EventPublisherConfig> eventPublisherConfigMap =
             new HashMap<String, EventPublisherConfig>();
@@ -91,14 +91,14 @@ public class PublisherUtils {
         bamMediationStatsPublisherAdmin = mediationStatsPublisherAdmin;
     }
 
-    public static void setSynapseEnvironmentService(
-            SynapseEnvironmentService synapseEnvironmentService) {
-        PublisherUtils.synapseEnvironmentService = synapseEnvironmentService;
-    }
-
-    public static SynapseEnvironmentService getSynapseEnvironmentService() {
-        return synapseEnvironmentService;
-    }
+//    public static void setSynapseEnvironmentService(
+//            SynapseEnvironmentService synapseEnvironmentService) {
+//        PublisherUtils.synapseEnvironmentService = synapseEnvironmentService;
+//    }
+//
+//    public static SynapseEnvironmentService getSynapseEnvironmentService() {
+//        return synapseEnvironmentService;
+//    }
 
 
     /**

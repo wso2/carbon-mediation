@@ -109,13 +109,13 @@ public class MediationStatConfig {
         return isLoadBalancingEnabled;
     }
 
-    public void setStatisticsReporterDisable(boolean isPublishingEnabled) {
-        isPublishingEnable = isPublishingEnabled;
-    }
-
-    public boolean getStatisticsReporterDisable() {
-        return isPublishingEnable;
-    }
+//    public void setStatisticsReporterDisable(boolean isPublishingEnabled) {
+//        isPublishingEnable = isPublishingEnabled;
+//    }
+//
+//    public boolean getStatisticsReporterDisable() {
+//        return isPublishingEnable;
+//    }
 
 
 

@@ -18,8 +18,10 @@ package org.wso2.carbon.das.mediationstats.data.publisher.internal;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.messageflowtracer.processors.MessageFlowTracingDataCollector;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.mediationstats.data.publisher.conf.RegistryPersistenceManager;
 import org.wso2.carbon.das.mediationstats.data.publisher.observer.DASMediationStatisticsObserver;
 import org.wso2.carbon.das.mediationstats.data.publisher.services.DASMediationStatsPublisherAdmin;
@@ -27,11 +29,19 @@ import org.wso2.carbon.das.mediationstats.data.publisher.util.CommonConstants;
 import org.wso2.carbon.das.mediationstats.data.publisher.util.PublisherUtils;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
-import org.wso2.carbon.message.flow.tracer.datastore.MessageFlowTraceObserverStore;
-import org.wso2.carbon.message.flow.tracer.services.tenant.MessageFlowTraceService;
+import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
+import org.wso2.carbon.das.mediationstats.data.publisher.data.MessageFlowTraceObserverStore;
+import org.wso2.carbon.das.mediationstats.data.publisher.services.MessageFlowTraceReporterThread;
+import org.wso2.carbon.das.mediationstats.data.publisher.util.MessageFlowTraceConstants;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @scr.component name="org.wso2.carbon.das.mediationstats.data.publisher" immediate="true"
@@ -48,82 +58,138 @@ import org.wso2.carbon.utils.ConfigurationContextService;
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService"
  * cardinality="1..1" policy="dynamic" bind="setSynapseEnvironmentService"
  * unbind="unsetSynapseEnvironmentService"
- * @scr.reference name="mediation.flow.tracer"
- * interface="org.wso2.carbon.message.flow.tracer.services.tenant.MessageFlowTraceService"
- * cardinality="1..n" policy="dynamic" bind="setMediationStatisticsService"
- * unbind="unsetMediationStatisticsService"
+ * @scr.reference name="synapse.registrations.service"
+ * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
+ * cardinality="1..n" policy="dynamic" bind="setSynapseRegistrationsService"
+ * unbind="unsetSynapseRegistrationsService"
  */
 public class MediationStatisticsComponent {
 
     private static final Log log = LogFactory.getLog(MediationStatisticsComponent.class);
 
-    private static boolean StatisticReporterDisabled;
+    private static boolean flowTracingEnabled;
 
     private boolean activated = false;
-    private ServiceRegistration statAdminServiceRegistration;
-    private MessageFlowTraceService mediationStatisticsService;
-    private ConfigurationContext configContext;
-    private ServerConfigurationService serverConfigurationService;
+//    private ConfigurationContext configContext;
+//    private ServerConfigurationService serverConfigurationService;
+
+    private Map<Integer, MessageFlowTraceObserverStore> stores =
+            new HashMap<Integer, MessageFlowTraceObserverStore>();
+
+    private Map<Integer, MessageFlowTraceReporterThread> reporterThreads =
+            new HashMap<Integer, MessageFlowTraceReporterThread>();
+
+    private Map<Integer, SynapseEnvironmentService> synapseEnvServices =
+            new HashMap<Integer, SynapseEnvironmentService>();
+
+    private ComponentContext compCtx;
+
 
     protected void activate(ComponentContext ctxt) {
 
-        checkPublishingEnabled();
+        this.compCtx = ctxt;
 
-        PublisherUtils.setStatisticsReporterDisable(StatisticReporterDisabled);
+        checkPublishingEnabled(); // TODO: change logic
 
-        if(true){
-            DASMediationStatsPublisherAdmin bamMediationStatsPublisherAdmin = new DASMediationStatsPublisherAdmin();
+        SynapseEnvironmentService synapseEnvService = synapseEnvServices.get(MultitenantConstants.SUPER_TENANT_ID);
 
-            PublisherUtils.setMediationStatPublisherAdmin(bamMediationStatsPublisherAdmin);
+        createObserversStore(synapseEnvService);
+        MessageFlowTraceObserverStore observerStore = stores.get(MultitenantConstants.SUPER_TENANT_ID);
+        DASMediationStatsPublisherAdmin dasMediationStatsPublisherAdmin = new DASMediationStatsPublisherAdmin();
 
-            MessageFlowTraceObserverStore mediationStatisticsStore = mediationStatisticsService.getTraceDataStore();
-            int tenantId = mediationStatisticsService.getTenantId();
+        PublisherUtils.setMediationStatPublisherAdmin(dasMediationStatsPublisherAdmin);
 
-            if(mediationStatisticsStore!= null){
-                DASMediationStatisticsObserver observer = new DASMediationStatisticsObserver();
-                mediationStatisticsStore.registerObserver(observer);
-                observer.setTenantId(tenantId);
-                // 'MediationStat service' will be deployed per tenant (cardinality="1..n")
-                observer.setTenantAxisConfiguration(mediationStatisticsService.getConfigurationContext().
-                        getAxisConfiguration());
-                log.debug("Registering  Observer for tenant: " + mediationStatisticsService.getTenantId());
-            } else {
-                log.error("Can't register an observer for mediationStatisticsStore. " +
-                                    "If you have disabled StatisticsReporter, please enable it in the Carbon.xml");
-            }
+        int tenantId = MultitenantConstants.SUPER_TENANT_ID;
 
-            //Load previously saved configurations
-            new RegistryPersistenceManager().load(tenantId);
-
-
-            activated = true;
-            log.debug("BAM MediationStatisticsComponent activate");
-            if (log.isDebugEnabled()) {
-                log.debug("BAM Mediation statistics data publisher bundle is activated");
-            }
-        }else{
-            log.info("Can't register an observer for mediationStatisticsStore. " +
-                                    "If you have disabled StatisticsReporter, please enable it in the Carbon.xml");
+        if (observerStore != null) {
+            DASMediationStatisticsObserver observer = new DASMediationStatisticsObserver();
+            observerStore.registerObserver(observer);
+            observer.setTenantId(tenantId);
+            // 'MediationStat service' will be deployed per tenant (cardinality="1..n")
+//                observer.setTenantAxisConfiguration(mediationStatisticsService.getConfigurationContext().
+//                        getAxisConfiguration());
+            log.debug("Registering  Observer for tenant: " + tenantId);
+        } else {
+            log.error("Can't register an observer for MessageFlowTraceObserverStore. " +
+                      "If you have disabled StatisticsReporter, please enable it in the Carbon.xml");
         }
+
+        //Load previously saved configurations
+        new RegistryPersistenceManager().load(tenantId);
+
+
+        activated = true;
+        log.debug("BAM MediationStatisticsComponent activate");
+        if (log.isDebugEnabled()) {
+            log.debug("BAM Mediation statistics data publisher bundle is activated");
+        }
+    }
+
+
+    /**
+     * Create the observers store using the synapse environment and configuration context.
+     *
+     * @param synEnvService information about synapse runtime
+     */
+    private void createObserversStore(SynapseEnvironmentService synEnvService) {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        ConfigurationContext cfgCtx = synEnvService.getConfigurationContext();
+
+        MessageFlowTraceObserverStore observerStore = new MessageFlowTraceObserverStore();
+//        cfgCtx.setProperty(MessageFlowTraceConstants.MESSAGE_FLOW_TRACE_STORE, observerStore);
+
+        MessageFlowTraceReporterThread reporterThread = new MessageFlowTraceReporterThread(synEnvService, observerStore);
+        reporterThread.setName("mediation-flow-tracer-" + tenantId);
+        reporterThread.start();
+        if (log.isDebugEnabled()) {
+            log.debug("Registering the new mediation flow tracer service");
+        }
+        reporterThreads.put(tenantId, reporterThread);
+        stores.put(tenantId, observerStore);
     }
 
     protected void deactivate(ComponentContext ctxt) {
         // unregistered DASMediationStatsPublisherAdmin service from the OSGi Service Register.
-        statAdminServiceRegistration.unregister();
+//        statAdminServiceRegistration.unregister();
+
+        Set<Map.Entry<Integer, MessageFlowTraceReporterThread>> threadEntries = reporterThreads.entrySet();
+        for (Map.Entry<Integer, MessageFlowTraceReporterThread> threadEntry : threadEntries) {
+            MessageFlowTraceReporterThread reporterThread = threadEntry.getValue();
+            if (reporterThread != null && reporterThread.isAlive()) {
+                reporterThread.shutdown();
+                reporterThread.interrupt(); // This should wake up the thread if it is asleep
+
+                // Wait for the reporting thread to gracefully terminate
+                // Observers should not be disengaged before this thread halts
+                // Otherwise some of the collected data may not be sent to the observers
+                while (reporterThread.isAlive()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Waiting for the mediation tracer reporter thread to terminate");
+                    }
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ignore) {
+
+                    }
+                }
+            }
+        }
+
         if (log.isDebugEnabled()) {
-            log.debug("BAM service statistics data publisher bundle is deactivated");
+            log.debug("DAS service statistics data publisher bundle is deactivated");
         }
     }
 
     protected void setConfigurationContextService(ConfigurationContextService contextService) {
-        this.configContext = contextService.getServerConfigContext();
+//        this.configContext = contextService.getServerConfigContext();
         PublisherUtils.setConfigurationContextService(contextService);
 
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
         PublisherUtils.setConfigurationContextService(null);
-        this.configContext = null;
+//        this.configContext = null;
     }
 
     protected void setRegistryService(RegistryService registryService) {
@@ -139,63 +205,81 @@ public class MediationStatisticsComponent {
     }
 
     protected void setSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
-        PublisherUtils.setSynapseEnvironmentService(synapseEnvironmentService);
+//        PublisherUtils.setSynapseEnvironmentService(synapseEnvironmentService);
+
+        if (log.isDebugEnabled()) {
+            log.debug("SynapseEnvironmentService bound to the mediation tracer initialization");
+        }
+
+        synapseEnvServices.put(synapseEnvironmentService.getTenantId(), synapseEnvironmentService);
     }
 
     protected void unsetSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
-        PublisherUtils.setSynapseEnvironmentService(null);
+//        PublisherUtils.setSynapseEnvironmentService(null);
+
+        if (log.isDebugEnabled()) {
+            log.debug("SynapseEnvironmentService unbound from the mediation tracer collector");
+        }
+
+        synapseEnvServices.remove(synapseEnvironmentService.getTenantId());
     }
 
     protected void setServerConfiguration(ServerConfigurationService serverConfigService) {
-        this.serverConfigurationService = serverConfigService;
+//        this.serverConfigurationService = serverConfigService;
     }
 
     protected void unsetServerConfiguration(ServerConfigurationService serverConfigService) {
-        this.serverConfigurationService = null;
+//        this.serverConfigurationService = null;
     }
 
-    protected void setMediationStatisticsService(MessageFlowTraceService mediationStatisticsService) {
-        if (log.isDebugEnabled()) {
-            log.debug("Mediation statistics service bound to the DAS mediation statistics component");
-        }
-        if (activated && mediationStatisticsService != null) {
-            MessageFlowTraceObserverStore mediationStatisticsStore =
-                    mediationStatisticsService.getTraceDataStore();
-            DASMediationStatisticsObserver observer = new DASMediationStatisticsObserver();
-            mediationStatisticsStore.registerObserver(observer);
-            observer.setTenantId(mediationStatisticsService.getTenantId());
-            observer.setTenantAxisConfiguration(
-                    mediationStatisticsService.getConfigurationContext().getAxisConfiguration());
-            log.info("Registering DAS Mediation Statistics Observer for tenant: " +
-                     mediationStatisticsService.getTenantId());
-
-        } else {
-            this.mediationStatisticsService = mediationStatisticsService;
+    protected void setSynapseRegistrationsService(SynapseRegistrationsService registrationsService) {
+        ServiceRegistration synEnvSvcRegistration = registrationsService.getSynapseEnvironmentServiceRegistration();
+        try {
+            if (activated && compCtx != null) {
+                SynapseEnvironmentService synEnvSvc = (SynapseEnvironmentService) compCtx.getBundleContext().getService(
+                        synEnvSvcRegistration.getReference());
+                createObserversStore(synEnvSvc);
+            }
+        } catch (Throwable t) {
+            log.fatal("Error occurred at the osgi service method", t);
         }
     }
 
-    protected void unsetMediationStatisticsService(MessageFlowTraceService statService) {
-        if (log.isDebugEnabled()) {
-            log.debug("Mediation statistics service unbound from the BAM mediation statistics component");
+    protected void unsetSynapseRegistrationsService(SynapseRegistrationsService registrationsService) {
+        try {
+            int tenantId = registrationsService.getTenantId();
+            MessageFlowTraceReporterThread reporterThread = reporterThreads.get(tenantId);
+            if (reporterThread != null && reporterThread.isAlive()) {
+                reporterThread.shutdown();
+                reporterThread.interrupt(); // This should wake up the thread if it is asleep
+
+                // Wait for the reporting thread to gracefully terminate
+                // Observers should not be disengaged before this thread halts
+                // Otherwise some of the collected data may not be sent to the observers
+                while (reporterThread.isAlive()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Waiting for the trace reporter thread to terminate");
+                    }
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ignore) {
+
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            log.error("Fatal error occured at the osgi service method", t);
         }
-        // mediationStatisticsService = null;
     }
 
     private void checkPublishingEnabled() {
 
-                String carbonStatisticsReporter =
-                        /*bamConfig.getFirstChildWithName(new QName());*/
-                        CarbonUtils.getServerConfiguration().getFirstProperty(CommonConstants.DAS_CARBON_STATISTICS_REPORTER);
-                if (null != carbonStatisticsReporter) {
-                    if (carbonStatisticsReporter.trim()
-                            .equalsIgnoreCase(CommonConstants.DAS_CARBON_STATISTIC_REPORTER_DISABLED)) {
-                        StatisticReporterDisabled = false;
-                    } else {
-                        log.info("Statistic Reporter is Disabled");
-                        StatisticReporterDisabled = true;
-                    }
-                } else {
-                    StatisticReporterDisabled = true;
-                }
+        flowTracingEnabled = MessageFlowTracingDataCollector.isMessageFlowTracingEnabled();
+
+        if (!flowTracingEnabled) {
+            log.info("Statistic Reporter is Disabled");
         }
+
+    }
 }
