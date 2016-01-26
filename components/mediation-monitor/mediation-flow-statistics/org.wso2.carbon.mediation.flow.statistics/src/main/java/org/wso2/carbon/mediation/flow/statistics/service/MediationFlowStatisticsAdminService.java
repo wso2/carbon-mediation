@@ -24,6 +24,7 @@ import org.wso2.carbon.mediation.flow.statistics.service.data.StatisticTreeWrapp
 import org.wso2.carbon.mediation.flow.statistics.store.StatisticsStore;
 import org.wso2.carbon.mediation.flow.statistics.store.tree.data.EndpointDataHolder;
 import org.wso2.carbon.mediation.flow.statistics.store.tree.StatisticsTree;
+import org.wso2.carbon.mediation.flow.statistics.store.tree.data.StatisticDataHolder;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 
 import java.util.LinkedList;
@@ -88,6 +89,18 @@ public class MediationFlowStatisticsAdminService extends AbstractServiceBusAdmin
 		StatisticsStore statisticsStore = ((StatisticsStore) getConfigContext()
 				.getProperty(MessageFlowStatisticConstants.MESSAGE_FLOW_STATISTIC_STORE));
 		return statisticsStore.getApiStatistics(componentID);
+	}
+
+	public StatisticDataHolder[] getMessageFlows(String request) {
+		StatisticsStore statisticsStore = ((StatisticsStore) getConfigContext()
+				.getProperty(MessageFlowStatisticConstants.MESSAGE_FLOW_STATISTIC_STORE));
+		return statisticsStore.getAllMessageFlows(request);
+	}
+
+	public String getMessageFlowDetails(String request) {
+		StatisticsStore statisticsStore = ((StatisticsStore) getConfigContext()
+				.getProperty(MessageFlowStatisticConstants.MESSAGE_FLOW_STATISTIC_STORE));
+		return statisticsStore.getMessageFlowTree(request);
 	}
 
 	private AdminData[] getAdminData(Set<Map.Entry<String, StatisticsTree>> statRecords) {

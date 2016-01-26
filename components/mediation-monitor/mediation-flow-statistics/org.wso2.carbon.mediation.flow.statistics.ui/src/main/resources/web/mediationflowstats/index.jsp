@@ -32,43 +32,46 @@
             // Set standard HTTP/1.0 no-cache header.
             response.setHeader("Pragma", "no-cache");
     %>
-    <form method="POST" name="inboundcreationform" id="inboundcreationform" action="component_statistics.jsp">
-        <div id="middle">
-            <h2>Mediation Flow Statistics</h2>
+    <div id="middle">
+        <h2>Mediation Flow Statistics</h2>
 
-            <div id="workArea">
-                <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
-                    <thead>
-                    <tr>
-                        <th colspan="3">Statistic Category</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+        <div id="workArea">
+            <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
+                <thead>
+                <tr>
+                    <th colspan="3">Statistic Category</th>
+                </tr>
+                </thead>
+                <tbody>
 
-                    <tr>
-                        <td style="width:150px"><label for="statisticCategory">Select Static Category</label><span
-                                class="required">*</span></td>
-                        <td align="left">
-                            <select id="statisticCategory" name="statisticCategory" class="longInput">
-                                <option value="proxy">Proxy Service Statistic</option>
-                                <option value="api">API Statistic</option>
-                                <option value="inbound">Inbound Endpoint Statistics</option>
-                                <option value="sequence">Sequence Statistics</option>
-                                <option value="endpoint">Endpoint Statistics</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="buttonRow" colspan="3">
-                            <input class="button" type="Submit" value="Next">
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+                <tr>
+                    <td style="width:150px"><label for="statisticCategory">Select Static Category</label><span
+                            class="required">*</span></td>
+                    <td align="left">
+                        <select id="statisticCategory" name="statisticCategory" class="longInput">
+                            <option value="proxy">Proxy Service Statistic</option>
+                            <option value="api">API Statistic</option>
+                            <option value="inbound">Inbound Endpoint Statistics</option>
+                            <option value="sequence">Sequence Statistics</option>
+                            <option value="endpoint">Endpoint Statistics</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="buttonRow" colspan="3">
+                        <input class="button" type="button" value="Next" onclick="onClick()">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
-
-    </form>
+    </div>
+    <script>
+        function onClick() {
+            var selectedValue = document.getElementById("statisticCategory").value;
+            window.location.href = "component_statistics.jsp?statisticCategory=" + selectedValue;
+        }
+    </script>
     <%
     } catch (Throwable e) {
     %>
