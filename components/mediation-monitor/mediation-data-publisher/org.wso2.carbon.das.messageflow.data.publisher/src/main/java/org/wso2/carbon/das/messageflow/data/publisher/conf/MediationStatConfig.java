@@ -22,11 +22,12 @@ public class MediationStatConfig {
 
     private boolean isMessageFlowTracePublishingEnabled;
     private boolean isMessageFlowStatsPublishingEnabled;
+    private String serverId = "";
     private String url = "";
     private String userName = "";
     private String password = "";
-    private Property[] properties;
 
+    private Property[] properties;
     private String streamName = "esb-flow_tracer-trace_entry-stream";
     private String version = "1.0.0";
     private String nickName = "MessageFlowTraceDataAgent";
@@ -117,6 +118,14 @@ public class MediationStatConfig {
 
     public void setMessageFlowStatsPublishingEnabled(boolean messageFlowStatsPublishingEnabled) {
         isMessageFlowStatsPublishingEnabled = messageFlowStatsPublishingEnabled;
+    }
+
+    public String getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(String serverId) {
+        this.serverId = serverId;
     }
 
     //    public void setStatisticsReporterDisable(boolean isPublishingEnabled) {

@@ -2,9 +2,9 @@
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.das.mediationstats.data.publisher.stub.conf.MediationStatConfig" %>
-<%@ page import="org.wso2.carbon.das.mediationstats.data.publisher.stub.conf.Property" %>
-<%@ page import="org.wso2.carbon.das.mediationstats.data.publisher.ui.MediationStatPublisherAdminClient" %>
+<%@ page import="org.wso2.carbon.das.messageflow.data.publisher.stub.conf.MediationStatConfig" %>
+<%@ page import="org.wso2.carbon.das.messageflow.data.publisher.stub.conf.Property" %>
+<%@ page import="org.wso2.carbon.das.messageflow.data.publisher.ui.DASMessageFlowPublisherAdminClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
@@ -15,24 +15,23 @@
 <%! public static final String PROPERTY_VALUES = "propertyValues";
     public static final String PROPERTY_KEYS = "propertyKeys";
 %>
-<fmt:bundle basename="org.wso2.carbon.das.mediationstats.data.publisher.ui.i18n.Resources">
+<fmt:bundle basename="org.wso2.carbon.das.messageflow.data.publisher.ui.i18n.Resources">
 
 <carbon:breadcrumb
         label="system.statistics"
-        resourceBundle="org.wso2.carbon.das.mediationstats.data.publisher.ui.i18n.Resources"
+        resourceBundle="org.wso2.carbon.das.messageflow.data.publisher.ui.i18n.Resources"
         topPage="true"
         request="<%=request%>"/>
 <%
-    String setConfig = request.getParameter("setConfig"); // hidden parameter to check if the form is being submitted
-    String enableMediationStats = request.getParameter("enableMediationStats"); // String value is "on" of checkbox clicked, else null
+	String action = request.getParameter("action");
+	String serverId = request.getParameter("serverId");
+	
     String url = request.getParameter("url");
     String userName = request.getParameter("user_name");
     String password = request.getParameter("password");
-
-    String streamName = request.getParameter("stream_name");
-    String version = request.getParameter("version");
-    String nickName = request.getParameter("nick_name");
-    String description = request.getParameter("description");
+    
+    String traceState = request.getParameter("traceState");
+    String statsState = request.getParameter("statsState");
 
     String[] propertyKeys = request.getParameterValues(PROPERTY_KEYS);
     String[] propertyValues = request.getParameterValues(PROPERTY_VALUES);
@@ -54,17 +53,30 @@
     ConfigurationContext configContext =
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-    MediationStatPublisherAdminClient client = new MediationStatPublisherAdminClient(
+    DASMessageFlowPublisherAdminClient client = new DASMessageFlowPublisherAdminClient(
             cookie, backendServerURL, configContext, request.getLocale());
-    MediationStatConfig mediationStatConfig = null;
+    MediationStatConfig mediationStatConfig = new MediationStatConfig();
 
-    if (setConfig != null) {    // form submitted request to set eventing config
-        mediationStatConfig = new MediationStatConfig();
-        if (enableMediationStats != null) {
-            mediationStatConfig.setEnableMediationStats(true);
-        } else {
-            mediationStatConfig.setEnableMediationStats(false);
-        }
+
+    if (action != null && action.equals("load") && serverId != null) {
+    	// Load existing
+    	try {
+            mediationStatConfig = client.getEventingConfigData(serverId);
+        } catch (Exception e) {
+            if (e.getCause().getMessage().toLowerCase().indexOf("you are not authorized") == -1) {
+                response.setStatus(500);
+                CarbonUIMessage uiMsg = new CarbonUIMessage(CarbonUIMessage.ERROR, e.getMessage(), e);
+                session.setAttribute(CarbonUIMessage.ID, uiMsg);
+			    %>
+			    <jsp:include page="../admin/error.jsp"/>
+			    <%
+                }
+            }
+    	
+    }
+
+    if (action != null && action.equals("save")) {
+
         if (url != null) {
             mediationStatConfig.setUrl(url);
         }
@@ -74,104 +86,57 @@
         if (password != null) {
             mediationStatConfig.setPassword(password);
         }
-
-        if (streamName != null) {
-            mediationStatConfig.setStreamName(streamName);
+        System.out.println("STATE-"+traceState);System.out.println(statsState);System.out.println(userName);
+        if (traceState != null) {
+        	mediationStatConfig.setMessageFlowTracePublishingEnabled(true);
         }
-
-        if (version != null) {
-            mediationStatConfig.setVersion(version);
-        }
-
-        if (nickName != null) {
-            mediationStatConfig.setNickName(nickName);
-        }
-
-        if (description != null) {
-            mediationStatConfig.setDescription(description);
+        if (statsState != null) {
+        	mediationStatConfig.setMessageFlowStatsPublishingEnabled(true);
         }
 
         if (properties != null) {
             mediationStatConfig.setProperties(properties.toArray(new Property[properties.size()]));
         }
 
+        if (serverId != null) {
+        	mediationStatConfig.setServerId(serverId);
+        } else {
+        	serverId = String.valueOf(url.hashCode());
+        	mediationStatConfig.setServerId(serverId);
+        }
 
 
         try {
-            client.setEventingConfigData(mediationStatConfig);
+            client.setEventingConfigData(mediationStatConfig);// TODO : temp for testing
+
+		%>
+		<script type="text/javascript">
+		    jQuery(document).init(function() {
+		        function handleOK() {
+		
+		        }
+		
+		        CARBON.showInfoDialog("Eventing Configuration Successfully Updated!", handleOK);
+		    });
+		</script>
+		<%
+		} catch (Exception e) {
+	    if (e.getCause().getMessage().toLowerCase().indexOf("you are not authorized") == -1) {
+	        response.setStatus(500);
+	        CarbonUIMessage uiMsg = new CarbonUIMessage(CarbonUIMessage.ERROR, e.getMessage(), e);
+	        session.setAttribute(CarbonUIMessage.ID, uiMsg);
+		%>
+		<jsp:include page="../admin/error.jsp"/>
+		<%
+	        }
+	    }
+    	
+    	
+    	
+    }
 
 %>
-<script type="text/javascript">
-    jQuery(document).init(function() {
-        function handleOK() {
 
-        }
-
-        CARBON.showInfoDialog("Eventing Configuration Successfully Updated!", handleOK);
-    });
-</script>
-<%
-} catch (Exception e) {
-    if (e.getCause().getMessage().toLowerCase().indexOf("you are not authorized") == -1) {
-        response.setStatus(500);
-        CarbonUIMessage uiMsg = new CarbonUIMessage(CarbonUIMessage.ERROR, e.getMessage(), e);
-        session.setAttribute(CarbonUIMessage.ID, uiMsg);
-%>
-<jsp:include page="../admin/error.jsp"/>
-<%
-        }
-    }
-} else {
-    try {
-        mediationStatConfig = client.getEventingConfigData();
-    } catch (Exception e) {
-        if (e.getCause().getMessage().toLowerCase().indexOf("you are not authorized") == -1) {
-            response.setStatus(500);
-            CarbonUIMessage uiMsg = new CarbonUIMessage(CarbonUIMessage.ERROR, e.getMessage(), e);
-            session.setAttribute(CarbonUIMessage.ID, uiMsg);
-%>
-<jsp:include page="../admin/error.jsp"/>
-<%
-            }
-        }
-    }
-
-    boolean isMediationStatsEnable = mediationStatConfig.getEnableMediationStats();
-
-    if (url == null) {
-        url = mediationStatConfig.getUrl();
-    }
-    if (userName == null) {
-        userName = mediationStatConfig.getUserName();
-    }
-    if (password == null) {
-        password = mediationStatConfig.getPassword();
-    }
-
-    if (streamName == null) {
-        streamName = mediationStatConfig.getStreamName();
-    }
-    if (version == null) {
-        version = mediationStatConfig.getVersion();
-    }
-    if(nickName == null){
-        nickName = mediationStatConfig.getNickName();
-    }
-    if(description == null){
-        description = mediationStatConfig.getDescription();
-    }
-
-    if (properties == null) {
-        Property[] propertiesDTO = mediationStatConfig.getProperties();
-        if (propertiesDTO != null) {
-            properties = new ArrayList<Property>();
-            for (int i = 0; i < propertiesDTO.length; i++) {
-                Property property = propertiesDTO[i];
-                properties.add(property);
-            }
-        }
-    }
-%>
 
 <script id="source" type="text/javascript">
     function showHideDiv(divId) {
@@ -182,16 +147,18 @@
             theDiv.style.display = "none";
         }
     }
+    
+    function goBackToServerList() {
+    	window.location.href = "publisher_list.jsp";
+    }
 
     var rowNum = 1;
 
     function addColumn() {
         rowNum++;
-        /*var n =  + parseInt(trId.charAt(trId.length-1))+1;
-         jQuery("#"+trId+" td div.addIcon").remove();*/
-        //alert(n);
+        
         var sId = "propertyTable_" + rowNum;
-        //alert(sId);
+       
         var tableContent = "<tr id=\"" + sId + "\">" +
                            "<td>\n" +
                            "                        <fmt:message key='property.name'/>\n" +
@@ -246,15 +213,15 @@
         } else{
             jQuery.ajax({
                             type:"GET",
-                            url:"../dasmediationstatpub/test_server_ajaxprocessor.jsp",
+                            url:"../dasmessageflowpub/test_server_ajaxprocessor.jsp",
                             data:{action:"testServer", ip:serverIp, port:authPort},
                             success:function(data){
                                 if(data != null && data != ""){
                                     var result = data.replace(/\n+/g, '');
                                     if(result == "true"){
-                                        CARBON.showInfoDialog("Successfully connected to BAM Server");
+                                        CARBON.showInfoDialog("Successfully connected to DAS Server");
                                     } else if(result == "false"){
-                                        CARBON.showErrorDialog("BAM Server cannot be connected!")
+                                        CARBON.showErrorDialog("DAS Server cannot be connected!")
                                     }
                                 }
                             }
@@ -265,93 +232,49 @@
 
 <div id="middle">
     <h2>
-        <fmt:message key="bam.stat.publisher.config"/>
+        <fmt:message key="das.stat.publisher.config"/>
     </h2>
 
     <div id="workArea">
         <div id="result"></div>
         <p>&nbsp;</p>
 
-        <form action="configure_mediationstats_publisher.jsp" method="post">
-            <input type="hidden" name="setConfig" value="on"/>
+        <form action="configure_publisher.jsp" method="post">
+            <input type="hidden" name="action" value="save"/>
             <table width="100%" class="styledLeft" style="margin-left: 0px;">
+                 
                 <thead>
                 <tr>
                     <th colspan="4">
-                        <fmt:message key="mediation.stats.configuration"/>
+                        <fmt:message key="das.credential"/>
                     </th>
                 </tr>
                 </thead>
+
                 <tr>
+                    <td><fmt:message key="das.url"/></td>
                     <td>
-                        <% if (isMediationStatsEnable) { %>
-                        <input type="checkbox" name="enableMediationStats"
-                               checked="true">&nbsp;&nbsp;&nbsp;&nbsp;
-                        <% } else { %>
-                        <input type="checkbox" name="enableMediationStats">&nbsp;&nbsp;&nbsp;&nbsp;
-                        <% } %>
-                        <fmt:message key="enable.mediation.stats"/>
-
-                    </td>
-                </tr>
-
-                <thead>
-                <tr>
-                    <th colspan="4">
-                        <fmt:message key="stream.definition.configuration"/>
-                    </th>
-                </tr>
-                </thead>
-
-                <tr>
-                    <td><fmt:message key="stream.name"/></td>
-                    <td><input type="text" name="stream_name" value="<%=streamName%>"/></td>
-                </tr>
-                <tr>
-                    <td><fmt:message key="version"/></td>
-                    <td><input type="text" name="version" value="<%=version%>"/></td>
-                </tr>
-                <tr>
-                    <td><fmt:message key="nick.name"/></td>
-                    <td><input type="text" name="nick_name" value="<%=nickName%>"/></td>
-                </tr>
-                <tr>
-                    <td><fmt:message key="description"/></td>
-                    <td><input type="text" name="description" value="<%=description%>"/></td>
-                </tr>
-
-                    <%--                    <% if (isServiceStatsEnable || isMsgDumpingEnable) { %>--%>
-                <thead>
-                <tr>
-                    <th colspan="4">
-                        <fmt:message key="bam.credential"/>
-                    </th>
-                </tr>
-                </thead>
-                <%
-                    if (!client.isCloudDeployment()){
-                %>
-                <tr>
-                    <td><fmt:message key="bam.url"/></td>
-                    <td>
-                        <input type="text" id="url" name="url" value="<%=url%>"/>
+                        <input type="text" id="url" name="url" value="<%= (url != null) ? url : "" %>"/>
                         <input type="button" value="Test Server" onclick="testServer()"/>
                     </td>
                 </tr>
-                <%
-                    }else{
-                %>
-                  <input type="hidden" id="url" name="url" value="<%=client.getBAMServerURL()%>"/>
-                <%
-                    }
-                %>
                 <tr>
                     <td><fmt:message key="username"/></td>
-                    <td><input type="text" name="user_name" value="<%=userName%>"/></td>
+                    <td><input type="text" name="user_name" value="<%= (userName != null) ? userName : "" %>"/></td>
                 </tr>
                 <tr>
                     <td><fmt:message key="password"/></td>
-                    <td><input type="password" name="password" value="<%=password%>"/></td>
+                    <td><input type="password" name="password" value="<%= (password != null) ? password : "" %>"/></td>
+                </tr>
+                
+                <tr>
+                	<td><fmt:message key="publishing"/></td>
+                    <td>
+	                    <input type="checkbox" name="traceState" value="traceEnabled" <%=mediationStatConfig.getMessageFlowTracePublishingEnabled() ? "checked='checked'" : "" %> />
+	                    <fmt:message key="publishing.traceData"/>
+	                    <input type="checkbox" name="statsState" value="statsEnabled" <%=mediationStatConfig.getMessageFlowStatsPublishingEnabled() ? "checked='checked'" : "" %> />
+	                    <fmt:message key="publishing.statsData"/>
+                    </td>
                 </tr>
 
                 <thead>
@@ -371,8 +294,7 @@
                             <tr>
                                 <td colspan="3">
                                     <a onClick='javaScript:addColumn()' style='background-image:
-                                    url(../dasmediationstatpub/images/add.gif);' class='icon-link addIcon'>Add
-                                                                                                     Property</a>
+                                    url(../dasmessageflowpub/images/add.gif);' class='icon-link addIcon'>Add Property</a>
                                 </td>
                             </tr>
                             <% int i = 1;
@@ -393,8 +315,7 @@
 
                                 <td>
                                     <a onClick='javaScript:removeColumn("propertyTable_<%=i%>")' style='background-image:
-                                    url(../dasmediationstatpub/images/delete.gif);' class='icon-link addIcon'>Remove
-                                                                                                        Property</a>
+                                    url(../dasmessageflowpub/images/delete.gif);' class='icon-link addIcon'>Remove Property</a>
                                 </td>
 
 
@@ -413,7 +334,7 @@
                                 <tr>
                                     <td colspan="3">
                                     <a onClick='javaScript:addMetaData()'
-                                    style='background-image: url(../dasmediationstatpub/images/add.gif);'
+                                    style='background-image: url(../dasmessageflowpub/images/add.gif);'
                                     class='icon-link addIcon'>Add Property</a>
                                     </td>
                                 </tr>
@@ -424,13 +345,15 @@
                 </tr>
                 </tbody>
 
-                    <%--                    <% } %>--%>
+                  
 
 
                 <tr>
                     <td colspan="4" class="buttonRow">
-                        <input type="submit" class="button" value="<fmt:message key="update"/>"
+                        <input type="submit" class="button" value="<fmt:message key="save"/>"
                                id="updateStats"/>&nbsp;&nbsp;
+                        <input type="button" class="button" onclick="goBackToServerList()" value="<fmt:message key="close"/>"
+                               id="closeStats"/>&nbsp;&nbsp;
                     </td>
                 </tr>
             </table>

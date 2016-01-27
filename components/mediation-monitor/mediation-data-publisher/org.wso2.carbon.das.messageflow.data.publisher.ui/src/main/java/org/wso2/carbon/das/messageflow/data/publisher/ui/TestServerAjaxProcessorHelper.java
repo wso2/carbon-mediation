@@ -16,7 +16,7 @@
 * under the License.
 */
 
-package java.org.wso2.carbon.das.messageflow.data.publisher.ui;
+package org.wso2.carbon.das.messageflow.data.publisher.ui;
 
 import java.io.IOException;
 import java.net.Socket;

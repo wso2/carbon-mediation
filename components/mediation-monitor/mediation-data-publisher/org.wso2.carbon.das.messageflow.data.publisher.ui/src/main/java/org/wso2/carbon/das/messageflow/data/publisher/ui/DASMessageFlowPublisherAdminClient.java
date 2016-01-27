@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package java.org.wso2.carbon.das.messageflow.data.publisher.ui;
+package org.wso2.carbon.das.messageflow.data.publisher.ui;
 
 
 import org.apache.axis2.AxisFault;
@@ -29,16 +29,16 @@ import java.rmi.RemoteException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class MediationStatPublisherAdminClient {
+public class DASMessageFlowPublisherAdminClient {
 
-    private static final Log log = LogFactory.getLog(MediationStatPublisherAdminClient.class);
-	private static final String BUNDLE = "org.wso2.carbon.das.mediationstats.data.publisher.ui.i18n.Resources";
+    private static final Log log = LogFactory.getLog(DASMessageFlowPublisherAdminClient.class);
+	private static final String BUNDLE = "org.wso2.carbon.das.messageflow.data.publisher.ui.i18n.Resources";
 	private DASMessageFlowPublisherAdminStub stub;
 	private ResourceBundle bundle;
 
-    public MediationStatPublisherAdminClient(String cookie, String backendServerURL,
-            ConfigurationContext configCtx, Locale locale) throws AxisFault {
-        String serviceURL = backendServerURL + "DASMediationStatPublisherAdmin";
+    public DASMessageFlowPublisherAdminClient(String cookie, String backendServerURL,
+                                              ConfigurationContext configCtx, Locale locale) throws AxisFault {
+        String serviceURL = backendServerURL + "DASMessageFlowPublisherAdmin";
         bundle = ResourceBundle.getBundle(BUNDLE, locale);
 
         stub = new DASMessageFlowPublisherAdminStub(configCtx, serviceURL);
@@ -48,9 +48,18 @@ public class MediationStatPublisherAdminClient {
         option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
     }
 
-    public MediationStatConfig getEventingConfigData() throws RemoteException {
+    public MediationStatConfig getEventingConfigData(String serverId) throws RemoteException {
         try {
-            return stub.getEventingConfigData();
+            return stub.getEventingConfigData(serverId);
+        } catch (RemoteException e) {
+            handleException(bundle.getString("cannot.get.eventing.config"), e);
+        }
+        return null;
+    }
+    
+    public MediationStatConfig[] getAllPublisherNames() throws RemoteException {
+        try {
+            return stub.getAllPublisherNames();
         } catch (RemoteException e) {
             handleException(bundle.getString("cannot.get.eventing.config"), e);
         }

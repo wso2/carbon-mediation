@@ -16,8 +16,8 @@
   ~  limitations under the License.
   --%>
 
-<%@ page import="org.wso2.carbon.das.mediationstats.data.publisher.ui.TestServerAjaxProcessorHelper" %>
-<%@ page import="org.wso2.carbon.das.mediationstats.data.publisher.ui.TestServerAjaxProcessorHelper" %>
+<%@ page import="org.wso2.carbon.das.messageflow.data.publisher.ui.TestServerAjaxProcessorHelper" %>
+<%@ page import="org.wso2.carbon.das.messageflow.data.publisher.ui.TestServerAjaxProcessorHelper" %>
 
 <%
     TestServerAjaxProcessorHelper testServerAjaxProcessorHelper = new TestServerAjaxProcessorHelper();

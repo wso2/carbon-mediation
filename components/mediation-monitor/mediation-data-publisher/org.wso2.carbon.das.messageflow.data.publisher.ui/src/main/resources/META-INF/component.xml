@@ -19,15 +19,15 @@
         <!-- sample menu configuration -->
     <menus>
         <menu>
-            <id>das_mediation_statistics_data_publisher_menu</id>
+            <id>das_message_flow_data_publisher_menu</id>
             <i18n-key>config.menu.text</i18n-key>
-            <i18n-bundle>org.wso2.carbon.das.mediationstats.data.publisher.ui.i18n.Resources</i18n-bundle>
+            <i18n-bundle>org.wso2.carbon.das.messageflow.data.publisher.ui.i18n.Resources</i18n-bundle>
             <parent-menu>configure_menu</parent-menu>
-            <link>../dasmediationstatpub/configure_mediationstats_publisher.jsp</link>
+            <link>../dasmessageflowpub/publisher_list.jsp</link>
             <region>region1</region>
             <order>35</order>
             <style-class>monitor</style-class>
-            <icon>../dasmediationstatpub/images/chart_bar.gif</icon>
+            <icon>../dasmessageflowpub/images/chart_bar.gif</icon>
 <!--			<require-super-tenant>true</require-super-tenant>
             <require-permission>/permissions/admin/manage</require-permission>-->
         </menu>

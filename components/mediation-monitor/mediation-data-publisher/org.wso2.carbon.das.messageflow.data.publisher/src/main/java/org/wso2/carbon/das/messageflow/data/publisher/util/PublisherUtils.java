@@ -37,7 +37,7 @@ public class PublisherUtils {
 
     private static ConfigurationContext axisConfigurationContext;
     private static ConfigurationContextService configurationContextService;
-    private static DASMessageFlowPublisherAdmin bamMediationStatsPublisherAdmin;
+    private static DASMessageFlowPublisherAdmin dasMessageFlowPublisherAdmin;
     private static SynapseEnvironmentService synapseEnvironmentService;
     private static String serverName;
 
@@ -83,12 +83,12 @@ public class PublisherUtils {
 
 
     public static DASMessageFlowPublisherAdmin getMediationStatPublisherAdmin() {
-        return bamMediationStatsPublisherAdmin;
+        return dasMessageFlowPublisherAdmin;
     }
 
     public static void setMediationStatPublisherAdmin(
             DASMessageFlowPublisherAdmin mediationStatsPublisherAdmin) {
-        bamMediationStatsPublisherAdmin = mediationStatsPublisherAdmin;
+        dasMessageFlowPublisherAdmin = mediationStatsPublisherAdmin;
     }
 
 //    public static void setSynapseEnvironmentService(

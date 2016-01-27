@@ -36,7 +36,7 @@ public class DASMessageFlowPublisherAdmin extends AbstractAdmin {
                                           CarbonContext.getThreadLocalCarbonContext().getTenantId());
     }
 
-    public MediationStatConfig getEventingConfigData() {
+    public MediationStatConfig getEventingConfigData(String serverId) {
         return registryPersistenceManager.getEventingConfigData(CarbonContext.getThreadLocalCarbonContext().getTenantId()).get(0);
     }
 
@@ -56,5 +56,10 @@ public class DASMessageFlowPublisherAdmin extends AbstractAdmin {
            return MediationDataPublisherConstants.DEFAULT_DAS_SERVER_URL;
         }
     }
+
+    public MediationStatConfig[] getAllPublisherNames() {
+        return new MediationStatConfig[10];
+    }
+
 
 }

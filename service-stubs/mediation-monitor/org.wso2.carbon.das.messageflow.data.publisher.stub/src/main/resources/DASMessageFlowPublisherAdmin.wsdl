@@ -1,20 +1,8 @@
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://services.publisher.data.messageflow.das.carbon.wso2.org" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ax2100="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://services.publisher.data.messageflow.das.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:tns="http://services.publisher.data.messageflow.das.carbon.wso2.org" xmlns:ax298="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://services.publisher.data.messageflow.das.carbon.wso2.org">
    <wsdl:documentation>DASMessageFlowPublisherAdmin</wsdl:documentation>
    <wsdl:types>
-      <xs:schema xmlns:ns="http://org.apache.axis2/xsd" xmlns:ax2101="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
+      <xs:schema xmlns:ns="http://org.apache.axis2/xsd" xmlns:ax299="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
          <xs:import namespace="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd"/>
-         <xs:element name="getEventingConfigData">
-            <xs:complexType>
-               <xs:sequence/>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getEventingConfigDataResponse">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element minOccurs="0" name="return" nillable="true" type="ax2101:MediationStatConfig"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
          <xs:element name="isCloudDeployment">
             <xs:complexType>
                <xs:sequence/>
@@ -42,7 +30,33 @@
          <xs:element name="configureEventing">
             <xs:complexType>
                <xs:sequence>
-                  <xs:element minOccurs="0" name="mediationStatConfig" nillable="true" type="ax2101:MediationStatConfig"/>
+                  <xs:element minOccurs="0" name="mediationStatConfig" nillable="true" type="ax298:MediationStatConfig"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getEventingConfigData">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="serverId" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getEventingConfigDataResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" nillable="true" type="ax298:MediationStatConfig"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllPublisherNames">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllPublisherNamesResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax298:MediationStatConfig"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -56,7 +70,8 @@
                <xs:element minOccurs="0" name="messageFlowTracePublishingEnabled" type="xs:boolean"/>
                <xs:element minOccurs="0" name="nickName" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"/>
-               <xs:element maxOccurs="unbounded" minOccurs="0" name="properties" nillable="true" type="ax2100:Property"/>
+               <xs:element maxOccurs="unbounded" minOccurs="0" name="properties" nillable="true" type="ax298:Property"/>
+               <xs:element minOccurs="0" name="serverId" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="streamName" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="url" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string"/>
@@ -92,6 +107,12 @@
    <wsdl:message name="getEventingConfigDataResponse">
       <wsdl:part name="parameters" element="ns1:getEventingConfigDataResponse"/>
    </wsdl:message>
+   <wsdl:message name="getAllPublisherNamesRequest">
+      <wsdl:part name="parameters" element="ns1:getAllPublisherNames"/>
+   </wsdl:message>
+   <wsdl:message name="getAllPublisherNamesResponse">
+      <wsdl:part name="parameters" element="ns1:getAllPublisherNamesResponse"/>
+   </wsdl:message>
    <wsdl:portType name="DASMessageFlowPublisherAdminPortType">
       <wsdl:operation name="configureEventing">
          <wsdl:input message="tns:configureEventingRequest" wsaw:Action="urn:configureEventing"/>
@@ -107,6 +128,10 @@
       <wsdl:operation name="getEventingConfigData">
          <wsdl:input message="tns:getEventingConfigDataRequest" wsaw:Action="urn:getEventingConfigData"/>
          <wsdl:output message="tns:getEventingConfigDataResponse" wsaw:Action="urn:getEventingConfigDataResponse"/>
+      </wsdl:operation>
+      <wsdl:operation name="getAllPublisherNames">
+         <wsdl:input message="tns:getAllPublisherNamesRequest" wsaw:Action="urn:getAllPublisherNames"/>
+         <wsdl:output message="tns:getAllPublisherNamesResponse" wsaw:Action="urn:getAllPublisherNamesResponse"/>
       </wsdl:operation>
    </wsdl:portType>
    <wsdl:binding name="DASMessageFlowPublisherAdminSoap11Binding" type="tns:DASMessageFlowPublisherAdminPortType">
@@ -137,6 +162,15 @@
       </wsdl:operation>
       <wsdl:operation name="getEventingConfigData">
          <soap:operation soapAction="urn:getEventingConfigData" style="document"/>
+         <wsdl:input>
+            <soap:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllPublisherNames">
+         <soap:operation soapAction="urn:getAllPublisherNames" style="document"/>
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
@@ -180,6 +214,15 @@
             <soap12:body use="literal"/>
          </wsdl:output>
       </wsdl:operation>
+      <wsdl:operation name="getAllPublisherNames">
+         <soap12:operation soapAction="urn:getAllPublisherNames" style="document"/>
+         <wsdl:input>
+            <soap12:body use="literal"/>
+         </wsdl:input>
+         <wsdl:output>
+            <soap12:body use="literal"/>
+         </wsdl:output>
+      </wsdl:operation>
    </wsdl:binding>
    <wsdl:binding name="DASMessageFlowPublisherAdminHttpBinding" type="tns:DASMessageFlowPublisherAdminPortType">
       <http:binding verb="POST"/>
@@ -209,6 +252,15 @@
       </wsdl:operation>
       <wsdl:operation name="getEventingConfigData">
          <http:operation location="getEventingConfigData"/>
+         <wsdl:input>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:input>
+         <wsdl:output>
+            <mime:content type="text/xml" part="parameters"/>
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="getAllPublisherNames">
+         <http:operation location="getAllPublisherNames"/>
          <wsdl:input>
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
