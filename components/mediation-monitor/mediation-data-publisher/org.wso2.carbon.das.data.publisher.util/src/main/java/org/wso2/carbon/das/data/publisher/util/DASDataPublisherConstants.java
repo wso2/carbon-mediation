@@ -63,4 +63,7 @@ public class DASDataPublisherConstants {
     public static final String STAT_PUBLISH_DATA = "stat_data";
     public static final String HOSTNAME_AND_PORT_SEPARATOR = ":";
     public static final String DAS_PREFIX_FOR_REGISTRY_HIDDEN_PROPERTIES = "registry.";
+
+    public static final String DAS_TRACE_PUBLISHING_ENABLED = "trace-publishing-enabled";
+    public static final String DAS_STATS_PUBLISHING_ENABLED = "stats-publishing-enabled";
 }
