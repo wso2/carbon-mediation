@@ -60,7 +60,7 @@ public class DASMediationStatisticsObserver implements MessageFlowTracingObserve
     private void updateStatisticsInternal(Object traceEntry)
             throws Exception {
         int tenantID = getTenantId();
-        List<MediationStatConfig> mediationStatConfigList = new RegistryPersistenceManager().getEventingConfigData(tenantID);
+        List<MediationStatConfig> mediationStatConfigList = new RegistryPersistenceManager().load(tenantID);
 
         if (mediationStatConfigList.isEmpty()) {
             return;

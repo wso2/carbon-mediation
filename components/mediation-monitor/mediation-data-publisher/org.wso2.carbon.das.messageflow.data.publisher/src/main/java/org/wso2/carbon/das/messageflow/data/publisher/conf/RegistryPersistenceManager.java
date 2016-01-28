@@ -36,18 +36,184 @@ public class RegistryPersistenceManager {
     private static Log log = LogFactory.getLog(RegistryPersistenceManager.class);
     private static RegistryService dasRegistryService;
     public static final String EMPTY_STRING = "";
+    public static final String DAS_SERVER_ID = "DAS_server_id";
+    private static String IDS = "ids";
 
     public static void setDasRegistryService(RegistryService registryServiceParam) {
         dasRegistryService = registryServiceParam;
+    }
+
+    public MediationStatConfig get(String serverId, int tenantId) {
+        MediationStatConfig mediationStatConfig = new MediationStatConfig();
+
+        // First set it to defaults, but do not persist
+        mediationStatConfig.setMessageFlowTracePublishingEnabled(false);
+        mediationStatConfig.setMessageFlowStatsPublishingEnabled(false);
+        mediationStatConfig.setUrl(EMPTY_STRING);
+        mediationStatConfig.setUserName(EMPTY_STRING);
+        mediationStatConfig.setPassword(EMPTY_STRING);
+
+        try {
+            Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
+            String resourcePath = MediationDataPublisherConstants.DAS_MEDIATION_MESSAGE_FLOW_REG_PATH + serverId;
+            Properties configs = null;
+
+            if (registry != null && registry.resourceExists(resourcePath)) {
+                Resource resource = registry.get(resourcePath);
+                configs = resource.getProperties();
+            } else {
+                log.error("Resource not found from registry: " + resourcePath);
+                return null;
+            }
+
+            if (configs != null) {
+                String serverIdRecorded = ((List<String>) configs.get(DAS_SERVER_ID)).get(0);//((List<String>) configs.get(DAS_SERVER_ID)).get(0);
+                String url = ((List<String>) configs.get(DASDataPublisherConstants.DAS_URL)).get(0);//(String)configs.get(DASDataPublisherConstants.DAS_URL);
+                String userName = ((List<String>) configs.get(DASDataPublisherConstants.DAS_USER_NAME)).get(0);//(String)configs.get(DASDataPublisherConstants.DAS_USER_NAME);
+                String password = ((List<String>) configs.get(DASDataPublisherConstants.DAS_PASSWORD)).get(0);//(String)configs.get(DASDataPublisherConstants.DAS_PASSWORD);
+                String tracePublishingEnable = ((List<String>) configs.get(DASDataPublisherConstants.DAS_TRACE_PUBLISHING_ENABLED)).get(0);//(String)configs.get(DASDataPublisherConstants.DAS_TRACE_PUBLISHING_ENABLED);
+                String statsPublishingEnable = ((List<String>) configs.get(DASDataPublisherConstants.DAS_STATS_PUBLISHING_ENABLED)).get(0);//(String)configs.get(DASDataPublisherConstants.DAS_STATS_PUBLISHING_ENABLED);
+
+                if (url != null && userName != null && password != null) {
+                    mediationStatConfig.setMessageFlowTracePublishingEnabled(Boolean.parseBoolean(tracePublishingEnable));
+                    mediationStatConfig.setMessageFlowStatsPublishingEnabled(Boolean.parseBoolean(statsPublishingEnable));
+                    mediationStatConfig.setServerId(serverIdRecorded);
+                    mediationStatConfig.setUrl(url);
+                    mediationStatConfig.setUserName(userName);
+                    mediationStatConfig.setPassword(password);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Could not load values from registry", e);
+        }
+
+        return mediationStatConfig;
+    }
+
+    public void update(MediationStatConfig config, int tenantId) {
+        try {
+            Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
+            String serverId = config.getServerId();
+            String resourcePath = MediationDataPublisherConstants.DAS_MEDIATION_MESSAGE_FLOW_REG_PATH + serverId;
+            Resource resource;
+
+            if (registry != null) {
+                if (registry.resourceExists(resourcePath)) {
+                    resource = registry.get(resourcePath);
+                } else {
+                    resource = registry.newResource();
+                }
+
+                resource.addProperty(DAS_SERVER_ID, config.getServerId());
+                resource.addProperty(DASDataPublisherConstants.DAS_URL, config.getUrl());
+                resource.addProperty(DASDataPublisherConstants.DAS_USER_NAME, config.getUserName());
+                resource.addProperty(DASDataPublisherConstants.DAS_PASSWORD, config.getPassword());
+                resource.addProperty(DASDataPublisherConstants.DAS_TRACE_PUBLISHING_ENABLED, String.valueOf(config.isMessageFlowTracePublishingEnabled()));
+                resource.addProperty(DASDataPublisherConstants.DAS_STATS_PUBLISHING_ENABLED, String.valueOf(config.isMessageFlowStatsPublishingEnabled()));
+
+                // update registry at the end
+                registry.put(resourcePath, resource);
+
+                // update the list of server-IDs
+                String serverListPath = MediationDataPublisherConstants.DAS_SERVER_LIST_REG_PATH;
+                if (registry.resourceExists(serverListPath)) {
+                    Resource listResource = registry.get(serverListPath);
+                    List<String> idList = listResource.getPropertyValues(IDS);
+                    if (idList == null) {
+                        idList = new ArrayList<>();
+                    }
+                    idList.add(serverId);
+                    listResource.setProperty(IDS, idList);
+                    registry.put(serverListPath, listResource);
+                }
+            } else {
+                log.error("Resource not found from registry: " + resourcePath);
+                return;
+            }
+        } catch (Exception e) {
+            log.error("Could not load values from registry", e);
+        }
+    }
+
+    public List<MediationStatConfig> load(int tenantId) {
+        List<MediationStatConfig> mediationStatConfigList = new ArrayList<>();
+
+        try {
+            Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
+            String serverListPath = MediationDataPublisherConstants.DAS_SERVER_LIST_REG_PATH;
+            Resource resource;
+
+            if (registry != null) {
+                if (registry.resourceExists(serverListPath)) {
+                    resource = registry.get(serverListPath);
+
+                    List<String> idList = resource.getPropertyValues(IDS);
+
+                    if (idList != null) {
+                        for (String id : idList) {
+                            mediationStatConfigList.add(this.get(id, tenantId));
+                        }
+                    }
+
+                } else {
+                    resource = registry.newResource();
+                    resource.setProperty(IDS, new ArrayList<String>());
+                    registry.put(serverListPath, resource);
+                }
+
+            }
+
+
+        } catch (Exception e) {
+            log.error("Could not load values from registry", e);
+        }
+
+        return mediationStatConfigList;
+    }
+
+    public MediationStatConfig[] getAllPublisherNames(int tenantId) {
+        List<MediationStatConfig> configList = load(tenantId);
+        return configList.toArray(new MediationStatConfig[configList.size()]);
+    }
+
+    public boolean remove(String serverId, int tenantId) {
+
+        try {
+            Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
+            String resourcePath = MediationDataPublisherConstants.DAS_MEDIATION_MESSAGE_FLOW_REG_PATH + serverId;
+            String serverListPath = MediationDataPublisherConstants.DAS_SERVER_LIST_REG_PATH;
+
+            if (registry != null) {
+                if (registry.resourceExists(resourcePath)) {
+                    registry.delete(resourcePath);
+                }
+
+                if (registry.resourceExists(serverListPath)) {
+                    Resource listResource = registry.get(serverListPath);
+                    List<String> idList = listResource.getPropertyValues(IDS);
+                    idList.remove(serverId);
+                    listResource.setProperty(IDS, idList);
+                    registry.put(serverListPath, listResource);
+                }
+            } else {
+                return false;
+            }
+
+        } catch (Exception e) {
+            log.error("Could not load values from registry", e);
+            return false;
+        }
+
+        return true;
     }
 
 
     /**
      * Loads configuration from Registry.
      */
-    public List<MediationStatConfig> load(int tenantId) {
+ /*   public List<MediationStatConfig> load(int tenantId) {
 
-        List<MediationStatConfig> mediationStatConfigList = new ArrayList<MediationStatConfig>();
+        List<MediationStatConfig> mediationStatConfigList = new ArrayList<>();
 
         MediationStatConfig mediationStatConfig = new MediationStatConfig();
         // First set it to defaults, but do not persist
@@ -78,9 +244,9 @@ public class RegistryPersistenceManager {
             String nickName = getConfigurationProperty(DASDataPublisherConstants.DAS_NICK_NAME,
                                                        registry);
             String tracePublishingEnable = getConfigurationProperty(DASDataPublisherConstants.DAS_TRACE_PUBLISHING_ENABLED,
-                                                     registry);
+                                                                    registry);
             String statsPublishingEnable = getConfigurationProperty(DASDataPublisherConstants.DAS_STATS_PUBLISHING_ENABLED,
-                                                    registry);
+                                                                    registry);
 
             Properties properties = getAllConfigProperties(MediationDataPublisherConstants.DAS_MEDIATION_STATISTICS_PROPERTIES_REG_PATH,
                                                            registry);
@@ -113,8 +279,7 @@ public class RegistryPersistenceManager {
                     mediationStatConfig.setProperties(propertyDTOList.toArray(new Property[propertyDTOList.size()]));
                 }
 
-            }
-            else {
+            } else {
                 // Registry does not have eventing config
                 update(mediationStatConfig, tenantId);
             }
@@ -126,8 +291,8 @@ public class RegistryPersistenceManager {
 
         return mediationStatConfigList;
     }
-
-    private Properties getAllConfigProperties(String mediationStatisticsPropertiesRegPath,Registry registry)
+*/
+    private Properties getAllConfigProperties(String mediationStatisticsPropertiesRegPath, Registry registry)
             throws RegistryException {
         Properties properties = null;
         Properties filterProperties = null;
@@ -155,7 +320,7 @@ public class RegistryPersistenceManager {
      * @param properties
      * @param registryPath
      */
-    public void updateAllProperties(Properties properties, String registryPath,Registry registry)
+    public void updateAllProperties(Properties properties, String registryPath, Registry registry)
             throws RegistryException {
         // Always creating a new resource because properties should be replaced and overridden
         Resource resource = registry.newResource();
@@ -174,7 +339,7 @@ public class RegistryPersistenceManager {
      * @throws RegistryException
      * @throws MediationPublisherException
      */
-    public String getConfigurationProperty(String propertyName, Registry registry)
+    /*public String getConfigurationProperty(String propertyName, Registry registry)
             throws RegistryException, MediationPublisherException {
         String resourcePath = MediationDataPublisherConstants.DAS_MEDIATION_STATISTICS_REG_PATH + propertyName;
         String value = null;
@@ -189,7 +354,7 @@ public class RegistryPersistenceManager {
             }
         }
         return value;
-    }
+    }*/
 
     /**
      * Updates the Registry with given config data.
@@ -197,7 +362,7 @@ public class RegistryPersistenceManager {
      * @param eventConfig eventing configuration data
      * @param tenantId
      */
-    public void update(MediationStatConfig eventConfig, int tenantId) {
+/*    public void update(MediationStatConfig eventConfig, int tenantId) {
         try {
             Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
             updateConfigProperty(DASDataPublisherConstants.DAS_TRACE_PUBLISHING_ENABLED,
@@ -205,19 +370,19 @@ public class RegistryPersistenceManager {
             updateConfigProperty(DASDataPublisherConstants.DAS_STATS_PUBLISHING_ENABLED,
                                  eventConfig.isMessageFlowStatsPublishingEnabled(), registry);
             updateConfigProperty(DASDataPublisherConstants.DAS_URL,
-                                 eventConfig.getUrl(),registry);
+                                 eventConfig.getUrl(), registry);
             updateConfigProperty(DASDataPublisherConstants.DAS_USER_NAME,
-                                 eventConfig.getUserName(),registry);
+                                 eventConfig.getUserName(), registry);
             updateConfigProperty(DASDataPublisherConstants.DAS_PASSWORD,
-                                 eventConfig.getPassword(),registry);
+                                 eventConfig.getPassword(), registry);
             updateConfigProperty(DASDataPublisherConstants.DAS_STREAM_NAME,
-                                 eventConfig.getStreamName(),registry);
+                                 eventConfig.getStreamName(), registry);
             updateConfigProperty(DASDataPublisherConstants.DAS_VERSION,
-                                 eventConfig.getVersion(),registry);
+                                 eventConfig.getVersion(), registry);
             updateConfigProperty(DASDataPublisherConstants.DAS_NICK_NAME,
-                                 eventConfig.getNickName(),registry);
+                                 eventConfig.getNickName(), registry);
             updateConfigProperty(DASDataPublisherConstants.DAS_DESCRIPTION,
-                                 eventConfig.getDescription(),registry);
+                                 eventConfig.getDescription(), registry);
 
 
             Property[] propertiesDTO = eventConfig.getProperties();
@@ -231,7 +396,7 @@ public class RegistryPersistenceManager {
                 }
                 updateAllProperties(properties, MediationDataPublisherConstants.DAS_MEDIATION_STATISTICS_PROPERTIES_REG_PATH,
                                     registry);
-            }else {
+            } else {
                 updateAllProperties(null, MediationDataPublisherConstants.DAS_MEDIATION_STATISTICS_PROPERTIES_REG_PATH,
                                     registry);
             }
@@ -239,7 +404,7 @@ public class RegistryPersistenceManager {
         } catch (Exception e) {
             log.error("Could not update the registry", e);
         }
-    }
+    }*/
 
     /**
      * Update the properties
@@ -248,12 +413,11 @@ public class RegistryPersistenceManager {
      * @param value
      * @param registry
      * @throws org.wso2.carbon.registry.core.exceptions.RegistryException
-     *
      * @throws MediationPublisherException
      */
-    public void updateConfigProperty(String propertyName, Object value, Registry registry)
+/*    public void updateConfigProperty(String propertyName, Object value, Registry registry)
             throws RegistryException, MediationPublisherException {
-        String resourcePath = MediationDataPublisherConstants.DAS_MEDIATION_STATISTICS_REG_PATH + propertyName;
+//        String resourcePath = MediationDataPublisherConstants.DAS_MEDIATION_STATISTICS_REG_PATH + propertyName;
         Resource resource;
         if (registry != null) {
             try {
@@ -270,11 +434,7 @@ public class RegistryPersistenceManager {
                 throw new MediationPublisherException("Error while accessing registry", e);
             }
         }
-    }
-
-    public List<MediationStatConfig> getEventingConfigData(int tenantId) {
-        return load(tenantId);
-    }
+    }*/
 
 
 }

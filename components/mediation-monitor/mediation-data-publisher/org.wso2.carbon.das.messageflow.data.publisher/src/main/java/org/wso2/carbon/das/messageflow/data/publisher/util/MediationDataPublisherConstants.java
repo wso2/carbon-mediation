@@ -20,11 +20,13 @@ import org.wso2.carbon.core.RegistryResources;
 
 public class MediationDataPublisherConstants {
 
-    public static final String DAS_MEDIATION_STATISTICS_REG_PATH = RegistryResources.COMPONENTS
-                                                               + "org.wso2.carbon.das.mediationstats.data.publisher/mediationstats";
+    public static final String DAS_MEDIATION_MESSAGE_FLOW_REG_PATH = RegistryResources.COMPONENTS
+                                                               + "org.wso2.carbon.das.messageflow.data.publisher/";
+
+    public static final String DAS_SERVER_LIST_REG_PATH = DAS_MEDIATION_MESSAGE_FLOW_REG_PATH + "servers";
 
     public static final String DAS_MEDIATION_STATISTICS_PROPERTIES_REG_PATH = RegistryResources.COMPONENTS
-                                                             + "org.wso2.carbon.das.mediationstats.data.publisher/properties";
+                                                             + "org.wso2.carbon.das.messageflow.data.publisher/properties";
 
 
     // key, value constants

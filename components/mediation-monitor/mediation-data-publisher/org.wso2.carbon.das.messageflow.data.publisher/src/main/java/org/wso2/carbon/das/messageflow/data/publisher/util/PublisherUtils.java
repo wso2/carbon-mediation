@@ -43,7 +43,9 @@ public class PublisherUtils {
 
     private static final String TRANSPORT = "https"; // TODO: it is not ideal to assume https is always available
 
-    private static boolean isStatisticsReporterDisable = false;
+//    private static boolean isStatisticsReporterDisable = false;
+
+    private static boolean isTraceDataCollectingEnabled = false;
 
 //    public static void setStatisticsReporterDisable(boolean isStatisticsReporterDisabled) {
 //        PublisherUtils.isStatisticsReporterDisable = isStatisticsReporterDisabled;
@@ -52,6 +54,15 @@ public class PublisherUtils {
 //    public static boolean getStatisticsReporterDisable() {
 //        return isStatisticsReporterDisable;
 //    }
+
+
+    public static boolean isTraceDataCollectingEnabled() {
+        return isTraceDataCollectingEnabled;
+    }
+
+    public static void setTraceDataCollectingEnabled(boolean isTraceDataCollectingEnabled) {
+        PublisherUtils.isTraceDataCollectingEnabled = isTraceDataCollectingEnabled;
+    }
 
     private static Map<String,EventPublisherConfig> eventPublisherConfigMap =
             new HashMap<String, EventPublisherConfig>();

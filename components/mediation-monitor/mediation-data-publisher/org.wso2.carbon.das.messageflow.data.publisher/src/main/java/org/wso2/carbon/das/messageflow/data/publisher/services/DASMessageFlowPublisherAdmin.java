@@ -18,10 +18,11 @@ package org.wso2.carbon.das.messageflow.data.publisher.services;
 
 import org.wso2.carbon.das.messageflow.data.publisher.conf.MediationStatConfig;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
-import org.wso2.carbon.das.messageflow.data.publisher.util.MediationDataPublisherConstants;
-import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
+import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
+
+import java.util.List;
 
 public class DASMessageFlowPublisherAdmin extends AbstractAdmin {
 
@@ -37,29 +38,38 @@ public class DASMessageFlowPublisherAdmin extends AbstractAdmin {
     }
 
     public MediationStatConfig getEventingConfigData(String serverId) {
-        return registryPersistenceManager.getEventingConfigData(CarbonContext.getThreadLocalCarbonContext().getTenantId()).get(0);
-    }
-
-     public boolean isCloudDeployment(){
-        String[] cloudDeploy = ServerConfiguration.getInstance().
-                getProperties(MediationDataPublisherConstants.CLOUD_DEPLOYMENT_PROP);
-        return null != cloudDeploy && Boolean.parseBoolean(cloudDeploy[cloudDeploy.length - 1]);
-    }
-
-    public String getServerConfigBAMServerURL(){
-        String[] bamServerUrl =
-                ServerConfiguration.getInstance().
-                        getProperties(MediationDataPublisherConstants.SERVER_CONFIG_DAS_URL);
-        if(null != bamServerUrl){
-           return bamServerUrl[bamServerUrl.length-1];
-        }else {
-           return MediationDataPublisherConstants.DEFAULT_DAS_SERVER_URL;
-        }
+        return registryPersistenceManager.get(serverId, CarbonContext.getThreadLocalCarbonContext().getTenantId());
     }
 
     public MediationStatConfig[] getAllPublisherNames() {
-        return new MediationStatConfig[10];
+        return registryPersistenceManager.getAllPublisherNames(CarbonContext.getThreadLocalCarbonContext().getTenantId());
     }
 
+    public boolean removeServer(String serverId) {
+        return registryPersistenceManager.remove(serverId, CarbonContext.getThreadLocalCarbonContext().getTenantId());
+    }
+
+    public boolean isCollectingEnabled() {
+        return PublisherUtils.isTraceDataCollectingEnabled();
+    }
+
+    /*
+         public boolean isCloudDeployment(){
+            String[] cloudDeploy = ServerConfiguration.getInstance().
+                    getProperties(MediationDataPublisherConstants.CLOUD_DEPLOYMENT_PROP);
+            return null != cloudDeploy && Boolean.parseBoolean(cloudDeploy[cloudDeploy.length - 1]);
+        }
+
+        public String getServerConfigBAMServerURL(){
+            String[] bamServerUrl =
+                    ServerConfiguration.getInstance().
+                            getProperties(MediationDataPublisherConstants.SERVER_CONFIG_DAS_URL);
+            if(null != bamServerUrl){
+               return bamServerUrl[bamServerUrl.length-1];
+            }else {
+               return MediationDataPublisherConstants.DEFAULT_DAS_SERVER_URL;
+            }
+        }
+    */
 
 }

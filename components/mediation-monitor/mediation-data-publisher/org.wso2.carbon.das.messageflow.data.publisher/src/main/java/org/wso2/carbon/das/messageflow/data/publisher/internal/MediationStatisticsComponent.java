@@ -257,6 +257,7 @@ public class MediationStatisticsComponent {
 
     private void checkPublishingEnabled() {
         flowTracingEnabled = MessageFlowTracingDataCollector.isMessageFlowTracingEnabled();
+        PublisherUtils.setTraceDataCollectingEnabled(flowTracingEnabled);
 
         if (!flowTracingEnabled) {
             log.info("Statistic Reporter is Disabled");

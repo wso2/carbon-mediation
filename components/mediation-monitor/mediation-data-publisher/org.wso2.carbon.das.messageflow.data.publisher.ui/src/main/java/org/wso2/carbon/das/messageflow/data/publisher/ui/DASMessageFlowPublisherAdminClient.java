@@ -26,6 +26,7 @@ import org.wso2.carbon.das.messageflow.data.publisher.stub.DASMessageFlowPublish
 import org.wso2.carbon.das.messageflow.data.publisher.stub.conf.MediationStatConfig;
 
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -57,6 +58,15 @@ public class DASMessageFlowPublisherAdminClient {
         return null;
     }
     
+    public boolean removeServer(String serverId) throws RemoteException {
+        try {
+            return stub.removeServer(serverId);
+        } catch (RemoteException e) {
+            handleException(bundle.getString("cannot.get.eventing.config"), e);
+        }
+        return false;
+    }
+    
     public MediationStatConfig[] getAllPublisherNames() throws RemoteException {
         try {
             return stub.getAllPublisherNames();
@@ -73,7 +83,17 @@ public class DASMessageFlowPublisherAdminClient {
             handleException(bundle.getString("cannot.set.eventing.config"), e);
         }
     }
-
+    
+    public boolean isCollectingEnabled() throws RemoteException {
+        try {
+            return stub.isCollectingEnabled();
+        } catch (java.lang.Exception e) {
+            handleException(bundle.getString("cannot.set.eventing.config"), e);
+        }
+        return false;
+    }
+    
+/*
     public boolean isCloudDeployment() throws RemoteException {
         try {
             return stub.isCloudDeployment();
@@ -91,7 +111,7 @@ public class DASMessageFlowPublisherAdminClient {
         }
         return "";
     }
-
+*/
 
     private void handleException(String msg, java.lang.Exception e) throws RemoteException {
         log.error(msg, e);

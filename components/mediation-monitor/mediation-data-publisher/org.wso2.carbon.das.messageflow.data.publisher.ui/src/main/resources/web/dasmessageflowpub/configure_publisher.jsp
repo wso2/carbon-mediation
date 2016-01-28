@@ -62,6 +62,12 @@
     	// Load existing
     	try {
             mediationStatConfig = client.getEventingConfigData(serverId);
+            
+            url = mediationStatConfig.getUrl();
+            userName = mediationStatConfig.getUserName();
+            password = mediationStatConfig.getPassword();
+            
+            
         } catch (Exception e) {
             if (e.getCause().getMessage().toLowerCase().indexOf("you are not authorized") == -1) {
                 response.setStatus(500);
@@ -72,7 +78,6 @@
 			    <%
                 }
             }
-    	
     }
 
     if (action != null && action.equals("save")) {
@@ -86,7 +91,6 @@
         if (password != null) {
             mediationStatConfig.setPassword(password);
         }
-        System.out.println("STATE-"+traceState);System.out.println(statsState);System.out.println(userName);
         if (traceState != null) {
         	mediationStatConfig.setMessageFlowTracePublishingEnabled(true);
         }
@@ -101,7 +105,7 @@
         if (serverId != null) {
         	mediationStatConfig.setServerId(serverId);
         } else {
-        	serverId = String.valueOf(url.hashCode());
+        	serverId = String.valueOf("server_id_" + url.hashCode());
         	mediationStatConfig.setServerId(serverId);
         }
 
@@ -170,7 +174,7 @@
                            "                    </td>" +
                            "<td>\n" +
                            "<a onClick='javaScript:removeColumn(\"" + sId + "\")'" +
-                           "style='background-image: url(../daspubsvcstat/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
+                           "style='background-image: url(../dasmessageflowpub/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
                            "                    </td>" +
                            "</tr>";
 
@@ -191,7 +195,7 @@
                            "                    </td>" +
                            "<td>\n" +
                            "<a onClick='javaScript:removeColumn(\"" + sId + "\")'" +
-                           "style='background-image: url(../daspubsvcstat/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
+                           "style='background-image: url(../dasmessageflowpub/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
                            "                    </td>" +
                            "</tr></table>";
 
@@ -241,6 +245,10 @@
 
         <form action="configure_publisher.jsp" method="post">
             <input type="hidden" name="action" value="save"/>
+            <% if (serverId != null) { %>
+            	<input type="hidden" name="serverId" value="<%= mediationStatConfig.getServerId() %>"/>
+            <% } %>
+            
             <table width="100%" class="styledLeft" style="margin-left: 0px;">
                  
                 <thead>
@@ -276,7 +284,7 @@
 	                    <fmt:message key="publishing.statsData"/>
                     </td>
                 </tr>
-
+<!-- 
                 <thead>
                 <tr>
                     <th colspan="4">
@@ -288,7 +296,7 @@
                 <tr>
                     <td id="propertyTablePlaceHolder" colspan="2">
 
-                        <% if (properties != null) { %>
+                        <%-- if (properties != null) { --%>
                         <table id="propertyTable" width="100%" class="styledLeft"
                            style="margin-left: 0px;">
                             <tr>
@@ -297,24 +305,24 @@
                                     url(../dasmessageflowpub/images/add.gif);' class='icon-link addIcon'>Add Property</a>
                                 </td>
                             </tr>
-                            <% int i = 1;
+                            <%-- int i = 1;
                             for (Property property : properties) {
 
-                            %>
-                            <tr id="propertyTable_<%=i%>">
+                            --%>
+                            <tr id="propertyTable_<%--=i--%>">
                                 <td>
                                     <fmt:message key="property.name"/>
-                                    <input type="text" name="<%=PROPERTY_KEYS%>"
-                                           value="<%=property.getKey()%>">
+                                    <input type="text" name="<%--=PROPERTY_KEYS--%>"
+                                           value="<%--=property.getKey()--%>">
                                 </td>
                                 <td>
                                     <fmt:message key="property.value"/>
-                                    <input type="text" name="<%=PROPERTY_VALUES%>"
-                                           value="<%=property.getValue()%>">
+                                    <input type="text" name="<%--=PROPERTY_VALUES--%>"
+                                           value="<%--=property.getValue()--%>">
                                 </td>
 
                                 <td>
-                                    <a onClick='javaScript:removeColumn("propertyTable_<%=i%>")' style='background-image:
+                                    <a onClick='javaScript:removeColumn("propertyTable_<%--=i--%>")' style='background-image:
                                     url(../dasmessageflowpub/images/delete.gif);' class='icon-link addIcon'>Remove Property</a>
                                 </td>
 
@@ -323,13 +331,13 @@
                             <script type="text/javascript">
                                 rowNum++;
                             </script>
-                            <% i++;
+                            <%-- i++;
                             }
-                            %>
+                            --%>
 
                         </table>
-                        <%
-                        } else { %>
+                        <%--
+                        } else { --%>
                             <table width="100%" class="styledLeft" style="margin-left: 0px;">
                                 <tr>
                                     <td colspan="3">
@@ -340,11 +348,11 @@
                                 </tr>
                             </table>
 
-                        <% } %>
+                        <%-- } --%>
                     </td>
                 </tr>
                 </tbody>
-
+ -->
                   
 
 

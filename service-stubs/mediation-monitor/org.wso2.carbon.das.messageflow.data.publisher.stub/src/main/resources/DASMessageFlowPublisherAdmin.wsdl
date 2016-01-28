@@ -3,37 +3,6 @@
    <wsdl:types>
       <xs:schema xmlns:ns="http://org.apache.axis2/xsd" xmlns:ax299="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
          <xs:import namespace="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd"/>
-         <xs:element name="isCloudDeployment">
-            <xs:complexType>
-               <xs:sequence/>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="isCloudDeploymentResponse">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getServerConfigBAMServerURL">
-            <xs:complexType>
-               <xs:sequence/>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getServerConfigBAMServerURLResponse">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="configureEventing">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element minOccurs="0" name="mediationStatConfig" nillable="true" type="ax298:MediationStatConfig"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
          <xs:element name="getEventingConfigData">
             <xs:complexType>
                <xs:sequence>
@@ -48,6 +17,13 @@
                </xs:sequence>
             </xs:complexType>
          </xs:element>
+         <xs:element name="configureEventing">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="mediationStatConfig" nillable="true" type="ax298:MediationStatConfig"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
          <xs:element name="getAllPublisherNames">
             <xs:complexType>
                <xs:sequence/>
@@ -57,6 +33,32 @@
             <xs:complexType>
                <xs:sequence>
                   <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax298:MediationStatConfig"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="isCollectingEnabled">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="isCollectingEnabledResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="removeServer">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="serverId" nillable="true" type="xs:string"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="removeServerResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -89,17 +91,17 @@
    <wsdl:message name="configureEventingRequest">
       <wsdl:part name="parameters" element="ns1:configureEventing"/>
    </wsdl:message>
-   <wsdl:message name="getServerConfigBAMServerURLRequest">
-      <wsdl:part name="parameters" element="ns1:getServerConfigBAMServerURL"/>
+   <wsdl:message name="removeServerRequest">
+      <wsdl:part name="parameters" element="ns1:removeServer"/>
    </wsdl:message>
-   <wsdl:message name="getServerConfigBAMServerURLResponse">
-      <wsdl:part name="parameters" element="ns1:getServerConfigBAMServerURLResponse"/>
+   <wsdl:message name="removeServerResponse">
+      <wsdl:part name="parameters" element="ns1:removeServerResponse"/>
    </wsdl:message>
-   <wsdl:message name="isCloudDeploymentRequest">
-      <wsdl:part name="parameters" element="ns1:isCloudDeployment"/>
+   <wsdl:message name="isCollectingEnabledRequest">
+      <wsdl:part name="parameters" element="ns1:isCollectingEnabled"/>
    </wsdl:message>
-   <wsdl:message name="isCloudDeploymentResponse">
-      <wsdl:part name="parameters" element="ns1:isCloudDeploymentResponse"/>
+   <wsdl:message name="isCollectingEnabledResponse">
+      <wsdl:part name="parameters" element="ns1:isCollectingEnabledResponse"/>
    </wsdl:message>
    <wsdl:message name="getEventingConfigDataRequest">
       <wsdl:part name="parameters" element="ns1:getEventingConfigData"/>
@@ -117,13 +119,13 @@
       <wsdl:operation name="configureEventing">
          <wsdl:input message="tns:configureEventingRequest" wsaw:Action="urn:configureEventing"/>
       </wsdl:operation>
-      <wsdl:operation name="getServerConfigBAMServerURL">
-         <wsdl:input message="tns:getServerConfigBAMServerURLRequest" wsaw:Action="urn:getServerConfigBAMServerURL"/>
-         <wsdl:output message="tns:getServerConfigBAMServerURLResponse" wsaw:Action="urn:getServerConfigBAMServerURLResponse"/>
+      <wsdl:operation name="removeServer">
+         <wsdl:input message="tns:removeServerRequest" wsaw:Action="urn:removeServer"/>
+         <wsdl:output message="tns:removeServerResponse" wsaw:Action="urn:removeServerResponse"/>
       </wsdl:operation>
-      <wsdl:operation name="isCloudDeployment">
-         <wsdl:input message="tns:isCloudDeploymentRequest" wsaw:Action="urn:isCloudDeployment"/>
-         <wsdl:output message="tns:isCloudDeploymentResponse" wsaw:Action="urn:isCloudDeploymentResponse"/>
+      <wsdl:operation name="isCollectingEnabled">
+         <wsdl:input message="tns:isCollectingEnabledRequest" wsaw:Action="urn:isCollectingEnabled"/>
+         <wsdl:output message="tns:isCollectingEnabledResponse" wsaw:Action="urn:isCollectingEnabledResponse"/>
       </wsdl:operation>
       <wsdl:operation name="getEventingConfigData">
          <wsdl:input message="tns:getEventingConfigDataRequest" wsaw:Action="urn:getEventingConfigData"/>
@@ -142,8 +144,8 @@
             <soap:body use="literal"/>
          </wsdl:input>
       </wsdl:operation>
-      <wsdl:operation name="getServerConfigBAMServerURL">
-         <soap:operation soapAction="urn:getServerConfigBAMServerURL" style="document"/>
+      <wsdl:operation name="removeServer">
+         <soap:operation soapAction="urn:removeServer" style="document"/>
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
@@ -151,8 +153,8 @@
             <soap:body use="literal"/>
          </wsdl:output>
       </wsdl:operation>
-      <wsdl:operation name="isCloudDeployment">
-         <soap:operation soapAction="urn:isCloudDeployment" style="document"/>
+      <wsdl:operation name="isCollectingEnabled">
+         <soap:operation soapAction="urn:isCollectingEnabled" style="document"/>
          <wsdl:input>
             <soap:body use="literal"/>
          </wsdl:input>
@@ -187,8 +189,8 @@
             <soap12:body use="literal"/>
          </wsdl:input>
       </wsdl:operation>
-      <wsdl:operation name="getServerConfigBAMServerURL">
-         <soap12:operation soapAction="urn:getServerConfigBAMServerURL" style="document"/>
+      <wsdl:operation name="removeServer">
+         <soap12:operation soapAction="urn:removeServer" style="document"/>
          <wsdl:input>
             <soap12:body use="literal"/>
          </wsdl:input>
@@ -196,8 +198,8 @@
             <soap12:body use="literal"/>
          </wsdl:output>
       </wsdl:operation>
-      <wsdl:operation name="isCloudDeployment">
-         <soap12:operation soapAction="urn:isCloudDeployment" style="document"/>
+      <wsdl:operation name="isCollectingEnabled">
+         <soap12:operation soapAction="urn:isCollectingEnabled" style="document"/>
          <wsdl:input>
             <soap12:body use="literal"/>
          </wsdl:input>
@@ -232,8 +234,8 @@
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
       </wsdl:operation>
-      <wsdl:operation name="getServerConfigBAMServerURL">
-         <http:operation location="getServerConfigBAMServerURL"/>
+      <wsdl:operation name="removeServer">
+         <http:operation location="removeServer"/>
          <wsdl:input>
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
@@ -241,8 +243,8 @@
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:output>
       </wsdl:operation>
-      <wsdl:operation name="isCloudDeployment">
-         <http:operation location="isCloudDeployment"/>
+      <wsdl:operation name="isCollectingEnabled">
+         <http:operation location="isCollectingEnabled"/>
          <wsdl:input>
             <mime:content type="text/xml" part="parameters"/>
          </wsdl:input>
