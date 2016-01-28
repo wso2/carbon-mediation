@@ -25,18 +25,11 @@ public class MediationDataPublisherConstants {
 
     public static final String DAS_SERVER_LIST_REG_PATH = DAS_MEDIATION_MESSAGE_FLOW_REG_PATH + "servers";
 
-    public static final String DAS_MEDIATION_STATISTICS_PROPERTIES_REG_PATH = RegistryResources.COMPONENTS
-                                                             + "org.wso2.carbon.das.messageflow.data.publisher/properties";
+//    public static final String DAS_MEDIATION_STATISTICS_PROPERTIES_REG_PATH = RegistryResources.COMPONENTS
+//                                                             + "org.wso2.carbon.das.messageflow.data.publisher/properties";
 
 
     // key, value constants
-    public static final String MAX_PROCESS_TIME = "max_processing_time";
-    public static final String MIN_PROCESS_TIME = "min_processing_time";
-    public static final String AVG_PROCESS_TIME = "avg_processing_time";
-    public static final String COUNT = "count";
-    public static final String CUMULATIVE_COUNT = "cumulative_count";
-    public static final String FAULT_COUNT = "fault_count";
-    public static final String BAM_ID = "ID";
 
     public static final String MESSAGE_ID = "messageId";
     public static final String COMPONENT_ID = "componentId";
@@ -50,20 +43,6 @@ public class MediationDataPublisherConstants {
     public static final String ENTRY_TYPE = "entryType";
     public static final String MESSAGE_FLOW = "messageFlow";
 
-    public static final String IN_STATISTIC = "In";
-    public static final String OUT_STATISTIC = "Out";
-
-    public static final String DIRECTION = "direction";
-    public static final String TIMESTAMP = "timestamp";
-    public static final String RESOURCE_ID = "resource_id";
-    public static final String STATS_TYPE = "stats_type";
-
-
-    public static final String ENABLE_MEDIATION_STATS = "EnableMediationStats";
-
-    public static final String CLOUD_DEPLOYMENT_PROP = "IsCloudDeployment";
-
-    public static final String SERVER_CONFIG_DAS_URL = "BamServerURL";
 
     public static final String DEFAULT_DAS_SERVER_URL = "tcp://127.0.0.1:7611";
 

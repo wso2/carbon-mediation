@@ -12,9 +12,6 @@
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<%! public static final String PROPERTY_VALUES = "propertyValues";
-    public static final String PROPERTY_KEYS = "propertyKeys";
-%>
 <fmt:bundle basename="org.wso2.carbon.das.messageflow.data.publisher.ui.i18n.Resources">
 
 <carbon:breadcrumb
@@ -33,21 +30,7 @@
     String traceState = request.getParameter("traceState");
     String statsState = request.getParameter("statsState");
 
-    String[] propertyKeys = request.getParameterValues(PROPERTY_KEYS);
-    String[] propertyValues = request.getParameterValues(PROPERTY_VALUES);
 
-    List<Property> properties = null;
-    if (propertyKeys != null) {
-        properties = new ArrayList<Property>();
-        for (int i = 0; i < propertyKeys.length; i++) {
-            Property property = new Property();
-            String propertyKey = propertyKeys[i];
-            String propertyValue = propertyValues[i];
-            property.setKey(propertyKey);
-            property.setValue(propertyValue);
-            properties.add(property);
-        }
-    }
 
     String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext =
@@ -96,10 +79,6 @@
         }
         if (statsState != null) {
         	mediationStatConfig.setMessageFlowStatsPublishingEnabled(true);
-        }
-
-        if (properties != null) {
-            mediationStatConfig.setProperties(properties.toArray(new Property[properties.size()]));
         }
 
         if (serverId != null) {
@@ -154,56 +133,6 @@
     
     function goBackToServerList() {
     	window.location.href = "publisher_list.jsp";
-    }
-
-    var rowNum = 1;
-
-    function addColumn() {
-        rowNum++;
-        
-        var sId = "propertyTable_" + rowNum;
-       
-        var tableContent = "<tr id=\"" + sId + "\">" +
-                           "<td>\n" +
-                           "                        <fmt:message key='property.name'/>\n" +
-                           "                        <input type=\"text\" name=\"<%=PROPERTY_KEYS%>\" value=\"\">\n" +
-                           "                    </td>\n" +
-                           "                    <td>\n" +
-                           "                        <fmt:message key='property.value'/>\n" +
-                           "                        <input type=\"text\" name=\"<%=PROPERTY_VALUES%>\" value=\"\">\n" +
-                           "                    </td>" +
-                           "<td>\n" +
-                           "<a onClick='javaScript:removeColumn(\"" + sId + "\")'" +
-                           "style='background-image: url(../dasmessageflowpub/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
-                           "                    </td>" +
-                           "</tr>";
-
-        $("#propertyTable").append(tableContent);
-    }
-
-    function addMetaData(){
-        var sId = "propertyTable_" + rowNum;
-        var propertyTable = "<table id=\"propertyTable\" width=\"100%\" class=\"styledLeft\""+
-                           " style=\"margin-left: 0px;\"><tr id=\"" + sId + "\">" +
-                           "<td>\n" +
-                           "                        <fmt:message key='property.name'/>\n" +
-                           "                        <input type=\"text\" name=\"<%=PROPERTY_KEYS%>\" value=\"\">\n" +
-                           "                    </td>\n" +
-                           "                    <td>\n" +
-                           "                        <fmt:message key='property.value'/>\n" +
-                           "                        <input type=\"text\" name=\"<%=PROPERTY_VALUES%>\" value=\"\">\n" +
-                           "                    </td>" +
-                           "<td>\n" +
-                           "<a onClick='javaScript:removeColumn(\"" + sId + "\")'" +
-                           "style='background-image: url(../dasmessageflowpub/images/delete.gif);'class='icon-link addIcon'>Remove Property</a>\n" +
-                           "                    </td>" +
-                           "</tr></table>";
-
-        $("#propertyTablePlaceHolder").append(propertyTable);
-    }
-
-    function removeColumn(id) {
-        $("#" + id).remove();
     }
 
     function testServer(){
@@ -284,77 +213,6 @@
 	                    <fmt:message key="publishing.statsData"/>
                     </td>
                 </tr>
-<!-- 
-                <thead>
-                <tr>
-                    <th colspan="4">
-                        <fmt:message key="properties"/>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td id="propertyTablePlaceHolder" colspan="2">
-
-                        <%-- if (properties != null) { --%>
-                        <table id="propertyTable" width="100%" class="styledLeft"
-                           style="margin-left: 0px;">
-                            <tr>
-                                <td colspan="3">
-                                    <a onClick='javaScript:addColumn()' style='background-image:
-                                    url(../dasmessageflowpub/images/add.gif);' class='icon-link addIcon'>Add Property</a>
-                                </td>
-                            </tr>
-                            <%-- int i = 1;
-                            for (Property property : properties) {
-
-                            --%>
-                            <tr id="propertyTable_<%--=i--%>">
-                                <td>
-                                    <fmt:message key="property.name"/>
-                                    <input type="text" name="<%--=PROPERTY_KEYS--%>"
-                                           value="<%--=property.getKey()--%>">
-                                </td>
-                                <td>
-                                    <fmt:message key="property.value"/>
-                                    <input type="text" name="<%--=PROPERTY_VALUES--%>"
-                                           value="<%--=property.getValue()--%>">
-                                </td>
-
-                                <td>
-                                    <a onClick='javaScript:removeColumn("propertyTable_<%--=i--%>")' style='background-image:
-                                    url(../dasmessageflowpub/images/delete.gif);' class='icon-link addIcon'>Remove Property</a>
-                                </td>
-
-
-                            </tr>
-                            <script type="text/javascript">
-                                rowNum++;
-                            </script>
-                            <%-- i++;
-                            }
-                            --%>
-
-                        </table>
-                        <%--
-                        } else { --%>
-                            <table width="100%" class="styledLeft" style="margin-left: 0px;">
-                                <tr>
-                                    <td colspan="3">
-                                    <a onClick='javaScript:addMetaData()'
-                                    style='background-image: url(../dasmessageflowpub/images/add.gif);'
-                                    class='icon-link addIcon'>Add Property</a>
-                                    </td>
-                                </tr>
-                            </table>
-
-                        <%-- } --%>
-                    </td>
-                </tr>
-                </tbody>
- -->
-                  
-
 
                 <tr>
                     <td colspan="4" class="buttonRow">

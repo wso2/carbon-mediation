@@ -40,7 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @scr.component name="org.wso2.carbon.das.mediationstats.data.publisher" immediate="true"
+ * @scr.component name="org.wso2.carbon.das.messageflow.data.publisher" immediate="true"
  * @scr.reference name="config.context.service" interface="org.wso2.carbon.utils.ConfigurationContextService"
  * cardinality="1..1" policy="dynamic" bind="setConfigurationContextService"
  * unbind="unsetConfigurationContextService"
