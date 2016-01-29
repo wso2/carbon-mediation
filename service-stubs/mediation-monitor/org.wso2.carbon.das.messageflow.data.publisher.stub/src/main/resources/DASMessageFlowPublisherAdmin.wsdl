@@ -3,6 +3,13 @@
    <wsdl:types>
       <xs:schema xmlns:ns="http://org.apache.axis2/xsd" xmlns:ax299="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
          <xs:import namespace="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd"/>
+         <xs:element name="configureEventing">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element minOccurs="0" name="mediationStatConfig" nillable="true" type="ax298:MediationStatConfig"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
          <xs:element name="getEventingConfigData">
             <xs:complexType>
                <xs:sequence>
@@ -14,13 +21,6 @@
             <xs:complexType>
                <xs:sequence>
                   <xs:element minOccurs="0" name="return" nillable="true" type="ax298:MediationStatConfig"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="configureEventing">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element minOccurs="0" name="mediationStatConfig" nillable="true" type="ax298:MediationStatConfig"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -66,18 +66,14 @@
       <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://conf.publisher.data.messageflow.das.carbon.wso2.org/xsd">
          <xs:complexType name="MediationStatConfig">
             <xs:sequence>
-               <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="loadBalancingEnabled" type="xs:boolean"/>
                <xs:element minOccurs="0" name="messageFlowStatsPublishingEnabled" type="xs:boolean"/>
                <xs:element minOccurs="0" name="messageFlowTracePublishingEnabled" type="xs:boolean"/>
-               <xs:element minOccurs="0" name="nickName" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"/>
                <xs:element maxOccurs="unbounded" minOccurs="0" name="properties" nillable="true" type="ax298:Property"/>
                <xs:element minOccurs="0" name="serverId" nillable="true" type="xs:string"/>
-               <xs:element minOccurs="0" name="streamName" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="url" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="userName" nillable="true" type="xs:string"/>
-               <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
             </xs:sequence>
          </xs:complexType>
          <xs:complexType name="Property">
