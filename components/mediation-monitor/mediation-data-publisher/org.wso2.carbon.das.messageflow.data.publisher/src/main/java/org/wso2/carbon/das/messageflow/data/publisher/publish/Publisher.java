@@ -47,7 +47,6 @@ public class Publisher {
 
 
     private static Log log = LogFactory.getLog(Publisher.class);
-    private static boolean isStreamDefinitionAlreadyExist = false;
 
     public static void process(MessageFlowDataEntry dataEntry, MediationStatConfig mediationStatConfig) {
         List<String> metaDataKeyList = new ArrayList<String>();
@@ -62,12 +61,12 @@ public class Publisher {
             if (mediationStatConfig.isMessageFlowTracePublishingEnabled()) {
                 if (dataEntry instanceof MessageFlowTraceEntry) {
                     addEventData(eventData, (MessageFlowTraceEntry) dataEntry);
-                    StreamDefinition streamDef = getTraceStreamDefinition(mediationStatConfig, metaDataKeyList.toArray());
-                    publishToAgent(eventData, metaDataKeyList, metaDataValueList, mediationStatConfig, streamDef);
+                    StreamDefinition streamDef = getTraceStreamDefinition(metaDataKeyList.toArray());
+                    publishToAgent(eventData, metaDataValueList, mediationStatConfig, streamDef);
                 } else if (dataEntry instanceof MessageFlowComponentEntry) {
                     addEventData(eventData, (MessageFlowComponentEntry) dataEntry);
-                    StreamDefinition streamDef = getComponentStreamDefinition(mediationStatConfig, metaDataKeyList.toArray());
-                    publishToAgent(eventData, metaDataKeyList, metaDataValueList, mediationStatConfig, streamDef);
+                    StreamDefinition streamDef = getComponentStreamDefinition(metaDataKeyList.toArray());
+                    publishToAgent(eventData, metaDataValueList, mediationStatConfig, streamDef);
                 } else {
                     log.error("Invalid entry type for update.");
                     return;
@@ -119,21 +118,13 @@ public class Publisher {
 
 
     private static void publishToAgent(List<Object> eventData,
-                                       List<String> metaDataKeyList,
                                        List<String> metaDataValueList,
                                        MediationStatConfig mediationStatConfig,
                                        StreamDefinition streamDef) {
 
-        String streamId = null;
-
         String serverUrl = mediationStatConfig.getUrl();
         String userName = mediationStatConfig.getUserName();
         String passWord = mediationStatConfig.getPassword();
-            /*
-            String serverUrl = "tcp://127.0.0.1:7611";
-            String userName = "admin";
-            String passWord = "admin";
-            */
 
         String key = serverUrl + "_" + userName
                      + "_" + passWord + "_" + streamDef.getName();
@@ -201,10 +192,11 @@ public class Publisher {
     }
 
     public static StreamDefinition getComponentStreamDefinition(
-            MediationStatConfig mediationStatConfig,
             Object[] metaData)
             throws MalformedStreamDefinitionException {
-        StreamDefinition eventStreamDefinition = new StreamDefinition("esb-flow_tracer-component_entry-stream", "1.0.0");
+        StreamDefinition eventStreamDefinition = new StreamDefinition(
+                MediationDataPublisherConstants.TRACE_STREAM_NAME,
+                MediationDataPublisherConstants.TRACE_STREAM_VERSION);
         eventStreamDefinition.setNickName("");
         eventStreamDefinition.setDescription("This stream is use by WSO2 ESB to publish component specific data for tracing");
         eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
@@ -233,10 +225,11 @@ public class Publisher {
     }
 
     public static StreamDefinition getTraceStreamDefinition(
-            MediationStatConfig mediationStatConfig,
             Object[] metaData)
             throws MalformedStreamDefinitionException {
-        StreamDefinition eventStreamDefinition = new StreamDefinition("esb-flow_tracer-trace_entry-stream", "1.0.0");
+        StreamDefinition eventStreamDefinition = new StreamDefinition(
+                MediationDataPublisherConstants.COMPONENT_STREAM_NAME,
+                MediationDataPublisherConstants.COMPONENT_STREAM_VERSION);
         eventStreamDefinition.setNickName("");
         eventStreamDefinition.setDescription("WSO2 ESB publish message flow trace events through this");
         eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);

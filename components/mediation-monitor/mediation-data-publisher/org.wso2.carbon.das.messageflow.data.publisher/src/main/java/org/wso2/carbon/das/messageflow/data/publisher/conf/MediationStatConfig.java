@@ -18,8 +18,6 @@ package org.wso2.carbon.das.messageflow.data.publisher.conf;
 
 public class MediationStatConfig {
 
-//    private boolean isPublishingEnable; // No need to check this since this component must be activated when tracing/stats enabled. Otherwise ESB will go OOM
-
     private boolean isMessageFlowTracePublishingEnabled;
     private boolean isMessageFlowStatsPublishingEnabled;
     private String serverId = "";
@@ -28,43 +26,7 @@ public class MediationStatConfig {
     private String password = "";
 
     private Property[] properties;
-    private String streamName = "esb-flow_tracer-trace_entry-stream";
-    private String version = "1.0.0";
-    private String nickName = "MessageFlowTraceDataAgent";
-    private String description = "WSO2 ESB publish message flow trace events through this";
     private boolean isLoadBalancingEnabled = false;
-
-    public String getStreamName() {
-        return streamName;
-    }
-
-    public void setStreamName(String streamName) {
-        this.streamName = streamName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
 
     public Property[] getProperties() {
         return properties;
@@ -127,15 +89,5 @@ public class MediationStatConfig {
     public void setServerId(String serverId) {
         this.serverId = serverId;
     }
-
-    //    public void setStatisticsReporterDisable(boolean isPublishingEnabled) {
-//        isPublishingEnable = isPublishingEnabled;
-//    }
-//
-//    public boolean getStatisticsReporterDisable() {
-//        return isPublishingEnable;
-//    }
-
-
 
 }
