@@ -28,7 +28,6 @@ public class MessageFlowTraceReporterThread extends Thread {
 
 
     private boolean shutdownRequested = false;
-    private boolean tracingEnabled = false;
 
     private MessageFlowTraceObserverStore messageFlowTraceObserverStore;
 
@@ -49,10 +48,6 @@ public class MessageFlowTraceReporterThread extends Thread {
             log.debug("Mediation statistics reporter delay set to " + delay + " ms");
         }
         this.delay = delay;
-    }
-
-    public void setTracingEnabled(boolean tracingEnabled) {
-        this.tracingEnabled = tracingEnabled;
     }
 
     private void delay() {
