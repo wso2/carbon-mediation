@@ -88,6 +88,8 @@ var existingInbounds = null;
                                 <option value="<%=InboundClientConstants.TYPE_CLASS%>">Custom</option>
                                 <option value="<%=InboundClientConstants.TYPE_MQTT%>">MQTT</option>
                                 <option value="<%=InboundClientConstants.TYPE_RABBITMQ%>">RabbitMQ</option>
+                                <option value="<%=InboundClientConstants.TYPE_WS%>">WS</option>
+                                <option value="<%=InboundClientConstants.TYPE_WSS%>">WSS</option>
                             </select>
                         </td>
                     </tr>
