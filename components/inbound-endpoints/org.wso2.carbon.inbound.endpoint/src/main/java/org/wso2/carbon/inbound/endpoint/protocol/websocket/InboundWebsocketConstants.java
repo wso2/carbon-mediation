@@ -20,16 +20,16 @@ public class InboundWebsocketConstants {
 
     public static final String WS = "ws";
     public static final String WSS = "wss";
-    public static final String INBOUND_ENDPOINT_PARAMETER_WEBSOCKET_PORT = "inbound.websocket.port";
+    public static final String INBOUND_ENDPOINT_PARAMETER_WEBSOCKET_PORT = "inbound.ws.port";
 
-    public static final String INBOUND_BOSS_THREAD_POOL_SIZE = "boss.thread.pool.size";
-    public static final String INBOUND_WORKER_THREAD_POOL_SIZE = "worker.thread.pool.size";
+    public static final String INBOUND_BOSS_THREAD_POOL_SIZE = "ws.boss.thread.pool.size";
+    public static final String INBOUND_WORKER_THREAD_POOL_SIZE = "ws.worker.thread.pool.size";
 
-    public static final String INBOUND_SSL_KEY_STORE_FILE = "ssl.key.store.file";
-    public static final String INBOUND_SSL_KEY_STORE_PASS = "ssl.key.store.pass";
-    public static final String INBOUND_SSL_TRUST_STORE_FILE = "ssl.trust.store.file";
-    public static final String INBOUND_SSL_TRUST_STORE_PASS = "ssl.trust.store.pass";
-    public static final String INBOUND_SSL_CERT_PASS = "ssl.cert.pass";
+    public static final String INBOUND_SSL_KEY_STORE_FILE = "wss.ssl.key.store.file";
+    public static final String INBOUND_SSL_KEY_STORE_PASS = "wss.ssl.key.store.pass";
+    public static final String INBOUND_SSL_TRUST_STORE_FILE = "wss.ssl.trust.store.file";
+    public static final String INBOUND_SSL_TRUST_STORE_PASS = "wss.ssl.trust.store.pass";
+    public static final String INBOUND_SSL_CERT_PASS = "wss.ssl.cert.pass";
 
     public static final String WEBSOCKET_SOURCE_HANDSHAKE_PRESENT = "websocket.source.handshake.present";
     public static final String WEBSOCKET_TARGET_HANDSHAKE_PRESENT = "websocket.target.handshake.present";
@@ -40,17 +40,10 @@ public class InboundWebsocketConstants {
     public static final String WEBSOCKET_BINARY_FRAME_PRESENT = "websocket.binary.frame.present";
     public static final String WEBSOCKET_BINARY_FRAME = "websocket.binary.frame";
 
-    public static final String WEBSOCKET_TARGET_CLOSE_FRAME_PRESENT = "websocket.target.close.frame.present";
-    public static final String WEBSOCKET_TARGET_CLOSE_FRAME = "websocket.target.close.frame";
+    public static final String WEBSOCKET_CLIENT_SIDE_BROADCAST_LEVEL = "ws.client.side.broadcast.level";
 
-    public static final String WEBSOCKET_SOURCE_CLOSE_FRAME_PRESENT = "websocket.source.close.frame.present";
-    public static final String WEBSOCKET_SOURCE_CLOSE_FRAME = "websocket.source.close.frame";
-
-
-    public static final String WEBSOCKET_CLIENT_SIDE_BROADCAST_LEVEL = "websocket.client.side.broadcast.level";
-
-    public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "websocket.outflow.dispatch.sequence";
-    public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "websocket.outflow.dispatch.fault.sequence";
+    public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "ws.outflow.dispatch.sequence";
+    public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "ws.outflow.dispatch.fault.sequence";
 
 
 }

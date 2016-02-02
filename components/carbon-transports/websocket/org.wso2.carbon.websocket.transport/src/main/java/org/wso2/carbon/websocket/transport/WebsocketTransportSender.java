@@ -110,11 +110,6 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                 WebSocketFrame frame = (BinaryWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME);
                 log.info("Sending the message to the WS server.");
                 clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame);
-            } else if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_CLOSE_FRAME_PRESENT) != null
-                    && msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_CLOSE_FRAME_PRESENT).equals(true)) {
-                WebSocketFrame frame = (CloseWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_CLOSE_FRAME);
-                log.info("Sending the message to the WS server.");
-                clientHandler.handleExclusiveTargetWebsocketChannelTermination(frame);
             } else {
                 if (!handshakePresent) {
                     OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);

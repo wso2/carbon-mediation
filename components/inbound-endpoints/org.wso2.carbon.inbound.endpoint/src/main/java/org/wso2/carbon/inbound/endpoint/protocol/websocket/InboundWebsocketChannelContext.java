@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.websocket;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
 public class InboundWebsocketChannelContext {
@@ -50,7 +51,10 @@ public class InboundWebsocketChannelContext {
         closeFuture.addListener(new ChannelFutureListener() {
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (future.isSuccess()) {
-                    targetCtx.close();
+                    if (targetCtx.channel().isActive()) {
+                        targetCtx.channel().write(new CloseWebSocketFrame())
+                                .addListener(ChannelFutureListener.CLOSE);
+                    }
                 }
             }
         });

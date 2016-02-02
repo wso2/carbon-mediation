@@ -41,7 +41,6 @@ import org.apache.axis2.builder.SOAPBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
-import org.apache.axis2.description.InOnlyAxisOperation;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
@@ -180,7 +179,18 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
 
         try {
+
             if (handshakeFuture.isSuccess()) {
+
+                String endpointName =
+                        WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
+                MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+                InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
+
+                if (endpoint == null) {
+                    log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
+                    return;
+                }
 
                 if (frame instanceof CloseWebSocketFrame) {
                     handleClientWebsocketChannelTermination(frame);
@@ -189,16 +199,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     handleWebsocketBinaryFrame(frame);
                     return;
                 } else if (frame instanceof TextWebSocketFrame) {
-
-                    String endpointName =
-                            WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
-                    MessageContext synCtx = getSynapseMessageContext(tenantDomain);
-                    InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-
-                    if (endpoint == null) {
-                        log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
-                        return;
-                    }
 
                     CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
@@ -237,6 +237,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
+                } else if (frame instanceof PingWebSocketFrame) {
+                    ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
+                    return;
                 }
 
             } else {
@@ -248,16 +251,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
     }
 
-    public void handleExclusiveClientWebsocketChannelTermination(WebSocketFrame frame)  {
-
-        handshaker.close(wrappedContext.getChannelHandlerContext().channel(), (CloseWebSocketFrame) frame.retain());
-        String endpointName =
-                WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
-        WebsocketSubscriberPathManager.getInstance()
-                .removeChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
-
-    }
-
     public void handleClientWebsocketChannelTermination(WebSocketFrame frame) throws AxisFault {
 
         handshaker.close(wrappedContext.getChannelHandlerContext().channel(), (CloseWebSocketFrame) frame.retain());
@@ -265,21 +258,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
         WebsocketSubscriberPathManager.getInstance()
                 .removeChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
-
-
-        MessageContext synCtx = getSynapseMessageContext(tenantDomain);
-        InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-
-        if (endpoint == null) {
-            log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
-            return;
-        }
-
-        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_CLOSE_FRAME_PRESENT, true);
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_CLOSE_FRAME_PRESENT, true);
-        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_CLOSE_FRAME, frame);
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_CLOSE_FRAME, frame);
-        injectToSequence(synCtx, endpoint);
 
     }
 

@@ -19,6 +19,7 @@
 package org.wso2.carbon.websocket.transport;
 
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -136,18 +137,8 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         }
     }
 
-    public void handleExclusiveTargetWebsocketChannelTermination(WebSocketFrame frame) {
-        handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
-    }
-
     public void handleTargetWebsocketChannelTermination(WebSocketFrame frame) throws AxisFault{
-        handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
-        if(responseSender != null) {
-            org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
-            synCtx.setProperty(WebsocketConstants.WEBSOCKET_TARGET_CLOSE_FRAME_PRESENT, true);
-            synCtx.setProperty(WebsocketConstants.WEBSOCKET_TARGET_CLOSE_FRAME, frame);
-            injectToSequence(synCtx, dispatchSequence, dispatchErrorSequence);
-        }
+        handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain()).addListener(ChannelFutureListener.CLOSE);
     }
 
     public void handleWebsocketBinaryFrame(WebSocketFrame frame) throws AxisFault{

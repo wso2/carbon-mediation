@@ -53,10 +53,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
     public void sendBack(MessageContext msgContext) {
         if (msgContext != null) {
 
-            if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT) != null &&
-                    msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT).equals(true)) {
-                return;
-            } else if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_HANDSHAKE_PRESENT) != null &&
+            if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_HANDSHAKE_PRESENT) != null &&
                     msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_HANDSHAKE_PRESENT).equals(true)) {
                 if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_HANDLER_CONTEXT) != null) {
                     ChannelHandlerContext targetCtx = (ChannelHandlerContext) msgContext
@@ -64,13 +61,6 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     sourceHandler.getChannelHandlerContext().addCloseListener(targetCtx);
                 }
                 return;
-            } else if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_CLOSE_FRAME_PRESENT) != null &&
-                    msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_CLOSE_FRAME_PRESENT).equals(true)) {
-                return;
-            } else if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_CLOSE_FRAME_PRESENT) != null &&
-                    msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_CLOSE_FRAME_PRESENT).equals(true)) {
-                sourceHandler.handleExclusiveClientWebsocketChannelTermination((CloseWebSocketFrame) msgContext
-                        .getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_CLOSE_FRAME));
             } else if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT) != null &&
                     msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT).equals(true)) {
                 BinaryWebSocketFrame frame = (BinaryWebSocketFrame)

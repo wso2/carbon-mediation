@@ -35,5 +35,5 @@ public class InboundClientConstants {
 
     public static final String[] LISTENER_TYPES = {TYPE_HTTP, TYPE_HTTPS, TYPE_HL7, TYPE_WS, TYPE_WSS};
 
-    public static final String[] LISTENER_PORT_PARAMS = {"inbound.http.port", "inbound.hl7.Port", "inbound.websocket.port"};
+    public static final String[] LISTENER_PORT_PARAMS = {"inbound.http.port", "inbound.hl7.Port", "inbound.ws.port"};
 }

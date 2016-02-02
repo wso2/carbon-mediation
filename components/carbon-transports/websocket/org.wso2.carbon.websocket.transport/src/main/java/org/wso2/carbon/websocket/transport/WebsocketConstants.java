@@ -25,22 +25,15 @@ public class WebsocketConstants {
 
 
     public static final String UNIVERSAL_SOURCE_IDENTIFIER = "universal.source.identifier";
-    public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "websocket.outflow.dispatch.sequence";
-    public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "websocket.outflow.dispatch.fault.sequence";
-    public static final String CONTENT_TYPE = "messageType";
+    public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "ws.outflow.dispatch.sequence";
+    public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "ws.outflow.dispatch.fault.sequence";
+    public static final String CONTENT_TYPE = "ws.accept.contenType";
 
     public static final String WEBSOCKET_SOURCE_HANDSHAKE_PRESENT = "websocket.source.handshake.present";
     public static final String WEBSOCKET_TARGET_HANDSHAKE_PRESENT = "websocket.target.handshake.present";
 
     public static final String WEBSOCKET_BINARY_FRAME_PRESENT = "websocket.binary.frame.present";
     public static final String WEBSOCKET_BINARY_FRAME = "websocket.binary.frame";
-
-    public static final String WEBSOCKET_SOURCE_CLOSE_FRAME_PRESENT = "websocket.source.close.frame.present";
-    public static final String WEBSOCKET_SOURCE_CLOSE_FRAME = "websocket.source.close.frame";
-
-    public static final String WEBSOCKET_TARGET_CLOSE_FRAME_PRESENT = "websocket.target.close.frame.present";
-    public static final String WEBSOCKET_TARGET_CLOSE_FRAME = "websocket.target.close.frame";
-
 
     public static final String WEBSOCKET_TARGET_HANDLER_CONTEXT = "websocket.target.handler.context";
     public static final String WEBSOCKET_SOURCE_HANDLER_CONTEXT = "websocket.source.handler.context";
