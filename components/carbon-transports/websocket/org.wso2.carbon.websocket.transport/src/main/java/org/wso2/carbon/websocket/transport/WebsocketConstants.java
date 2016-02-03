@@ -1,0 +1,45 @@
+/**
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+package org.wso2.carbon.websocket.transport;
+
+public class WebsocketConstants {
+
+    public static final String WS = "ws";
+    public static final String WSS = "wss";
+
+
+    public static final String UNIVERSAL_SOURCE_IDENTIFIER = "universal.source.identifier";
+    public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "ws.outflow.dispatch.sequence";
+    public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "ws.outflow.dispatch.fault.sequence";
+    public static final String CONTENT_TYPE = "ws.accept.contenType";
+
+    public static final String WEBSOCKET_SOURCE_HANDSHAKE_PRESENT = "websocket.source.handshake.present";
+    public static final String WEBSOCKET_TARGET_HANDSHAKE_PRESENT = "websocket.target.handshake.present";
+
+    public static final String WEBSOCKET_BINARY_FRAME_PRESENT = "websocket.binary.frame.present";
+    public static final String WEBSOCKET_BINARY_FRAME = "websocket.binary.frame";
+
+    public static final String WEBSOCKET_TARGET_HANDLER_CONTEXT = "websocket.target.handler.context";
+    public static final String WEBSOCKET_SOURCE_HANDLER_CONTEXT = "websocket.source.handler.context";
+
+    public static final String TRUST_STORE_LOCATION = "websocket.trust.store.location";
+    public static final String TRUST_STORE_PASSWORD = "websocket.trust.store.Password";
+    public static final String TRUST_STORE_CONFIG_ELEMENT = "websocket.trust.store";
+
+}
