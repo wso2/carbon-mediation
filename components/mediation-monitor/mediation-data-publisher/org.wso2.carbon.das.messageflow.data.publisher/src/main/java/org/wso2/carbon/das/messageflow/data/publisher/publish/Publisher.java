@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.messageflowtracer.data.MessageFlowComponentEntry;
 import org.apache.synapse.messageflowtracer.data.MessageFlowDataEntry;
-import org.apache.synapse.messageflowtracer.data.MessageFlowTraceEntry;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
 import org.wso2.carbon.das.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.EventPublisherConfig;
@@ -44,8 +43,6 @@ import java.util.List;
 
 
 public class Publisher {
-
-
     private static Log log = LogFactory.getLog(Publisher.class);
 
     public static void process(MessageFlowDataEntry dataEntry, MediationStatConfig mediationStatConfig) {
@@ -59,11 +56,7 @@ public class Publisher {
         try {
 
             if (mediationStatConfig.isMessageFlowTracePublishingEnabled()) {
-                if (dataEntry instanceof MessageFlowTraceEntry) {
-                    addEventData(eventData, (MessageFlowTraceEntry) dataEntry);
-                    StreamDefinition streamDef = getTraceStreamDefinition(metaDataKeyList.toArray());
-                    publishToAgent(eventData, metaDataValueList, mediationStatConfig, streamDef);
-                } else if (dataEntry instanceof MessageFlowComponentEntry) {
+                if (dataEntry instanceof MessageFlowComponentEntry) {
                     addEventData(eventData, (MessageFlowComponentEntry) dataEntry);
                     StreamDefinition streamDef = getComponentStreamDefinition(metaDataKeyList.toArray());
                     publishToAgent(eventData, metaDataValueList, mediationStatConfig, streamDef);
@@ -95,23 +88,14 @@ public class Publisher {
         }
     }
 
-
-    private static void addEventData(List<Object> eventData, MessageFlowTraceEntry messageFlowTraceEntryData) {
-        eventData.add(messageFlowTraceEntryData.getMessageId());
-        eventData.add(messageFlowTraceEntryData.getEntryType());
-        eventData.add(messageFlowTraceEntryData.getMessageFlow());
-        eventData.add(messageFlowTraceEntryData.getTimeStamp());
-    }
-
-
     private static void addEventData(List<Object> eventData, MessageFlowComponentEntry traceComponentData) {
         eventData.add(traceComponentData.getMessageId());
         eventData.add(traceComponentData.getComponentId());
         eventData.add(traceComponentData.getComponentName());
         eventData.add(traceComponentData.getTimestamp());
         eventData.add(traceComponentData.getPayload());
-        eventData.add(traceComponentData.isResponse());
-        eventData.add(traceComponentData.isStart());
+        eventData.add(traceComponentData.getEntryType());
+        eventData.add(traceComponentData.getParent());
         eventData.add(JSONObject.toJSONString(traceComponentData.getPropertyMap()));
         eventData.add(JSONObject.toJSONString(traceComponentData.getTransportPropertyMap()));
     }
@@ -124,10 +108,10 @@ public class Publisher {
 
         String serverUrl = mediationStatConfig.getUrl();
         String userName = mediationStatConfig.getUserName();
-        String passWord = mediationStatConfig.getPassword();
+        String password = mediationStatConfig.getPassword();
 
         String key = serverUrl + "_" + userName
-                     + "_" + passWord + "_" + streamDef.getName();
+                     + "_" + password + "_" + streamDef.getName();
         EventPublisherConfig eventPublisherConfig = PublisherUtils.getEventPublisherConfig(key);
         if (!mediationStatConfig.isLoadBalancingEnabled()) {
             AsyncDataPublisher dataPublisher = null;
@@ -135,9 +119,7 @@ public class Publisher {
                 if (eventPublisherConfig == null) {
                     synchronized (Publisher.class) {
                         eventPublisherConfig = new EventPublisherConfig();
-                        AsyncDataPublisher asyncDataPublisher = new AsyncDataPublisher(serverUrl,
-                                                                                       userName,
-                                                                                       passWord);
+                        AsyncDataPublisher asyncDataPublisher = new AsyncDataPublisher(serverUrl, userName, password);
                         asyncDataPublisher.addStreamDefinition(streamDef);
 
 
@@ -166,8 +148,7 @@ public class Publisher {
                             ArrayList<DataPublisherHolder> dataPublisherHolders = new ArrayList<DataPublisherHolder>();
                             String[] urls = aReceiverGroupURL.split(",");
                             for (String aUrl : urls) {
-                                DataPublisherHolder aNode = new DataPublisherHolder(null, aUrl.trim(), userName,
-                                                                                    passWord);
+                                DataPublisherHolder aNode = new DataPublisherHolder(null, aUrl.trim(), userName, password);
                                 dataPublisherHolders.add(aNode);
                             }
                             ReceiverGroup group = new ReceiverGroup(dataPublisherHolders);
@@ -195,8 +176,8 @@ public class Publisher {
             Object[] metaData)
             throws MalformedStreamDefinitionException {
         StreamDefinition eventStreamDefinition = new StreamDefinition(
-                MediationDataPublisherConstants.TRACE_STREAM_NAME,
-                MediationDataPublisherConstants.TRACE_STREAM_VERSION);
+                MediationDataPublisherConstants.COMPONENT_STREAM_NAME,
+                MediationDataPublisherConstants.COMPONENT_STREAM_VERSION);
         eventStreamDefinition.setNickName("");
         eventStreamDefinition.setDescription("This stream is use by WSO2 ESB to publish component specific data for tracing");
         eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
@@ -213,38 +194,14 @@ public class Publisher {
                                              AttributeType.STRING);
         eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.PAYLOAD,
                                              AttributeType.STRING);
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.RESPONSE,
-                                             AttributeType.BOOL);
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.START,
-                                             AttributeType.BOOL);
+        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.ENTRY_TYPE,
+                                             AttributeType.STRING);
+        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.PARENT,
+                                             AttributeType.STRING);
         eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.PROPERTY_MAP,
                                              AttributeType.STRING);
         eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.TRANSPORT_PROPERTY_MAP,
                                              AttributeType.STRING);
         return eventStreamDefinition;
     }
-
-    public static StreamDefinition getTraceStreamDefinition(
-            Object[] metaData)
-            throws MalformedStreamDefinitionException {
-        StreamDefinition eventStreamDefinition = new StreamDefinition(
-                MediationDataPublisherConstants.COMPONENT_STREAM_NAME,
-                MediationDataPublisherConstants.COMPONENT_STREAM_VERSION);
-        eventStreamDefinition.setNickName("");
-        eventStreamDefinition.setDescription("WSO2 ESB publish message flow trace events through this");
-        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
-        for (int i = 0; i < metaData.length; i++) {
-            eventStreamDefinition.addMetaData(metaData[i].toString(), AttributeType.STRING);
-        }
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.MESSAGE_ID,
-                                             AttributeType.STRING);
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.ENTRY_TYPE,
-                                             AttributeType.STRING);
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.MESSAGE_FLOW,
-                                             AttributeType.STRING);
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.TRACE_TIMESTAMP,
-                                             AttributeType.STRING);
-        return eventStreamDefinition;
-    }
-
 }
