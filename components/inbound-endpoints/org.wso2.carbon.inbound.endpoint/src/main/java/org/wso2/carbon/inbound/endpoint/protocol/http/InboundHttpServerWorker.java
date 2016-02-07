@@ -154,7 +154,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                                                                                + endpointName), synCtx.getMessageID());
                     }
 
-                    mediatorId = MessageFlowTracingDataCollector.setTraceFlowEvent(synCtx, mediatorId, MessageFlowTracerConstants.ENTRY_TYPE_INBOUND_ENDPOINT + endpointName, true);
+                    mediatorId = MessageFlowTracingDataCollector.setTraceFlowEvent(synCtx, MessageFlowTracerConstants.ENTRY_TYPE_INBOUND_ENDPOINT + endpointName);
                 }
 
                 if (continueDispatch && dispatchPattern != null) {
@@ -217,7 +217,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                     injectToMainSequence(synCtx, endpoint);
                 }
 
-                MessageFlowTracingDataCollector.setTraceFlowEvent(synCtx, mediatorId, MessageFlowTracerConstants.ENTRY_TYPE_INBOUND_ENDPOINT + endpointName, false);
 
                 // send ack for client if needed
                 sendAck(axis2MsgContext);
