@@ -39,6 +39,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+                <module>components/carbon-transports</module>
                 <module>service-stubs/mediation-admin</module>
                 <module>service-stubs/mediation-monitor</module>
                 <module>service-stubs/application-mgt</module>
@@ -60,7 +61,8 @@
                 <module>components/application-mgt</module>
                 <module>components/mediation-throttle</module>
                 <module>components/mediation-cg</module>
-		        <module>features/event-sink</module>
+                <module>features/event-sink</module>
+                <module>features/carbon-transports</module>
                 <module>features/scheduled-tasks</module>
                 <module>features/business-adaptors</module>
                 <module>features/mediation-config-admin-features</module>
@@ -884,6 +886,11 @@
             </dependency>
 
             <!--10.2 Components-->
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.websocket.transport</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.bam.service.data.publisher</artifactId>
@@ -2288,11 +2295,41 @@
             <artifactId>jetty-bundle</artifactId>
             <version>${jetty.wso2.version}</version>
         </dependency>
-	        <dependency>
-	            <groupId>libthrift.wso2</groupId>
-	            <artifactId>libthrift</artifactId>
-	            <version>${libthrift.version}</version>
-	        </dependency>
+	    <dependency>
+	        <groupId>libthrift.wso2</groupId>
+	        <artifactId>libthrift</artifactId>
+	        <version>${libthrift.version}</version>
+	 </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-buffer</artifactId>   
+                <version>${netty.version}</version>             
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2438,8 +2475,8 @@
         <jsonpath.version>0.8.1.wso2v1</jsonpath.version>
         <json.smart.version>1.2</json.smart.version>
         <damnhandy.version>1.1.7.wso2v1</damnhandy.version>
+        <netty.version>4.0.30.Final</netty.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
-        <netty.version>4.0.0.Final</netty.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
         <javax.servlet.http.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.http.imp.pkg.version>
         <javax.xml.stream.imp.pkg.version>[1.0.1, 1.1.0)</javax.xml.stream.imp.pkg.version>

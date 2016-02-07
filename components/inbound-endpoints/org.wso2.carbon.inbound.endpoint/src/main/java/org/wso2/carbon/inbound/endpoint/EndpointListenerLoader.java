@@ -26,6 +26,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.ArrayList;
@@ -68,8 +69,16 @@ public class EndpointListenerLoader {
                                 inboundEndpointInfoDTO.getInboundParams());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTPS)) {
                 HTTPEndpointManager.getInstance().
-                           startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(),
-                                         inboundEndpointInfoDTO.getSslConfiguration(), inboundEndpointInfoDTO.getInboundParams());
+                        startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                inboundEndpointInfoDTO.getSslConfiguration(), inboundEndpointInfoDTO.getInboundParams());
+            } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.Protocols.ws.toString())) {
+                WebsocketEndpointManager.getInstance().
+                        startListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                inboundEndpointInfoDTO.getInboundParams());
+            } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.Protocols.wss.toString())) {
+                WebsocketEndpointManager.getInstance().
+                        startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                inboundEndpointInfoDTO.getInboundParams());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.Protocols.hl7.toString())) {
                 HL7EndpointManager.getInstance().
                         startListener(port, inboundEndpointInfoDTO.getEndpointName(),
