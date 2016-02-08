@@ -24,18 +24,6 @@
                </xs:sequence>
             </xs:complexType>
          </xs:element>
-         <xs:element name="getAllPublisherNames">
-            <xs:complexType>
-               <xs:sequence/>
-            </xs:complexType>
-         </xs:element>
-         <xs:element name="getAllPublisherNamesResponse">
-            <xs:complexType>
-               <xs:sequence>
-                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax298:MediationStatConfig"/>
-               </xs:sequence>
-            </xs:complexType>
-         </xs:element>
          <xs:element name="isCollectingEnabled">
             <xs:complexType>
                <xs:sequence/>
@@ -45,6 +33,18 @@
             <xs:complexType>
                <xs:sequence>
                   <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllPublisherNames">
+            <xs:complexType>
+               <xs:sequence/>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="getAllPublisherNamesResponse">
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax298:MediationStatConfig"/>
                </xs:sequence>
             </xs:complexType>
          </xs:element>
@@ -67,8 +67,7 @@
          <xs:complexType name="MediationStatConfig">
             <xs:sequence>
                <xs:element minOccurs="0" name="loadBalancingEnabled" type="xs:boolean"/>
-               <xs:element minOccurs="0" name="messageFlowStatsPublishingEnabled" type="xs:boolean"/>
-               <xs:element minOccurs="0" name="messageFlowTracePublishingEnabled" type="xs:boolean"/>
+               <xs:element minOccurs="0" name="messageFlowPublishingEnabled" type="xs:boolean"/>
                <xs:element minOccurs="0" name="password" nillable="true" type="xs:string"/>
                <xs:element maxOccurs="unbounded" minOccurs="0" name="properties" nillable="true" type="ax298:Property"/>
                <xs:element minOccurs="0" name="serverId" nillable="true" type="xs:string"/>
@@ -269,13 +268,13 @@
    </wsdl:binding>
    <wsdl:service name="DASMessageFlowPublisherAdmin">
       <wsdl:port name="DASMessageFlowPublisherAdminHttpsSoap11Endpoint" binding="tns:DASMessageFlowPublisherAdminSoap11Binding">
-         <soap:address location="https://buddhima-pc:8245/services/DASMessageFlowPublisherAdmin.DASMessageFlowPublisherAdminHttpsSoap11Endpoint"/>
+         <soap:address location="https://buddhima-pc:8253/services/DASMessageFlowPublisherAdmin.DASMessageFlowPublisherAdminHttpsSoap11Endpoint"/>
       </wsdl:port>
       <wsdl:port name="DASMessageFlowPublisherAdminHttpsSoap12Endpoint" binding="tns:DASMessageFlowPublisherAdminSoap12Binding">
-         <soap12:address location="https://buddhima-pc:8245/services/DASMessageFlowPublisherAdmin.DASMessageFlowPublisherAdminHttpsSoap12Endpoint"/>
+         <soap12:address location="https://buddhima-pc:8253/services/DASMessageFlowPublisherAdmin.DASMessageFlowPublisherAdminHttpsSoap12Endpoint"/>
       </wsdl:port>
       <wsdl:port name="DASMessageFlowPublisherAdminHttpsEndpoint" binding="tns:DASMessageFlowPublisherAdminHttpBinding">
-         <http:address location="https://buddhima-pc:8245/services/DASMessageFlowPublisherAdmin.DASMessageFlowPublisherAdminHttpsEndpoint"/>
+         <http:address location="https://buddhima-pc:8253/services/DASMessageFlowPublisherAdmin.DASMessageFlowPublisherAdminHttpsEndpoint"/>
       </wsdl:port>
    </wsdl:service>
 </wsdl:definitions>

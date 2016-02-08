@@ -33,7 +33,7 @@ public class RegistryPersistenceManager {
     private static Log log = LogFactory.getLog(RegistryPersistenceManager.class);
     private static RegistryService dasRegistryService;
     public static final String EMPTY_STRING = "";
-    public static final String DAS_SERVER_ID = "DAS_server_id";
+
     private static String IDS = "ids";
 
     public static void setDasRegistryService(RegistryService registryServiceParam) {
@@ -51,8 +51,7 @@ public class RegistryPersistenceManager {
         MediationStatConfig mediationStatConfig = new MediationStatConfig();
 
         // First set it to defaults, but do not persist
-        mediationStatConfig.setMessageFlowTracePublishingEnabled(false);
-        mediationStatConfig.setMessageFlowStatsPublishingEnabled(false);
+        mediationStatConfig.setMessageFlowPublishingEnabled(false);
         mediationStatConfig.setUrl(EMPTY_STRING);
         mediationStatConfig.setUserName(EMPTY_STRING);
         mediationStatConfig.setPassword(EMPTY_STRING);
@@ -71,16 +70,14 @@ public class RegistryPersistenceManager {
             }
 
             if (configs != null) {
-                String serverIdRecorded = getPropertyFromList(DAS_SERVER_ID, configs);
+                String serverIdRecorded = getPropertyFromList(DASDataPublisherConstants.DAS_SERVER_ID, configs);
                 String url = getPropertyFromList(DASDataPublisherConstants.DAS_URL, configs);
                 String userName = getPropertyFromList(DASDataPublisherConstants.DAS_USER_NAME, configs);
                 String password = getPropertyFromList(DASDataPublisherConstants.DAS_PASSWORD, configs);
-                String tracePublishingEnable = getPropertyFromList(DASDataPublisherConstants.DAS_TRACE_PUBLISHING_ENABLED, configs);
-                String statsPublishingEnable = getPropertyFromList(DASDataPublisherConstants.DAS_STATS_PUBLISHING_ENABLED, configs);
+                String tracePublishingEnable = getPropertyFromList(DASDataPublisherConstants.DAS_PUBLISHING_ENABLED, configs);
 
                 if (url != null && userName != null && password != null) {
-                    mediationStatConfig.setMessageFlowTracePublishingEnabled(Boolean.parseBoolean(tracePublishingEnable));
-                    mediationStatConfig.setMessageFlowStatsPublishingEnabled(Boolean.parseBoolean(statsPublishingEnable));
+                    mediationStatConfig.setMessageFlowPublishingEnabled(Boolean.parseBoolean(tracePublishingEnable));
                     mediationStatConfig.setServerId(serverIdRecorded);
                     mediationStatConfig.setUrl(url);
                     mediationStatConfig.setUserName(userName);
@@ -114,12 +111,11 @@ public class RegistryPersistenceManager {
                     resource = registry.newResource();
                 }
 
-                resource.setProperty(DAS_SERVER_ID, config.getServerId());
+                resource.setProperty(DASDataPublisherConstants.DAS_SERVER_ID, config.getServerId());
                 resource.setProperty(DASDataPublisherConstants.DAS_URL, config.getUrl());
                 resource.setProperty(DASDataPublisherConstants.DAS_USER_NAME, config.getUserName());
                 resource.setProperty(DASDataPublisherConstants.DAS_PASSWORD, config.getPassword());
-                resource.setProperty(DASDataPublisherConstants.DAS_TRACE_PUBLISHING_ENABLED, String.valueOf(config.isMessageFlowTracePublishingEnabled()));
-                resource.setProperty(DASDataPublisherConstants.DAS_STATS_PUBLISHING_ENABLED, String.valueOf(config.isMessageFlowStatsPublishingEnabled()));
+                resource.setProperty(DASDataPublisherConstants.DAS_PUBLISHING_ENABLED, String.valueOf(config.isMessageFlowPublishingEnabled()));
 
                 // update registry at the end
                 registry.put(resourcePath, resource);

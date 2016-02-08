@@ -45,6 +45,7 @@ public class DASDataPublisherConstants {
     public static final String IN_DIRECTION = "IN";
     public static final String OUT_DIRECTION = "OUT";
 
+    public static final String DAS_SERVER_ID = "DAS_server_id";
     public static final String DAS_URL = "DASUrl";
     public static final String DAS_USER_NAME = "DASUserName";
     public static final String DAS_PASSWORD = "DASPassword";
@@ -64,6 +65,5 @@ public class DASDataPublisherConstants {
     public static final String HOSTNAME_AND_PORT_SEPARATOR = ":";
     public static final String DAS_PREFIX_FOR_REGISTRY_HIDDEN_PROPERTIES = "registry.";
 
-    public static final String DAS_TRACE_PUBLISHING_ENABLED = "trace-publishing-enabled";
-    public static final String DAS_STATS_PUBLISHING_ENABLED = "stats-publishing-enabled";
+    public static final String DAS_PUBLISHING_ENABLED = "publishing-enabled";
 }

@@ -143,7 +143,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                     }
                 }
 
-                String mediatorId = null;
                 boolean tracing = endpoint.getTraceState() == SynapseConstants.TRACING_ON;
 
                 //Enabled inbound tracing
@@ -154,7 +153,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                                                                                + endpointName), synCtx.getMessageID());
                     }
 
-                    mediatorId = MessageFlowTracingDataCollector.setTraceFlowEvent(synCtx, MessageFlowTracerConstants.ENTRY_TYPE_INBOUND_ENDPOINT + endpointName);
+                    MessageFlowTracingDataCollector.setTraceFlowEvent(synCtx, MessageFlowTracerConstants.ENTRY_TYPE_INBOUND_ENDPOINT + endpointName);
                 }
 
                 if (continueDispatch && dispatchPattern != null) {
