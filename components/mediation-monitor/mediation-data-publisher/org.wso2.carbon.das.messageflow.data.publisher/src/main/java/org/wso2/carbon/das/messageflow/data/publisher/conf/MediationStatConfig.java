@@ -18,8 +18,7 @@ package org.wso2.carbon.das.messageflow.data.publisher.conf;
 
 public class MediationStatConfig {
 
-    private boolean isMessageFlowTracePublishingEnabled;
-    private boolean isMessageFlowStatsPublishingEnabled;
+    private boolean isMessageFlowPublishingEnabled;
     private String serverId = "";
     private String url = "";
     private String userName = "";
@@ -66,20 +65,12 @@ public class MediationStatConfig {
         return isLoadBalancingEnabled;
     }
 
-    public boolean isMessageFlowTracePublishingEnabled() {
-        return isMessageFlowTracePublishingEnabled;
+    public boolean isMessageFlowPublishingEnabled() {
+        return isMessageFlowPublishingEnabled;
     }
 
-    public void setMessageFlowTracePublishingEnabled(boolean messageFlowTracePublishingEnabled) {
-        isMessageFlowTracePublishingEnabled = messageFlowTracePublishingEnabled;
-    }
-
-    public boolean isMessageFlowStatsPublishingEnabled() {
-        return isMessageFlowStatsPublishingEnabled;
-    }
-
-    public void setMessageFlowStatsPublishingEnabled(boolean messageFlowStatsPublishingEnabled) {
-        isMessageFlowStatsPublishingEnabled = messageFlowStatsPublishingEnabled;
+    public void setMessageFlowPublishingEnabled(boolean messageFlowPublishingEnabled) {
+        isMessageFlowPublishingEnabled = messageFlowPublishingEnabled;
     }
 
     public String getServerId() {

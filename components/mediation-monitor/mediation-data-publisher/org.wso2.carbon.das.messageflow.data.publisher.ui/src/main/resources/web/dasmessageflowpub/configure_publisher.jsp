@@ -27,9 +27,7 @@
     String userName = request.getParameter("user_name");
     String password = request.getParameter("password");
     
-    String traceState = request.getParameter("traceState");
-    String statsState = request.getParameter("statsState");
-
+    String publishingState = request.getParameter("publishingState");
 
 
     String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
@@ -74,11 +72,8 @@
         if (password != null) {
             mediationStatConfig.setPassword(password);
         }
-        if (traceState != null) {
-        	mediationStatConfig.setMessageFlowTracePublishingEnabled(true);
-        }
-        if (statsState != null) {
-        	mediationStatConfig.setMessageFlowStatsPublishingEnabled(true);
+        if (publishingState != null) {
+        	mediationStatConfig.setMessageFlowPublishingEnabled(true);
         }
 
         if (serverId != null) {
@@ -193,6 +188,7 @@
                     <td>
                         <input type="text" id="url" name="url" value="<%= (url != null) ? url : "" %>"/>
                         <input type="button" value="Test Server" onclick="testServer()"/>
+                        <i>&nbsp; (eg: tcp://127.0.0.1:7611)</i>
                     </td>
                 </tr>
                 <tr>
@@ -207,10 +203,7 @@
                 <tr>
                 	<td><fmt:message key="publishing"/></td>
                     <td>
-	                    <input type="checkbox" name="traceState" value="traceEnabled" <%=mediationStatConfig.getMessageFlowTracePublishingEnabled() ? "checked='checked'" : "" %> />
-	                    <fmt:message key="publishing.traceData"/>
-	                    <input type="checkbox" name="statsState" value="statsEnabled" <%=mediationStatConfig.getMessageFlowStatsPublishingEnabled() ? "checked='checked'" : "" %> />
-	                    <fmt:message key="publishing.statsData"/>
+	                    <input type="checkbox" name="publishingState" value="publishingEnabled" <%=mediationStatConfig.getMessageFlowPublishingEnabled() ? "checked='checked'" : "" %> />
                     </td>
                 </tr>
 
