@@ -37,7 +37,7 @@
 	    <artifactId>org.wso2.carbon.mediator.smooks</artifactId>
 	</dependency>
 	<dependency>
-	    <groupId>org.milyn.wso2</groupId>
+	    <groupId>org.wso2.orbit.org.milyn</groupId>
 	    <artifactId>smooks</artifactId>
 	</dependency>
     </dependencies>
@@ -66,7 +66,7 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.smooks</bundleDef>
-                                <bundleDef>org.milyn.wso2:smooks</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.milyn:smooks</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
