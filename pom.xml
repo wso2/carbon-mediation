@@ -1951,7 +1951,7 @@
                 <version>${org.slf4j.verison}</version>
             </dependency>
             <dependency>
-                <groupId>org.milyn.wso2</groupId>
+                <groupId>org.wso2.orbit.org.milyn</groupId>
                 <artifactId>smooks</artifactId>
                 <version>${org.milyn.wso2.version}</version>
             </dependency>
@@ -2416,7 +2416,7 @@
         <orbit.version.json>2.0.0.wso2v1</orbit.version.json>
 
         <imp.pkg.version.javax.servlet>[2.6.0, 3.0.0)</imp.pkg.version.javax.servlet>
-        <org.milyn.wso2.version>1.4.0.wso2v1</org.milyn.wso2.version>
+        <org.milyn.wso2.version>1.5.1.wso2v1</org.milyn.wso2.version>
         <javax.persistence.version>1.0</javax.persistence.version>
         <com.google.code.gson.version>2.2.4</com.google.code.gson.version>
         <org.slf4j.verison>1.6.1</org.slf4j.verison>
