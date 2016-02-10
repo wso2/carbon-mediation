@@ -18,8 +18,8 @@ package org.wso2.carbon.inbound.endpoint.protocol.websocket;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.base.BaseUtils;
@@ -29,9 +29,11 @@ import org.apache.log4j.Logger;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.inbound.InboundResponseSender;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketSubscriberPathManager;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -69,58 +71,65 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
                 String subscriberPath = sourceHandler.getSubscriberPath();
                 WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
-
-                if (clientBroadcastLevel == 0) {
-                    ctx.writeToChannel(frame);
-                } else if (clientBroadcastLevel == 1) {
-                    String endpointName =
-                            WebsocketEndpointManager.getInstance().getEndpointName(sourceHandler.getPort(),
-                                    sourceHandler.getTenantDomain());
-                    pathManager.broadcastOnSubscriberPath(frame, endpointName, subscriberPath);
-                } else if (clientBroadcastLevel == 2) {
-                    String endpointName =
-                            WebsocketEndpointManager.getInstance().getEndpointName(sourceHandler.getPort(),
-                                    sourceHandler.getTenantDomain());
-                    pathManager.exclusiveBroadcastOnSubscriberPath(frame, endpointName, subscriberPath, ctx);
-                }
-            } else {
-                TextWebSocketFrame frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext) msgContext).getAxis2MessageContext()));
+                handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+            } else if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT) != null &&
+                    msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT).equals(true)) {
+                TextWebSocketFrame frame = (TextWebSocketFrame)
+                        msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME);
                 InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
                 int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
                 String subscriberPath = sourceHandler.getSubscriberPath();
                 WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
-
-                if (clientBroadcastLevel == 0) {
-                    ctx.writeToChannel(frame);
-                } else if (clientBroadcastLevel == 1) {
-                    String endpointName =
-                            WebsocketEndpointManager.getInstance().getEndpointName(sourceHandler.getPort(),
-                                    sourceHandler.getTenantDomain());
-                    pathManager.broadcastOnSubscriberPath(frame, endpointName, subscriberPath);
-                } else if (clientBroadcastLevel == 2) {
-                    String endpointName =
-                            WebsocketEndpointManager.getInstance().getEndpointName(sourceHandler.getPort(),
-                                    sourceHandler.getTenantDomain());
-                    pathManager.exclusiveBroadcastOnSubscriberPath(frame, endpointName, subscriberPath, ctx);
+                handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+            } else {
+                try {
+                    RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
+                    TextWebSocketFrame frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext) msgContext)
+                            .getAxis2MessageContext()));
+                    InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+                    int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
+                    String subscriberPath = sourceHandler.getSubscriberPath();
+                    WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
+                    handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+                } catch (XMLStreamException e) {
+                    log.error("Error while building message", e);
+                } catch (IOException ex) {
+                    log.error("Failed for format message to specified output format", ex);
                 }
             }
         }
     }
 
-    protected String messageContextToText(org.apache.axis2.context.MessageContext msgCtx) {
-        try {
-            OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
-            MessageFormatter messageFormatter =
-                    MessageProcessorSelector.getMessageFormatter(msgCtx);
-            StringWriter sw = new StringWriter();
-            OutputStream out = new WriterOutputStream(sw, format.getCharSetEncoding());
-            messageFormatter.writeTo(msgCtx, format, out, true);
-            out.close();
-            return sw.toString();
-        } catch (IOException ex) {
-            log.error("Failed for format message to specified output format", ex);
+    protected void handleSendBack(WebSocketFrame frame,
+                                  InboundWebsocketChannelContext ctx,
+                                  int clientBroadcastLevel,
+                                  String subscriberPath,
+                                  WebsocketSubscriberPathManager pathManager) {
+        if (clientBroadcastLevel == 0) {
+            ctx.writeToChannel(frame);
+        } else if (clientBroadcastLevel == 1) {
+            String endpointName =
+                    WebsocketEndpointManager.getInstance().getEndpointName(sourceHandler.getPort(),
+                            sourceHandler.getTenantDomain());
+            pathManager.broadcastOnSubscriberPath(frame, endpointName, subscriberPath);
+        } else if (clientBroadcastLevel == 2) {
+            String endpointName =
+                    WebsocketEndpointManager.getInstance().getEndpointName(sourceHandler.getPort(),
+                            sourceHandler.getTenantDomain());
+            pathManager.exclusiveBroadcastOnSubscriberPath(frame, endpointName, subscriberPath, ctx);
         }
-        return null;
+    }
+
+    protected String messageContextToText(org.apache.axis2.context.MessageContext msgCtx)
+            throws IOException {
+        OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
+        MessageFormatter messageFormatter =
+                MessageProcessorSelector.getMessageFormatter(msgCtx);
+        StringWriter sw = new StringWriter();
+        OutputStream out = new WriterOutputStream(sw, format.getCharSetEncoding());
+        messageFormatter.writeTo(msgCtx, format, out, true);
+        out.close();
+        return sw.toString();
     }
 
 }

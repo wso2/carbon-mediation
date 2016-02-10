@@ -36,10 +36,13 @@ import org.apache.axis2.util.MessageProcessorSelector;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.inbound.InboundResponseSender;
+import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -54,7 +57,9 @@ public class WebsocketTransportSender extends AbstractTransportSender {
 
     public void init(ConfigurationContext cfgCtx, TransportOutDescription transportOut)
             throws AxisFault {
-        log.info("Initializing WS Connection Factory.");
+        if (log.isDebugEnabled()) {
+            log.debug("Initializing WS Connection Factory.");
+        }
         super.init(cfgCtx, transportOut);
         connectionFactory = WebsocketConnectionFactory.getInstance(transportOut);
     }
@@ -71,7 +76,8 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         if (msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER) != null) {
             responseSender = (InboundResponseSender)
                     msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER);
-            sourceIdentier = ((ChannelHandlerContext)msgCtx.getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT)).channel().toString();
+            sourceIdentier = ((ChannelHandlerContext) msgCtx.
+                    getProperty(WebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT)).channel().toString();
         } else {
             sourceIdentier = WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER;
         }
@@ -94,11 +100,17 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         }
 
         try {
-            log.info("Fetching a Connection from the WS Connection Factory.");
+            if (log.isDebugEnabled()) {
+                log.debug("Fetching a Connection from the WS(WSS) Connection Factory.");
+            }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR), sourceIdentier,
                     handshakePresent, responceDispatchSequence, responceErrorSequence, messageType);
             String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
-            clientHandler.setTenantDomain(tenantDomain);
+            if (tenantDomain != null) {
+                clientHandler.setTenantDomain(tenantDomain);
+            } else {
+                clientHandler.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+            }
             if (!sourceIdentier.equals(WebsocketConstants.UNIVERSAL_SOURCE_IDENTIFIER)) {
                 clientHandler.registerWebsocketResponseSender(responseSender);
                 clientHandler.setDispatchSequence(responceDispatchSequence);
@@ -108,10 +120,26 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT) != null
                     && msgCtx.getProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT).equals(true)) {
                 WebSocketFrame frame = (BinaryWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME);
-                log.info("Sending the message to the WS server.");
-                clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame);
+                if (log.isDebugEnabled()) {
+                    log.debug("Sending the binary frame to the WS server on context id : "
+                            + clientHandler.getChannelHandlerContext().channel().toString());
+                }
+                if (clientHandler.getChannelHandlerContext().channel().isActive()) {
+                    clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame);
+                }
+            } else if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT) != null
+                    && msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT).equals(true)) {
+                WebSocketFrame frame = (TextWebSocketFrame) msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME);
+                if (log.isDebugEnabled()) {
+                    log.debug("Sending the passthrough text frame to the WS server on context id : "
+                            + clientHandler.getChannelHandlerContext().channel().toString());
+                }
+                if (clientHandler.getChannelHandlerContext().channel().isActive()) {
+                    clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame);
+                }
             } else {
                 if (!handshakePresent) {
+                    RelayUtils.buildMessage(msgCtx, false);
                     OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
                     MessageFormatter messageFormatter =
                             MessageProcessorSelector.getMessageFormatter(msgCtx);
@@ -121,8 +149,13 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                     out.close();
                     final String msg = sw.toString();
                     WebSocketFrame frame = new TextWebSocketFrame(msg);
-                    log.info("Sending the message to the WS server.");
-                    clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Sending the text frame to the WS server on context id : "
+                                + clientHandler.getChannelHandlerContext().channel().toString());
+                    }
+                    if (clientHandler.getChannelHandlerContext().channel().isActive()) {
+                        clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame);
+                    }
                 } else {
                     clientHandler.acknowledgeHandshake();
                 }
@@ -133,6 +166,8 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             log.error("Error writting to the websocket channel", e);
         } catch (InterruptedException e) {
             log.error("Error writting to the websocket channel", e);
+        } catch (XMLStreamException e) {
+            handleException("Error while building message", e);
         }
     }
 }

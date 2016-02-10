@@ -35,11 +35,14 @@ public class WebsocketConstants {
     public static final String WEBSOCKET_BINARY_FRAME_PRESENT = "websocket.binary.frame.present";
     public static final String WEBSOCKET_BINARY_FRAME = "websocket.binary.frame";
 
+    public static final String WEBSOCKET_TEXT_FRAME_PRESENT = "websocket.text.frame.present";
+    public static final String WEBSOCKET_TEXT_FRAME = "websocket.text.frame";
+
     public static final String WEBSOCKET_TARGET_HANDLER_CONTEXT = "websocket.target.handler.context";
     public static final String WEBSOCKET_SOURCE_HANDLER_CONTEXT = "websocket.source.handler.context";
 
-    public static final String TRUST_STORE_LOCATION = "websocket.trust.store.location";
-    public static final String TRUST_STORE_PASSWORD = "websocket.trust.store.Password";
-    public static final String TRUST_STORE_CONFIG_ELEMENT = "websocket.trust.store";
+    public static final String TRUST_STORE_LOCATION = "ws.trust.store.location";
+    public static final String TRUST_STORE_PASSWORD = "ws.trust.store.Password";
+    public static final String TRUST_STORE_CONFIG_ELEMENT = "ws.trust.store";
 
 }
