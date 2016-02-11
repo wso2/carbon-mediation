@@ -20,14 +20,14 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>das-message-flow-data-publisher-feature</artifactId>
-        <version>4.6.1-ALPHA</version>
+        <version>4.6.1-BETA-SNAPSHOT</version>
 	    <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.das.messageflow.data.publisher.server.feature</artifactId>
     <packaging>pom</packaging>
-    <version>4.6.1-ALPHA</version>
+    <version>4.6.1-BETA-SNAPSHOT</version>
     <groupId>org.wso2.carbon.mediation</groupId>
     <name>WSO2 Carbon - DAS Message Flow Publisher Server Feature</name>
     <url>http://wso2.org</url>
