@@ -198,6 +198,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 } else if (frame instanceof BinaryWebSocketFrame) {
                     handleWebsocketBinaryFrame(frame);
                     return;
+                } else if ((frame instanceof TextWebSocketFrame) && (handshaker.selectedSubprotocol() == null)) {
+                    handleWebsocketPassthroughTextFrame(frame);
+                    return;
                 } else if (frame instanceof TextWebSocketFrame) {
 
                     CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
@@ -277,6 +280,26 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, new Boolean(true));
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME, frame);
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME, frame);
+        injectToSequence(synCtx, endpoint);
+
+    }
+
+    protected void handleWebsocketPassthroughTextFrame(WebSocketFrame frame) throws AxisFault {
+        String endpointName =
+                WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
+
+        MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+        InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
+
+        if (endpoint == null) {
+            log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
+            return;
+        }
+
+        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, new Boolean(true));
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, new Boolean(true));
+        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME, frame);
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME, frame);
         injectToSequence(synCtx, endpoint);
 
     }

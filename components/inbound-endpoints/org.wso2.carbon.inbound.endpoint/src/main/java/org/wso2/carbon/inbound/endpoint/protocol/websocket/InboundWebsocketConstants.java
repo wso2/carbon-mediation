@@ -40,6 +40,9 @@ public class InboundWebsocketConstants {
     public static final String WEBSOCKET_BINARY_FRAME_PRESENT = "websocket.binary.frame.present";
     public static final String WEBSOCKET_BINARY_FRAME = "websocket.binary.frame";
 
+    public static final String WEBSOCKET_TEXT_FRAME_PRESENT = "websocket.text.frame.present";
+    public static final String WEBSOCKET_TEXT_FRAME = "websocket.text.frame";
+
     public static final String WEBSOCKET_CLIENT_SIDE_BROADCAST_LEVEL = "ws.client.side.broadcast.level";
 
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "ws.outflow.dispatch.sequence";

@@ -81,8 +81,9 @@ public class WebsocketConnectionFactory {
                                                      String dispatchSequence,
                                                      String dispatchErrorSequence,
                                                      String contentType) {
-
-        log.info("Creating a Connection for the specified WS endpoint.");
+        if (log.isDebugEnabled()) {
+            log.debug("Creating a Connection for the specified WS endpoint.");
+        }
         final WebSocketClientHandler handler;
 
         try {
@@ -152,7 +153,7 @@ public class WebsocketConnectionFactory {
                 @Override
                 public void operationComplete(ChannelFuture channelFuture) throws Exception {
                     group.shutdownGracefully();
-                    removeChannelHandler(sourceIdentifier,getClientHandlerIdentifier(uri));
+                    removeChannelHandler(sourceIdentifier, getClientHandlerIdentifier(uri));
                 }
             });
             handler.setDispatchSequence(dispatchSequence);

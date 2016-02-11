@@ -96,7 +96,8 @@ public class WebsocketSubscriberPathManager {
         List<InboundWebsocketChannelContext> contextList =
                 getSubscriberPathChannelContextList(inboundName, subscriberPath);
         for (InboundWebsocketChannelContext context : contextList) {
-            context.writeToChannel(frame);
+            WebSocketFrame duplicatedFrame = frame.duplicate();
+            context.writeToChannel(duplicatedFrame);
         }
     }
 
@@ -108,7 +109,8 @@ public class WebsocketSubscriberPathManager {
                 getSubscriberPathChannelContextList(inboundName, subscriberPath);
         for (InboundWebsocketChannelContext context : contextList) {
             if (!context.getChannelIdentifier().equals(ctx.getChannelIdentifier())) {
-                context.writeToChannel(frame);
+                WebSocketFrame duplicatedFrame = frame.duplicate();
+                context.writeToChannel(duplicatedFrame);
             }
         }
     }

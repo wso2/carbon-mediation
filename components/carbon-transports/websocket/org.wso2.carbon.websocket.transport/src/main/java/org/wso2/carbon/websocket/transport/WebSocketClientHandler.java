@@ -69,7 +69,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     private InboundResponseSender responseSender;
     private String tenantDomain;
 
-    public void setTenantDomain (String tenantDomain) {
+    public void setTenantDomain(String tenantDomain) {
         this.tenantDomain = tenantDomain;
     }
 
@@ -110,13 +110,17 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        log.info("WebSocket Client disconnected");
+        if (log.isDebugEnabled()) {
+            log.debug("WebSocket client disconnected on context id : " + ctx.channel().toString());
+        }
     }
 
     public void handleHandshake(ChannelHandlerContext ctx, FullHttpResponse msg) {
         if (!handshaker.isHandshakeComplete()) {
             handshaker.finishHandshake(ctx.channel(), (FullHttpResponse) msg);
-            log.info("WebSocket client connected to remote WS endpoint");
+            if (log.isDebugEnabled()) {
+                log.debug("WebSocket client connected to remote WS endpoint on context id : " + ctx.channel().toString());
+            }
             handshakeFuture.setSuccess();
             return;
         }
@@ -137,18 +141,25 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
         }
     }
 
-    public void handleTargetWebsocketChannelTermination(WebSocketFrame frame) throws AxisFault{
+    public void handleTargetWebsocketChannelTermination(WebSocketFrame frame) throws AxisFault {
         handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain()).addListener(ChannelFutureListener.CLOSE);
     }
 
-    public void handleWebsocketBinaryFrame(WebSocketFrame frame) throws AxisFault{
+    public void handleWebsocketBinaryFrame(WebSocketFrame frame) throws AxisFault {
         org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         synCtx.setProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, true);
         synCtx.setProperty(WebsocketConstants.WEBSOCKET_BINARY_FRAME, frame);
         injectToSequence(synCtx, dispatchSequence, dispatchErrorSequence);
     }
 
-    public void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) throws AxisFault{
+    public void handlePassthroughTextFrame(WebSocketFrame frame) throws AxisFault {
+        org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
+        synCtx.setProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, true);
+        synCtx.setProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME, frame);
+        injectToSequence(synCtx, dispatchSequence, dispatchErrorSequence);
+    }
+
+    public void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) throws AxisFault {
 
         try {
 
@@ -159,6 +170,9 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                     return;
                 } else if (frame instanceof BinaryWebSocketFrame) {
                     handleWebsocketBinaryFrame(frame);
+                    return;
+                } else if (frame instanceof TextWebSocketFrame && (handshaker.actualSubprotocol() == null)) {
+                    handlePassthroughTextFrame(frame);
                     return;
                 } else if (frame instanceof TextWebSocketFrame) {
 
@@ -248,7 +262,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                             axis2MsgCtx.getConfigurationContext());
             axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
             axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
-        }else {
+        } else {
             axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN,
                     MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
         }
