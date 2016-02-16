@@ -18,6 +18,8 @@
 package org.wso2.carbon.das.messageflow.data.publisher.services;
 
 import org.apache.log4j.Logger;
+import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
+import org.apache.synapse.aspects.flow.statistics.store.CompletedStatisticStore;
 import org.apache.synapse.messageflowtracer.data.MessageFlowDataEntry;
 import org.apache.synapse.messageflowtracer.processors.MessageDataCollector;
 import org.wso2.carbon.das.messageflow.data.publisher.data.MessageFlowTraceObserverStore;
@@ -78,10 +80,15 @@ public class MessageFlowTraceReporterThread extends Thread {
             log.trace("Starting new mediation statistics collection cycle");
         }
 
-        MessageDataCollector tracingStatisticsCollector =
-                synapseEnvironmentService.getSynapseEnvironment().getMessageDataCollector();
+//        MessageDataCollector tracingStatisticsCollector =
+//                synapseEnvironmentService.getSynapseEnvironment().getMessageDataCollector();
 
-        if (tracingStatisticsCollector == null) {
+        CompletedStatisticStore completedStatisticStore = synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore();
+
+
+
+
+        if (completedStatisticStore == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Statistics collector is not available in the Synapse environment");
             }
@@ -91,10 +98,10 @@ public class MessageFlowTraceReporterThread extends Thread {
 
 
         try {
-            while (!tracingStatisticsCollector.isEmpty()){
+            while (!completedStatisticStore.isEmpty()){
 
-                MessageFlowDataEntry dataEntry = tracingStatisticsCollector.deQueue();
-                messageFlowTraceObserverStore.notifyObservers(dataEntry);
+                PublishingFlow publishingFlow = completedStatisticStore.dequeue();
+                messageFlowTraceObserverStore.notifyObservers(publishingFlow);
             }
 
         } catch (Exception e) {
