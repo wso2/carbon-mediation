@@ -40,5 +40,5 @@ public interface DigestGenerator extends Serializable {
      * @return Object representing the unique identifier for the msgContext
      * @throws CachingException if there is an error in generating the digest key
      */
-    public String getDigest(MessageContext msgContext) throws CachingException;
+    String getDigest(MessageContext msgContext) throws CachingException;
 }

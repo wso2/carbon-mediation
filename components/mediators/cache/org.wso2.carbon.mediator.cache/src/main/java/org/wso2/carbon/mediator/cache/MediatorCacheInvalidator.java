@@ -18,13 +18,13 @@
 
 package org.wso2.carbon.mediator.cache;
 
+import javax.cache.CacheException;
+import javax.cache.Caching;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-
-import javax.cache.CacheException;
-import javax.cache.Caching;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 /**
  * This class is used for global cache invalidation
@@ -71,7 +71,7 @@ public class MediatorCacheInvalidator implements MediatorCacheInvalidatorMBean {
 				PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(getTenantDomain());
 			}
 
-			if (PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId() == -1) {
+			if (PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId() == MultitenantConstants.INVALID_TENANT_ID) {
 				PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(getTenantId());
 			}
 
