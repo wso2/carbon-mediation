@@ -25,12 +25,11 @@ import org.wso2.carbon.das.messageflow.data.publisher.observer.MessageFlowObserv
 import java.util.HashSet;
 import java.util.Set;
 
-public class MessageFlowTraceObserverStore {
+public class MessageFlowObserverStore {
 
-    private static final Log log = LogFactory.getLog(MessageFlowTraceObserverStore.class);
+    private static final Log log = LogFactory.getLog(MessageFlowObserverStore.class);
 
-    private Set<MessageFlowObserver> observers =
-            new HashSet<MessageFlowObserver>();
+    private Set<MessageFlowObserver> observers = new HashSet<MessageFlowObserver>();
 
     /**
      * Register a custom statistics consumer to receive updates from this
@@ -71,12 +70,12 @@ public class MessageFlowTraceObserverStore {
             try {
                 o.updateStatistics(publishingFlow);
             } catch (Throwable t) {
-                log.error("Error occured while notifying the statistics observer", t);
+                log.error("Error occurred while notifying the statistics observer", t);
             }
         }
     }
 
-    public MessageFlowTraceObserverStore() {
+    public MessageFlowObserverStore() {
     }
 
 }

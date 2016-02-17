@@ -20,18 +20,18 @@ package org.wso2.carbon.das.messageflow.data.publisher.services;
 import org.apache.log4j.Logger;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
 import org.apache.synapse.aspects.flow.statistics.store.CompletedStatisticStore;
-import org.apache.synapse.messageflowtracer.data.MessageFlowDataEntry;
-import org.apache.synapse.messageflowtracer.processors.MessageDataCollector;
-import org.wso2.carbon.das.messageflow.data.publisher.data.MessageFlowTraceObserverStore;
+import org.wso2.carbon.das.messageflow.data.publisher.data.MessageFlowObserverStore;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 
-public class MessageFlowTraceReporterThread extends Thread {
-    private static Logger log = Logger.getLogger(MessageFlowTraceReporterThread.class);
+import java.util.List;
+
+public class MessageFlowReporterThread extends Thread {
+    private static Logger log = Logger.getLogger(MessageFlowReporterThread.class);
 
 
     private boolean shutdownRequested = false;
 
-    private MessageFlowTraceObserverStore messageFlowTraceObserverStore;
+    private MessageFlowObserverStore messageFlowObserverStore;
 
     /** The reference to the synapse environment service */
     private SynapseEnvironmentService synapseEnvironmentService;
@@ -39,10 +39,10 @@ public class MessageFlowTraceReporterThread extends Thread {
     private long delay = 5 * 1000;
 
 
-    public MessageFlowTraceReporterThread(SynapseEnvironmentService synEnvSvc,
-                                          MessageFlowTraceObserverStore messageFlowTraceObserverStore) {
+    public MessageFlowReporterThread(SynapseEnvironmentService synEnvSvc,
+                                     MessageFlowObserverStore messageFlowObserverStore) {
         this.synapseEnvironmentService = synEnvSvc;
-        this.messageFlowTraceObserverStore = messageFlowTraceObserverStore;
+        this.messageFlowObserverStore = messageFlowObserverStore;
     }
 
     public void setDelay(long delay) {
@@ -80,13 +80,7 @@ public class MessageFlowTraceReporterThread extends Thread {
             log.trace("Starting new mediation statistics collection cycle");
         }
 
-//        MessageDataCollector tracingStatisticsCollector =
-//                synapseEnvironmentService.getSynapseEnvironment().getMessageDataCollector();
-
         CompletedStatisticStore completedStatisticStore = synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore();
-
-
-
 
         if (completedStatisticStore == null) {
             if (log.isDebugEnabled()) {
@@ -96,16 +90,19 @@ public class MessageFlowTraceReporterThread extends Thread {
             return;
         }
 
-
         try {
-            while (!completedStatisticStore.isEmpty()){
+            if (!completedStatisticStore.isEmpty()) {
 
-                PublishingFlow publishingFlow = completedStatisticStore.dequeue();
-                messageFlowTraceObserverStore.notifyObservers(publishingFlow);
+                List<PublishingFlow> publishingFlowList = completedStatisticStore.getCompletedStatisticEntries();
+
+                for (PublishingFlow aPublishingFlow : publishingFlowList) {
+                    messageFlowObserverStore.notifyObservers(aPublishingFlow);
+                }
+
             }
 
         } catch (Exception e) {
-            log.error("Error while obtaining tracing data.", e);
+            log.error("Error while obtaining statistic data.", e);
         }
     }
 

@@ -28,13 +28,13 @@ import org.wso2.carbon.mediation.statistics.*;
 import java.util.List;
 
 
-public class DASMediationStatisticsObserver implements MessageFlowObserver,
-                                                       TenantInformation {
+public class DASMediationFlowObserver implements MessageFlowObserver,
+                                                 TenantInformation {
 
-    private static final Log log = LogFactory.getLog(DASMediationStatisticsObserver.class);
+    private static final Log log = LogFactory.getLog(DASMediationFlowObserver.class);
     private int tenantId = -1234;
 
-    public DASMediationStatisticsObserver() {
+    public DASMediationFlowObserver() {
     }
 
     @Override
