@@ -28,23 +28,24 @@ public class MediationDataPublisherConstants {
 
     // key, value constants
 
+    //    public static final String COMPONENT_ID = "componentId";
+//    public static final String COMPONENT_NAME = "componentName";
+//    public static final String PAYLOAD = "payload";
+//    public static final String TRACE_TIMESTAMP = "timestamp";
+//    public static final String PROPERTY_MAP = "propertyMap";
+//    public static final String TRANSPORT_PROPERTY_MAP = "transportPropertyMap";
+//    public static final String ENTRY_TYPE = "entryType";
+//    public static final String PARENT = "parent";
+    public static final String  FLOW_DATA = "flowData";
     public static final String MESSAGE_ID = "messageId";
-    public static final String COMPONENT_ID = "componentId";
-    public static final String COMPONENT_NAME = "componentName";
-    public static final String PAYLOAD = "payload";
-    public static final String TRACE_TIMESTAMP = "timestamp";
-    public static final String PROPERTY_MAP = "propertyMap";
-    public static final String TRANSPORT_PROPERTY_MAP = "transportPropertyMap";
-    public static final String ENTRY_TYPE = "entryType";
-    public static final String PARENT = "parent";
 
 
     public static final String DEFAULT_DAS_SERVER_URL = "tcp://127.0.0.1:7611";
 
-    public static final String COMPONENT_STREAM_NAME = "esb-flow_tracer-component-entry-stream";
-    public static final String COMPONENT_STREAM_VERSION = "1.0.0";
+    public static final String STREAM_NAME = "esb-flow-entry-stream";
+    public static final String STREAM_VERSION = "1.0.0";
 
-    public static final String TRACE_STREAM_NAME = "esb-flow_tracer-trace-entry-stream";
-    public static final String TRACE_STREAM_VERSION = "1.0.0";
+//    public static final String TRACE_STREAM_NAME = "esb-flow_tracer-trace-entry-stream";
+//    public static final String TRACE_STREAM_VERSION = "1.0.0";
 
 }

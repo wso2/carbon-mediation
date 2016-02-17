@@ -17,7 +17,6 @@ package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
 
 import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 //import org.apache.synapse.messageflowtracer.data.MessageFlowComponentEntry;
@@ -115,7 +114,9 @@ public class Publisher {
 //        eventData.add(publishingFlow.getTimestamp());
 //        eventData.add(publishingFlow.getEntryType());
 
+        String tmp = JSONObject.toJSONString(publishingFlow.getObjectAsMap());
 
+        eventData.add(publishingFlow.getMessageFlowId());
         eventData.add(JSONObject.toJSONString(publishingFlow.getObjectAsMap()));
     }
 
@@ -195,15 +196,15 @@ public class Publisher {
             Object[] metaData)
             throws MalformedStreamDefinitionException {
         StreamDefinition eventStreamDefinition = new StreamDefinition(
-                MediationDataPublisherConstants.COMPONENT_STREAM_NAME,
-                MediationDataPublisherConstants.COMPONENT_STREAM_VERSION);
+                MediationDataPublisherConstants.STREAM_NAME,
+                MediationDataPublisherConstants.STREAM_VERSION);
         eventStreamDefinition.setNickName("");
         eventStreamDefinition.setDescription("This stream is use by WSO2 ESB to publish component specific data for tracing");
         eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
         for (int i = 0; i < metaData.length; i++) {
             eventStreamDefinition.addMetaData(metaData[i].toString(), AttributeType.STRING);
         }
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.MESSAGE_ID,
+        /*eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.MESSAGE_ID,
                                              AttributeType.STRING);
         eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.COMPONENT_ID,
                                              AttributeType.STRING);
@@ -218,30 +219,32 @@ public class Publisher {
         eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.PARENT,
                                              AttributeType.STRING);
         eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.PROPERTY_MAP,
+                                             AttributeType.STRING);*/
+        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.MESSAGE_ID,
                                              AttributeType.STRING);
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.TRANSPORT_PROPERTY_MAP,
+        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.FLOW_DATA,
                                              AttributeType.STRING);
         return eventStreamDefinition;
     }
 
-    public static StreamDefinition getTraceStreamDefinition(
-            Object[] metaData)
-            throws MalformedStreamDefinitionException {
-        StreamDefinition eventStreamDefinition = new StreamDefinition(
-                MediationDataPublisherConstants.TRACE_STREAM_NAME,
-                MediationDataPublisherConstants.TRACE_STREAM_VERSION);
-        eventStreamDefinition.setNickName("");
-        eventStreamDefinition.setDescription("This stream is use by WSO2 ESB to publish trace specific data for tracing");
-        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
-        for (int i = 0; i < metaData.length; i++) {
-            eventStreamDefinition.addMetaData(metaData[i].toString(), AttributeType.STRING);
-        }
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.MESSAGE_ID,
-                                             AttributeType.STRING);
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.TRACE_TIMESTAMP,
-                                             AttributeType.LONG);
-        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.ENTRY_TYPE,
-                                             AttributeType.STRING);
-        return eventStreamDefinition;
-    }
+//    public static StreamDefinition getTraceStreamDefinition(
+//            Object[] metaData)
+//            throws MalformedStreamDefinitionException {
+//        StreamDefinition eventStreamDefinition = new StreamDefinition(
+//                MediationDataPublisherConstants.TRACE_STREAM_NAME,
+//                MediationDataPublisherConstants.TRACE_STREAM_VERSION);
+//        eventStreamDefinition.setNickName("");
+//        eventStreamDefinition.setDescription("This stream is use by WSO2 ESB to publish trace specific data for tracing");
+//        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
+//        for (int i = 0; i < metaData.length; i++) {
+//            eventStreamDefinition.addMetaData(metaData[i].toString(), AttributeType.STRING);
+//        }
+//        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.MESSAGE_ID,
+//                                             AttributeType.STRING);
+//        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.TRACE_TIMESTAMP,
+//                                             AttributeType.LONG);
+//        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.ENTRY_TYPE,
+//                                             AttributeType.STRING);
+//        return eventStreamDefinition;
+//    }
 }
