@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
-import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
+import org.apache.synapse.aspects.flow.statistics.collectors.InboundEPStatisticCollector;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.messageflowtracer.util.MessageFlowTracerConstants;
@@ -109,7 +109,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                     return;
                 }
 
-                RuntimeStatisticCollector.reportStatisticsForInbound(synCtx,endpointName,endpoint
+                InboundEPStatisticCollector.reportStatisticsForInbound(synCtx,endpointName,endpoint
                         .getAspectConfiguration().isStatisticsEnable(),true);
 
                 CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
