@@ -19,18 +19,17 @@ package org.wso2.carbon.das.messageflow.data.publisher.data;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.messageflowtracer.data.MessageFlowDataEntry;
-import org.wso2.carbon.das.messageflow.data.publisher.observer.MessageFlowTracingObserver;
+import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
+import org.wso2.carbon.das.messageflow.data.publisher.observer.MessageFlowObserver;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class MessageFlowTraceObserverStore {
+public class MessageFlowObserverStore {
 
-    private static final Log log = LogFactory.getLog(MessageFlowTraceObserverStore.class);
+    private static final Log log = LogFactory.getLog(MessageFlowObserverStore.class);
 
-    private Set<MessageFlowTracingObserver> observers =
-            new HashSet<MessageFlowTracingObserver>();
+    private Set<MessageFlowObserver> observers = new HashSet<MessageFlowObserver>();
 
     /**
      * Register a custom statistics consumer to receive updates from this
@@ -38,7 +37,7 @@ public class MessageFlowTraceObserverStore {
      *
      * @param o The MediationStatisticsObserver instance to be notified of data updates
      */
-    public void registerObserver(MessageFlowTracingObserver o) {
+    public void registerObserver(MessageFlowObserver o) {
         observers.add(o);
     }
 
@@ -47,7 +46,7 @@ public class MessageFlowTraceObserverStore {
      *
      * @param o The MediationStatisticsObserver instance to be removed
      */
-    public void unregisterObserver(MessageFlowTracingObserver o) {
+    public void unregisterObserver(MessageFlowObserver o) {
         if (observers.contains(o)) {
             observers.remove(o);
             o.destroy();
@@ -59,24 +58,24 @@ public class MessageFlowTraceObserverStore {
             log.debug("Unregistering mediation statistics observers");
         }
 
-        for (MessageFlowTracingObserver o : observers) {
+        for (MessageFlowObserver o : observers) {
             o.destroy();
         }
         observers.clear();
     }
 
-    public void notifyObservers(MessageFlowDataEntry dataEntry) {
+    public void notifyObservers(PublishingFlow publishingFlow) {
 
-        for (MessageFlowTracingObserver o : observers) {
+        for (MessageFlowObserver o : observers) {
             try {
-                o.updateStatistics(dataEntry);
+                o.updateStatistics(publishingFlow);
             } catch (Throwable t) {
-                log.error("Error occured while notifying the statistics observer", t);
+                log.error("Error occurred while notifying the statistics observer", t);
             }
         }
     }
 
-    public MessageFlowTraceObserverStore() {
+    public MessageFlowObserverStore() {
     }
 
 }

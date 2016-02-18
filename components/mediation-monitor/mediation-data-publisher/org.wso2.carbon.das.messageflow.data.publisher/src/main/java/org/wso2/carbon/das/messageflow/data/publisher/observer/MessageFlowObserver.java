@@ -19,11 +19,13 @@
 
 package org.wso2.carbon.das.messageflow.data.publisher.observer;
 
+import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
+
 /**
  * This interface can be used to register consumers into the MediationStatisticsStore
  * and retrieve statistics updates from the data store.
  */
-public interface MessageFlowTracingObserver {
+public interface MessageFlowObserver {
 
     /**
      * Clean up this observer and prepare for shutdown
@@ -43,6 +45,6 @@ public interface MessageFlowTracingObserver {
      * @param snapshot Current latest update containing resource specific data, category specific
      *        data, cumulative data and error logs
      */
-    public void updateStatistics(Object snapshot);
+    public void updateStatistics(PublishingFlow snapshot);
 
 }

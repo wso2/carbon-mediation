@@ -18,7 +18,7 @@ package org.wso2.carbon.das.messageflow.data.publisher.observer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.messageflowtracer.data.MessageFlowDataEntry;
+import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.MediationStatConfig;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
 import org.wso2.carbon.das.messageflow.data.publisher.publish.Publisher;
@@ -28,13 +28,13 @@ import org.wso2.carbon.mediation.statistics.*;
 import java.util.List;
 
 
-public class DASMediationStatisticsObserver implements MessageFlowTracingObserver,
-                                                       TenantInformation {
+public class DASMediationFlowObserver implements MessageFlowObserver,
+                                                 TenantInformation {
 
-    private static final Log log = LogFactory.getLog(DASMediationStatisticsObserver.class);
+    private static final Log log = LogFactory.getLog(DASMediationFlowObserver.class);
     private int tenantId = -1234;
 
-    public DASMediationStatisticsObserver() {
+    public DASMediationFlowObserver() {
     }
 
     @Override
@@ -45,11 +45,11 @@ public class DASMediationStatisticsObserver implements MessageFlowTracingObserve
     }
 
     @Override
-    public void updateStatistics(Object traceEntry) {
+    public void updateStatistics(PublishingFlow flow) {
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId,true);
-            updateStatisticsInternal(traceEntry);
+            updateStatisticsInternal(flow);
         } catch (Exception e) {
             log.error("failed to update statics from DAS publisher", e);
         } finally {
@@ -57,7 +57,7 @@ public class DASMediationStatisticsObserver implements MessageFlowTracingObserve
         }
     }
 
-    private void updateStatisticsInternal(Object traceEntry)
+    private void updateStatisticsInternal(PublishingFlow flow)
             throws Exception {
         int tenantID = getTenantId();
         List<MediationStatConfig> mediationStatConfigList = new RegistryPersistenceManager().load(tenantID);
@@ -67,7 +67,7 @@ public class DASMediationStatisticsObserver implements MessageFlowTracingObserve
         }
 
         for (MediationStatConfig mediationStatConfig:mediationStatConfigList) {
-            Publisher.process((MessageFlowDataEntry) traceEntry, mediationStatConfig);
+            Publisher.process(flow, mediationStatConfig);
         }
     }
 

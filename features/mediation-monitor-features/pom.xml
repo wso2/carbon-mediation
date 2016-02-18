@@ -35,7 +35,6 @@
         <module>mediation-data-publisher-features</module>
         <module>mediation-tracer-features</module>
         <module>message-relay-features</module>
-        <module>mediation-flow-statistics-features</module>
     </modules>
 </project>
 
