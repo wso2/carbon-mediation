@@ -256,7 +256,7 @@ public class MediationStatisticsComponent {
     }
 
     private void checkPublishingEnabled() {
-        flowStatisticsEnabled = RuntimeStatisticCollector.isStatisticsEnable();
+        flowStatisticsEnabled = RuntimeStatisticCollector.isStatisticsEnabled();
         PublisherUtils.setTraceDataCollectingEnabled(flowStatisticsEnabled);
 
         if (!flowStatisticsEnabled) {
