@@ -98,7 +98,7 @@ public class KAFKAInjectHandler implements InjectHandler {
         }
         OMElement documentElement = null;
         // set the message payload to the message context
-        InputStream in = new ByteArrayInputStream(msg);
+        InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(msg));
         try {
             documentElement = builder.processDocument(in, contentType,
                     axis2MsgCtx);
