@@ -40,6 +40,7 @@
         <module>org.wso2.carbon.mediators.ui.feature</module>
         <module>org.wso2.carbon.mediators.server.feature</module>
         <module>cache-mediator</module>
+        <module>datamapper-mediator</module>
     </modules>
 </project>
 

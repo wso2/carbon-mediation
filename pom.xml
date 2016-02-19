@@ -1288,6 +1288,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.datamapper.ui</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediator.callout.ui</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -1894,6 +1899,24 @@
                 <version>${carbon.mediation.version}</version>
                 <type>zip</type>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.datamapper.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.datamapper.server.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.datamapper.ui.feature</artifactId>
+                <version>${carbon.mediation.version}</version>
+                <type>zip</type>
+            </dependency>
 
             <!--11 Previous version components -->
             <!--TODO use ndatasources-->
@@ -2243,6 +2266,12 @@
                 <artifactId>org.wso2.carbon.mediator.cache</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.datamapper</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+
 
             <!-- publishEvent mediator dependencies -->
             <dependency>
