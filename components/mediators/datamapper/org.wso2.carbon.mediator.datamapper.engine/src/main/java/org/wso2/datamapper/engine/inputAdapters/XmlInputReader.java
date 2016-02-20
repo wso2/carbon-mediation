@@ -36,7 +36,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
 
-
+//TODO : class name should be *adapter
 public class XmlInputReader implements InputDataReaderAdapter {
 
 	private OMElement body; // Soap Message body

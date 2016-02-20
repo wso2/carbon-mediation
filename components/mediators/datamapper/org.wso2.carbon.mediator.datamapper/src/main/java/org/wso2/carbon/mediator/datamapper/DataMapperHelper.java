@@ -35,6 +35,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.commons.json.JsonUtil;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.util.AXIOMUtils;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
@@ -76,20 +78,31 @@ public class DataMapperHelper {
 			IOException {
 
 		MappingResourceLoader mappingResourceLoader = null;
-		OMElement inputMessage, outputMessage = null;
+		OMElement outputMessage = null;
 
 		try {
-
 			// mapping resources needed to get the final output
 			//FIXME : remove caching part?? use in-memory for schemas
 			mappingResourceLoader = CacheResources.getCachedResources(context,
 					configkey, inSchemaKey, outSchemaKey, uuid);
-
-			inputMessage = context.getEnvelope().getBody().getFirstElement();
-			// FIXME include DatumReaders
-			InputDataReaderAdapter inputReader = convertInputMessage(inputType);
 			
-			InputStream inputSstream = new ByteArrayInputStream(inputMessage.toString().getBytes(StandardCharsets.UTF_8));
+			InputStream inputSstream = null;
+            // FIXME include DatumReaders
+            InputDataReaderAdapter inputReader = convertInputMessage(inputType);
+
+            switch (InputOutputDataTypes.DataType.fromString(inputType)) {
+                case XML:
+                    OMElement inputMessage = context.getEnvelope().getBody().getFirstElement();
+                    inputSstream = new ByteArrayInputStream(inputMessage.toString().getBytes(StandardCharsets.UTF_8));
+                    break;
+                case JSON:
+                    org.apache.axis2.context.MessageContext a2mc = ((Axis2MessageContext) context).getAxis2MessageContext();
+                    if (JsonUtil.hasAJsonPayload(a2mc)) {
+                        inputSstream = JsonUtil.getJsonPayload(a2mc);
+                    }
+                    break;
+                default:
+            }
 
 			GenericRecord result = MappingHandler.doMap(inputSstream, mappingResourceLoader, inputReader);
 
@@ -172,6 +185,9 @@ public class DataMapperHelper {
 			case XML:
 				inputReader = new XmlInputReader();
 				break;
+            case JSON:
+                inputReader = new JsonInputReader();
+                break;
 			default:
 				// HandleJSONMessages.getOutputMessage(outputDataType, result);
 			}
