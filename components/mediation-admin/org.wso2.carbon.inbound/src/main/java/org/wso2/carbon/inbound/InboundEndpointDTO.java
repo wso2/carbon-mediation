@@ -52,7 +52,8 @@ public class InboundEndpointDTO {
         this.isEdited = inboundEndpoint.getIsEdited();
         isStatisticsEnable = ((inboundEndpoint.getAspectConfiguration() != null) &&
                               inboundEndpoint.getAspectConfiguration().isStatisticsEnable());
-        isTracingEnable = inboundEndpoint.getTraceState() == SynapseConstants.TRACING_ON;
+        isTracingEnable = ((inboundEndpoint.getAspectConfiguration() != null) &&
+                           inboundEndpoint.getAspectConfiguration().isTracingEnabled());
         Map<String, String> mParams = inboundEndpoint.getParametersMap();        
         if (mParams != null && !mParams.isEmpty()) {
             parameters = new ParameterDTO[mParams.keySet().size()];

@@ -109,8 +109,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                     return;
                 }
 
-                InboundEPStatisticCollector.reportStatisticsForInbound(synCtx,endpointName,endpoint
-                        .getAspectConfiguration().isStatisticsEnable(),true);
+                InboundEPStatisticCollector.reportStatisticsForInbound(
+                        synCtx, endpointName, endpoint.getAspectConfiguration(), true);
 
                 CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
@@ -143,19 +143,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                     }
                 }
 
-                boolean tracing = endpoint.getTraceState() == SynapseConstants.TRACING_ON;
-
-                //Enabled inbound tracing
-                if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled() & tracing) {
-                    if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
-                        MessageFlowTracingDataCollector.setEntryPoint(synCtx, (MessageFlowTracerConstants
-                                                                                       .ENTRY_TYPE_INBOUND_ENDPOINT
-                                                                               + endpointName), synCtx.getMessageID());
-                    }
-
-                    MessageFlowTracingDataCollector.setTraceFlowEvent(synCtx, MessageFlowTracerConstants.ENTRY_TYPE_INBOUND_ENDPOINT + endpointName);
-                }
-
                 if (continueDispatch && dispatchPattern != null) {
 
                     boolean processedByAPI = false;
@@ -180,15 +167,6 @@ public class InboundHttpServerWorker extends ServerWorker {
                             //set inbound properties for axis2 context
                             setInboundProperties(axis2MsgContext);
 
-                            //Enabled inbound-proxy/sequence tracing
-                            if (MessageFlowTracingDataCollector.isMessageFlowTracingEnabled() & tracing) {
-                                if (axis2MsgContext.getProperty(MessageFlowTracerConstants.MESSAGE_FLOW_ID) == null) {
-                                    MessageFlowTracingDataCollector.setEntryPoint(synCtx,
-                                                                                (MessageFlowTracerConstants
-                                                                                         .ENTRY_TYPE_INBOUND_ENDPOINT
-                                                                                 + endpointName), synCtx.getMessageID());
-                                }
-                            }
                             if (!isRESTRequest(axis2MsgContext, method)) {
                                 if (request.isEntityEnclosing()) {
                                     processEntityEnclosingRequest(axis2MsgContext, isAxis2Path);
