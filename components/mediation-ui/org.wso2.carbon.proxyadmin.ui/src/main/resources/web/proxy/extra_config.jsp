@@ -151,6 +151,7 @@
                     function(data,status) {
                         handleProxyCallBack(data,status, "successfully.enabled.tracing", "unable.to.enable.tracing",
                                 "disableTracing", "enableTracing");
+                        showHideIcon("disableStat", "enableStat");
                     });
         } else if ("disable" == command) {
             jQuery.get("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' : 'disableTrace'},
