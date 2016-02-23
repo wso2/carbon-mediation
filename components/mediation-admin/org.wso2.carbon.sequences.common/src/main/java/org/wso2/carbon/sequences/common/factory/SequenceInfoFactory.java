@@ -50,7 +50,7 @@ public class SequenceInfoFactory {
             sequenceInfo.setEnableStatistics(false);
         }
         
-        if(sequenceMediator.getTraceState() == SynapseConstants.TRACING_ON) {
+        if(sequenceMediator.isTracingEnabled()) {
             sequenceInfo.setEnableTracing(true);
         } else {
             sequenceInfo.setEnableTracing(false);

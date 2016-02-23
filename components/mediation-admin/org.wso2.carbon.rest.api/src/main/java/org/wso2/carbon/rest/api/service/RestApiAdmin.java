@@ -346,7 +346,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     } else {
                         apiData.setStatisticsEnable(false);
                     }
-                    if (SynapseConstants.TRACING_ON == api.getTraceState()) {
+                    if (api.getAspectConfiguration() != null
+                        && api.getAspectConfiguration().isTracingEnabled()) {
                         apiData.setTracingEnable(true);
                     } else {
                         apiData.setTracingEnable(false);
@@ -608,7 +609,15 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             API api = synapseConfiguration.getAPI(apiName);
             if (api != null) {
-                api.setTraceState(SynapseConstants.TRACING_ON);
+                if (api.getAspectConfiguration() == null) {
+                    AspectConfiguration config = new AspectConfiguration(apiName);
+                    config.enableTracing();
+                    config.enableStatistics(); // Need to enable statistics for tracing
+                    api.configure(config);
+                } else {
+                    api.getAspectConfiguration().enableTracing();
+                    api.getAspectConfiguration().enableStatistics(); // Need to enable statistics for tracing
+                }
 
                 /** Persist the api service if it is not deployed via an artifact container */
                 if (api.getArtifactContainerName() == null) {
@@ -636,7 +645,13 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             API api = synapseConfiguration.getAPI(apiName);
             if (api != null) {
-                api.setTraceState(SynapseConstants.TRACING_OFF);
+                if (api.getAspectConfiguration() == null) {
+                    AspectConfiguration config = new AspectConfiguration(apiName);
+                    config.disableTracing();
+                    api.configure(config);
+                } else {
+                    api.getAspectConfiguration().disableTracing();
+                }
 
                 /** Persist the api service if it is not deployed via an artifact container */
                 if (api.getArtifactContainerName() == null) {

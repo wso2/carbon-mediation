@@ -480,6 +480,8 @@ function enableTrace(inboundEndpointName) {
         success: function (msg) {
             document.getElementById("disableTrace" + inboundEndpointName).style.display = "";
             document.getElementById("enableTrace" + inboundEndpointName).style.display = "none";
+            document.getElementById("disableStat" + inboundEndpointName).style.display = "";
+            document.getElementById("enableStat" + inboundEndpointName).style.display = "none";
         },
         error: function (msg) {
             CARBON.showErrorDialog('Error occurred when enabling tracing for the inbound Endpoint :' + inboundEndpointName);
