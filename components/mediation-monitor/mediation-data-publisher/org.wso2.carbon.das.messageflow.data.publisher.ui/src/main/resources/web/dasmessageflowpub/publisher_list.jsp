@@ -74,7 +74,7 @@
         	if (!collectingEnabled){
         		%>
         		<p  style="color: red;">
-        			You need to enable message-tracing-data in "synapse.properties" file for publishing data.
+        			You need to enable mediation flow statistics in "synapse.properties" file for publishing data.
         		</p>
         		<br/>
         		<%

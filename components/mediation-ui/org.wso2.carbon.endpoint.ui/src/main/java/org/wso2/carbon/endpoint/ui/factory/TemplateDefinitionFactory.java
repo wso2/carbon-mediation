@@ -63,14 +63,12 @@ public class TemplateDefinitionFactory extends EndpointDefinitionFactory{
         if (trace != null && trace.getAttributeValue() != null) {
             String traceValue = trace.getAttributeValue();
             if (XMLConfigConstants.TRACE_ENABLE.equals(traceValue)) {
-                definition.setTraceState(SynapseConstants.TRACING_ON);
-            } else if (XMLConfigConstants.TRACE_DISABLE.equals(traceValue)) {
-                definition.setTraceState(SynapseConstants.TRACING_OFF);
+                definition.enableTracing();
+                definition.enableStatistics(); // Tracing needs statistics to be enabled
+            } else {
+                definition.disableTracing();
             }
-        } else {
-            definition.setTraceState(SynapseConstants.TRACING_UNSET);
         }
-
 
         if (optimize != null && optimize.getAttributeValue().length() > 0) {
             String method = optimize.getAttributeValue().trim();

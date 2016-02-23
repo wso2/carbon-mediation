@@ -263,6 +263,7 @@
             data: 'sequenceName=' + sequenceName + '&action=enableTracing',
             success: function(msg) {
                 handleCallback(sequenceName, ENABLE, TRACE);
+                handleCallback(sequenceName, ENABLE, STAT);
             },
             error: function(msg) {
                 CARBON.showErrorDialog('<fmt:message key="sequence.trace.enable.link"/>' +

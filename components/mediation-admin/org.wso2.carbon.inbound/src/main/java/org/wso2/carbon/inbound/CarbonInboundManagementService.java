@@ -343,7 +343,15 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             InboundEndpoint inboundEndpoint = synapseConfiguration.getInboundEndpoint(inboundEndpointName);
             if (inboundEndpoint != null) {
-                inboundEndpoint.setTraceState(SynapseConstants.TRACING_ON);
+                if (inboundEndpoint.getAspectConfiguration() == null) {
+                    AspectConfiguration config = new AspectConfiguration(inboundEndpointName);
+                    config.enableTracing();
+                    config.enableStatistics(); // Tracing need statistics to be enabled
+                    inboundEndpoint.configure(config);
+                } else {
+                    inboundEndpoint.getAspectConfiguration().enableTracing();
+                    inboundEndpoint.getAspectConfiguration().enableStatistics(); // Tracing need statistics to be enabled
+                }
 
                 /** Persist the api service if it is not deployed via an artifact container */
                 if (inboundEndpoint.getArtifactContainerName() == null) {
@@ -370,7 +378,13 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             InboundEndpoint inboundEndpoint = synapseConfiguration.getInboundEndpoint(inboundEndpointName);
             if (inboundEndpoint != null) {
-                inboundEndpoint.setTraceState(SynapseConstants.TRACING_OFF);
+                if (inboundEndpoint.getAspectConfiguration() == null) {
+                    AspectConfiguration config = new AspectConfiguration(inboundEndpointName);
+                    config.disableTracing();
+                    inboundEndpoint.configure(config);
+                } else {
+                    inboundEndpoint.getAspectConfiguration().disableTracing();
+                }
 
                 /** Persist the api service if it is not deployed via an artifact container */
                 if (inboundEndpoint.getArtifactContainerName() == null) {
