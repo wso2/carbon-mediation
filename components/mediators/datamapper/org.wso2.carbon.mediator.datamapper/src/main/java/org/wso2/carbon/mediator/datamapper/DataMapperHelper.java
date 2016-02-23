@@ -91,7 +91,7 @@ public class DataMapperHelper {
             InputDataReaderAdapter inputReader = convertInputMessage(inputType);
 
             switch (InputOutputDataTypes.DataType.fromString(inputType)) {
-                case XML:
+                case XML:case CSV:
                     OMElement inputMessage = context.getEnvelope().getBody().getFirstElement();
                     inputSstream = new ByteArrayInputStream(inputMessage.toString().getBytes(StandardCharsets.UTF_8));
                     break;

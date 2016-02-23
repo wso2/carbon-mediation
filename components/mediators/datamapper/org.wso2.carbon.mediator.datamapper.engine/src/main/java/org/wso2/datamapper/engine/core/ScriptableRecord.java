@@ -126,7 +126,7 @@ public class ScriptableRecord implements Scriptable{
 		
 	}
 
-	public Object getDefaultValue(Class<?> hint) {
+	public Object getDefaultValue(Class hint) {
 		return null;
 	}
 

@@ -64,20 +64,10 @@
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>
         </dependency>
-
-        <!--&lt;!&ndash;datamapper dependencies&ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.avro</groupId>-->
-            <!--<artifactId>avro</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>net.sf.opencsv</groupId>-->
-            <!--<artifactId>opencsv</artifactId>-->
-        <!--</dependency>-->
+        <!--TODO : engine component will be moved to a different repository in future-->
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.datamapper.engine</artifactId>
-            <version>4.6.1-BETA-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
