@@ -40,21 +40,18 @@
 
     Value configKey = null;
     if(dataMapperMediator.getConfigurationKey() != null) {
-        System.out.println("getConfigurationKey is null");
         configKey = dataMapperMediator.getConfigurationKey();
         configKeyVal = configKey.getKeyValue();
     }
 
 	Value inputSchema = null;
     if(dataMapperMediator.getInputSchemaKey() != null) {
-        System.out.println("getInputSchemaKey is null");
         inputSchema = dataMapperMediator.getInputSchemaKey();
         inputSchemaVal = inputSchema.getKeyValue();
     }
 
 	Value outputSchema = null;
     if(dataMapperMediator.getOutputSchemaKey() != null) {
-        System.out.println("getOutputSchemaKey is null");
         outputSchema = dataMapperMediator.getOutputSchemaKey();
         outputSchemaVal = outputSchema.getKeyValue();
     }
@@ -141,7 +138,6 @@
                 <td>
                     <select id="mediator.datamapper.inputType" name="mediator.datamapper.inputType">
                         <%
-                            System.out.println("dataMapperMediator.getInputType()" + dataMapperMediator.getInputType());
                             if(dataMapperMediator.getInputType() == DataMapperMediator.CSV_VALUE){
                         %>
                         <option value="<%=DataMapperMediator.CSV_VALUE%>" selected="true"><fmt:message key="mediator.datamapper.type.csv"/></option>
@@ -150,15 +146,15 @@
                         <%
                             } else if(dataMapperMediator.getInputType() == DataMapperMediator.XML_VALUE){
                         %>
-                        <option value="<%=DataMapperMediator.CSV_VALUE%>" selected="true"><fmt:message key="mediator.datamapper.type.csv"/></option>
-                        <option value="<%=DataMapperMediator.XML_VALUE%>"><fmt:message key="mediator.datamapper.type.xml"/></option>
+                        <option value="<%=DataMapperMediator.CSV_VALUE%>"><fmt:message key="mediator.datamapper.type.csv"/></option>
+                        <option value="<%=DataMapperMediator.XML_VALUE%>" selected="true"><fmt:message key="mediator.datamapper.type.xml"/></option>
                         <option value="<%=DataMapperMediator.JSON_VALUE%>"><fmt:message key="mediator.datamapper.type.json"/></option>
                         <%
                             } else if (dataMapperMediator.getInputType() == DataMapperMediator.JSON_VALUE) {
                         %>
-                        <option value="<%=DataMapperMediator.CSV_VALUE%>" selected="true"><fmt:message key="mediator.datamapper.type.csv"/></option>
+                        <option value="<%=DataMapperMediator.CSV_VALUE%>"><fmt:message key="mediator.datamapper.type.csv"/></option>
                         <option value="<%=DataMapperMediator.XML_VALUE%>"><fmt:message key="mediator.datamapper.type.xml"/></option>
-                        <option value="<%=DataMapperMediator.JSON_VALUE%>"><fmt:message key="mediator.datamapper.type.json"/></option>
+                        <option value="<%=DataMapperMediator.JSON_VALUE%>" selected="true"><fmt:message key="mediator.datamapper.type.json"/></option>
                         <%}%>
                     </select>
                 </td>
@@ -168,7 +164,6 @@
                 <td>
                     <select id="mediator.datamapper.outputType" name="mediator.datamapper.outputType">
                         <%
-                            System.out.println("dataMapperMediator.getOutputType()" + dataMapperMediator.getOutputType());
                             if(dataMapperMediator.getOutputType() == DataMapperMediator.CSV_VALUE){
                         %>
                         <option value="<%=DataMapperMediator.CSV_VALUE%>" selected="true"><fmt:message key="mediator.datamapper.type.csv"/></option>
@@ -177,15 +172,15 @@
                         <%
                             } else if(dataMapperMediator.getOutputType() == DataMapperMediator.XML_VALUE){
                         %>
-                         <option value="<%=DataMapperMediator.CSV_VALUE%>" selected="true"><fmt:message key="mediator.datamapper.type.csv"/></option>
-                        <option value="<%=DataMapperMediator.XML_VALUE%>"><fmt:message key="mediator.datamapper.type.xml"/></option>
+                         <option value="<%=DataMapperMediator.CSV_VALUE%>"><fmt:message key="mediator.datamapper.type.csv"/></option>
+                        <option value="<%=DataMapperMediator.XML_VALUE%>"  selected="true"><fmt:message key="mediator.datamapper.type.xml"/></option>
                         <option value="<%=DataMapperMediator.JSON_VALUE%>"><fmt:message key="mediator.datamapper.type.json"/></option>
                         <%
                             } else if (dataMapperMediator.getOutputType() == DataMapperMediator.JSON_VALUE) {
                         %>
-                        <option value="<%=DataMapperMediator.CSV_VALUE%>" selected="true"><fmt:message key="mediator.datamapper.type.csv"/></option>
+                        <option value="<%=DataMapperMediator.CSV_VALUE%>"><fmt:message key="mediator.datamapper.type.csv"/></option>
                         <option value="<%=DataMapperMediator.XML_VALUE%>"><fmt:message key="mediator.datamapper.type.xml"/></option>
-                        <option value="<%=DataMapperMediator.JSON_VALUE%>"><fmt:message key="mediator.datamapper.type.json"/></option>
+                        <option value="<%=DataMapperMediator.JSON_VALUE%>"  selected="true"><fmt:message key="mediator.datamapper.type.json"/></option>
                         <%}%>
                     </select>
                 </td>

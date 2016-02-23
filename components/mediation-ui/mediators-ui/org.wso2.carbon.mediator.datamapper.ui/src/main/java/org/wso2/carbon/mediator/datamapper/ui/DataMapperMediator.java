@@ -16,7 +16,9 @@
 package org.wso2.carbon.mediator.datamapper.ui;
 
 
+import org.apache.axiom.om.OMNamespace;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.mediators.Value;
 import org.apache.axiom.om.OMAttribute;
@@ -34,8 +36,7 @@ import javax.xml.namespace.QName;
  */
 public class DataMapperMediator extends AbstractMediator {
 
-	private static final QName DATAMAPPER_Q = new QName(
-			XMLConfigConstants.SYNAPSE_NAMESPACE, "datamapper");
+
 	private static final String ATT_CONFIGURATION_KEY = "config";
 	private static final String ATT_INPUT_SCHEMA_KEY = "inputSchema";
 	private static final String ATT_OUTPUT_SCHEMA_KEY = "outputSchema";
@@ -45,12 +46,10 @@ public class DataMapperMediator extends AbstractMediator {
 	private Value configurationKey;
 	private Value inputSchemaKey;
 	private Value outputSchemaKey;
-//	private String inputType;
-//	private String outputType;
 	
-	private static final String CSV = "text/csv";
-	private static final String XML = "application/xml";
-	private static final String JSON = "application/json";
+	private static final String CSV = "CSV";
+	private static final String XML = "XML";
+	private static final String JSON = "JSON";
 	
 	public static final int CSV_VALUE = 0;
 	public static final int XML_VALUE = 1;
@@ -147,7 +146,7 @@ public class DataMapperMediator extends AbstractMediator {
 	}
 
 	public OMElement serialize(OMElement parent) {
-		OMElement dataMapperElement = fac.createOMElement(DATAMAPPER_Q);
+		OMElement dataMapperElement = fac.createOMElement("datamapper", synNS);
 
 		if (configurationKey != null) {
 			// Serialize Value using ValueSerializer
@@ -181,7 +180,7 @@ public class DataMapperMediator extends AbstractMediator {
 	            ));
 	     }
 		if(outputType != CSV_VALUE ){
-			   dataMapperElement.addAttribute(fac.createOMAttribute(ATT_INPUT_TYPE, nullNS,
+			   dataMapperElement.addAttribute(fac.createOMAttribute(ATT_OUTPUT_TYPE, nullNS,
 					   outputType == XML_VALUE ? "XML" :
 					   outputType == JSON_VALUE ? "JSON" :"CSV"
 	            ));
@@ -254,11 +253,11 @@ public class DataMapperMediator extends AbstractMediator {
         if(outputTypeAttribute != null) {
             String outputTypeStr = outputTypeAttribute.getAttributeValue();
             if (CSV.equals(outputTypeStr)) {
-                inputType = CSV_VALUE;
+                outputType = CSV_VALUE;
             } else if (XML.equals(outputTypeStr)) {
-            	inputType = XML_VALUE;
+				outputType = XML_VALUE;
             } else if (JSON.equals(outputTypeStr)) {
-            	inputType = JSON_VALUE;
+				outputType = JSON_VALUE;
             } 
         }
 

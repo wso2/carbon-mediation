@@ -22,32 +22,25 @@
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     if (!(mediator instanceof DataMapperMediator)) {
-        // todo : proper error handling
         throw new RuntimeException("Unable to edit the mediator");
     }
     DataMapperMediator dataMapperMediator = (DataMapperMediator) mediator;
 
     Value configKey = new Value(request.getParameter("configKey"));
     if(configKey != null) {
-        System.out.println("configKey" + configKey + "|" + new Value(request.getParameter("configKey")));
         dataMapperMediator.setConfigurationKey(configKey);
     }
     Value inputSchema = new Value(request.getParameter("inputSchema"));
     if(inputSchema != null) {
-        System.out.println("inputSchema" + configKey);
         dataMapperMediator.setInputSchemaKey(inputSchema);
     }
     Value outputSchema = new Value(request.getParameter("outputSchema"));
     if(outputSchema != null) {
-        System.out.println("inputSchema" + configKey);
         dataMapperMediator.setOutputSchemaKey(outputSchema);
     }
 
-    System.out.println(request.getParameter("mediator.datamapper.inputType"));
-    System.out.println(request.getParameter("mediator.datamapper.outputType"));
     dataMapperMediator.setInputType(Integer.parseInt(request.getParameter("mediator.datamapper.inputType")));
     dataMapperMediator.setOutputType(Integer.parseInt(request.getParameter("mediator.datamapper.outputType")));
-    //dataMapperMediator.getProperties().clear(); // to avoid duplicates
 
 %>
 
