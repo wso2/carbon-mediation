@@ -31,6 +31,7 @@ public class DASDataPublisherConstants {
     public static final String DAS_REMOTE_ADDRESS = "remote_address";
     public static final String DAS_USER_AGENT = "user_agent";
     public static final String DAS_HOST = "host";
+    public static final String DAS_COMPRESSED = "compressed";
     public static final String DAS_CONTENT_TYPE = "content_type";
     public static final String DAS_REFERER = "referer";
     public static final String DAS_REQUEST_URL = "request_url";
