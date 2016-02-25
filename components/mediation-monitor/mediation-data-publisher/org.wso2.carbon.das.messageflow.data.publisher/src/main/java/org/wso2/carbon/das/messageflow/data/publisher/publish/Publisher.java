@@ -41,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -72,7 +73,7 @@ public class Publisher {
 
     private static void addMetaData(List<String> metaDataKeyList, List<String> metaDataValueList,
                                     MediationStatConfig mediationStatConfig) {
-        metaDataValueList.add(PublisherUtil.getHostAddress());
+//        metaDataValueList.add(PublisherUtil.getHostAddress());
         metaDataValueList.add("true"); // payload-data is in compressed form
         Property[] properties = mediationStatConfig.getProperties();
         if (properties != null) {
@@ -88,7 +89,11 @@ public class Publisher {
     private static void addEventData(List<Object> eventData, PublishingFlow publishingFlow) {
         eventData.add(publishingFlow.getMessageFlowId());
 
+        Map<String, Object> mapping = publishingFlow.getObjectAsMap();
+        mapping.put("host", PublisherUtil.getHostAddress()); // Adding host
+
         String jsonString = JSONObject.toJSONString(publishingFlow.getObjectAsMap());
+
         eventData.add(compress(jsonString));
     }
 
@@ -172,7 +177,6 @@ public class Publisher {
                 MediationDataPublisherConstants.STREAM_VERSION);
         eventStreamDefinition.setNickName("");
         eventStreamDefinition.setDescription("This stream is use by WSO2 ESB to publish component specific data for tracing");
-        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
         eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_COMPRESSED, AttributeType.STRING);
         for (Object aMetaData : metaData) {
             eventStreamDefinition.addMetaData(aMetaData.toString(), AttributeType.STRING);
