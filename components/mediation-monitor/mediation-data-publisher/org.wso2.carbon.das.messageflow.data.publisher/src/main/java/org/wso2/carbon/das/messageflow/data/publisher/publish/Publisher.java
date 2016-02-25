@@ -72,7 +72,6 @@ public class Publisher {
     private static void addMetaData(List<String> metaDataKeyList, List<String> metaDataValueList,
                                     MediationStatConfig mediationStatConfig) {
         metaDataValueList.add(PublisherUtil.getHostAddress());
-        metaDataValueList.add("true"); // payload-data is in compressed form
         Property[] properties = mediationStatConfig.getProperties();
         if (properties != null) {
             for (Property property : properties) {
@@ -88,7 +87,7 @@ public class Publisher {
         eventData.add(publishingFlow.getMessageFlowId());
 
         String jsonString = JSONObject.toJSONString(publishingFlow.getObjectAsMap());
-        eventData.add(compress(jsonString));
+        eventData.add(jsonString);
     }
 
 
@@ -172,7 +171,6 @@ public class Publisher {
         eventStreamDefinition.setNickName("");
         eventStreamDefinition.setDescription("This stream is use by WSO2 ESB to publish component specific data for tracing");
         eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
-        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_COMPRESSED, AttributeType.STRING);
         for (Object aMetaData : metaData) {
             eventStreamDefinition.addMetaData(aMetaData.toString(), AttributeType.STRING);
         }
@@ -184,27 +182,4 @@ public class Publisher {
         return eventStreamDefinition;
     }
 
-    /**
-     * Compress the payload
-     *
-     * @param str
-     * @return
-     */
-    private static String compress(String str) {
-        if (str == null || str.length() == 0) {
-            return str;
-        }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            GZIPOutputStream gzip = new GZIPOutputStream(out);
-            gzip.write(str.getBytes());
-            gzip.close();
-            return out.toString("UTF-8");
-        } catch (IOException e) {
-            log.error("Unable to compress data", e);
-        }
-
-        return str;
-    }
 }
