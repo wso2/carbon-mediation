@@ -36,6 +36,7 @@ import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -200,7 +201,7 @@ public class Publisher {
             GZIPOutputStream gzip = new GZIPOutputStream(out);
             gzip.write(str.getBytes());
             gzip.close();
-            return out.toString("UTF-8");
+            return DatatypeConverter.printBase64Binary(out.toByteArray());
         } catch (IOException e) {
             log.error("Unable to compress data", e);
         }
