@@ -92,7 +92,7 @@ public class Publisher {
         Map<String, Object> mapping = publishingFlow.getObjectAsMap();
         mapping.put("host", PublisherUtil.getHostAddress()); // Adding host
 
-        String jsonString = JSONObject.toJSONString(publishingFlow.getObjectAsMap());
+        String jsonString = JSONObject.toJSONString(mapping);
 
         eventData.add(compress(jsonString));
     }
