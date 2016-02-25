@@ -50,7 +50,7 @@ public class Publisher {
 
     public static void process(PublishingFlow publishingFlow, MediationStatConfig mediationStatConfig) {
         List<String> metaDataKeyList = new ArrayList<String>();
-        List<String> metaDataValueList = new ArrayList<String>();
+        List<Object> metaDataValueList = new ArrayList<Object>();
 
         List<Object> eventData = new ArrayList<Object>();
 
@@ -71,10 +71,11 @@ public class Publisher {
 
     }
 
-    private static void addMetaData(List<String> metaDataKeyList, List<String> metaDataValueList,
+    private static void addMetaData(List<String> metaDataKeyList, List<Object> metaDataValueList,
                                     MediationStatConfig mediationStatConfig) {
 //        metaDataValueList.add(PublisherUtil.getHostAddress());
-        metaDataValueList.add("true"); // payload-data is in compressed form
+        metaDataValueList.add(true); // payload-data is in compressed form
+
         Property[] properties = mediationStatConfig.getProperties();
         if (properties != null) {
             for (Property property : properties) {
@@ -95,11 +96,12 @@ public class Publisher {
         String jsonString = JSONObject.toJSONString(mapping);
 
         eventData.add(compress(jsonString));
+//        eventData.add((jsonString));
     }
 
 
     private static void publishToAgent(List<Object> eventData,
-                                       List<String> metaDataValueList,
+                                       List<Object> metaDataValueList,
                                        MediationStatConfig mediationStatConfig,
                                        StreamDefinition streamDef) {
 
@@ -177,7 +179,8 @@ public class Publisher {
                 MediationDataPublisherConstants.STREAM_VERSION);
         eventStreamDefinition.setNickName("");
         eventStreamDefinition.setDescription("This stream is use by WSO2 ESB to publish component specific data for tracing");
-        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_COMPRESSED, AttributeType.STRING);
+        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_COMPRESSED, AttributeType.BOOL);
+//        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
         for (Object aMetaData : metaData) {
             eventStreamDefinition.addMetaData(aMetaData.toString(), AttributeType.STRING);
         }
