@@ -183,11 +183,11 @@ public class CGAgentServiceComponent {
                             String serverName = adminService.getPublishedServer(serviceName);
                             adminService.unPublishService(serviceName, serverName, true);
                             adminService.publishService(serviceName, serverName, isAutomatic);
+                            log.info("Service '" + serviceName + "', re-published successfully");
                         } catch (CGException e) {
                             log.error("Error while re-publishing the previously published service '" + serviceName + "'," +
                                     " you will need to re-publish the service manually!", e);
                         }
-                        log.info("Service '" + serviceName + "', re-published successfully");
                     }
 
                     // register observers for automatic published services
