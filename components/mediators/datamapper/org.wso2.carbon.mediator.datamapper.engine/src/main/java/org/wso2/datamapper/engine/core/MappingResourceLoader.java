@@ -15,18 +15,19 @@
  */
 package org.wso2.datamapper.engine.core;
 
+import org.apache.avro.Schema;
+import org.apache.avro.Schema.Parser;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Scriptable;
+import org.wso2.datamapper.engine.core.exceptions.JSException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Parser;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
-import org.mozilla.javascript.Scriptable;
 
 public class MappingResourceLoader {
 	
@@ -87,13 +88,13 @@ public class MappingResourceLoader {
 		return scope;
 	}
 
-	public Function getFunction() throws MappingResourceLoader.JSException{
+	public Function getFunction() throws JSException {
 		if(function!=null){
 			initScriptEnviroment();
 			context.evaluateString(scope, function.getFunctionBody(), "	", 1, null);
 			return (Function) scope.get(function.getFunctioName(), scope);
 		}else{
-			throw new MappingResourceLoader.JSException("JS function not in a correct format");
+			throw new JSException("JS function not in a correct format");
 		}
 	}
 
@@ -172,35 +173,5 @@ public class MappingResourceLoader {
 	  
 	  
   }
-  class JSException extends Exception {
-	  
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-		private String message = null;
-	 
-	    public JSException() {
-	        super();
-	    }
-	 
-	    public JSException(String message) {
-	        super(message);
-	        this.message = message;
-	    }
-	 
-	    public JSException(Throwable cause) {
-	        super(cause);
-	    }
-	 
-	    @Override
-	    public String toString() {
-	        return message;
-	    }
-	 
-	    @Override
-	    public String getMessage() {
-	        return message;
-	    }
-	}
+
 }

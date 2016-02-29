@@ -15,13 +15,15 @@
  */
 package org.wso2.datamapper.engine.core;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.apache.avro.generic.GenericRecord;
 import org.json.JSONException;
-import org.wso2.datamapper.engine.core.MappingResourceLoader.JSException;
+import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.executors.ScriptExecutorFactory;
+import org.wso2.datamapper.engine.core.executors.ScriptExecutorType;
 import org.wso2.datamapper.engine.inputAdapters.InputDataReaderAdapter;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 
 public class MappingHandler {
@@ -33,7 +35,8 @@ public class MappingHandler {
 		//InputDataReaderAdapter inputReader = new CsvInputReader();
 		inputReader.setInputMsg(inputMsg);
 	    GenericRecord inputRecord = inputReader.getInputRecord(resourceModel.getInputSchema());
-		GenericRecord outputRecord = FunctionExecuter.execute(resourceModel, inputRecord);
+		IScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.RHINO);
+		GenericRecord outputRecord = scriptExecutor.executeMapping(resourceModel, inputRecord);
 	    
 		return outputRecord;
 
