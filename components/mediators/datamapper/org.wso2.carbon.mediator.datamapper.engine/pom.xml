@@ -47,7 +47,8 @@
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
-                            javax.xml.namespace; version=0.0.0,
+                            javax.xml.namespace; version=${javax.xml.namespace.version},
+                            <!--org.apache.avro; version=${avro.version},-->
                             org.apache.commons.logging.*;version="${org.apache.commons.logging.version}",
                             org.osgi.framework,
                             *;resolution:=optional,

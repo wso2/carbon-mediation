@@ -2553,7 +2553,7 @@
 	<cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
         <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
         <libthrift.version>0.8.0.wso2v1</libthrift.version>
-        <avro.version>1.7.5</avro.version>
+        <avro.version>1.8.0</avro.version>
         <opencsv.version>2.3</opencsv.version>
     </properties>
     <pluginRepositories>
