@@ -24,6 +24,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.sequences.common.SequenceEditorException;
+import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class ConfigHolder {
     private SynapseConfiguration synapseConfiguration;
     private AxisConfiguration axisConfiguration;
     private DependencyManagementService dependencyManager;
+    private ConfigurationContextService configurationContextService;
 
     private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices =
             new HashMap<Integer, SynapseEnvironmentService>();
@@ -103,6 +105,14 @@ public class ConfigHolder {
 
     public Map<Integer, SynapseEnvironmentService> getSynapseEnvironmentServices() {
         return synapseEnvironmentServices;
+    }
+
+    public void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+        this.configurationContextService = configurationContextService;
+    }
+
+    public ConfigurationContextService getConfigurationContextService() {
+        return configurationContextService;
     }
 
 }

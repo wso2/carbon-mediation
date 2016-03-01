@@ -53,7 +53,7 @@ public class SequenceAdminService {
         final Lock lock = SequenceAdminUtil.getLock();
         try {
             lock.lock();
-            SynapseConfiguration synCfg = SequenceAdminUtil.getSynapseConfiguration();
+            SynapseConfiguration synCfg = SequenceAdminUtil.getSynapseConfigFromConfigCtx();
             SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
             if (sequence != null && sequence.getArtifactContainerName() == null) {
                 synCfg.removeSequence(sequenceName);
@@ -68,28 +68,6 @@ public class SequenceAdminService {
             handleException("Couldn't get the Synapse Configuration to delete the sequence", fault);
         } finally {
             lock.unlock();
-        }
-    }
-
-    /**
-     * Set the tenant domain when a publisher deletes custom sequences in MT mode. When publisher
-     * deletes the sequence, we login the gateway as supertenant. But we need to delete in the particular
-     * tenant domain.
-     *
-     * @param sequenceName
-     * @param tenantDomain
-     * @throws SequenceEditorException
-     */
-    public void deleteSequenceForTenant(String sequenceName, String tenantDomain) throws SequenceEditorException {
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
-                    true);
-            deleteSequence(sequenceName);
-        } catch (Exception e) {
-            handleException("Issue is in deleting the sequence definition");
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
         }
     }
 
@@ -110,7 +88,7 @@ public class SequenceAdminService {
                 if ("".equals(sequenceName) || null == sequenceName) {
                     handleException("sequence name is required.");
                 }
-                SynapseConfiguration config = SequenceAdminUtil.getSynapseConfiguration();
+                SynapseConfiguration config = SequenceAdminUtil.getSynapseConfigFromConfigCtx();
                 if (log.isDebugEnabled()) {
                     log.debug("Adding sequence : " + sequenceName + " to the configuration");
                 }
@@ -120,14 +98,14 @@ public class SequenceAdminService {
                             "name already exists");
                 } else {
                     SynapseXMLConfigurationFactory.defineSequence(config, sequenceElement,
-                            SequenceAdminUtil.getSynapseConfiguration().getProperties());
+                            SequenceAdminUtil.getSynapseConfigFromConfigCtx().getProperties());
                     if (log.isDebugEnabled()) {
                         log.debug("Added sequence : " + sequenceName + " to the configuration");
                     }
 
                     SequenceMediator seq = config.getDefinedSequences().get(sequenceName);
                     seq.setFileName(ServiceBusUtils.generateFileName(sequenceName));
-                    seq.init(SequenceAdminUtil.getSynapseEnvironment());
+                    seq.init(SequenceAdminUtil.getSynapseEnvironmentFromConfigCtx());
 
                     //noinspection ConstantConditions
                     persistSequence(seq);
@@ -142,29 +120,6 @@ public class SequenceAdminService {
                     "adding the sequence : " + error.getMessage(), error);
         } finally {
             lock.unlock();
-        }
-    }
-
-    /**
-     * Set the tenant domain when a publisher deploys custom sequences in MT mode. When publisher
-     * deploys the sequence, we login the gateway as supertenant. But we need to deploy in the particular
-     * tenant domain.
-     *
-     * @param sequenceElement
-     * @param tenantDomain
-     * @throws SequenceEditorException
-     */
-    public void addSequenceForTenant(OMElement sequenceElement, String tenantDomain) throws SequenceEditorException {
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
-                    true);
-            addSequence(sequenceElement);
-
-        } catch (Exception e) {
-            handleException("Issue in deploying the sequence definition");
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
         }
     }
 
@@ -196,7 +151,7 @@ public class SequenceAdminService {
         final Lock lock = SequenceAdminUtil.getLock();
         try {
             lock.lock();
-            SynapseConfiguration synapseConfiguration = SequenceAdminUtil.getSynapseConfiguration();
+            SynapseConfiguration synapseConfiguration = SequenceAdminUtil.getSynapseConfigFromConfigCtx();
             if (synapseConfiguration.getSequence(sequenceName) != null) {
                 return MediatorSerializerFinder.getInstance().getSerializer(
                         synapseConfiguration.getSequence(sequenceName))
@@ -212,29 +167,6 @@ public class SequenceAdminService {
             handleException("Couldn't get the Synapse Configuration to get the sequence", fault);
         } finally {
             lock.unlock();
-        }
-        return null;
-    }
-
-    /**
-     * Set the tenant domain when a publisher tries to get custom sequences in MT mode. When publisher
-     * tries to get the sequence, we login the gateway as supertenant. But we need to get in the particular
-     * tenant domain.
-     *
-     * @param sequenceName
-     * @param tenantDomain
-     * @throws SequenceEditorException
-     */
-    public OMElement getSequenceForTenant(String sequenceName, String tenantDomain) throws SequenceEditorException {
-        try {
-            PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
-                    true);
-            return getSequence(sequenceName);
-        } catch (Exception e) {
-            handleException("Issue is in getting the sequence definition");
-        } finally {
-            PrivilegedCarbonContext.endTenantFlow();
         }
         return null;
     }
