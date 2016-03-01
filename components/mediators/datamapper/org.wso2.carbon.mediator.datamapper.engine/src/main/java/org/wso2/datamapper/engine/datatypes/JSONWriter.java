@@ -1,9 +1,4 @@
-package org.wso2.carbon.mediator.datamapper.datatypes;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import javax.xml.stream.XMLStreamException;
+package org.wso2.datamapper.engine.datatypes;
 
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
@@ -16,16 +11,20 @@ import org.apache.synapse.SynapseException;
 import org.wso2.datamapper.engine.outputAdapters.DummyEncoder;
 import org.wso2.datamapper.engine.outputAdapters.WriterRegistry;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 
 /**
  * 
- * Generates the relevant output message when the data type is XML
+ * Generates the relevant output message when the data type is JSON
  * 
  */
 
-public class XMLWriter implements OutputWriter {
+public class JSONWriter implements OutputWriter {
 	
-	private static final Log log = LogFactory.getLog(XMLWriter.class);
+	private static final Log log = LogFactory.getLog(JSONWriter.class);
 	
 	/**
 	 * Gives the output message 
@@ -110,6 +109,3 @@ public class XMLWriter implements OutputWriter {
 	}
 
 }
-
-
-

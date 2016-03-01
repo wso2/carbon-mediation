@@ -17,9 +17,6 @@ package org.wso2.datamapper.engine.core.executors;
 
 import org.wso2.datamapper.engine.core.IScriptExecutor;
 
-/**
- * Created by nuwan on 2/29/16.
- */
 public class ScriptExecutorFactory {
 
     /**

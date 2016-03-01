@@ -1,4 +1,4 @@
-package org.wso2.carbon.mediator.datamapper.datatypes;
+package org.wso2.datamapper.engine.datatypes;
 
 /**
  * Factory class for writer classes

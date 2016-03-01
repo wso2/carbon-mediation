@@ -44,7 +44,7 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
 	 */
 	private static final QName TAG_QNAME = new QName(
 			XMLConfigConstants.SYNAPSE_NAMESPACE,
-			ConfigurationProperties.DATAMAPPER);
+			DataMapperMediatorConstants.DATAMAPPER);
 
 	/**
 	 * Get the DataMapperMediator configuration tag name
@@ -75,15 +75,15 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
 		DataMapperMediator datamapperMediator = new DataMapperMediator();
 
 		OMAttribute configKeyAttribute = element.getAttribute(new QName(
-				ConfigurationProperties.CONFIG));
+				DataMapperMediatorConstants.CONFIG));
 		OMAttribute inputSchemaKeyAttribute = element.getAttribute(new QName(
-				ConfigurationProperties.INPUTSCHEMA));
+				DataMapperMediatorConstants.INPUTSCHEMA));
 		OMAttribute outputSchemaKeyAttribute = element.getAttribute(new QName(
-				ConfigurationProperties.OUTPUTSCHEMA));
+				DataMapperMediatorConstants.OUTPUTSCHEMA));
 		OMAttribute inputTypeAttribute = element.getAttribute(new QName(
-				ConfigurationProperties.INPUTTYPE));
+				DataMapperMediatorConstants.INPUTTYPE));
 		OMAttribute outputTypeAttribute = element.getAttribute(new QName(
-				ConfigurationProperties.OUTPUTTYPE));
+				DataMapperMediatorConstants.OUTPUTTYPE));
 
 		/*
 		 * ValueFactory for creating dynamic or static Value and provide methods
@@ -96,7 +96,7 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
 			Value configKeyValue = keyFac.createValue(
 					configKeyAttribute.getLocalName(), element);
 			// set key as the Value
-			datamapperMediator.setConfigurationKey(configKeyValue);
+			datamapperMediator.setMappingConfigurationKey(configKeyValue);
 		} else {
 			handleException("The attribute config is required for the DataMapper mediator");
 		}

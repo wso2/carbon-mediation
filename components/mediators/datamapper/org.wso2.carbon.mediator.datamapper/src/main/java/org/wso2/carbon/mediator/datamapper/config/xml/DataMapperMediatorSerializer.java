@@ -62,13 +62,13 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
 
 		DataMapperMediator dataMapperMediator = (DataMapperMediator) mediator;
 		OMElement dataMapperElement = fac
-				.createOMElement(ConfigurationProperties.DATAMAPPER, synNS);
+				.createOMElement(DataMapperMediatorConstants.DATAMAPPER, synNS);
 
-		if (dataMapperMediator.getConfigurationKey() != null) {
+		if (dataMapperMediator.getMappingConfigurationKey() != null) {
 			// Serialize Value using ValueSerializer
 			ValueSerializer keySerializer = new ValueSerializer();
-			keySerializer.serializeValue(dataMapperMediator.getConfigurationKey(),
-					ConfigurationProperties.CONFIG, dataMapperElement);
+			keySerializer.serializeValue(dataMapperMediator.getMappingConfigurationKey(),
+					DataMapperMediatorConstants.CONFIG, dataMapperElement);
 		} else {
 			handleException("Invalid DataMapper mediator. Configuration registry key is required");
 		}
@@ -76,7 +76,7 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
 		if (dataMapperMediator.getInputSchemaKey() != null) {
 			ValueSerializer keySerializer = new ValueSerializer();
 			keySerializer.serializeValue(dataMapperMediator.getInputSchemaKey(),
-					ConfigurationProperties.INPUTSCHEMA, dataMapperElement);
+					DataMapperMediatorConstants.INPUTSCHEMA, dataMapperElement);
 		} else {
 			handleException("Invalid DataMapper mediator. InputSchema registry key is required");
 		}
@@ -84,20 +84,20 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
 		if (dataMapperMediator.getOutputSchemaKey() != null) {
 			ValueSerializer keySerializer = new ValueSerializer();
 			keySerializer.serializeValue(dataMapperMediator.getOutputSchemaKey(),
-					ConfigurationProperties.OUTPUTSCHEMA, dataMapperElement);
+					DataMapperMediatorConstants.OUTPUTSCHEMA, dataMapperElement);
 		} else {
 			handleException("Invalid DataMapper mediator. OutputSchema registry key is required");
 		}
 
 		if (dataMapperMediator.getInputType() != null) {
-			dataMapperElement.addAttribute(fac.createOMAttribute(ConfigurationProperties.INPUTTYPE,
+			dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.INPUTTYPE,
 					nullNS, dataMapperMediator.getInputType()));
 		} else {
 			handleException("InputType is required");
 		}
 		if (dataMapperMediator.getOutputType() != null) {
 			dataMapperElement
-					.addAttribute(fac.createOMAttribute(ConfigurationProperties.OUTPUTTYPE, nullNS,
+					.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.OUTPUTTYPE, nullNS,
 							dataMapperMediator.getOutputType()));
 		} else {
 			handleException("OutputType is required");

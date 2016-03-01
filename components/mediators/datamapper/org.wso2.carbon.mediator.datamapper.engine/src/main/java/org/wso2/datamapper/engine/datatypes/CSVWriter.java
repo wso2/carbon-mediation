@@ -1,9 +1,4 @@
-package org.wso2.carbon.mediator.datamapper.datatypes;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import javax.xml.stream.XMLStreamException;
+package org.wso2.datamapper.engine.datatypes;
 
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
@@ -16,16 +11,20 @@ import org.apache.synapse.SynapseException;
 import org.wso2.datamapper.engine.outputAdapters.DummyEncoder;
 import org.wso2.datamapper.engine.outputAdapters.WriterRegistry;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * 
- * Generates the relevant output message when the data type is JSON
+ * Generates the relevant output message when the data type is CSV
  * 
  */
 
-public class JSONWriter implements OutputWriter {
-	
-	private static final Log log = LogFactory.getLog(JSONWriter.class);
+public class CSVWriter implements OutputWriter {
+	private static OMElement element = null;
+	private static final String ROOT_TAG = "<text xmlns=\"http://ws.apache.org/commons/ns/payload\"></text>";
+	private static final Log log = LogFactory.getLog(CSVWriter.class);
 	
 	/**
 	 * Gives the output message 
@@ -100,8 +99,9 @@ public class JSONWriter implements OutputWriter {
 	 
 	private static OMElement getOutputResult(String result)
 			throws XMLStreamException {
-		return AXIOMUtil.stringToOM(result);
-		
+		element = AXIOMUtil.stringToOM(ROOT_TAG);
+		element.setText(result);
+		return element;
 	}
 
 	private static void handleException(String message, Exception e) {
@@ -110,3 +110,6 @@ public class JSONWriter implements OutputWriter {
 	}
 
 }
+
+
+
