@@ -43,8 +43,9 @@ public class RhinoExecutor implements IScriptExecutor {
         ScriptableRecord inScriptableRecord = new ScriptableRecord(inputRecord, getScope());
         ScriptableRecord outScriptableRecord = new ScriptableRecord(genericOutRecord,
                 getScope());
-        Object resultOb = fn.call(resourceModel.getContext(), getScope(), getScope(),
+        Object resultOb = fn.call(getContext(), getScope(), getScope(),
                 new Object[]{inScriptableRecord, outScriptableRecord});
+
 
         if (resultOb != ScriptableObject.NOT_FOUND) {
             return outScriptableRecord.getRecord();
@@ -64,6 +65,10 @@ public class RhinoExecutor implements IScriptExecutor {
         } else {
             throw new JSException("JS function not in a correct format");
         }
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     /**
