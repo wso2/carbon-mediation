@@ -26,6 +26,9 @@ import org.json.XML;
 
 import java.io.IOException;
 
+/**
+ * This class implement the xml datum writer for WSO2 data mapper
+ */
 public class XMLDatumWriter extends GenericDatumWriter<GenericRecord> {
 
 
