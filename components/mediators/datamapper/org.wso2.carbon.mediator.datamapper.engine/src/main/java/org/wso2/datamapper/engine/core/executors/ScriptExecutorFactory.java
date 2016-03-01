@@ -16,7 +16,12 @@
 package org.wso2.datamapper.engine.core.executors;
 
 import org.wso2.datamapper.engine.core.IScriptExecutor;
+import org.wso2.datamapper.engine.core.executors.nashorn.NasHornJava8Executor;
+import org.wso2.datamapper.engine.core.executors.rhino.RhinoExecutor;
 
+/**
+ * This class act as a factory to get the requested script executor
+ */
 public class ScriptExecutorFactory {
 
     /**
@@ -26,11 +31,19 @@ public class ScriptExecutorFactory {
 
     }
 
+    /**
+     * This method will return the script executor according to the given {@link ScriptExecutorType}
+     *
+     * @param executorType
+     * @return
+     */
     public static IScriptExecutor getScriptExecutor(ScriptExecutorType executorType) {
         switch (executorType) {
-            case RHINO:
-                return new RhinoExecutor();
+        case RHINO:
+            return new RhinoExecutor();
+        case NASHORN:
+            return new NasHornJava8Executor();
         }
-        throw new IllegalArgumentException("");
+        throw new IllegalArgumentException("Unsupported script engine type found : " + executorType);
     }
 }

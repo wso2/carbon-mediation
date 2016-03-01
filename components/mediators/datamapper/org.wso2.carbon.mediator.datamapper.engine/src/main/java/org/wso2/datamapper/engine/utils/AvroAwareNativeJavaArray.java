@@ -27,7 +27,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.generic.GenericData.Array;
 import org.mozilla.javascript.NativeJavaArray;
 import org.mozilla.javascript.Scriptable;
-import org.wso2.datamapper.engine.core.ScriptableRecord;
+import org.wso2.datamapper.engine.core.executors.rhino.ScriptableRecord;
 
 public class  AvroAwareNativeJavaArray extends NativeJavaArray  {
 	

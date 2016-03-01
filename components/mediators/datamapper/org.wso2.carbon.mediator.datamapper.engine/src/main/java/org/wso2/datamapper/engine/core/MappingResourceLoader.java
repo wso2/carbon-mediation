@@ -18,9 +18,7 @@ package org.wso2.datamapper.engine.core;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Parser;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
-import org.wso2.datamapper.engine.core.exceptions.JSException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,9 +36,8 @@ public class MappingResourceLoader {
 	private String outputRootelement;
 	private Context context;
 	private Scriptable scope;
-	private MappingResourceLoader.JSFunction function;
- 
-	
+	private JSFunction function;
+
 	/**
 	 * 
 	 * @param inputSchema - Respective output Avro schema as a a stream of bytes
@@ -58,7 +55,8 @@ public class MappingResourceLoader {
 		this.inputRootelement = inputAvroSchema.getName();
 		this.outputRootelement = outputAvroSchema.getName();
 		this.mappingConfig = mappingConfig;
-		this.function = getFunction(mappingConfig);
+		this.function = createFunction(mappingConfig);
+
 	}
 
 	public Schema getInputSchema() {
@@ -84,18 +82,8 @@ public class MappingResourceLoader {
 		return context;
 	}
 
-	public Scriptable getScope() {
-		return scope;
-	}
-
-	public Function getFunction() throws JSException {
-		if(function!=null){
-			initScriptEnviroment();
-			context.evaluateString(scope, function.getFunctionBody(), "	", 1, null);
-			return (Function) scope.get(function.getFunctioName(), scope);
-		}else{
-			throw new JSException("JS function not in a correct format");
-		}
+	public JSFunction getFunction() {
+		return function;
 	}
 
 	private Schema getAvroSchema(InputStream schema) throws IOException{
@@ -110,7 +98,7 @@ public class MappingResourceLoader {
 	 * @return
 	 * @throws IOException
 	 */
-	private MappingResourceLoader.JSFunction getFunction(InputStream mappingConfig) throws IOException {
+	private JSFunction createFunction(InputStream mappingConfig) throws IOException {
 
 		BufferedReader configReader = new BufferedReader(new InputStreamReader(mappingConfig));
        //need to identify the main method of the configuration because that method going to execute in engine		
@@ -128,50 +116,11 @@ public class MappingResourceLoader {
 		}
 		
 		if (fnName != null) {
-		    MappingResourceLoader.JSFunction jsfunction = new MappingResourceLoader.JSFunction(fnName,configScriptbuilder.toString());
+		    JSFunction jsfunction = new JSFunction(fnName,configScriptbuilder.toString());
 			return jsfunction;
 		
 		}
 		return null;
 	}
-
-	/**
-	 * Before executing a script, an instance of Context must be created
-	 * and associated with the thread that will be executing the script
-	 */
-	private void initScriptEnviroment() {
-		context = Context.enter();
-		context.setOptimizationLevel(-1);
-		scope = context.initStandardObjects();
-	}
-	
-  class JSFunction{
-	  
-	private String functioName;
-	private  String functionBody;
-	  
-	  public JSFunction(String name,String body){
-		  this.setFunctioName(name);
-		  this.setFunctionBody(body);
-	  }
-
-	public String getFunctioName() {
-		return functioName;
-	}
-
-	public void setFunctioName(String functioName) {
-		this.functioName = functioName;
-	}
-
-	public String getFunctionBody() {
-		return functionBody;
-	}
-
-	public void setFunctionBody(String functionBody) {
-		this.functionBody = functionBody;
-	}
-	  
-	  
-  }
 
 }
