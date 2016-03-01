@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wso2.datamapper.engine.core;
+package org.wso2.datamapper.engine.core.executors.rhino;
 
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
