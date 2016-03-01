@@ -30,7 +30,7 @@ import org.wso2.datamapper.engine.core.exceptions.JSException;
 /**
  * This class implements script executor for data mapper using rhino
  */
-public class RhinoExecutor implements IScriptExecutor{
+public class RhinoExecutor implements IScriptExecutor {
 
     private Context context;
     private Scriptable scope;
@@ -39,11 +39,11 @@ public class RhinoExecutor implements IScriptExecutor{
     public GenericRecord executeMapping(MappingResourceLoader resourceModel, GenericRecord inputRecord) throws JSException {
         GenericRecord genericOutRecord = new GenericData.Record(resourceModel.getOutputSchema());
         Function fn = getFunction(resourceModel.getFunction());
-        ScriptableRecord inScriptableRecord = new ScriptableRecord(inputRecord,getScope());
+        ScriptableRecord inScriptableRecord = new ScriptableRecord(inputRecord, getScope());
         ScriptableRecord outScriptableRecord = new ScriptableRecord(genericOutRecord,
                 getScope());
         Object resultOb = fn.call(resourceModel.getContext(), getScope(), getScope(),
-                new Object[] { inScriptableRecord, outScriptableRecord });
+                new Object[]{inScriptableRecord, outScriptableRecord});
 
         if (resultOb != ScriptableObject.NOT_FOUND) {
             return outScriptableRecord.getRecord();
@@ -56,11 +56,11 @@ public class RhinoExecutor implements IScriptExecutor{
     }
 
     public Function getFunction(JSFunction function) throws JSException {
-        if(function!=null){
+        if (function != null) {
             initScriptEnviroment();
             context.evaluateString(scope, function.getFunctionBody(), "	", 1, null);
             return (Function) scope.get(function.getFunctioName(), scope);
-        }else{
+        } else {
             throw new JSException("JS function not in a correct format");
         }
     }

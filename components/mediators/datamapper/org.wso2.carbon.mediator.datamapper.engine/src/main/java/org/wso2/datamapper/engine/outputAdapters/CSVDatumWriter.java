@@ -17,28 +17,28 @@
 
 package org.wso2.datamapper.engine.outputAdapters;
 
-import java.io.IOException;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumWriter;
-import org.apache.avro.io.Encoder;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.Encoder;
 import org.json.CDL;
 import org.json.JSONArray;
 import org.json.JSONException;
 
- 
+import java.io.IOException;
+
+
 public class CSVDatumWriter extends GenericDatumWriter<GenericRecord> {
-	
-	@Override
-	protected void writeArray(Schema schema, Object datum, Encoder out)
-			throws IOException {
-		try {
-			JSONArray jsonArray = new JSONArray(datum.toString());
-			out.writeString(CDL.toString(jsonArray));
-		} catch (JSONException e) {
-			throw new IOException(e);
-		}
-	}
+
+    @Override
+    protected void writeArray(Schema schema, Object datum, Encoder out)
+            throws IOException {
+        try {
+            JSONArray jsonArray = new JSONArray(datum.toString());
+            out.writeString(CDL.toString(jsonArray));
+        } catch (JSONException e) {
+            throw new IOException(e);
+        }
+    }
 
 }

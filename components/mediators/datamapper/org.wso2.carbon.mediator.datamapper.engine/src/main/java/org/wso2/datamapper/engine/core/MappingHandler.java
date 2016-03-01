@@ -27,19 +27,19 @@ import java.io.InputStream;
 
 
 public class MappingHandler {
-	
-	public static GenericRecord doMap(InputStream inputMsg, MappingResourceLoader resourceModel,InputDataReaderAdapter inputReader)
-			throws IOException, IllegalAccessException, InstantiationException, JSONException, JSException {
 
-		//XmlInputReader inputReader = new XmlInputReader(); OR
-		//InputDataReaderAdapter inputReader = new CsvInputReader();
-		inputReader.setInputMsg(inputMsg);
-	    GenericRecord inputRecord = inputReader.getInputRecord(resourceModel.getInputSchema());
-		IScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.RHINO);
-		GenericRecord outputRecord = scriptExecutor.executeMapping(resourceModel, inputRecord);
-	    
-		return outputRecord;
+    public static GenericRecord doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputDataReaderAdapter inputReader)
+            throws IOException, IllegalAccessException, InstantiationException, JSONException, JSException {
 
-	}
+        //XmlInputReader inputReader = new XmlInputReader(); OR
+        //InputDataReaderAdapter inputReader = new CsvInputReader();
+        inputReader.setInputMsg(inputMsg);
+        GenericRecord inputRecord = inputReader.getInputRecord(resourceModel.getInputSchema());
+        IScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.RHINO);
+        GenericRecord outputRecord = scriptExecutor.executeMapping(resourceModel, inputRecord);
+
+        return outputRecord;
+
+    }
 
 }

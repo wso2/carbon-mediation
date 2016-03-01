@@ -17,60 +17,60 @@
 
 package org.wso2.datamapper.engine.outputAdapters;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A registry of writer.
  */
 public class WriterRegistry {
-	
-	/**
-	 * Singleton instance.
-	 */
-	private static WriterRegistry singleton;
-	
-	
-	/**
-	 * writer map.
-	 */
-	private Map<String, Class<? extends DatumWriter<GenericRecord>>> writerMap;
-	
-	/**
-	 * 
-	 */
-	private WriterRegistry() {
-		writerMap = new HashMap<String, Class<? extends DatumWriter<GenericRecord>>>();
-		
-		// FIXME : use java service provider interface rather than hard-coding class names/ importing classes
-		writerMap.put("CSV",CSVDatumWriter.class);
-		writerMap.put("XML", XMLDatumWriter.class);
-		writerMap.put("JSON", JSONDatumWriter.class);
-	}
-	
-	/**
-	 * @return singleton instance.
-	 */
-	public static WriterRegistry getInstance() {
-		if (null == singleton) {
-			singleton = new WriterRegistry();
-		}
-		return singleton;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Class<DatumWriter<GenericRecord>> get(String mediaType){
-		Class<DatumWriter<GenericRecord>> writer = null;
-		if(writerMap.containsKey(mediaType)){
-			writer = (Class<DatumWriter<GenericRecord>>) writerMap.get(mediaType);
-		} else {
-			throw new RuntimeException("No writer found for " + mediaType);
-		}
-		//FIXME: use proper error handling 
-		return writer;
-	}
+
+    /**
+     * Singleton instance.
+     */
+    private static WriterRegistry singleton;
+
+
+    /**
+     * writer map.
+     */
+    private Map<String, Class<? extends DatumWriter<GenericRecord>>> writerMap;
+
+    /**
+     *
+     */
+    private WriterRegistry() {
+        writerMap = new HashMap<String, Class<? extends DatumWriter<GenericRecord>>>();
+
+        // FIXME : use java service provider interface rather than hard-coding class names/ importing classes
+        writerMap.put("CSV", CSVDatumWriter.class);
+        writerMap.put("XML", XMLDatumWriter.class);
+        writerMap.put("JSON", JSONDatumWriter.class);
+    }
+
+    /**
+     * @return singleton instance.
+     */
+    public static WriterRegistry getInstance() {
+        if (null == singleton) {
+            singleton = new WriterRegistry();
+        }
+        return singleton;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Class<DatumWriter<GenericRecord>> get(String mediaType) {
+        Class<DatumWriter<GenericRecord>> writer = null;
+        if (writerMap.containsKey(mediaType)) {
+            writer = (Class<DatumWriter<GenericRecord>>) writerMap.get(mediaType);
+        } else {
+            throw new RuntimeException("No writer found for " + mediaType);
+        }
+        //FIXME: use proper error handling
+        return writer;
+    }
 
 }

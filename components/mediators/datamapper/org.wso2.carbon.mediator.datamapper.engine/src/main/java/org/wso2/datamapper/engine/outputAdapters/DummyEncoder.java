@@ -16,131 +16,131 @@
 
 package org.wso2.datamapper.engine.outputAdapters;
 
+import org.apache.avro.io.Encoder;
+import org.apache.avro.util.Utf8;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-import org.apache.avro.io.Encoder;
-import org.apache.avro.util.Utf8;
-
 public class DummyEncoder extends Encoder {
-	
-	OutputStream outputStream ;
-	
-	public DummyEncoder(OutputStream outputStream) {
-		this.outputStream = outputStream;
-	}
 
-	public void flush() throws IOException {
-		outputStream.flush();
+    OutputStream outputStream;
 
-	}
+    public DummyEncoder(OutputStream outputStream) {
+        this.outputStream = outputStream;
+    }
 
-	@Override
-	public void setItemCount(long arg0) throws IOException {
-		// TODO Auto-generated method stub
+    public void flush() throws IOException {
+        outputStream.flush();
 
-	}
+    }
 
-	@Override
-	public void startItem() throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void setItemCount(long arg0) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeArrayEnd() throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void startItem() throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeArrayStart() throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeArrayEnd() throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeBoolean(boolean arg0) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeArrayStart() throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeBytes(ByteBuffer arg0) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeBoolean(boolean arg0) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeBytes(byte[] arg0, int arg1, int arg2) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeBytes(ByteBuffer arg0) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeDouble(double arg0) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeBytes(byte[] arg0, int arg1, int arg2) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeEnum(int arg0) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeDouble(double arg0) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeFixed(byte[] arg0, int arg1, int arg2) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeEnum(int arg0) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeFloat(float arg0) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeFixed(byte[] arg0, int arg1, int arg2) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeIndex(int arg0) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeFloat(float arg0) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeInt(int arg0) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeIndex(int arg0) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeLong(long arg0) throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeInt(int arg0) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeMapEnd() throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeLong(long arg0) throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeMapStart() throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeMapEnd() throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeNull() throws IOException {
-		// TODO Auto-generated method stub
+    @Override
+    public void writeMapStart() throws IOException {
+        // TODO Auto-generated method stub
 
-	}
+    }
 
-	@Override
-	public void writeString(Utf8 data) throws IOException {
-		outputStream.write(data.toString().getBytes());
-	}
+    @Override
+    public void writeNull() throws IOException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void writeString(Utf8 data) throws IOException {
+        outputStream.write(data.toString().getBytes());
+    }
 
 }

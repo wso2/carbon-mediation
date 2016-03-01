@@ -24,10 +24,10 @@ package org.wso2.carbon.mediator.datamapper.config.xml;
  * Defines the properties and attributes of DataMapperMediator
  */
 public class DataMapperMediatorConstants {
-	public static String DATAMAPPER = "datamapper";
-	public static String CONFIG = "config";
-	public static String INPUTSCHEMA = "inputSchema";
-	public static String OUTPUTSCHEMA = "outputSchema";
-	public static String INPUTTYPE = "inputType";
-	public static String OUTPUTTYPE = "outputType";
+    public static String DATAMAPPER = "datamapper";
+    public static String CONFIG = "config";
+    public static String INPUTSCHEMA = "inputSchema";
+    public static String OUTPUTSCHEMA = "outputSchema";
+    public static String INPUTTYPE = "inputType";
+    public static String OUTPUTTYPE = "outputType";
 }

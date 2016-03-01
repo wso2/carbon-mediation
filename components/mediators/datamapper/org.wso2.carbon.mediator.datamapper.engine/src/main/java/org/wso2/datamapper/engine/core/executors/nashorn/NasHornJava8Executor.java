@@ -27,7 +27,8 @@ import org.wso2.datamapper.engine.core.exceptions.JSException;
  */
 public class NasHornJava8Executor implements IScriptExecutor {
 
-    @Override public GenericRecord executeMapping(MappingResourceLoader resourceModel, GenericRecord inputRecord)
+    @Override
+    public GenericRecord executeMapping(MappingResourceLoader resourceModel, GenericRecord inputRecord)
             throws JSException {
         GenericRecord genericOutRecord = new GenericData.Record(resourceModel.getOutputSchema());
 

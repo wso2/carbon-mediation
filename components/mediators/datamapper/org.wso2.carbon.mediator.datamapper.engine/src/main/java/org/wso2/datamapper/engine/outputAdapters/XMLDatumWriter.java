@@ -15,31 +15,31 @@
  */
 package org.wso2.datamapper.engine.outputAdapters;
 
-import java.io.IOException;
-
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumWriter;
-import org.apache.avro.io.Encoder;
 import org.apache.avro.generic.GenericRecord;
-import org.json.XML;
+import org.apache.avro.io.Encoder;
 import org.json.JSONException;
 import org.json.JSONObject;
- 
+import org.json.XML;
+
+import java.io.IOException;
+
 public class XMLDatumWriter extends GenericDatumWriter<GenericRecord> {
-	
-	
-	@Override
-	protected void writeRecord(Schema schema, Object datum, Encoder out)
-			throws IOException {
-		try {
-			GenericRecord record = (GenericRecord) datum;
-			String name = record.getSchema().getName();
-			JSONObject rootObj = new JSONObject();
-			rootObj.putOnce(name, new JSONObject(record.toString()));
-			out.writeString(XML.toString(rootObj));
-		} catch (JSONException e) {
-			throw new IOException(e);
-		}
-	}
+
+
+    @Override
+    protected void writeRecord(Schema schema, Object datum, Encoder out)
+            throws IOException {
+        try {
+            GenericRecord record = (GenericRecord) datum;
+            String name = record.getSchema().getName();
+            JSONObject rootObj = new JSONObject();
+            rootObj.putOnce(name, new JSONObject(record.toString()));
+            out.writeString(XML.toString(rootObj));
+        } catch (JSONException e) {
+            throw new IOException(e);
+        }
+    }
 
 }

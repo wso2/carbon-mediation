@@ -18,12 +18,6 @@
  */
 package org.wso2.carbon.mediator.datamapper;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-
 import org.apache.avro.generic.GenericRecord;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -52,6 +46,11 @@ import org.wso2.datamapper.engine.inputAdapters.InputDataReaderAdapter;
 import org.wso2.datamapper.engine.inputAdapters.InputReaderFactory;
 
 import javax.xml.namespace.QName;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 
 /**
@@ -59,202 +58,201 @@ import javax.xml.namespace.QName;
  * DataMapperMediator generates the output required by the next mediator for the
  * input received by the previous mediator.
  */
-public class DataMapperMediator extends AbstractMediator implements ManagedLifecycle{
+public class DataMapperMediator extends AbstractMediator implements ManagedLifecycle {
 
-	private Value mappingConfigurationKey = null;
-	private Value inputSchemaKey = null;
-	private Value outputSchemaKey = null;
-	private String inputType = null;
-	private String outputType = null;
-	private UUID id = null;
-	private static final Log log = LogFactory.getLog(DataMapperMediator.class);
+    private Value mappingConfigurationKey = null;
+    private Value inputSchemaKey = null;
+    private Value outputSchemaKey = null;
+    private String inputType = null;
+    private String outputType = null;
+    private UUID id = null;
+    private static final Log log = LogFactory.getLog(DataMapperMediator.class);
 
-	/**
-	 * Gets the key which is used to pick the mapping configuration from the
-	 * registry
-	 * 
-	 * @return the key which is used to pick the mapping configuration from the
-	 *         registry
-	 */
-	public Value getMappingConfigurationKey() {
-		return mappingConfigurationKey;
-	}
-	/**
-	 * Sets the registry key in order to pick the mapping configuration
-	 * 
-	 * @param dataMapperconfigKey registry key for the mapping configuration
-	 */
-	public void setMappingConfigurationKey(Value dataMapperconfigKey) {
-		this.mappingConfigurationKey = dataMapperconfigKey;
-	}
+    /**
+     * Gets the key which is used to pick the mapping configuration from the
+     * registry
+     *
+     * @return the key which is used to pick the mapping configuration from the
+     * registry
+     */
+    public Value getMappingConfigurationKey() {
+        return mappingConfigurationKey;
+    }
 
-	/**
-	 * Gets the key which is used to pick the input schema from the
-	 * registry
-	 * 
-	 * @return the key which is used to pick the input schema from the
-	 *         registry
-	 */
-	public Value getInputSchemaKey() {
-		return inputSchemaKey;
-	}
-	/**
-	 * Sets the registry key in order to pick the input schema
-	 * 
-	 * @param dataMapperInSchemaKey registry key for the input schema
-	 */
-	public void setInputSchemaKey(Value dataMapperInSchemaKey) {
-		this.inputSchemaKey = dataMapperInSchemaKey;
-	}
-	
-	/**
-	 * Gets the key which is used to pick the output schema from the
-	 * registry
-	 * 
-	 * @return the key which is used to pick the output schema from the
-	 *         registry
-	 */
-	public Value getOutputSchemaKey() {
-		return outputSchemaKey;
-	}
-	/**
-	 * Sets the registry key in order to pick the output schema
-	 * 
-	 * @param dataMapperOutSchemaKey registry key for the output schema
-	 */
-	public void setOutputSchemaKey(Value dataMapperOutSchemaKey) {
-		this.outputSchemaKey = dataMapperOutSchemaKey;
-	}
+    /**
+     * Sets the registry key in order to pick the mapping configuration
+     *
+     * @param dataMapperconfigKey registry key for the mapping configuration
+     */
+    public void setMappingConfigurationKey(Value dataMapperconfigKey) {
+        this.mappingConfigurationKey = dataMapperconfigKey;
+    }
 
-	/**
-	 * Gets the input data type
-	 * 
-	 * @return the input data type
-	 */
-	public String getInputType() {
-		return inputType;
-	}
-	/**
-	 * Sets the input data type
-	 * 
-	 * @param type the input data type
-	 */
-	public void setInputType(String type) {
-		this.inputType = type;
-	}
-	
-	/**
-	 * Gets the output data type
-	 * 
-	 * @return the output data type
-	 */
-	public String getOutputType() {
-		return outputType;
-	}
-	/**
-	 * Sets the output data type
-	 * 
-	 * @param type the output data type
-	 */
-	public void setOutputType(String type) {
-		this.outputType = type;
-	}
+    /**
+     * Gets the key which is used to pick the input schema from the
+     * registry
+     *
+     * @return the key which is used to pick the input schema from the
+     * registry
+     */
+    public Value getInputSchemaKey() {
+        return inputSchemaKey;
+    }
 
-	/**
-	 * Gets the unique ID for the DataMapperMediator instance
-	 * 
-	 * @return the unique ID
-	 */
-	public String getUniqueID() {
-		String uuid = id.toString();
-		return uuid;
-	}	
-	/**
-	 * Sets the unique ID for the DataMapperMediator instance
-	 * 
-	 * @param id the unique ID
-	 */
-	public void setUniqueID(UUID id) {
-		this.id = id;
-	}
+    /**
+     * Sets the registry key in order to pick the input schema
+     *
+     * @param dataMapperInSchemaKey registry key for the input schema
+     */
+    public void setInputSchemaKey(Value dataMapperInSchemaKey) {
+        this.inputSchemaKey = dataMapperInSchemaKey;
+    }
 
-	/**
-	 * Get the values from the message context to do the data mapping
-	 * 
-	 * @param synCtx current message for the mediation
-	 * @return true if mediation happened successfully else false.
-	 */
-	@Override
-	public boolean mediate(MessageContext synCtx) {
+    /**
+     * Gets the key which is used to pick the output schema from the
+     * registry
+     *
+     * @return the key which is used to pick the output schema from the
+     * registry
+     */
+    public Value getOutputSchemaKey() {
+        return outputSchemaKey;
+    }
 
-		SynapseLog synLog = getLog(synCtx);
+    /**
+     * Sets the registry key in order to pick the output schema
+     *
+     * @param dataMapperOutSchemaKey registry key for the output schema
+     */
+    public void setOutputSchemaKey(Value dataMapperOutSchemaKey) {
+        this.outputSchemaKey = dataMapperOutSchemaKey;
+    }
 
-		if (synCtx.getEnvironment().isDebugEnabled()) {
-			if (super.divertMediationRoute(synCtx)) {
-				return true;
-			}
-		}
-		if (synLog.isTraceOrDebugEnabled()) {
-			synLog.traceOrDebug("Start : DataMapper mediator");
-			if (synLog.isTraceTraceEnabled()) {
-				synLog.traceTrace("Message :" + synCtx.getEnvelope());
-			}
-		}
+    /**
+     * Gets the input data type
+     *
+     * @return the input data type
+     */
+    public String getInputType() {
+        return inputType;
+    }
 
-		String configKey = mappingConfigurationKey.evaluateValue(synCtx);
-		String inSchemaKey = inputSchemaKey.evaluateValue(synCtx);
-		String outSchemaKey = outputSchemaKey.evaluateValue(synCtx);
+    /**
+     * Sets the input data type
+     *
+     * @param type the input data type
+     */
+    public void setInputType(String type) {
+        this.inputType = type;
+    }
 
-		//checks the availability of the inputs for data mapping
-		if (!(StringUtils.isNotEmpty(configKey)
-				&& StringUtils.isNotEmpty(inSchemaKey) && StringUtils
-					.isNotEmpty(outSchemaKey))) {
-			handleException("DataMapper mediator : Invalid configurations", synCtx);
-		} else {
-			try {
-				// Does message conversion and gives the final result
-				transform(synCtx, configKey, inSchemaKey,
-						outSchemaKey, inputType, outputType, getUniqueID());
+    /**
+     * Gets the output data type
+     *
+     * @return the output data type
+     */
+    public String getOutputType() {
+        return outputType;
+    }
 
-			} catch (SynapseException e) {
-				handleException("DataMapper mediator mediation failed", e, synCtx);
-			} catch (IOException e) {
-				handleException("DataMapper mediator mediation failed", e, synCtx);
-			}
-		}
+    /**
+     * Sets the output data type
+     *
+     * @param type the output data type
+     */
+    public void setOutputType(String type) {
+        this.outputType = type;
+    }
 
-		if (synLog.isTraceOrDebugEnabled()) {
-			synLog.traceOrDebug("End : DataMapper mediator");
-			if (synLog.isTraceTraceEnabled()) {
-				synLog.traceTrace("Message : " + synCtx.getEnvelope());
-			}
-		}
-		return true;
-	}
+    /**
+     * Gets the unique ID for the DataMapperMediator instance
+     *
+     * @return the unique ID
+     */
+    public String getUniqueID() {
+        String uuid = id.toString();
+        return uuid;
+    }
+
+    /**
+     * Sets the unique ID for the DataMapperMediator instance
+     *
+     * @param id the unique ID
+     */
+    public void setUniqueID(UUID id) {
+        this.id = id;
+    }
+
+    /**
+     * Get the values from the message context to do the data mapping
+     *
+     * @param synCtx current message for the mediation
+     * @return true if mediation happened successfully else false.
+     */
+    @Override
+    public boolean mediate(MessageContext synCtx) {
+
+        SynapseLog synLog = getLog(synCtx);
+
+        if (synCtx.getEnvironment().isDebugEnabled()) {
+            if (super.divertMediationRoute(synCtx)) {
+                return true;
+            }
+        }
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("Start : DataMapper mediator");
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message :" + synCtx.getEnvelope());
+            }
+        }
+
+        String configKey = mappingConfigurationKey.evaluateValue(synCtx);
+        String inSchemaKey = inputSchemaKey.evaluateValue(synCtx);
+        String outSchemaKey = outputSchemaKey.evaluateValue(synCtx);
+
+        //checks the availability of the inputs for data mapping
+        if (!(StringUtils.isNotEmpty(configKey)
+                && StringUtils.isNotEmpty(inSchemaKey) && StringUtils
+                .isNotEmpty(outSchemaKey))) {
+            handleException("DataMapper mediator : Invalid configurations", synCtx);
+        } else {
+            try {
+                // Does message conversion and gives the final result
+                transform(synCtx, configKey, inSchemaKey,
+                        outSchemaKey, inputType, outputType, getUniqueID());
+
+            } catch (SynapseException e) {
+                handleException("DataMapper mediator mediation failed", e, synCtx);
+            } catch (IOException e) {
+                handleException("DataMapper mediator mediation failed", e, synCtx);
+            }
+        }
+
+        if (synLog.isTraceOrDebugEnabled()) {
+            synLog.traceOrDebug("End : DataMapper mediator");
+            if (synLog.isTraceTraceEnabled()) {
+                synLog.traceTrace("Message : " + synCtx.getEnvelope());
+            }
+        }
+        return true;
+    }
 
     /**
      * Does message conversion and gives the output message as the final result
      *
-     * @param synCtx
-     *            the message synCtx
-     * @param configkey
-     *            registry location of the mapping configuration
-     * @param inSchemaKey
-     *            registry location of the input schema
-     * @param outSchemaKey
-     *            registry location of the output schema
-     * @param inputType
-     *            input data type
-     * @param outputType
-     *            output data type
-     * @param uuid
-     *            unique ID for the DataMapperMediator instance
+     * @param synCtx       the message synCtx
+     * @param configkey    registry location of the mapping configuration
+     * @param inSchemaKey  registry location of the input schema
+     * @param outSchemaKey registry location of the output schema
+     * @param inputType    input data type
+     * @param outputType   output data type
+     * @param uuid         unique ID for the DataMapperMediator instance
      * @throws SynapseException
      * @throws IOException
      */
     private void transform(MessageContext synCtx, String configkey,
-                                 String inSchemaKey, String outSchemaKey, String inputType,
-                                 String outputType, String uuid) throws SynapseException,
+                           String inSchemaKey, String outSchemaKey, String inputType,
+                           String outputType, String uuid) throws SynapseException,
             IOException {
 
         MappingResourceLoader mappingResourceLoader = null;
@@ -333,7 +331,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
         InputStream inputStream = null;
         switch (InputOutputDataTypes.DataType.fromString(inputType)) {
-            case XML:case CSV:
+            case XML:
+            case CSV:
                 inputStream = new ByteArrayInputStream(
                         context.getEnvelope().getBody().getFirstElement().toString().getBytes(StandardCharsets.UTF_8));
                 break;
@@ -353,28 +352,29 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
 
     /**
-	 * State that DataMapperMediator interacts with the message context
-	 * 
-	 * @return true if the DataMapperMediator is intending to interact with the
-	 *         message context
-	 */
-	@Override
-	public boolean isContentAware() {
-		return true;
-	}
-	@Override
-	public void init(SynapseEnvironment se) {
+     * State that DataMapperMediator interacts with the message context
+     *
+     * @return true if the DataMapperMediator is intending to interact with the
+     * message context
+     */
+    @Override
+    public boolean isContentAware() {
+        return true;
+    }
 
-	}
-	
-	/**
-	 * destroy the generated unique ID for the DataMapperMediator instance
-	 */
-	@Override
-	public void destroy() {
-		if (id != null) {
-			setUniqueID(id);
-        }		
-	}
+    @Override
+    public void init(SynapseEnvironment se) {
+
+    }
+
+    /**
+     * destroy the generated unique ID for the DataMapperMediator instance
+     */
+    @Override
+    public void destroy() {
+        if (id != null) {
+            setUniqueID(id);
+        }
+    }
 
 }

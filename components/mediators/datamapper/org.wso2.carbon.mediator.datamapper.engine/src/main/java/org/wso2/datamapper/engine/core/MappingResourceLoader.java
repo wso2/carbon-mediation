@@ -28,99 +28,99 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MappingResourceLoader {
-	
-	private Schema inputAvroSchema;
-	private Schema outputAvroSchema;
-	private InputStream mappingConfig;
-	private String inputRootelement;
-	private String outputRootelement;
-	private Context context;
-	private Scriptable scope;
-	private JSFunction function;
 
-	/**
-	 * 
-	 * @param inputSchema - Respective output Avro schema as a a stream of bytes
-	 * @param outPutSchema -Respective output Avro schema as a a stream of bytes
-	 * @param mappingConfig-Mapping configuration file as a stream of bytes
-	 * @throws IOException - when input errors, If there any parser exception occur while passing above schemas method
-	 *  will this exception
-	 * 
-	 */
-	public MappingResourceLoader(InputStream inputSchema, InputStream outPutSchema,
-			InputStream mappingConfig) throws IOException {
+    private Schema inputAvroSchema;
+    private Schema outputAvroSchema;
+    private InputStream mappingConfig;
+    private String inputRootelement;
+    private String outputRootelement;
+    private Context context;
+    private Scriptable scope;
+    private JSFunction function;
 
-		this.inputAvroSchema = getAvroSchema(inputSchema);
-		this.outputAvroSchema = getAvroSchema(outPutSchema);
-		this.inputRootelement = inputAvroSchema.getName();
-		this.outputRootelement = outputAvroSchema.getName();
-		this.mappingConfig = mappingConfig;
-		this.function = createFunction(mappingConfig);
+    /**
+     * @param inputSchema           - Respective output Avro schema as a a stream of bytes
+     * @param outPutSchema          -Respective output Avro schema as a a stream of bytes
+     * @param mappingConfig-Mapping configuration file as a stream of bytes
+     * @throws IOException - when input errors, If there any parser exception occur while passing above schemas method
+     *                     will this exception
+     */
+    public MappingResourceLoader(InputStream inputSchema, InputStream outPutSchema,
+                                 InputStream mappingConfig) throws IOException {
 
-	}
+        this.inputAvroSchema = getAvroSchema(inputSchema);
+        this.outputAvroSchema = getAvroSchema(outPutSchema);
+        this.inputRootelement = inputAvroSchema.getName();
+        this.outputRootelement = outputAvroSchema.getName();
+        this.mappingConfig = mappingConfig;
+        this.function = createFunction(mappingConfig);
 
-	public Schema getInputSchema() {
-		return inputAvroSchema;
-	}
+    }
 
-	public Schema getOutputSchema() {
-		return outputAvroSchema;
-	}
+    public Schema getInputSchema() {
+        return inputAvroSchema;
+    }
 
-	public InputStream getMappingConfig() {
-		return mappingConfig;
-	}
+    public Schema getOutputSchema() {
+        return outputAvroSchema;
+    }
 
-	public String getInputRootelement() {
-		return inputRootelement;
-	}
+    public InputStream getMappingConfig() {
+        return mappingConfig;
+    }
 
-	public String getOutputRootelement() {
-		return outputRootelement;
-	}
-	public Context getContext() {
-		return context;
-	}
+    public String getInputRootelement() {
+        return inputRootelement;
+    }
 
-	public JSFunction getFunction() {
-		return function;
-	}
+    public String getOutputRootelement() {
+        return outputRootelement;
+    }
 
-	private Schema getAvroSchema(InputStream schema) throws IOException{
-		return new Parser().parse(schema);
-	}
-	
-	/**
-	 * need to create java script function by passing the configuration file 
-	 * Since this function going to execute every time when message hit the mapping backend
-	 * so this function save in the resource model
-	 * @param mappingConfig
-	 * @return
-	 * @throws IOException
-	 */
-	private JSFunction createFunction(InputStream mappingConfig) throws IOException {
+    public Context getContext() {
+        return context;
+    }
 
-		BufferedReader configReader = new BufferedReader(new InputStreamReader(mappingConfig));
-       //need to identify the main method of the configuration because that method going to execute in engine		
-		Pattern functionIdPattern = Pattern.compile("(function )(map_(L|S)_" + inputRootelement
-				+ "_(L|S)_" + outputRootelement + ")");
-		String fnName = null;
-		String configLine = "";
-		StringBuilder configScriptbuilder = new StringBuilder();
-		while ((configLine = configReader.readLine()) != null) {
-			configScriptbuilder.append(configLine);
-			Matcher matcher = functionIdPattern.matcher(configLine);
-			if (matcher.find()) {
-				fnName = matcher.group(2);
-			}
-		}
-		
-		if (fnName != null) {
-		    JSFunction jsfunction = new JSFunction(fnName,configScriptbuilder.toString());
-			return jsfunction;
-		
-		}
-		return null;
-	}
+    public JSFunction getFunction() {
+        return function;
+    }
+
+    private Schema getAvroSchema(InputStream schema) throws IOException {
+        return new Parser().parse(schema);
+    }
+
+    /**
+     * need to create java script function by passing the configuration file
+     * Since this function going to execute every time when message hit the mapping backend
+     * so this function save in the resource model
+     *
+     * @param mappingConfig
+     * @return
+     * @throws IOException
+     */
+    private JSFunction createFunction(InputStream mappingConfig) throws IOException {
+
+        BufferedReader configReader = new BufferedReader(new InputStreamReader(mappingConfig));
+        //need to identify the main method of the configuration because that method going to execute in engine
+        Pattern functionIdPattern = Pattern.compile("(function )(map_(L|S)_" + inputRootelement
+                + "_(L|S)_" + outputRootelement + ")");
+        String fnName = null;
+        String configLine = "";
+        StringBuilder configScriptbuilder = new StringBuilder();
+        while ((configLine = configReader.readLine()) != null) {
+            configScriptbuilder.append(configLine);
+            Matcher matcher = functionIdPattern.matcher(configLine);
+            if (matcher.find()) {
+                fnName = matcher.group(2);
+            }
+        }
+
+        if (fnName != null) {
+            JSFunction jsfunction = new JSFunction(fnName, configScriptbuilder.toString());
+            return jsfunction;
+
+        }
+        return null;
+    }
 
 }

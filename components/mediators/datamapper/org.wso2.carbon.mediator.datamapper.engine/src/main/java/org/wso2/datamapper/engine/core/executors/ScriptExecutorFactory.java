@@ -39,10 +39,10 @@ public class ScriptExecutorFactory {
      */
     public static IScriptExecutor getScriptExecutor(ScriptExecutorType executorType) {
         switch (executorType) {
-        case RHINO:
-            return new RhinoExecutor();
-        case NASHORN:
-            return new NasHornJava8Executor();
+            case RHINO:
+                return new RhinoExecutor();
+            case NASHORN:
+                return new NasHornJava8Executor();
         }
         throw new IllegalArgumentException("Unsupported script engine type found : " + executorType);
     }

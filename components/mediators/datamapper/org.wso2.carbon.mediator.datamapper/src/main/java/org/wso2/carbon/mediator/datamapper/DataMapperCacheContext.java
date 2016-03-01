@@ -18,35 +18,34 @@
  */
 package org.wso2.carbon.mediator.datamapper;
 
-import java.util.Date;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
 
+import java.util.Date;
+
 /**
- * 
  * A wrapper class to wrap MappingResourceLoader with the first accessed time
- * 
  */
 public class DataMapperCacheContext {
 
-	private Date dateTime;
-	private MappingResourceLoader mappingResourceLoader;
+    private Date dateTime;
+    private MappingResourceLoader mappingResourceLoader;
 
-	public DataMapperCacheContext(Date dateTime,
-			MappingResourceLoader mappingResourceLoader) {
-		this.dateTime = dateTime;
-		this.mappingResourceLoader = mappingResourceLoader;
-	}
+    public DataMapperCacheContext(Date dateTime,
+                                  MappingResourceLoader mappingResourceLoader) {
+        this.dateTime = dateTime;
+        this.mappingResourceLoader = mappingResourceLoader;
+    }
 
-	public Date getDateTime() {
-		return dateTime;
-	}
+    public Date getDateTime() {
+        return dateTime;
+    }
 
-	public MappingResourceLoader getCachedResources() {
-		return mappingResourceLoader;
-	}
+    public MappingResourceLoader getCachedResources() {
+        return mappingResourceLoader;
+    }
 
-	public void setDateTime(Date time) {
-		this.dateTime = time;
-	}
+    public void setDateTime(Date time) {
+        this.dateTime = time;
+    }
 
 }

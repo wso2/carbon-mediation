@@ -16,23 +16,21 @@
 
 package org.wso2.datamapper.engine.inputAdapters;
 
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumReader;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
 
 /**
  * Input reader class for JSON.
@@ -62,6 +60,7 @@ public class JsonInputReader implements InputDataReaderAdapter {
 
     /**
      * This method will return a GenericRecord from provided JSON
+     *
      * @param input
      * @return
      */
@@ -86,6 +85,7 @@ public class JsonInputReader implements InputDataReaderAdapter {
 
     /**
      * Recursive method to traverse JSON tree and create GenericRecord
+     *
      * @param input
      * @param jsonNodeIterator
      * @return
