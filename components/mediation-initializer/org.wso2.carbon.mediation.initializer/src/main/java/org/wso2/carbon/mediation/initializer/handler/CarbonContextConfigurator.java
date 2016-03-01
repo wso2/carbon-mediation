@@ -16,11 +16,20 @@ public class CarbonContextConfigurator extends AbstractHandler {
     public InvocationResponse invoke(MessageContext messageContext) throws AxisFault {
 
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        boolean validDomain = false;
+        boolean validContext = false;
 
         //if cc is already populated ( servlet transport ) just return
         //TODO: Ideally only tenant domain need to check, but there are some admin calls comes with null domain and tenant ID
         if (cc.getTenantDomain() != null || cc.getTenantId() != MultitenantConstants.INVALID_TENANT_ID) {
-            return InvocationResponse.CONTINUE;
+            validDomain = true;
+
+            if (messageContext.getOperationContext() != null && messageContext.getOperationContext().getMessageContexts().size() > 0) {
+                validContext = true;
+                // Do Nothing
+            } else {
+                return InvocationResponse.CONTINUE;
+            }
         }
 
         //for non-http we assume that it's for ST
@@ -39,11 +48,19 @@ public class CarbonContextConfigurator extends AbstractHandler {
                     String str1 = to.substring(to.indexOf("/t/") + 3);
                     String domain = str1.substring(0, str1.indexOf("/"));
                     cc.setTenantDomain(domain, true);
+                } else if (validDomain) {
+                    if (validContext) {
+                        cc.setTenantId((Integer) ((messageContext.getOperationContext().getMessageContexts()).
+                                get("In").getProperty("tenantId")), true);
+                    } else {
+                        return InvocationResponse.CONTINUE;
+                    }
                 } else {
                     cc.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
                     cc.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
                 }
             }
+            // Need to check whether there is a possibility of being this epr null
         } catch (Throwable ignore) {
             //don't care if anything failed
         }
