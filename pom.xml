@@ -2370,7 +2370,7 @@
                 <version>${netty.version}</version>             
             </dependency>
             <dependency>
-                <groupId>org.apache.avro</groupId>
+                <groupId>org.wso2.orbit.org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
                 <version>${avro.version}</version>
             </dependency>

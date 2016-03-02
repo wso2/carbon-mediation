@@ -38,7 +38,7 @@
             <artifactId>org.wso2.carbon.mediator.datamapper.engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.avro</groupId>
+            <groupId>org.wso2.orbit.org.apache.avro</groupId>
             <artifactId>avro</artifactId>
         </dependency>
     </dependencies>
@@ -67,7 +67,7 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.datamapper.engine</bundleDef>
-                                <bundleDef>org.apache.avro:avro:${avro.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.avro:avro:${avro.version}</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
