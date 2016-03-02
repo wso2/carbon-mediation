@@ -36,10 +36,12 @@ import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 
@@ -48,7 +50,7 @@ public class Publisher {
 
     public static void process(PublishingFlow publishingFlow, MediationStatConfig mediationStatConfig) {
         List<String> metaDataKeyList = new ArrayList<String>();
-        List<String> metaDataValueList = new ArrayList<String>();
+        List<Object> metaDataValueList = new ArrayList<Object>();
 
         List<Object> eventData = new ArrayList<Object>();
 
@@ -69,10 +71,11 @@ public class Publisher {
 
     }
 
-    private static void addMetaData(List<String> metaDataKeyList, List<String> metaDataValueList,
+    private static void addMetaData(List<String> metaDataKeyList, List<Object> metaDataValueList,
                                     MediationStatConfig mediationStatConfig) {
-        metaDataValueList.add(PublisherUtil.getHostAddress());
-        metaDataValueList.add("true"); // payload-data is in compressed form
+//        metaDataValueList.add(PublisherUtil.getHostAddress());
+        metaDataValueList.add(true); // payload-data is in compressed form
+
         Property[] properties = mediationStatConfig.getProperties();
         if (properties != null) {
             for (Property property : properties) {
@@ -87,13 +90,18 @@ public class Publisher {
     private static void addEventData(List<Object> eventData, PublishingFlow publishingFlow) {
         eventData.add(publishingFlow.getMessageFlowId());
 
-        String jsonString = JSONObject.toJSONString(publishingFlow.getObjectAsMap());
+        Map<String, Object> mapping = publishingFlow.getObjectAsMap();
+        mapping.put("host", PublisherUtil.getHostAddress()); // Adding host
+
+        String jsonString = JSONObject.toJSONString(mapping);
+
         eventData.add(compress(jsonString));
+//        eventData.add((jsonString));
     }
 
 
     private static void publishToAgent(List<Object> eventData,
-                                       List<String> metaDataValueList,
+                                       List<Object> metaDataValueList,
                                        MediationStatConfig mediationStatConfig,
                                        StreamDefinition streamDef) {
 
@@ -171,8 +179,8 @@ public class Publisher {
                 MediationDataPublisherConstants.STREAM_VERSION);
         eventStreamDefinition.setNickName("");
         eventStreamDefinition.setDescription("This stream is use by WSO2 ESB to publish component specific data for tracing");
-        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
-        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_COMPRESSED, AttributeType.STRING);
+        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_COMPRESSED, AttributeType.BOOL);
+//        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
         for (Object aMetaData : metaData) {
             eventStreamDefinition.addMetaData(aMetaData.toString(), AttributeType.STRING);
         }
@@ -200,7 +208,7 @@ public class Publisher {
             GZIPOutputStream gzip = new GZIPOutputStream(out);
             gzip.write(str.getBytes());
             gzip.close();
-            return out.toString("UTF-8");
+            return DatatypeConverter.printBase64Binary(out.toByteArray());
         } catch (IOException e) {
             log.error("Unable to compress data", e);
         }
