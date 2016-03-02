@@ -21,6 +21,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.SubprotocolBuilderUtil;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
@@ -123,6 +124,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setClientBroadcastLevel(config.getBroadcastLevel());
         handler.setOutflowDispatchSequence(config.getOutFlowDispatchSequence());
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
+        handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -149,6 +151,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setClientBroadcastLevel(config.getBroadcastLevel());
         handler.setOutflowDispatchSequence(config.getOutFlowDispatchSequence());
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
+        handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -186,7 +189,8 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                         InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE))
                 .outFlowErrorSequence(params.getProperties().getProperty(
                         InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE))
-                .build();
+                .subprotocolHandler(params.getProperties().getProperty(
+                        InboundWebsocketConstants.INBOUND_SUBPROTOCOL_HANDLER_CLASS)).build();
     }
 
     protected int validateBroadcastLevelParam(String broadcastLevelParam) {
