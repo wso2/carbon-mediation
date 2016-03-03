@@ -73,12 +73,12 @@ public class MqttInjectHandler {
      * @param mqttMessage
      * @return
      */
-    public boolean invoke(MqttMessage mqttMessage, String name) {
+    public boolean invoke(MqttMessage mqttMessage, String name, String topicName) {
 
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
 
-            msgCtx.setProperty("inbound.endpoint.name", name);
+            msgCtx.setProperty(MqttConstants.MQTT_TOPIC_NAME, topicName);
 
             if (name != null) {
                 InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
