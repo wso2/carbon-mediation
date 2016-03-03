@@ -45,12 +45,10 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
     </dependencies>
 
@@ -88,8 +86,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <jackson.version>1.9.13</jackson.version>
-            </properties>
 </project>

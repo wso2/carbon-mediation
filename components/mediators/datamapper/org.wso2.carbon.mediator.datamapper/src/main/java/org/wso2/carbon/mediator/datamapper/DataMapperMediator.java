@@ -16,8 +16,12 @@
  */
 package org.wso2.carbon.mediator.datamapper;
 
+import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumWriter;
+import org.apache.avro.io.Encoder;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -42,9 +46,12 @@ import org.wso2.datamapper.engine.datatypes.OutputWriter;
 import org.wso2.datamapper.engine.datatypes.OutputWriterFactory;
 import org.wso2.datamapper.engine.inputAdapters.InputDataReaderAdapter;
 import org.wso2.datamapper.engine.inputAdapters.InputReaderFactory;
+import org.wso2.datamapper.engine.outputAdapters.DummyEncoder;
+import org.wso2.datamapper.engine.outputAdapters.WriterRegistry;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -277,9 +284,15 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
             GenericRecord result = MappingHandler.doMap(inputStream, mappingResourceLoader, inputReader);
 
-            // Output message
-            OutputWriter writer = OutputWriterFactory.getWriter(outputType);
-            outputMessage = writer.getOutputMessage(outputType, result);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            Encoder encoder = new DummyEncoder(baos);
+
+
+            GenericDatumWriter<GenericRecord> writer = OutputWriterFactory.getDatumWriter(outputType);
+            writer.write(result, encoder);
+            outputMessage = AXIOMUtil.stringToOM(String.valueOf(result));
+
 
             if (outputMessage != null) {
                 if (log.isDebugEnabled()) {

@@ -17,11 +17,18 @@
 
 package org.wso2.datamapper.engine.datatypes;
 
+import org.apache.avro.generic.GenericDatumWriter;
+import org.apache.avro.io.DatumWriter;
+import org.wso2.datamapper.engine.outputAdapters.CSVDatumWriter;
+import org.wso2.datamapper.engine.outputAdapters.JSONDatumWriter;
+import org.wso2.datamapper.engine.outputAdapters.XMLDatumWriter;
+
 /**
  * Factory class for writer classes
  */
 public class OutputWriterFactory {
 
+    @Deprecated
     public static OutputWriter getWriter(String dataType) {
         if (dataType.equals(InputOutputDataTypes.DataType.CSV.toString())) {
             return new CSVWriter();
@@ -34,6 +41,23 @@ public class OutputWriterFactory {
 
         } else {
             return new JSONWriter();
+        }
+
+
+    }
+
+    public static GenericDatumWriter getDatumWriter(String dataType) {
+        if (dataType.equals(InputOutputDataTypes.DataType.CSV.toString())) {
+            return new CSVDatumWriter();
+        } else if (dataType
+                .equals(InputOutputDataTypes.DataType.XML.toString())) {
+            return new XMLDatumWriter();
+        } else if (dataType.equals(InputOutputDataTypes.DataType.JSON
+                .toString())) {
+            return new JSONDatumWriter();
+
+        } else {
+            return new XMLDatumWriter();
         }
 
 
