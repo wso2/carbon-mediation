@@ -24,28 +24,28 @@ import org.wso2.datamapper.engine.datatypes.InputOutputDataTypes;
  */
 public class InputReaderFactory {
 
-    public static InputDataReaderAdapter getReader(String dataType) {
+    /**
+     * This method returns the matching {@link InputDataReaderAdapter} instance according to the passed data Type
+     *
+     * @param dataType
+     * @return
+     */
+    public static InputDataReaderAdapter getInputDataReader(String dataType) {
 
         InputDataReaderAdapter inputReader = null;
-        if (dataType != null) {
-            switch (InputOutputDataTypes.DataType.fromString(dataType)) {
-                case CSV:
-                    inputReader = new CsvInputReader();
-                    break;
-                case XML:
-                    inputReader = new XmlInputReader();
-                    break;
-                case JSON:
-                    inputReader = new JsonInputReader();
-                    break;
-                default:
-                    inputReader = new XmlInputReader();
-            }
-        } else {
+        switch (InputOutputDataTypes.DataType.fromString(dataType)) {
+        case CSV:
+            inputReader = new CsvInputReader();
+            break;
+        case XML:
             inputReader = new XmlInputReader();
+            break;
+        case JSON:
+            inputReader = new JsonInputReader();
+            break;
+        default:
+            throw new IllegalArgumentException("Invalid data type found for Input Readers : " + dataType);
         }
         return inputReader;
-
-
     }
 }

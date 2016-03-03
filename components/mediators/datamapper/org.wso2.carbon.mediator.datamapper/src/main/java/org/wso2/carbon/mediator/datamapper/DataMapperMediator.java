@@ -132,7 +132,12 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @return the input data type
      */
     public String getInputType() {
-        return inputType;
+        if (inputType != null) {
+            return inputType;
+        } else {
+            log.warn("Input data type not found. Set to default value : " + InputOutputDataTypes.DataType.XML);
+            return InputOutputDataTypes.DataType.XML.toString();
+        }
     }
 
     /**
@@ -150,7 +155,12 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @return the output data type
      */
     public String getOutputType() {
-        return outputType;
+        if (outputType != null) {
+            return outputType;
+        } else {
+            log.warn("Output data type not found. Set to default value : " + InputOutputDataTypes.DataType.XML);
+            return InputOutputDataTypes.DataType.XML.toString();
+        }
     }
 
     /**
@@ -216,8 +226,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         } else {
             try {
                 // Does message conversion and gives the final result
-                transform(synCtx, configKey, inSchemaKey,
-                        outSchemaKey, inputType, outputType, getUniqueID());
+                transform(synCtx, configKey, inSchemaKey, outSchemaKey, getInputType(), getOutputType(), getUniqueID());
 
             } catch (SynapseException e) {
                 handleException("DataMapper mediator mediation failed", e, synCtx);
@@ -262,7 +271,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     configkey, inSchemaKey, outSchemaKey, uuid);
 
 
-            InputDataReaderAdapter inputReader = InputReaderFactory.getReader(inputType);
+            InputDataReaderAdapter inputReader = InputReaderFactory.getInputDataReader(inputType);
 
             InputStream inputStream = getInputStream(synCtx, inputType);
 

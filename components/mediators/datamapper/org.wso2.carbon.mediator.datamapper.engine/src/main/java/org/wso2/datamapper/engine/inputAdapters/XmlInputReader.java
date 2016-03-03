@@ -16,7 +16,6 @@
  */
 package org.wso2.datamapper.engine.inputAdapters;
 
-
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
@@ -26,8 +25,10 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
+import org.apache.axiom.om.impl.llom.OMAttributeImpl;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,40 +38,40 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-//TODO : class name should be *adapter
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.AVRO_ATTRIBUTE_FIELD_PREFIX;
+
+/**
+ * This class implement the xml reader for WSO2 data mapper
+ */
 public class XmlInputReader implements InputDataReaderAdapter {
 
-    private OMElement body; // Soap Message body
+    private OMElement messageBody;
+    private static final Log log = LogFactory.getLog(XmlInputReader.class);
 
-    /**
-     * @param msg - Soap Envelop
-     * @throws IOException
-     */
-    public void setInputMsg(InputStream in) {
-        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(in);
+    public void setInputMsg(InputStream inputStream) {
+        OMXMLParserWrapper builder = OMXMLBuilderFactory.createOMBuilder(inputStream);
         OMElement documentElement = builder.getDocumentElement();
-        this.body = documentElement;
+        this.messageBody = documentElement;
     }
 
     public GenericRecord getInputRecord(Schema input) {
 
-        @SuppressWarnings("unchecked")
-        GenericRecord inputRecord = getChild(input, this.body.getChildElements());
+        GenericRecord inputRecord = getChild(input, this.messageBody.getChildElements());
         return inputRecord;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private GenericRecord getChild(Schema schema, Iterator<OMElement> iter) {
+    private GenericRecord getChild(Schema schema, Iterator<OMElement> omElementIterator) {
 
         GenericRecord record = new GenericData.Record(schema);
         ConcurrentMap<String, Collection<Object>> arrMap = new ConcurrentHashMap<String, Collection<Object>>();
 
-        while (iter.hasNext()) {
-            OMElement element = iter.next();
+        while (omElementIterator.hasNext()) {
+            OMElement element = omElementIterator.next();
             String localName = element.getLocalName();
             Field field = schema.getField(localName);
             if (field != null) {
-                if (field.schema().getType().equals(Type.ARRAY)) {
+                Type fieldSchemaType = field.schema().getType();
+                if (Type.ARRAY.equals(fieldSchemaType)) {
                     Collection<Object> arr = arrMap.get(localName);
                     if (arr == null) {
                         arr = new ArrayList<Object>();
@@ -78,19 +79,23 @@ public class XmlInputReader implements InputDataReaderAdapter {
                     }
                     if (field.schema().getElementType().getType().equals(Type.RECORD)) {
                         Iterator childElements = element.getChildElements();
-                        GenericRecord child = getChild(field.schema().getElementType(),
-                                childElements);
+                        GenericRecord child = getChild(field.schema().getElementType(), childElements);
                         arr.add(child);
                     } else if (field.schema().getElementType().getType().equals(Type.ARRAY)) {
-                        // not supports yet!
-                    } else { // !(ARRAY||RECORD) != primitive type
+                        log.warn("Array avro schema type is not supported inside another array type");
+                    } else {
                         arr.add(element.getText());
                     }
-                } else if (field.schema().getType().equals(Type.RECORD)) {
+                } else if (Type.RECORD.equals(fieldSchemaType)) {
+                    //Add child elements to generic record
                     Iterator childElements = element.getChildElements();
                     GenericRecord child = getChild(field.schema(), childElements);
                     record.put(localName, child);
-                } else if (field.schema().getType().equals(Type.UNION)) {
+                    //Add attribute values to generic record
+                    Iterator attrElements = element.getAllAttributes();
+                    GenericRecord attributes = getChildForAttributes(field.schema(), attrElements);
+                    record.put(localName, attributes);
+                } else if (Type.UNION.equals(fieldSchemaType)) {
                     Iterator childElements = element.getChildElements();
                     if (childElements.hasNext()) {
                         Schema childSchema = field.schema();
@@ -111,13 +116,14 @@ public class XmlInputReader implements InputDataReaderAdapter {
                     } else {
                         record.put(localName, element.getText());
                     }
+                } else if (Type.ENUM.equals(fieldSchemaType) || Type.MAP.equals(fieldSchemaType) || Type.FIXED
+                        .equals(fieldSchemaType)) {
+                    log.warn("Array avro schema type : " + fieldSchemaType + " is not supported.");
                 } else {
                     record.put(localName, element.getText());
-                    // TODO: fix for other types too... !(ARRAY||RECORD) !=
-                    // primitive type
                 }
             } else {
-                // TODO: log unrecognized element
+                log.error("Unrecognized element recieved : " + localName);
             }
         }
 
@@ -127,8 +133,7 @@ public class XmlInputReader implements InputDataReaderAdapter {
             Array<Object> childArray = null;
             Collection<Object> value = arrEntry.getValue();
             if (object == null) {
-                childArray = new GenericData.Array<Object>(value.size(), schema.getField(key)
-                        .schema());
+                childArray = new GenericData.Array<Object>(value.size(), schema.getField(key).schema());
             } else {
                 childArray = (Array<Object>) object;
             }
@@ -136,9 +141,16 @@ public class XmlInputReader implements InputDataReaderAdapter {
                 childArray.add(obj);
             }
             record.put(key, childArray);
-
         }
+        return record;
+    }
 
+    private GenericRecord getChildForAttributes(Schema schema, Iterator attrElements) {
+        GenericRecord record = new GenericData.Record(schema);
+        while (attrElements.hasNext()) {
+            OMAttributeImpl element = (OMAttributeImpl) attrElements.next();
+            record.put(AVRO_ATTRIBUTE_FIELD_PREFIX + element.getLocalName(), element.getAttributeValue());
+        }
         return record;
     }
 
