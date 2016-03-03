@@ -81,6 +81,8 @@ public class XMLDatumWriter extends GenericDatumWriter<GenericRecord> {
                         field.schema());
             } else if (Schema.Type.STRING.equals(fieldType)) {
                 xMLStreamWriter = decodeStringTypeField(xMLStreamWriter, record, field);
+            } else if (Schema.Type.UNION.equals(fieldType)) {
+                xMLStreamWriter = decodeStringTypeField(xMLStreamWriter, record, field);
             } else {
                 log.warn("unsupported AVRO schema type found : " + fieldType);
             }
