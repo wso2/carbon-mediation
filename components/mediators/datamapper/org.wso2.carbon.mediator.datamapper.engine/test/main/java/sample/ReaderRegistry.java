@@ -18,10 +18,10 @@
 
 package sample;
 
-import org.wso2.datamapper.engine.inputAdapters.CsvInputReader;
-import org.wso2.datamapper.engine.inputAdapters.InputDataReaderAdapter;
-import org.wso2.datamapper.engine.inputAdapters.JsonInputReader;
-import org.wso2.datamapper.engine.inputAdapters.XmlInputReader;
+import org.wso2.datamapper.engine.input.readers.CsvInputReader;
+import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
+import org.wso2.datamapper.engine.input.readers.JsonInputReader;
+import org.wso2.datamapper.engine.input.readers.XmlInputReader;
 
 import java.util.HashMap;
 import java.util.Map;

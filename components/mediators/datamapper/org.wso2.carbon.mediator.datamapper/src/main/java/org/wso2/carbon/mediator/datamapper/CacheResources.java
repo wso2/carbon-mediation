@@ -56,7 +56,7 @@ public class CacheResources {
      */
     public static MappingResourceLoader getCachedResources(
             MessageContext context, String configkey, String inSchemaKey,
-            String outSchemaKey, String datamapperMediatorUuid) throws IOException {
+            String outSchemaKey, String datamapperMediatorUuid) {
 
         ConfigurationContext configurationContext;
         DataMapperCacheContext dmcc = null;

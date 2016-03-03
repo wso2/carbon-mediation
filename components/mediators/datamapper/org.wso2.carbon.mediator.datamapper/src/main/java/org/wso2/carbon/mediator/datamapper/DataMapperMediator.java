@@ -18,7 +18,6 @@ package org.wso2.carbon.mediator.datamapper;
 
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
@@ -42,12 +41,10 @@ import org.apache.synapse.util.AXIOMUtils;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
 import org.wso2.datamapper.engine.datatypes.InputOutputDataTypes;
-import org.wso2.datamapper.engine.datatypes.OutputWriter;
-import org.wso2.datamapper.engine.datatypes.OutputWriterFactory;
-import org.wso2.datamapper.engine.inputAdapters.InputDataReaderAdapter;
-import org.wso2.datamapper.engine.inputAdapters.InputReaderFactory;
-import org.wso2.datamapper.engine.outputAdapters.DummyEncoder;
-import org.wso2.datamapper.engine.outputAdapters.WriterRegistry;
+import org.wso2.datamapper.engine.input.InputReaderFactory;
+import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
+import org.wso2.datamapper.engine.output.OutputWriterFactory;
+import org.wso2.datamapper.engine.output.readers.DummyEncoder;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
@@ -237,8 +234,6 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
             } catch (SynapseException e) {
                 handleException("DataMapper mediator mediation failed", e, synCtx);
-            } catch (IOException e) {
-                handleException("DataMapper mediator mediation failed", e, synCtx);
             }
         }
 
@@ -266,32 +261,25 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      */
     private void transform(MessageContext synCtx, String configkey,
                            String inSchemaKey, String outSchemaKey, String inputType,
-                           String outputType, String uuid) throws SynapseException,
-            IOException {
-
+                           String outputType, String uuid)
+             {
         MappingResourceLoader mappingResourceLoader = null;
         OMElement outputMessage = null;
-
         try {
             // mapping resources needed to get the final output
             mappingResourceLoader = CacheResources.getCachedResources(synCtx,
                     configkey, inSchemaKey, outSchemaKey, uuid);
 
-
             InputDataReaderAdapter inputReader = InputReaderFactory.getInputDataReader(inputType);
-
             InputStream inputStream = getInputStream(synCtx, inputType);
-
             GenericRecord result = MappingHandler.doMap(inputStream, mappingResourceLoader, inputReader);
-
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Encoder encoder = new DummyEncoder(baos);
-
-
             GenericDatumWriter<GenericRecord> writer = OutputWriterFactory.getDatumWriter(outputType);
+            writer.setSchema(mappingResourceLoader.getOutputSchema());
             writer.write(result, encoder);
-            outputMessage = AXIOMUtil.stringToOM(String.valueOf(result));
+            outputMessage = AXIOMUtil.stringToOM(baos.toString());
 
 
             if (outputMessage != null) {

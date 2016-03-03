@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package org.wso2.datamapper.engine.inputAdapters;
+package org.wso2.datamapper.engine.input.readers;
 
 import au.com.bytecode.opencsv.CSVReader;
 import org.apache.avro.Schema;
@@ -40,10 +40,10 @@ public class CsvInputReader implements InputDataReaderAdapter {
 
 
     private InputStreamReader csvReader;
-    private OMElement textEement;
+    private OMElement textElement;
 
     /**
-     * @param msg - Soap Envelop
+     * @param in - input message stream
      * @throws IOException
      */
     public void setInputMsg(InputStream in) {
@@ -52,7 +52,7 @@ public class CsvInputReader implements InputDataReaderAdapter {
         ;
         OMElement body = documentElement.getFirstElement().getFirstElement();
         getTextElement(body);
-        String text = textEement.getText();
+        String text = textElement.getText();
         InputStream is = new ByteArrayInputStream(text.getBytes());
         csvReader = new InputStreamReader(is);
     }
@@ -64,8 +64,8 @@ public class CsvInputReader implements InputDataReaderAdapter {
         while (iter.hasNext()) {
             OMElement childElement = iter.next();
             if ("text".equals(childElement.getLocalName())) {
-                textEement = childElement;
-                return textEement;
+                textElement = childElement;
+                return textElement;
             } else {
                 if (getTextElement(childElement) != null) {
                     break;

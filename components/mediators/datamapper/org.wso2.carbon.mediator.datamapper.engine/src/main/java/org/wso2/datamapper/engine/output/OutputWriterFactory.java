@@ -15,36 +15,18 @@
  * under the License.
  */
 
-package org.wso2.datamapper.engine.datatypes;
+package org.wso2.datamapper.engine.output;
 
 import org.apache.avro.generic.GenericDatumWriter;
-import org.apache.avro.io.DatumWriter;
-import org.wso2.datamapper.engine.outputAdapters.CSVDatumWriter;
-import org.wso2.datamapper.engine.outputAdapters.JSONDatumWriter;
-import org.wso2.datamapper.engine.outputAdapters.XMLDatumWriter;
+import org.wso2.datamapper.engine.datatypes.InputOutputDataTypes;
+import org.wso2.datamapper.engine.output.readers.CSVDatumWriter;
+import org.wso2.datamapper.engine.output.readers.JSONDatumWriter;
+import org.wso2.datamapper.engine.output.readers.XMLDatumWriter;
 
 /**
  * Factory class for writer classes
  */
 public class OutputWriterFactory {
-
-    @Deprecated
-    public static OutputWriter getWriter(String dataType) {
-        if (dataType.equals(InputOutputDataTypes.DataType.CSV.toString())) {
-            return new CSVWriter();
-        } else if (dataType
-                .equals(InputOutputDataTypes.DataType.XML.toString())) {
-            return new XMLWriter();
-        } else if (dataType.equals(InputOutputDataTypes.DataType.JSON
-                .toString())) {
-            return new JSONWriter();
-
-        } else {
-            return new JSONWriter();
-        }
-
-
-    }
 
     public static GenericDatumWriter getDatumWriter(String dataType) {
         if (dataType.equals(InputOutputDataTypes.DataType.CSV.toString())) {
@@ -55,11 +37,8 @@ public class OutputWriterFactory {
         } else if (dataType.equals(InputOutputDataTypes.DataType.JSON
                 .toString())) {
             return new JSONDatumWriter();
-
         } else {
             return new XMLDatumWriter();
         }
-
-
     }
 }

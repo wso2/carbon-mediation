@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package org.wso2.datamapper.engine.inputAdapters;
+package org.wso2.datamapper.engine.input.readers;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;

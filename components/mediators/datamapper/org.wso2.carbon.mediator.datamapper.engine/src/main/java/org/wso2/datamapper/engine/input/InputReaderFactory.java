@@ -15,9 +15,13 @@
  * under the License.
  */
 
-package org.wso2.datamapper.engine.inputAdapters;
+package org.wso2.datamapper.engine.input;
 
 import org.wso2.datamapper.engine.datatypes.InputOutputDataTypes;
+import org.wso2.datamapper.engine.input.readers.CsvInputReader;
+import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
+import org.wso2.datamapper.engine.input.readers.JsonInputReader;
+import org.wso2.datamapper.engine.input.readers.XmlInputReader;
 
 /**
  * Factory class for writer classes

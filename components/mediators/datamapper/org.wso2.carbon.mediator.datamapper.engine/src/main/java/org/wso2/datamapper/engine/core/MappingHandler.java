@@ -21,7 +21,7 @@ import org.json.JSONException;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorFactory;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorType;
-import org.wso2.datamapper.engine.inputAdapters.InputDataReaderAdapter;
+import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import java.io.InputStream;
 public class MappingHandler {
 
     public static GenericRecord doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputDataReaderAdapter inputReader)
-            throws IOException, IllegalAccessException, InstantiationException, JSONException, JSException {
+            throws JSException {
 
         inputReader.setInputMsg(inputMsg);
         GenericRecord inputRecord = inputReader.getInputRecord(resourceModel.getInputSchema());

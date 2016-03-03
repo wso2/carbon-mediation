@@ -16,7 +16,7 @@
  */
 
 
-package org.wso2.datamapper.engine.outputAdapters;
+package org.wso2.datamapper.engine.output.readers;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumWriter;

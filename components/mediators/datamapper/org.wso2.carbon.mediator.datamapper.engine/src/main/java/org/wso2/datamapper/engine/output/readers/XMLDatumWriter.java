@@ -14,7 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.outputAdapters;
+package org.wso2.datamapper.engine.output.readers;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -42,7 +42,8 @@ public class XMLDatumWriter extends GenericDatumWriter<GenericRecord> {
 
     private static final Log log = LogFactory.getLog(XMLDatumWriter.class);
 
-    @Override protected void writeRecord(Schema schema, Object datum, Encoder out) throws IOException {
+    @Override
+    protected void writeRecord(Schema schema, Object datum, Encoder out) throws IOException {
         try {
             StringWriter stringWriter = new StringWriter();
             XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
@@ -71,7 +72,7 @@ public class XMLDatumWriter extends GenericDatumWriter<GenericRecord> {
     }
 
     private XMLStreamWriter decodeFieldList(XMLStreamWriter xMLStreamWriter, List<Schema.Field> fieldList,
-            GenericRecord record) throws XMLStreamException {
+                                            GenericRecord record) throws XMLStreamException {
         for (Schema.Field field : fieldList) {
             Schema.Type fieldType = field.schema().getType();
             if (Schema.Type.ARRAY.equals(fieldType)) {
@@ -91,7 +92,7 @@ public class XMLDatumWriter extends GenericDatumWriter<GenericRecord> {
     }
 
     private XMLStreamWriter decodeStringTypeField(XMLStreamWriter xMLStreamWriter, GenericRecord record,
-            Schema.Field field) throws XMLStreamException {
+                                                  Schema.Field field) throws XMLStreamException {
         String fieldName = field.name();
         if (fieldName.startsWith(AVRO_ATTRIBUTE_FIELD_PREFIX)) {
             String stringFieldValue = (String) record.get(fieldName);
@@ -126,7 +127,7 @@ public class XMLDatumWriter extends GenericDatumWriter<GenericRecord> {
     }
 
     private XMLStreamWriter decodeArrayTypeField(XMLStreamWriter xMLStreamWriter, GenericRecord record,
-            Schema.Field field) throws XMLStreamException {
+                                                 Schema.Field field) throws XMLStreamException {
         GenericData.Array<GenericData.Record> fieldValues = (GenericData.Array<GenericData.Record>) record
                 .get(field.name());
         for (GenericData.Record recordValue : fieldValues) {

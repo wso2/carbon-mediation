@@ -22,9 +22,8 @@ import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
-import org.wso2.datamapper.engine.inputAdapters.InputDataReaderAdapter;
-import org.wso2.datamapper.engine.outputAdapters.DummyEncoder;
-import org.wso2.datamapper.engine.outputAdapters.WriterRegistry;
+import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
+import org.wso2.datamapper.engine.output.readers.DummyEncoder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

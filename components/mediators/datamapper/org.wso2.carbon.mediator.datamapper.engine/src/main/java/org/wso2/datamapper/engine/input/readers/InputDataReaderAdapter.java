@@ -14,20 +14,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.datamapper.engine.input.readers;
 
-package org.wso2.datamapper.engine.datatypes;
-
+import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.axiom.om.OMElement;
 
-import java.io.IOException;
+import java.io.InputStream;
 
-/**
- * Parent class for writer classes
- */
-public interface OutputWriter {
+public interface InputDataReaderAdapter {
 
-    public abstract OMElement getOutputMessage(String outputType,
-                                               GenericRecord result) throws IOException;
+    public void setInputMsg(InputStream msg);
 
+    public GenericRecord getInputRecord(Schema input);
 }
