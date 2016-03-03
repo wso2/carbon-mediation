@@ -93,7 +93,7 @@ public class XmlInputReader implements InputDataReaderAdapter {
                     record.put(localName, child);
                     //Add attribute values to generic record
                     Iterator attrElements = element.getAllAttributes();
-                    GenericRecord attributes = getChildForAttributes(field.schema(), attrElements);
+                    GenericRecord attributes = getChildForAttributes(field.schema(), attrElements, child);
                     record.put(localName, attributes);
                 } else if (Type.UNION.equals(fieldSchemaType)) {
                     Iterator childElements = element.getChildElements();
@@ -145,13 +145,12 @@ public class XmlInputReader implements InputDataReaderAdapter {
         return record;
     }
 
-    private GenericRecord getChildForAttributes(Schema schema, Iterator attrElements) {
-        GenericRecord record = new GenericData.Record(schema);
+    private GenericRecord getChildForAttributes(Schema schema, Iterator attrElements, GenericRecord child) {
         while (attrElements.hasNext()) {
             OMAttributeImpl element = (OMAttributeImpl) attrElements.next();
-            record.put(AVRO_ATTRIBUTE_FIELD_PREFIX + element.getLocalName(), element.getAttributeValue());
+            child.put(AVRO_ATTRIBUTE_FIELD_PREFIX + element.getLocalName(), element.getAttributeValue());
         }
-        return record;
+        return child;
     }
 
     public static String getType() {
