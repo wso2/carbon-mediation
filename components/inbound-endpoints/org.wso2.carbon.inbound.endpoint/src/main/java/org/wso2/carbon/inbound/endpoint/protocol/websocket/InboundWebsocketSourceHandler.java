@@ -193,7 +193,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     }
 
     private boolean interceptWebsocketMessageFlow(ChannelHandlerContext ctx, WebSocketFrame frame) {
-        if (subprotocolHandlers == null ||
+        if (handshaker.selectedSubprotocol() == null || subprotocolHandlers == null ||
                 (subprotocolHandlers != null && subprotocolHandlers.isEmpty())) {
             return false;
         }

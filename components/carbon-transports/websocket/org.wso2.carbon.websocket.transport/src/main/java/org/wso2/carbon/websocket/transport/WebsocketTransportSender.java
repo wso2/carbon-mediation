@@ -125,7 +125,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                             + clientHandler.getChannelHandlerContext().channel().toString());
                 }
                 if (clientHandler.getChannelHandlerContext().channel().isActive()) {
-                    clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame);
+                    clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
                 }
             } else if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT) != null
                     && msgCtx.getProperty(WebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT).equals(true)) {
@@ -135,7 +135,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                             + clientHandler.getChannelHandlerContext().channel().toString());
                 }
                 if (clientHandler.getChannelHandlerContext().channel().isActive()) {
-                    clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame);
+                    clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
                 }
             } else {
                 if (!handshakePresent) {
@@ -154,7 +154,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
                                 + clientHandler.getChannelHandlerContext().channel().toString());
                     }
                     if (clientHandler.getChannelHandlerContext().channel().isActive()) {
-                        clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame);
+                        clientHandler.getChannelHandlerContext().channel().writeAndFlush(frame.retain());
                     }
                 } else {
                     clientHandler.acknowledgeHandshake();

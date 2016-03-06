@@ -149,7 +149,7 @@ public class WebsocketConnectionFactory {
             final EventLoopGroup group = new NioEventLoopGroup();
             handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
                     WebSocketVersion.V13,
-                    SubprotocolBuilderUtil.contentTypeToSyanapeSubprotocol(contentType),
+                    contentType != null ? SubprotocolBuilderUtil.contentTypeToSyanapeSubprotocol(contentType) : null,
                     false,
                     new DefaultHttpHeaders()));
             Bootstrap b = new Bootstrap();
