@@ -201,7 +201,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         for (AbstractSubprotocolHandler handler : subprotocolHandlers) {
             if (handshaker.selectedSubprotocol() != null &&
                     handshaker.selectedSubprotocol().contains(handler.getSubprotocolIdentifier())) {
-                continueFlow = handler.handle(ctx, frame);
+                continueFlow = handler.handle(ctx, frame, subscriberPath.toString());
                 break;
             }
         }
@@ -224,7 +224,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     return;
                 }
 
-                if (interceptWebsocketMessageFlow(ctx,frame)){
+                if (interceptWebsocketMessageFlow(ctx, frame)) {
                     return;
                 }
 
@@ -247,7 +247,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
                     String message = ((TextWebSocketFrame) frame).text();
-                    String contentType = SubprotocolBuilderUtil.syanapeSubprotocolToContentType(handshaker.selectedSubprotocol());
+                    String contentType = SubprotocolBuilderUtil
+                            .syanapeSubprotocolToContentType(SubprotocolBuilderUtil
+                                    .extractSynapseSubprotocol(handshaker.selectedSubprotocol()));
 
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
                             ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)

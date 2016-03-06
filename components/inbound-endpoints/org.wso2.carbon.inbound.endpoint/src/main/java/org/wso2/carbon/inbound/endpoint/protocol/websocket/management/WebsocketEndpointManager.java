@@ -110,6 +110,10 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
     }
 
     public boolean startListener(int port, String name, InboundProcessorParams params) {
+        if (WebsocketEventExecutorManager.getInstance().isRegisteredExecutor(port)) {
+            log.info("Netty Listener already started on port " + port);
+            return true;
+        }
 
         InboundWebsocketConfiguration config = buildConfiguration(port, name, params);
         NettyThreadPoolConfiguration threadPoolConfig =
@@ -136,6 +140,11 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
     }
 
     public boolean startSSLListener(int port, String name, InboundProcessorParams params) {
+        if (WebsocketEventExecutorManager.getInstance().isRegisteredExecutor(port)) {
+            log.info("Netty Listener already started on port " + port);
+            return true;
+        }
+
         InboundWebsocketConfiguration config = buildConfiguration(port, name, params);
         InboundWebsocketSSLConfiguration sslConfiguration = buildSSLConfiguration(params);
         NettyThreadPoolConfiguration threadPoolConfig =

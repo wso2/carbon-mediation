@@ -23,7 +23,7 @@ public abstract class AbstractSubprotocolHandler {
 
     private String subprotocolIdentifier;
 
-    public abstract boolean handle(ChannelHandlerContext context, WebSocketFrame frame);
+    public abstract boolean handle(ChannelHandlerContext context, WebSocketFrame frame, String subscriberPath);
 
     public void setSubprotocolIdentifier(String subprotocolIdentifier) {
         this.subprotocolIdentifier = subprotocolIdentifier;

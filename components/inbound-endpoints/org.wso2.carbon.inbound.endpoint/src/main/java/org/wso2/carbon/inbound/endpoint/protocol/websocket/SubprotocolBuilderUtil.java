@@ -29,6 +29,7 @@ public class SubprotocolBuilderUtil {
     private static String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse(";
     private static String SYNAPSE_SUBPROTOCOL_SUFFIX = ")";
     private static String SYNAPSE_CONTENT_TYPE = "contentType=";
+    private static String SUBPROTOCOL_SEPERATOR = ",";
 
     private static final Log log = LogFactory.getLog(SubprotocolBuilderUtil.class);
 
@@ -62,6 +63,16 @@ public class SubprotocolBuilderUtil {
         } else {
             return null;
         }
+    }
+
+    public static String extractSynapseSubprotocol(String combinedSubprotocol) {
+        String[] subprotocolArray = combinedSubprotocol.split(SUBPROTOCOL_SEPERATOR);
+        for (String subprotocol : subprotocolArray) {
+            if (subprotocol.contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)) {
+                return subprotocol;
+            }
+        }
+        return null;
     }
 
     public static String contentTypeToSyanapeSubprotocol(String contentType) {

@@ -26,9 +26,9 @@ public class EchoSubprotocolHandler extends AbstractSubprotocolHandler {
         super.setSubprotocolIdentifier("echo");
     }
 
-    public boolean handle(ChannelHandlerContext context, WebSocketFrame frame){
+    public boolean handle(ChannelHandlerContext context, WebSocketFrame frame, String subprotocol) {
         context.channel().writeAndFlush(frame.retain());
-        return true;
+        return false;
     }
 
 }
