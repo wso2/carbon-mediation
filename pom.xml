@@ -2402,7 +2402,6 @@
         <!--Misc-->
         <org.wso2.uri.template.version>1.6.4</org.wso2.uri.template.version>
         <org.wso2.caching.version>4.0.3</org.wso2.caching.version>
-        <ec2.client.version>4.2.0</ec2.client.version>
         <org.wso2.carbon.caching.core.version>4.2.0</org.wso2.carbon.caching.core.version>
         <bam.data.publisher.version>4.2.0</bam.data.publisher.version>
         <carbon.datastore.version>4.2.0</carbon.datastore.version>
