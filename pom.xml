@@ -40,6 +40,7 @@
             </activation>
             <modules>
                 <module>components/carbon-transports</module>
+                <module>components/carbon-mediation-startup</module>
                 <module>service-stubs/mediation-admin</module>
                 <module>service-stubs/mediation-monitor</module>
                 <module>service-stubs/application-mgt</module>
@@ -1138,6 +1139,11 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediation.startup</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.transport.handlers</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -1914,11 +1920,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.startup</artifactId>
-                <version>${carbon.startup.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
                 <artifactId>org.wso2.carbon.ec2-client</artifactId>
                 <version>${ec2.client.version}</version>
             </dependency>
@@ -2407,7 +2408,6 @@
         <org.wso2.uri.template.version>1.6.4</org.wso2.uri.template.version>
         <org.wso2.caching.version>4.0.3</org.wso2.caching.version>
         <ec2.client.version>4.2.0</ec2.client.version>
-        <carbon.startup.version>4.2.0</carbon.startup.version>
         <org.wso2.carbon.caching.core.version>4.2.0</org.wso2.carbon.caching.core.version>
         <bam.data.publisher.version>4.2.0</bam.data.publisher.version>
         <carbon.datastore.version>4.2.0</carbon.datastore.version>
