@@ -25,6 +25,7 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.services.DASMessageFlowPublisherAdmin;
+import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
@@ -68,6 +69,8 @@ public class MediationStatisticsComponent {
 
     private Map<Integer, MessageFlowReporterThread> reporterThreads = new HashMap<Integer, MessageFlowReporterThread>();
 
+    private Map<Integer, MediationConfigReporterThread> configReporterThreads = new HashMap<Integer, MediationConfigReporterThread>();
+
     private Map<Integer, SynapseEnvironmentService> synapseEnvServices = new HashMap<Integer, SynapseEnvironmentService>();
 
     private ComponentContext compCtx;
@@ -109,6 +112,7 @@ public class MediationStatisticsComponent {
             log.error("Can't register an observer for MessageFlowTraceObserverStore. " );
         }
 
+
         //Load previously saved configurations
         new RegistryPersistenceManager().load(tenantId);
 
@@ -139,6 +143,15 @@ public class MediationStatisticsComponent {
         }
         reporterThreads.put(tenantId, reporterThread);
         stores.put(tenantId, observerStore);
+
+        // Adding configuration reporting thread
+        MediationConfigReporterThread configReporterThread = new MediationConfigReporterThread(synEnvService);
+        configReporterThread.setName("mediation-config-reporter-" + tenantId);
+        configReporterThread.start();
+        if (log.isDebugEnabled()) {
+            log.debug("Registering the new mediation configuration reporter thread");
+        }
+        configReporterThreads.put(tenantId, configReporterThread);
     }
 
     protected void deactivate(ComponentContext ctxt) {
@@ -168,6 +181,8 @@ public class MediationStatisticsComponent {
                 }
             }
         }
+
+        // TODO: stop config reporting threads
 
         if (log.isDebugEnabled()) {
             log.debug("DAS service statistics data publisher bundle is deactivated");

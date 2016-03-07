@@ -32,4 +32,10 @@ public class MediationDataPublisherConstants {
     public static final String STREAM_NAME = "esb-flow-entry-stream";
     public static final String STREAM_VERSION = "1.0.0";
 
+    public static final String CONFIG_STREAM_NAME = "esb-config-entry-stream";
+    public static final String CONFIG_STREAM_VERSION = "1.0.0";
+    public static final String CONFIG_HASHCODE = "hashcode";
+    public static final String CONFIG_DATA = "configData";
+
+
 }
