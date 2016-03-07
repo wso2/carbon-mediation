@@ -930,9 +930,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
      */
     private void addParameterObserver(String serviceName) throws AxisFault {
         AxisService service = getAxisConfig().getService(serviceName);
-        ProxyServiceParameterObserver paramObserver =
-                new ProxyServiceParameterObserver(service);
-        service.addParameterObserver(paramObserver);
+        if (service != null) {
+            ProxyServiceParameterObserver paramObserver =
+                       new ProxyServiceParameterObserver(service);
+            service.addParameterObserver(paramObserver);
+        }
     }
 
     public void persistProxyService(ProxyService proxy) throws ProxyAdminException {
