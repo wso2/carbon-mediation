@@ -44,7 +44,7 @@ import java.util.Set;
 import java.util.HashMap;
 
 /**
- * @scr.component name="org.wso2.carbon.startup" immediate="true"
+ * @scr.component name="org.wso2.carbon.mediation.startup" immediate="true"
  * @scr.reference name="synapse.env.service"
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService"
  * cardinality="1..n" policy="dynamic"
