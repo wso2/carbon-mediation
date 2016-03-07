@@ -134,6 +134,13 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
         }
     }
 
+    public void shutdown() {
+        if (log.isDebugEnabled()) {
+            log.debug("Mediation config reporter thread is being stopped");
+        }
+        shutdownRequested = true;
+    }
+
     @Override
     public int getTenantId() {
         return tenantId;

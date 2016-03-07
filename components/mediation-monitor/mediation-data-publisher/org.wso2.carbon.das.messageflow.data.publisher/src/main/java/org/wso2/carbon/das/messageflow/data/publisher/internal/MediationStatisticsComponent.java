@@ -182,7 +182,27 @@ public class MediationStatisticsComponent {
             }
         }
 
-        // TODO: stop config reporting threads
+        // Stops config reporting threads
+        for(MediationConfigReporterThread configReporterThread : configReporterThreads.values()) {
+            if (configReporterThread != null && configReporterThread.isAlive()) {
+                configReporterThread.shutdown();
+                configReporterThread.interrupt();
+
+                // Wait until the thread is gracefully terminates
+                while (configReporterThread.isAlive()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Waiting for the mediation config reporter thread to terminate");
+                    }
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ignore) {
+
+                    }
+                }
+            }
+        }
+
 
         if (log.isDebugEnabled()) {
             log.debug("DAS service statistics data publisher bundle is deactivated");
