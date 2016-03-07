@@ -1918,11 +1918,6 @@
                 <artifactId>org.wso2.carbon.bam.data.publisher.util</artifactId>
                 <version>${bam.data.publisher.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.ec2-client</artifactId>
-                <version>${ec2.client.version}</version>
-            </dependency>
 
 
             <!--12 Misc -->
