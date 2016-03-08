@@ -16,10 +16,7 @@
  */
 package org.wso2.datamapper.engine.core;
 
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Parser;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
+import org.wso2.datamapper.engine.core.schemas.AVROSchema;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,8 +32,6 @@ public class MappingResourceLoader {
     private InputStream mappingConfig;
     private String inputRootelement;
     private String outputRootelement;
-    private Context context;
-    private Scriptable scope;
     private JSFunction function;
 
     /**
@@ -56,6 +51,10 @@ public class MappingResourceLoader {
         this.mappingConfig = mappingConfig;
         this.function = createFunction(mappingConfig);
 
+    }
+
+    private Schema getAvroSchema(InputStream inputSchema) throws IOException {
+        return new AVROSchema(inputSchema);
     }
 
     public Schema getInputSchema() {
@@ -78,16 +77,8 @@ public class MappingResourceLoader {
         return outputRootelement;
     }
 
-    public Context getContext() {
-        return context;
-    }
-
-    public JSFunction getFunction() {
+     public JSFunction getFunction() {
         return function;
-    }
-
-    private Schema getAvroSchema(InputStream schema) throws IOException {
-        return new Parser().parse(schema);
     }
 
     /**

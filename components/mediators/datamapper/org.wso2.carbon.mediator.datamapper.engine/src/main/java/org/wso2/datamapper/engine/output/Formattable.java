@@ -14,20 +14,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core.executors.nashorn;
+package org.wso2.datamapper.engine.output;
 
-import org.wso2.datamapper.engine.core.Executable;
-import org.wso2.datamapper.engine.core.MappingResourceLoader;
 import org.wso2.datamapper.engine.core.Model;
-import org.wso2.datamapper.engine.core.exceptions.JSException;
 
 /**
- * This class implements script executor for data mapper using java 8 NasHorn JS executor
+ * This interface should be implemented to convert data mapper generic models to
  */
-public class NasHornJava8Executor implements Executable {
+public interface Formattable <T>{
 
-    @Override
-    public Model execute(MappingResourceLoader resourceModel, Model inputRecord, Model outputRecord) throws JSException {
-        return null;
-    }
+    T format(Model model);
 }

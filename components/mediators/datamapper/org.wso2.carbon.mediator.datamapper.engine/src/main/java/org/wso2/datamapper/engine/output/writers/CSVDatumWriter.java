@@ -15,33 +15,31 @@
  * under the License.
  */
 
-package org.wso2.datamapper.engine.output.readers;
+
+package org.wso2.datamapper.engine.output.writers;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.Encoder;
+import org.json.CDL;
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class JSONDatumWriter extends GenericDatumWriter<GenericRecord> {
 
+public class CSVDatumWriter extends GenericDatumWriter<GenericRecord> {
 
     @Override
-    protected void writeRecord(Schema schema, Object datum, Encoder out)
+    protected void writeArray(Schema schema, Object datum, Encoder out)
             throws IOException {
         try {
-            GenericRecord record = (GenericRecord) datum;
-            String name = record.getSchema().getName();
-            JSONObject rootObj = new JSONObject();
-            rootObj.putOnce(name, new JSONObject(record.toString()));
-            out.writeString(rootObj.toString());
+            JSONArray jsonArray = new JSONArray(datum.toString());
+            out.writeString(CDL.toString(jsonArray));
         } catch (JSONException e) {
             throw new IOException(e);
         }
     }
 
 }
-

@@ -24,7 +24,9 @@ import org.apache.avro.generic.GenericData.Array;
 import org.apache.avro.generic.GenericRecord;
 import org.mozilla.javascript.NativeJavaArray;
 import org.mozilla.javascript.Scriptable;
+import org.wso2.datamapper.engine.core.Model;
 import org.wso2.datamapper.engine.core.executors.rhino.ScriptableRecord;
+import org.wso2.datamapper.engine.core.models.AVROGenericModel;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -81,7 +83,9 @@ public class AvroAwareNativeJavaArray extends NativeJavaArray {
             if ((recordArray.size() - 1) < index) {
                 recordArray.add(new GenericData.Record(elementType));
             }
-            return new ScriptableRecord((GenericRecord) recordArray.get(index), scope);
+            AVROGenericModel nextModel = new AVROGenericModel();
+            nextModel.setModel((GenericRecord) recordArray.get(index));
+            return new ScriptableRecord((Model)nextModel , scope);
         } else {
             return recordArray.get(index);
         }
@@ -107,7 +111,9 @@ public class AvroAwareNativeJavaArray extends NativeJavaArray {
         while (iterator.hasNext()) {
             Object next = iterator.next();
             if (next instanceof GenericRecord) {
-                list.add(new ScriptableRecord((GenericRecord) next, scope));
+                AVROGenericModel nextModel = new AVROGenericModel();
+                nextModel.setModel((GenericRecord) next);
+                list.add(new ScriptableRecord((Model) nextModel, scope));
             } else {
                 list.add(next);
             }

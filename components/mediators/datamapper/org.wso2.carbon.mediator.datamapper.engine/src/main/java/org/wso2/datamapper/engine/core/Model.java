@@ -14,20 +14,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core.executors.nashorn;
-
-import org.wso2.datamapper.engine.core.Executable;
-import org.wso2.datamapper.engine.core.MappingResourceLoader;
-import org.wso2.datamapper.engine.core.Model;
-import org.wso2.datamapper.engine.core.exceptions.JSException;
+package org.wso2.datamapper.engine.core;
 
 /**
- * This class implements script executor for data mapper using java 8 NasHorn JS executor
+ *
  */
-public class NasHornJava8Executor implements Executable {
+public interface Model <T>{
 
-    @Override
-    public Model execute(MappingResourceLoader resourceModel, Model inputRecord, Model outputRecord) throws JSException {
-        return null;
-    }
+    void setModel(T model);
+
+    T getModel();
+
+    void setSchema(Schema schema);
+
+    Schema getSchema();
 }

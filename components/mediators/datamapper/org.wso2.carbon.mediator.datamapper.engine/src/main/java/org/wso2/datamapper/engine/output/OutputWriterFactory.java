@@ -18,10 +18,10 @@
 package org.wso2.datamapper.engine.output;
 
 import org.apache.avro.generic.GenericDatumWriter;
-import org.wso2.datamapper.engine.datatypes.InputOutputDataTypes;
-import org.wso2.datamapper.engine.output.readers.CSVDatumWriter;
-import org.wso2.datamapper.engine.output.readers.JSONDatumWriter;
-import org.wso2.datamapper.engine.output.readers.XMLDatumWriter;
+import org.wso2.datamapper.engine.types.InputOutputDataTypes;
+import org.wso2.datamapper.engine.output.writers.CSVDatumWriter;
+import org.wso2.datamapper.engine.output.writers.JSONDatumWriter;
+import org.wso2.datamapper.engine.output.writers.XMLDatumWriter;
 
 /**
  * Factory class for writer classes

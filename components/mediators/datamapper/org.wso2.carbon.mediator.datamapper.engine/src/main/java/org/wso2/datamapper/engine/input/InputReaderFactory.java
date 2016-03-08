@@ -17,7 +17,7 @@
 
 package org.wso2.datamapper.engine.input;
 
-import org.wso2.datamapper.engine.datatypes.InputOutputDataTypes;
+import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 import org.wso2.datamapper.engine.input.readers.CsvInputReader;
 import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
 import org.wso2.datamapper.engine.input.readers.JsonInputReader;

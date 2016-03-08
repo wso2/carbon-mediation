@@ -40,11 +40,11 @@ import org.apache.synapse.mediators.Value;
 import org.apache.synapse.util.AXIOMUtils;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
-import org.wso2.datamapper.engine.datatypes.InputOutputDataTypes;
+import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 import org.wso2.datamapper.engine.input.InputReaderFactory;
 import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
 import org.wso2.datamapper.engine.output.OutputWriterFactory;
-import org.wso2.datamapper.engine.output.readers.DummyEncoder;
+import org.wso2.datamapper.engine.output.writers.DummyEncoder;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
@@ -259,7 +259,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @throws SynapseException
      * @throws IOException
      */
-    private void transform(MessageContext synCtx, String configkey,
+    private void  transform(MessageContext synCtx, String configkey,
                            String inSchemaKey, String outSchemaKey, String inputType,
                            String outputType, String uuid)
              {
@@ -272,12 +272,12 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
             InputDataReaderAdapter inputReader = InputReaderFactory.getInputDataReader(inputType);
             InputStream inputStream = getInputStream(synCtx, inputType);
-            GenericRecord result = MappingHandler.doMap(inputStream, mappingResourceLoader, inputReader);
+            GenericRecord result = (GenericRecord) MappingHandler.doMap(inputStream, mappingResourceLoader, inputReader).getModel();
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Encoder encoder = new DummyEncoder(baos);
             GenericDatumWriter<GenericRecord> writer = OutputWriterFactory.getDatumWriter(outputType);
-            writer.setSchema(mappingResourceLoader.getOutputSchema());
+            writer.setSchema(result.getSchema());
             writer.write(result, encoder);
             outputMessage = AXIOMUtil.stringToOM(baos.toString());
 

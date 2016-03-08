@@ -23,21 +23,23 @@ import org.apache.avro.generic.GenericData.Array;
 import org.apache.avro.generic.GenericRecord;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
+import org.wso2.datamapper.engine.core.Model;
+import org.wso2.datamapper.engine.core.models.AVROGenericModel;
 import org.wso2.datamapper.engine.utils.AvroAwareNativeJavaArray;
 
 public class ScriptableRecord implements Scriptable {
 
-    private GenericRecord record;
     private Scriptable prototype;
     private Scriptable scope;
+    private AVROGenericModel record;
 
 
-    public ScriptableRecord(GenericRecord record, Scriptable scope) {
-        this.record = record;
+    public ScriptableRecord(Model model, Scriptable scope) {
+        this.record = (AVROGenericModel) model;
         this.scope = scope;
     }
 
-    public GenericRecord getRecord() {
+    public Model getModel() {
         return record;
     }
 
@@ -47,10 +49,12 @@ public class ScriptableRecord implements Scriptable {
     }
 
     public Object get(String name, Scriptable start) {
-        Object resource = this.record.get(name);
-        Field field = record.getSchema().getField(name);
+        Object resource = record.getModel().get(name);
+        Field field = record.getModel().getSchema().getField(name);
         if (resource instanceof GenericRecord) {
-            return new ScriptableRecord((GenericRecord) resource, getScope());
+            AVROGenericModel nextModel = new AVROGenericModel();
+            nextModel.setModel((GenericRecord)resource);
+            return new ScriptableRecord((Model) nextModel, getScope());
         } else if (resource instanceof Array) {
             @SuppressWarnings("unchecked")
             Array<Object> recordArray = (Array<Object>) resource;
@@ -60,12 +64,14 @@ public class ScriptableRecord implements Scriptable {
         } else if (field != null) {
             if (field.schema().getType().equals(Type.ARRAY)) {
                 Array<Object> recordArray = new GenericData.Array<Object>(32, field.schema());
-                record.put(name, recordArray);
+                record.getModel().put(name, recordArray);
                 return new AvroAwareNativeJavaArray(getScope(), recordArray);
             } else if (field.schema().getType().equals(Type.RECORD)) {
                 GenericRecord subRecord = new GenericData.Record(field.schema());
-                record.put(name, subRecord);
-                return new ScriptableRecord((GenericRecord) record.get(name), getScope());
+                record.getModel().put(name, subRecord);
+                AVROGenericModel nextModel = new AVROGenericModel();
+                nextModel.setModel((GenericRecord) record.getModel().get(name));
+                return new ScriptableRecord((Model) nextModel, getScope());
             } else {
                 return NOT_FOUND;
             }
@@ -90,9 +96,9 @@ public class ScriptableRecord implements Scriptable {
     public void put(String name, Scriptable start, Object value) {
 
         if (value instanceof NativeJavaObject) {
-            this.record.put(name, ((NativeJavaObject) value).getDefaultValue(String.class));
+            this.record.getModel().put(name, ((NativeJavaObject) value).getDefaultValue(String.class));
         } else {
-            this.record.put(name, value);
+            this.record.getModel().put(name, value);
         }
     }
 

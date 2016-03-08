@@ -16,39 +16,34 @@
  */
 package org.wso2.datamapper.engine.core.executors.rhino;
 
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.synapse.SynapseException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.wso2.datamapper.engine.core.IScriptExecutor;
-import org.wso2.datamapper.engine.core.JSFunction;
-import org.wso2.datamapper.engine.core.MappingResourceLoader;
+import org.wso2.datamapper.engine.core.*;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 
 /**
  * This class implements script executor for data mapper using rhino
  */
-public class RhinoExecutor implements IScriptExecutor {
+public class RhinoExecutor implements Executable {
 
     private Context context;
     private Scriptable scope;
 
     @Override
-    public GenericRecord executeMapping(MappingResourceLoader resourceModel, GenericRecord inputRecord) throws JSException {
-        GenericRecord genericOutRecord = new GenericData.Record(resourceModel.getOutputSchema());
+    public Model execute(MappingResourceLoader resourceModel, Model inputRecord, Model outputRecord) throws JSException {
+        outputRecord.setSchema( resourceModel.getOutputSchema());
         Function fn = getFunction(resourceModel.getFunction());
-        ScriptableRecord inScriptableRecord = new ScriptableRecord(inputRecord, getScope());
-        ScriptableRecord outScriptableRecord = new ScriptableRecord(genericOutRecord,
-                getScope());
+        ScriptableRecord inScriptableRecord = new ScriptableRecord( inputRecord, getScope());
+        ScriptableRecord outScriptableRecord = new ScriptableRecord(outputRecord,getScope());
         Object resultOb = fn.call(getContext(), getScope(), getScope(),
                 new Object[]{inScriptableRecord, outScriptableRecord});
 
 
         if (resultOb != ScriptableObject.NOT_FOUND) {
-            return outScriptableRecord.getRecord();
+            return outScriptableRecord.getModel();
         }
         throw new SynapseException("Invalid output mapped generic record found");
     }

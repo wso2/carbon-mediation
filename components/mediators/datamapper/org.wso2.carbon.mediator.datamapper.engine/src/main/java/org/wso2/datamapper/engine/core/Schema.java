@@ -16,21 +16,15 @@
  */
 package org.wso2.datamapper.engine.core;
 
-import org.apache.avro.generic.GenericRecord;
-import org.wso2.datamapper.engine.core.exceptions.JSException;
-
 /**
- * This interface should be implemented by script executors of Data Mapper Engine
+ *
  */
-public interface IScriptExecutor {
+public interface Schema<T> {
 
-    /**
-     * This method executes the mapping config in the {@link MappingResourceLoader} on input generic record and returns the output generic record
-     *
-     * @param resourceModel
-     * @param inputRecord
-     * @return
-     * @throws JSException
-     */
-    GenericRecord executeMapping(MappingResourceLoader resourceModel, GenericRecord inputRecord) throws JSException;
+    T getSchema();
+
+    void setSchema(T schema);
+
+    String getName();
+
 }

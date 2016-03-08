@@ -14,7 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.output.readers;
+package org.wso2.datamapper.engine.output.writers;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;

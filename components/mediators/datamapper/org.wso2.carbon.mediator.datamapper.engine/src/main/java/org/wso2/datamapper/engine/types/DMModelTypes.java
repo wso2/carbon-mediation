@@ -14,21 +14,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.datamapper.engine.types;
 
-package org.wso2.datamapper.engine.datatypes;
-
-public class InputOutputDataTypes {
+/**
+ *
+ */
+public class DMModelTypes {
 
     private final static String JSON_CONTENT_TYPE = "JSON";
-    private final static String XML_CONTENT_TYPE = "XML";
-    private final static String CSV_CONTENT_TYPE = "CSV";
+    private final static String AVRO_CONTENT_TYPE = "AVRO";
 
     // Use to define input and output data formats
-    public enum DataType {
-        CSV(CSV_CONTENT_TYPE), XML(XML_CONTENT_TYPE), JSON(JSON_CONTENT_TYPE);
+    public enum ModelType {
+       JSON(JSON_CONTENT_TYPE),AVRO(AVRO_CONTENT_TYPE);
         private final String value;
 
-        private DataType(String value) {
+        private ModelType(String value) {
             this.value = value;
         }
 
@@ -38,9 +39,9 @@ public class InputOutputDataTypes {
         }
 
         // Use to get the DataType from the relevant input and output data type
-        public static DataType fromString(String dataType) {
+        public static ModelType fromString(String dataType) {
             if (dataType != null) {
-                for (DataType definedTypes : DataType.values()) {
+                for (ModelType definedTypes : ModelType.values()) {
                     if (dataType.equalsIgnoreCase(definedTypes.toString())) {
                         return definedTypes;
                     }
@@ -50,7 +51,4 @@ public class InputOutputDataTypes {
         }
 
     }
-
-    ;
-
 }

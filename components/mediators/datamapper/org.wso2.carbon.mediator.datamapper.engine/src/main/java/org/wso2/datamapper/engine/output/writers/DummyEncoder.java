@@ -15,7 +15,7 @@
  * under the License.
  */
 
-package org.wso2.datamapper.engine.output.readers;
+package org.wso2.datamapper.engine.output.writers;
 
 import org.apache.avro.io.Encoder;
 import org.apache.avro.util.Utf8;
