@@ -126,10 +126,9 @@ public class FileInjectHandler {
             String streaming = vfsProperties.getProperty(VFSConstants.STREAMING);
             
             if (builder instanceof DataSourceMessageBuilder && "true".equals(streaming)) {
-                in = null;
                 dataSource = ManagedDataSourceFactory.create(
                         new FileObjectDataSource(file, contentType));
-                dataSource = null;
+                in = null;
             } else {
                 in = new AutoCloseInputStream(file.getContent().getInputStream());
                 dataSource = null;

@@ -27,8 +27,9 @@
    <name>WSO2 Carbon - DataMapper Mediator Feature Aggregator Module</name>
    <url>http://wso2.org</url>
    <modules>
-      <module>org.wso2.carbon.mediator.datamapper.server.feature</module>
-      <module>org.wso2.carbon.mediator.datamapper.ui.feature</module>
-      <module>org.wso2.carbon.mediator.datamapper.feature</module>
+       <module>org.wso2.carbon.mediator.datamapper.engine.feature</module>
+       <module>org.wso2.carbon.mediator.datamapper.server.feature</module>
+       <module>org.wso2.carbon.mediator.datamapper.ui.feature</module>
+       <module>org.wso2.carbon.mediator.datamapper.feature</module>
    </modules>
 </project>

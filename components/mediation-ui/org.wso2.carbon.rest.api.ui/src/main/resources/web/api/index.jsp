@@ -387,6 +387,8 @@
             success: function (msg) {
                 document.getElementById("enableTrace" + apiName).style.display = "none";
                 document.getElementById("disableTrace" + apiName).style.display = "";
+                document.getElementById("enableStat" + apiName).style.display = "none";
+                document.getElementById("disableStat" + apiName).style.display = "";
             },
             error: function (msg) {
                 CARBON.showErrorDialog('<fmt:message key="api.trace.enable.error"/>' + ' ' + apiName);

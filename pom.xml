@@ -2271,6 +2271,11 @@
                 <artifactId>org.wso2.carbon.mediator.datamapper</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.datamapper.engine</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
 
 
             <!-- publishEvent mediator dependencies -->
@@ -2363,6 +2368,31 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-buffer</artifactId>   
                 <version>${netty.version}</version>             
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${avro.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>${opencsv.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wso2.carbon.mediation</groupId>
+                <artifactId>org.wso2.carbon.mediator.datamapper.engine</artifactId>
+                <version>${carbon.mediation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${jackson.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -2530,9 +2560,12 @@
         <org.apache.axiom.om.version>0.0.0</org.apache.axiom.om.version>
         <org.apache.felix.framework.version>1.0.3</org.apache.felix.framework.version>
         <xercesImpl.version>2.8.1.wso2v2</xercesImpl.version>
-	<cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
+	    <cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
         <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
         <libthrift.version>0.8.0.wso2v1</libthrift.version>
+        <avro.version>1.8.0.wso2v1</avro.version>
+        <opencsv.version>2.3</opencsv.version>
+        <jackson.version>1.9.13</jackson.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>

@@ -596,7 +596,9 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             SequenceMediator sequence
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
-                sequence.setTraceState(SynapseConstants.TRACING_ON);
+                sequence.enableTracing();
+                sequence.enableStatistics(); // Tracing needs statistics to be enabled
+
                 if (sequence.getArtifactContainerName() == null) {
                     persistSequence(sequence);
                 }
@@ -621,7 +623,7 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             SequenceMediator sequence
                     = (SequenceMediator) getSynapseConfiguration().getSequence(sequenceName);
             if (sequence != null) {
-                sequence.setTraceState(SynapseConstants.TRACING_OFF);
+                sequence.disableTracing();
                 if (sequence.getArtifactContainerName() == null) {
                     persistSequence(sequence);
                 }
