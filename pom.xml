@@ -556,19 +556,19 @@
                 <version>${carbon.commons.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.commons</groupId>
-                <artifactId>org.wso2.carbon.databridge.agent.thrift</artifactId>
-                <version>${carbon.commons.version}</version>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.databridge.agent</artifactId>
+                <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.commons</groupId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.commons</artifactId>
-                <version>${carbon.commons.version}</version>
+                <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.commons</groupId>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
                 <artifactId>org.wso2.carbon.databridge.commons.thrift</artifactId>
-                <version>${carbon.commons.version}</version>
+                <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
@@ -2342,23 +2342,28 @@
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.4.3</carbon.kernel.version>
+        <carbon.kernel.version>4.4.4</carbon.kernel.version>
         <carbon.kernel.imp.pkg.version>[4.4.0, 4.5.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.4.8</carbon.commons.version>
-        <carbon.commons.imp.pkg.version>[4.4.0, 4.5.0)</carbon.commons.imp.pkg.version>
+        <carbon.commons.version>4.5.2</carbon.commons.version>
+        <carbon.commons.imp.pkg.version>[4.5.0, 4.6.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
-        <carbon.deployment.version>4.6.0</carbon.deployment.version>
+        <carbon.deployment.version>4.6.1</carbon.deployment.version>
+        <carbon.deployment.imp.pkg.version>[4.6.0, 4.7.0)</carbon.deployment.imp.pkg.version>
 
         <!-- Carbon Registry version-->
-        <carbon.registry.version>4.4.5</carbon.registry.version>
-        <carbon.registry.imp.pkg.version>[4.4.0, 4.5.0)</carbon.registry.imp.pkg.version>
+        <carbon.registry.version>4.5.1</carbon.registry.version>
+        <carbon.registry.imp.pkg.version>[4.5.0, 4.6.0)</carbon.registry.imp.pkg.version>
+
+    <!-- Analytic Commons version-->
+        <carbon.analytics.common.version>5.0.6</carbon.analytics.common.version>
+        <carbon.analytics.common.imp.pkg.version>[5.0.6, 5.1.0)</carbon.analytics.common.imp.pkg.version>
 
         <!-- Carbon Identity version-->
-        <carbon.identity.version>5.0.7</carbon.identity.version>
+        <carbon.identity.version>5.0.8</carbon.identity.version>
         <carbon.identity.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->

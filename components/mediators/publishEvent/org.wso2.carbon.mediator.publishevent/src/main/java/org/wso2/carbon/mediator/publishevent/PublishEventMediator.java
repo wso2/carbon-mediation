@@ -26,10 +26,10 @@ import org.apache.synapse.SynapseLog;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.databridge.agent.thrift.exception.AgentException;
 import org.wso2.carbon.databridge.commons.Attribute;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 import org.wso2.carbon.event.sink.EventSink;
 import org.wso2.carbon.event.sink.EventSinkService;
 
@@ -148,12 +148,9 @@ public class PublishEventMediator extends AbstractMediator {
 			}
 
 			eventSink.getDataPublisher()
-			         .publish(getStreamName(), getStreamVersion(), metaData, correlationData, payloadData,
-			                  arbitraryData);
+			         .publish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()), metaData,
+			                  correlationData, payloadData, arbitraryData);
 
-		} catch (AgentException e) {
-			String errorMsg = "Agent error occurred while sending the event: " + e.getLocalizedMessage();
-			log.error(errorMsg, e);
 		} catch (SynapseException e) {
 			String errorMsg = "Error occurred while constructing the event: " + e.getLocalizedMessage();
 			log.error(errorMsg, e);
@@ -198,7 +195,6 @@ public class PublishEventMediator extends AbstractMediator {
 			streamDef.setCorrelationData(generateAttributeList(getCorrelationProperties()));
 			streamDef.setMetaData(generateAttributeList(getMetaProperties()));
 			streamDef.setPayloadData(generateAttributeList(getPayloadProperties()));
-			eventSink.getDataPublisher().addStreamDefinition(streamDef);
 		} catch (MalformedStreamDefinitionException e) {
 			String errorMsg = "Failed to set stream definition. Malformed Stream Definition: " + e.getMessage();
 			throw new SynapseException(errorMsg, e);
