@@ -108,7 +108,7 @@
                                     org.wso2.carbon.system.statistics.server:${carbon.commons.version}
                                 </importFeatureDef>
                                 <importFeatureDef>
-                                    org.wso2.carbon.databridge.datapublisher:${carbon.commons.version}
+                                    org.wso2.carbon.databridge.datapublisher:${carbon.analytics.common.version}
                                 </importFeatureDef>
                             </importFeatures>
                         </configuration>

@@ -17,20 +17,11 @@ package org.wso2.carbon.das.messageflow.data.publisher.util;
 
 
 import org.apache.axis2.context.ConfigurationContext;
-import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.synapse.aspects.statistics.ErrorLog;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.EventPublisherConfig;
 import org.wso2.carbon.das.messageflow.data.publisher.services.DASMessageFlowPublisherAdmin;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
-import org.wso2.carbon.mediation.statistics.MediationStatisticsSnapshot;
-import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
-import org.wso2.carbon.utils.NetworkUtils;
 
-import java.net.SocketException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PublisherUtils {

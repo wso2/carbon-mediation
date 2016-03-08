@@ -22,8 +22,6 @@ import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
 
-import java.util.List;
-
 public class DASMessageFlowPublisherAdmin extends AbstractAdmin {
 
     private RegistryPersistenceManager registryPersistenceManager;
