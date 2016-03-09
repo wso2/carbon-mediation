@@ -16,17 +16,19 @@
  */
 package org.wso2.datamapper.engine.input;
 
-import java.io.InputStreamReader;
+import org.wso2.datamapper.engine.core.Schema;
+
+import java.io.InputStream;
 
 /**
  * This interface should be implemented by data-mapper input readers.
  */
-public interface Readable <T>{
+public interface Readable {
 
     /**
      *
      * @param input
      * @return
      */
-    T read(InputStreamReader input);
+    void read(InputStream input,InputModelBuilder inputModelBuilder,Schema inputSchema);
 }

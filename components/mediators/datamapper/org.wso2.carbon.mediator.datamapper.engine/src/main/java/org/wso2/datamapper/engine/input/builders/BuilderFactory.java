@@ -14,31 +14,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core.schemas;
+package org.wso2.datamapper.engine.input.builders;
 
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Parser;
-
-import java.io.IOException;
-import java.io.InputStream;
+import org.wso2.datamapper.engine.input.Buildable;
+import org.wso2.datamapper.engine.types.DMModelTypes;
 
 /**
  *
  */
-public class AVROSchema implements org.wso2.datamapper.engine.core.Schema<Schema> {
+public class BuilderFactory {
 
-    private Schema schema;
-
-    public AVROSchema(InputStream inputSchema) throws IOException {
-        getAvroSchema(inputSchema);
+    public static Buildable getBuilder(DMModelTypes.ModelType inputType){
+        switch (inputType){
+            case JSON: return new JacksonJSONBuilder();
+        }
+        throw new IllegalArgumentException("Model builder for type "+inputType+" is not implemented.");
     }
 
-    private void getAvroSchema(InputStream inputSchema) throws IOException {
-        schema = new Parser().parse(inputSchema);
-    }
-
-    @Override
-    public String getName() {
-        return schema.getName();
-    }
 }

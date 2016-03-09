@@ -14,31 +14,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core.schemas;
+package org.wso2.datamapper.engine.input.readers;
 
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Parser;
-
-import java.io.IOException;
-import java.io.InputStream;
+import org.wso2.datamapper.engine.input.Readable;
+import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
 /**
  *
  */
-public class AVROSchema implements org.wso2.datamapper.engine.core.Schema<Schema> {
+public class ReaderFactory {
 
-    private Schema schema;
-
-    public AVROSchema(InputStream inputSchema) throws IOException {
-        getAvroSchema(inputSchema);
-    }
-
-    private void getAvroSchema(InputStream inputSchema) throws IOException {
-        schema = new Parser().parse(inputSchema);
-    }
-
-    @Override
-    public String getName() {
-        return schema.getName();
+    public static Readable getReader(InputOutputDataTypes.DataType inputType){
+        switch (inputType){
+            case XML: return new XMLReader();
+        }
+        throw new IllegalArgumentException("Input Reader for type "+inputType+" is not implemented.");
     }
 }

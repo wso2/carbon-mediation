@@ -16,18 +16,58 @@
  */
 package org.wso2.datamapper.engine.input;
 
+import org.wso2.datamapper.engine.core.Model;
+import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.input.builders.BuilderFactory;
+import org.wso2.datamapper.engine.input.readers.ReaderFactory;
+import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
+
+import java.io.InputStream;
 
 /**
  *
  */
 public class InputModelBuilder {
 
-    Readable inputReader;
-    Buildable modelBuilder;
+    private Readable inputReader;
+    private Buildable modelBuilder;
+    private Model inputModel;
+    private Schema inputSchema;
 
-    public InputModelBuilder(InputOutputDataTypes inputType, DMModelTypes modelType) {
+    public InputModelBuilder(InputOutputDataTypes.DataType inputType, DMModelTypes.ModelType modelType,Schema inputSchema) {
+        inputReader = ReaderFactory.getReader(inputType);
+        modelBuilder = BuilderFactory.getBuilder(modelType);
+        this.inputSchema = inputSchema;
+    }
+
+    public Model buildInputModel(InputStream inputStream){
+        inputReader.read(inputStream,this,inputSchema);
+        return inputModel;
+    }
+
+    public void notifyEvent(DMReaderEvent readerEvent) {
+        switch (readerEvent.getEventType()) {
+            case OBJECT_START:
+                System.out.println("Object Started");
+                break;
+            case OBJECT_END:
+                System.out.println("Object Ended");
+                break;
+            case ARRAY_START:
+                System.out.println("Array Started");
+                break;
+            case FIELD:
+
+                System.out.println("Field Started : "+readerEvent.getName()+" : "+readerEvent.getValue());
+                break;
+            case ARRAY_END:
+                System.out.println("Array Ended");
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal Reader event found : " + readerEvent.getEventType());
+        }
 
     }
 }

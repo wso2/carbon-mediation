@@ -14,31 +14,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core.schemas;
+package org.wso2.datamapper.engine.input.builders;
 
-import org.apache.avro.Schema;
-import org.apache.avro.Schema.Parser;
-
-import java.io.IOException;
-import java.io.InputStream;
+import com.fasterxml.jackson.core.JsonFactory;
+import org.wso2.datamapper.engine.core.Model;
+import org.wso2.datamapper.engine.input.Buildable;
 
 /**
  *
  */
-public class AVROSchema implements org.wso2.datamapper.engine.core.Schema<Schema> {
-
-    private Schema schema;
-
-    public AVROSchema(InputStream inputSchema) throws IOException {
-        getAvroSchema(inputSchema);
-    }
-
-    private void getAvroSchema(InputStream inputSchema) throws IOException {
-        schema = new Parser().parse(inputSchema);
+public class JacksonJSONBuilder implements Buildable {
+    @Override
+    public Model build(Object model) {
+        return null;
     }
 
     @Override
-    public String getName() {
-        return schema.getName();
+    public Model buildObject(String name, Model modelObject) {
+        JsonFactory jsonFactory = new JsonFactory();
+        return null;
+    }
+
+    @Override
+    public Model buildArray(String arrayName, Model modelArray) {
+        return null;
+    }
+
+    @Override
+    public Model buildField(String name, Object value) {
+        return null;
     }
 }

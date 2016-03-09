@@ -55,7 +55,6 @@ public class XmlInputReader implements InputDataReaderAdapter {
     }
 
     public GenericRecord getInputRecord(Schema input) {
-
         GenericRecord inputRecord = getChild(input, this.messageBody.getChildElements());
         return inputRecord;
     }

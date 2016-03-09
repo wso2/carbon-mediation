@@ -21,10 +21,6 @@ package org.wso2.datamapper.engine.core;
  */
 public interface Schema<T> {
 
-    T getSchema();
-
-    void setSchema(T schema);
-
     String getName();
 
 }

@@ -24,4 +24,8 @@ import org.wso2.datamapper.engine.core.Model;
 public interface Buildable <T>{
 
     Model build(T model);
+    Model buildObject(String name,Model modelObject);
+    Model buildArray(String arrayName,Model modelArray);
+    Model buildField(String name,Object value);
+
 }
