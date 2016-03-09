@@ -265,7 +265,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             // create input model builder to convert input payload to generic data holder
             InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(inputType), DMModelTypes.ModelType.JSON,mappingResourceLoader.getInputSchema());
             //execute mapping on the input stream
-            MappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader, inputModelBuilder).getModel();
+            MappingHandler mappingHandler = new MappingHandler();
+            mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader, inputModelBuilder);
 
             /*InputDataReaderAdapter inputReader = InputReaderFactory.getInputDataReader(inputType);
             InputStream inputStream = getInputStream(synCtx, inputType);
