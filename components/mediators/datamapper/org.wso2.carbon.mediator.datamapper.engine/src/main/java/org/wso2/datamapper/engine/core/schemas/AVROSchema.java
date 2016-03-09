@@ -34,18 +34,7 @@ public class AVROSchema implements org.wso2.datamapper.engine.core.Schema<Schema
     }
 
     private void getAvroSchema(InputStream inputSchema) throws IOException {
-        setSchema(new Parser().parse(inputSchema));
-    }
-
-
-    @Override
-    public Schema getSchema() {
-        return schema;
-    }
-
-    @Override
-    public void setSchema(Schema schema) {
-        this.schema = schema;
+        schema = new Parser().parse(inputSchema);
     }
 
     @Override

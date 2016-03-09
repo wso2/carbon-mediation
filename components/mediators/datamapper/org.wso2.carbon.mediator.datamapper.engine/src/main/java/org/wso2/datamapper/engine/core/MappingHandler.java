@@ -16,35 +16,31 @@
  */
 package org.wso2.datamapper.engine.core;
 
-import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericRecord;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorFactory;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorType;
-import org.wso2.datamapper.engine.core.models.AVROGenericModel;
-import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
+import org.wso2.datamapper.engine.input.InputModelBuilder;
 
 import java.io.InputStream;
 
 
 public class MappingHandler {
 
-    public static Model doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputDataReaderAdapter inputReader)
+    private String inputVariable;
+
+    public Model doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputModelBuilder inputModelBuilder)
             throws JSException {
 
-        inputReader.setInputMsg(inputMsg);
-        GenericRecord inputRecord = inputReader.getInputRecord((org.apache.avro.Schema) resourceModel.getInputSchema().getSchema());
-        Executable scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.RHINO);
-        AVROGenericModel outputRecord = new AVROGenericModel();
-        GenericRecord outputGenericRecord = new GenericData.Record((org.apache.avro.Schema) resourceModel.getOutputSchema().getSchema());
-        outputRecord.setModel(outputGenericRecord);
-        AVROGenericModel avroInputRecord = new AVROGenericModel();
-        avroInputRecord.setModel(inputRecord);
-        avroInputRecord.setSchema(resourceModel.getInputSchema());
-        outputRecord = (AVROGenericModel) scriptExecutor.execute(resourceModel, avroInputRecord, outputRecord);
+        inputModelBuilder.buildInputModel(inputMsg,this);
+        Executable scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.NASHORN);
+        while(inputVariable==null){
+        }
+        Model outputModel = scriptExecutor.execute(resourceModel, inputVariable);
+        return outputModel;
+    }
 
-        return outputRecord;
-
+    public void notifyInputVariable(String inputVariable){
+        this.inputVariable=inputVariable;
     }
 
 }

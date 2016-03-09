@@ -17,13 +17,13 @@
 
 package sample;
 
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumWriter;
 import org.apache.avro.io.Encoder;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
-import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
+import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.output.writers.DummyEncoder;
+import org.wso2.datamapper.engine.types.DMModelTypes;
+import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -35,8 +35,8 @@ public class MapperMain {
     public static void main(String[] args) throws Exception {
 
         InputStream inStream = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/input3.xml"));
-        InputStream inputSchema = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/inputSchema3.avsc"));
-        InputStream outputSchema = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/outputSchema3.avsc"));
+        InputStream inputSchema = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/employees.json"));
+        InputStream outputSchema = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/engineers.json"));
         InputStream config = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/testMap.js"));
 
         //Contexts are anti-pattern and no need getters/setters for access static class, just used for code readability
@@ -50,7 +50,7 @@ public class MapperMain {
         //XML : application/xml
         //XML : application/json
 
-        context.setInputType("application/xml");
+        context.setInputType("XML");
         context.setOutputType("XML");
 
         String output = map(context);
@@ -69,17 +69,27 @@ public class MapperMain {
 
         MappingResourceLoader configModel = new MappingResourceLoader(c.getInputSchema(), c.getOutputSchema(),
                 c.getConfig());
-        InputDataReaderAdapter reader = ReaderRegistry.getInstance().get(c.getInputType()).newInstance();
+        InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(c.getInputType()), DMModelTypes.ModelType.JSON,configModel.getInputSchema());
+        MappingHandler mappingHandler = new MappingHandler();
+        mappingHandler.doMap(c.getInputStream(), configModel, inputModelBuilder);
 
-        GenericRecord result = (GenericRecord) MappingHandler.doMap(c.getInputStream(), configModel, reader).getModel();
 
-        DatumWriter<GenericRecord> writer = WriterRegistry.getInstance().get(c.getOutputType()).newInstance();
-        writer.setSchema(result.getSchema());
 
-        writer.write(result, encoder);
-        encoder.flush();
+       // InputDataReaderAdapter reader = ReaderRegistry.getInstance().get(c.getInputType()).newInstance();
+
+       // GenericRecord result = (GenericRecord) MappingHandler.doMap(c.getInputStream(), configModel, reader).getModel();
+
+       // DatumWriter<GenericRecord> writer = WriterRegistry.getInstance().get(c.getOutputType()).newInstance();
+       // writer.setSchema(result.getSchema());
+
+       // writer.write(result, encoder);
+       // encoder.flush();
 
         return baos.toString();
+    }
+
+    private static InputOutputDataTypes.DataType getDataType(String inputType) {
+        return InputOutputDataTypes.DataType.fromString(inputType);
     }
 
     static class MappingContext {

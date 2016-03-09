@@ -16,18 +16,64 @@
  */
 package org.wso2.datamapper.engine.input;
 
+import org.wso2.datamapper.engine.core.MappingHandler;
+import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.input.builders.BuilderFactory;
+import org.wso2.datamapper.engine.input.readers.ReaderFactory;
+import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *
  */
 public class InputModelBuilder {
 
-    Readable inputReader;
-    Buildable modelBuilder;
+    private Readable inputReader;
+    private Buildable modelBuilder;
+    private Schema inputSchema;
+    private MappingHandler mappingHandler;
 
-    public InputModelBuilder(InputOutputDataTypes inputType, DMModelTypes modelType) {
+    public InputModelBuilder(InputOutputDataTypes.DataType inputType, DMModelTypes.ModelType modelType,Schema inputSchema) throws IOException {
+        inputReader = ReaderFactory.getReader(inputType);
+        modelBuilder = BuilderFactory.getBuilder(modelType);
+        this.inputSchema = inputSchema;
+    }
+
+    public void buildInputModel(InputStream inputStream, MappingHandler mappingHandler){
+        this.mappingHandler = mappingHandler;
+        inputReader.read(inputStream,this,inputSchema);
+    }
+
+    public void notifyEvent(DMReaderEvent readerEvent) throws IOException {
+        switch (readerEvent.getEventType()) {
+            case OBJECT_START:
+                modelBuilder.writeObjectFieldStart(readerEvent.getName());
+                break;
+            case OBJECT_END:
+                modelBuilder.writeEndObject();
+                break;
+            case ARRAY_START:
+                modelBuilder.writeArrayFieldStart(readerEvent.getName());
+                break;
+            case FIELD:
+                modelBuilder.writeStringField(readerEvent.getName(), (String) readerEvent.getValue());
+                break;
+            case ARRAY_END:
+                modelBuilder.writeEndArray();
+                break;
+            case TERMINATE:
+                mappingHandler.notifyInputVariable(modelBuilder.close());
+                break;
+            case ANONYMOUS_OBJECT_START:
+                modelBuilder.writeStartObject();
+                break;
+            default:
+                throw new IllegalArgumentException("Illegal Reader event found : " + readerEvent.getEventType());
+        }
 
     }
 }

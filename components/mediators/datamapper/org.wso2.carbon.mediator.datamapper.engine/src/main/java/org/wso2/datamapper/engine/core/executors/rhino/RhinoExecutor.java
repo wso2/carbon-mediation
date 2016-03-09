@@ -32,7 +32,6 @@ public class RhinoExecutor implements Executable {
     private Context context;
     private Scriptable scope;
 
-    @Override
     public Model execute(MappingResourceLoader resourceModel, Model inputRecord, Model outputRecord) throws JSException {
         outputRecord.setSchema( resourceModel.getOutputSchema());
         Function fn = getFunction(resourceModel.getFunction());
@@ -74,5 +73,10 @@ public class RhinoExecutor implements Executable {
         context = Context.enter();
         context.setOptimizationLevel(-1);
         scope = context.initStandardObjects();
+    }
+
+    @Override
+    public Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException {
+        return null;
     }
 }
