@@ -70,8 +70,8 @@ public class MapperMain {
         MappingResourceLoader configModel = new MappingResourceLoader(c.getInputSchema(), c.getOutputSchema(),
                 c.getConfig());
         InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(c.getInputType()), DMModelTypes.ModelType.JSON,configModel.getInputSchema());
-        inputModelBuilder.buildInputModel(c.getInputStream());
-        MappingHandler.doMap(c.getInputStream(), configModel, inputModelBuilder).getModel();
+        MappingHandler mappingHandler = new MappingHandler();
+        mappingHandler.doMap(c.getInputStream(), configModel, inputModelBuilder);
 
 
 
