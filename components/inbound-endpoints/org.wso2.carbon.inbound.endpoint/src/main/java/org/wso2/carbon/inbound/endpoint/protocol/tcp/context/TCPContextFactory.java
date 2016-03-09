@@ -54,14 +54,17 @@ public class TCPContextFactory {
             case InboundTCPConstants.DECODE_BY_HEADER_TRAILER: {
                 tcpContext.getCodec().setHeader(processor.getHeader());
                 tcpContext.getCodec().setTrailer(processor.getTrailer());
+                break;
             }
             case InboundTCPConstants.DECODE_BY_TAG: {
                 byte[] delimiterTag = processor.getTag().getBytes(decoder.charset());
                 tcpContext.getCodec().setTag(processor.getTag());
                 tcpContext.getCodec().setDelimiterTag(delimiterTag);
+                break;
             }
             case InboundTCPConstants.DECODE_BY_LENGTH: {
                 tcpContext.getCodec().setMsgLength(processor.getMsgLength());
+                break;
             }
         }
 

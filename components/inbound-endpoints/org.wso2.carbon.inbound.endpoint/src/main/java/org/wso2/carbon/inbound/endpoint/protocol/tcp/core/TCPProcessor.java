@@ -112,24 +112,28 @@ public class TCPProcessor implements InboundResponseSender {
             String t1 = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_TRAILER_BYTE1);
             String t2 = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_TRAILER_BYTE2);
 
-            if (!h.isEmpty() && !t1.isEmpty() && !t2.isEmpty()) {
-                header = new BigInteger(h, 16).toByteArray();
-                byte[] trailer1 = new BigInteger(t1, 16).toByteArray();
-                byte[] trailer2 = new BigInteger(t2, 16).toByteArray();
-                trailer = new byte[2];
-                trailer[0] = trailer1[0];
-                trailer[1] = trailer2[0];
+            if(h!=null && t1!=null && t2!=null) {
+                if (!h.isEmpty() && !t1.isEmpty() && !t2.isEmpty()) {
+                    header = new BigInteger(h, 16).toByteArray();
+                    byte[] trailer1 = new BigInteger(t1, 16).toByteArray();
+                    byte[] trailer2 = new BigInteger(t2, 16).toByteArray();
+                    trailer = new byte[2];
+                    trailer[0] = trailer1[0];
+                    trailer[1] = trailer2[0];
 
-                if (header[0] > 0 && trailer1[0] > 0 && trailer2[0] > 0) {
-                    decodeMode = InboundTCPConstants.DECODE_BY_HEADER_TRAILER;
-                    log.info("decode by header & trailer");
+                    if (header[0] > 0 && trailer1[0] > 0 && trailer2[0] > 0) {
+                        decodeMode = InboundTCPConstants.DECODE_BY_HEADER_TRAILER;
+                        log.info("decode by header & trailer");
+                    }
                 }
             }
             //tag mode
             tag = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_TAG);
-            if (!tag.isEmpty() && decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
-                decodeMode = InboundTCPConstants.DECODE_BY_TAG;
-                log.info("decode by enclosure tag : " + tag);
+            if(tag!=null) {
+                if (!tag.isEmpty() && decodeMode == InboundTCPConstants.NOT_DECIDED_YET) {
+                    decodeMode = InboundTCPConstants.DECODE_BY_TAG;
+                    log.info("decode by enclosure tag : " + tag);
+                }
             }
 
             //length mode

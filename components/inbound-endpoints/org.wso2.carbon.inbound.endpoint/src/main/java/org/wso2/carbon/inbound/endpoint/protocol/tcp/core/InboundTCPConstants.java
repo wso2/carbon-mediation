@@ -46,7 +46,7 @@ public class InboundTCPConstants {
 
     public final static String TCP_MSG_TAG = "inbound.tcp.enclosure.tag";
 
-    public final static String TCP_MSG_ONE_WAY = "inbound.tcp.sendOnly";
+    public final static String TCP_MSG_ONE_WAY = "inbound.tcp.outOnly";
 
     public final static String TCP_CONTEXT = "TCP_CONTEXT";
 
