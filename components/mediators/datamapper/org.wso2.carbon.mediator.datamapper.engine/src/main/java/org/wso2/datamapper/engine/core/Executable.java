@@ -31,5 +31,5 @@ public interface Executable {
      * @return
      * @throws JSException
      */
-    Model execute(MappingResourceLoader resourceModel, Model inputRecord, Model outputRecord) throws JSException;
+    Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException;
 }

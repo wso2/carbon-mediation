@@ -16,7 +16,7 @@
  */
 package org.wso2.datamapper.engine.input;
 
-import org.wso2.datamapper.engine.core.Model;
+import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.input.builders.BuilderFactory;
 import org.wso2.datamapper.engine.input.readers.ReaderFactory;
@@ -24,6 +24,7 @@ import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -33,37 +34,42 @@ public class InputModelBuilder {
 
     private Readable inputReader;
     private Buildable modelBuilder;
-    private Model inputModel;
     private Schema inputSchema;
+    private MappingHandler mappingHandler;
 
-    public InputModelBuilder(InputOutputDataTypes.DataType inputType, DMModelTypes.ModelType modelType,Schema inputSchema) {
+    public InputModelBuilder(InputOutputDataTypes.DataType inputType, DMModelTypes.ModelType modelType,Schema inputSchema) throws IOException {
         inputReader = ReaderFactory.getReader(inputType);
         modelBuilder = BuilderFactory.getBuilder(modelType);
         this.inputSchema = inputSchema;
     }
 
-    public Model buildInputModel(InputStream inputStream){
+    public void buildInputModel(InputStream inputStream, MappingHandler mappingHandler){
+        this.mappingHandler = mappingHandler;
         inputReader.read(inputStream,this,inputSchema);
-        return inputModel;
     }
 
-    public void notifyEvent(DMReaderEvent readerEvent) {
+    public void notifyEvent(DMReaderEvent readerEvent) throws IOException {
         switch (readerEvent.getEventType()) {
             case OBJECT_START:
-                System.out.println("Object Started");
+                modelBuilder.writeObjectFieldStart(readerEvent.getName());
                 break;
             case OBJECT_END:
-                System.out.println("Object Ended");
+                modelBuilder.writeEndObject();
                 break;
             case ARRAY_START:
-                System.out.println("Array Started");
+                modelBuilder.writeArrayFieldStart(readerEvent.getName());
                 break;
             case FIELD:
-
-                System.out.println("Field Started : "+readerEvent.getName()+" : "+readerEvent.getValue());
+                modelBuilder.writeStringField(readerEvent.getName(), (String) readerEvent.getValue());
                 break;
             case ARRAY_END:
-                System.out.println("Array Ended");
+                modelBuilder.writeEndArray();
+                break;
+            case TERMINATE:
+                mappingHandler.notifyInputVariable(modelBuilder.close());
+                break;
+            case ANONYMOUS_OBJECT_START:
+                modelBuilder.writeStartObject();
                 break;
             default:
                 throw new IllegalArgumentException("Illegal Reader event found : " + readerEvent.getEventType());

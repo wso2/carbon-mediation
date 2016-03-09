@@ -26,14 +26,21 @@ import java.io.InputStream;
 
 public class MappingHandler {
 
-    public static Model doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputModelBuilder inputModelBuilder)
+    private String inputVariable;
+
+    public Model doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputModelBuilder inputModelBuilder)
             throws JSException {
 
-        Model inputModel = inputModelBuilder.buildInputModel(inputMsg);
-        Executable scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.RHINO);
-        Model outputModel = scriptExecutor.execute(resourceModel, inputModel, null);
+        inputModelBuilder.buildInputModel(inputMsg,this);
+        Executable scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.NASHORN);
+        while(inputVariable==null){
+        }
+        Model outputModel = scriptExecutor.execute(resourceModel, inputVariable);
         return outputModel;
+    }
 
+    public void notifyInputVariable(String inputVariable){
+        this.inputVariable=inputVariable;
     }
 
 }

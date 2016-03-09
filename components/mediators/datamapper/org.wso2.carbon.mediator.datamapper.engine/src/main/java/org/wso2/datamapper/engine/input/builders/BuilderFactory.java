@@ -19,12 +19,14 @@ package org.wso2.datamapper.engine.input.builders;
 import org.wso2.datamapper.engine.input.Buildable;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 
+import java.io.IOException;
+
 /**
  *
  */
 public class BuilderFactory {
 
-    public static Buildable getBuilder(DMModelTypes.ModelType inputType){
+    public static Buildable getBuilder(DMModelTypes.ModelType inputType) throws IOException {
         switch (inputType){
             case JSON: return new JacksonJSONBuilder();
         }
