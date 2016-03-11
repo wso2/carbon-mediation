@@ -91,6 +91,7 @@ public class ConfigurationPublisher {
     private static void addEventData(List<Object> eventData, StructuringArtifact structuringArtifact) {
 
         eventData.add(String.valueOf(structuringArtifact.getHashcode()));
+        eventData.add(String.valueOf(structuringArtifact.getName()));
 
         ArrayList<StructuringElement> elementList = structuringArtifact.getList();
 
@@ -184,6 +185,8 @@ public class ConfigurationPublisher {
         }
 
         eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.CONFIG_HASHCODE,
+                                             AttributeType.STRING);
+        eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.CONFIG_ENTRY_NAME,
                                              AttributeType.STRING);
         eventStreamDefinition.addPayloadData(MediationDataPublisherConstants.CONFIG_DATA,
                                              AttributeType.STRING);
