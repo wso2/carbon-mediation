@@ -17,10 +17,29 @@
 package org.wso2.datamapper.engine.core;
 
 /**
- *
+ * Interface to represent schema in data mapper engine.
  */
-public interface Schema<T> {
+public interface Schema {
 
+    /**
+     * Method for get defined name of the schema
+     *
+     * @return Name of the schema as a String
+     */
     String getName();
 
+    /**
+     * Method to get the element type specified in the schema by giving the element name
+     *
+     * @param elementName
+     * @return type of the element
+     */
+    String getElementTypeByName(String elementName);
+
+    /**
+     * Method for check whether schema has a child element inside given element
+     *
+     * @return
+     */
+    boolean isChildElement(String elementName,String childElementName);
 }

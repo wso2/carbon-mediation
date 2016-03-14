@@ -21,12 +21,14 @@ package org.wso2.datamapper.engine.types;
  */
 public class DMModelTypes {
 
-    private final static String JSON_CONTENT_TYPE = "JSON";
+    private final static String JSON_STRING_CONTENT_TYPE = "JSON_STRING";
     private final static String AVRO_CONTENT_TYPE = "AVRO";
+    private final static String JAVA_MAP_CONTENT_TYPE = "AVRO";
+
 
     // Use to define input and output data formats
     public enum ModelType {
-       JSON(JSON_CONTENT_TYPE),AVRO(AVRO_CONTENT_TYPE);
+       JSON_STRING(JSON_STRING_CONTENT_TYPE),AVRO(AVRO_CONTENT_TYPE),JAVA_MAP(JAVA_MAP_CONTENT_TYPE);
         private final String value;
 
         private ModelType(String value) {

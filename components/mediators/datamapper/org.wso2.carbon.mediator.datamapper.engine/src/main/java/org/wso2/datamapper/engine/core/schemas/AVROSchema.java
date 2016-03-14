@@ -25,7 +25,7 @@ import java.io.InputStream;
 /**
  *
  */
-public class AVROSchema implements org.wso2.datamapper.engine.core.Schema<Schema> {
+public class AVROSchema implements org.wso2.datamapper.engine.core.Schema {
 
     private Schema schema;
 
@@ -40,5 +40,15 @@ public class AVROSchema implements org.wso2.datamapper.engine.core.Schema<Schema
     @Override
     public String getName() {
         return schema.getName();
+    }
+
+    @Override
+    public String getElementTypeByName(String elementName) {
+        return null;
+    }
+
+    @Override
+    public boolean isChildElement(String elementName, String childElementName) {
+        return false;
     }
 }

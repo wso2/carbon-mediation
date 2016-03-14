@@ -18,7 +18,6 @@ package org.wso2.datamapper.engine.core.executors;
 
 import org.wso2.datamapper.engine.core.Executable;
 import org.wso2.datamapper.engine.core.executors.nashorn.NasHornJava8Executor;
-import org.wso2.datamapper.engine.core.executors.rhino.RhinoExecutor;
 
 /**
  * This class act as a factory to get the requested script executor
@@ -40,8 +39,6 @@ public class ScriptExecutorFactory {
      */
     public static Executable getScriptExecutor(ScriptExecutorType executorType) {
         switch (executorType) {
-            case RHINO:
-                return new RhinoExecutor();
             case NASHORN:
                 return new NasHornJava8Executor();
         }

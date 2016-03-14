@@ -39,12 +39,10 @@ public class AVROGenericModel extends GenericData implements Model<GenericRecord
         return this.model;
     }
 
-    @Override
     public void setSchema(Schema schema) {
         this.schema=schema;
     }
 
-    @Override
     public Schema getSchema() {
         return schema;
     }

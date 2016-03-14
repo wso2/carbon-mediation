@@ -19,7 +19,21 @@ package org.wso2.datamapper.engine.output;
 /**
  * This interface should be implemented by data-mapper output writers
  */
-public interface Writable <T>{
+public interface Writable{
 
-    T write();
+    void write();
+
+    void writeStartObject(String name);
+
+    void writeField(String name, String value);
+
+    void writeEndObject();
+
+    String terminateMessageBuilding();
+
+    void writeStartArray();
+
+    void writeEndArray();
+
+    void writeStartAnonymousObject();
 }

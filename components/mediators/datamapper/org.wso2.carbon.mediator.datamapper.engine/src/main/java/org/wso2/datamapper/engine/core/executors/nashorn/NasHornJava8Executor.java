@@ -16,15 +16,23 @@
  */
 package org.wso2.datamapper.engine.core.executors.nashorn;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseException;
 import org.wso2.datamapper.engine.core.Executable;
+import org.wso2.datamapper.engine.core.JSFunction;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
 import org.wso2.datamapper.engine.core.Model;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.models.MapModel;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.util.Map;
+
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.NASHORN_ENGINE_NAME;
 
 /**
  * This class implements script executor for data mapper using java 8 NasHorn JS executor
@@ -32,39 +40,34 @@ import javax.script.ScriptException;
 public class NasHornJava8Executor implements Executable {
 
     private ScriptEngine scriptEngine;
-    public NasHornJava8Executor(){
-        scriptEngine = new ScriptEngineManager().getEngineByName("nashorn");
+    private static final Log log = LogFactory.getLog(NasHornJava8Executor.class);
+
+    public NasHornJava8Executor() {
+        scriptEngine = new ScriptEngineManager().getEngineByName(NASHORN_ENGINE_NAME);
     }
 
     @Override
     public Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException {
         try {
-            scriptEngine.eval("var inputemployees="+inputRecord);
-            scriptEngine.eval("function map_S_employees_S_engineers(){ \n" +
-                    "\n" +
-                    "\n" +
-                    "var outputengineers={};"+
-                    "outputengineers.engineer = [];"+
-                    "for(i_employeeRecord in inputemployees.employee){\n" +
-                    "\n" + "outputengineers.engineer[i_employeeRecord]={};"+
-                    "outputengineers.engineer[i_employeeRecord].fullname= inputemployees.employee[i_employeeRecord].firstname + inputemployees.employee[i_employeeRecord].lastname;\n" +
-                    "\n" +
-                    "outputengineers.engineer[i_employeeRecord].address= inputemployees.employee[i_employeeRecord].address.no + inputemployees.employee[i_employeeRecord].address.city;\n" +
-                    "\n" +
-                    "\n" +
-                    "}\n" +
-                    "return outputengineers;\n" +
-                    "}");
+            JSFunction jsFunction = resourceModel.getFunction();
+            injectInputVariableToEngine(resourceModel.getInputSchema().getName(), inputRecord);
+            scriptEngine.eval(jsFunction.getFunctionBody());
             Invocable invocable = (Invocable) scriptEngine;
 
-            Object result = invocable.invokeFunction("map_S_employees_S_engineers");
-            System.out.println(result);
+            Object result = invocable.invokeFunction(jsFunction.getFunctioName());
+            if (result instanceof Map) {
+                return new MapModel((Map<String, Object>) result);
+            }
 
         } catch (ScriptException e) {
-            e.printStackTrace();
+            log.error("Script execution failed", e);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            log.error("Undefined method called to execute", e);
         }
-        return null;
+        throw new SynapseException("NasHornJava8Executor unable to produce the mapped output");
+    }
+
+    private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
+        scriptEngine.eval("var input" + inputSchemaName + "=" + inputVariable);
     }
 }

@@ -14,23 +14,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core;
+package org.wso2.datamapper.engine.core.models;
 
-import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.Model;
+
+import java.util.Map;
 
 /**
- * This interface should be implemented by script executors of Data Mapper Engine
+ * This class implements {@link Model} interface with a {@link Map} to hold data
+ *
  */
-public interface Executable {
+public class MapModel implements Model<Map<String,Object>> {
 
-    /**
-     * Method to execute the mapping config in the {@link MappingResourceLoader} on
-     * input generic record and returns the output generic record
-     *
-     * @param resourceModel
-     * @param inputRecord
-     * @return
-     * @throws JSException
-     */
-    Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException;
+    private Map<String,Object> mapDataHolder;
+
+    public MapModel(Map<String, Object> model) {
+        mapDataHolder = model;
+    }
+
+    @Override
+    public void setModel(Map<String, Object> model) {
+        mapDataHolder=model;
+    }
+
+    @Override
+    public Map<String, Object> getModel() {
+        return mapDataHolder;
+    }
 }

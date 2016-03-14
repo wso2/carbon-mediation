@@ -20,6 +20,7 @@ import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorFactory;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorType;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
+import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 
 import java.io.InputStream;
 
@@ -27,20 +28,28 @@ import java.io.InputStream;
 public class MappingHandler {
 
     private String inputVariable;
+    private String outputVariable;
+    private MappingResourceLoader mappingResourceLoader;
+    private OutputMessageBuilder outputMessageBuilder;
 
-    public Model doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputModelBuilder inputModelBuilder)
+    public String doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputModelBuilder inputModelBuilder, OutputMessageBuilder outputMessageBuilder)
             throws JSException {
-
+        mappingResourceLoader=resourceModel;
+        this.outputMessageBuilder=outputMessageBuilder;
         inputModelBuilder.buildInputModel(inputMsg,this);
-        Executable scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.NASHORN);
-        while(inputVariable==null){
+        while(outputVariable==null){
         }
-        Model outputModel = scriptExecutor.execute(resourceModel, inputVariable);
-        return outputModel;
+        return outputVariable;
     }
 
-    public void notifyInputVariable(String inputVariable){
+    public void notifyInputVariable(String inputVariable) throws JSException {
         this.inputVariable=inputVariable;
+        Executable scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.NASHORN);
+        Model outputModel = scriptExecutor.execute(mappingResourceLoader, inputVariable);
+        outputMessageBuilder.buildOutputMessage(outputModel,this);
     }
 
+    public void notifyOutputVariable(String outputVariable){
+        this.outputVariable=outputVariable;
+    }
 }

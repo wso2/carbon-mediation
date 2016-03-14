@@ -38,7 +38,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.AVRO_ATTRIBUTE_FIELD_PREFIX;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
 
 /**
  * This class implement the xml reader for WSO2 data mapper
@@ -147,7 +147,7 @@ public class XmlInputReader implements InputDataReaderAdapter {
     private GenericRecord getChildForAttributes(Schema schema, Iterator attrElements, GenericRecord child) {
         while (attrElements.hasNext()) {
             OMAttributeImpl element = (OMAttributeImpl) attrElements.next();
-            child.put(AVRO_ATTRIBUTE_FIELD_PREFIX + element.getLocalName(), element.getAttributeValue());
+            child.put(SCHEMA_ATTRIBUTE_FIELD_PREFIX + element.getLocalName(), element.getAttributeValue());
         }
         return child;
     }

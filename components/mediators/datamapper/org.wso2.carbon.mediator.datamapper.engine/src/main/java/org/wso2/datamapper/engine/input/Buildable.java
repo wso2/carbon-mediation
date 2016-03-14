@@ -19,13 +19,13 @@ package org.wso2.datamapper.engine.input;
 import java.io.IOException;
 
 /**
- *
+ * Interface for implement the methods to create generic data holding model of data mapper engine
  */
 public interface Buildable {
 
 
     /**
-     * Method for writing starting marker of a Array value.
+     * Method for writing start marker of a Array value.
      * <p/>
      * <p/>
      * Array values can be written in any context where values
@@ -129,20 +129,20 @@ public interface Buildable {
     /**
      * Convenience method for outputting a field entry ("member")
      * that has a String value. Equivalent to:
-     *<pre>
+     * <pre>
      *  writeFieldName(fieldName);
      *  writeString(value);
-     *</pre>
+     * </pre>
      */
     void writeStringField(String fieldName, String value) throws IOException;
 
     /**
      * Convenience method for outputting a field entry ("member")
      * that has a boolean value. Equivalent to:
-     *<pre>
+     * <pre>
      *  writeFieldName(fieldName);
      *  writeBoolean(value);
-     *</pre>
+     * </pre>
      */
     void writeBooleanField(String fieldName, boolean value) throws IOException;
 
@@ -150,20 +150,20 @@ public interface Buildable {
     /**
      * Convenience method for outputting a field entry ("member")
      * that has the specified numeric value. Equivalent to:
-     *<pre>
+     * <pre>
      *  writeFieldName(fieldName);
      *  writeNumber(value);
-     *</pre>
+     * </pre>
      */
     void writeNumberField(String fieldName, int value) throws IOException;
 
     /**
      * Convenience method for outputting a field entry ("member")
      * that has the specified numeric value. Equivalent to:
-     *<pre>
+     * <pre>
      *  writeFieldName(fieldName);
      *  writeNumber(value);
-     *</pre>
+     * </pre>
      */
     void writeNumberField(String fieldName, double value) throws IOException;
 
@@ -171,10 +171,10 @@ public interface Buildable {
      * Convenience method for outputting a field entry ("member")
      * that contains specified data in base64-encoded form.
      * Equivalent to:
-     *<pre>
+     * <pre>
      *  writeFieldName(fieldName);
      *  writeBinary(value);
-     *</pre>
+     * </pre>
      */
     void writeBinaryField(String fieldName, byte[] data) throws IOException;
 
@@ -182,11 +182,11 @@ public interface Buildable {
      * Convenience method for outputting a field entry ("member")
      * (that will contain a JSON Array value), and the START_ARRAY marker.
      * Equivalent to:
-     *<pre>
+     * <pre>
      *  writeFieldName(fieldName);
      *  writeStartArray();
-     *</pre>
-     *<p>
+     * </pre>
+     * <p/>
      * Note: caller still has to take care to close the array
      * (by calling {#link #writeEndArray}) after writing all values
      * of the value Array.
@@ -197,11 +197,11 @@ public interface Buildable {
      * Convenience method for outputting a field entry ("member")
      * (that will contain a JSON Object value), and the START_OBJECT marker.
      * Equivalent to:
-     *<pre>
+     * <pre>
      *  writeFieldName(fieldName);
      *  writeStartObject();
-     *</pre>
-     *<p>
+     * </pre>
+     * <p/>
      * Note: caller still has to take care to close the Object
      * (by calling {#link #writeEndObject}) after writing all
      * entries of the value Object.
@@ -211,7 +211,6 @@ public interface Buildable {
     /**
      * Method called to close builder, so that no more content
      * can be written.
-     *
      */
     String close() throws IOException;
 
