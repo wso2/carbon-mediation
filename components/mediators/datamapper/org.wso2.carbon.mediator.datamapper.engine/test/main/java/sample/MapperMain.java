@@ -21,6 +21,7 @@ import org.apache.avro.io.Encoder;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
+import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.datamapper.engine.output.writers.DummyEncoder;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
@@ -69,23 +70,14 @@ public class MapperMain {
 
         MappingResourceLoader configModel = new MappingResourceLoader(c.getInputSchema(), c.getOutputSchema(),
                 c.getConfig());
-        InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(c.getInputType()), DMModelTypes.ModelType.JSON,configModel.getInputSchema());
+        InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(c.getInputType()),
+                DMModelTypes.ModelType.JSON_STRING,configModel.getInputSchema());
+        OutputMessageBuilder outputMessageBuilder = new OutputMessageBuilder(getDataType(c.getOutputType()),
+                DMModelTypes.ModelType.JAVA_MAP,configModel.getOutputSchema());
         MappingHandler mappingHandler = new MappingHandler();
-        mappingHandler.doMap(c.getInputStream(), configModel, inputModelBuilder);
+        String outputMessage = mappingHandler.doMap(c.getInputStream(), configModel, inputModelBuilder,outputMessageBuilder);
 
-
-
-       // InputDataReaderAdapter reader = ReaderRegistry.getInstance().get(c.getInputType()).newInstance();
-
-       // GenericRecord result = (GenericRecord) MappingHandler.doMap(c.getInputStream(), configModel, reader).getModel();
-
-       // DatumWriter<GenericRecord> writer = WriterRegistry.getInstance().get(c.getOutputType()).newInstance();
-       // writer.setSchema(result.getSchema());
-
-       // writer.write(result, encoder);
-       // encoder.flush();
-
-        return baos.toString();
+        return outputMessage;
     }
 
     private static InputOutputDataTypes.DataType getDataType(String inputType) {
