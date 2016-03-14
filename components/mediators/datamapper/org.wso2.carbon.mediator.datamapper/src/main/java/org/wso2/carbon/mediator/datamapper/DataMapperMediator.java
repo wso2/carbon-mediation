@@ -17,6 +17,7 @@
 package org.wso2.carbon.mediator.datamapper;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -37,6 +38,7 @@ import org.apache.synapse.util.AXIOMUtils;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
+import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
@@ -263,22 +265,14 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             mappingResourceLoader = CacheResources.getCachedResources(synCtx,
                     configkey, inSchemaKey, outSchemaKey, uuid);
             // create input model builder to convert input payload to generic data holder
-            InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(inputType), DMModelTypes.ModelType.JSON,mappingResourceLoader.getInputSchema());
+            InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(inputType), DMModelTypes.ModelType.JSON_STRING,mappingResourceLoader.getInputSchema());
             //execute mapping on the input stream
             MappingHandler mappingHandler = new MappingHandler();
-            mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader, inputModelBuilder);
+            OutputMessageBuilder outputMessageBuilder = new OutputMessageBuilder(getDataType(outputType),
+                    DMModelTypes.ModelType.JAVA_MAP,mappingResourceLoader.getOutputSchema());
+            String outputString = mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader, inputModelBuilder, outputMessageBuilder);
 
-            /*InputDataReaderAdapter inputReader = InputReaderFactory.getInputDataReader(inputType);
-            InputStream inputStream = getInputStream(synCtx, inputType);
-            GenericRecord result = (GenericRecord) MappingHandler.doMap(inputStream, mappingResourceLoader, inputReader).getModel();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Encoder encoder = new DummyEncoder(baos);
-            GenericDatumWriter<GenericRecord> writer = OutputWriterFactory.getDatumWriter(outputType);
-            writer.setSchema(result.getSchema());
-            writer.write(result, encoder);
-            outputMessage = AXIOMUtil.stringToOM(baos.toString());*/
-
+            outputMessage = AXIOMUtil.stringToOM(outputString);
 
             if (outputMessage != null) {
                 if (log.isDebugEnabled()) {
