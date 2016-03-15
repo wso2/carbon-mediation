@@ -19,6 +19,7 @@ package org.wso2.datamapper.engine.output;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.Model;
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.callbacks.OutputVariableCallback;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
 import org.wso2.datamapper.engine.output.formatters.FormatterFactory;
 import org.wso2.datamapper.engine.output.writers.WriterFactory;
@@ -33,7 +34,7 @@ public class OutputMessageBuilder {
     private Formattable formatter;
     private Writable outputWriter;
     private Schema outputSchema;
-    private MappingHandler mappingHandler;
+    private OutputVariableCallback mappingHandler;
 
     public OutputMessageBuilder(InputOutputDataTypes.DataType dataType, DMModelTypes.ModelType dmModelType
             , Schema outputSchema) {
@@ -42,7 +43,7 @@ public class OutputMessageBuilder {
         this.outputWriter = WriterFactory.getWriter(dataType,outputSchema);
     }
 
-    public void buildOutputMessage(Model outputModel, MappingHandler mappingHandler) {
+    public void buildOutputMessage(Model outputModel, OutputVariableCallback mappingHandler) {
         this.mappingHandler = mappingHandler;
         formatter.format(outputModel, this, outputSchema);
     }
@@ -91,7 +92,7 @@ public class OutputMessageBuilder {
         this.outputWriter = outputWriter;
     }
 
-    public MappingHandler getMappingHandler() {
+    public OutputVariableCallback getMappingHandler() {
         return mappingHandler;
     }
 

@@ -16,8 +16,8 @@
  */
 package org.wso2.datamapper.engine.input;
 
-import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.callbacks.InputVariableCallback;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.input.builders.BuilderFactory;
 import org.wso2.datamapper.engine.input.readers.ReaderFactory;
@@ -36,7 +36,7 @@ public class InputModelBuilder {
     private Readable inputReader;
     private Buildable modelBuilder;
     private Schema inputSchema;
-    private MappingHandler mappingHandler;
+    private InputVariableCallback mappingHandler;
 
     public InputModelBuilder(InputOutputDataTypes.DataType inputType,
                              DMModelTypes.ModelType modelType,Schema inputSchema) throws IOException {
@@ -45,7 +45,7 @@ public class InputModelBuilder {
         this.inputSchema = inputSchema;
     }
 
-    public void buildInputModel(InputStream inputStream, MappingHandler mappingHandler){
+    public void buildInputModel(InputStream inputStream, InputVariableCallback mappingHandler){
         this.mappingHandler = mappingHandler;
         inputReader.read(inputStream,this,inputSchema);
     }
