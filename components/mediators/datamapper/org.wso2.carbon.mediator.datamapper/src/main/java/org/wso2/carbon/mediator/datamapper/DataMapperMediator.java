@@ -254,10 +254,9 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @throws SynapseException
      * @throws IOException
      */
-    private void  transform(MessageContext synCtx, String configkey,
+    private void transform(MessageContext synCtx, String configkey,
                            String inSchemaKey, String outSchemaKey, String inputType,
-                           String outputType, String uuid)
-             {
+                           String outputType, String uuid) {
         MappingResourceLoader mappingResourceLoader = null;
         OMElement outputMessage = null;
         try {
@@ -265,15 +264,15 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             mappingResourceLoader = CacheResources.getCachedResources(synCtx,
                     configkey, inSchemaKey, outSchemaKey, uuid);
             // create input model builder to convert input payload to generic data holder
-            InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(inputType), DMModelTypes.ModelType.JSON_STRING,mappingResourceLoader.getInputSchema());
+            InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(inputType),
+                    DMModelTypes.ModelType.JSON_STRING, mappingResourceLoader.getInputSchema());
             //execute mapping on the input stream
             MappingHandler mappingHandler = new MappingHandler();
             OutputMessageBuilder outputMessageBuilder = new OutputMessageBuilder(getDataType(outputType),
-                    DMModelTypes.ModelType.JAVA_MAP,mappingResourceLoader.getOutputSchema());
-            String outputString = mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader, inputModelBuilder, outputMessageBuilder);
-
-            outputMessage = AXIOMUtil.stringToOM(outputString);
-
+                    DMModelTypes.ModelType.JAVA_MAP, mappingResourceLoader.getOutputSchema());
+            String outputVariable=mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader,
+                    inputModelBuilder, outputMessageBuilder);
+            outputMessage = AXIOMUtil.stringToOM(outputVariable);
             if (outputMessage != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Output message received ");
@@ -321,6 +320,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     }
                 }
             }
+
         } catch (Exception e) {
             handleException("Mapping failed", e, synCtx);
         }
