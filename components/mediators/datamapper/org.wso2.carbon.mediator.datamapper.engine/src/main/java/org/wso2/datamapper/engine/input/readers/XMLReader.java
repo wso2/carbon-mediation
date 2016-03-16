@@ -24,6 +24,7 @@ import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
 import org.wso2.datamapper.engine.types.ReaderEventTypes;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -60,7 +61,13 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
             SAXParser parser = factory.newSAXParser();
-            parser.parse(input, this);
+            org.xml.sax.XMLReader xmlReader = parser.getXMLReader();
+            xmlReader.setContentHandler(this);
+            xmlReader.setDTDHandler(this);
+            xmlReader.setEntityResolver(this);
+            xmlReader.setFeature("http://xml.org/sax/features/namespaces",true);
+            xmlReader.setFeature("http://xml.org/sax/features/namespace-prefixes",true);
+            xmlReader.parse(new InputSource(input));
         } catch (ParserConfigurationException e) {
             log.error("ParserConfig error", e);
         } catch (SAXException e) {
