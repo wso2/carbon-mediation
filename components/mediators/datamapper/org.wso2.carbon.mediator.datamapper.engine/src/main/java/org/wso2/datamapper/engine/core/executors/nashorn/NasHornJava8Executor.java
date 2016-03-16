@@ -61,10 +61,12 @@ public class NasHornJava8Executor implements Executable {
 
         } catch (ScriptException e) {
             log.error("Script execution failed", e);
+            throw new SynapseException("NasHornJava8Executor unable to execute the script " + e);
         } catch (NoSuchMethodException e) {
             log.error("Undefined method called to execute", e);
+            throw new SynapseException("Undefined method called to execute " + e);
         }
-        throw new SynapseException("NasHornJava8Executor unable to produce the mapped output");
+        throw new SynapseException("NasHornJava8Executor Undefined method called to execute");
     }
 
     private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
