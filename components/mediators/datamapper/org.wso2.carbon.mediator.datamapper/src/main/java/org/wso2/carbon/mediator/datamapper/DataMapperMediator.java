@@ -17,6 +17,7 @@
 package org.wso2.carbon.mediator.datamapper;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
@@ -48,7 +49,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 
 /**
@@ -63,7 +63,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private Value outputSchemaKey = null;
     private String inputType = null;
     private String outputType = null;
-    private UUID id = null;
+    private static MappingResourceLoader mappingResourceLoader = null;
     private static final Log log = LogFactory.getLog(DataMapperMediator.class);
 
     /**
@@ -173,25 +173,6 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     }
 
     /**
-     * Gets the unique ID for the DataMapperMediator instance
-     *
-     * @return the unique ID
-     */
-    public String getUniqueID() {
-        String uuid = id.toString();
-        return uuid;
-    }
-
-    /**
-     * Sets the unique ID for the DataMapperMediator instance
-     *
-     * @param id the unique ID
-     */
-    public void setUniqueID(UUID id) {
-        this.id = id;
-    }
-
-    /**
      * Get the values from the message context to do the data mapping
      *
      * @param synCtx current message for the mediation
@@ -226,7 +207,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         } else {
             try {
                 // Does message conversion and gives the final result
-                transform(synCtx, configKey, inSchemaKey, outSchemaKey, getInputType(), getOutputType(), getUniqueID());
+                transform(synCtx, configKey, inSchemaKey, outSchemaKey, getInputType(), getOutputType());
 
             } catch (SynapseException e) {
                 handleException("DataMapper mediator mediation failed", e, synCtx);
@@ -251,19 +232,18 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @param outSchemaKey registry location of the output schema
      * @param inputType    input data type
      * @param outputType   output data type
-     * @param uuid         unique ID for the DataMapperMediator instance
      * @throws SynapseException
      * @throws IOException
      */
     private void transform(MessageContext synCtx, String configkey,
                            String inSchemaKey, String outSchemaKey, String inputType,
-                           String outputType, String uuid) {
-        MappingResourceLoader mappingResourceLoader = null;
+                           String outputType) {
+        //MappingResourceLoader mappingResourceLoader = null;
         OMElement outputMessage = null;
         try {
             // mapping resources needed to get the final output
-            mappingResourceLoader = CacheResources.getCachedResources(synCtx,
-                    configkey, inSchemaKey, outSchemaKey, uuid);
+            mappingResourceLoader = getMappingResourceLoader(synCtx, configkey, inSchemaKey, outSchemaKey);
+
             // create input model builder to convert input payload to generic data holder
             InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(inputType),
                     DMModelTypes.ModelType.JSON_STRING, mappingResourceLoader.getInputSchema());
@@ -383,9 +363,53 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      */
     @Override
     public void destroy() {
-        if (id != null) {
-            setUniqueID(id);
+    }
+
+    /**
+     * When Data mapper mediator has been invoked initially, this creates a new mapping resource loader
+     *
+     * @param context      message context
+     * @param configkey    the location of the mapping configuration
+     * @param inSchemaKey  the location of the input schema
+     * @param outSchemaKey the location of the output schema
+     * @return the MappingResourceLoader object
+     * @throws IOException
+     */
+    private static MappingResourceLoader getMappingResourceLoader(
+            MessageContext context, String configkey, String inSchemaKey, String outSchemaKey) throws IOException {
+
+        if(mappingResourceLoader == null){
+            InputStream configFileInputStream = getRegistryResource(context, configkey);
+            InputStream inputSchemaStream = getRegistryResource(context, inSchemaKey);
+            InputStream outputSchemaStream = getRegistryResource(context, outSchemaKey);
+
+            // Creates a new mappingResourceLoader
+            mappingResourceLoader = new MappingResourceLoader(inputSchemaStream,
+                    outputSchemaStream, configFileInputStream);
         }
+        return mappingResourceLoader;
+    }
+
+    /**
+     * Returns registry resources as input streams to create the MappingResourceLoader object
+     *
+     * @param context Message context
+     * @param key     registry key
+     * @return mapping configuration, inputSchema and outputSchema as inputStreams
+     */
+    private static InputStream getRegistryResource(MessageContext context, String key) {
+
+        InputStream inputStream = null;
+        Object entry = context.getEntry(key);
+        if (entry instanceof OMTextImpl) {
+            if (log.isDebugEnabled()) {
+                log.debug("Value for the key is ");
+            }
+            OMTextImpl text = (OMTextImpl) entry;
+            String content = text.getText();
+            inputStream = new ByteArrayInputStream(content.getBytes());
+        }
+        return inputStream;
     }
 
 }
