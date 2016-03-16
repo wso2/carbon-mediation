@@ -14,23 +14,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core;
+package org.wso2.datamapper.engine.output.writers;
 
-import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.output.Writable;
+import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
 /**
- * This interface should be implemented by script executors of Data Mapper Engine
+ *  This class is a factory class to get {@link Writable} needed by the data mapper engine
  */
-public interface Executable {
+public class WriterFactory {
 
-    /**
-     * Method to execute the mapping config in the {@link MappingResourceLoader} on
-     * input generic record and returns the output generic record
-     *
-     * @param resourceModel
-     * @param inputRecord
-     * @return
-     * @throws JSException
-     */
-    Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException;
+    public static Writable getWriter(InputOutputDataTypes.DataType outputType,Schema outputSchema) {
+        switch (outputType) {
+            case XML:
+                return new XMLWriter(outputSchema);
+        }
+        throw new IllegalArgumentException("Output Writer for type " + outputType + " is not implemented.");
+    }
 }

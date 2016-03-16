@@ -16,8 +16,9 @@
  */
 package org.wso2.datamapper.engine.input;
 
-import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.callbacks.InputVariableCallback;
+import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.input.builders.BuilderFactory;
 import org.wso2.datamapper.engine.input.readers.ReaderFactory;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
@@ -35,20 +36,21 @@ public class InputModelBuilder {
     private Readable inputReader;
     private Buildable modelBuilder;
     private Schema inputSchema;
-    private MappingHandler mappingHandler;
+    private InputVariableCallback mappingHandler;
 
-    public InputModelBuilder(InputOutputDataTypes.DataType inputType, DMModelTypes.ModelType modelType,Schema inputSchema) throws IOException {
+    public InputModelBuilder(InputOutputDataTypes.DataType inputType,
+                             DMModelTypes.ModelType modelType,Schema inputSchema) throws IOException {
         inputReader = ReaderFactory.getReader(inputType);
         modelBuilder = BuilderFactory.getBuilder(modelType);
         this.inputSchema = inputSchema;
     }
 
-    public void buildInputModel(InputStream inputStream, MappingHandler mappingHandler){
+    public void buildInputModel(InputStream inputStream, InputVariableCallback mappingHandler){
         this.mappingHandler = mappingHandler;
         inputReader.read(inputStream,this,inputSchema);
     }
 
-    public void notifyEvent(DMReaderEvent readerEvent) throws IOException {
+    public void notifyEvent(DMReaderEvent readerEvent) throws IOException, JSException {
         switch (readerEvent.getEventType()) {
             case OBJECT_START:
                 modelBuilder.writeObjectFieldStart(readerEvent.getName());

@@ -14,23 +14,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core;
-
-import org.wso2.datamapper.engine.core.exceptions.JSException;
+package org.wso2.datamapper.engine.core.callbacks;
 
 /**
- * This interface should be implemented by script executors of Data Mapper Engine
+ *
  */
-public interface Executable {
+public interface OutputVariableCallback {
 
-    /**
-     * Method to execute the mapping config in the {@link MappingResourceLoader} on
-     * input generic record and returns the output generic record
-     *
-     * @param resourceModel
-     * @param inputRecord
-     * @return
-     * @throws JSException
-     */
-    Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException;
+    void notifyOutputVariable(Object variable);
 }

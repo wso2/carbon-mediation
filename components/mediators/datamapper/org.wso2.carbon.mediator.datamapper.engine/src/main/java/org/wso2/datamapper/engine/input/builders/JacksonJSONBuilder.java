@@ -26,7 +26,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 
 /**
- *
+ *  This class implements {@link Buildable} interface and JSON builder for data mapper engine using jackson
  */
 public class JacksonJSONBuilder implements Buildable {
 

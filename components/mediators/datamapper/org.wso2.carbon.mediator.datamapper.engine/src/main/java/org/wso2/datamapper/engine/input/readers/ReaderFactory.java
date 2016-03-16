@@ -20,7 +20,7 @@ import org.wso2.datamapper.engine.input.Readable;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
 /**
- *
+ *  This class is a factory class to get {@link Readable} needed by the data mapper engine
  */
 public class ReaderFactory {
 
