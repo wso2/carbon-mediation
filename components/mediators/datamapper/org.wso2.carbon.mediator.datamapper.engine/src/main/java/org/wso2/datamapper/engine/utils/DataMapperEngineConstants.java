@@ -22,6 +22,7 @@ package org.wso2.datamapper.engine.utils;
 public class DataMapperEngineConstants {
 
     public static final String SCHEMA_ATTRIBUTE_FIELD_PREFIX = "attr_";
+    public static final String SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX ="ATTR";
     public static final String AVRO_RECORD_FIELD_POSTFIX = "Record";
     public static final String OBJECT_ELEMENT_TYPE = "object";
     public static final String ARRAY_ELEMENT_TYPE = "array";

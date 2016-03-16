@@ -38,9 +38,11 @@ import java.util.Stack;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 
 /**
- *  This class implements {@link Readable} interface and xml reader for data mapper engine using SAX
+ * This class implements {@link Readable} interface and xml reader for data mapper engine using SAX
  */
 public class XMLReader extends DefaultHandler implements org.wso2.datamapper.engine.input.Readable {
 
@@ -110,6 +112,10 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
 
             if (qName.equals(getInputSchema().getName())) {
                 sendAnonymousObjectStartEvent();
+                for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
+                    sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
+                            attributes.getValue(attributeCount));
+                }
             } else if (ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))) {
                 //first element of a array should fire array start element
                 if (!getDmEventStack().isEmpty()) {
@@ -124,8 +130,19 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 sendAnonymousObjectStartEvent();
             } else if (OBJECT_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))) {
                 sendObjectStartEvent(qName);
+                for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
+                    sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
+                            attributes.getValue(attributeCount));
+                }
+            } else if (STRING_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))){
+                sendObjectStartEvent(qName+SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
+                    sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
+                            attributes.getValue(attributeCount));
+                }
+                sendObjectEndEvent(qName);
             }
-        } catch (IOException|JSException e) {
+        } catch (IOException | JSException e) {
             log.error("Error occurred while processing start element event", e);
         }
     }
@@ -142,7 +159,7 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
             } else if (OBJECT_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))) {
                 sendObjectEndEvent(qName);
             }
-        } catch (IOException|JSException e) {
+        } catch (IOException | JSException e) {
             log.error("Error occurred while processing end element event", e);
         }
     }
