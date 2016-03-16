@@ -134,7 +134,7 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                     sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
                             attributes.getValue(attributeCount));
                 }
-            } else if (STRING_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))){
+            } else if (STRING_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName)) && attributes.getLength()>0){
                 sendObjectStartEvent(qName+SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
