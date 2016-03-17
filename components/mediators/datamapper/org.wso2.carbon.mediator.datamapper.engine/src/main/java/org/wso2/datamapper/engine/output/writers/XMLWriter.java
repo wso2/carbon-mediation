@@ -57,11 +57,6 @@ public class XMLWriter implements Writable {
     }
 
     @Override
-    public void write() {
-
-    }
-
-    @Override
     public void writeStartObject(String name) {
         try {
             xMLStreamWriter.writeStartElement(name);
@@ -75,12 +70,14 @@ public class XMLWriter implements Writable {
     public void writeField(String name, String value) {
         try {
             //with in a element attributes must come first before any of other field values
-            if (name.startsWith(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
-                xMLStreamWriter.writeAttribute(name.replaceFirst(SCHEMA_ATTRIBUTE_FIELD_PREFIX, ""), value);
-            } else {
-                xMLStreamWriter.writeStartElement(name);
-                xMLStreamWriter.writeCharacters(value);
-                xMLStreamWriter.writeEndElement();
+            if (value != null) {
+                if (name.startsWith(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
+                    xMLStreamWriter.writeAttribute(name.replaceFirst(SCHEMA_ATTRIBUTE_FIELD_PREFIX, ""), value);
+                } else {
+                    xMLStreamWriter.writeStartElement(name);
+                    xMLStreamWriter.writeCharacters(value);
+                    xMLStreamWriter.writeEndElement();
+                }
             }
         } catch (XMLStreamException e) {
             throw new SynapseException(e.getMessage());

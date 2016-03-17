@@ -37,7 +37,6 @@ public class JacksonJSONBuilder implements Buildable {
     public JacksonJSONBuilder() throws IOException {
         jsonStream = new ByteArrayOutputStream();
         JsonFactory jsonFactory = new JsonFactory();
-        //jsonGenerator = jsonFactory.createGenerator(jsonStream);
         writer = new StringWriter();
         jsonGenerator= jsonFactory.createGenerator(writer);
     }

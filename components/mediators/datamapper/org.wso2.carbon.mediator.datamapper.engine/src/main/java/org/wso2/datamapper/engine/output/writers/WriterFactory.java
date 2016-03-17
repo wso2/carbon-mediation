@@ -29,6 +29,8 @@ public class WriterFactory {
         switch (outputType) {
             case XML:
                 return new XMLWriter(outputSchema);
+            case JSON:
+                return new JacksonJSONWriter(outputSchema);
         }
         throw new IllegalArgumentException("Output Writer for type " + outputType + " is not implemented.");
     }
