@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.util.Stack;
 
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 
 /**
  * This class implements {@link Writable} interface and xml writer for data mapper engine using StAX
@@ -41,6 +42,7 @@ public class XMLWriter implements Writable {
     private Schema outputSchema;
     private Stack<String> arrayElementStack;
     private String latestElementName;
+    private String latestFieldName;
 
     public XMLWriter(Schema outputSchema) {
         this.outputSchema = outputSchema;
@@ -59,8 +61,13 @@ public class XMLWriter implements Writable {
     @Override
     public void writeStartObject(String name) {
         try {
-            xMLStreamWriter.writeStartElement(name);
-            latestElementName = name;
+            if(name.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)){
+                latestElementName = name.substring(0,name.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
+                xMLStreamWriter.writeStartElement(latestElementName);
+            }else{
+                xMLStreamWriter.writeStartElement(name);
+                latestElementName = name;
+            }
         } catch (XMLStreamException e) {
             throw new SynapseException(e.getMessage());
         }
@@ -73,7 +80,10 @@ public class XMLWriter implements Writable {
             if (value != null) {
                 if (name.startsWith(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
                     xMLStreamWriter.writeAttribute(name.replaceFirst(SCHEMA_ATTRIBUTE_FIELD_PREFIX, ""), value);
-                } else {
+                } else if(name.equals(latestElementName)){
+                    xMLStreamWriter.writeCharacters(value);
+                    xMLStreamWriter.writeEndElement();
+                }else{
                     xMLStreamWriter.writeStartElement(name);
                     xMLStreamWriter.writeCharacters(value);
                     xMLStreamWriter.writeEndElement();
