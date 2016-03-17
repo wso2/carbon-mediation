@@ -41,6 +41,7 @@ import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
+import org.apache.synapse.commons.json.JsonUtil;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
@@ -272,55 +273,61 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     DMModelTypes.ModelType.JAVA_MAP, mappingResourceLoader.getOutputSchema());
             String outputVariable=mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader,
                     inputModelBuilder, outputMessageBuilder);
-            outputMessage = AXIOMUtil.stringToOM(outputVariable);
-            if (outputMessage != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Output message received ");
-                }
-                // Use to create the SOAP message
+
+            if(InputOutputDataTypes.DataType.XML.toString().equals(outputType)){
+                outputMessage = AXIOMUtil.stringToOM(outputVariable);
                 if (outputMessage != null) {
-                    OMElement firstChild = outputMessage.getFirstElement();
-                    if (firstChild != null) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Contains a first child");
-                        }
-                        QName resultQName = firstChild.getQName();
-                        // TODO use XPath
-                        if (resultQName.getLocalPart().equals("Envelope")
-                                && (resultQName
-                                .getNamespaceURI()
-                                .equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI) || resultQName
-                                .getNamespaceURI()
-                                .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))) {
-                            SOAPEnvelope soapEnvelope = AXIOMUtils
-                                    .getSOAPEnvFromOM(outputMessage
-                                            .getFirstElement());
-                            if (soapEnvelope != null) {
-                                try {
-                                    if (log.isDebugEnabled()) {
-                                        log.debug("Valid Envelope");
+                    if (log.isDebugEnabled()) {
+                        log.debug("Output message received ");
+                    }
+                    // Use to create the SOAP message
+                    if (outputMessage != null) {
+                        OMElement firstChild = outputMessage.getFirstElement();
+                        if (firstChild != null) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Contains a first child");
+                            }
+                            QName resultQName = firstChild.getQName();
+                            // TODO use XPath
+                            if (resultQName.getLocalPart().equals("Envelope")
+                                    && (resultQName
+                                    .getNamespaceURI()
+                                    .equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI) || resultQName
+                                    .getNamespaceURI()
+                                    .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))) {
+                                SOAPEnvelope soapEnvelope = AXIOMUtils
+                                        .getSOAPEnvFromOM(outputMessage
+                                                .getFirstElement());
+                                if (soapEnvelope != null) {
+                                    try {
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("Valid Envelope");
+                                        }
+                                        synCtx.setEnvelope(soapEnvelope);
+                                    } catch (AxisFault axisFault) {
+                                        handleException("Invalid Envelope",
+                                                axisFault, synCtx);
                                     }
-                                    synCtx.setEnvelope(soapEnvelope);
-                                } catch (AxisFault axisFault) {
-                                    handleException("Invalid Envelope",
-                                            axisFault, synCtx);
                                 }
+                            } else {
+                                synCtx.getEnvelope().getBody().getFirstElement()
+                                        .detach();
+                                synCtx.getEnvelope().getBody()
+                                        .addChild(outputMessage);
+
                             }
                         } else {
                             synCtx.getEnvelope().getBody().getFirstElement()
                                     .detach();
-                            synCtx.getEnvelope().getBody()
-                                    .addChild(outputMessage);
-
+                            synCtx.getEnvelope().getBody().addChild(outputMessage);
                         }
-                    } else {
-                        synCtx.getEnvelope().getBody().getFirstElement()
-                                .detach();
-                        synCtx.getEnvelope().getBody().addChild(outputMessage);
                     }
                 }
-            }
 
+            }else if(InputOutputDataTypes.DataType.JSON.toString().equals(outputType)){
+                org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+                JsonUtil.newJsonPayload(axis2MessageContext, outputVariable, true, true);
+            }
         } catch (Exception e) {
             handleException("Mapping failed", e, synCtx);
         }
