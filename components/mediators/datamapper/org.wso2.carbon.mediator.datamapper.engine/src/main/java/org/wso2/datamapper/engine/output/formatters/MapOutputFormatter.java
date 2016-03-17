@@ -23,10 +23,10 @@ import org.wso2.datamapper.engine.output.Formattable;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.datamapper.engine.types.ReaderEventTypes;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_FIRST_NAME;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
 
 /**
  * This class implements {@link Formattable} interface to read {@link Map} model and trigger events to read
@@ -56,13 +56,22 @@ public class MapOutputFormatter implements Formattable {
      */
     private void traversMap(Map<String, Object> outputMap) {
         Set<String> mapKeys = outputMap.keySet();
+        LinkedList<String> orderedKeyList = new LinkedList<>();
         boolean arrayType = false;
         if (isMapContainArray(mapKeys)) {
             sendArrayStartEvent();
             arrayType = true;
         }
-        int mapKeyIndex = 0;
+        //Attributes should come first than other fields. So attribute should be listed first
         for (String key : mapKeys) {
+            if (key.startsWith(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
+                orderedKeyList.addFirst(key);
+            } else {
+                orderedKeyList.addLast(key);
+            }
+        }
+        int mapKeyIndex = 0;
+        for (String key : orderedKeyList) {
             Object value = outputMap.get(key);
             if (value instanceof Map) {
                 if (arrayType) {
