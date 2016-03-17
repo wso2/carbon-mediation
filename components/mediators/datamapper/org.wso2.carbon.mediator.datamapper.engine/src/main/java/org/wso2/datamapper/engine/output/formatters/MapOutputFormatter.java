@@ -27,6 +27,7 @@ import java.util.*;
 
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_FIRST_NAME;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 
 /**
  * This class implements {@link Formattable} interface to read {@link Map} model and trigger events to read
@@ -62,12 +63,31 @@ public class MapOutputFormatter implements Formattable {
             sendArrayStartEvent();
             arrayType = true;
         }
+        ArrayList<String> tempKeys = new ArrayList<>();
+        tempKeys.addAll(mapKeys);
         //Attributes should come first than other fields. So attribute should be listed first
         for (String key : mapKeys) {
-            if (key.startsWith(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
+            if (key.startsWith(SCHEMA_ATTRIBUTE_FIELD_PREFIX) && tempKeys.contains(key)) {
                 orderedKeyList.addFirst(key);
+                tempKeys.remove(key);
             } else {
-                orderedKeyList.addLast(key);
+                if (key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX) && tempKeys.contains(key)) {
+                    String elementName = key.substring(0, key.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
+                    orderedKeyList.addLast(key);
+                    orderedKeyList.addLast(elementName);
+                    tempKeys.remove(key);
+                    tempKeys.remove(elementName);
+                } else if (tempKeys.contains(key)) {
+                    if (tempKeys.contains(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
+                        orderedKeyList.addLast(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                        orderedKeyList.addLast(key);
+                        tempKeys.remove(key);
+                        tempKeys.remove(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                    } else {
+                        orderedKeyList.addLast(key);
+                        tempKeys.remove(key);
+                    }
+                }
             }
         }
         int mapKeyIndex = 0;
@@ -88,7 +108,9 @@ public class MapOutputFormatter implements Formattable {
                 } else {
                     sendObjectStartEvent(key);
                     traversMap((Map<String, Object>) value);
-                    sendObjectEndEvent();
+                    if (!key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
+                        sendObjectEndEvent();
+                    }
                 }
             } else {
                 sendFieldEvent(key, value);
