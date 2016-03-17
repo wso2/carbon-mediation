@@ -24,6 +24,7 @@ import org.wso2.datamapper.engine.core.Schema;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -160,7 +161,12 @@ public class JacksonJSONSchema implements Schema {
 
     private Map<String, Object> getSchemaItems(Map<String, Object> schema) {
         if (schema.containsKey(ITEMS_KEY)) {
-            return (Map<String, Object>) schema.get(ITEMS_KEY);
+            Object propertyList=schema.get(ITEMS_KEY);
+            if(propertyList instanceof Map) {
+                return (Map<String, Object>) propertyList;
+            }else{
+                return (Map<String, Object>) ((ArrayList)propertyList).get(0);
+            }
         } else {
             throw new IllegalArgumentException("Given schema does not contain value under key : " + ITEMS_KEY);
         }

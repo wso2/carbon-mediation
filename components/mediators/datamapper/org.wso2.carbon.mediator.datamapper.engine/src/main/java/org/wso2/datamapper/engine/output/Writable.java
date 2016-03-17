@@ -21,8 +21,6 @@ package org.wso2.datamapper.engine.output;
  */
 public interface Writable{
 
-    void write();
-
     void writeStartObject(String name);
 
     void writeField(String name, String value);
