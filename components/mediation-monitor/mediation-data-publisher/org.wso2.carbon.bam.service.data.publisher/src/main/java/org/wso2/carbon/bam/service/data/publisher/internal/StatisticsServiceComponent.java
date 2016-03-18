@@ -31,6 +31,7 @@ import org.wso2.carbon.bam.service.data.publisher.util.CommonConstants;
 import org.wso2.carbon.bam.service.data.publisher.util.ServiceStatisticsPublisherConstants;
 import org.wso2.carbon.bam.service.data.publisher.util.TenantEventConfigData;
 import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.statistics.services.SystemStatisticsUtil;
 import org.wso2.carbon.utils.Axis2ConfigurationContextObserver;
@@ -110,9 +111,20 @@ public class StatisticsServiceComponent {
                 String key = configData.getUrl() + "_" + configData.getUserName() + "_" + configData.getPassword();
                 EventPublisherConfig eventPublisherConfig = ServiceAgentUtil.getEventPublisherConfig(key);
                 if (null != eventPublisherConfig) {
-                    if (null != eventPublisherConfig.getDataPublisher()) eventPublisherConfig.getDataPublisher().stop();
-                    if (null != eventPublisherConfig.getLoadBalancingDataPublisher())
-                        eventPublisherConfig.getLoadBalancingDataPublisher().stop();
+                    if (null != eventPublisherConfig.getDataPublisher()) {
+                        try {
+                            eventPublisherConfig.getDataPublisher().shutdownWithAgent();
+                        } catch (DataEndpointException e) {
+                            log.error("Error shutting down data publisher", e);
+                        }
+                    }
+                    if (null != eventPublisherConfig.getLoadBalancingDataPublisher()) {
+                        try {
+                            eventPublisherConfig.getLoadBalancingDataPublisher().shutdownWithAgent();
+                        } catch (DataEndpointException e) {
+                            log.error("Error shutting down data load balancing publisher", e);
+                        }
+                    }
                 }
             }
         }
