@@ -26,6 +26,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Stack;
 
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
@@ -43,6 +45,8 @@ public class XMLWriter implements Writable {
     private Stack<String> arrayElementStack;
     private String latestElementName;
     private String latestFieldName;
+    private Map<String, String> namespaceMap;
+    private static final String NAMESPACE_SEPERATOR = "_";
 
     public XMLWriter(Schema outputSchema) {
         this.outputSchema = outputSchema;
@@ -52,7 +56,13 @@ public class XMLWriter implements Writable {
         try {
             xMLStreamWriter = xMLOutputFactory.createXMLStreamWriter(stringWriter);
             //creating root element of the xml message
-            xMLStreamWriter.writeStartElement(outputSchema.getName());
+            namespaceMap =  outputSchema.getNamespaceMap();
+            writeStartElement(outputSchema.getName(), xMLStreamWriter);
+            Iterator<String> namespaceKeyIterator= namespaceMap.keySet().iterator();
+            while(namespaceKeyIterator.hasNext()){
+                String key = namespaceKeyIterator.next();
+                xMLStreamWriter.writeNamespace(namespaceMap.get(key), key);
+            }
         } catch (XMLStreamException e) {
             log.error("Error while creating xml output factory");
         }
@@ -63,9 +73,9 @@ public class XMLWriter implements Writable {
         try {
             if(name.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)){
                 latestElementName = name.substring(0,name.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
-                xMLStreamWriter.writeStartElement(latestElementName);
+                writeStartElement(latestElementName, xMLStreamWriter);
             }else{
-                xMLStreamWriter.writeStartElement(name);
+                writeStartElement(name, xMLStreamWriter);
                 latestElementName = name;
             }
         } catch (XMLStreamException e) {
@@ -84,7 +94,7 @@ public class XMLWriter implements Writable {
                     xMLStreamWriter.writeCharacters(value);
                     xMLStreamWriter.writeEndElement();
                 }else{
-                    xMLStreamWriter.writeStartElement(name);
+                    writeStartElement(name, xMLStreamWriter);
                     xMLStreamWriter.writeCharacters(value);
                     xMLStreamWriter.writeEndElement();
                 }
@@ -128,9 +138,25 @@ public class XMLWriter implements Writable {
     @Override
     public void writeStartAnonymousObject() {
         try {
-            xMLStreamWriter.writeStartElement(arrayElementStack.peek());
+            writeStartElement(arrayElementStack.peek(),xMLStreamWriter);
         } catch (XMLStreamException e) {
             throw new SynapseException(e.getMessage());
+        }
+    }
+
+    private void writeStartElement(String name, XMLStreamWriter xMLStreamWriter) throws XMLStreamException {
+        String prefix = name.split(NAMESPACE_SEPERATOR)[0];
+        if(namespaceMap.values().contains(prefix)){
+            String nameWithoutPrefix = name.split(NAMESPACE_SEPERATOR)[1];
+            Iterator<String> keyIterator = namespaceMap.keySet().iterator();
+            while(keyIterator.hasNext()){
+                String key = keyIterator.next();
+                if(prefix.equals(namespaceMap.get(key))){
+                    xMLStreamWriter.writeStartElement(prefix,nameWithoutPrefix,key);
+                }
+            }
+        }else{
+            xMLStreamWriter.writeStartElement(name);
         }
     }
 
