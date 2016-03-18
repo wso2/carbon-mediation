@@ -14,23 +14,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core;
-
-import org.apache.avro.generic.GenericRecord;
-import org.wso2.datamapper.engine.core.exceptions.JSException;
+package org.wso2.datamapper.engine.output;
 
 /**
- * This interface should be implemented by script executors of Data Mapper Engine
+ * This interface should be implemented by data-mapper output writers
  */
-public interface IScriptExecutor {
+public interface Writable{
 
-    /**
-     * This method executes the mapping config in the {@link MappingResourceLoader} on input generic record and returns the output generic record
-     *
-     * @param resourceModel
-     * @param inputRecord
-     * @return
-     * @throws JSException
-     */
-    GenericRecord executeMapping(MappingResourceLoader resourceModel, GenericRecord inputRecord) throws JSException;
+    void writeStartObject(String name);
+
+    void writeField(String name, String value);
+
+    void writeEndObject();
+
+    String terminateMessageBuilding();
+
+    void writeStartArray();
+
+    void writeEndArray();
+
+    void writeStartAnonymousObject();
 }

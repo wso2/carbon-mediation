@@ -14,32 +14,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.datamapper.engine.core.models;
 
-
-package org.wso2.datamapper.engine.output.readers;
-
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericDatumWriter;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.Encoder;
-import org.json.CDL;
-import org.json.JSONArray;
-import org.json.JSONException;
+import org.wso2.datamapper.engine.core.Model;
+import org.wso2.datamapper.engine.core.Schema;
 
-import java.io.IOException;
+/**
+ *
+ */
+public class AVROGenericModel extends GenericData implements Model<GenericRecord>{
 
-
-public class CSVDatumWriter extends GenericDatumWriter<GenericRecord> {
+    private GenericRecord model;
+    private Schema schema;
 
     @Override
-    protected void writeArray(Schema schema, Object datum, Encoder out)
-            throws IOException {
-        try {
-            JSONArray jsonArray = new JSONArray(datum.toString());
-            out.writeString(CDL.toString(jsonArray));
-        } catch (JSONException e) {
-            throw new IOException(e);
-        }
+    public void setModel(GenericRecord model) {
+        this.model = model;
     }
 
+    @Override
+    public GenericRecord getModel() {
+        return this.model;
+    }
+
+    public void setSchema(Schema schema) {
+        this.schema=schema;
+    }
+
+    public Schema getSchema() {
+        return schema;
+    }
 }

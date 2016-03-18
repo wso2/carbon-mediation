@@ -16,29 +16,49 @@
  */
 package org.wso2.datamapper.engine.core;
 
-import org.apache.avro.generic.GenericRecord;
-import org.json.JSONException;
+import org.apache.synapse.SynapseException;
+import org.wso2.datamapper.engine.core.callbacks.InputVariableCallback;
+import org.wso2.datamapper.engine.core.callbacks.OutputVariableCallback;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorFactory;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorType;
-import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
+import org.wso2.datamapper.engine.input.InputModelBuilder;
+import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 
-public class MappingHandler {
+public class MappingHandler implements InputVariableCallback, OutputVariableCallback {
 
-    public static GenericRecord doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputDataReaderAdapter inputReader)
+    private String inputVariable;
+    private String outputVariable;
+    private MappingResourceLoader mappingResourceLoader;
+    private OutputMessageBuilder outputMessageBuilder;
+
+    public String doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputModelBuilder inputModelBuilder,
+                        OutputMessageBuilder outputMessageBuilder)
             throws JSException {
-
-        inputReader.setInputMsg(inputMsg);
-        GenericRecord inputRecord = inputReader.getInputRecord(resourceModel.getInputSchema());
-        IScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.RHINO);
-        GenericRecord outputRecord = scriptExecutor.executeMapping(resourceModel, inputRecord);
-
-        return outputRecord;
-
+        mappingResourceLoader = resourceModel;
+        this.outputMessageBuilder = outputMessageBuilder;
+        inputModelBuilder.buildInputModel(inputMsg, this);
+        return outputVariable;
     }
 
+    @Override
+    public void notifyInputVariable(Object variable) {
+        this.inputVariable = (String) variable;
+        Executable scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.NASHORN);
+        Model outputModel = null;
+        try {
+            outputModel = scriptExecutor.execute(mappingResourceLoader, inputVariable);
+            outputMessageBuilder.buildOutputMessage(outputModel, this);
+        } catch (JSException e) {
+            throw new SynapseException("Unable to execute the mapping configuration on data mapper engine");
+        }
+    }
+
+    @Override
+    public void notifyOutputVariable(Object variable) {
+        outputVariable=(String) variable;
+    }
 }

@@ -16,9 +16,6 @@
  */
 package org.wso2.carbon.mediator.datamapper;
 
-import org.apache.avro.generic.GenericDatumWriter;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.Encoder;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -40,15 +37,13 @@ import org.apache.synapse.mediators.Value;
 import org.apache.synapse.util.AXIOMUtils;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
-import org.wso2.datamapper.engine.datatypes.InputOutputDataTypes;
-import org.wso2.datamapper.engine.input.InputReaderFactory;
-import org.wso2.datamapper.engine.input.readers.InputDataReaderAdapter;
-import org.wso2.datamapper.engine.output.OutputWriterFactory;
-import org.wso2.datamapper.engine.output.readers.DummyEncoder;
+import org.wso2.datamapper.engine.input.InputModelBuilder;
+import org.wso2.datamapper.engine.output.OutputMessageBuilder;
+import org.wso2.datamapper.engine.types.DMModelTypes;
+import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -261,27 +256,23 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      */
     private void transform(MessageContext synCtx, String configkey,
                            String inSchemaKey, String outSchemaKey, String inputType,
-                           String outputType, String uuid)
-             {
+                           String outputType, String uuid) {
         MappingResourceLoader mappingResourceLoader = null;
         OMElement outputMessage = null;
         try {
             // mapping resources needed to get the final output
             mappingResourceLoader = CacheResources.getCachedResources(synCtx,
                     configkey, inSchemaKey, outSchemaKey, uuid);
-
-            InputDataReaderAdapter inputReader = InputReaderFactory.getInputDataReader(inputType);
-            InputStream inputStream = getInputStream(synCtx, inputType);
-            GenericRecord result = MappingHandler.doMap(inputStream, mappingResourceLoader, inputReader);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Encoder encoder = new DummyEncoder(baos);
-            GenericDatumWriter<GenericRecord> writer = OutputWriterFactory.getDatumWriter(outputType);
-            writer.setSchema(mappingResourceLoader.getOutputSchema());
-            writer.write(result, encoder);
-            outputMessage = AXIOMUtil.stringToOM(baos.toString());
-
-
+            // create input model builder to convert input payload to generic data holder
+            InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(inputType),
+                    DMModelTypes.ModelType.JSON_STRING, mappingResourceLoader.getInputSchema());
+            //execute mapping on the input stream
+            MappingHandler mappingHandler = new MappingHandler();
+            OutputMessageBuilder outputMessageBuilder = new OutputMessageBuilder(getDataType(outputType),
+                    DMModelTypes.ModelType.JAVA_MAP, mappingResourceLoader.getOutputSchema());
+            String outputVariable=mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader,
+                    inputModelBuilder, outputMessageBuilder);
+            outputMessage = AXIOMUtil.stringToOM(outputVariable);
             if (outputMessage != null) {
                 if (log.isDebugEnabled()) {
                     log.debug("Output message received ");
@@ -329,10 +320,15 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     }
                 }
             }
+
         } catch (Exception e) {
             handleException("Mapping failed", e, synCtx);
         }
 
+    }
+
+    private static InputOutputDataTypes.DataType getDataType(String inputType) {
+        return InputOutputDataTypes.DataType.fromString(inputType);
     }
 
     private InputStream getInputStream(MessageContext context, String inputType) {

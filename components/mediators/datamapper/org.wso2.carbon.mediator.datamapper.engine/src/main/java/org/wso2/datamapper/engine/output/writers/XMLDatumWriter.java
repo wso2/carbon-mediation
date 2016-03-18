@@ -14,7 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.output.readers;
+package org.wso2.datamapper.engine.output.writers;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.AVRO_ATTRIBUTE_FIELD_PREFIX;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.AVRO_RECORD_FIELD_POSTFIX;
 
 /**
@@ -94,7 +94,7 @@ public class XMLDatumWriter extends GenericDatumWriter<GenericRecord> {
     private XMLStreamWriter decodeStringTypeField(XMLStreamWriter xMLStreamWriter, GenericRecord record,
                                                   Schema.Field field) throws XMLStreamException {
         String fieldName = field.name();
-        if (fieldName.startsWith(AVRO_ATTRIBUTE_FIELD_PREFIX)) {
+        if (fieldName.startsWith(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
             String stringFieldValue = (String) record.get(fieldName);
             xMLStreamWriter.writeAttribute(getValidAttributeFieldName(fieldName), stringFieldValue.toString());
         } else {
@@ -107,7 +107,7 @@ public class XMLDatumWriter extends GenericDatumWriter<GenericRecord> {
     }
 
     private String getValidAttributeFieldName(String attributeName) {
-        return attributeName.replaceFirst(AVRO_ATTRIBUTE_FIELD_PREFIX, "");
+        return attributeName.replaceFirst(SCHEMA_ATTRIBUTE_FIELD_PREFIX, "");
     }
 
     private XMLStreamWriter decodeRecordTypeField(XMLStreamWriter xMLStreamWriter, GenericRecord record, Schema field)

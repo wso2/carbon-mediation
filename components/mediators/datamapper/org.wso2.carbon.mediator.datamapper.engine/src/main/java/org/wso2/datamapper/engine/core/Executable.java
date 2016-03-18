@@ -14,19 +14,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.utils;
+package org.wso2.datamapper.engine.core;
+
+import org.wso2.datamapper.engine.core.exceptions.JSException;
 
 /**
- * This class contains constants used in Data Mapper Engine
+ * This interface should be implemented by script executors of Data Mapper Engine
  */
-public class DataMapperEngineConstants {
+public interface Executable {
 
-    public static final String SCHEMA_ATTRIBUTE_FIELD_PREFIX = "attr_";
-    public static final String SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX ="ATTR";
-    public static final String AVRO_RECORD_FIELD_POSTFIX = "Record";
-    public static final String OBJECT_ELEMENT_TYPE = "object";
-    public static final String ARRAY_ELEMENT_TYPE = "array";
-    public static final String STRING_ELEMENT_TYPE = "string";
-    public static final String ARRAY_ELEMENT_FIRST_NAME = "0";
-    public static final String NASHORN_ENGINE_NAME = "nashorn";
+    /**
+     * Method to execute the mapping config in the {@link MappingResourceLoader} on
+     * input generic record and returns the output generic record
+     *
+     * @param resourceModel
+     * @param inputRecord
+     * @return
+     * @throws JSException
+     */
+    Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException;
 }

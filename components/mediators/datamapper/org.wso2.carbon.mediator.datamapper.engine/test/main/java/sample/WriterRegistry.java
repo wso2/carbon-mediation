@@ -20,9 +20,9 @@ package sample;
 
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumWriter;
-import org.wso2.datamapper.engine.output.readers.CSVDatumWriter;
-import org.wso2.datamapper.engine.output.readers.JSONDatumWriter;
-import org.wso2.datamapper.engine.output.readers.XMLDatumWriter;
+import org.wso2.datamapper.engine.output.writers.CSVDatumWriter;
+import org.wso2.datamapper.engine.output.writers.JSONDatumWriter;
+import org.wso2.datamapper.engine.output.writers.XMLDatumWriter;
 
 import java.util.HashMap;
 import java.util.Map;
