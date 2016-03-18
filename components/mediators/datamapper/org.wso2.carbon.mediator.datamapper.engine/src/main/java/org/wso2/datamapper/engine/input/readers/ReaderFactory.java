@@ -27,6 +27,7 @@ public class ReaderFactory {
     public static Readable getReader(InputOutputDataTypes.DataType inputType){
         switch (inputType){
             case XML: return new XMLReader();
+            case JSON: return new JSONSimpleJSONReader();
         }
         throw new IllegalArgumentException("Input Reader for type "+inputType+" is not implemented.");
     }

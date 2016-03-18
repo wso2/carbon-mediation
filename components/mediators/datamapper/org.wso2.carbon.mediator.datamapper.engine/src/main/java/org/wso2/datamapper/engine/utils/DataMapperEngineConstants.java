@@ -27,6 +27,10 @@ public class DataMapperEngineConstants {
     public static final String OBJECT_ELEMENT_TYPE = "object";
     public static final String ARRAY_ELEMENT_TYPE = "array";
     public static final String STRING_ELEMENT_TYPE = "string";
+    public static final String BOOLEAN_ELEMENT_TYPE = "boolean";
+    public static final String INTEGER_ELEMENT_TYPE = "integer";
+    public static final String NUMBER_ELEMENT_TYPE = "number";
+    public static final String NULL_ELEMENT_TYPE = "null";
     public static final String ARRAY_ELEMENT_FIRST_NAME = "0";
     public static final String NASHORN_ENGINE_NAME = "nashorn";
 }

@@ -108,6 +108,7 @@ public class JacksonJSONWriter implements Writable {
     @Override
     public void writeStartArray() {
         //no implementation
+        System.out.println();
     }
 
     @Override
