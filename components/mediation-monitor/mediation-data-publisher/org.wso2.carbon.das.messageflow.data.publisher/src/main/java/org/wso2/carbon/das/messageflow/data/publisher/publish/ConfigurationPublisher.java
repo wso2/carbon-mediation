@@ -29,12 +29,18 @@ import org.wso2.carbon.das.messageflow.data.publisher.conf.MediationStatConfig;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.Property;
 import org.wso2.carbon.das.messageflow.data.publisher.util.MediationDataPublisherConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
-import org.wso2.carbon.databridge.agent.thrift.AsyncDataPublisher;
-import org.wso2.carbon.databridge.agent.thrift.exception.AgentException;
-import org.wso2.carbon.databridge.agent.thrift.lb.DataPublisherHolder;
-import org.wso2.carbon.databridge.agent.thrift.lb.LoadBalancingDataPublisher;
-import org.wso2.carbon.databridge.agent.thrift.lb.ReceiverGroup;
-import org.wso2.carbon.databridge.agent.thrift.util.DataPublisherUtil;
+
+import org.wso2.carbon.databridge.agent.DataPublisher;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointConfigurationException;
+import org.wso2.carbon.databridge.agent.exception.DataEndpointException;
+import org.wso2.carbon.databridge.commons.AttributeType;
+import org.wso2.carbon.databridge.commons.StreamDefinition;
+import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
+import org.wso2.carbon.databridge.commons.exception.TransportException;
+import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
+
 import org.wso2.carbon.databridge.commons.AttributeType;
 import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
@@ -100,75 +106,57 @@ public class ConfigurationPublisher {
         eventData.add(jsonString);
     }
 
-
-    private static void publishToAgent(List<Object> eventData,
-                                       List<Object> metaDataValueList,
-                                       MediationStatConfig mediationStatConfig,
-                                       StreamDefinition streamDef) {
+    private static void publishToAgent(List<Object> eventData, List<Object> metaDataValueList,
+                                       MediationStatConfig mediationStatConfig, StreamDefinition streamDef) {
 
         String serverUrl = mediationStatConfig.getUrl();
         String userName = mediationStatConfig.getUserName();
         String password = mediationStatConfig.getPassword();
 
-        String key = serverUrl + "_" + userName
-                     + "_" + password + "_" + streamDef.getName();
+        String key = serverUrl + "_" + userName + "_" + password + "_" + streamDef.getName();
         EventPublisherConfig eventPublisherConfig = PublisherUtils.getEventPublisherConfig(key);
         if (!mediationStatConfig.isLoadBalancingEnabled()) {
-            AsyncDataPublisher dataPublisher = null;
-            try {
-                if (eventPublisherConfig == null) {
-                    synchronized (ConfigurationPublisher.class) {
-                        eventPublisherConfig = new EventPublisherConfig();
-                        AsyncDataPublisher asyncDataPublisher = new AsyncDataPublisher(serverUrl, userName, password);
-                        asyncDataPublisher.addStreamDefinition(streamDef);
-
-
-                        eventPublisherConfig.setDataPublisher(asyncDataPublisher);
-                        PublisherUtils.getEventPublisherConfigMap().put(key, eventPublisherConfig);
+            DataPublisher dataPublisher = null;
+            if (eventPublisherConfig == null) {
+                synchronized (Publisher.class) {
+                    eventPublisherConfig = new EventPublisherConfig();
+                    DataPublisher asyncDataPublisher = null;
+                    try {
+                        asyncDataPublisher = new DataPublisher(serverUrl, userName, password);
+                    } catch (DataEndpointAgentConfigurationException | DataEndpointException |
+                            DataEndpointConfigurationException | DataEndpointAuthenticationException |
+                            TransportException e) {
+                        log.error("Error occurred while sending the event", e);
                     }
+                    eventPublisherConfig.setDataPublisher(asyncDataPublisher);
+                    PublisherUtils.getEventPublisherConfigMap().put(key, eventPublisherConfig);
                 }
-                dataPublisher = eventPublisherConfig.getDataPublisher();
-
-                dataPublisher.publish(streamDef.getName(), streamDef.getVersion(), metaDataValueList.toArray(), null,
-                                      eventData.toArray());
-
-            } catch (AgentException e) {
-                log.error("Error occurred while sending the event", e);
             }
+            dataPublisher = eventPublisherConfig.getDataPublisher();
+            dataPublisher.publish(DataBridgeCommonsUtils.generateStreamId(streamDef.getName(), streamDef.getVersion()),
+                                  metaDataValueList.toArray(), null, eventData.toArray());
         } else {
-            try {
-                LoadBalancingDataPublisher dataPublisher = null;
-                if (eventPublisherConfig == null) {
-                    synchronized (ConfigurationPublisher.class) {
-                        eventPublisherConfig = new EventPublisherConfig();
-                        ArrayList<ReceiverGroup> allReceiverGroups = new ArrayList<ReceiverGroup>();
-                        ArrayList<String> receiverGroupUrls = DataPublisherUtil.getReceiverGroups(serverUrl);
+            DataPublisher dataPublisher = null;
+            if (eventPublisherConfig == null) {
+                synchronized (Publisher.class) {
+                    eventPublisherConfig = new EventPublisherConfig();
 
-                        for (String aReceiverGroupURL : receiverGroupUrls) {
-                            ArrayList<DataPublisherHolder> dataPublisherHolders = new ArrayList<DataPublisherHolder>();
-                            String[] urls = aReceiverGroupURL.split(",");
-                            for (String aUrl : urls) {
-                                DataPublisherHolder aNode = new DataPublisherHolder(null, aUrl.trim(), userName, password);
-                                dataPublisherHolders.add(aNode);
-                            }
-                            ReceiverGroup group = new ReceiverGroup(dataPublisherHolders);
-                            allReceiverGroups.add(group);
-                        }
-
-                        LoadBalancingDataPublisher loadBalancingDataPublisher = new LoadBalancingDataPublisher(allReceiverGroups);
-
-                        loadBalancingDataPublisher.addStreamDefinition(streamDef);
-                        eventPublisherConfig.setLoadBalancingDataPublisher(loadBalancingDataPublisher);
-                        PublisherUtils.getEventPublisherConfigMap().put(key, eventPublisherConfig);
+                    DataPublisher loadBalancingDataPublisher = null;
+                    try {
+                        loadBalancingDataPublisher = new DataPublisher(serverUrl, userName, password);
+                    } catch (DataEndpointAgentConfigurationException | DataEndpointException |
+                            DataEndpointConfigurationException | DataEndpointAuthenticationException |
+                            TransportException e) {
+                        log.error("Error occurred while sending the event", e);
                     }
+                    eventPublisherConfig.setLoadBalancingDataPublisher(loadBalancingDataPublisher);
+                    PublisherUtils.getEventPublisherConfigMap().put(key, eventPublisherConfig);
                 }
-                dataPublisher = eventPublisherConfig.getLoadBalancingDataPublisher();
-
-                dataPublisher.publish(streamDef.getName(), streamDef.getVersion(), metaDataValueList.toArray(), null,
-                                      eventData.toArray());
-            } catch (AgentException e) {
-                log.error("Error occurred while sending the event", e);
             }
+            dataPublisher = eventPublisherConfig.getLoadBalancingDataPublisher();
+
+            dataPublisher.publish(DataBridgeCommonsUtils.generateStreamId(streamDef.getName(), streamDef.getVersion()),
+                                  metaDataValueList.toArray(), null, eventData.toArray());
         }
     }
 
