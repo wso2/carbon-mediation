@@ -55,7 +55,10 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
     public void sendBack(MessageContext msgContext) {
         if (msgContext != null) {
 
-            if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_HANDSHAKE_PRESENT) != null &&
+            if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT) != null &&
+                    msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT).equals(true)) {
+                return;
+            } else if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_HANDSHAKE_PRESENT) != null &&
                     msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_HANDSHAKE_PRESENT).equals(true)) {
                 if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TARGET_HANDLER_CONTEXT) != null) {
                     ChannelHandlerContext targetCtx = (ChannelHandlerContext) msgContext

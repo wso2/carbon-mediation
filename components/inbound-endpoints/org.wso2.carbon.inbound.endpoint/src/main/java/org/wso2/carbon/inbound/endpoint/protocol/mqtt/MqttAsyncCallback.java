@@ -119,12 +119,12 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
                 PrivilegedCarbonContext privilegedCarbonContext =
                         PrivilegedCarbonContext.getThreadLocalCarbonContext();
                 privilegedCarbonContext.setTenantDomain(super.tenantDomain, true);
-                injectHandler.invoke(mqttMessage, name);
+                injectHandler.invoke(mqttMessage, name, topic);
             } finally {
                 PrivilegedCarbonContext.endTenantFlow();
             }
         } else {
-            injectHandler.invoke(mqttMessage, name);
+            injectHandler.invoke(mqttMessage, name, topic);
         }
     }
 

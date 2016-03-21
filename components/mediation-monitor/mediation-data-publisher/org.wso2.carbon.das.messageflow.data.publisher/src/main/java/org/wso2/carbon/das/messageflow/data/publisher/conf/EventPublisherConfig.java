@@ -13,32 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wso2.carbon.das.messageflow.data.publisher.conf;
 
-
-import org.wso2.carbon.databridge.agent.thrift.AsyncDataPublisher;
-import org.wso2.carbon.databridge.agent.thrift.conf.AgentConfiguration;
-import org.wso2.carbon.databridge.agent.thrift.lb.LoadBalancingDataPublisher;
+import org.wso2.carbon.databridge.agent.DataPublisher;
 
 public class EventPublisherConfig {
 
-    private AsyncDataPublisher dataPublisher;
-    private AgentConfiguration agentConfiguration;
-    private LoadBalancingDataPublisher loadBalancingDataPublisher;
+	private DataPublisher dataPublisher;
 
-    public AsyncDataPublisher getDataPublisher() {
-        return dataPublisher;
-    }
+	public DataPublisher getDataPublisher() {
+		return dataPublisher;
+	}
 
-    public void setDataPublisher(AsyncDataPublisher dataPublisher) {
-        this.dataPublisher = dataPublisher;
-    }
+	public void setDataPublisher(DataPublisher dataPublisher) {
+		this.dataPublisher = dataPublisher;
+	}
 
-    public LoadBalancingDataPublisher getLoadBalancingDataPublisher() {
-        return loadBalancingDataPublisher;
-    }
+	public DataPublisher getLoadBalancingDataPublisher() {
+		return dataPublisher;
+	}
 
-    public void setLoadBalancingDataPublisher(LoadBalancingDataPublisher loadBalancingDataPublisher) {
-        this.loadBalancingDataPublisher = loadBalancingDataPublisher;
-    }
+	public void setLoadBalancingDataPublisher(DataPublisher loadBalancingDataPublisher) {
+		this.dataPublisher = loadBalancingDataPublisher;
+	}
 }
