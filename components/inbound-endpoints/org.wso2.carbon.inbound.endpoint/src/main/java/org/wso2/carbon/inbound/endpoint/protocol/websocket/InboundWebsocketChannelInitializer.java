@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.SSLHandlerFactory;
 
+import java.util.ArrayList;
+
 public class InboundWebsocketChannelInitializer extends ChannelInitializer<SocketChannel> {
     private static final Logger log = LoggerFactory.getLogger(InboundWebsocketChannelInitializer.class);
 
@@ -35,6 +37,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
     private int clientBroadcastLevel;
     private String outflowDispatchSequence;
     private String outflowErrorSequence;
+    private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
 
     public InboundWebsocketChannelInitializer() {
     }
@@ -55,6 +58,10 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         this.outflowErrorSequence = outflowErrorSequence;
     }
 
+    public void setSubprotocolHandlers(ArrayList<AbstractSubprotocolHandler> subprotocolHandlers){
+        this.subprotocolHandlers = subprotocolHandlers;
+    }
+
     @Override
     protected void initChannel(SocketChannel websocketChannel) throws Exception {
 
@@ -73,6 +80,8 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
             sourceHandler.setOutflowDispatchSequence(outflowDispatchSequence);
         if (outflowErrorSequence != null)
             sourceHandler.setOutflowErrorSequence(outflowErrorSequence);
+        if (subprotocolHandlers != null)
+            sourceHandler.setSubprotocolHandlers(subprotocolHandlers);
         p.addLast("handler", sourceHandler);
     }
 

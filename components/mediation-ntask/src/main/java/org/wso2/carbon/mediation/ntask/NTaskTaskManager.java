@@ -170,11 +170,9 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     return false;
                 }
                 deleted = taskManager.deleteTask(name);
-
-            }
-            if (deleted) {
                 NTaskAdapter.removeProperty(taskName);
             }
+
             logger.debug("Deleted task [" + name + "] [" + deleted + "]");
             return deleted;
         } catch (Exception e) {

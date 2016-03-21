@@ -15,22 +15,21 @@
  */
 package org.wso2.carbon.das.messageflow.data.publisher.util;
 
-
 import org.wso2.carbon.core.RegistryResources;
 
 public class MediationDataPublisherConstants {
 
-    public static final String DAS_MEDIATION_MESSAGE_FLOW_REG_PATH = RegistryResources.COMPONENTS
-                                                               + "org.wso2.carbon.das.messageflow.data.publisher/";
+	public static final String DAS_MEDIATION_MESSAGE_FLOW_REG_PATH =
+			RegistryResources.COMPONENTS + "org.wso2.carbon.das.messageflow.data.publisher/";
 
-    public static final String DAS_SERVER_LIST_REG_PATH = DAS_MEDIATION_MESSAGE_FLOW_REG_PATH + "servers";
+	public static final String DAS_SERVER_LIST_REG_PATH = DAS_MEDIATION_MESSAGE_FLOW_REG_PATH + "servers";
 
-    // key, value constants
-    public static final String  FLOW_DATA = "flowData";
-    public static final String MESSAGE_ID = "messageId";
+	// key, value constants
+	public static final String FLOW_DATA = "flowData";
+	public static final String MESSAGE_ID = "messageId";
 
-    public static final String STREAM_NAME = "esb-flow-entry-stream";
-    public static final String STREAM_VERSION = "1.0.0";
+	public static final String STREAM_NAME = "esb-flow-entry-stream";
+	public static final String STREAM_VERSION = "1.0.0";
 
     public static final String CONFIG_STREAM_NAME = "esb-config-entry-stream";
     public static final String CONFIG_STREAM_VERSION = "1.0.0";

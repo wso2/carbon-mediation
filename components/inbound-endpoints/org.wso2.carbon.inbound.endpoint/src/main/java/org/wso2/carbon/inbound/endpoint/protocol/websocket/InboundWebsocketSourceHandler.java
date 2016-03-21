@@ -70,6 +70,7 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.HOST;
 
@@ -85,13 +86,28 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private String tenantDomain;
     private int port;
     private InboundWebsocketResponseSender responseSender;
-    private String contentTypesAsSubprotocol = "application/xml,application/json,text/xml";
+    private static ArrayList<String> contentTypes = new ArrayList<>();
+    private static ArrayList<String> otherSubprotocols = new ArrayList<>();
     private int clientBroadcastLevel;
     private String outflowDispatchSequence;
     private String outflowErrorSequence;
     private ChannelPromise handshakeFuture;
+    private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
+
+    static {
+        contentTypes.add("application/xml");
+        contentTypes.add("application/json");
+        contentTypes.add("text/xml");
+    }
 
     public InboundWebsocketSourceHandler() throws Exception {
+    }
+
+    public void setSubprotocolHandlers(ArrayList<AbstractSubprotocolHandler> subprotocolHandlers) {
+        this.subprotocolHandlers = subprotocolHandlers;
+        for (AbstractSubprotocolHandler handler : subprotocolHandlers) {
+            otherSubprotocols.add(handler.getSubprotocolIdentifier());
+        }
     }
 
     @Override
@@ -124,7 +140,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private void handleHandshake(ChannelHandlerContext ctx, FullHttpRequest req) throws URISyntaxException, AxisFault {
 
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
-                getWebSocketLocation(req), contentTypesAsSubprotocol, true);
+                getWebSocketLocation(req), SubprotocolBuilderUtil.buildSubprotocolString(contentTypes,otherSubprotocols), true);
         handshaker = wsFactory.newHandshaker(req);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
@@ -176,6 +192,22 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         }
     }
 
+    private boolean interceptWebsocketMessageFlow(ChannelHandlerContext ctx, WebSocketFrame frame) {
+        if (handshaker.selectedSubprotocol() == null || subprotocolHandlers == null ||
+                (subprotocolHandlers != null && subprotocolHandlers.isEmpty())) {
+            return false;
+        }
+        boolean continueFlow = false;
+        for (AbstractSubprotocolHandler handler : subprotocolHandlers) {
+            if (handshaker.selectedSubprotocol() != null &&
+                    handshaker.selectedSubprotocol().contains(handler.getSubprotocolIdentifier())) {
+                continueFlow = handler.handle(ctx, frame, subscriberPath.toString());
+                break;
+            }
+        }
+        return !continueFlow;
+    }
+
     private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
 
         try {
@@ -192,21 +224,32 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     return;
                 }
 
+                if (interceptWebsocketMessageFlow(ctx, frame)) {
+                    return;
+                }
+
                 if (frame instanceof CloseWebSocketFrame) {
                     handleClientWebsocketChannelTermination(frame);
                     return;
-                } else if (frame instanceof BinaryWebSocketFrame) {
+                } else if ((frame instanceof BinaryWebSocketFrame)&& ((handshaker.selectedSubprotocol() == null) ||
+                        (handshaker.selectedSubprotocol() != null
+                                && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     handleWebsocketBinaryFrame(frame);
                     return;
-                } else if ((frame instanceof TextWebSocketFrame) && (handshaker.selectedSubprotocol() == null)) {
+                } else if ((frame instanceof TextWebSocketFrame) && ((handshaker.selectedSubprotocol() == null) ||
+                        (handshaker.selectedSubprotocol() != null
+                                && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     handleWebsocketPassthroughTextFrame(frame);
                     return;
-                } else if (frame instanceof TextWebSocketFrame) {
+                } else if ((frame instanceof TextWebSocketFrame) && handshaker.selectedSubprotocol() != null
+                        && handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)) {
 
                     CustomLogSetter.getInstance().setLogAppender(endpoint.getArtifactContainerName());
 
                     String message = ((TextWebSocketFrame) frame).text();
-                    String contentType = handshaker.selectedSubprotocol();
+                    String contentType = SubprotocolBuilderUtil
+                            .syanapeSubprotocolToContentType(SubprotocolBuilderUtil
+                                    .extractSynapseSubprotocol(handshaker.selectedSubprotocol()));
 
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
                             ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)
@@ -361,7 +404,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
             ((Axis2MessageContext) synCtx).getAxis2MessageContext()
                     .setProperty(InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE, outflowErrorSequence);
         }
-
+        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SUBSCRIBER_PATH, subscriberPath.toString());
         return synCtx;
     }
 
