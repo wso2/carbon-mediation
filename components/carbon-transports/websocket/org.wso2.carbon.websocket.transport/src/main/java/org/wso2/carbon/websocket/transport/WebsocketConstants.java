@@ -27,7 +27,7 @@ public class WebsocketConstants {
     public static final String UNIVERSAL_SOURCE_IDENTIFIER = "universal.source.identifier";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "ws.outflow.dispatch.sequence";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "ws.outflow.dispatch.fault.sequence";
-    public static final String CONTENT_TYPE = "ws.accept.contenType";
+    public static final String CONTENT_TYPE = "websocket.accept.contenType";
 
     public static final String WEBSOCKET_SOURCE_HANDSHAKE_PRESENT = "websocket.source.handshake.present";
     public static final String WEBSOCKET_TARGET_HANDSHAKE_PRESENT = "websocket.target.handshake.present";
@@ -44,5 +44,8 @@ public class WebsocketConstants {
     public static final String TRUST_STORE_LOCATION = "ws.trust.store.location";
     public static final String TRUST_STORE_PASSWORD = "ws.trust.store.Password";
     public static final String TRUST_STORE_CONFIG_ELEMENT = "ws.trust.store";
+
+    public static final String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse";
+    public static final String WEBSOCKET_SUBSCRIBER_PATH = "websocket.subscriber.path";
 
 }

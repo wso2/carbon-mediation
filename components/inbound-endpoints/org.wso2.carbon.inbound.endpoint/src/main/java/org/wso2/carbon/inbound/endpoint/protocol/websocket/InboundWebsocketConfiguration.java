@@ -25,7 +25,7 @@ public class InboundWebsocketConfiguration {
     private int broadcastLevel;
     private String outFlowDispatchSequence;
     private String outFlowErrorSequence;
-
+    private String subprotocolHandler;
 
     private InboundWebsocketConfiguration(InboundWebsocketConfigurationBuilder builder) {
         this.port = builder.port;
@@ -35,6 +35,7 @@ public class InboundWebsocketConfiguration {
         this.broadcastLevel = builder.broadcastLevel;
         this.outFlowDispatchSequence = builder.outFlowDispatchSequence;
         this.outFlowErrorSequence = builder.outFlowErrorSequence;
+        this.subprotocolHandler = builder.subprotocolHandler;
     }
 
     public int getPort() {
@@ -65,6 +66,10 @@ public class InboundWebsocketConfiguration {
         return outFlowErrorSequence;
     }
 
+    public String getSubprotocolHandler() {
+        return subprotocolHandler;
+    }
+
     public static class InboundWebsocketConfigurationBuilder {
         private final int port;
         private final String name;
@@ -73,6 +78,7 @@ public class InboundWebsocketConfiguration {
         private int broadcastLevel;
         private String outFlowDispatchSequence;
         private String outFlowErrorSequence;
+        private String subprotocolHandler;
 
         public InboundWebsocketConfigurationBuilder(int port, String name) {
             this.port = port;
@@ -105,6 +111,11 @@ public class InboundWebsocketConfiguration {
 
         public InboundWebsocketConfigurationBuilder outFlowErrorSequence(String outFlowErrorSequence) {
             this.outFlowErrorSequence = outFlowErrorSequence;
+            return this;
+        }
+
+        public InboundWebsocketConfigurationBuilder subprotocolHandler(String subprotocolHandler) {
+            this.subprotocolHandler = subprotocolHandler;
             return this;
         }
 

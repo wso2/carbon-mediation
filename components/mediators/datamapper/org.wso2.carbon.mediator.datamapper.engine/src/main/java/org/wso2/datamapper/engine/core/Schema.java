@@ -16,6 +16,11 @@
  */
 package org.wso2.datamapper.engine.core;
 
+import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
+import org.wso2.datamapper.engine.core.schemas.SchemaElement;
+
+import java.util.List;
+
 /**
  * Interface to represent schema in data mapper engine.
  */
@@ -36,10 +41,16 @@ public interface Schema {
      */
     String getElementTypeByName(String elementName);
 
+    String getElementTypeByName(List<SchemaElement> elementStack) throws InvalidPayloadException;
+
     /**
      * Method for check whether schema has a child element inside given element
      *
      * @return
      */
     boolean isChildElement(String elementName,String childElementName);
+
+    boolean isChildElement(List<SchemaElement> elementStack,String childElementName) throws InvalidPayloadException;
+
+    String getPrefixForNamespace(String url);
 }

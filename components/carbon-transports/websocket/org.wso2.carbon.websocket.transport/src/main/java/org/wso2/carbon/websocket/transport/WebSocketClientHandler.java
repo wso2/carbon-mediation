@@ -168,18 +168,24 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
                 if (frame instanceof CloseWebSocketFrame) {
                     handleTargetWebsocketChannelTermination(frame);
                     return;
-                } else if (frame instanceof BinaryWebSocketFrame) {
+                } else if ((frame instanceof BinaryWebSocketFrame) && ((handshaker.actualSubprotocol() == null) ||
+                        ((handshaker.actualSubprotocol() != null) &&
+                                !handshaker.actualSubprotocol().contains(WebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     handleWebsocketBinaryFrame(frame);
                     return;
-                } else if (frame instanceof TextWebSocketFrame && (handshaker.actualSubprotocol() == null)) {
+                } else if ((frame instanceof TextWebSocketFrame) && ((handshaker.actualSubprotocol() == null) ||
+                        ((handshaker.actualSubprotocol() != null) &&
+                                !handshaker.actualSubprotocol().contains(WebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     handlePassthroughTextFrame(frame);
                     return;
-                } else if (frame instanceof TextWebSocketFrame) {
+                } else if ((frame instanceof TextWebSocketFrame) &&
+                        ((handshaker.actualSubprotocol() != null) &&
+                                handshaker.actualSubprotocol().contains(WebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX))) {
 
                     org.apache.synapse.MessageContext synCtx = getSynapseMessageContext(tenantDomain);
 
                     String message = ((TextWebSocketFrame) frame).text();
-                    String contentType = handshaker.actualSubprotocol();
+                    String contentType = SubprotocolBuilderUtil.syanapeSubprotocolToContentType(handshaker.actualSubprotocol());
 
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
                             ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)
@@ -247,6 +253,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
             synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
             synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, responseSender);
         }
+        synCtx.setProperty(WebsocketConstants.WEBSOCKET_SUBSCRIBER_PATH, handshaker.uri().toString());
         return synCtx;
     }
 

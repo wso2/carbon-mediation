@@ -15,30 +15,29 @@
  */
 package org.wso2.carbon.business.messaging.hl7.common.data.conf;
 
-import org.wso2.carbon.databridge.agent.thrift.AsyncDataPublisher;
-import org.wso2.carbon.databridge.agent.thrift.lb.LoadBalancingDataPublisher;
+import org.wso2.carbon.databridge.agent.DataPublisher;
+
 /**
  * This class represents data publisher instances
  */
 public class EventPublisherConfig {
 
-    private AsyncDataPublisher asyncDataPublisher;
-    private LoadBalancingDataPublisher loadBalancingDataPublisher;
+	private DataPublisher asyncDataPublisher;
+	private DataPublisher loadBalancingDataPublisher;
 
-    public AsyncDataPublisher getAsyncDataPublisher() {
-        return asyncDataPublisher;
-    }
+	public DataPublisher getAsyncDataPublisher() {
+		return asyncDataPublisher;
+	}
 
-    public void setAsyncDataPublisher(AsyncDataPublisher asyncDataPublisher) {
-        this.asyncDataPublisher = asyncDataPublisher;
-    }
+	public void setAsyncDataPublisher(DataPublisher asyncDataPublisher) {
+		this.asyncDataPublisher = asyncDataPublisher;
+	}
 
-    public LoadBalancingDataPublisher getLoadBalancingDataPublisher() {
-        return loadBalancingDataPublisher;
-    }
+	public DataPublisher getLoadBalancingDataPublisher() {
+		return loadBalancingDataPublisher;
+	}
 
-    public void setLoadBalancingDataPublisher(
-            LoadBalancingDataPublisher loadBalancingDataPublisher) {
-        this.loadBalancingDataPublisher = loadBalancingDataPublisher;
-    }
+	public void setLoadBalancingDataPublisher(DataPublisher loadBalancingDataPublisher) {
+		this.loadBalancingDataPublisher = loadBalancingDataPublisher;
+	}
 }
