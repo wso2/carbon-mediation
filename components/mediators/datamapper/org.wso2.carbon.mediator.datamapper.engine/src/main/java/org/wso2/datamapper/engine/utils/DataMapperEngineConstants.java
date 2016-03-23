@@ -33,4 +33,7 @@ public class DataMapperEngineConstants {
     public static final String NULL_ELEMENT_TYPE = "null";
     public static final String ARRAY_ELEMENT_FIRST_NAME = "0";
     public static final String NASHORN_ENGINE_NAME = "nashorn";
+    public static final int DEFAULT_DATAMAPPER_ENGINE_POOL_SIZE = 20;
+    public static final String ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE = "org.apache.synapse.datamapper.executor.pool.size";
+
 }
