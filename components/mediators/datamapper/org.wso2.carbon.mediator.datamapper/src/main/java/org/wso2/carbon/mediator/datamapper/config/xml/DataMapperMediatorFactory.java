@@ -126,22 +126,10 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
         } else {
             handleException("The output DataType is required for the DataMapper mediator");
         }
-
-        // set the unique ID for the DataMapperMediator instance
-        if (generateID() != null) {
-            datamapperMediator.setUniqueID(generateID());
-        } else {
-            generateID();
-        }
+        
         processAuditStatus(datamapperMediator, element);
 
         return datamapperMediator;
     }
 
-    // Generated a unique ID
-    private UUID generateID() {
-        UUID uuid = UUID.randomUUID();
-        return uuid;
-
-    }
 }

@@ -21,6 +21,7 @@ import org.apache.avro.Schema.Parser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  *
@@ -43,6 +44,11 @@ public class AVROSchema implements org.wso2.datamapper.engine.core.Schema {
     }
 
     @Override
+    public String getElementTypeByName(List<SchemaElement> elementStack) {
+        return null;
+    }
+
+    @Override
     public String getElementTypeByName(String elementName) {
         return null;
     }
@@ -51,4 +57,15 @@ public class AVROSchema implements org.wso2.datamapper.engine.core.Schema {
     public boolean isChildElement(String elementName, String childElementName) {
         return false;
     }
+
+    @Override
+    public boolean isChildElement(List<SchemaElement> elementStack, String childElementName) {
+        return false;
+    }
+
+    @Override
+    public String getPrefixForNamespace(String url) {
+        return null;
+    }
+
 }

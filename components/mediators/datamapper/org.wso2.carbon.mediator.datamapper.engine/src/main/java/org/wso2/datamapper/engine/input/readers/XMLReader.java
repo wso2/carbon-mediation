@@ -16,14 +16,18 @@
  */
 package org.wso2.datamapper.engine.input.readers;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
 import org.wso2.datamapper.engine.types.ReaderEventTypes;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -33,6 +37,8 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.events.StartElement;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.*;
@@ -47,10 +53,12 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
     private Schema inputSchema;
     private Stack<DMReaderEvent> dmEventStack;
     private String tempFieldValue;
-    private boolean arrayElementStarted;
+    private List<SchemaElement> elementStack;
+
 
     public XMLReader() {
         dmEventStack = new Stack<>();
+        elementStack = new ArrayList();
     }
 
     @Override
@@ -60,7 +68,13 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
             SAXParser parser = factory.newSAXParser();
-            parser.parse(input, this);
+            org.xml.sax.XMLReader xmlReader = parser.getXMLReader();
+            xmlReader.setContentHandler(this);
+            xmlReader.setDTDHandler(this);
+            xmlReader.setEntityResolver(this);
+            xmlReader.setFeature("http://xml.org/sax/features/namespaces", true);
+            xmlReader.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
+            xmlReader.parse(new InputSource(input));
         } catch (ParserConfigurationException e) {
             log.error("ParserConfig error", e);
         } catch (SAXException e) {
@@ -72,7 +86,8 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
 
     @Override
     public void startDocument() throws SAXException {
-        // do nothing
+
+        System.out.println();
     }
 
     @Override
@@ -86,89 +101,122 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
 
     @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        // no op
+        /*if (!namespaceMap.containsKey(uri)) {
+            namespaceMap.put(uri, prefix);
+        }*/
+        System.out.println();
     }
 
     @Override
     public void endPrefixMapping(String prefix) throws SAXException {
-        // no op
+        System.out.println(prefix);
     }
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         try {
+            elementStack.add(new SchemaElement(localName, uri));
+            String tempLocalName = getNamespaceAddedFieldName(uri, localName).replace(":","_");
             if (!getDmEventStack().isEmpty()) {
                 DMReaderEvent stackElement = getDmEventStack().peek();
                 if (ReaderEventTypes.EventType.ARRAY_START.equals(stackElement.getEventType()) &&
-                        !(getInputSchema().isChildElement(stackElement.getName(), qName) ||
-                                qName.equals(stackElement.getName()))) {
-                    sendArrayEndEvent(qName);
+                        !(getInputSchema().isChildElement(elementStack.subList(0,elementStack.size()-2), localName) ||
+                                tempLocalName.equals(stackElement.getName()))) {
+                    sendArrayEndEvent(localName);
+                    elementStack.add(new SchemaElement(localName, uri));
                 }
             }
-
-            if (qName.equals(getInputSchema().getName())) {
-                sendAnonymousObjectStartEvent();
+            localName = getNamespaceAddedFieldName(uri, localName);
+            String elementType = getInputSchema().getElementTypeByName(elementStack);
+            String schemaTitle = getInputSchema().getName();
+            if (localName.equals(schemaTitle)) {
+                sendAnonymousObjectStartEvent(schemaTitle);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
-                    sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
-                            attributes.getValue(attributeCount));
+                    if(!attributes.getQName(attributeCount).contains("xmlns")) {
+                        sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
+                                attributes.getValue(attributeCount));
+                    }
                 }
-            } else if (ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))) {
+            } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
                 //first element of a array should fire array start element
                 if (!getDmEventStack().isEmpty()) {
                     DMReaderEvent stackElement = getDmEventStack().peek();
                     if (!(ReaderEventTypes.EventType.ARRAY_START.equals(stackElement.getEventType()) &&
-                            qName.equals(stackElement.getName()))) {
-                        sendArrayStartEvent(qName);
+                            tempLocalName.equals(stackElement.getName()))) {
+                        sendArrayStartEvent(localName);
                     }
                 } else {
-                    sendArrayStartEvent(qName);
+                    sendArrayStartEvent(localName);
                 }
-                sendAnonymousObjectStartEvent();
+                sendAnonymousObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
-                    sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
-                            attributes.getValue(attributeCount));
+                    if(!attributes.getQName(attributeCount).contains("xmlns")) {
+                        sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
+                                attributes.getValue(attributeCount));
+                    }
                 }
-            } else if (OBJECT_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))) {
-                sendObjectStartEvent(qName);
+            } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
+                sendObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
-                    sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
-                            attributes.getValue(attributeCount));
+                    if(!attributes.getQName(attributeCount).contains("xmlns")) {
+                        sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
+                                attributes.getValue(attributeCount));
+                    }
                 }
-            } else if (STRING_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName)) && attributes.getLength() > 0) {
-                sendObjectStartEvent(qName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+            } else if (STRING_ELEMENT_TYPE.equals(elementType) && attributes.getLength() > 0) {
+                sendObjectStartEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
-                    sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
-                            attributes.getValue(attributeCount));
+                    if(!attributes.getQName(attributeCount).contains("xmlns")) {
+                        sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
+                                attributes.getValue(attributeCount));
+                    }
                 }
-                sendObjectEndEvent(qName);
+                sendObjectEndEvent(localName+SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
             }
         } catch (IOException | JSException e) {
             log.error("Error occurred while processing start element event", e);
+        } catch (InvalidPayloadException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    private String getNamespaceAddedFieldName(String uri, String localName) {
+        String prefix=getInputSchema().getPrefixForNamespace(uri);
+        if(StringUtils.isNotEmpty(prefix)){
+            return prefix+":"+localName;
+        }else{
+            return localName;
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         try {
-            if (qName.equals(getInputSchema().getName())) {
-                sendObjectEndEvent(qName);
-            } else if (STRING_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))) {
-                sendFieldEvent(qName, tempFieldValue);
-            } else if (ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))) {
-                sendObjectEndEvent(qName);
-            } else if (OBJECT_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(qName))) {
+            String elementType = getInputSchema().getElementTypeByName(elementStack);
+            localName=getNamespaceAddedFieldName(uri,localName);
+            if (localName.equals(getInputSchema().getName())) {
+                sendObjectEndEvent(localName);
+            } else if (STRING_ELEMENT_TYPE.equals(elementType)) {
+                sendFieldEvent(localName, tempFieldValue);
+            } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
+                sendObjectEndEvent(localName);
+            } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
                 while (!getDmEventStack().isEmpty()) {
                     DMReaderEvent stackElement = getDmEventStack().peek();
                     if (ReaderEventTypes.EventType.ARRAY_START.equals(stackElement.getEventType())) {
+                        elementStack.add(new SchemaElement(stackElement.getName(),uri));
                         sendArrayEndEvent(stackElement.getName());
-                    }else{
+                    } else {
                         break;
                     }
                 }
-                sendObjectEndEvent(qName);
+                sendObjectEndEvent(localName);
             }
+
         } catch (IOException | JSException e) {
             log.error("Error occurred while processing end element event", e);
+        } catch (InvalidPayloadException e) {
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -190,39 +238,47 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
 
     private void sendFieldEvent(String fieldName, String value) throws IOException, JSException {
         getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
-                fieldName, value));
+                getModifiedFieldName(fieldName), value));
+        if(!fieldName.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
+            elementStack.remove(elementStack.size() - 1);
+        }
+
     }
 
     private void sendObjectStartEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent objectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START,
-                fieldName, null);
+                getModifiedFieldName(fieldName), null);
         getModelBuilder().notifyEvent(objectStartEvent);
         dmEventStack.push(objectStartEvent);
     }
 
     private void sendObjectEndEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent objectEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END,
-                fieldName, null);
+                getModifiedFieldName(fieldName), null);
         getModelBuilder().notifyEvent(objectEndEvent);
         /*if (!getInputSchema().getName().equals(fieldName)&&
                 !ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(fieldName))) {
             dmEventStack.pop();
         }*/
         dmEventStack.pop();
+        if(!fieldName.contains(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
+            elementStack.remove(elementStack.size() - 1);
+        }
     }
 
     private void sendArrayStartEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent arrayStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_START,
-                fieldName, null);
+                getModifiedFieldName(fieldName), null);
         getModelBuilder().notifyEvent(arrayStartEvent);
         dmEventStack.push(arrayStartEvent);
     }
 
     private void sendArrayEndEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent arrayEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_END,
-                fieldName, null);
+                getModifiedFieldName(fieldName), null);
         getModelBuilder().notifyEvent(arrayEndEvent);
         dmEventStack.pop();
+        elementStack.remove(elementStack.size()-1);
     }
 
     public Stack<DMReaderEvent> getDmEventStack() {
@@ -235,9 +291,9 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 null, null));
     }
 
-    private void sendAnonymousObjectStartEvent() throws IOException, JSException {
+    private void sendAnonymousObjectStartEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent anonymousObjectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START,
-                null, null);
+                getModifiedFieldName(fieldName), null);
         getModelBuilder().notifyEvent(anonymousObjectStartEvent);
         dmEventStack.push(anonymousObjectStartEvent);
     }
@@ -250,6 +306,10 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
     private String getFieldName(StartElement startElement) {
         String fieldName = startElement.getName().getLocalPart();
         return fieldName;
+    }
+
+    private String getModifiedFieldName(String fieldName){
+        return fieldName.replace(":","_");
     }
 
 }
