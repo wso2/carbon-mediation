@@ -34,12 +34,14 @@ public class MappingHandler implements InputVariableCallback, OutputVariableCall
     private String outputVariable;
     private MappingResourceLoader mappingResourceLoader;
     private OutputMessageBuilder outputMessageBuilder;
+    private Executable scriptExecutor;
 
     public String doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputModelBuilder inputModelBuilder,
-                        OutputMessageBuilder outputMessageBuilder)
+                        OutputMessageBuilder outputMessageBuilder, Executable scriptExecutor)
             throws JSException {
-        mappingResourceLoader = resourceModel;
+        this.mappingResourceLoader = resourceModel;
         this.outputMessageBuilder = outputMessageBuilder;
+        this.scriptExecutor = scriptExecutor;
         inputModelBuilder.buildInputModel(inputMsg, this);
         return outputVariable;
     }
@@ -47,7 +49,7 @@ public class MappingHandler implements InputVariableCallback, OutputVariableCall
     @Override
     public void notifyInputVariable(Object variable) {
         this.inputVariable = (String) variable;
-        Executable scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.NASHORN);
+        //Executable scriptExecutor = ScriptExecutorFactory.getScriptExecutor(ScriptExecutorType.NASHORN);
         Model outputModel = null;
         try {
             outputModel = scriptExecutor.execute(mappingResourceLoader, inputVariable);

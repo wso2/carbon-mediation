@@ -53,7 +53,7 @@ public class NasHornJava8Executor implements Executable {
             injectInputVariableToEngine(resourceModel.getInputSchema().getName(), inputRecord);
             scriptEngine.eval(jsFunction.getFunctionBody());
             Invocable invocable = (Invocable) scriptEngine;
-            String value= (String) scriptEngine.eval("inputns2_employees.ns2_employee[0].ns2_firstname");
+            //String value= (String) scriptEngine.eval("inputns2_employees.ns2_employee[0].ns2_firstname");
             Object result = invocable.invokeFunction(jsFunction.getFunctioName());
             if (result instanceof Map) {
                 return new MapModel((Map<String, Object>) result);

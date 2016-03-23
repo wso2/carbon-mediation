@@ -16,32 +16,64 @@
  */
 package org.wso2.datamapper.engine.core.executors;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.wso2.datamapper.engine.core.Executable;
 import org.wso2.datamapper.engine.core.executors.nashorn.NasHornJava8Executor;
+import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
 
 /**
  * This class act as a factory to get the requested script executor
  */
 public class ScriptExecutorFactory {
 
+    private static ScriptExecutorPool executorPool = null;
+    private static ScriptExecutorType scriptExecutorType = ScriptExecutorType.NASHORN; //default is Nashorn
+    private static final Log log = LogFactory.getLog(ScriptExecutorFactory.class);
+
     /**
      * This private constructor added to hide the implicit public constructor
      */
     private ScriptExecutorFactory() {
-
     }
 
     /**
      * This method will return the script executor according to the given {@link ScriptExecutorType}
      *
-     * @param executorType
-     * @return
+     * @return script executor
      */
-    public static Executable getScriptExecutor(ScriptExecutorType executorType) {
-        switch (executorType) {
-            case NASHORN:
-                return new NasHornJava8Executor();
+    public static Executable getScriptExecutor() throws InterruptedException {
+        if (executorPool == null) {
+            initializeExecutorPool();
         }
-        throw new IllegalArgumentException("Unsupported script engine type found : " + executorType);
+        return executorPool.take();
+    }
+
+    private synchronized static void initializeExecutorPool() {
+        if (executorPool == null) {
+            String javaVersion = System.getProperty("java.version");
+            if (javaVersion.startsWith("1.7") || javaVersion.startsWith("1.6")) {
+                //TODO : create Rhino engine
+                log.error("Script Engine works only on Java 1.8 and above. Found java version : " + javaVersion);
+            }
+
+            String executorPoolSizeStr = SynapsePropertiesLoader.getPropertyValue(DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
+            int executorPoolSize = DataMapperEngineConstants.DEFAULT_DATAMAPPER_ENGINE_POOL_SIZE;
+            if (executorPoolSizeStr != null) {
+                executorPoolSize = Integer.parseInt(executorPoolSizeStr);
+                log.debug("Script executor pool size set to " + executorPoolSize);
+            } else {
+                log.debug("Using default script executor pool size " + executorPoolSize);
+            }
+            executorPool = new ScriptExecutorPool(scriptExecutorType, executorPoolSize);
+        }
+    }
+
+    /**
+     * This method will release the script executor to the pool
+     */
+    public static void releaseScriptExecutor(Executable executor) throws InterruptedException {
+        executorPool.put(executor);
     }
 }

@@ -36,8 +36,10 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.util.AXIOMUtils;
+import org.wso2.datamapper.engine.core.Executable;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
+import org.wso2.datamapper.engine.core.executors.ScriptExecutorFactory;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.datamapper.engine.types.DMModelTypes;
@@ -251,8 +253,13 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             MappingHandler mappingHandler = new MappingHandler();
             OutputMessageBuilder outputMessageBuilder = new OutputMessageBuilder(getDataType(outputType),
                     DMModelTypes.ModelType.JAVA_MAP, mappingResourceLoader.getOutputSchema());
+
+            Executable executor = ScriptExecutorFactory.getScriptExecutor();
+
             String outputVariable=mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader,
-                    inputModelBuilder, outputMessageBuilder);
+                    inputModelBuilder, outputMessageBuilder, executor);
+
+            ScriptExecutorFactory.releaseScriptExecutor(executor);
 
             if(InputOutputDataTypes.DataType.XML.toString().equals(outputType)){
                 outputMessage = AXIOMUtil.stringToOM(outputVariable);
