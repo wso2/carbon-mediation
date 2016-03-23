@@ -1,50 +1,61 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/**
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * <p/>
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.das.messageflow.data.publisher.services;
 
-
-import org.wso2.carbon.das.messageflow.data.publisher.conf.MediationStatConfig;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherConfig;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfile;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DASMessageFlowPublisherAdmin extends AbstractAdmin {
 
-    private RegistryPersistenceManager registryPersistenceManager;
+    private PublisherProfileManager publisherProfileManager;
 
     public DASMessageFlowPublisherAdmin() {
-        registryPersistenceManager = new RegistryPersistenceManager();
+        this.publisherProfileManager = new PublisherProfileManager();
     }
 
-    public void configureEventing(MediationStatConfig mediationStatConfig) {
-        registryPersistenceManager.update(mediationStatConfig,
-                                          CarbonContext.getThreadLocalCarbonContext().getTenantId());
+    public void configureEventing(PublisherConfig PublisherConfig) {
+        publisherProfileManager.addPublisherProfile(CarbonContext.getThreadLocalCarbonContext().getTenantId(), PublisherConfig.getServerId(), new PublisherProfile(PublisherConfig));
     }
 
-    public MediationStatConfig getEventingConfigData(String serverId) {
-        return registryPersistenceManager.get(serverId, CarbonContext.getThreadLocalCarbonContext().getTenantId());
+    public PublisherConfig getEventingConfigData(String serverId) {
+        return  publisherProfileManager.getPublisherProfiles(CarbonContext.getThreadLocalCarbonContext().getTenantId(), serverId).getConfig();
     }
 
-    public MediationStatConfig[] getAllPublisherNames() {
-        return registryPersistenceManager.getAllPublisherNames(CarbonContext.getThreadLocalCarbonContext().getTenantId());
+    public PublisherConfig[] getAllPublisherNames() {
+        List<PublisherProfile> profileArrayList = publisherProfileManager.getTenantPublisherProfilesList(CarbonContext.getThreadLocalCarbonContext().getTenantId());
+        ArrayList<PublisherConfig> publisherConfigs = new ArrayList<PublisherConfig>();
+
+        for (PublisherProfile profile : profileArrayList) {
+            publisherConfigs.add(profile.getConfig());
+        }
+
+        return publisherConfigs.toArray(new PublisherConfig[publisherConfigs.size()]);
     }
 
     public boolean removeServer(String serverId) {
-        return registryPersistenceManager.remove(serverId, CarbonContext.getThreadLocalCarbonContext().getTenantId());
+        return publisherProfileManager.removePublisherProfile(CarbonContext.getThreadLocalCarbonContext().getTenantId(), serverId);
     }
 
     public boolean isCollectingEnabled() {

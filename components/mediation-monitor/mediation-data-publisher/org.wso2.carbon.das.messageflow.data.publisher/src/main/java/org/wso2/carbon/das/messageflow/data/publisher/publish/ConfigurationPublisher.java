@@ -16,20 +16,15 @@
 package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
 import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
 import org.apache.synapse.aspects.flow.statistics.structuring.StructuringArtifact;
 import org.apache.synapse.aspects.flow.statistics.structuring.StructuringElement;
-import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
-import org.wso2.carbon.das.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.EventPublisherConfig;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.MediationStatConfig;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherConfig;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.Property;
 import org.wso2.carbon.das.messageflow.data.publisher.util.MediationDataPublisherConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
-
 import org.wso2.carbon.databridge.agent.DataPublisher;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAgentConfigurationException;
 import org.wso2.carbon.databridge.agent.exception.DataEndpointAuthenticationException;
@@ -41,37 +36,28 @@ import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionExc
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
 
-import org.wso2.carbon.databridge.commons.AttributeType;
-import org.wso2.carbon.databridge.commons.StreamDefinition;
-import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
-
-import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.zip.GZIPOutputStream;
 
 
 public class ConfigurationPublisher {
     private static Log log = LogFactory.getLog(ConfigurationPublisher.class);
 
-    public static void process(StructuringArtifact structuringArtifact, MediationStatConfig mediationStatConfig) {
+    public static void process(StructuringArtifact structuringArtifact, PublisherConfig PublisherConfig) {
         List<String> metaDataKeyList = new ArrayList<String>();
         List<Object> metaDataValueList = new ArrayList<Object>();
 
         List<Object> eventData = new ArrayList<Object>();
 
-        addMetaData(metaDataKeyList, metaDataValueList, mediationStatConfig);
+        addMetaData(metaDataKeyList, metaDataValueList, PublisherConfig);
 
         try {
 
-            if (mediationStatConfig.isMessageFlowPublishingEnabled()) {
+            if (PublisherConfig.isMessageFlowPublishingEnabled()) {
 
                 addEventData(eventData, structuringArtifact);
                 StreamDefinition streamDef = getComponentStreamDefinition(metaDataKeyList.toArray());
-                publishToAgent(eventData, metaDataValueList, mediationStatConfig, streamDef);
+                publishToAgent(eventData, metaDataValueList, PublisherConfig, streamDef);
             }
 
         } catch (MalformedStreamDefinitionException e) {
@@ -81,9 +67,9 @@ public class ConfigurationPublisher {
     }
 
     private static void addMetaData(List<String> metaDataKeyList, List<Object> metaDataValueList,
-                                    MediationStatConfig mediationStatConfig) {
+                                    PublisherConfig PublisherConfig) {
 
-        Property[] properties = mediationStatConfig.getProperties();
+        Property[] properties = PublisherConfig.getProperties();
         if (properties != null) {
             for (Property property : properties) {
                 if (property.getKey() != null && !property.getKey().isEmpty()) {
@@ -107,18 +93,18 @@ public class ConfigurationPublisher {
     }
 
     private static void publishToAgent(List<Object> eventData, List<Object> metaDataValueList,
-                                       MediationStatConfig mediationStatConfig, StreamDefinition streamDef) {
+                                       PublisherConfig PublisherConfig, StreamDefinition streamDef) {
 
-        String serverUrl = mediationStatConfig.getUrl();
-        String userName = mediationStatConfig.getUserName();
-        String password = mediationStatConfig.getPassword();
+        String serverUrl = PublisherConfig.getUrl();
+        String userName = PublisherConfig.getUserName();
+        String password = PublisherConfig.getPassword();
 
         String key = serverUrl + "_" + userName + "_" + password + "_" + streamDef.getName();
         EventPublisherConfig eventPublisherConfig = PublisherUtils.getEventPublisherConfig(key);
-        if (!mediationStatConfig.isLoadBalancingEnabled()) {
+        if (!PublisherConfig.isLoadBalancingEnabled()) {
             DataPublisher dataPublisher = null;
             if (eventPublisherConfig == null) {
-                synchronized (Publisher.class) {
+                synchronized (ConfigurationPublisher.class) {
                     eventPublisherConfig = new EventPublisherConfig();
                     DataPublisher asyncDataPublisher = null;
                     try {
@@ -138,7 +124,7 @@ public class ConfigurationPublisher {
         } else {
             DataPublisher dataPublisher = null;
             if (eventPublisherConfig == null) {
-                synchronized (Publisher.class) {
+                synchronized (ConfigurationPublisher.class) {
                     eventPublisherConfig = new EventPublisherConfig();
 
                     DataPublisher loadBalancingDataPublisher = null;

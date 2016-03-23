@@ -1,30 +1,33 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/**
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * <p/>
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.das.messageflow.data.publisher.internal;
 
-import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherConfig;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfile;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
-import org.wso2.carbon.das.messageflow.data.publisher.services.DASMessageFlowPublisherAdmin;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
@@ -36,7 +39,9 @@ import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.data.MessageFlowObserverStore;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MessageFlowReporterThread;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,6 +85,7 @@ public class MediationStatisticsComponent {
 
         this.compCtx = ctxt;
 
+        // Check whether statistic collecting is globally enabled
         checkPublishingEnabled();
 
         if (!flowStatisticsEnabled){
@@ -94,33 +100,22 @@ public class MediationStatisticsComponent {
 
         SynapseEnvironmentService synapseEnvService = synapseEnvServices.get(tenantId);
 
-        createObserversStore(synapseEnvService);
-        MessageFlowObserverStore observerStore = stores.get(tenantId);
+        // Create list of profiles for data publishers
+        createPublisherProfiles();
 
-
-        DASMessageFlowPublisherAdmin dasMediationStatsPublisherAdmin = new DASMessageFlowPublisherAdmin();
-        PublisherUtils.setMediationStatPublisherAdmin(dasMediationStatsPublisherAdmin);
-
-        if (observerStore != null) {
-            DASMediationFlowObserver observer = new DASMediationFlowObserver();
-            observerStore.registerObserver(observer);
-            observer.setTenantId(tenantId);
-            // 'MediationStat service' will be deployed per tenant (cardinality="1..n")
-
-            log.debug("Registering  Observer for tenant: " + tenantId);
-        } else {
-            log.error("Can't register an observer for MessageFlowTraceObserverStore. " );
-        }
-
-
-        //Load previously saved configurations
-        new RegistryPersistenceManager().load(tenantId);
-
+        // Create observer store for super-tenant
+        createStores(synapseEnvService);
 
         activated = true;
+
         if (log.isDebugEnabled()) {
             log.debug("DAS Message Flow Publishing Component activate");
         }
+    }
+
+    private void createPublisherProfiles() {
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        new PublisherProfileManager().loadTenantPublisherProfilesFromRegistry(tenantId);
     }
 
 
@@ -129,9 +124,8 @@ public class MediationStatisticsComponent {
      *
      * @param synEnvService information about synapse runtime
      */
-    private void createObserversStore(SynapseEnvironmentService synEnvService) {
+    private void createStores(SynapseEnvironmentService synEnvService) {
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        ConfigurationContext cfgCtx = synEnvService.getConfigurationContext();
 
         MessageFlowObserverStore observerStore = new MessageFlowObserverStore();
 
@@ -142,6 +136,15 @@ public class MediationStatisticsComponent {
             log.debug("Registering the new mediation flow tracer service");
         }
         reporterThreads.put(tenantId, reporterThread);
+
+        DASMediationFlowObserver dasObserver = new DASMediationFlowObserver();
+        observerStore.registerObserver(dasObserver);
+        dasObserver.setTenantId(tenantId);
+        // 'MediationStat service' will be deployed per tenant (cardinality="1..n")
+
+        if (log.isDebugEnabled()) {
+            log.debug("Registering  Observer for tenant: " + tenantId);
+        }
         stores.put(tenantId, observerStore);
 
         // Adding configuration reporting thread
@@ -255,7 +258,8 @@ public class MediationStatisticsComponent {
             if (activated && compCtx != null) {
                 SynapseEnvironmentService synEnvSvc = (SynapseEnvironmentService) compCtx.getBundleContext().getService(
                         synEnvSvcRegistration.getReference());
-                createObserversStore(synEnvSvc);
+                createPublisherProfiles();
+                createStores(synEnvSvc);
             }
         } catch (Throwable t) {
             log.fatal("Error occurred at the osgi service method", t);

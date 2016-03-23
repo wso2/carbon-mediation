@@ -16,7 +16,7 @@
 package org.wso2.carbon.das.messageflow.data.publisher.conf;
 
 
-public class MediationStatConfig {
+public class PublisherConfig {
 
     private boolean isMessageFlowPublishingEnabled;
     private String serverId = "";
