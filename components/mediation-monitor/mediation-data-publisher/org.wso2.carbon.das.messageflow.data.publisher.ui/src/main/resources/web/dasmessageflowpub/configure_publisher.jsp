@@ -2,7 +2,7 @@
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.das.messageflow.data.publisher.stub.conf.MediationStatConfig" %>
+<%@ page import="org.wso2.carbon.das.messageflow.data.publisher.stub.conf.PublisherConfig" %>
 <%@ page import="org.wso2.carbon.das.messageflow.data.publisher.stub.conf.Property" %>
 <%@ page import="org.wso2.carbon.das.messageflow.data.publisher.ui.DASMessageFlowPublisherAdminClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
@@ -36,7 +36,7 @@
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
     DASMessageFlowPublisherAdminClient client = new DASMessageFlowPublisherAdminClient(
             cookie, backendServerURL, configContext, request.getLocale());
-    MediationStatConfig mediationStatConfig = new MediationStatConfig();
+    PublisherConfig mediationStatConfig = new PublisherConfig();
 
 
     if (action != null && action.equals("load") && serverId != null) {

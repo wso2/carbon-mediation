@@ -2,7 +2,7 @@
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.das.messageflow.data.publisher.stub.conf.MediationStatConfig" %>
+<%@ page import="org.wso2.carbon.das.messageflow.data.publisher.stub.conf.PublisherConfig" %>
 <%@ page import="org.wso2.carbon.das.messageflow.data.publisher.stub.conf.Property" %>
 <%@ page import="org.wso2.carbon.das.messageflow.data.publisher.ui.DASMessageFlowPublisherAdminClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
@@ -26,7 +26,7 @@
 	            (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
 	    String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
 	    DASMessageFlowPublisherAdminClient client = new DASMessageFlowPublisherAdminClient(cookie, backendServerURL, configContext, request.getLocale());
-	    MediationStatConfig[] publisherNameList = null;
+	    PublisherConfig[] publisherNameList = null;
 	    
 	    boolean collectingEnabled = client.isCollectingEnabled();
 
@@ -94,7 +94,7 @@
                 </thead>
                 <tbody>
                     <%
-                        for (MediationStatConfig publisherName : publisherNameList) {
+                        for (PublisherConfig publisherName : publisherNameList) {
                             %>
                                  <tr>
                                      <td>
