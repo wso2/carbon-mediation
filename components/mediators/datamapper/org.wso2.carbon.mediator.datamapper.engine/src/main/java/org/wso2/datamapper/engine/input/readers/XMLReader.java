@@ -128,8 +128,8 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 sendAnonymousObjectStartEvent(schemaTitle);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
-                                attributes.getValue(attributeCount));
+                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount), attributes.getURI(attributeCount));
+                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount));
                     }
                 }
             } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
@@ -146,26 +146,26 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 sendAnonymousObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
-                                attributes.getValue(attributeCount));
+                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount), attributes.getURI(attributeCount));
+                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount));
                     }
                 }
             } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
                 sendObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
-                                attributes.getValue(attributeCount));
+                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount), attributes.getURI(attributeCount));
+                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount));
                     }
                 }
-            } else if ((STRING_ELEMENT_TYPE.equals(elementType) || BOOLEAN_ELEMENT_TYPE.equals(elementType)||
-                    NUMBER_ELEMENT_TYPE.equals(elementType)|| INTEGER_ELEMENT_TYPE.equals(elementType))
+            } else if ((STRING_ELEMENT_TYPE.equals(elementType) || BOOLEAN_ELEMENT_TYPE.equals(elementType) ||
+                    NUMBER_ELEMENT_TYPE.equals(elementType) || INTEGER_ELEMENT_TYPE.equals(elementType))
                     && attributes.getLength() > 0) {
                 sendObjectStartEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        sendFieldEvent(SCHEMA_ATTRIBUTE_FIELD_PREFIX + attributes.getQName(attributeCount),
-                                attributes.getValue(attributeCount));
+                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),attributes.getURI(attributeCount));
+                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount));
                     }
                 }
                 sendObjectEndEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
@@ -174,6 +174,17 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
             log.error("Error occurred while processing start element event", e);
         } catch (InvalidPayloadException e) {
             log.error(e.getMessage(), e);
+        }
+    }
+
+    private String getAttributeFieldName(String qName, String uri) {
+        String[] qNameOriginalArray=qName.split(":");
+        qName=getNamespaceAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length-1]);
+        String[] qNameArray = qName.split(":");
+        if (qNameArray.length > 1) {
+            return qNameArray[0] + ":" + SCHEMA_ATTRIBUTE_FIELD_PREFIX + qNameArray[qNameArray.length - 1];
+        } else {
+            return SCHEMA_ATTRIBUTE_FIELD_PREFIX + qName;
         }
     }
 
