@@ -19,6 +19,7 @@ package org.wso2.carbon.das.messageflow.data.publisher.conf;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.aspects.flow.statistics.structuring.StructuringArtifact;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,10 @@ public class PublisherProfileManager {
     // Common place for storing all PublisherProfiles
     private static Map<Integer, HashMap<String, PublisherProfile>> publisherProfiles =
             new HashMap<Integer, HashMap<String, PublisherProfile>>();
+
+    // Common place for storing all synapse-configurations
+    private static Map<Integer, HashMap<String, StructuringArtifact>> synapseConfigs =
+            new HashMap<Integer, HashMap<String, StructuringArtifact>>();
 
     public PublisherProfileManager() {
         registryPersistenceManager = new RegistryPersistenceManager();
@@ -57,6 +62,22 @@ public class PublisherProfileManager {
     public boolean removePublisherProfile(int tenantId, String serverId) {
         return (publisherProfiles.get(tenantId).remove(serverId) != null)
                 && registryPersistenceManager.remove(tenantId, serverId);
+    }
+
+    public List<StructuringArtifact> getSynapseArtifactList(int tenantId) {
+        if (synapseConfigs.get(tenantId) == null){
+            synapseConfigs.put(tenantId, new HashMap<String, StructuringArtifact>());
+            return null;
+        } else {
+            return new ArrayList<StructuringArtifact>(synapseConfigs.get(tenantId).values());
+        }
+    }
+
+    public void addSynapseConfig(int tenantId, StructuringArtifact artifact) {
+        if (synapseConfigs.get(tenantId) == null){
+            synapseConfigs.put(tenantId, new HashMap<String, StructuringArtifact>());
+        }
+        synapseConfigs.get(tenantId).put(artifact.getName(), artifact);
     }
 
     /**

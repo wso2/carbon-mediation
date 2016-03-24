@@ -17,11 +17,13 @@
  */
 package org.wso2.carbon.das.messageflow.data.publisher.services;
 
+import org.apache.synapse.aspects.flow.statistics.structuring.StructuringArtifact;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherConfig;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfile;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
+import org.wso2.carbon.das.messageflow.data.publisher.publish.ConfigurationPublisher;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
 
 import java.util.ArrayList;
@@ -35,8 +37,17 @@ public class DASMessageFlowPublisherAdmin extends AbstractAdmin {
         this.publisherProfileManager = new PublisherProfileManager();
     }
 
-    public void configureEventing(PublisherConfig PublisherConfig) {
-        publisherProfileManager.addPublisherProfile(CarbonContext.getThreadLocalCarbonContext().getTenantId(), PublisherConfig.getServerId(), new PublisherProfile(PublisherConfig));
+    public void configureEventing(PublisherConfig config) {
+        publisherProfileManager.addPublisherProfile(CarbonContext.getThreadLocalCarbonContext().getTenantId(), config.getServerId(), new PublisherProfile(config));
+
+        // Publish previous configs belongs to a tenant
+        if (config.isMessageFlowPublishingEnabled()) {
+            List<StructuringArtifact> artifactList = publisherProfileManager.getSynapseArtifactList(CarbonContext.getThreadLocalCarbonContext().getTenantId());
+
+            for (StructuringArtifact artifact : artifactList) {
+                ConfigurationPublisher.process(artifact, config);
+            }
+        }
     }
 
     public PublisherConfig getEventingConfigData(String serverId) {

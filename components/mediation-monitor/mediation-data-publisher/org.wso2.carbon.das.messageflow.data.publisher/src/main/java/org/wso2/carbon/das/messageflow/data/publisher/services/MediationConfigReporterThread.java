@@ -113,6 +113,9 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
                 }
                 ConfigurationPublisher.process(structuringArtifact, aProfile.getConfig());
             }
+
+            // Adding synapse config to common place for later usage
+            publisherProfileManager.addSynapseConfig(tenantID, structuringArtifact);
         }
     }
 
