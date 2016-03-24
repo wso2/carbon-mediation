@@ -44,6 +44,8 @@ public class DASMessageFlowPublisherAdmin extends AbstractAdmin {
         if (config.isMessageFlowPublishingEnabled()) {
             List<StructuringArtifact> artifactList = publisherProfileManager.getSynapseArtifactList(CarbonContext.getThreadLocalCarbonContext().getTenantId());
 
+            if (artifactList == null) return;
+
             for (StructuringArtifact artifact : artifactList) {
                 ConfigurationPublisher.process(artifact, config);
             }
