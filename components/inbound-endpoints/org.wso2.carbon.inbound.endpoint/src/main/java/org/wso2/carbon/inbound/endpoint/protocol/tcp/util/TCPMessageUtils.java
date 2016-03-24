@@ -29,6 +29,7 @@ import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.builder.ApplicationXMLBuilder;
 import org.apache.axis2.builder.Builder;
+import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
@@ -41,6 +42,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
+import org.compass.core.converter.basic.format.FormatterFactory;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
 import org.wso2.carbon.inbound.endpoint.protocol.tcp.context.TCPContext;
@@ -122,18 +125,6 @@ public class TCPMessageUtils {
         org.apache.axis2.context.MessageContext axis2MsgCtx =
                 ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx).getAxis2MessageContext();
 
-        Builder builder;
-
-        //Select message builder based on the message content type
-        if (contentType == null || contentType.contains("xml")) {
-            log.debug("No content type specified. Using ApplicationXMLBuilder.");
-            builder = new ApplicationXMLBuilder();
-        } else {
-            builder = new ApplicationXMLBuilder();
-        }
-
-        OMElement documentElement = null;
-
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 
         SOAPEnvelope envelope = null;
@@ -155,20 +146,15 @@ public class TCPMessageUtils {
         //get the msg content type get a new formatter.
         String contentType = params.getProperties().getProperty(InboundTCPConstants.TCP_MSG_CONTENT_TYPE);
 
-        MessageFormatter formatter;
-        if (contentType.equals("application/xml")) {
-            formatter = new ApplicationXMLFormatter();
-        } else {
-            formatter = new ApplicationXMLFormatter();
-        }
+        org.apache.axis2.context.MessageContext axis2MsgCtx =
+                ((org.apache.synapse.core.axis2.Axis2MessageContext) messageContext).getAxis2MessageContext();
+
+        MessageFormatter formatter = MessageFormatterDecoratorFactory.createMessageFormatterDecorator(axis2MsgCtx);
 
         OMOutputFormat format = new OMOutputFormat();
         format.setContentType(contentType);
         format.setDoOptimize(false);
         format.setDoingSWA(false);
-
-        org.apache.axis2.context.MessageContext axis2MsgCtx =
-                ((org.apache.synapse.core.axis2.Axis2MessageContext) messageContext).getAxis2MessageContext();
 
         byte[] message_bytes = new byte[0];
         try {

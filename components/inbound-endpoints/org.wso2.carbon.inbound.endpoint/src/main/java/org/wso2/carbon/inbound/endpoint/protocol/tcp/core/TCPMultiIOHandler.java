@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TCPMultiIOHandler extends TCPSourceHandler {
     private static final Log log = LogFactory.getLog(TCPMultiIOHandler.class);
 
-    public ConcurrentHashMap<Integer, TCPSourceHandler> handlers = new ConcurrentHashMap<Integer, TCPSourceHandler>();
+    public ConcurrentHashMap<String, TCPSourceHandler> handlers = new ConcurrentHashMap<String, TCPSourceHandler>();
 
     private ConcurrentHashMap<Integer, TCPProcessor> processorMap;
 
@@ -47,7 +47,7 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
         InetSocketAddress localIsa = (InetSocketAddress) session.getLocalAddress();
 
         TCPSourceHandler handler = new TCPSourceHandler(processorMap.get(localIsa.getPort()));
-        handlers.put(remoteIsa.getPort(), handler);
+        handlers.put(remoteIsa.getHostName()+remoteIsa.getPort(), handler);
 
         handler.connected(session);
     }
@@ -55,7 +55,7 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
     @Override public void inputReady(IOSession session) {
 
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
-        TCPSourceHandler handler = handlers.get(isa.getPort());
+        TCPSourceHandler handler = handlers.get(isa.getHostName()+isa.getPort());
         handler.inputReady(session);
 
     }
@@ -63,7 +63,7 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
     @Override public void outputReady(IOSession session) {
 
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
-        TCPSourceHandler handler = handlers.get(isa.getPort());
+        TCPSourceHandler handler = handlers.get(isa.getHostName()+isa.getPort());
         handler.outputReady(session);
 
     }
@@ -71,7 +71,7 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
     @Override public void timeout(IOSession session) {
         //log.info("Time out method called...");
         InetSocketAddress isa = (InetSocketAddress) session.getRemoteAddress();
-        TCPSourceHandler handler = handlers.get(isa.getPort());
+        TCPSourceHandler handler = handlers.get(isa.getHostName()+isa.getPort());
         handler.timeout(session);
         handlers.remove(handler);
 
@@ -84,7 +84,7 @@ public class TCPMultiIOHandler extends TCPSourceHandler {
         if (isa == null) {
             return;
         }
-        TCPSourceHandler handler = handlers.get(isa.getPort());
+        TCPSourceHandler handler = handlers.get(isa.getHostName()+isa.getPort());
         handler.disconnected(session);
         handlers.remove(handler);
 
