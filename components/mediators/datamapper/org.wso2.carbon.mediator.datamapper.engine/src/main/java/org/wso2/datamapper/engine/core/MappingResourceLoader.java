@@ -96,8 +96,8 @@ public class MappingResourceLoader {
         //need to identify the main method of the configuration because that method going to execute in engine
         String[] inputRootelementArray = inputRootelement.split(":");
         String inputRootElement = inputRootelementArray[inputRootelementArray.length - 1];
-        String[] outputRootelementArray = inputRootelement.split(":");
-        String outputRootElement = inputRootelementArray[outputRootelementArray.length - 1];
+        String[] outputRootelementArray = outputRootelement.split(":");
+        String outputRootElement = outputRootelementArray[outputRootelementArray.length - 1];
         Pattern functionIdPattern = Pattern.compile("(function )(map_(L|S)_" + inputRootElement
                 + "_(L|S)_" + outputRootElement + ")");
         String fnName = null;

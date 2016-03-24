@@ -87,7 +87,6 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
     @Override
     public void startDocument() throws SAXException {
 
-        System.out.println();
     }
 
     @Override
@@ -101,15 +100,11 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
 
     @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        /*if (!namespaceMap.containsKey(uri)) {
-            namespaceMap.put(uri, prefix);
-        }*/
-        System.out.println();
+
     }
 
     @Override
     public void endPrefixMapping(String prefix) throws SAXException {
-        System.out.println(prefix);
     }
 
     @Override
