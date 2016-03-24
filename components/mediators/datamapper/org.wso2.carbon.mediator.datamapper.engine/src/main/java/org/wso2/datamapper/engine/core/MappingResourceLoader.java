@@ -95,9 +95,11 @@ public class MappingResourceLoader {
         BufferedReader configReader = new BufferedReader(new InputStreamReader(mappingConfig));
         //need to identify the main method of the configuration because that method going to execute in engine
         String[] inputRootelementArray = inputRootelement.split(":");
-        String rootElement = inputRootelementArray[inputRootelementArray.length - 1];
-        Pattern functionIdPattern = Pattern.compile("(function )(map_(L|S)_" + rootElement
-                + "_(L|S)_" + outputRootelement + ")");
+        String inputRootElement = inputRootelementArray[inputRootelementArray.length - 1];
+        String[] outputRootelementArray = inputRootelement.split(":");
+        String outputRootElement = inputRootelementArray[outputRootelementArray.length - 1];
+        Pattern functionIdPattern = Pattern.compile("(function )(map_(L|S)_" + inputRootElement
+                + "_(L|S)_" + outputRootElement + ")");
         String fnName = null;
         String configLine = "";
         StringBuilder configScriptbuilder = new StringBuilder();

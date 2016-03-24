@@ -65,6 +65,7 @@ public class JacksonJSONSchema implements Schema {
             }
         } catch (IOException e) {
             log.error("Error while reading input stream");
+            throw new SynapseException("Error while reading input stream"+e);
         }
     }
 
