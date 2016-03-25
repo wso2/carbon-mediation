@@ -23,10 +23,9 @@ import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.das.messageflow.data.publisher.stub.DASMessageFlowPublisherAdminStub;
-import org.wso2.carbon.das.messageflow.data.publisher.stub.conf.MediationStatConfig;
+import org.wso2.carbon.das.messageflow.data.publisher.stub.conf.PublisherConfig;
 
 import java.rmi.RemoteException;
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -49,7 +48,7 @@ public class DASMessageFlowPublisherAdminClient {
         option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
     }
 
-    public MediationStatConfig getEventingConfigData(String serverId) throws RemoteException {
+    public PublisherConfig getEventingConfigData(String serverId) throws RemoteException {
         try {
             return stub.getEventingConfigData(serverId);
         } catch (RemoteException e) {
@@ -67,7 +66,7 @@ public class DASMessageFlowPublisherAdminClient {
         return false;
     }
     
-    public MediationStatConfig[] getAllPublisherNames() throws RemoteException {
+    public PublisherConfig[] getAllPublisherNames() throws RemoteException {
         try {
             return stub.getAllPublisherNames();
         } catch (RemoteException e) {
@@ -76,7 +75,7 @@ public class DASMessageFlowPublisherAdminClient {
         return null;
     }
 
-    public void setEventingConfigData(MediationStatConfig eventingConfigData) throws RemoteException {
+    public void setEventingConfigData(PublisherConfig eventingConfigData) throws RemoteException {
         try {
             stub.configureEventing(eventingConfigData);
         } catch (java.lang.Exception e) {

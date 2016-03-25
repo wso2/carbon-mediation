@@ -21,8 +21,8 @@ import org.apache.log4j.Logger;
 import org.apache.synapse.aspects.flow.statistics.store.CompletedStructureStore;
 import org.apache.synapse.aspects.flow.statistics.structuring.StructuringArtifact;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.MediationStatConfig;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfile;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.das.messageflow.data.publisher.publish.ConfigurationPublisher;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.statistics.TenantInformation;
@@ -39,12 +39,14 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
     /** The reference to the synapse environment service */
     private SynapseEnvironmentService synapseEnvironmentService;
 
+    private PublisherProfileManager publisherProfileManager;
+
     private long delay = 2 * 1000;
 
     public MediationConfigReporterThread(SynapseEnvironmentService synEnvSvc) {
         this.synapseEnvironmentService = synEnvSvc;
+        this.publisherProfileManager = new PublisherProfileManager();
     }
-
 
     public void run() {
         while (!shutdownRequested) {
@@ -57,15 +59,13 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
         }
     }
 
-
-
-
-    private void collectDataAndReport(){
+    private void collectDataAndReport() {
         if (log.isDebugEnabled()) {
             log.trace("Starting new mediation statistics collection cycle");
         }
 
-        CompletedStructureStore completedStructureStore = synapseEnvironmentService.getSynapseEnvironment().getSynapseConfiguration().getCompletedStructureStore();
+        CompletedStructureStore completedStructureStore
+                = synapseEnvironmentService.getSynapseEnvironment().getSynapseConfiguration().getCompletedStructureStore();
 
         if (completedStructureStore == null) {
             if (log.isDebugEnabled()) {
@@ -77,23 +77,16 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
 
         try {
             if (!completedStructureStore.isEmpty()) {
-
                 List<StructuringArtifact> completedStructureList = completedStructureStore.getCompletedStructureEntries();
-
-
                 try {
                     PrivilegedCarbonContext.startTenantFlow();
                     PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId,true);
                     updateConfigurations(completedStructureList);
                 } catch (Exception e) {
-                    log.error("failed to update statics from DAS publisher", e);
+                    log.error("Failed to update configuration from DAS configuration-publisher", e);
                 } finally {
                     PrivilegedCarbonContext.endTenantFlow();
                 }
-
-
-
-
             }
 
         } catch (Exception e) {
@@ -102,25 +95,29 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
     }
 
     private void updateConfigurations(List<StructuringArtifact> completedStructureList) {
-
         int tenantID = getTenantId();
-        List<MediationStatConfig> mediationStatConfigList = new RegistryPersistenceManager().load(tenantID);
 
-        if (mediationStatConfigList.isEmpty()) {
+        List<PublisherProfile> publisherProfiles = publisherProfileManager.getTenantPublisherProfilesList(tenantID);
+
+        if (publisherProfiles.isEmpty()) {
             return;
         }
 
         for (StructuringArtifact structuringArtifact : completedStructureList) {
+            // Iterate over each publisher
+            for (PublisherProfile aProfile : publisherProfiles) {
 
-
-            for (MediationStatConfig mediationStatConfig:mediationStatConfigList) {
-                ConfigurationPublisher.process(structuringArtifact, mediationStatConfig);
+                // Check is the structuring artifact already published, if so skip
+                if (aProfile.isAlreadyPublished(structuringArtifact)) {
+                    continue;
+                }
+                ConfigurationPublisher.process(structuringArtifact, aProfile.getConfig());
             }
 
-
+            // Adding synapse config to common place for later usage
+            publisherProfileManager.addSynapseConfig(tenantID, structuringArtifact);
         }
     }
-
 
     private void delay() {
         if (delay <= 0) {

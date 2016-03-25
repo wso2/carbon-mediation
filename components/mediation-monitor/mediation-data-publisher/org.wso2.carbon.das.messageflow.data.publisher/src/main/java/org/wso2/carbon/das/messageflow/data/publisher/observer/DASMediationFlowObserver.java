@@ -1,17 +1,19 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/**
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * <p/>
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.das.messageflow.data.publisher.observer;
 
@@ -19,9 +21,9 @@ package org.wso2.carbon.das.messageflow.data.publisher.observer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.MediationStatConfig;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
-import org.wso2.carbon.das.messageflow.data.publisher.publish.Publisher;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfile;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
+import org.wso2.carbon.das.messageflow.data.publisher.publish.StatisticsPublisher;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.statistics.*;
 
@@ -34,7 +36,10 @@ public class DASMediationFlowObserver implements MessageFlowObserver,
     private static final Log log = LogFactory.getLog(DASMediationFlowObserver.class);
     private int tenantId = -1234;
 
+    private PublisherProfileManager publisherProfileManager;
+
     public DASMediationFlowObserver() {
+        this.publisherProfileManager = new PublisherProfileManager();
     }
 
     @Override
@@ -60,14 +65,14 @@ public class DASMediationFlowObserver implements MessageFlowObserver,
     private void updateStatisticsInternal(PublishingFlow flow)
             throws Exception {
         int tenantID = getTenantId();
-        List<MediationStatConfig> mediationStatConfigList = new RegistryPersistenceManager().load(tenantID);
+        List<PublisherProfile> publisherProfiles = publisherProfileManager.getTenantPublisherProfilesList(tenantID);
 
-        if (mediationStatConfigList.isEmpty()) {
+        if (publisherProfiles.isEmpty()) {
             return;
         }
 
-        for (MediationStatConfig mediationStatConfig:mediationStatConfigList) {
-            Publisher.process(flow, mediationStatConfig);
+        for (PublisherProfile aProfile : publisherProfiles) {
+            StatisticsPublisher.process(flow, aProfile.getConfig());
         }
     }
 

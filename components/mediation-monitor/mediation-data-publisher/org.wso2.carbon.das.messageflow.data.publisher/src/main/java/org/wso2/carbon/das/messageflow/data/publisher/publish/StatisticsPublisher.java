@@ -22,7 +22,7 @@ import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
 import org.wso2.carbon.das.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.EventPublisherConfig;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.MediationStatConfig;
+import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherConfig;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.Property;
 import org.wso2.carbon.das.messageflow.data.publisher.util.MediationDataPublisherConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
@@ -45,26 +45,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
-public class Publisher {
-	private static Log log = LogFactory.getLog(Publisher.class);
+public class StatisticsPublisher {
+	private static Log log = LogFactory.getLog(StatisticsPublisher.class);
 
-	public static void process(PublishingFlow publishingFlow, MediationStatConfig mediationStatConfig) {
+	public static void process(PublishingFlow publishingFlow, PublisherConfig PublisherConfig) {
 		List<String> metaDataKeyList = new ArrayList<String>();
 		List<Object> metaDataValueList = new ArrayList<Object>();
-
 		List<Object> eventData = new ArrayList<Object>();
 
-		addMetaData(metaDataKeyList, metaDataValueList, mediationStatConfig);
+		addMetaData(metaDataKeyList, metaDataValueList, PublisherConfig);
 
 		try {
-
-			if (mediationStatConfig.isMessageFlowPublishingEnabled()) {
-
+			if (PublisherConfig.isMessageFlowPublishingEnabled()) {
 				addEventData(eventData, publishingFlow);
 				StreamDefinition streamDef = getComponentStreamDefinition(metaDataKeyList.toArray());
-				publishToAgent(eventData, metaDataValueList, mediationStatConfig, streamDef);
+				publishToAgent(eventData, metaDataValueList, PublisherConfig, streamDef);
 			}
-
 		} catch (MalformedStreamDefinitionException e) {
 			log.error("Error while creating stream definition object", e);
 		}
@@ -72,11 +68,11 @@ public class Publisher {
 	}
 
 	private static void addMetaData(List<String> metaDataKeyList, List<Object> metaDataValueList,
-	                                MediationStatConfig mediationStatConfig) {
+	                                PublisherConfig PublisherConfig) {
 		//        metaDataValueList.add(PublisherUtil.getHostAddress());
 		metaDataValueList.add(true); // payload-data is in compressed form
 
-		Property[] properties = mediationStatConfig.getProperties();
+		Property[] properties = PublisherConfig.getProperties();
 		if (properties != null) {
 			for (Property property : properties) {
 				if (property.getKey() != null && !property.getKey().isEmpty()) {
@@ -100,18 +96,18 @@ public class Publisher {
 	}
 
 	private static void publishToAgent(List<Object> eventData, List<Object> metaDataValueList,
-	                                   MediationStatConfig mediationStatConfig, StreamDefinition streamDef) {
+	                                   PublisherConfig PublisherConfig, StreamDefinition streamDef) {
 
-		String serverUrl = mediationStatConfig.getUrl();
-		String userName = mediationStatConfig.getUserName();
-		String password = mediationStatConfig.getPassword();
+		String serverUrl = PublisherConfig.getUrl();
+		String userName = PublisherConfig.getUserName();
+		String password = PublisherConfig.getPassword();
 
 		String key = serverUrl + "_" + userName + "_" + password + "_" + streamDef.getName();
 		EventPublisherConfig eventPublisherConfig = PublisherUtils.getEventPublisherConfig(key);
-		if (!mediationStatConfig.isLoadBalancingEnabled()) {
+		if (!PublisherConfig.isLoadBalancingEnabled()) {
 			DataPublisher dataPublisher = null;
 			if (eventPublisherConfig == null) {
-				synchronized (Publisher.class) {
+				synchronized (StatisticsPublisher.class) {
 					eventPublisherConfig = new EventPublisherConfig();
 					DataPublisher asyncDataPublisher = null;
 					try {
@@ -131,7 +127,7 @@ public class Publisher {
 		} else {
 			DataPublisher dataPublisher = null;
 			if (eventPublisherConfig == null) {
-				synchronized (Publisher.class) {
+				synchronized (StatisticsPublisher.class) {
 					eventPublisherConfig = new EventPublisherConfig();
 
 					DataPublisher loadBalancingDataPublisher = null;
