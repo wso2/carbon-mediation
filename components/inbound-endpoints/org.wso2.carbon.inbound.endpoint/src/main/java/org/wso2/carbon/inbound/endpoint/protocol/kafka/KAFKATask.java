@@ -22,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 
+import java.util.Properties;
+
 public class KAFKATask extends InboundTask {
     private static final Log logger = LogFactory.getLog(KAFKATask.class
             .getName());
@@ -44,5 +46,10 @@ public class KAFKATask extends InboundTask {
     public void taskExecute() {
         logger.debug("Executing.");
         kafkaPollingConsumer.execute();
+    }
+
+    @Override
+    public Properties getInboundProperties() {
+        return kafkaPollingConsumer.getInboundProperties();
     }
 }

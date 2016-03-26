@@ -18,6 +18,10 @@
 package org.wso2.carbon.inbound.endpoint.common;
 
 
+import java.util.Properties;
+
 public interface PinnedPollingTask {
+
+    public Properties getInboundProperties();
 
 }

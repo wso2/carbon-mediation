@@ -17,18 +17,19 @@
  */
 package org.wso2.carbon.inbound.endpoint.common;
 
-import java.util.Date;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
+
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * 
  * This class provides Generic Task implementation for inbound polling
  * 
  */
-public abstract class InboundTask implements org.apache.synapse.task.Task, ManagedLifecycle{
+public abstract class InboundTask implements org.apache.synapse.task.Task, ManagedLifecycle, PinnedPollingTask {
 
     private static final Log logger = LogFactory.getLog(InboundTask.class.getName());
     
@@ -64,4 +65,6 @@ public abstract class InboundTask implements org.apache.synapse.task.Task, Manag
     }
     
     protected abstract void taskExecute();
+
+    public abstract Properties getInboundProperties();
 }
