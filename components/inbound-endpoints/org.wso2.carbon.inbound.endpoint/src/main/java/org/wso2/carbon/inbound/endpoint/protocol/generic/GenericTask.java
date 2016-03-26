@@ -23,6 +23,8 @@ import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 
+import java.util.Properties;
+
 public class GenericTask extends InboundTask {
     private static final Log logger = LogFactory.getLog(GenericTask.class.getName());
 
@@ -37,6 +39,11 @@ public class GenericTask extends InboundTask {
     protected void taskExecute() {
     	logger.debug("Generic Task executing.");
     	pollingConsumer.poll();
+    }
+
+    @Override
+    public Properties getInboundProperties() {
+        return pollingConsumer.getInboundProperties();
     }
 
 

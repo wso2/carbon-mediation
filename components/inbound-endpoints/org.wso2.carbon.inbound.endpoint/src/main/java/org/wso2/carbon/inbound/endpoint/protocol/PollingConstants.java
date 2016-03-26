@@ -30,4 +30,6 @@ public class PollingConstants {
    
    public static final String INBOUND_COORDINATION ="coordination";
 
+   public static final String INBOUND_PINNED_SERVER = "pinnedServers";
+
 }

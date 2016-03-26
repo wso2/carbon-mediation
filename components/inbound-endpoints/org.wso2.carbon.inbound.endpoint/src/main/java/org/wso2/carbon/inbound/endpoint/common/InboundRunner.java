@@ -17,8 +17,6 @@
  */
 package org.wso2.carbon.inbound.endpoint.common;
 
-import java.util.Date;
-
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,6 +25,8 @@ import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersi
 import org.wso2.carbon.mediation.clustering.ClusteringAgentUtil;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ConfigurationContextService;
+
+import java.util.Date;
 
 /**
  * 
@@ -46,13 +46,15 @@ public class InboundRunner implements Runnable {
     private long currentRuntime;
     private long cycleInterval;
     private String tenantDomain;
+    private boolean runOnManagerOverride = false;
 
     private static final Log log = LogFactory.getLog(InboundRunner.class);
 
-    public InboundRunner(InboundTask task, long interval, String tenantDomain) {
+    public InboundRunner(InboundTask task, long interval, String tenantDomain, boolean mgrOverride) {
         this.task = task;
         this.interval = interval;
         this.tenantDomain = tenantDomain;
+        this.runOnManagerOverride = mgrOverride;
     }
 
     /**
@@ -70,7 +72,7 @@ public class InboundRunner implements Runnable {
             log.debug("Waiting for the configuration context to be loaded to run Inbound Endpoint.");
             Boolean isSinglNode = ClusteringAgentUtil.isSingleNode();
             if (isSinglNode != null) {
-                if (!isSinglNode && !CarbonUtils.isWorkerNode()) {
+                if (!isSinglNode && !CarbonUtils.isWorkerNode() && !runOnManagerOverride) {
                     // Given node is the manager in the cluster, and not
                     // required to run the service
                     execute = false;

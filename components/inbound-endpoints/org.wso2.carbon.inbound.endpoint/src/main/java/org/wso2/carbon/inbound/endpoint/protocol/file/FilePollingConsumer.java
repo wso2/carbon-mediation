@@ -17,14 +17,6 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,6 +36,14 @@ import org.apache.synapse.commons.vfs.VFSParamDTO;
 import org.apache.synapse.commons.vfs.VFSUtils;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.mediation.clustering.ClusteringServiceUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * 
@@ -942,6 +942,10 @@ public class FilePollingConsumer {
             }
             return lDiff.intValue();
         }
-    }     
+    }
+
+    protected Properties getInboundProperties() {
+        return vfsProperties;
+    }
     
 }

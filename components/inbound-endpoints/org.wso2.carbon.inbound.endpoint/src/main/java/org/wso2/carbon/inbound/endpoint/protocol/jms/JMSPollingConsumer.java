@@ -45,6 +45,7 @@ public class JMSPollingConsumer {
     private Integer iReceiveTimeout;
     private String replyDestinationName;
     private String name;
+    private Properties jmsProperties;
     
     private Connection connection = null;
     private Session session = null;
@@ -70,6 +71,7 @@ public class JMSPollingConsumer {
         this.replyDestinationName = jmsProperties.getProperty(JMSConstants.PARAM_REPLY_DESTINATION);
         this.scanInterval = scanInterval;
         this.lastRanTime = null;
+        this.jmsProperties = jmsProperties;
     }
 
     /**
@@ -251,5 +253,9 @@ public class JMSPollingConsumer {
             msg = messageConsumer.receive();
         }
         return msg;
+    }
+
+    protected Properties getInboundProperites() {
+        return jmsProperties;
     }
 }
