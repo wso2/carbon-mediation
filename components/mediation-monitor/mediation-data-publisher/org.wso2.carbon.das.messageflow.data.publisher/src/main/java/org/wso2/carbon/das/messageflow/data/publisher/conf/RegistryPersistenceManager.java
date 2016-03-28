@@ -1,17 +1,19 @@
-/*
- * Copyright 2004,2005 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+/**
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * <p/>
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
  * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.wso2.carbon.das.messageflow.data.publisher.conf;
 
@@ -47,14 +49,14 @@ public class RegistryPersistenceManager {
      * @param tenantId
      * @return
      */
-    public MediationStatConfig get(String serverId, int tenantId) {
-        MediationStatConfig mediationStatConfig = new MediationStatConfig();
+    public PublisherConfig get(String serverId, int tenantId) {
+        PublisherConfig PublisherConfig = new PublisherConfig();
 
         // First set it to defaults, but do not persist
-        mediationStatConfig.setMessageFlowPublishingEnabled(false);
-        mediationStatConfig.setUrl(EMPTY_STRING);
-        mediationStatConfig.setUserName(EMPTY_STRING);
-        mediationStatConfig.setPassword(EMPTY_STRING);
+        PublisherConfig.setMessageFlowPublishingEnabled(false);
+        PublisherConfig.setUrl(EMPTY_STRING);
+        PublisherConfig.setUserName(EMPTY_STRING);
+        PublisherConfig.setPassword(EMPTY_STRING);
 
         try {
             Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
@@ -77,27 +79,27 @@ public class RegistryPersistenceManager {
                 String tracePublishingEnable = getPropertyFromList(DASDataPublisherConstants.DAS_PUBLISHING_ENABLED, configs);
 
                 if (url != null && userName != null && password != null) {
-                    mediationStatConfig.setMessageFlowPublishingEnabled(Boolean.parseBoolean(tracePublishingEnable));
-                    mediationStatConfig.setServerId(serverIdRecorded);
-                    mediationStatConfig.setUrl(url);
-                    mediationStatConfig.setUserName(userName);
-                    mediationStatConfig.setPassword(password);
+                    PublisherConfig.setMessageFlowPublishingEnabled(Boolean.parseBoolean(tracePublishingEnable));
+                    PublisherConfig.setServerId(serverIdRecorded);
+                    PublisherConfig.setUrl(url);
+                    PublisherConfig.setUserName(userName);
+                    PublisherConfig.setPassword(password);
                 }
             }
         } catch (Exception e) {
             log.error("Could not load values from registry", e);
         }
 
-        return mediationStatConfig;
+        return PublisherConfig;
     }
 
     /**
      * Update a DAS server information
      *
-     * @param config
      * @param tenantId
+     * @param config
      */
-    public void update(MediationStatConfig config, int tenantId) {
+    public void update(int tenantId, PublisherConfig config) {
         try {
             Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
             String serverId = config.getServerId();
@@ -151,8 +153,8 @@ public class RegistryPersistenceManager {
      * @param tenantId
      * @return
      */
-    public List<MediationStatConfig> load(int tenantId) {
-        List<MediationStatConfig> mediationStatConfigList = new ArrayList<>();
+    public List<PublisherConfig> load(int tenantId) {
+        List<PublisherConfig> publisherConfigList = new ArrayList<>();
 
         try {
             Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
@@ -167,7 +169,7 @@ public class RegistryPersistenceManager {
 
                     if (idList != null) {
                         for (String id : idList) {
-                            mediationStatConfigList.add(this.get(id, tenantId));
+                            publisherConfigList.add(this.get(id, tenantId));
                         }
                     }
 
@@ -184,23 +186,23 @@ public class RegistryPersistenceManager {
             log.error("Could not load values from registry", e);
         }
 
-        return mediationStatConfigList;
+        return publisherConfigList;
     }
 
     // Get list of DAS servers
-    public MediationStatConfig[] getAllPublisherNames(int tenantId) {
-        List<MediationStatConfig> configList = load(tenantId);
-        return configList.toArray(new MediationStatConfig[configList.size()]);
+    public PublisherConfig[] getAllPublisherNames(int tenantId) {
+        List<PublisherConfig> configList = load(tenantId);
+        return configList.toArray(new PublisherConfig[configList.size()]);
     }
 
     /**
      * Remove a DAS server
      *
-     * @param serverId
      * @param tenantId
+     * @param serverId
      * @return
      */
-    public boolean remove(String serverId, int tenantId) {
+    public boolean remove(int tenantId, String serverId) {
 
         try {
             Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
