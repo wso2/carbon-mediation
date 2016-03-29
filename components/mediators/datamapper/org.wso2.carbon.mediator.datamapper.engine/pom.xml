@@ -20,11 +20,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>datamapper-mediator</artifactId>
-        <version>4.6.1-BETA-SNAPSHOT</version>
+        <version>4.6.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediator.datamapper.engine</artifactId>
-    <version>4.6.1-BETA-SNAPSHOT</version>
+    <version>4.6.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - DataMapper Mediator Engine</name>
     <url>http://wso2.org</url>
@@ -88,12 +88,16 @@
             <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
+            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jsonSchema</artifactId>
+            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
