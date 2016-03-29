@@ -23,6 +23,8 @@ import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 
+import java.util.Properties;
+
 /**
  * 
  * JMSTask class is used to schedule the inbound execution when the coordination
@@ -43,6 +45,11 @@ public class JMSTask extends InboundTask {
     protected void taskExecute() {
         logger.debug("Executing JMS Task Execution.");
         jmsPollingConsumer.execute();
+    }
+
+    @Override
+    public Properties getInboundProperties() {
+        return jmsPollingConsumer.getInboundProperites();
     }
 
     public void init(SynapseEnvironment synapseEnvironment) {

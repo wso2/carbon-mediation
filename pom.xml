@@ -27,7 +27,7 @@
 
     <groupId>org.wso2.carbon.mediation</groupId>
 	<artifactId>carbon-mediation</artifactId>
- 	<version>4.6.1-BETA-SNAPSHOT</version>
+ 	<version>4.6.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -2337,7 +2337,7 @@
     <properties>
 
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.6.1-BETA-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.6.1-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
 
@@ -2500,7 +2500,7 @@
         <org.apache.axiom.om.version>0.0.0</org.apache.axiom.om.version>
         <org.apache.felix.framework.version>1.0.3</org.apache.felix.framework.version>
         <xercesImpl.version>2.8.1.wso2v2</xercesImpl.version>
-	<cxf.wso2.version>3.0.5.wso2v1</cxf.wso2.version>
+	<cxf.wso2.version>3.0.5.wso2v2</cxf.wso2.version>
         <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
         <libthrift.version>0.8.0.wso2v1</libthrift.version>
     </properties>

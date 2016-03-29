@@ -142,4 +142,8 @@ public abstract class GenericPollingConsumer {
         axis2MsgCtx.setMessageID(UUIDGenerator.getUUID());
         return msgCtx;
     }
+
+    protected Properties getInboundProperties() {
+        return properties;
+    }
 }
