@@ -50,9 +50,17 @@
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
-	<dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jsonSchema</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
         </dependency>
     </dependencies>
 
@@ -83,6 +91,9 @@
                                 <bundleDef>org.wso2.orbit.org.apache.avro:avro:${avro.version}</bundleDef>
                                 <bundleDef>org.codehaus.jackson:jackson-core-asl:${jackson.version}</bundleDef>
                                 <bundleDef>org.codehaus.jackson:jackson-mapper-asl:${jackson.version}</bundleDef>
+                                <bundleDef>com.fasterxml.jackson.core:jackson-core:${fasterxml.jackson.version}</bundleDef>
+                                <bundleDef>com.fasterxml.jackson.module:jackson-module-jsonSchema:${fasterxml.jackson.version}</bundleDef>
+                                <bundleDef>com.googlecode.json-simple:json-simple:${json.simple.version}</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>

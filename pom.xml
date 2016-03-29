@@ -2386,15 +2386,24 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>2.7.2</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${fasterxml.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-jsonSchema</artifactId>
+                <version>${fasterxml.jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.googlecode.json-simple</groupId>
+                <artifactId>json-simple</artifactId>
+                <version>${json.simple.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -2571,6 +2580,8 @@
         <avro.version>1.8.0.wso2v1</avro.version>
         <opencsv.version>2.3</opencsv.version>
         <jackson.version>1.9.13</jackson.version>
+        <fasterxml.jackson.version>2.7.2</fasterxml.jackson.version>
+        <json.simple.version>1.1.1</json.simple.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>
