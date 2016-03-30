@@ -74,9 +74,17 @@ public class JacksonJSONWriter implements Writable {
     }
 
     @Override
-    public void writeField(String name, String value) {
+    public void writeField(String name, Object value) {
         try {
-            jsonGenerator.writeStringField(name, value);
+            if( value instanceof String) {
+                jsonGenerator.writeStringField(name, (String) value);
+            } else if( value instanceof Integer){
+                jsonGenerator.writeNumberField(name, (Integer) value);
+            } else if( value instanceof Double){
+                jsonGenerator.writeNumberField(name, (Double) value);
+            } else if( value instanceof Boolean){
+                jsonGenerator.writeBooleanField(name, (Boolean) value);
+            }
         } catch (IOException e) {
             log.error("Error while creating writing field" + e);
         }
@@ -108,7 +116,6 @@ public class JacksonJSONWriter implements Writable {
     @Override
     public void writeStartArray() {
         //no implementation
-        System.out.println();
     }
 
     @Override

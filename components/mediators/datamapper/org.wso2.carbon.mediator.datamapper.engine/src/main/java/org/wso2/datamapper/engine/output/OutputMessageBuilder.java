@@ -54,7 +54,7 @@ public class OutputMessageBuilder {
                 outputWriter.writeStartObject(readerEvent.getName());
                 break;
             case FIELD:
-                outputWriter.writeField(readerEvent.getName(), (String) readerEvent.getValue());
+                outputWriter.writeField(readerEvent.getName(), readerEvent.getValue());
                 break;
             case OBJECT_END:
                 outputWriter.writeEndObject();

@@ -55,14 +55,10 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
     private String tempFieldValue;
     private List<SchemaElement> elementStack;
 
-
-    public XMLReader() {
-        dmEventStack = new Stack<>();
-        elementStack = new ArrayList();
-    }
-
     @Override
     public void read(InputStream input, InputModelBuilder inputModelBuilder, Schema inputSchema) {
+        dmEventStack = new Stack<>();
+        elementStack = new ArrayList();
         modelBuilder = inputModelBuilder;
         this.inputSchema = inputSchema;
         SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -129,7 +125,7 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount), attributes.getURI(attributeCount));
-                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount));
+                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount),null);
                     }
                 }
             } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
@@ -146,16 +142,18 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 sendAnonymousObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount), attributes.getURI(attributeCount));
-                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount));
+                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
+                                attributes.getURI(attributeCount));
+                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount),null);
                     }
                 }
             } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
                 sendObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount), attributes.getURI(attributeCount));
-                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount));
+                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
+                                attributes.getURI(attributeCount));
+                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount),null);
                     }
                 }
             } else if ((STRING_ELEMENT_TYPE.equals(elementType) || BOOLEAN_ELEMENT_TYPE.equals(elementType) ||
@@ -164,8 +162,9 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 sendObjectStartEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),attributes.getURI(attributeCount));
-                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount));
+                        String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount)
+                                ,attributes.getURI(attributeCount));
+                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount),null);
                     }
                 }
                 sendObjectEndEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
@@ -205,13 +204,13 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
             if (localName.equals(getInputSchema().getName())) {
                 sendObjectEndEvent(localName);
             } else if (STRING_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue);
+                sendFieldEvent(localName, tempFieldValue,STRING_ELEMENT_TYPE);
             } else if (NUMBER_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue);
+                sendFieldEvent(localName, tempFieldValue,NUMBER_ELEMENT_TYPE);
             } else if (BOOLEAN_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue);
+                sendFieldEvent(localName, tempFieldValue,BOOLEAN_ELEMENT_TYPE);
             } else if (INTEGER_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue);
+                sendFieldEvent(localName, tempFieldValue,INTEGER_ELEMENT_TYPE);
             } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
                 sendObjectEndEvent(localName);
             } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
@@ -250,9 +249,29 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
         return inputSchema;
     }
 
-    private void sendFieldEvent(String fieldName, String value) throws IOException, JSException {
-        getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
-                getModifiedFieldName(fieldName), value));
+    private void sendFieldEvent(String fieldName, String valueString,String fieldType) throws IOException, JSException {
+        switch (fieldType){
+            case "string":
+                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
+                        getModifiedFieldName(fieldName), valueString, fieldType));
+                break;
+            case "boolean":
+                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
+                        getModifiedFieldName(fieldName), Boolean.parseBoolean(valueString), fieldType));
+                break;
+            case "number":
+                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
+                        getModifiedFieldName(fieldName), Double.parseDouble((String) valueString), fieldType));
+                break;
+            case "integer":
+                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
+                        getModifiedFieldName(fieldName), Integer.parseInt((String) valueString), fieldType));
+                break;
+            default:
+                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
+                        getModifiedFieldName(fieldName), valueString, fieldType));
+        }
+
         if (!fieldName.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
             elementStack.remove(elementStack.size() - 1);
         }
@@ -261,14 +280,14 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
 
     private void sendObjectStartEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent objectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START,
-                getModifiedFieldName(fieldName), null);
+                getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(objectStartEvent);
         dmEventStack.push(objectStartEvent);
     }
 
     private void sendObjectEndEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent objectEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END,
-                getModifiedFieldName(fieldName), null);
+                getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(objectEndEvent);
         /*if (!getInputSchema().getName().equals(fieldName)&&
                 !ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(fieldName))) {
@@ -282,14 +301,14 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
 
     private void sendArrayStartEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent arrayStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_START,
-                getModifiedFieldName(fieldName), null);
+                getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(arrayStartEvent);
         dmEventStack.push(arrayStartEvent);
     }
 
     private void sendArrayEndEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent arrayEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_END,
-                getModifiedFieldName(fieldName), null);
+                getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(arrayEndEvent);
         dmEventStack.pop();
         elementStack.remove(elementStack.size() - 1);
@@ -300,14 +319,12 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
     }
 
     private void sendTerminateEvent() throws IOException, JSException {
-        getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.TERMINATE,
-
-                null, null));
+        getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.TERMINATE));
     }
 
     private void sendAnonymousObjectStartEvent(String fieldName) throws IOException, JSException {
         DMReaderEvent anonymousObjectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START,
-                getModifiedFieldName(fieldName), null);
+                getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(anonymousObjectStartEvent);
         dmEventStack.push(anonymousObjectStartEvent);
     }

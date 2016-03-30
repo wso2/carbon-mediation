@@ -23,7 +23,7 @@ public interface Writable{
 
     void writeStartObject(String name);
 
-    void writeField(String name, String value);
+    void writeField(String name, Object value);
 
     void writeEndObject();
 

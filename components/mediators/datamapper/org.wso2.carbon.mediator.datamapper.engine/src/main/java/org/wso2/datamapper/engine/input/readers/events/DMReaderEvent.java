@@ -26,12 +26,30 @@ public class DMReaderEvent {
     private ReaderEventTypes.EventType eventType;
     private String name;
     private Object value;
+    private String fieldType;
+
+    public DMReaderEvent(ReaderEventTypes.EventType eventType, String name, Object value,String fieldType) {
+        this.eventType = eventType;
+        this.name = name;
+        this.value = value;
+        this.fieldType = fieldType;
+    }
 
     public DMReaderEvent(ReaderEventTypes.EventType eventType, String name, Object value) {
         this.eventType = eventType;
         this.name = name;
         this.value = value;
     }
+
+    public DMReaderEvent(ReaderEventTypes.EventType eventType, String name) {
+        this.eventType = eventType;
+        this.name = name;
+    }
+
+    public DMReaderEvent(ReaderEventTypes.EventType eventType) {
+        this.eventType = eventType;
+    }
+
 
     public void setEventType(ReaderEventTypes.EventType eventType) {
         this.eventType = eventType;
@@ -57,4 +75,11 @@ public class DMReaderEvent {
         return eventType;
     }
 
+    public String getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(String fieldType) {
+        this.fieldType = fieldType;
+    }
 }
