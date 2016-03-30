@@ -44,7 +44,6 @@ import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
-import org.apache.synapse.commons.json.JsonUtil;
 
 import javax.xml.namespace.QName;
 import java.io.ByteArrayInputStream;
@@ -332,7 +331,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             case XML:
             case CSV:
                 inputStream = new ByteArrayInputStream(
-                        context.getEnvelope().getBody().getFirstElement().toString().getBytes(StandardCharsets.UTF_8));
+                        context.getEnvelope().getFirstElement().toString().getBytes(StandardCharsets.UTF_8));
                 break;
             case JSON:
                 org.apache.axis2.context.MessageContext a2mc = ((Axis2MessageContext) context).getAxis2MessageContext();
@@ -385,15 +384,13 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private static MappingResourceLoader getMappingResourceLoader(
             MessageContext context, String configkey, String inSchemaKey, String outSchemaKey) throws IOException {
 
-        if(mappingResourceLoader == null){
-            InputStream configFileInputStream = getRegistryResource(context, configkey);
-            InputStream inputSchemaStream = getRegistryResource(context, inSchemaKey);
-            InputStream outputSchemaStream = getRegistryResource(context, outSchemaKey);
+        InputStream configFileInputStream = getRegistryResource(context, configkey);
+        InputStream inputSchemaStream = getRegistryResource(context, inSchemaKey);
+        InputStream outputSchemaStream = getRegistryResource(context, outSchemaKey);
 
-            // Creates a new mappingResourceLoader
-            mappingResourceLoader = new MappingResourceLoader(inputSchemaStream,
-                    outputSchemaStream, configFileInputStream);
-        }
+        // Creates a new mappingResourceLoader
+        mappingResourceLoader = new MappingResourceLoader(inputSchemaStream,
+                outputSchemaStream, configFileInputStream);
         return mappingResourceLoader;
     }
 
