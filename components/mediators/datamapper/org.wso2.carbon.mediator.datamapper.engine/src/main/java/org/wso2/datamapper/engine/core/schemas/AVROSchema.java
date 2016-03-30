@@ -22,6 +22,7 @@ import org.apache.avro.Schema.Parser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -65,6 +66,11 @@ public class AVROSchema implements org.wso2.datamapper.engine.core.Schema {
 
     @Override
     public String getPrefixForNamespace(String url) {
+        return null;
+    }
+
+    @Override
+    public Map<String, String> getNamespaceMap() {
         return null;
     }
 

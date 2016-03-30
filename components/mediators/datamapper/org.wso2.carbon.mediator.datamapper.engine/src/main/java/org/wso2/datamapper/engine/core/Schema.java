@@ -19,7 +19,9 @@ package org.wso2.datamapper.engine.core;
 import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
 import org.wso2.datamapper.engine.core.schemas.SchemaElement;
 
+import javax.xml.namespace.QName;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface to represent schema in data mapper engine.
@@ -53,4 +55,6 @@ public interface Schema {
     boolean isChildElement(List<SchemaElement> elementStack,String childElementName) throws InvalidPayloadException;
 
     String getPrefixForNamespace(String url);
+
+    Map<String, String> getNamespaceMap();
 }

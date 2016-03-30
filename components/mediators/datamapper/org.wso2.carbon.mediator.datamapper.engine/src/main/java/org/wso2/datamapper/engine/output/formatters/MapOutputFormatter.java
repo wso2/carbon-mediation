@@ -67,7 +67,7 @@ public class MapOutputFormatter implements Formattable {
         tempKeys.addAll(mapKeys);
         //Attributes should come first than other fields. So attribute should be listed first
         for (String key : mapKeys) {
-            if (key.startsWith(SCHEMA_ATTRIBUTE_FIELD_PREFIX) && tempKeys.contains(key)) {
+            if (key.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX) && tempKeys.contains(key)) {
                 orderedKeyList.addFirst(key);
                 tempKeys.remove(key);
             } else {
