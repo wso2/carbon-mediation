@@ -48,7 +48,7 @@
 
             if (keyExp != null && !keyExp.equals("")) {
                 Value dynamicKey = new Value(xPathFactory.createSynapseXPath(
-                        "mediator.sequence.key.dynamic_val", request.getParameter(
+                        "mediator.xslt.key.dynamic_val", request.getParameter(
                                 "mediator.sequence.key.dynamic_val"), session));
                 sequenceMediator.setKey(dynamicKey);
             }
