@@ -17,16 +17,15 @@
 
 package sample;
 
-import org.apache.avro.io.Encoder;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
+import org.wso2.datamapper.engine.core.executors.ScriptExecutor;
+import org.wso2.datamapper.engine.core.executors.ScriptExecutorType;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
-import org.wso2.datamapper.engine.output.writers.DummyEncoder;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -35,10 +34,10 @@ public class MapperMain {
 
     public static void main(String[] args) throws Exception {
 
-        InputStream inStream = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/input3.xml"));
-        InputStream inputSchema = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/employees.json"));
-        InputStream outputSchema = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/engineers.json"));
-        InputStream config = new FileInputStream(new File("/home/nuwan/Desktop/resources/demo/testMap.js"));
+        InputStream inStream = new FileInputStream(new File("/Users/maheeka/ESB_WORK/DATAMAPPER/SRC/DataMapperUsecases/sample1/input.xml"));
+        InputStream inputSchema = new FileInputStream(new File("/Users/maheeka/ESB_WORK/DATAMAPPER/SRC/DataMapperUsecases/sample1/inschema.json"));
+        InputStream outputSchema = new FileInputStream(new File("/Users/maheeka/ESB_WORK/DATAMAPPER/SRC/DataMapperUsecases/sample1/outschema.json"));
+        InputStream config = new FileInputStream(new File("/Users/maheeka/ESB_WORK/DATAMAPPER/SRC/DataMapperUsecases/sample1/testMap.js"));
 
         //Contexts are anti-pattern and no need getters/setters for access static class, just used for code readability
         MappingContext context = new MappingContext();
@@ -65,9 +64,6 @@ public class MapperMain {
     }
 
     private static String map(MappingContext c) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Encoder encoder = new DummyEncoder(baos);
-
         MappingResourceLoader configModel = new MappingResourceLoader(c.getInputSchema(), c.getOutputSchema(),
                 c.getConfig());
         InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(c.getInputType()),
@@ -75,7 +71,7 @@ public class MapperMain {
         OutputMessageBuilder outputMessageBuilder = new OutputMessageBuilder(getDataType(c.getOutputType()),
                 DMModelTypes.ModelType.JAVA_MAP,configModel.getOutputSchema());
         MappingHandler mappingHandler = new MappingHandler();
-        String outputMessage = mappingHandler.doMap(c.getInputStream(), configModel, inputModelBuilder,outputMessageBuilder);
+        String outputMessage = mappingHandler.doMap(c.getInputStream(), configModel, inputModelBuilder,outputMessageBuilder, new ScriptExecutor(ScriptExecutorType.NASHORN));
 
         return outputMessage;
     }

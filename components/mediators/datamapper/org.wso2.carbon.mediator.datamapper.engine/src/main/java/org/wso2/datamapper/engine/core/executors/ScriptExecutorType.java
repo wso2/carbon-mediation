@@ -20,5 +20,5 @@ package org.wso2.datamapper.engine.core.executors;
  * This enum type represent the types of executors support in data mapper
  */
 public enum ScriptExecutorType {
-    RHINO, NASHORN, J2V8, V8
+    RHINO, NASHORN
 }

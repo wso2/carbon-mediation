@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.wso2.datamapper.engine.core.Executable;
-import org.wso2.datamapper.engine.core.executors.nashorn.NasHornJava8Executor;
 import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
 
 /**
@@ -54,8 +53,10 @@ public class ScriptExecutorFactory {
         if (executorPool == null) {
             String javaVersion = System.getProperty("java.version");
             if (javaVersion.startsWith("1.7") || javaVersion.startsWith("1.6")) {
-                //TODO : create Rhino engine
-                log.error("Script Engine works only on Java 1.8 and above. Found java version : " + javaVersion);
+                scriptExecutorType = ScriptExecutorType.RHINO;
+                log.debug("Script Engine set to Rhino");
+            } else {
+                log.debug("Script Engine set to Nashorn");
             }
 
             String executorPoolSizeStr = SynapsePropertiesLoader.getPropertyValue(DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);

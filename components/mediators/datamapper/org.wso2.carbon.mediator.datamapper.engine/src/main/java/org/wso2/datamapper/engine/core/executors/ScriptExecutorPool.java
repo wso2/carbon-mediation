@@ -18,7 +18,6 @@
 package org.wso2.datamapper.engine.core.executors;
 
 import org.wso2.datamapper.engine.core.Executable;
-import org.wso2.datamapper.engine.core.executors.nashorn.NasHornJava8Executor;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -39,11 +38,7 @@ public class ScriptExecutorPool {
     }
 
     private Executable createScriptExecutor(ScriptExecutorType executorType) {
-        switch (executorType) {
-            case NASHORN:
-                return new NasHornJava8Executor();
-        }
-        return null;
+        return new ScriptExecutor(executorType);
     }
 
     public Executable take() throws InterruptedException {

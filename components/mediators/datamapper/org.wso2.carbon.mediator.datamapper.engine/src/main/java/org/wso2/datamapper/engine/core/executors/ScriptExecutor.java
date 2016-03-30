@@ -14,7 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core.executors.nashorn;
+package org.wso2.datamapper.engine.core.executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +25,7 @@ import org.wso2.datamapper.engine.core.MappingResourceLoader;
 import org.wso2.datamapper.engine.core.Model;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.models.MapModel;
+import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -32,18 +33,29 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.Map;
 
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.NASHORN_ENGINE_NAME;
-
 /**
  * This class implements script executor for data mapper using java 8 NasHorn JS executor
  */
-public class NasHornJava8Executor implements Executable {
+public class ScriptExecutor implements Executable {
 
     private ScriptEngine scriptEngine;
-    private static final Log log = LogFactory.getLog(NasHornJava8Executor.class);
+    private static final Log log = LogFactory.getLog(ScriptExecutor.class);
 
-    public NasHornJava8Executor() {
-        scriptEngine = new ScriptEngineManager().getEngineByName(NASHORN_ENGINE_NAME);
+    public ScriptExecutor(ScriptExecutorType scriptExecutorType) {
+        switch (scriptExecutorType) {
+            case NASHORN:
+                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
+                log.info("Setting Nashorn as Script Engine");
+                break;
+            case RHINO:
+                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
+                log.info("Setting default Rhino as Script Engine");
+                break;
+            default:
+                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
+                log.info("Setting default Rhino as Script Engine");
+                break;
+        }
     }
 
     @Override
@@ -53,7 +65,6 @@ public class NasHornJava8Executor implements Executable {
             injectInputVariableToEngine(resourceModel.getInputSchema().getName(), inputRecord);
             scriptEngine.eval(jsFunction.getFunctionBody());
             Invocable invocable = (Invocable) scriptEngine;
-            //String value= (String) scriptEngine.eval("inputns2_employees.ns2_employee[0].ns2_firstname");
             Object result = invocable.invokeFunction(jsFunction.getFunctioName());
             if (result instanceof Map) {
                 return new MapModel((Map<String, Object>) result);
@@ -61,15 +72,15 @@ public class NasHornJava8Executor implements Executable {
 
         } catch (ScriptException e) {
             log.error("Script execution failed", e);
-            throw new SynapseException("NasHornJava8Executor unable to execute the script " + e);
+            throw new SynapseException("Script engine unable to execute the script " + e);
         } catch (NoSuchMethodException e) {
             log.error("Undefined method called to execute", e);
             throw new SynapseException("Undefined method called to execute " + e);
         }
-        throw new SynapseException("NasHornJava8Executor Undefined method called to execute");
+        throw new SynapseException("Undefined method called to execute");
     }
 
     private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
-        scriptEngine.eval("var input" + inputSchemaName.replace(':','_') + "=" + inputVariable);
+        scriptEngine.eval("var input" + inputSchemaName.replace(':', '_') + "=" + inputVariable);
     }
 }
