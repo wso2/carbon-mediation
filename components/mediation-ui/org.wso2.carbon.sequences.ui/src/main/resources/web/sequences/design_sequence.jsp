@@ -47,6 +47,8 @@
                     = SequenceEditorHelper.getClientForEditor(getServletConfig(), session);//new SequenceAdminClient(getServletConfig(), session);
             sequence = sequenceClient.getSequenceMediator(name);
         } else {
+            //remove attribute if it is already set in edit dynamic sequence page
+            session.removeAttribute("registrySequenceName");
             sequence = SequenceEditorHelper.getSequenceForEditor(session);//new SequenceMediator();
         }
         session.setAttribute("editingSequenceAction", action);
