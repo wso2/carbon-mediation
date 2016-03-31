@@ -39,18 +39,6 @@
             <artifactId>org.wso2.carbon.mediator.datamapper.engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.apache.avro</groupId>
-            <artifactId>avro</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
@@ -92,9 +80,6 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.datamapper.engine</bundleDef>
-                                <bundleDef>org.wso2.orbit.org.apache.avro:avro:${avro.version}</bundleDef>
-                                <bundleDef>org.codehaus.jackson:jackson-core-asl:${jackson.version}</bundleDef>
-                                <bundleDef>org.codehaus.jackson:jackson-mapper-asl:${jackson.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-core:${fasterxml.jackson.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-annotations:${fasterxml.jackson.version}</bundleDef>

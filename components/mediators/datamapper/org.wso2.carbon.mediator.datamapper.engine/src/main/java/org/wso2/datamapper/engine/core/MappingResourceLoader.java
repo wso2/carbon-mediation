@@ -35,8 +35,8 @@ public class MappingResourceLoader {
     private JSFunction function;
 
     /**
-     * @param inputSchema           - Respective output Avro schema as a a stream of bytes
-     * @param outPutSchema          -Respective output Avro schema as a a stream of bytes
+     * @param inputSchema           - Respective output json schema as a a stream of bytes
+     * @param outPutSchema          -Respective output json schema as a a stream of bytes
      * @param mappingConfig-Mapping configuration file as a stream of bytes
      * @throws IOException - when input errors, If there any parser exception occur while passing above schemas method
      *                     will this exception
@@ -44,8 +44,8 @@ public class MappingResourceLoader {
     public MappingResourceLoader(InputStream inputSchema, InputStream outPutSchema,
                                  InputStream mappingConfig) throws IOException {
 
-        this.inputSchema = getAvroSchema(inputSchema);
-        this.outputSchema = getAvroSchema(outPutSchema);
+        this.inputSchema = getJSONSchema(inputSchema);
+        this.outputSchema = getJSONSchema(outPutSchema);
         this.inputRootelement = this.inputSchema.getName();
         this.outputRootelement = outputSchema.getName();
         this.mappingConfig = mappingConfig;
@@ -53,7 +53,7 @@ public class MappingResourceLoader {
 
     }
 
-    private Schema getAvroSchema(InputStream inputSchema) throws IOException {
+    private Schema getJSONSchema(InputStream inputSchema) throws IOException {
         return new JacksonJSONSchema(inputSchema);
     }
 

@@ -64,28 +64,12 @@
             <artifactId>synapse-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.orbit.org.apache.avro</groupId>
-            <artifactId>avro</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>rhino.wso2</groupId>
-            <artifactId>js</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.json.wso2</groupId>
             <artifactId>json</artifactId>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>

@@ -45,15 +45,15 @@ public class ScriptExecutor implements Executable {
         switch (scriptExecutorType) {
             case NASHORN:
                 scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
-                log.info("Setting Nashorn as Script Engine");
+                log.debug("Setting Nashorn as Script Engine");
                 break;
             case RHINO:
                 scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
-                log.info("Setting default Rhino as Script Engine");
+                log.debug("Setting default Rhino as Script Engine");
                 break;
             default:
                 scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
-                log.info("Setting default Rhino as Script Engine");
+                log.debug("Setting default Rhino as Script Engine");
                 break;
         }
     }
