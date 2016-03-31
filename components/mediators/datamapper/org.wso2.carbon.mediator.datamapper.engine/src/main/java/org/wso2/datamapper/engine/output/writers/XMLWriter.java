@@ -84,10 +84,11 @@ public class XMLWriter implements Writable {
     }
 
     @Override
-    public void writeField(String name, String value) {
+    public void writeField(String name, Object fieldValue) {
         try {
             //with in a element attributes must come first before any of other field values
-            if (value != null) {
+            if (fieldValue != null) {
+                String value = getFieldValueAsString(fieldValue);
                 if (name.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
                     String attributeNameWithNamespace = name.replaceFirst(SCHEMA_ATTRIBUTE_FIELD_PREFIX, "");
                     if (attributeNameWithNamespace.contains("_")) {
@@ -97,7 +98,8 @@ public class XMLWriter implements Writable {
                             while (keyIterator.hasNext()) {
                                 String key = keyIterator.next();
                                 if (attributeNameArray[0].equals(namespaceMap.get(key))) {
-                                    xMLStreamWriter.writeAttribute(key, attributeNameArray[attributeNameArray.length - 1], value);
+                                    xMLStreamWriter.writeAttribute(key,
+                                            attributeNameArray[attributeNameArray.length - 1], value);
                                 }
                             }
                         } else {
@@ -118,6 +120,19 @@ public class XMLWriter implements Writable {
         } catch (XMLStreamException e) {
             throw new SynapseException(e.getMessage());
         }
+    }
+
+    private String getFieldValueAsString(Object fieldValue) {
+        if( fieldValue instanceof String) {
+            return (String) fieldValue;
+        } else if( fieldValue instanceof Integer){
+            return Integer.toString((Integer) fieldValue);
+        } else if( fieldValue instanceof Double){
+            return Double.toString((Double) fieldValue);
+        } else if( fieldValue instanceof Boolean){
+            return Boolean.toString((Boolean) fieldValue);
+        }
+        throw new IllegalArgumentException("Unsupported value type found"+fieldValue.toString());
     }
 
     @Override

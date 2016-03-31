@@ -62,7 +62,7 @@ public class InputModelBuilder {
                 modelBuilder.writeArrayFieldStart(readerEvent.getName());
                 break;
             case FIELD:
-                modelBuilder.writeStringField(readerEvent.getName(), (String) readerEvent.getValue());
+                modelBuilder.writeField(readerEvent.getName(), readerEvent.getValue(),readerEvent.getFieldType());
                 break;
             case ARRAY_END:
                 modelBuilder.writeEndArray();

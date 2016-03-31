@@ -37,9 +37,12 @@ import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_E
 public class JacksonJSONSchema implements Schema {
 
     private static final Log log = LogFactory.getLog(JacksonJSONSchema.class);
+    private static final String EMPTY_STRING = "";
+    private static final String NAMESPACE_NAME_CONCAT_STRING = ":";
     Map<String, Object> jsonSchemaMap;
 
     private static final String PROPERTIES_KEY = "properties";
+    private static final String ATTRIBUTES_KEY = "attributes";
     private static final String NAMESPACE_KEY = "namespaces";
     private static final String PREFIX_KEY = "prefix";
     private static final String URL_KEY = "url";
@@ -65,7 +68,7 @@ public class JacksonJSONSchema implements Schema {
             }
         } catch (IOException e) {
             log.error("Error while reading input stream");
-            throw new SynapseException("Error while reading input stream"+e);
+            throw new SynapseException("Error while reading input stream" + e);
         }
     }
 
@@ -108,13 +111,14 @@ public class JacksonJSONSchema implements Schema {
             }
         }
         return elementType;
-
     }
 
     public String getElementTypeByName(String elementName) {
         String elementType = null;
         Map<String, Object> properties = getSchemaProperties(jsonSchemaMap);
-        if (properties.containsKey(elementName)) {
+        if (getName().equals(elementName)) {
+            return (String) jsonSchemaMap.get(TYPE_KEY);
+        } else if (properties.containsKey(elementName)) {
             return getSchemaType((Map<String, Object>) properties.get(elementName));
         } else {
             Set<String> elementKeys = properties.keySet();
@@ -243,24 +247,34 @@ public class JacksonJSONSchema implements Schema {
     }
 
     private Map<String, Object> getSchemaProperties(Map<String, Object> schema) {
+        Map<String, Object> nextSchema = new HashMap<>();
         if (schema.containsKey(PROPERTIES_KEY)) {
-            return (Map<String, Object>) schema.get(PROPERTIES_KEY);
+            nextSchema.putAll((Map<? extends String, Object>) schema.get(PROPERTIES_KEY));
         } else {
             throw new IllegalArgumentException("Given schema does not contain value under key : " + PROPERTIES_KEY);
         }
+        if (schema.containsKey(ATTRIBUTES_KEY)) {
+            nextSchema.putAll((Map<? extends String, Object>) schema.get(ATTRIBUTES_KEY));
+        }
+        return nextSchema;
     }
 
     private Map<String, Object> getSchemaItems(Map<String, Object> schema) {
+        Map<String, Object> nextSchema = new HashMap<>();
         if (schema.containsKey(ITEMS_KEY)) {
             Object propertyList = schema.get(ITEMS_KEY);
             if (propertyList instanceof Map) {
-                return (Map<String, Object>) propertyList;
+                nextSchema.putAll((Map<? extends String, Object>) propertyList);
             } else {
-                return (Map<String, Object>) ((ArrayList) propertyList).get(0);
+                nextSchema.putAll((Map<? extends String, Object>) ((ArrayList) propertyList).get(0));
             }
         } else {
             throw new IllegalArgumentException("Given schema does not contain value under key : " + ITEMS_KEY);
         }
+        if (schema.containsKey(ATTRIBUTES_KEY)) {
+            nextSchema.putAll((Map<? extends String, Object>) schema.get(ATTRIBUTES_KEY));
+        }
+        return nextSchema;
     }
 
     private String getSchemaType(Map<String, Object> schema) {
@@ -278,8 +292,8 @@ public class JacksonJSONSchema implements Schema {
 
     @Override
     public String getPrefixForNamespace(String url) {
-        if ("".equals(url)) {
-            return "";
+        if (EMPTY_STRING.equals(url)) {
+            return EMPTY_STRING;
         } else if (namespaceMap.containsKey(url)) {
             return namespaceMap.get(url);
         } else {
@@ -288,13 +302,17 @@ public class JacksonJSONSchema implements Schema {
     }
 
     private String getNamespaceAddedFieldName(String uri, String localName) throws InvalidPayloadException {
-        String prefix = getPrefixForNamespace(uri);
-        if (StringUtils.isNotEmpty(prefix)) {
-            return prefix + ":" + localName;
-        } else if(prefix!= null){
-            return localName;
-        }else{
-            throw new InvalidPayloadException(uri+ " name-space is not defined in the schema with element "+localName);
+        if (uri != null) {
+            String prefix = getPrefixForNamespace(uri);
+            if (StringUtils.isNotEmpty(prefix)) {
+                return prefix + NAMESPACE_NAME_CONCAT_STRING + localName;
+            } else if (prefix != null) {
+                return localName;
+            } else {
+                throw new InvalidPayloadException(uri + " name-space is not defined in the schema with element " + localName);
+            }
         }
+        return localName;
     }
+
 }

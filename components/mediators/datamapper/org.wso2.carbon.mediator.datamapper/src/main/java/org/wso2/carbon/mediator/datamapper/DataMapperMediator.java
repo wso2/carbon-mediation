@@ -268,7 +268,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     }
                     // Use to create the SOAP message
                     if (outputMessage != null) {
-                        OMElement firstChild = outputMessage.getFirstElement();
+                        OMElement firstChild = outputMessage;
                         if (firstChild != null) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Contains a first child");
@@ -282,8 +282,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                                     .getNamespaceURI()
                                     .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))) {
                                 SOAPEnvelope soapEnvelope = AXIOMUtils
-                                        .getSOAPEnvFromOM(outputMessage
-                                                .getFirstElement());
+                                        .getSOAPEnvFromOM(outputMessage);
                                 if (soapEnvelope != null) {
                                     try {
                                         if (log.isDebugEnabled()) {
@@ -331,7 +330,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             case XML:
             case CSV:
                 inputStream = new ByteArrayInputStream(
-                        context.getEnvelope().getFirstElement().toString().getBytes(StandardCharsets.UTF_8));
+                        context.getEnvelope().toString().getBytes(StandardCharsets.UTF_8));
                 break;
             case JSON:
                 org.apache.axis2.context.MessageContext a2mc = ((Axis2MessageContext) context).getAxis2MessageContext();

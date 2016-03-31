@@ -138,6 +138,16 @@ public interface Buildable {
 
     /**
      * Convenience method for outputting a field entry ("member")
+     * that has a String value. Equivalent to:
+     * <pre>
+     *  writeFieldName(fieldName);
+     *  writeString(value);
+     * </pre>
+     */
+    void writeField(String fieldName, Object value, String fieldType) throws IOException;
+
+    /**
+     * Convenience method for outputting a field entry ("member")
      * that has a boolean value. Equivalent to:
      * <pre>
      *  writeFieldName(fieldName);

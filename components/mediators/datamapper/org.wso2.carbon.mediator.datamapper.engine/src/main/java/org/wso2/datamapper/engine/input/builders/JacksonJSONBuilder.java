@@ -25,8 +25,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+
 /**
- *  This class implements {@link Buildable} interface and JSON builder for data mapper engine using jackson
+ * This class implements {@link Buildable} interface and JSON builder for data mapper engine using jackson
  */
 public class JacksonJSONBuilder implements Buildable {
 
@@ -38,7 +43,7 @@ public class JacksonJSONBuilder implements Buildable {
         jsonStream = new ByteArrayOutputStream();
         JsonFactory jsonFactory = new JsonFactory();
         writer = new StringWriter();
-        jsonGenerator= jsonFactory.createGenerator(writer);
+        jsonGenerator = jsonFactory.createGenerator(writer);
     }
 
     @Override
@@ -98,6 +103,26 @@ public class JacksonJSONBuilder implements Buildable {
     }
 
     @Override
+    public void writeField(String fieldName, Object value, String fieldType) throws IOException {
+        switch (fieldType) {
+            case STRING_ELEMENT_TYPE:
+                writeStringField(fieldName, (String) value);
+                break;
+            case BOOLEAN_ELEMENT_TYPE:
+                writeBooleanField(fieldName, (Boolean) value);
+                break;
+            case NUMBER_ELEMENT_TYPE:
+                writeNumberField(fieldName, (Double) value);
+                break;
+            case INTEGER_ELEMENT_TYPE:
+                writeNumberField(fieldName, (Long) value);
+                break;
+            default:
+                writeStringField(fieldName, (String) value);
+        }
+    }
+
+    @Override
     public void writeBooleanField(String fieldName, boolean value) throws IOException {
         writeFieldName(fieldName);
         writeBoolean(value);
@@ -118,7 +143,7 @@ public class JacksonJSONBuilder implements Buildable {
     @Override
     public void writeBinaryField(String fieldName, byte[] data) throws IOException {
         writeFieldName(fieldName);
-        writeBinary(data,0,0);
+        writeBinary(data, 0, 0);
     }
 
     @Override
@@ -136,9 +161,9 @@ public class JacksonJSONBuilder implements Buildable {
     @Override
     public String close() throws IOException {
         jsonGenerator.close();
-        String inputJSVariable =writer.toString();
+        String inputJSVariable = writer.toString();
         writer.close();
-        return  inputJSVariable;
+        return inputJSVariable;
     }
 
 }
