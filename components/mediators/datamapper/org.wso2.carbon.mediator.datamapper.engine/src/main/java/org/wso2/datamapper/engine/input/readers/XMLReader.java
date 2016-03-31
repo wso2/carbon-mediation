@@ -82,7 +82,7 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
 
     @Override
     public void startDocument() throws SAXException {
-
+        System.out.println();
     }
 
     @Override
@@ -107,7 +107,7 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         try {
             elementStack.add(new SchemaElement(localName, uri));
-            String tempLocalName = getNamespaceAddedFieldName(uri, localName).replace(":", "_");
+            String tempLocalName = getNamespaceAddedFieldName(uri, localName).replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
             if (!getDmEventStack().isEmpty()) {
                 DMReaderEvent stackElement = getDmEventStack().peek();
                 if (ReaderEventTypes.EventType.ARRAY_START.equals(stackElement.getEventType()) &&
@@ -124,8 +124,11 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 sendAnonymousObjectStartEvent(schemaTitle);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
+                        elementStack.add(new SchemaElement(attributes.getQName(attributeCount),attributes.getURI(attributeCount)));
+                        String attributeType = getInputSchema().getElementTypeByName(elementStack);
+                        elementStack.remove(elementStack.size()-1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount), attributes.getURI(attributeCount));
-                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount),null);
+                        sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
             } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
@@ -142,18 +145,24 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 sendAnonymousObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
+                        elementStack.add(new SchemaElement(attributes.getQName(attributeCount),attributes.getURI(attributeCount)));
+                        String attributeType = getInputSchema().getElementTypeByName(elementStack);
+                        elementStack.remove(elementStack.size()-1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
                                 attributes.getURI(attributeCount));
-                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount),null);
+                        sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
             } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
                 sendObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
+                        elementStack.add(new SchemaElement(attributes.getQName(attributeCount),attributes.getURI(attributeCount)));
+                        String attributeType = getInputSchema().getElementTypeByName(elementStack);
+                        elementStack.remove(elementStack.size()-1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
                                 attributes.getURI(attributeCount));
-                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount),null);
+                        sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
             } else if ((STRING_ELEMENT_TYPE.equals(elementType) || BOOLEAN_ELEMENT_TYPE.equals(elementType) ||
@@ -162,9 +171,12 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
                 sendObjectStartEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains("xmlns")) {
+                        elementStack.add(new SchemaElement(attributes.getQName(attributeCount),attributes.getURI(attributeCount)));
+                        String attributeType = getInputSchema().getElementTypeByName(elementStack);
+                        elementStack.remove(elementStack.size()-1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount)
-                                ,attributes.getURI(attributeCount));
-                        sendFieldEvent(attributeFieldName,attributes.getValue(attributeCount),null);
+                                , attributes.getURI(attributeCount));
+                        sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
                 sendObjectEndEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
@@ -177,11 +189,11 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
     }
 
     private String getAttributeFieldName(String qName, String uri) {
-        String[] qNameOriginalArray=qName.split(":");
-        qName=getNamespaceAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length-1]);
-        String[] qNameArray = qName.split(":");
+        String[] qNameOriginalArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
+        qName = getNamespaceAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length - 1]);
+        String[] qNameArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
         if (qNameArray.length > 1) {
-            return qNameArray[0] + ":" + SCHEMA_ATTRIBUTE_FIELD_PREFIX + qNameArray[qNameArray.length - 1];
+            return qNameArray[0] + SCHEMA_NAMESPACE_NAME_SEPARATOR + SCHEMA_ATTRIBUTE_FIELD_PREFIX + qNameArray[qNameArray.length - 1];
         } else {
             return SCHEMA_ATTRIBUTE_FIELD_PREFIX + qName;
         }
@@ -190,7 +202,7 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
     private String getNamespaceAddedFieldName(String uri, String localName) {
         String prefix = getInputSchema().getPrefixForNamespace(uri);
         if (StringUtils.isNotEmpty(prefix)) {
-            return prefix + ":" + localName;
+            return prefix + SCHEMA_NAMESPACE_NAME_SEPARATOR + localName;
         } else {
             return localName;
         }
@@ -204,13 +216,13 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
             if (localName.equals(getInputSchema().getName())) {
                 sendObjectEndEvent(localName);
             } else if (STRING_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue,STRING_ELEMENT_TYPE);
+                sendFieldEvent(localName, tempFieldValue, STRING_ELEMENT_TYPE);
             } else if (NUMBER_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue,NUMBER_ELEMENT_TYPE);
+                sendFieldEvent(localName, tempFieldValue, NUMBER_ELEMENT_TYPE);
             } else if (BOOLEAN_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue,BOOLEAN_ELEMENT_TYPE);
+                sendFieldEvent(localName, tempFieldValue, BOOLEAN_ELEMENT_TYPE);
             } else if (INTEGER_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue,INTEGER_ELEMENT_TYPE);
+                sendFieldEvent(localName, tempFieldValue, INTEGER_ELEMENT_TYPE);
             } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
                 sendObjectEndEvent(localName);
             } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
@@ -249,21 +261,21 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
         return inputSchema;
     }
 
-    private void sendFieldEvent(String fieldName, String valueString,String fieldType) throws IOException, JSException {
-        switch (fieldType){
-            case "string":
+    private void sendFieldEvent(String fieldName, String valueString, String fieldType) throws IOException, JSException {
+        switch (fieldType) {
+            case STRING_ELEMENT_TYPE:
                 getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
                         getModifiedFieldName(fieldName), valueString, fieldType));
                 break;
-            case "boolean":
+            case BOOLEAN_ELEMENT_TYPE:
                 getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
                         getModifiedFieldName(fieldName), Boolean.parseBoolean(valueString), fieldType));
                 break;
-            case "number":
+            case NUMBER_ELEMENT_TYPE:
                 getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
                         getModifiedFieldName(fieldName), Double.parseDouble((String) valueString), fieldType));
                 break;
-            case "integer":
+            case INTEGER_ELEMENT_TYPE:
                 getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
                         getModifiedFieldName(fieldName), Integer.parseInt((String) valueString), fieldType));
                 break;
@@ -340,7 +352,7 @@ public class XMLReader extends DefaultHandler implements org.wso2.datamapper.eng
     }
 
     private String getModifiedFieldName(String fieldName) {
-        return fieldName.replace(":", "_");
+        return fieldName.replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
     }
 
 }
