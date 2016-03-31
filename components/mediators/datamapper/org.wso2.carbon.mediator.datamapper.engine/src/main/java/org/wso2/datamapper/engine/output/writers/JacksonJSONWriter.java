@@ -21,14 +21,16 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
+import org.wso2.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.datamapper.engine.output.Writable;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.*;
 
 /**
  * This class implements {@link Writable} interface and json writer for data mapper engine using Jackson
@@ -39,11 +41,14 @@ public class JacksonJSONWriter implements Writable {
     private Schema outputSchema;
     private JsonGenerator jsonGenerator;
     private StringWriter writer;
+    private List<SchemaElement> elementStack;
 
     public JacksonJSONWriter(Schema outputSchema) {
         this.outputSchema = outputSchema;
         JsonFactory jsonFactory = new JsonFactory();
         writer = new StringWriter();
+        elementStack = new ArrayList<>();
+        elementStack.add(new SchemaElement(outputSchema.getName()));
         try {
             jsonGenerator = jsonFactory.createGenerator(writer);
             jsonGenerator.writeStartObject();
@@ -59,7 +64,13 @@ public class JacksonJSONWriter implements Writable {
             if (name.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
                 schemaName = name.substring(0, name.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
             }
-            String type = outputSchema.getElementTypeByName(schemaName);
+            elementStack.add(new SchemaElement(schemaName));
+            String type = null;
+            try {
+                type = outputSchema.getElementTypeByName(elementStack);
+            } catch (InvalidPayloadException e) {
+                e.printStackTrace();
+            }
             if (OBJECT_ELEMENT_TYPE.equals(type)) {
                 jsonGenerator.writeObjectFieldStart(name);
             } else if(STRING_ELEMENT_TYPE.equals(type)){
@@ -94,6 +105,7 @@ public class JacksonJSONWriter implements Writable {
     public void writeEndObject() {
         try {
             jsonGenerator.writeEndObject();
+            elementStack.remove(elementStack.size()-1);
         } catch (IOException e) {
             log.error("Error while creating ending object" + e);
         }
@@ -131,6 +143,7 @@ public class JacksonJSONWriter implements Writable {
     public void writeStartAnonymousObject() {
         try {
             jsonGenerator.writeStartObject();
+            elementStack.remove(elementStack.size()-1);
         } catch (IOException e) {
             log.error("Error while creating anonymous object " + e);
         }

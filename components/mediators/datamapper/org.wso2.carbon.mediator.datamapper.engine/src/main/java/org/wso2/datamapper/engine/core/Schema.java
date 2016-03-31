@@ -19,7 +19,6 @@ package org.wso2.datamapper.engine.core;
 import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
 import org.wso2.datamapper.engine.core.schemas.SchemaElement;
 
-import javax.xml.namespace.QName;
 import java.util.List;
 import java.util.Map;
 
@@ -36,14 +35,14 @@ public interface Schema {
     String getName();
 
     /**
-     * Method to get the element type specified in the schema by giving the element name
+     * Method to get the element type specified in the schema by giving the element hierarchy
      *
-     * @param elementName
+     * @param elementStack
      * @return type of the element
      */
-    String getElementTypeByName(String elementName);
+     String getElementTypeByName(List<SchemaElement> elementStack) throws InvalidPayloadException;
 
-    String getElementTypeByName(List<SchemaElement> elementStack) throws InvalidPayloadException;
+    String getElementTypeByName(String elementStack) throws InvalidPayloadException;
 
     /**
      * Method for check whether schema has a child element inside given element
