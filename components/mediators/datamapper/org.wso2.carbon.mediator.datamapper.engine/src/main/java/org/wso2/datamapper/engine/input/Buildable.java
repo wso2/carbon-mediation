@@ -222,6 +222,8 @@ public interface Buildable {
      * Method called to close builder, so that no more content
      * can be written.
      */
-    String close() throws IOException;
+    void close() throws IOException;
+
+    String getContent() throws IOException;
 
 }

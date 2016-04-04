@@ -27,10 +27,11 @@ import java.io.IOException;
 public class BuilderFactory {
 
     public static Buildable getBuilder(DMModelTypes.ModelType inputType) throws IOException {
-        switch (inputType){
-            case JSON_STRING: return new JacksonJSONBuilder();
+        switch (inputType) {
+            case JSON_STRING:
+                return new JacksonJSONBuilder();
         }
-        throw new IllegalArgumentException("Model builder for type "+inputType+" is not implemented.");
+        throw new IllegalArgumentException("Model builder for type " + inputType + " is not implemented.");
     }
 
 }

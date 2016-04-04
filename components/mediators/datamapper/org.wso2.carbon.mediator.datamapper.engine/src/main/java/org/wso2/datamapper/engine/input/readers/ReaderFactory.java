@@ -20,15 +20,17 @@ import org.wso2.datamapper.engine.input.Readable;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
 /**
- *  This class is a factory class to get {@link Readable} needed by the data mapper engine
+ * This class is a factory class to get {@link Readable} needed by the data mapper engine
  */
 public class ReaderFactory {
 
-    public static Readable getReader(InputOutputDataTypes.DataType inputType){
-        switch (inputType){
-            case XML: return new XMLReader();
-            case JSON: return new JSONSimpleJSONReader();
+    public static Readable getReader(InputOutputDataTypes.DataType inputType) {
+        switch (inputType) {
+            case XML:
+                return new XMLReader();
+            case JSON:
+                return new JSONSimpleJSONReader();
         }
-        throw new IllegalArgumentException("Input Reader for type "+inputType+" is not implemented.");
+        throw new IllegalArgumentException("Input Reader for type " + inputType + " is not implemented.");
     }
 }

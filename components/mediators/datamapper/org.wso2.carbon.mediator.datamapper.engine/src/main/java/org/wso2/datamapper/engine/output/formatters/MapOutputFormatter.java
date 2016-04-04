@@ -18,12 +18,17 @@ package org.wso2.datamapper.engine.output.formatters;
 
 import org.wso2.datamapper.engine.core.Model;
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
 import org.wso2.datamapper.engine.output.Formattable;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.datamapper.engine.types.ReaderEventTypes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_FIRST_NAME;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
@@ -38,11 +43,11 @@ public class MapOutputFormatter implements Formattable {
     private OutputMessageBuilder outputMessageBuilder;
 
     @Override
-    public void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema) {
+    public void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema) throws SchemaException, WriterException {
         if (model.getModel() instanceof Map) {
             this.outputMessageBuilder = outputMessageBuilder;
             Map<String, Object> mapOutputModel = (Map<String, Object>) model.getModel();
-            traversMap(mapOutputModel);
+            traverseMap(mapOutputModel);
             sendTerminateEvent();
         } else {
             throw new IllegalArgumentException("Illegal model passed to MapOutputFormatter : " + model.getModel());
@@ -55,7 +60,7 @@ public class MapOutputFormatter implements Formattable {
      *
      * @param outputMap
      */
-    private void traversMap(Map<String, Object> outputMap) {
+    private void traverseMap(Map<String, Object> outputMap) throws SchemaException, WriterException {
         Set<String> mapKeys = outputMap.keySet();
         LinkedList<String> orderedKeyList = new LinkedList<>();
         boolean arrayType = false;
@@ -101,13 +106,13 @@ public class MapOutputFormatter implements Formattable {
                     if (mapKeyIndex != 0) {
                         sendAnonymousObjectStartEvent();
                     }
-                    traversMap((Map<String, Object>) value);
+                    traverseMap((Map<String, Object>) value);
                     if (mapKeyIndex != mapKeys.size() - 1) {
                         sendObjectEndEvent();
                     }
                 } else {
                     sendObjectStartEvent(key);
-                    traversMap((Map<String, Object>) value);
+                    traverseMap((Map<String, Object>) value);
                     if (!key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
                         sendObjectEndEvent();
                     }
@@ -122,14 +127,12 @@ public class MapOutputFormatter implements Formattable {
         }
     }
 
-    private void sendAnonymousObjectStartEvent() {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START,
-                null, null));
+    private void sendAnonymousObjectStartEvent() throws SchemaException, WriterException {
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START, null, null));
     }
 
-    private void sendArrayEndEvent() {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_END,
-                null, null));
+    private void sendArrayEndEvent() throws SchemaException, WriterException {
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_END, null, null));
     }
 
     private boolean isMapContainArray(Set<String> mapKeys) {
@@ -143,29 +146,24 @@ public class MapOutputFormatter implements Formattable {
         return false;
     }
 
-    private void sendArrayStartEvent() {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_START,
-                null, null));
+    private void sendArrayStartEvent() throws SchemaException, WriterException {
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_START, null, null));
     }
 
-    private void sendObjectStartEvent(String elementName) {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START,
-                elementName, null));
+    private void sendObjectStartEvent(String elementName) throws SchemaException, WriterException {
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START, elementName, null));
     }
 
-    private void sendObjectEndEvent() {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END,
-                null, null));
+    private void sendObjectEndEvent() throws SchemaException, WriterException {
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END, null, null));
     }
 
-    private void sendFieldEvent(String fieldName, Object value) {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
-                fieldName, value));
+    private void sendFieldEvent(String fieldName, Object value) throws SchemaException, WriterException {
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD, fieldName, value));
     }
 
-    private void sendTerminateEvent() {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.TERMINATE,
-                null, null));
+    private void sendTerminateEvent() throws SchemaException, WriterException {
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.TERMINATE, null, null));
     }
 
 

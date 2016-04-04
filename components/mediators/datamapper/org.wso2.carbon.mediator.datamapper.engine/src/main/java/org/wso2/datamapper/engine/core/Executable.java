@@ -17,6 +17,7 @@
 package org.wso2.datamapper.engine.core;
 
 import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 
 /**
  * This interface should be implemented by script executors of Data Mapper Engine
@@ -27,10 +28,10 @@ public interface Executable {
      * Method to execute the mapping config in the {@link MappingResourceLoader} on
      * input generic record and returns the output generic record
      *
-     * @param resourceModel
-     * @param inputRecord
-     * @return
+     * @param resourceModel mapping resource model
+     * @param inputRecord   input record
+     * @return model model
      * @throws JSException
      */
-    Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException;
+    public Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException, SchemaException;
 }

@@ -20,27 +20,23 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.wso2.datamapper.engine.input.Buildable;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringWriter;
 
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 
 /**
  * This class implements {@link Buildable} interface and JSON builder for data mapper engine using jackson
  */
 public class JacksonJSONBuilder implements Buildable {
 
-    private OutputStream jsonStream;
     private JsonGenerator jsonGenerator;
     private StringWriter writer;
 
     public JacksonJSONBuilder() throws IOException {
-        jsonStream = new ByteArrayOutputStream();
         JsonFactory jsonFactory = new JsonFactory();
         writer = new StringWriter();
         jsonGenerator = jsonFactory.createGenerator(writer);
@@ -159,8 +155,11 @@ public class JacksonJSONBuilder implements Buildable {
     }
 
     @Override
-    public String close() throws IOException {
+    public void close() throws IOException {
         jsonGenerator.close();
+    }
+
+    public String getContent() throws IOException {
         String inputJSVariable = writer.toString();
         writer.close();
         return inputJSVariable;

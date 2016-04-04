@@ -18,7 +18,6 @@ package org.wso2.datamapper.engine.core.executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.wso2.datamapper.engine.core.Executable;
 import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
 
@@ -42,14 +41,14 @@ public class ScriptExecutorFactory {
      *
      * @return script executor
      */
-    public static Executable getScriptExecutor() throws InterruptedException {
+    public static Executable getScriptExecutor(String executorPoolSize) throws InterruptedException {
         if (executorPool == null) {
-            initializeExecutorPool();
+            initializeExecutorPool(executorPoolSize);
         }
         return executorPool.take();
     }
 
-    private synchronized static void initializeExecutorPool() {
+    private synchronized static void initializeExecutorPool(String executorPoolSizeStr) {
         if (executorPool == null) {
             String javaVersion = System.getProperty("java.version");
             if (javaVersion.startsWith("1.7") || javaVersion.startsWith("1.6")) {
@@ -59,7 +58,6 @@ public class ScriptExecutorFactory {
                 log.debug("Script Engine set to Nashorn");
             }
 
-            String executorPoolSizeStr = SynapsePropertiesLoader.getPropertyValue(DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
             int executorPoolSize = DataMapperEngineConstants.DEFAULT_DATAMAPPER_ENGINE_POOL_SIZE;
             if (executorPoolSizeStr != null) {
                 executorPoolSize = Integer.parseInt(executorPoolSizeStr);

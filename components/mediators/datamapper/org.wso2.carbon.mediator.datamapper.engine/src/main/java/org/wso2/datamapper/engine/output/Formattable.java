@@ -18,11 +18,13 @@ package org.wso2.datamapper.engine.output;
 
 import org.wso2.datamapper.engine.core.Model;
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.exceptions.WriterException;
 
 /**
  * This interface should be implemented to convert data mapper generic models to
  */
 public interface Formattable {
 
-    void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema);
+    void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema) throws SchemaException, WriterException;
 }

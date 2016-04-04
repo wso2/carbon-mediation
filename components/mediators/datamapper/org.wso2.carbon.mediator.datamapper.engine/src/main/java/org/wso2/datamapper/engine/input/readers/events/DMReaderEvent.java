@@ -18,9 +18,6 @@ package org.wso2.datamapper.engine.input.readers.events;
 
 import org.wso2.datamapper.engine.types.ReaderEventTypes;
 
-/**
- *
- */
 public class DMReaderEvent {
 
     private ReaderEventTypes.EventType eventType;
@@ -28,7 +25,7 @@ public class DMReaderEvent {
     private Object value;
     private String fieldType;
 
-    public DMReaderEvent(ReaderEventTypes.EventType eventType, String name, Object value,String fieldType) {
+    public DMReaderEvent(ReaderEventTypes.EventType eventType, String name, Object value, String fieldType) {
         this.eventType = eventType;
         this.name = name;
         this.value = value;
@@ -71,7 +68,7 @@ public class DMReaderEvent {
         this.value = value;
     }
 
-    public ReaderEventTypes.EventType getEventType(){
+    public ReaderEventTypes.EventType getEventType() {
         return eventType;
     }
 

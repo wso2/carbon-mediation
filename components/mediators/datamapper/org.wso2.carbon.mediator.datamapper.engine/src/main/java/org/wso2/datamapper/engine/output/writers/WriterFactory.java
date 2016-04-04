@@ -17,15 +17,16 @@
 package org.wso2.datamapper.engine.output.writers;
 
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.output.Writable;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
 
 /**
- *  This class is a factory class to get {@link Writable} needed by the data mapper engine
+ * This class is a factory class to get {@link Writable} needed by the data mapper engine
  */
 public class WriterFactory {
 
-    public static Writable getWriter(InputOutputDataTypes.DataType outputType,Schema outputSchema) {
+    public static Writable getWriter(InputOutputDataTypes.DataType outputType, Schema outputSchema) throws SchemaException {
         switch (outputType) {
             case XML:
                 return new XMLWriter(outputSchema);

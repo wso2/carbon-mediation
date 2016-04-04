@@ -24,10 +24,11 @@ import org.wso2.datamapper.engine.types.DMModelTypes;
  */
 public class FormatterFactory {
 
-    public static Formattable getFormatter(DMModelTypes.ModelType formatterType){
-        switch (formatterType){
-            case JAVA_MAP:return new MapOutputFormatter();
+    public static Formattable getFormatter(DMModelTypes.ModelType formatterType) {
+        switch (formatterType) {
+            case JAVA_MAP:
+                return new MapOutputFormatter();
         }
-        throw new IllegalArgumentException("Model fomatter for type "+formatterType+" is not implemented.");
+        throw new IllegalArgumentException("Model fomatter for type " + formatterType + " is not implemented.");
     }
 }

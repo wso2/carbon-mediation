@@ -22,7 +22,7 @@ package org.wso2.datamapper.engine.utils;
 public class DataMapperEngineConstants {
 
     public static final String SCHEMA_ATTRIBUTE_FIELD_PREFIX = "attr_";
-    public static final String SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX ="ATTR";
+    public static final String SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX = "ATTR";
     public static final String OBJECT_ELEMENT_TYPE = "object";
     public static final String ARRAY_ELEMENT_TYPE = "array";
     public static final String STRING_ELEMENT_TYPE = "string";
@@ -32,7 +32,7 @@ public class DataMapperEngineConstants {
     public static final String NULL_ELEMENT_TYPE = "null";
     public static final String ARRAY_ELEMENT_FIRST_NAME = "0";
     public static final String NASHORN_ENGINE_NAME = "nashorn";
-    public static final String DEFAULT_ENGINE_NAME = "js";
+    public static final String DEFAULT_ENGINE_NAME = "js"; //rhino
     public static final int DEFAULT_DATAMAPPER_ENGINE_POOL_SIZE = 20;
     public static final String ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE = "org.apache.synapse.datamapper.executor.pool.size";
     public static final String SCHEMA_NAMESPACE_NAME_SEPARATOR = ":";

@@ -27,21 +27,21 @@ import org.wso2.carbon.mediator.datamapper.DataMapperMediator;
 
 import javax.xml.namespace.QName;
 import java.util.Properties;
-import java.util.UUID;
 
 /**
- * Configuration syntax: <datamapper config="gov:datamapper/mappingConfig.dmc"
- * inputSchema="gov:datamapper/inputSchema.avsc"
- * outputSchema="gov:datamapper/outputSchema.avsc" inputType="application/xml"
- * outputType="application/xml" />
+ * Configuration syntax:
+ * <datamapper config="gov:datamapper/mappingConfig.js"
+ * inputSchema="gov:datamapper/inputSchema.jsschema"
+ * outputSchema="gov:datamapper/outputSchema.jsschema"
+ * inputType="XML"
+ * outputType="XML" />
  */
 
 public class DataMapperMediatorFactory extends AbstractMediatorFactory {
     /**
      * Holds the QName for the DataMapperMediator xml configuration
      */
-    private static final QName TAG_QNAME = new QName(
-            XMLConfigConstants.SYNAPSE_NAMESPACE,
+    private static final QName TAG_QNAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
             DataMapperMediatorConstants.DATAMAPPER);
 
     /**
@@ -126,7 +126,7 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
         } else {
             handleException("The output DataType is required for the DataMapper mediator");
         }
-        
+
         processAuditStatus(datamapperMediator, element);
 
         return datamapperMediator;

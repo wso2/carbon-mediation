@@ -53,7 +53,7 @@ public class DMModelEvent {
         this.value = value;
     }
 
-    public ReaderEventTypes.EventType getEventType(){
+    public ReaderEventTypes.EventType getEventType() {
         return eventType;
     }
 

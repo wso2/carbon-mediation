@@ -17,6 +17,7 @@
 package org.wso2.datamapper.engine.input;
 
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.exceptions.ReaderException;
 
 import java.io.InputStream;
 
@@ -26,9 +27,8 @@ import java.io.InputStream;
 public interface Readable {
 
     /**
-     *
      * @param input
      * @return
      */
-    void read(InputStream input,InputModelBuilder inputModelBuilder,Schema inputSchema);
+    void read(InputStream input, InputModelBuilder inputModelBuilder, Schema inputSchema) throws ReaderException;
 }

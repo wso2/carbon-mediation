@@ -31,6 +31,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.commons.json.JsonUtil;
+import org.apache.synapse.config.SynapsePropertiesLoader;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
@@ -39,13 +40,18 @@ import org.apache.synapse.util.AXIOMUtils;
 import org.wso2.datamapper.engine.core.Executable;
 import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
+import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.exceptions.ReaderException;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorFactory;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.datamapper.engine.types.DMModelTypes;
 import org.wso2.datamapper.engine.types.InputOutputDataTypes;
+import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +70,6 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private Value outputSchemaKey = null;
     private String inputType = null;
     private String outputType = null;
-    private static MappingResourceLoader mappingResourceLoader = null;
     private static final Log log = LogFactory.getLog(DataMapperMediator.class);
 
     /**
@@ -209,9 +214,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             try {
                 // Does message conversion and gives the final result
                 transform(synCtx, configKey, inSchemaKey, outSchemaKey, getInputType(), getOutputType());
-
             } catch (SynapseException e) {
-                handleException("DataMapper mediator mediation failed", e, synCtx);
+                handleException("DataMapper mediator : mediation failed", e, synCtx);
             }
         }
 
@@ -233,17 +237,13 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @param outSchemaKey registry location of the output schema
      * @param inputType    input data type
      * @param outputType   output data type
-     * @throws SynapseException
-     * @throws IOException
      */
     private void transform(MessageContext synCtx, String configkey,
                            String inSchemaKey, String outSchemaKey, String inputType,
                            String outputType) {
-        //MappingResourceLoader mappingResourceLoader = null;
-        OMElement outputMessage = null;
         try {
             // mapping resources needed to get the final output
-            mappingResourceLoader = getMappingResourceLoader(synCtx, configkey, inSchemaKey, outSchemaKey);
+            MappingResourceLoader mappingResourceLoader = getMappingResourceLoader(synCtx, configkey, inSchemaKey, outSchemaKey);
 
             // create input model builder to convert input payload to generic data holder
             InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(inputType),
@@ -253,70 +253,56 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             OutputMessageBuilder outputMessageBuilder = new OutputMessageBuilder(getDataType(outputType),
                     DMModelTypes.ModelType.JAVA_MAP, mappingResourceLoader.getOutputSchema());
 
-            Executable executor = ScriptExecutorFactory.getScriptExecutor();
+            String dmExecutorPoolSize = SynapsePropertiesLoader.getPropertyValue(
+                    DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
 
-            String outputVariable=mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader,
+            Executable executor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
+
+            String outputVariable = mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader,
                     inputModelBuilder, outputMessageBuilder, executor);
 
             ScriptExecutorFactory.releaseScriptExecutor(executor);
 
-            if(InputOutputDataTypes.DataType.XML.toString().equals(outputType)){
-                outputMessage = AXIOMUtil.stringToOM(outputVariable);
+            if (InputOutputDataTypes.DataType.XML.toString().equals(outputType)) {
+                OMElement outputMessage = AXIOMUtil.stringToOM(outputVariable);
                 if (outputMessage != null) {
                     if (log.isDebugEnabled()) {
                         log.debug("Output message received ");
                     }
                     // Use to create the SOAP message
-                    if (outputMessage != null) {
-                        OMElement firstChild = outputMessage;
-                        if (firstChild != null) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Contains a first child");
-                            }
-                            QName resultQName = firstChild.getQName();
-                            // TODO use XPath
-                            if (resultQName.getLocalPart().equals("Envelope")
-                                    && (resultQName
-                                    .getNamespaceURI()
-                                    .equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI) || resultQName
-                                    .getNamespaceURI()
-                                    .equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))) {
-                                SOAPEnvelope soapEnvelope = AXIOMUtils
-                                        .getSOAPEnvFromOM(outputMessage);
-                                if (soapEnvelope != null) {
-                                    try {
-                                        if (log.isDebugEnabled()) {
-                                            log.debug("Valid Envelope");
-                                        }
-                                        synCtx.setEnvelope(soapEnvelope);
-                                    } catch (AxisFault axisFault) {
-                                        handleException("Invalid Envelope",
-                                                axisFault, synCtx);
-                                    }
+                    QName resultQName = outputMessage.getQName();
+                    if (resultQName.getLocalPart().equals("Envelope")
+                            && (resultQName.getNamespaceURI().equals(SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI)
+                            || resultQName.getNamespaceURI().equals(SOAP12Constants.SOAP_ENVELOPE_NAMESPACE_URI))) {
+                        SOAPEnvelope soapEnvelope = AXIOMUtils.getSOAPEnvFromOM(outputMessage);
+                        if (soapEnvelope != null) {
+                            try {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Valid Envelope");
                                 }
-                            } else {
-                                synCtx.getEnvelope().getBody().getFirstElement()
-                                        .detach();
-                                synCtx.getEnvelope().getBody()
-                                        .addChild(outputMessage);
-
+                                synCtx.setEnvelope(soapEnvelope);
+                            } catch (AxisFault axisFault) {
+                                handleException("Invalid Envelope", axisFault, synCtx);
                             }
-                        } else {
-                            synCtx.getEnvelope().getBody().getFirstElement()
-                                    .detach();
-                            synCtx.getEnvelope().getBody().addChild(outputMessage);
                         }
                     }
+                    else {
+                        synCtx.getEnvelope().getBody().getFirstElement().detach();
+                        synCtx.getEnvelope().getBody().addChild(outputMessage);
+                    }
+                } else {
+                    synCtx.getEnvelope().getBody().getFirstElement().detach();
+                    synCtx.getEnvelope().getBody().addChild(outputMessage);
                 }
 
-            }else if(InputOutputDataTypes.DataType.JSON.toString().equals(outputType)){
-                org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+            } else if (InputOutputDataTypes.DataType.JSON.toString().equals(outputType)) {
+                org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) synCtx)
+                        .getAxis2MessageContext();
                 JsonUtil.newJsonPayload(axis2MessageContext, outputVariable, true, true);
             }
-        } catch (Exception e) {
-            handleException("Mapping failed", e, synCtx);
+        } catch (ReaderException | InterruptedException | JSException | XMLStreamException | SchemaException | IOException e) {
+            handleException("DataMapper mediator : mapping failed", e, synCtx);
         }
-
     }
 
     private static InputOutputDataTypes.DataType getDataType(String inputType) {
@@ -373,23 +359,39 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     /**
      * When Data mapper mediator has been invoked initially, this creates a new mapping resource loader
      *
-     * @param context      message context
+     * @param synCtx       message context
      * @param configkey    the location of the mapping configuration
      * @param inSchemaKey  the location of the input schema
      * @param outSchemaKey the location of the output schema
      * @return the MappingResourceLoader object
      * @throws IOException
      */
-    private static MappingResourceLoader getMappingResourceLoader(
-            MessageContext context, String configkey, String inSchemaKey, String outSchemaKey) throws IOException {
+    private MappingResourceLoader getMappingResourceLoader(
+            MessageContext synCtx, String configkey, String inSchemaKey, String outSchemaKey) throws IOException {
 
-        InputStream configFileInputStream = getRegistryResource(context, configkey);
-        InputStream inputSchemaStream = getRegistryResource(context, inSchemaKey);
-        InputStream outputSchemaStream = getRegistryResource(context, outSchemaKey);
+        InputStream configFileInputStream = getRegistryResource(synCtx, configkey);
+        InputStream inputSchemaStream = getRegistryResource(synCtx, inSchemaKey);
+        InputStream outputSchemaStream = getRegistryResource(synCtx, outSchemaKey);
+
+        if (configFileInputStream == null) {
+            handleException("DataMapper mediator : mapping configuration is null", synCtx);
+        }
+
+        if (inputSchemaStream == null) {
+            handleException("DataMapper mediator : input schema is null", synCtx);
+        }
+
+        if (outputSchemaStream == null) {
+            handleException("DataMapper mediator : output schema is null", synCtx);
+        }
 
         // Creates a new mappingResourceLoader
-        mappingResourceLoader = new MappingResourceLoader(inputSchemaStream,
-                outputSchemaStream, configFileInputStream);
+        MappingResourceLoader mappingResourceLoader = null;
+        try {
+            mappingResourceLoader = new MappingResourceLoader(inputSchemaStream, outputSchemaStream, configFileInputStream);
+        } catch (SchemaException | JSException e) {
+            throw new SynapseException(e.getMessage());
+        }
         return mappingResourceLoader;
     }
 

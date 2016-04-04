@@ -16,10 +16,14 @@
  */
 package org.wso2.datamapper.engine.core.callbacks;
 
+import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.exceptions.ReaderException;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+
 /**
  *
  */
 public interface InputVariableCallback {
 
-    void notifyInputVariable(Object variable);
+    void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException;
 }

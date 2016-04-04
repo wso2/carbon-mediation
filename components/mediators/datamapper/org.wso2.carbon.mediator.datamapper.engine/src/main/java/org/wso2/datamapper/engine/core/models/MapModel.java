@@ -22,11 +22,10 @@ import java.util.Map;
 
 /**
  * This class implements {@link Model} interface with a {@link Map} to hold data
- *
  */
-public class MapModel implements Model<Map<String,Object>> {
+public class MapModel implements Model<Map<String, Object>> {
 
-    private Map<String,Object> mapDataHolder;
+    private Map<String, Object> mapDataHolder;
 
     public MapModel(Map<String, Object> model) {
         mapDataHolder = model;
@@ -34,7 +33,7 @@ public class MapModel implements Model<Map<String,Object>> {
 
     @Override
     public void setModel(Map<String, Object> model) {
-        mapDataHolder=model;
+        mapDataHolder = model;
     }
 
     @Override

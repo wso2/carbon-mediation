@@ -16,6 +16,8 @@
  */
 package org.wso2.datamapper.engine.core;
 
+import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.schemas.JacksonJSONSchema;
 
 import java.io.BufferedReader;
@@ -29,31 +31,31 @@ public class MappingResourceLoader {
 
     private Schema inputSchema;
     private Schema outputSchema;
-    private InputStream mappingConfig;
     private String inputRootelement;
     private String outputRootelement;
     private JSFunction function;
 
     /**
-     * @param inputSchema           - Respective output json schema as a a stream of bytes
-     * @param outPutSchema          -Respective output json schema as a a stream of bytes
-     * @param mappingConfig-Mapping configuration file as a stream of bytes
-     * @throws IOException - when input errors, If there any parser exception occur while passing above schemas method
+     * @param inputSchema   respective output json schema as a a stream of bytes
+     * @param outputSchema  respective output json schema as a a stream of bytes
+     * @param mappingConfig mapping configuration file as a stream of bytes
+     * @throws IOException when input errors, If there any parser exception occur while passing above schemas method
      *                     will this exception
      */
-    public MappingResourceLoader(InputStream inputSchema, InputStream outPutSchema,
-                                 InputStream mappingConfig) throws IOException {
-
+    public MappingResourceLoader(InputStream inputSchema, InputStream outputSchema,
+                                 InputStream mappingConfig) throws IOException, SchemaException, JSException {
         this.inputSchema = getJSONSchema(inputSchema);
-        this.outputSchema = getJSONSchema(outPutSchema);
+        this.outputSchema = getJSONSchema(outputSchema);
         this.inputRootelement = this.inputSchema.getName();
-        this.outputRootelement = outputSchema.getName();
-        this.mappingConfig = mappingConfig;
+        this.outputRootelement = this.outputSchema.getName();
         this.function = createFunction(mappingConfig);
 
+        if (this.function == null) {
+            throw new JSException("Mapping js function is null");
+        }
     }
 
-    private Schema getJSONSchema(InputStream inputSchema) throws IOException {
+    private Schema getJSONSchema(InputStream inputSchema) throws IOException, SchemaException {
         return new JacksonJSONSchema(inputSchema);
     }
 
@@ -65,19 +67,7 @@ public class MappingResourceLoader {
         return outputSchema;
     }
 
-    public InputStream getMappingConfig() {
-        return mappingConfig;
-    }
-
-    public String getInputRootelement() {
-        return inputRootelement;
-    }
-
-    public String getOutputRootelement() {
-        return outputRootelement;
-    }
-
-     public JSFunction getFunction() {
+    public JSFunction getFunction() {
         return function;
     }
 
@@ -86,8 +76,8 @@ public class MappingResourceLoader {
      * Since this function going to execute every time when message hit the mapping backend
      * so this function save in the resource model
      *
-     * @param mappingConfig
-     * @return
+     * @param mappingConfig mapping configuration
+     * @return java script function
      * @throws IOException
      */
     private JSFunction createFunction(InputStream mappingConfig) throws IOException {
@@ -98,8 +88,8 @@ public class MappingResourceLoader {
         String inputRootElement = inputRootelementArray[inputRootelementArray.length - 1];
         String[] outputRootelementArray = outputRootelement.split(":");
         String outputRootElement = outputRootelementArray[outputRootelementArray.length - 1];
-        Pattern functionIdPattern = Pattern.compile("(function )(map_(L|S)_" + inputRootElement
-                + "_(L|S)_" + outputRootElement + ")");
+        Pattern functionIdPattern = Pattern.compile(
+                "(function )(map_(L|S)_" + inputRootElement + "_(L|S)_" + outputRootElement + ")");
         String fnName = null;
         String configLine = "";
         StringBuilder configScriptbuilder = new StringBuilder();
@@ -112,9 +102,7 @@ public class MappingResourceLoader {
         }
 
         if (fnName != null) {
-            JSFunction jsfunction = new JSFunction(fnName, configScriptbuilder.toString());
-            return jsfunction;
-
+            return new JSFunction(fnName, configScriptbuilder.toString());
         }
         return null;
     }

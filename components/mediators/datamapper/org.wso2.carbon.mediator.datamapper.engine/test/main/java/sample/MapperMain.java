@@ -67,11 +67,11 @@ public class MapperMain {
         MappingResourceLoader configModel = new MappingResourceLoader(c.getInputSchema(), c.getOutputSchema(),
                 c.getConfig());
         InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(c.getInputType()),
-                DMModelTypes.ModelType.JSON_STRING,configModel.getInputSchema());
+                DMModelTypes.ModelType.JSON_STRING, configModel.getInputSchema());
         OutputMessageBuilder outputMessageBuilder = new OutputMessageBuilder(getDataType(c.getOutputType()),
-                DMModelTypes.ModelType.JAVA_MAP,configModel.getOutputSchema());
+                DMModelTypes.ModelType.JAVA_MAP, configModel.getOutputSchema());
         MappingHandler mappingHandler = new MappingHandler();
-        String outputMessage = mappingHandler.doMap(c.getInputStream(), configModel, inputModelBuilder,outputMessageBuilder, new ScriptExecutor(ScriptExecutorType.NASHORN));
+        String outputMessage = mappingHandler.doMap(c.getInputStream(), configModel, inputModelBuilder, outputMessageBuilder, new ScriptExecutor(ScriptExecutorType.NASHORN));
 
         return outputMessage;
     }

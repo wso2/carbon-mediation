@@ -18,8 +18,9 @@ package org.wso2.datamapper.engine.output.writers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.wso2.datamapper.engine.core.Schema;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.datamapper.engine.output.Writable;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -48,7 +49,7 @@ public class XMLWriter implements Writable {
     private Map<String, String> namespaceMap;
     private static final String NAMESPACE_SEPERATOR = "_";
 
-    public XMLWriter(Schema outputSchema) {
+    public XMLWriter(Schema outputSchema) throws SchemaException {
         this.outputSchema = outputSchema;
         arrayElementStack = new Stack<>();
         stringWriter = new StringWriter();
@@ -69,7 +70,7 @@ public class XMLWriter implements Writable {
     }
 
     @Override
-    public void writeStartObject(String name) {
+    public void writeStartObject(String name) throws WriterException {
         try {
             if (name.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
                 latestElementName = name.substring(0, name.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
@@ -79,12 +80,12 @@ public class XMLWriter implements Writable {
                 latestElementName = name;
             }
         } catch (XMLStreamException e) {
-            throw new SynapseException(e.getMessage());
+            throw new WriterException(e.getMessage());
         }
     }
 
     @Override
-    public void writeField(String name, Object fieldValue) {
+    public void writeField(String name, Object fieldValue) throws WriterException {
         try {
             //with in a element attributes must come first before any of other field values
             if (fieldValue != null) {
@@ -118,41 +119,41 @@ public class XMLWriter implements Writable {
                 }
             }
         } catch (XMLStreamException e) {
-            throw new SynapseException(e.getMessage());
+            throw new WriterException(e.getMessage());
         }
     }
 
     private String getFieldValueAsString(Object fieldValue) {
-        if( fieldValue instanceof String) {
+        if (fieldValue instanceof String) {
             return (String) fieldValue;
-        } else if( fieldValue instanceof Integer){
+        } else if (fieldValue instanceof Integer) {
             return Integer.toString((Integer) fieldValue);
-        } else if( fieldValue instanceof Double){
+        } else if (fieldValue instanceof Double) {
             return Double.toString((Double) fieldValue);
-        } else if( fieldValue instanceof Boolean){
+        } else if (fieldValue instanceof Boolean) {
             return Boolean.toString((Boolean) fieldValue);
         }
-        throw new IllegalArgumentException("Unsupported value type found"+fieldValue.toString());
+        throw new IllegalArgumentException("Unsupported value type found" + fieldValue.toString());
     }
 
     @Override
-    public void writeEndObject() {
+    public void writeEndObject() throws WriterException {
         try {
             xMLStreamWriter.writeEndElement();
         } catch (XMLStreamException e) {
-            throw new SynapseException(e.getMessage());
+            throw new WriterException(e.getMessage());
         }
     }
 
     @Override
-    public String terminateMessageBuilding() {
+    public String terminateMessageBuilding() throws WriterException {
         try {
             xMLStreamWriter.writeEndElement();
             xMLStreamWriter.flush();
             xMLStreamWriter.close();
             return stringWriter.getBuffer().toString();
         } catch (XMLStreamException e) {
-            throw new SynapseException(e.getMessage());
+            throw new WriterException(e.getMessage());
         }
     }
 
@@ -167,11 +168,11 @@ public class XMLWriter implements Writable {
     }
 
     @Override
-    public void writeStartAnonymousObject() {
+    public void writeStartAnonymousObject() throws WriterException {
         try {
             writeStartElement(arrayElementStack.peek(), xMLStreamWriter);
         } catch (XMLStreamException e) {
-            throw new SynapseException(e.getMessage());
+            throw new WriterException(e.getMessage());
         }
     }
 

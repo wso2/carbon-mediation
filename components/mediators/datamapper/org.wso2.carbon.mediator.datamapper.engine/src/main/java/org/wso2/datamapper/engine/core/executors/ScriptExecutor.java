@@ -18,12 +18,12 @@ package org.wso2.datamapper.engine.core.executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.wso2.datamapper.engine.core.Executable;
 import org.wso2.datamapper.engine.core.JSFunction;
 import org.wso2.datamapper.engine.core.MappingResourceLoader;
 import org.wso2.datamapper.engine.core.Model;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.models.MapModel;
 import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
 
@@ -59,7 +59,7 @@ public class ScriptExecutor implements Executable {
     }
 
     @Override
-    public Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException {
+    public Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException, SchemaException {
         try {
             JSFunction jsFunction = resourceModel.getFunction();
             injectInputVariableToEngine(resourceModel.getInputSchema().getName(), inputRecord);
@@ -69,15 +69,14 @@ public class ScriptExecutor implements Executable {
             if (result instanceof Map) {
                 return new MapModel((Map<String, Object>) result);
             }
-
         } catch (ScriptException e) {
             log.error("Script execution failed", e);
-            throw new SynapseException("Script engine unable to execute the script " + e);
+            throw new JSException("Script engine unable to execute the script " + e);
         } catch (NoSuchMethodException e) {
             log.error("Undefined method called to execute", e);
-            throw new SynapseException("Undefined method called to execute " + e);
+            throw new JSException("Undefined method called to execute " + e);
         }
-        throw new SynapseException("Undefined method called to execute");
+        throw new JSException("Undefined method called to execute");
     }
 
     private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {

@@ -18,14 +18,17 @@ package org.wso2.datamapper.engine.input.readers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.exceptions.ReaderException;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.exceptions.SimpleJSONParserException;
 import org.wso2.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
-import org.json.simple.parser.ContentHandler;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
 import org.wso2.datamapper.engine.types.ReaderEventTypes;
 
@@ -37,7 +40,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.*;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.NULL_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 
 public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Readable, ContentHandler {
     private static final Log log = LogFactory.getLog(JSONSimpleJSONReader.class);
@@ -51,9 +60,9 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
     }
 
     @Override
-    public void read(InputStream input, InputModelBuilder inputModelBuilder, Schema inputSchema) {
+    public void read(InputStream input, InputModelBuilder inputModelBuilder, Schema inputSchema) throws ReaderException {
         dmEventStack = new Stack<>();
-        elementStack = new ArrayList();
+        elementStack = new ArrayList<>();
         modelBuilder = inputModelBuilder;
         this.inputSchema = inputSchema;
         Reader reader = new InputStreamReader(input);
@@ -61,9 +70,9 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
         try {
             parser.parse(reader, this);
         } catch (IOException e) {
-            log.error("IO Error while parsing JSON input stream.", e);
+            throw new ReaderException("IO Error while parsing JSON input stream. " + e.getMessage());
         } catch (ParseException e) {
-            log.error("Error while parsing JSON input stream.", e);
+            throw new ReaderException("Error while parsing JSON input stream. " + e.getMessage());
         }
     }
 
@@ -75,8 +84,8 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
     public void endJSON() throws ParseException, IOException {
         try {
             sendTerminateEvent();
-        } catch (IOException | JSException e) {
-            log.error("Error occurred while sending termination event", e);
+        } catch (IOException | JSException | SchemaException | ReaderException e) {
+            throw new SimpleJSONParserException("Error occurred while sending termination event. " + e.getMessage());
         }
     }
 
@@ -88,8 +97,7 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
                 String type = getInputSchema().getElementTypeByName(elementStack);
                 if (ReaderEventTypes.EventType.OBJECT_START.equals(stackElement.getEventType())) {
                     if (ARRAY_ELEMENT_TYPE.equals(type)) {
-                        log.error("Schema specifies an array of type " + type +
-                                ". But payload doesn't contain an array.");
+                        log.error("Schema specifies an array of type " + type + ". But payload doesn't contain an array.");
                         return false;
                     }
                     sendObjectStartEvent(stackElement.getName());
@@ -99,10 +107,8 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
                 elementStack.add(new SchemaElement(getInputSchema().getName()));
             }
             sendAnonymousObjectStartEvent();
-        } catch (JSException e) {
-            log.error("Error occurred while processing start object event", e);
-        } catch (InvalidPayloadException e) {
-            log.error(e.getMessage(), e);
+        } catch (JSException | InvalidPayloadException | SchemaException | ReaderException e) {
+            throw new SimpleJSONParserException("Error occurred while processing start object event. " + e.getMessage());
         }
         return true;
     }
@@ -113,10 +119,8 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
             DMReaderEvent stackElement = getDmEventStack().peek();
             try {
                 sendObjectEndEvent(stackElement.getName());
-            } catch (JSException e) {
-                log.error("Error occurred while processing end object event", e);
-            } catch (InvalidPayloadException e) {
-                log.error(e.getMessage(), e);
+            } catch (JSException | InvalidPayloadException | SchemaException | ReaderException e) {
+                throw new SimpleJSONParserException("Error occurred while processing end object event. " + e.getMessage());
             }
         }
         return true;
@@ -136,10 +140,8 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
                     NULL_ELEMENT_TYPE.equals(type)) {
                 pushObjectStartEvent(s);
             }
-        } catch (IOException | JSException e) {
-            log.error("Error occurred while processing start element event", e);
-        } catch (InvalidPayloadException e) {
-            log.error(e.getMessage(), e);
+        } catch (JSException | InvalidPayloadException | SchemaException e) {
+            throw new SimpleJSONParserException("Error occurred while processing start element event. " + e.getMessage());
         }
         return true;
     }
@@ -151,10 +153,8 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
             try {
                 popObjectEndEvent(stackElement.getName());
                 elementStack.remove(elementStack.size() - 1);
-            } catch (JSException e) {
-                log.error("Error while sending end object entry");
-            } catch (InvalidPayloadException e) {
-                log.error(e.getMessage(), e);
+            } catch (JSException | InvalidPayloadException | SchemaException e) {
+                throw new SimpleJSONParserException("Error while sending end object entry. " + e.getMessage());
             }
         }
         return true;
@@ -165,22 +165,20 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
         try {
             if (!getDmEventStack().isEmpty()) {
                 DMReaderEvent stackElement = getDmEventStack().peek();
-                String type = null;
-                type = getInputSchema().getElementTypeByName(elementStack);
+                String type = getInputSchema().getElementTypeByName(elementStack);
 
                 if (ARRAY_ELEMENT_TYPE.equals(type)) {
                     try {
                         sendArrayStartEvent(stackElement.getName());
-                    } catch (JSException e) {
-                        log.error("Error occurred while processing start array event", e);
+                    } catch (JSException | SchemaException | ReaderException e) {
+                        throw new SimpleJSONParserException("Error occurred while processing start array event. " + e.getMessage());
                     }
                 } else {
-                    log.error("Found an array in the payload but schema doesn't specify any array of type " + type);
-                    return false;
+                    throw new SimpleJSONParserException("Found an array in the payload but schema doesn't specify any array of type " + type);
                 }
             }
-        } catch (InvalidPayloadException e) {
-            log.error(e.getMessage(), e);
+        } catch (InvalidPayloadException | SchemaException e) {
+            throw new SimpleJSONParserException("Error while sending array start entry. " + e.getMessage());
         }
         return true;
     }
@@ -192,18 +190,17 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
             String type = null;
             try {
                 type = getInputSchema().getElementTypeByName(elementStack);
-            } catch (InvalidPayloadException e) {
-                log.error(e.getMessage(), e);
+            } catch (InvalidPayloadException | SchemaException e) {
+                throw new SimpleJSONParserException(e.getMessage());
             }
             if (ARRAY_ELEMENT_TYPE.equals(type)) {
                 try {
                     sendArrayEndEvent(stackElement.getName());
-                } catch (JSException e) {
-                    log.error("Error occurred while processing end array event", e);
+                } catch (JSException | SchemaException | ReaderException e) {
+                    throw new SimpleJSONParserException("Error occurred while processing end array event. " + e.getMessage());
                 }
             } else {
-                log.error("Array element not found " + type);
-                return false;
+                throw new SimpleJSONParserException("Array element not found " + type);
             }
         }
         return true;
@@ -216,8 +213,8 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
             try {
                 String fieldType = getFieldType(value);
                 sendFieldEvent(stackElement.getName(), value, fieldType);
-            } catch (JSException e) {
-                log.error("Error while sending field value ");
+            } catch (JSException | SchemaException | ReaderException e) {
+                throw new SimpleJSONParserException("Error while sending field value. " + e.getMessage());
             }
         }
         return true;
@@ -240,7 +237,7 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
         return modelBuilder;
     }
 
-    private void sendFieldEvent(String fieldName, Object value, String type) throws IOException, JSException {
+    private void sendFieldEvent(String fieldName, Object value, String type) throws IOException, JSException, SchemaException, ReaderException {
         DMReaderEvent fieldEvent = new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
                 fieldName, value, type);
         getModelBuilder().notifyEvent(fieldEvent);
@@ -252,14 +249,14 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
         dmEventStack.push(objectStartEvent);
     }
 
-    private void sendObjectStartEvent(String fieldName) throws IOException, JSException {
+    private void sendObjectStartEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
         DMReaderEvent objectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START,
                 fieldName, null);
         getModelBuilder().notifyEvent(objectStartEvent);
         dmEventStack.push(objectStartEvent);
     }
 
-    private void sendObjectEndEvent(String fieldName) throws IOException, JSException, InvalidPayloadException {
+    private void sendObjectEndEvent(String fieldName) throws IOException, JSException, InvalidPayloadException, SchemaException, ReaderException {
         DMReaderEvent objectEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END,
                 fieldName, null);
         getModelBuilder().notifyEvent(objectEndEvent);
@@ -272,22 +269,21 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
         }
     }
 
-    private void popObjectEndEvent(String fieldName) throws IOException, JSException, InvalidPayloadException {
-        DMReaderEvent objectEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END,
-                fieldName, null);
+    private void popObjectEndEvent(String fieldName) throws IOException, JSException, InvalidPayloadException, SchemaException {
+        DMReaderEvent objectEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END, fieldName, null);
         if (!ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(elementStack))) {
             dmEventStack.pop();
         }
     }
 
-    private void sendArrayStartEvent(String fieldName) throws IOException, JSException {
+    private void sendArrayStartEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
         DMReaderEvent arrayStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_START,
                 fieldName, null);
         getModelBuilder().notifyEvent(arrayStartEvent);
         dmEventStack.push(arrayStartEvent);
     }
 
-    private void sendArrayEndEvent(String fieldName) throws IOException, JSException {
+    private void sendArrayEndEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
         DMReaderEvent arrayEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_END,
                 fieldName, null);
         getModelBuilder().notifyEvent(arrayEndEvent);
@@ -298,7 +294,7 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
         return dmEventStack;
     }
 
-    private void sendTerminateEvent() throws IOException, JSException {
+    private void sendTerminateEvent() throws IOException, JSException, SchemaException, ReaderException {
         getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.TERMINATE,
                 null, null));
         if (elementStack.size() != 1) {
@@ -308,7 +304,7 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
         }
     }
 
-    private void sendAnonymousObjectStartEvent() throws IOException, JSException {
+    private void sendAnonymousObjectStartEvent() throws IOException, JSException, SchemaException, ReaderException {
         DMReaderEvent anonymousObjectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START,
                 null, null);
         getModelBuilder().notifyEvent(anonymousObjectStartEvent);

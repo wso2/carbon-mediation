@@ -27,7 +27,9 @@ public class DMModelTypes {
 
     // Use to define input and output data formats
     public enum ModelType {
-       JSON_STRING(JSON_STRING_CONTENT_TYPE),JAVA_MAP(JAVA_MAP_CONTENT_TYPE);
+        JSON_STRING(JSON_STRING_CONTENT_TYPE),
+        JAVA_MAP(JAVA_MAP_CONTENT_TYPE);
+
         private final String value;
 
         private ModelType(String value) {

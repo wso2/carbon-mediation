@@ -20,6 +20,8 @@ import org.wso2.datamapper.engine.core.MappingHandler;
 import org.wso2.datamapper.engine.core.Model;
 import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.callbacks.OutputVariableCallback;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
 import org.wso2.datamapper.engine.output.formatters.FormatterFactory;
 import org.wso2.datamapper.engine.output.writers.WriterFactory;
@@ -37,18 +39,18 @@ public class OutputMessageBuilder {
     private OutputVariableCallback mappingHandler;
 
     public OutputMessageBuilder(InputOutputDataTypes.DataType dataType, DMModelTypes.ModelType dmModelType
-            , Schema outputSchema) {
+            , Schema outputSchema) throws SchemaException {
         this.outputSchema = outputSchema;
         this.formatter = FormatterFactory.getFormatter(dmModelType);
-        this.outputWriter = WriterFactory.getWriter(dataType,outputSchema);
+        this.outputWriter = WriterFactory.getWriter(dataType, outputSchema);
     }
 
-    public void buildOutputMessage(Model outputModel, OutputVariableCallback mappingHandler) {
+    public void buildOutputMessage(Model outputModel, OutputVariableCallback mappingHandler) throws SchemaException, WriterException {
         this.mappingHandler = mappingHandler;
         formatter.format(outputModel, this, outputSchema);
     }
 
-    public void notifyEvent(DMReaderEvent readerEvent) {
+    public void notifyEvent(DMReaderEvent readerEvent) throws SchemaException, WriterException {
         switch (readerEvent.getEventType()) {
             case OBJECT_START:
                 outputWriter.writeStartObject(readerEvent.getName());

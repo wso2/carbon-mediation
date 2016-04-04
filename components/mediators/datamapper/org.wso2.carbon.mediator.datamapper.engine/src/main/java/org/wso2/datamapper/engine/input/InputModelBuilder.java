@@ -19,6 +19,8 @@ package org.wso2.datamapper.engine.input;
 import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.callbacks.InputVariableCallback;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
+import org.wso2.datamapper.engine.core.exceptions.ReaderException;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.input.builders.BuilderFactory;
 import org.wso2.datamapper.engine.input.readers.ReaderFactory;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
@@ -39,18 +41,18 @@ public class InputModelBuilder {
     private InputVariableCallback mappingHandler;
 
     public InputModelBuilder(InputOutputDataTypes.DataType inputType,
-                             DMModelTypes.ModelType modelType,Schema inputSchema) throws IOException {
+                             DMModelTypes.ModelType modelType, Schema inputSchema) throws IOException {
         inputReader = ReaderFactory.getReader(inputType);
         modelBuilder = BuilderFactory.getBuilder(modelType);
         this.inputSchema = inputSchema;
     }
 
-    public void buildInputModel(InputStream inputStream, InputVariableCallback mappingHandler){
+    public void buildInputModel(InputStream inputStream, InputVariableCallback mappingHandler) throws ReaderException {
         this.mappingHandler = mappingHandler;
-        inputReader.read(inputStream,this,inputSchema);
+        inputReader.read(inputStream, this, inputSchema);
     }
 
-    public void notifyEvent(DMReaderEvent readerEvent) throws IOException, JSException {
+    public void notifyEvent(DMReaderEvent readerEvent) throws IOException, JSException, SchemaException, ReaderException {
         switch (readerEvent.getEventType()) {
             case OBJECT_START:
                 modelBuilder.writeObjectFieldStart(readerEvent.getName());
@@ -62,13 +64,15 @@ public class InputModelBuilder {
                 modelBuilder.writeArrayFieldStart(readerEvent.getName());
                 break;
             case FIELD:
-                modelBuilder.writeField(readerEvent.getName(), readerEvent.getValue(),readerEvent.getFieldType());
+                modelBuilder.writeField(readerEvent.getName(), readerEvent.getValue(), readerEvent.getFieldType());
                 break;
             case ARRAY_END:
                 modelBuilder.writeEndArray();
                 break;
             case TERMINATE:
-                mappingHandler.notifyInputVariable(modelBuilder.close());
+                modelBuilder.close();
+                //TODO : move this to an observer
+                mappingHandler.notifyInputVariable(modelBuilder.getContent());
                 break;
             case ANONYMOUS_OBJECT_START:
                 modelBuilder.writeStartObject();

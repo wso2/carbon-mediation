@@ -17,6 +17,7 @@
 package org.wso2.datamapper.engine.core;
 
 import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.schemas.SchemaElement;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public interface Schema {
      *
      * @return Name of the schema as a String
      */
-    String getName();
+    String getName() throws SchemaException;
 
     /**
      * Method to get the element type specified in the schema by giving the element hierarchy
@@ -40,18 +41,18 @@ public interface Schema {
      * @param elementStack
      * @return type of the element
      */
-     String getElementTypeByName(List<SchemaElement> elementStack) throws InvalidPayloadException;
+    String getElementTypeByName(List<SchemaElement> elementStack) throws InvalidPayloadException, SchemaException;
 
-    String getElementTypeByName(String elementStack) throws InvalidPayloadException;
+    String getElementTypeByName(String elementStack) throws InvalidPayloadException, SchemaException;
 
     /**
      * Method for check whether schema has a child element inside given element
      *
      * @return
      */
-    boolean isChildElement(String elementName,String childElementName);
+    boolean isChildElement(String elementName, String childElementName);
 
-    boolean isChildElement(List<SchemaElement> elementStack,String childElementName) throws InvalidPayloadException;
+    boolean isChildElement(List<SchemaElement> elementStack, String childElementName) throws InvalidPayloadException, SchemaException;
 
     String getPrefixForNamespace(String url);
 

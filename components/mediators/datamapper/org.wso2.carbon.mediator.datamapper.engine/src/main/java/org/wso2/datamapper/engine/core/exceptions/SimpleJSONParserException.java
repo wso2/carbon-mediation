@@ -14,26 +14,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.output;
+package org.wso2.datamapper.engine.core.exceptions;
 
-import org.wso2.datamapper.engine.core.exceptions.WriterException;
+import org.json.simple.parser.ParseException;
 
 /**
- * This interface should be implemented by data-mapper output writers
+ * This exception is thrown when engine gets a invalid payload with respect to schema
  */
-public interface Writable {
+public class SimpleJSONParserException extends ParseException {
 
-    void writeStartObject(String name) throws WriterException;
+    private String message = null;
 
-    void writeField(String name, Object value) throws WriterException;
+    public SimpleJSONParserException() {
+        super(ERROR_UNEXPECTED_EXCEPTION);
+    }
 
-    void writeEndObject() throws WriterException;
+    public SimpleJSONParserException(String message) {
+        super(ERROR_UNEXPECTED_EXCEPTION);
+        this.message = message;
+    }
 
-    String terminateMessageBuilding() throws WriterException;
+    @Override
+    public String toString() {
+        return message;
+    }
 
-    void writeStartArray();
-
-    void writeEndArray();
-
-    void writeStartAnonymousObject() throws WriterException;
+    @Override
+    public String getMessage() {
+        return message;
+    }
 }

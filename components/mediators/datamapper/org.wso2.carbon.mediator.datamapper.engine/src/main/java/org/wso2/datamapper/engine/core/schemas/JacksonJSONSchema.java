@@ -20,16 +20,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.SynapseException;
 import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
+import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
 
 /**
  * This class implements {@link Schema} interface using Jackson JSON library to hold JSON schema
@@ -39,7 +43,7 @@ public class JacksonJSONSchema implements Schema {
     private static final Log log = LogFactory.getLog(JacksonJSONSchema.class);
     private static final String EMPTY_STRING = "";
     private static final String NAMESPACE_NAME_CONCAT_STRING = ":";
-    Map<String, Object> jsonSchemaMap;
+    private Map jsonSchemaMap;
 
     private static final String PROPERTIES_KEY = "properties";
     private static final String ATTRIBUTES_KEY = "attributes";
@@ -51,7 +55,7 @@ public class JacksonJSONSchema implements Schema {
     private static final String ITEMS_KEY = "items";
     private Map<String, String> namespaceMap;
 
-    public JacksonJSONSchema(InputStream inputSchema) {
+    public JacksonJSONSchema(InputStream inputSchema) throws SchemaException {
         namespaceMap = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -68,22 +72,22 @@ public class JacksonJSONSchema implements Schema {
             }
         } catch (IOException e) {
             log.error("Error while reading input stream");
-            throw new SynapseException("Error while reading input stream" + e);
+            throw new SchemaException("Error while reading input stream" + e);
         }
     }
 
     @Override
-    public String getName() {
+    public String getName() throws SchemaException {
         String schemaName = (String) jsonSchemaMap.get(TITLE_KEY);
         if (schemaName != null) {
             return schemaName;
         } else {
-            throw new SynapseException("Invalid WSO2 Data Mapper JSON input schema, schema name not found.");
+            throw new SchemaException("Invalid WSO2 Data Mapper JSON input schema, schema name not found.");
         }
     }
 
     @Override
-    public String getElementTypeByName(List<SchemaElement> elementStack) throws InvalidPayloadException {
+    public String getElementTypeByName(List<SchemaElement> elementStack) throws InvalidPayloadException, SchemaException {
         Map<String, Object> schema = jsonSchemaMap;
         String elementType = null;
         boolean elementFound = false;
@@ -113,7 +117,7 @@ public class JacksonJSONSchema implements Schema {
         return elementType;
     }
 
-    public String getElementTypeByName(String elementName) {
+    public String getElementTypeByName(String elementName) throws SchemaException {
         String elementType = null;
         Map<String, Object> properties = getSchemaProperties(jsonSchemaMap);
         if (getName().equals(elementName)) {
@@ -154,7 +158,7 @@ public class JacksonJSONSchema implements Schema {
     }
 
     @Override
-    public boolean isChildElement(List<SchemaElement> elementStack, String childElementName) throws InvalidPayloadException {
+    public boolean isChildElement(List<SchemaElement> elementStack, String childElementName) throws InvalidPayloadException, SchemaException {
         Map<String, Object> elementSchema = getElementSchemaByName(elementStack, jsonSchemaMap);
         if (elementSchema.containsKey(PROPERTIES_KEY)) {
             if (getSchemaProperties(elementSchema).containsKey(childElementName)) {
@@ -176,7 +180,7 @@ public class JacksonJSONSchema implements Schema {
         return namespaceMap;
     }
 
-    private Map<String, Object> getElementSchemaByName(List<SchemaElement> elementStack, Map<String, Object> schema) throws InvalidPayloadException {
+    private Map<String, Object> getElementSchemaByName(List<SchemaElement> elementStack, Map<String, Object> schema) throws InvalidPayloadException, SchemaException {
         Map<String, Object> tempSchema = schema;
         String elementType = null;
         for (SchemaElement element : elementStack) {

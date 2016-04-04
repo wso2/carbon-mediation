@@ -14,26 +14,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.output;
-
-import org.wso2.datamapper.engine.core.exceptions.WriterException;
+package org.wso2.datamapper.engine.core.exceptions;
 
 /**
- * This interface should be implemented by data-mapper output writers
+ * This exception is thrown when engine gets a invalid payload with respect to schema
  */
-public interface Writable {
+public class WriterException extends Exception {
 
-    void writeStartObject(String name) throws WriterException;
+    private String message = null;
 
-    void writeField(String name, Object value) throws WriterException;
+    public WriterException() {
+        super();
+    }
 
-    void writeEndObject() throws WriterException;
+    public WriterException(String message) {
+        super(message);
+        this.message = message;
+    }
 
-    String terminateMessageBuilding() throws WriterException;
+    public WriterException(Throwable cause) {
+        super(cause);
+    }
 
-    void writeStartArray();
+    @Override
+    public String toString() {
+        return message;
+    }
 
-    void writeEndArray();
-
-    void writeStartAnonymousObject() throws WriterException;
+    @Override
+    public String getMessage() {
+        return message;
+    }
 }

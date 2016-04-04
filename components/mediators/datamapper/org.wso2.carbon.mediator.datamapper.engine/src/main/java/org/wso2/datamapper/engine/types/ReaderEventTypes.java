@@ -22,17 +22,22 @@ package org.wso2.datamapper.engine.types;
 public class ReaderEventTypes {
 
     private final static String OBJECT_START_EVENT = "ObjectStart";
-    private final static String OBJECT_END_EVENT  = "ObjectEnd";
-    private final static String ARRAY_START_EVENT  = "ArrayStart";
-    private final static String ARRAY_END_EVENT  = "ArrayEnd";
+    private final static String OBJECT_END_EVENT = "ObjectEnd";
+    private final static String ARRAY_START_EVENT = "ArrayStart";
+    private final static String ARRAY_END_EVENT = "ArrayEnd";
     private final static String FIELD_EVENT = "Field";
     private final static String TERMINATE_EVENT = "Terminate";
     private final static String ANONYMOUS_OBJECT_START_EVENT = "AnonymousObjectStart";
 
     // Use to define input and output data formats
     public enum EventType {
-        OBJECT_START(OBJECT_START_EVENT), OBJECT_END(OBJECT_END_EVENT), ARRAY_START(ARRAY_START_EVENT),
-        ARRAY_END(ARRAY_END_EVENT), FIELD(FIELD_EVENT), TERMINATE(TERMINATE_EVENT),ANONYMOUS_OBJECT_START(ANONYMOUS_OBJECT_START_EVENT);
+        OBJECT_START(OBJECT_START_EVENT),
+        OBJECT_END(OBJECT_END_EVENT),
+        ARRAY_START(ARRAY_START_EVENT),
+        ARRAY_END(ARRAY_END_EVENT),
+        FIELD(FIELD_EVENT),
+        TERMINATE(TERMINATE_EVENT),
+        ANONYMOUS_OBJECT_START(ANONYMOUS_OBJECT_START_EVENT);
         private final String value;
 
         private EventType(String value) {
