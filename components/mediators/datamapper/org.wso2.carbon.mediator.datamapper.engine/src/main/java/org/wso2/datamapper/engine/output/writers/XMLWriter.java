@@ -137,7 +137,7 @@ public class XMLWriter implements Writable {
     }
 
     @Override
-    public void writeEndObject() throws WriterException {
+    public void writeEndObject(String objectName) throws WriterException {
         try {
             xMLStreamWriter.writeEndElement();
         } catch (XMLStreamException e) {

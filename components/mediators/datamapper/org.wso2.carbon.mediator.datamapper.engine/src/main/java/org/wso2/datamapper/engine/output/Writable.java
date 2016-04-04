@@ -27,7 +27,7 @@ public interface Writable {
 
     void writeField(String name, Object value) throws WriterException;
 
-    void writeEndObject() throws WriterException;
+    void writeEndObject(String objectName) throws WriterException;
 
     String terminateMessageBuilding() throws WriterException;
 
