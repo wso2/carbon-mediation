@@ -18,7 +18,6 @@ package org.wso2.datamapper.engine.input.builders;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import org.wso2.datamapper.engine.input.Buildable;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -29,9 +28,9 @@ import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 
 /**
- * This class implements {@link Buildable} interface and JSON builder for data mapper engine using jackson
+ * This class implements {@link Builder} interface and JSON builder for data mapper engine using jackson
  */
-public class JacksonJSONBuilder implements Buildable {
+public class JacksonJSONBuilder implements Builder {
 
     private JsonGenerator jsonGenerator;
     private StringWriter writer;

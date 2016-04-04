@@ -58,8 +58,7 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
         }
 
         DataMapperMediator dataMapperMediator = (DataMapperMediator) mediator;
-        OMElement dataMapperElement = fac
-                .createOMElement(DataMapperMediatorConstants.DATAMAPPER, synNS);
+        OMElement dataMapperElement = fac.createOMElement(DataMapperMediatorConstants.DATAMAPPER, synNS);
 
         if (dataMapperMediator.getMappingConfigurationKey() != null) {
             // Serialize Value using ValueSerializer

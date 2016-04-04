@@ -19,15 +19,15 @@ package org.wso2.datamapper.engine.input.readers;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.schemas.Schema;
 import org.wso2.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
-import org.wso2.datamapper.engine.types.ReaderEventTypes;
+import org.wso2.datamapper.engine.input.readers.events.ReaderEventTypes;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -54,9 +54,9 @@ import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 
 /**
- * This class implements {@link Readable} interface and xml reader for data mapper engine using SAX
+ * This class implements {@link Reader} interface and xml reader for data mapper engine using SAX
  */
-public class XMLReader extends DefaultHandler implements org.wso2.datamapper.engine.input.Readable {
+public class XMLReader extends DefaultHandler implements Reader {
 
     private static final Log log = LogFactory.getLog(XMLReader.class);
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACES = "http://xml.org/sax/features/namespaces";

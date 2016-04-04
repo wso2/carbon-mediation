@@ -14,14 +14,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.input;
+package org.wso2.datamapper.engine.input.builders;
 
 import java.io.IOException;
 
 /**
  * Interface for implement the methods to create generic data holding model of data mapper engine
  */
-public interface Buildable {
+public interface Builder {
 
 
     /**
@@ -224,6 +224,12 @@ public interface Buildable {
      */
     void close() throws IOException;
 
+    /**
+     * Methid called to get the final content after closing the builder
+     *
+     * @return built content
+     * @throws IOException
+     */
     String getContent() throws IOException;
 
 }

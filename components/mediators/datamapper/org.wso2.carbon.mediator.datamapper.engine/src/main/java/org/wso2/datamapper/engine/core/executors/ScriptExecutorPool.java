@@ -17,41 +17,33 @@
 
 package org.wso2.datamapper.engine.core.executors;
 
-import org.wso2.datamapper.engine.core.Executable;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
 public class ScriptExecutorPool {
 
-    private BlockingQueue<Executable> executors;
+    private BlockingQueue<Executor> executors;
 
     public ScriptExecutorPool(ScriptExecutorType executorType, int executorPoolSize) {
         executors = new LinkedBlockingQueue<>();
         for (int i = 0; i < executorPoolSize; i++) {
-            Executable executor = createScriptExecutor(executorType);
+            Executor executor = createScriptExecutor(executorType);
             if (executor != null) {
                 executors.add(executor);
             }
         }
     }
 
-    private Executable createScriptExecutor(ScriptExecutorType executorType) {
+    private Executor createScriptExecutor(ScriptExecutorType executorType) {
         return new ScriptExecutor(executorType);
     }
 
-    public Executable take() throws InterruptedException {
+    public Executor take() throws InterruptedException {
         return executors.take();
     }
 
-    public void put(Executable executor) throws InterruptedException {
+    public void put(Executor executor) throws InterruptedException {
         executors.put(executor);
     }
-
-    public void clear() {
-        //TODO : clear the executors
-        executors.clear();
-    }
-
 }

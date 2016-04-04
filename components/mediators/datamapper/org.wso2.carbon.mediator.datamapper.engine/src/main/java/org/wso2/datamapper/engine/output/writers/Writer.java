@@ -14,35 +14,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core;
+package org.wso2.datamapper.engine.output.writers;
+
+import org.wso2.datamapper.engine.core.exceptions.WriterException;
 
 /**
- * This class will hold the data mapper mapping configuration
+ * This interface should be implemented by data-mapper output writers
  */
-public class JSFunction {
+public interface Writer {
 
-    private String functioName;
-    private String functionBody;
+    void writeStartObject(String name) throws WriterException;
 
-    public JSFunction(String name, String body) {
-        this.setFunctioName(name);
-        this.setFunctionBody(body);
-    }
+    void writeField(String name, Object value) throws WriterException;
 
-    public String getFunctioName() {
-        return functioName;
-    }
+    void writeEndObject() throws WriterException;
 
-    public void setFunctioName(String functioName) {
-        this.functioName = functioName;
-    }
+    String terminateMessageBuilding() throws WriterException;
 
-    public String getFunctionBody() {
-        return functionBody;
-    }
+    void writeStartArray();
 
-    public void setFunctionBody(String functionBody) {
-        this.functionBody = functionBody;
-    }
+    void writeEndArray();
 
+    void writeStartAnonymousObject() throws WriterException;
 }

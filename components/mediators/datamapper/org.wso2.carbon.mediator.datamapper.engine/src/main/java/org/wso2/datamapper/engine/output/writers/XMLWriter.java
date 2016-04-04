@@ -18,10 +18,9 @@ package org.wso2.datamapper.engine.output.writers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.exceptions.WriterException;
-import org.wso2.datamapper.engine.output.Writable;
+import org.wso2.datamapper.engine.core.schemas.Schema;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -35,9 +34,9 @@ import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 
 /**
- * This class implements {@link Writable} interface and xml writer for data mapper engine using StAX
+ * This class implements {@link Writer} interface and xml writer for data mapper engine using StAX
  */
-public class XMLWriter implements Writable {
+public class XMLWriter implements Writer {
 
     private static final Log log = LogFactory.getLog(XMLWriter.class);
     private StringWriter stringWriter;

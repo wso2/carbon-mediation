@@ -14,11 +14,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core;
+package org.wso2.datamapper.engine.core.schemas;
 
 import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
-import org.wso2.datamapper.engine.core.schemas.SchemaElement;
 
 import java.util.List;
 import java.util.Map;

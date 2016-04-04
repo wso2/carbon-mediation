@@ -14,21 +14,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.datamapper.engine.input.readers.events;
 
-package org.wso2.datamapper.engine.types;
+/**
+ *
+ */
+public class ReaderEventTypes {
 
-public class InputOutputDataTypes {
-
-    private final static String JSON_CONTENT_TYPE = "JSON";
-    private final static String XML_CONTENT_TYPE = "XML";
-    private final static String CSV_CONTENT_TYPE = "CSV";
+    private final static String OBJECT_START_EVENT = "ObjectStart";
+    private final static String OBJECT_END_EVENT = "ObjectEnd";
+    private final static String ARRAY_START_EVENT = "ArrayStart";
+    private final static String ARRAY_END_EVENT = "ArrayEnd";
+    private final static String FIELD_EVENT = "Field";
+    private final static String TERMINATE_EVENT = "Terminate";
+    private final static String ANONYMOUS_OBJECT_START_EVENT = "AnonymousObjectStart";
 
     // Use to define input and output data formats
-    public enum DataType {
-        CSV(CSV_CONTENT_TYPE), XML(XML_CONTENT_TYPE), JSON(JSON_CONTENT_TYPE);
+    public enum EventType {
+        OBJECT_START(OBJECT_START_EVENT),
+        OBJECT_END(OBJECT_END_EVENT),
+        ARRAY_START(ARRAY_START_EVENT),
+        ARRAY_END(ARRAY_END_EVENT),
+        FIELD(FIELD_EVENT),
+        TERMINATE(TERMINATE_EVENT),
+        ANONYMOUS_OBJECT_START(ANONYMOUS_OBJECT_START_EVENT);
         private final String value;
 
-        private DataType(String value) {
+        private EventType(String value) {
             this.value = value;
         }
 
@@ -38,17 +50,16 @@ public class InputOutputDataTypes {
         }
 
         // Use to get the DataType from the relevant input and output data type
-        public static DataType fromString(String dataType) {
+        public static EventType fromString(String dataType) {
             if (dataType != null) {
-                for (DataType definedTypes : DataType.values()) {
+                for (EventType definedTypes : EventType.values()) {
                     if (dataType.equalsIgnoreCase(definedTypes.toString())) {
                         return definedTypes;
                     }
                 }
             }
-            throw new IllegalArgumentException("Invalid input type found : " + dataType);
+            return null;
         }
 
     }
-
 }

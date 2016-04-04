@@ -16,17 +16,16 @@
  */
 package org.wso2.datamapper.engine.input.builders;
 
-import org.wso2.datamapper.engine.input.Buildable;
-import org.wso2.datamapper.engine.types.DMModelTypes;
+import org.wso2.datamapper.engine.utils.DMModelTypes;
 
 import java.io.IOException;
 
 /**
- * This class is a factory class to get {@link Buildable} needed by the data mapper engine
+ * This class is a factory class to get {@link Builder} needed by the data mapper engine
  */
 public class BuilderFactory {
 
-    public static Buildable getBuilder(DMModelTypes.ModelType inputType) throws IOException {
+    public static Builder getBuilder(DMModelTypes.ModelType inputType) throws IOException {
         switch (inputType) {
             case JSON_STRING:
                 return new JacksonJSONBuilder();

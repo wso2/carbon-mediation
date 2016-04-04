@@ -16,16 +16,18 @@
  */
 package org.wso2.datamapper.engine.input;
 
-import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.callbacks.InputVariableCallback;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.schemas.Schema;
+import org.wso2.datamapper.engine.input.builders.Builder;
 import org.wso2.datamapper.engine.input.builders.BuilderFactory;
+import org.wso2.datamapper.engine.input.readers.Reader;
 import org.wso2.datamapper.engine.input.readers.ReaderFactory;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
-import org.wso2.datamapper.engine.types.DMModelTypes;
-import org.wso2.datamapper.engine.types.InputOutputDataTypes;
+import org.wso2.datamapper.engine.utils.DMModelTypes;
+import org.wso2.datamapper.engine.utils.InputOutputDataTypes;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +37,8 @@ import java.io.InputStream;
  */
 public class InputModelBuilder {
 
-    private Readable inputReader;
-    private Buildable modelBuilder;
+    private Reader inputReader;
+    private Builder modelBuilder;
     private Schema inputSchema;
     private InputVariableCallback mappingHandler;
 

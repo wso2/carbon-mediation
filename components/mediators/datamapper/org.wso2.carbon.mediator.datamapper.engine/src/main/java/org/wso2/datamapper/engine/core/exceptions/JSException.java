@@ -21,22 +21,13 @@ package org.wso2.datamapper.engine.core.exceptions;
  */
 public class JSException extends Exception {
 
-
     private static final long serialVersionUID = 1L;
 
     private String message = null;
 
-    public JSException() {
-        super();
-    }
-
     public JSException(String message) {
         super(message);
         this.message = message;
-    }
-
-    public JSException(Throwable cause) {
-        super(cause);
     }
 
     @Override

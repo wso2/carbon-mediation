@@ -20,12 +20,11 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.exceptions.WriterException;
+import org.wso2.datamapper.engine.core.schemas.Schema;
 import org.wso2.datamapper.engine.core.schemas.SchemaElement;
-import org.wso2.datamapper.engine.output.Writable;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -37,9 +36,9 @@ import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 
 /**
- * This class implements {@link Writable} interface and json writer for data mapper engine using Jackson
+ * This class implements {@link Writer} interface and json writer for data mapper engine using Jackson
  */
-public class JacksonJSONWriter implements Writable {
+public class JacksonJSONWriter implements Writer {
 
     private static final Log log = LogFactory.getLog(XMLWriter.class);
     private Schema outputSchema;

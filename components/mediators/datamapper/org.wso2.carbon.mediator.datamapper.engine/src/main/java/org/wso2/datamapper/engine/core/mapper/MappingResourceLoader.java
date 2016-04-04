@@ -14,11 +14,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core;
+package org.wso2.datamapper.engine.core.mapper;
 
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.schemas.JacksonJSONSchema;
+import org.wso2.datamapper.engine.core.schemas.Schema;
 
 import java.io.BufferedReader;
 import java.io.IOException;

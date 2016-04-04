@@ -19,15 +19,11 @@ package org.wso2.datamapper.engine.core.exceptions;
 import org.json.simple.parser.ParseException;
 
 /**
- * This exception is thrown when engine gets a invalid payload with respect to schema
+ * This exception is thrown when engine gets an error parsing json with simple json
  */
 public class SimpleJSONParserException extends ParseException {
 
     private String message = null;
-
-    public SimpleJSONParserException() {
-        super(ERROR_UNEXPECTED_EXCEPTION);
-    }
 
     public SimpleJSONParserException(String message) {
         super(ERROR_UNEXPECTED_EXCEPTION);

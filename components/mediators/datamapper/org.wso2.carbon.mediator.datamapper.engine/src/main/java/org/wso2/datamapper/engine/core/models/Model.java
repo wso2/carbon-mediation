@@ -14,17 +14,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.output;
-
-import org.wso2.datamapper.engine.core.Model;
-import org.wso2.datamapper.engine.core.Schema;
-import org.wso2.datamapper.engine.core.exceptions.SchemaException;
-import org.wso2.datamapper.engine.core.exceptions.WriterException;
+package org.wso2.datamapper.engine.core.models;
 
 /**
- * This interface should be implemented to convert data mapper generic models to
+ * Interface to represent data in generic way in the data mapper engine.
  */
-public interface Formattable {
+public interface Model<T> {
 
-    void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema) throws SchemaException, WriterException;
+    void setModel(T model);
+
+    T getModel();
+
 }

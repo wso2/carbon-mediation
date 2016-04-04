@@ -14,17 +14,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.input;
+package org.wso2.datamapper.engine.input.readers;
 
-import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.exceptions.ReaderException;
+import org.wso2.datamapper.engine.core.schemas.Schema;
+import org.wso2.datamapper.engine.input.InputModelBuilder;
 
 import java.io.InputStream;
 
 /**
  * This interface should be implemented by data-mapper input readers.
  */
-public interface Readable {
+public interface Reader {
 
     /**
      * @param input

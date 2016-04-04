@@ -14,15 +14,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core;
+package org.wso2.datamapper.engine.core.executors;
 
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.mapper.MappingResourceLoader;
+import org.wso2.datamapper.engine.core.models.Model;
 
 /**
  * This interface should be implemented by script executors of Data Mapper Engine
  */
-public interface Executable {
+public interface Executor {
 
     /**
      * Method to execute the mapping config in the {@link MappingResourceLoader} on

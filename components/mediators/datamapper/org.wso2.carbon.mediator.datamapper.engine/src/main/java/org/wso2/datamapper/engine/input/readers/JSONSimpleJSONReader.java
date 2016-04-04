@@ -21,21 +21,20 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.parser.ContentHandler;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.exceptions.InvalidPayloadException;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.exceptions.SimpleJSONParserException;
+import org.wso2.datamapper.engine.core.schemas.Schema;
 import org.wso2.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
-import org.wso2.datamapper.engine.types.ReaderEventTypes;
+import org.wso2.datamapper.engine.input.readers.events.ReaderEventTypes;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -48,7 +47,7 @@ import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 
-public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Readable, ContentHandler {
+public class JSONSimpleJSONReader implements Reader, ContentHandler {
     private static final Log log = LogFactory.getLog(JSONSimpleJSONReader.class);
     private InputModelBuilder modelBuilder;
     private Schema inputSchema;
@@ -65,7 +64,7 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
         elementStack = new ArrayList<>();
         modelBuilder = inputModelBuilder;
         this.inputSchema = inputSchema;
-        Reader reader = new InputStreamReader(input);
+        java.io.Reader reader = new InputStreamReader(input);
         JSONParser parser = new JSONParser();
         try {
             parser.parse(reader, this);

@@ -16,15 +16,14 @@
  */
 package org.wso2.datamapper.engine.input.readers;
 
-import org.wso2.datamapper.engine.input.Readable;
-import org.wso2.datamapper.engine.types.InputOutputDataTypes;
+import org.wso2.datamapper.engine.utils.InputOutputDataTypes;
 
 /**
- * This class is a factory class to get {@link Readable} needed by the data mapper engine
+ * This class is a factory class to get {@link Reader} needed by the data mapper engine
  */
 public class ReaderFactory {
 
-    public static Readable getReader(InputOutputDataTypes.DataType inputType) {
+    public static Reader getReader(InputOutputDataTypes.DataType inputType) {
         switch (inputType) {
             case XML:
                 return new XMLReader();

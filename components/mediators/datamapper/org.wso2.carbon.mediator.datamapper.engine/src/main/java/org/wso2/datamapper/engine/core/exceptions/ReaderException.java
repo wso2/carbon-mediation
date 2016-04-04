@@ -17,23 +17,15 @@
 package org.wso2.datamapper.engine.core.exceptions;
 
 /**
- * This exception is thrown when engine gets a invalid payload with respect to schema
+ * This exception is thrown when engine gets an error when reading input or when building input
  */
 public class ReaderException extends Exception {
 
     private String message = null;
 
-    public ReaderException() {
-        super();
-    }
-
     public ReaderException(String message) {
         super(message);
         this.message = message;
-    }
-
-    public ReaderException(Throwable cause) {
-        super(cause);
     }
 
     @Override

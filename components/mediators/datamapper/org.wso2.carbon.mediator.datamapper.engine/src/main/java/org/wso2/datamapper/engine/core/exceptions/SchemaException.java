@@ -17,23 +17,15 @@
 package org.wso2.datamapper.engine.core.exceptions;
 
 /**
- * This exception is thrown when engine gets a invalid payload with respect to schema
+ * This exception is thrown when engine gets an error processing schema
  */
 public class SchemaException extends Exception {
 
     private String message = null;
 
-    public SchemaException() {
-        super();
-    }
-
     public SchemaException(String message) {
         super(message);
         this.message = message;
-    }
-
-    public SchemaException(Throwable cause) {
-        super(cause);
     }
 
     @Override

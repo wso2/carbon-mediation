@@ -23,17 +23,9 @@ public class InvalidPayloadException extends Exception {
 
     private String message = null;
 
-    public InvalidPayloadException() {
-        super();
-    }
-
     public InvalidPayloadException(String message) {
         super(message);
         this.message = message;
-    }
-
-    public InvalidPayloadException(Throwable cause) {
-        super(cause);
     }
 
     @Override

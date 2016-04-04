@@ -16,8 +16,6 @@
  */
 package org.wso2.datamapper.engine.input.readers.events;
 
-import org.wso2.datamapper.engine.types.ReaderEventTypes;
-
 public class DMReaderEvent {
 
     private ReaderEventTypes.EventType eventType;

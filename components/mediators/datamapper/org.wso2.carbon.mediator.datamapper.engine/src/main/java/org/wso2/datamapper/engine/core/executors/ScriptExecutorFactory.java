@@ -18,7 +18,6 @@ package org.wso2.datamapper.engine.core.executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.datamapper.engine.core.Executable;
 import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
 
 /**
@@ -41,13 +40,18 @@ public class ScriptExecutorFactory {
      *
      * @return script executor
      */
-    public static Executable getScriptExecutor(String executorPoolSize) throws InterruptedException {
+    public static Executor getScriptExecutor(String executorPoolSize) throws InterruptedException {
         if (executorPool == null) {
             initializeExecutorPool(executorPoolSize);
         }
         return executorPool.take();
     }
 
+    /**
+     * Initialize a script executors pool. If Java8, use Nashorn as the script engine or if Java7 or 6 use Rhino
+     *
+     * @param executorPoolSizeStr size of the executor pool
+     */
     private synchronized static void initializeExecutorPool(String executorPoolSizeStr) {
         if (executorPool == null) {
             String javaVersion = System.getProperty("java.version");
@@ -72,7 +76,7 @@ public class ScriptExecutorFactory {
     /**
      * This method will release the script executor to the pool
      */
-    public static void releaseScriptExecutor(Executable executor) throws InterruptedException {
+    public static void releaseScriptExecutor(Executor executor) throws InterruptedException {
         executorPool.put(executor);
     }
 }

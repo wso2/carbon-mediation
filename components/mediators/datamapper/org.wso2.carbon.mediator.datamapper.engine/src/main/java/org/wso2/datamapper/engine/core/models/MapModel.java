@@ -16,8 +16,6 @@
  */
 package org.wso2.datamapper.engine.core.models;
 
-import org.wso2.datamapper.engine.core.Model;
-
 import java.util.Map;
 
 /**

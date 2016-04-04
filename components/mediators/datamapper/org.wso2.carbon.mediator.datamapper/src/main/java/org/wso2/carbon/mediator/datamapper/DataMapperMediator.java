@@ -37,18 +37,18 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.util.AXIOMUtils;
-import org.wso2.datamapper.engine.core.Executable;
-import org.wso2.datamapper.engine.core.MappingHandler;
-import org.wso2.datamapper.engine.core.MappingResourceLoader;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.executors.Executor;
 import org.wso2.datamapper.engine.core.executors.ScriptExecutorFactory;
+import org.wso2.datamapper.engine.core.mapper.MappingHandler;
+import org.wso2.datamapper.engine.core.mapper.MappingResourceLoader;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
-import org.wso2.datamapper.engine.types.DMModelTypes;
-import org.wso2.datamapper.engine.types.InputOutputDataTypes;
+import org.wso2.datamapper.engine.utils.DMModelTypes;
 import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
+import org.wso2.datamapper.engine.utils.InputOutputDataTypes;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -256,7 +256,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             String dmExecutorPoolSize = SynapsePropertiesLoader.getPropertyValue(
                     DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
 
-            Executable executor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
+            Executor executor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
 
             String outputVariable = mappingHandler.doMap(getInputStream(synCtx, inputType), mappingResourceLoader,
                     inputModelBuilder, outputMessageBuilder, executor);
@@ -285,8 +285,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                                 handleException("Invalid Envelope", axisFault, synCtx);
                             }
                         }
-                    }
-                    else {
+                    } else {
                         synCtx.getEnvelope().getBody().getFirstElement().detach();
                         synCtx.getEnvelope().getBody().addChild(outputMessage);
                     }
@@ -300,7 +299,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                         .getAxis2MessageContext();
                 JsonUtil.newJsonPayload(axis2MessageContext, outputVariable, true, true);
             }
-        } catch (ReaderException | InterruptedException | JSException | XMLStreamException | SchemaException | IOException e) {
+        } catch (ReaderException | InterruptedException | JSException | XMLStreamException | SchemaException
+                | IOException e) {
             handleException("DataMapper mediator : mapping failed", e, synCtx);
         }
     }

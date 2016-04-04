@@ -17,23 +17,15 @@
 package org.wso2.datamapper.engine.core.exceptions;
 
 /**
- * This exception is thrown when engine gets a invalid payload with respect to schema
+ * This exception is thrown when engine gets an error writing output or when formatting
  */
 public class WriterException extends Exception {
 
     private String message = null;
 
-    public WriterException() {
-        super();
-    }
-
     public WriterException(String message) {
         super(message);
         this.message = message;
-    }
-
-    public WriterException(Throwable cause) {
-        super(cause);
     }
 
     @Override

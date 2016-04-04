@@ -16,15 +16,14 @@
  */
 package org.wso2.datamapper.engine.output.formatters;
 
-import org.wso2.datamapper.engine.output.Formattable;
-import org.wso2.datamapper.engine.types.DMModelTypes;
+import org.wso2.datamapper.engine.utils.DMModelTypes;
 
 /**
- * This class is a factory class to get {@link Formattable} needed by the data mapper engine
+ * This class is a factory class to get {@link Formatter} needed by the data mapper engine
  */
 public class FormatterFactory {
 
-    public static Formattable getFormatter(DMModelTypes.ModelType formatterType) {
+    public static Formatter getFormatter(DMModelTypes.ModelType formatterType) {
         switch (formatterType) {
             case JAVA_MAP:
                 return new MapOutputFormatter();

@@ -14,7 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.datamapper.engine.core;
+package org.wso2.datamapper.engine.core.mapper;
 
 import org.wso2.datamapper.engine.core.callbacks.InputVariableCallback;
 import org.wso2.datamapper.engine.core.callbacks.OutputVariableCallback;
@@ -22,6 +22,8 @@ import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.exceptions.WriterException;
+import org.wso2.datamapper.engine.core.executors.Executor;
+import org.wso2.datamapper.engine.core.models.Model;
 import org.wso2.datamapper.engine.input.InputModelBuilder;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
 
@@ -34,10 +36,10 @@ public class MappingHandler implements InputVariableCallback, OutputVariableCall
     private String outputVariable;
     private MappingResourceLoader mappingResourceLoader;
     private OutputMessageBuilder outputMessageBuilder;
-    private Executable scriptExecutor;
+    private Executor scriptExecutor;
 
     public String doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputModelBuilder inputModelBuilder,
-                        OutputMessageBuilder outputMessageBuilder, Executable scriptExecutor) throws JSException, ReaderException {
+                        OutputMessageBuilder outputMessageBuilder, Executor scriptExecutor) throws JSException, ReaderException {
         this.mappingResourceLoader = resourceModel;
         this.outputMessageBuilder = outputMessageBuilder;
         this.scriptExecutor = scriptExecutor;

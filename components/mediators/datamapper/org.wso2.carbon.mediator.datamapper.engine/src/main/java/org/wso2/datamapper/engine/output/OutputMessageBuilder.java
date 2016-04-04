@@ -16,25 +16,27 @@
  */
 package org.wso2.datamapper.engine.output;
 
-import org.wso2.datamapper.engine.core.MappingHandler;
-import org.wso2.datamapper.engine.core.Model;
-import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.callbacks.OutputVariableCallback;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.exceptions.WriterException;
+import org.wso2.datamapper.engine.core.mapper.MappingHandler;
+import org.wso2.datamapper.engine.core.models.Model;
+import org.wso2.datamapper.engine.core.schemas.Schema;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
+import org.wso2.datamapper.engine.output.formatters.Formatter;
 import org.wso2.datamapper.engine.output.formatters.FormatterFactory;
+import org.wso2.datamapper.engine.output.writers.Writer;
 import org.wso2.datamapper.engine.output.writers.WriterFactory;
-import org.wso2.datamapper.engine.types.DMModelTypes;
-import org.wso2.datamapper.engine.types.InputOutputDataTypes;
+import org.wso2.datamapper.engine.utils.DMModelTypes;
+import org.wso2.datamapper.engine.utils.InputOutputDataTypes;
 
 /**
  *
  */
 public class OutputMessageBuilder {
 
-    private Formattable formatter;
-    private Writable outputWriter;
+    private Formatter formatter;
+    private Writer outputWriter;
     private Schema outputSchema;
     private OutputVariableCallback mappingHandler;
 
@@ -78,19 +80,19 @@ public class OutputMessageBuilder {
         }
     }
 
-    public Formattable getFormatter() {
+    public Formatter getFormatter() {
         return formatter;
     }
 
-    public void setFormatter(Formattable formatter) {
+    public void setFormatter(Formatter formatter) {
         this.formatter = formatter;
     }
 
-    public Writable getOutputWriter() {
+    public Writer getOutputWriter() {
         return outputWriter;
     }
 
-    public void setOutputWriter(Writable outputWriter) {
+    public void setOutputWriter(Writer outputWriter) {
         this.outputWriter = outputWriter;
     }
 

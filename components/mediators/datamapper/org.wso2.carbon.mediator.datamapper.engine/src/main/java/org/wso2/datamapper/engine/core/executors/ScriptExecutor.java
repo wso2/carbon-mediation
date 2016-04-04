@@ -18,13 +18,12 @@ package org.wso2.datamapper.engine.core.executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.datamapper.engine.core.Executable;
-import org.wso2.datamapper.engine.core.JSFunction;
-import org.wso2.datamapper.engine.core.MappingResourceLoader;
-import org.wso2.datamapper.engine.core.Model;
 import org.wso2.datamapper.engine.core.exceptions.JSException;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.datamapper.engine.core.mapper.JSFunction;
+import org.wso2.datamapper.engine.core.mapper.MappingResourceLoader;
 import org.wso2.datamapper.engine.core.models.MapModel;
+import org.wso2.datamapper.engine.core.models.Model;
 import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
 
 import javax.script.Invocable;
@@ -34,13 +33,18 @@ import javax.script.ScriptException;
 import java.util.Map;
 
 /**
- * This class implements script executor for data mapper using java 8 NasHorn JS executor
+ * This class implements script executor for data mapper using java script executor (Rhino or Nashorn)
  */
-public class ScriptExecutor implements Executable {
+public class ScriptExecutor implements Executor {
 
     private ScriptEngine scriptEngine;
     private static final Log log = LogFactory.getLog(ScriptExecutor.class);
 
+    /**
+     * Create a script executor of the provided script executor type
+     *
+     * @param scriptExecutorType
+     */
     public ScriptExecutor(ScriptExecutorType scriptExecutorType) {
         switch (scriptExecutorType) {
             case NASHORN:
@@ -65,7 +69,7 @@ public class ScriptExecutor implements Executable {
             injectInputVariableToEngine(resourceModel.getInputSchema().getName(), inputRecord);
             scriptEngine.eval(jsFunction.getFunctionBody());
             Invocable invocable = (Invocable) scriptEngine;
-            Object result = invocable.invokeFunction(jsFunction.getFunctioName());
+            Object result = invocable.invokeFunction(jsFunction.getFunctionName());
             if (result instanceof Map) {
                 return new MapModel((Map<String, Object>) result);
             }

@@ -16,14 +16,13 @@
  */
 package org.wso2.datamapper.engine.output.formatters;
 
-import org.wso2.datamapper.engine.core.Model;
-import org.wso2.datamapper.engine.core.Schema;
 import org.wso2.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.datamapper.engine.core.exceptions.WriterException;
+import org.wso2.datamapper.engine.core.models.Model;
+import org.wso2.datamapper.engine.core.schemas.Schema;
 import org.wso2.datamapper.engine.input.readers.events.DMReaderEvent;
-import org.wso2.datamapper.engine.output.Formattable;
+import org.wso2.datamapper.engine.input.readers.events.ReaderEventTypes;
 import org.wso2.datamapper.engine.output.OutputMessageBuilder;
-import org.wso2.datamapper.engine.types.ReaderEventTypes;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -35,10 +34,10 @@ import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 
 /**
- * This class implements {@link Formattable} interface to read {@link Map} model and trigger events to read
+ * This class implements {@link Formatter} interface to read {@link Map} model and trigger events to read
  * by {@link OutputMessageBuilder}
  */
-public class MapOutputFormatter implements Formattable {
+public class MapOutputFormatter implements Formatter {
 
     private OutputMessageBuilder outputMessageBuilder;
 
