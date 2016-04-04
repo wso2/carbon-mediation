@@ -109,13 +109,12 @@ public class JacksonJSONWriter implements Writable {
     @Override
     public void writeEndObject(String objectName) {
         try {
-            if (elementStack.get(elementStack.size() - 1).getElementName().equals(objectName)) {
-                if ((!ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(elementStack)) && !elementStack.isEmpty())) {
-                    elementStack.remove(elementStack.size() - 1);
-                    jsonGenerator.writeEndObject();
-                } else {
-                    jsonGenerator.writeEndObject();
-                }
+            if ((!ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(elementStack)) &&
+                    !elementStack.isEmpty()) && elementStack.get(elementStack.size() - 1).getElementName().equals(objectName)) {
+                elementStack.remove(elementStack.size() - 1);
+                jsonGenerator.writeEndObject();
+            } else if (ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(elementStack))) {
+                jsonGenerator.writeEndObject();
             }
         } catch (IOException e) {
             log.error("Error while creating ending object" + e);
@@ -158,7 +157,6 @@ public class JacksonJSONWriter implements Writable {
             } catch (IOException e1) {
                 log.error(e.getMessage(), e);
             }
-            log.error("Error while creating end array" + e);
         }
     }
 
