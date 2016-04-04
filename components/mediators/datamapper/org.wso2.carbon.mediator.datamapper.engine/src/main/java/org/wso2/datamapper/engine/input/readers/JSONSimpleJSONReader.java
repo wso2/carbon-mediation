@@ -269,9 +269,11 @@ public class JSONSimpleJSONReader implements org.wso2.datamapper.engine.input.Re
         }
     }
 
-    private void popObjectEndEvent(String fieldName) throws IOException, JSException, InvalidPayloadException, SchemaException {
+    private void popObjectEndEvent(String fieldName) throws IOException, JSException, InvalidPayloadException,
+            SchemaException {
         DMReaderEvent objectEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END, fieldName, null);
-        if (!ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(elementStack))) {
+        if (!ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(elementStack)) ||
+                fieldName.equals(objectEndEvent.getName())) {
             dmEventStack.pop();
         }
     }

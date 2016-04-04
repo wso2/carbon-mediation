@@ -59,7 +59,7 @@ public class OutputMessageBuilder {
                 outputWriter.writeField(readerEvent.getName(), readerEvent.getValue());
                 break;
             case OBJECT_END:
-                outputWriter.writeEndObject();
+                outputWriter.writeEndObject(readerEvent.getName());
                 break;
             case TERMINATE:
                 mappingHandler.notifyOutputVariable(outputWriter.terminateMessageBuilding());

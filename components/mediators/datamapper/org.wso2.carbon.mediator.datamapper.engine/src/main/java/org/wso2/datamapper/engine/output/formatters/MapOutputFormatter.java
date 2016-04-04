@@ -43,7 +43,8 @@ public class MapOutputFormatter implements Formattable {
     private OutputMessageBuilder outputMessageBuilder;
 
     @Override
-    public void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema) throws SchemaException, WriterException {
+    public void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema)
+            throws SchemaException, WriterException {
         if (model.getModel() instanceof Map) {
             this.outputMessageBuilder = outputMessageBuilder;
             Map<String, Object> mapOutputModel = (Map<String, Object>) model.getModel();
@@ -108,13 +109,13 @@ public class MapOutputFormatter implements Formattable {
                     }
                     traverseMap((Map<String, Object>) value);
                     if (mapKeyIndex != mapKeys.size() - 1) {
-                        sendObjectEndEvent();
+                        sendObjectEndEvent(key);
                     }
                 } else {
                     sendObjectStartEvent(key);
                     traverseMap((Map<String, Object>) value);
                     if (!key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
-                        sendObjectEndEvent();
+                        sendObjectEndEvent(key);
                     }
                 }
             } else {
@@ -128,7 +129,8 @@ public class MapOutputFormatter implements Formattable {
     }
 
     private void sendAnonymousObjectStartEvent() throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START, null, null));
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START,
+                null, null));
     }
 
     private void sendArrayEndEvent() throws SchemaException, WriterException {
@@ -151,11 +153,13 @@ public class MapOutputFormatter implements Formattable {
     }
 
     private void sendObjectStartEvent(String elementName) throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START, elementName, null));
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START,
+                elementName, null));
     }
 
-    private void sendObjectEndEvent() throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END, null, null));
+    private void sendObjectEndEvent(String objectName) throws SchemaException, WriterException {
+        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END, objectName,
+                null));
     }
 
     private void sendFieldEvent(String fieldName, Object value) throws SchemaException, WriterException {
