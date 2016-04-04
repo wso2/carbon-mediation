@@ -44,6 +44,8 @@ public class MappingHandler implements InputVariableCallback, OutputVariableCall
         this.outputMessageBuilder = outputMessageBuilder;
         this.scriptExecutor = scriptExecutor;
         inputModelBuilder.buildInputModel(inputMsg, this);
+        while (outputVariable == null) {
+        }
         return outputVariable;
     }
 

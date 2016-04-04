@@ -34,6 +34,7 @@ import java.util.List;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
+import static org.wso2.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
 
 /**
  * This class implements {@link Writer} interface and json writer for data mapper engine using Jackson
@@ -54,7 +55,7 @@ public class JacksonJSONWriter implements Writer {
         elementStack.add(new SchemaElement(outputSchema.getName()));
         try {
             jsonGenerator = jsonFactory.createGenerator(writer);
-            jsonGenerator.writeStartObject();
+            writeStartAnonymousObject();
         } catch (IOException e) {
             log.error("Error while creating json generator" + e);
         }
@@ -105,12 +106,22 @@ public class JacksonJSONWriter implements Writer {
     }
 
     @Override
-    public void writeEndObject() {
+    public void writeEndObject(String objectName) {
         try {
-            jsonGenerator.writeEndObject();
-            elementStack.remove(elementStack.size() - 1);
+            if (elementStack.get(elementStack.size() - 1).getElementName().equals(objectName)) {
+                if ((!ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(elementStack)) && !elementStack.isEmpty())) {
+                    elementStack.remove(elementStack.size() - 1);
+                    jsonGenerator.writeEndObject();
+                } else {
+                    jsonGenerator.writeEndObject();
+                }
+            }
         } catch (IOException e) {
             log.error("Error while creating ending object" + e);
+        } catch (SchemaException e) {
+            log.error(e.getMessage(), e);
+        } catch (InvalidPayloadException e) {
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -118,6 +129,7 @@ public class JacksonJSONWriter implements Writer {
     public String terminateMessageBuilding() {
         String inputJSVariable = null;
         try {
+            writeEndObject(null);
             jsonGenerator.close();
             inputJSVariable = writer.toString();
             writer.close();
@@ -136,8 +148,15 @@ public class JacksonJSONWriter implements Writer {
     @Override
     public void writeEndArray() {
         try {
+            elementStack.remove(elementStack.size() - 1);
             jsonGenerator.writeEndArray();
         } catch (IOException e) {
+            try {
+                jsonGenerator.writeEndObject();
+                jsonGenerator.writeEndArray();
+            } catch (IOException e1) {
+                log.error(e.getMessage(), e);
+            }
             log.error("Error while creating end array" + e);
         }
     }
@@ -146,7 +165,6 @@ public class JacksonJSONWriter implements Writer {
     public void writeStartAnonymousObject() {
         try {
             jsonGenerator.writeStartObject();
-            elementStack.remove(elementStack.size() - 1);
         } catch (IOException e) {
             log.error("Error while creating anonymous object " + e);
         }
