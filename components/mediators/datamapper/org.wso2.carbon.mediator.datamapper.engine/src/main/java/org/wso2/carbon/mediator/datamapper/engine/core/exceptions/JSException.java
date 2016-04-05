@@ -14,18 +14,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-/*Defines configuration properties for DataMapperMediator*/
-package org.wso2.carbon.mediator.datamapper.config.xml;
+package org.wso2.carbon.mediator.datamapper.engine.core.exceptions;
 
 /**
- * Defines the properties and attributes of DataMapperMediator
+ * This exception is thrown when script executors can not execute the script
  */
-public class DataMapperMediatorConstants {
-    public static final String DATAMAPPER = "datamapper";
-    public static final String CONFIG = "config";
-    public static final String INPUT_SCHEMA = "inputSchema";
-    public static final String OUTPUT_SCHEMA = "outputSchema";
-    public static final String INPUT_TYPE = "inputType";
-    public static final String OUTPUT_TYPE = "outputType";
+public class JSException extends Exception {
+
+    private static final long serialVersionUID = 1L;
+
+    private String message = null;
+
+    public JSException(String message) {
+        super(message);
+        this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return message;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
 }

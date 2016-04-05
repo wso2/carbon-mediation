@@ -73,13 +73,13 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
         OMAttribute configKeyAttribute = element.getAttribute(new QName(
                 DataMapperMediatorConstants.CONFIG));
         OMAttribute inputSchemaKeyAttribute = element.getAttribute(new QName(
-                DataMapperMediatorConstants.INPUTSCHEMA));
+                DataMapperMediatorConstants.INPUT_SCHEMA));
         OMAttribute outputSchemaKeyAttribute = element.getAttribute(new QName(
-                DataMapperMediatorConstants.OUTPUTSCHEMA));
+                DataMapperMediatorConstants.OUTPUT_SCHEMA));
         OMAttribute inputTypeAttribute = element.getAttribute(new QName(
-                DataMapperMediatorConstants.INPUTTYPE));
+                DataMapperMediatorConstants.INPUT_TYPE));
         OMAttribute outputTypeAttribute = element.getAttribute(new QName(
-                DataMapperMediatorConstants.OUTPUTTYPE));
+                DataMapperMediatorConstants.OUTPUT_TYPE));
 
 		/*
          * ValueFactory for creating dynamic or static Value and provide methods

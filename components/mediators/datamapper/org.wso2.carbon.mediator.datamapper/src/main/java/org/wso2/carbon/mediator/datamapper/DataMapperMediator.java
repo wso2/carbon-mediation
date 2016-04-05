@@ -37,18 +37,18 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.util.AXIOMUtils;
-import org.wso2.datamapper.engine.core.exceptions.JSException;
-import org.wso2.datamapper.engine.core.exceptions.ReaderException;
-import org.wso2.datamapper.engine.core.exceptions.SchemaException;
-import org.wso2.datamapper.engine.core.executors.Executor;
-import org.wso2.datamapper.engine.core.executors.ScriptExecutorFactory;
-import org.wso2.datamapper.engine.core.mapper.MappingHandler;
-import org.wso2.datamapper.engine.core.mapper.MappingResourceLoader;
-import org.wso2.datamapper.engine.input.InputModelBuilder;
-import org.wso2.datamapper.engine.output.OutputMessageBuilder;
-import org.wso2.datamapper.engine.utils.DMModelTypes;
-import org.wso2.datamapper.engine.utils.DataMapperEngineConstants;
-import org.wso2.datamapper.engine.utils.InputOutputDataTypes;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.carbon.mediator.datamapper.engine.core.executors.Executor;
+import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutorFactory;
+import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
+import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResourceLoader;
+import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DMModelTypes;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -291,7 +291,6 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     }
                 } else {
                     synCtx.getEnvelope().getBody().getFirstElement().detach();
-                    synCtx.getEnvelope().getBody().addChild(outputMessage);
                 }
 
             } else if (InputOutputDataTypes.DataType.JSON.toString().equals(outputType)) {
@@ -385,14 +384,13 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             handleException("DataMapper mediator : output schema is null", synCtx);
         }
 
-        // Creates a new mappingResourceLoader
-        MappingResourceLoader mappingResourceLoader = null;
         try {
-            mappingResourceLoader = new MappingResourceLoader(inputSchemaStream, outputSchemaStream, configFileInputStream);
+            // Creates a new mappingResourceLoader
+            return new MappingResourceLoader(inputSchemaStream, outputSchemaStream, configFileInputStream);
         } catch (SchemaException | JSException e) {
-            throw new SynapseException(e.getMessage());
+            handleException(e.getMessage(), synCtx);
         }
-        return mappingResourceLoader;
+        return null;
     }
 
     /**
@@ -412,7 +410,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             }
             OMTextImpl text = (OMTextImpl) entry;
             String content = text.getText();
-            inputStream = new ByteArrayInputStream(content.getBytes());
+            inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
         }
         return inputStream;
     }

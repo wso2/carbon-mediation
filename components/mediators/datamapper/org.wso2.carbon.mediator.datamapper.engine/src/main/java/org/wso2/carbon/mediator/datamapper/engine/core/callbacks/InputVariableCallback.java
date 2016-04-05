@@ -14,18 +14,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.carbon.mediator.datamapper.engine.core.callbacks;
 
-/*Defines configuration properties for DataMapperMediator*/
-package org.wso2.carbon.mediator.datamapper.config.xml;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 
 /**
- * Defines the properties and attributes of DataMapperMediator
+ *
  */
-public class DataMapperMediatorConstants {
-    public static final String DATAMAPPER = "datamapper";
-    public static final String CONFIG = "config";
-    public static final String INPUT_SCHEMA = "inputSchema";
-    public static final String OUTPUT_SCHEMA = "outputSchema";
-    public static final String INPUT_TYPE = "inputType";
-    public static final String OUTPUT_TYPE = "outputType";
+public interface InputVariableCallback {
+
+    void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException;
 }

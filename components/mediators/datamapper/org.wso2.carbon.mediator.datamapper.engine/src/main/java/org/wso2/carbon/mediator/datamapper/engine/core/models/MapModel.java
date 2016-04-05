@@ -14,18 +14,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.carbon.mediator.datamapper.engine.core.models;
 
-/*Defines configuration properties for DataMapperMediator*/
-package org.wso2.carbon.mediator.datamapper.config.xml;
+import java.util.Map;
 
 /**
- * Defines the properties and attributes of DataMapperMediator
+ * This class implements {@link Model} interface with a {@link Map} to hold data
  */
-public class DataMapperMediatorConstants {
-    public static final String DATAMAPPER = "datamapper";
-    public static final String CONFIG = "config";
-    public static final String INPUT_SCHEMA = "inputSchema";
-    public static final String OUTPUT_SCHEMA = "outputSchema";
-    public static final String INPUT_TYPE = "inputType";
-    public static final String OUTPUT_TYPE = "outputType";
+public class MapModel implements Model<Map<String, Object>> {
+
+    private Map<String, Object> mapDataHolder;
+
+    public MapModel(Map<String, Object> model) {
+        mapDataHolder = model;
+    }
+
+    @Override
+    public void setModel(Map<String, Object> model) {
+        mapDataHolder = model;
+    }
+
+    @Override
+    public Map<String, Object> getModel() {
+        return mapDataHolder;
+    }
 }

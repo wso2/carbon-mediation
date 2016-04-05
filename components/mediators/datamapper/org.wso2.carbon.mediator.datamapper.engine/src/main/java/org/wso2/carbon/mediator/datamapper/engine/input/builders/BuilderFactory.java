@@ -14,18 +14,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.wso2.carbon.mediator.datamapper.engine.input.builders;
 
-/*Defines configuration properties for DataMapperMediator*/
-package org.wso2.carbon.mediator.datamapper.config.xml;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DMModelTypes;
+
+import java.io.IOException;
 
 /**
- * Defines the properties and attributes of DataMapperMediator
+ * This class is a factory class to get {@link Builder} needed by the data mapper engine
  */
-public class DataMapperMediatorConstants {
-    public static final String DATAMAPPER = "datamapper";
-    public static final String CONFIG = "config";
-    public static final String INPUT_SCHEMA = "inputSchema";
-    public static final String OUTPUT_SCHEMA = "outputSchema";
-    public static final String INPUT_TYPE = "inputType";
-    public static final String OUTPUT_TYPE = "outputType";
+public class BuilderFactory {
+
+    public static Builder getBuilder(DMModelTypes.ModelType inputType) throws IOException {
+        switch (inputType) {
+            case JSON_STRING:
+                return new JacksonJSONBuilder();
+        }
+        throw new IllegalArgumentException("Model builder for type " + inputType + " is not implemented.");
+    }
+
 }

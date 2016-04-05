@@ -72,7 +72,7 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
         if (dataMapperMediator.getInputSchemaKey() != null) {
             ValueSerializer keySerializer = new ValueSerializer();
             keySerializer.serializeValue(dataMapperMediator.getInputSchemaKey(),
-                    DataMapperMediatorConstants.INPUTSCHEMA, dataMapperElement);
+                    DataMapperMediatorConstants.INPUT_SCHEMA, dataMapperElement);
         } else {
             handleException("Invalid DataMapper mediator. InputSchema registry key is required");
         }
@@ -80,24 +80,17 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
         if (dataMapperMediator.getOutputSchemaKey() != null) {
             ValueSerializer keySerializer = new ValueSerializer();
             keySerializer.serializeValue(dataMapperMediator.getOutputSchemaKey(),
-                    DataMapperMediatorConstants.OUTPUTSCHEMA, dataMapperElement);
+                    DataMapperMediatorConstants.OUTPUT_SCHEMA, dataMapperElement);
         } else {
             handleException("Invalid DataMapper mediator. OutputSchema registry key is required");
         }
 
-        if (dataMapperMediator.getInputType() != null) {
-            dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.INPUTTYPE,
-                    nullNS, dataMapperMediator.getInputType()));
-        } else {
-            handleException("InputType is required");
-        }
-        if (dataMapperMediator.getOutputType() != null) {
-            dataMapperElement
-                    .addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.OUTPUTTYPE, nullNS,
-                            dataMapperMediator.getOutputType()));
-        } else {
-            handleException("OutputType is required");
-        }
+        dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.INPUT_TYPE,
+                nullNS, dataMapperMediator.getInputType()));
+
+        dataMapperElement
+                .addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.OUTPUT_TYPE, nullNS,
+                        dataMapperMediator.getOutputType()));
 
         saveTracingState(dataMapperElement, dataMapperMediator);
 

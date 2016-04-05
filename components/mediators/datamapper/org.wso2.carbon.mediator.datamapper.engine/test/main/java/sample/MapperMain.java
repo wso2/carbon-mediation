@@ -17,14 +17,14 @@
 
 package sample;
 
-import org.wso2.datamapper.engine.core.executors.ScriptExecutor;
-import org.wso2.datamapper.engine.core.executors.ScriptExecutorType;
-import org.wso2.datamapper.engine.core.mapper.MappingHandler;
-import org.wso2.datamapper.engine.core.mapper.MappingResourceLoader;
-import org.wso2.datamapper.engine.input.InputModelBuilder;
-import org.wso2.datamapper.engine.output.OutputMessageBuilder;
-import org.wso2.datamapper.engine.utils.DMModelTypes;
-import org.wso2.datamapper.engine.utils.InputOutputDataTypes;
+import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutor;
+import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutorType;
+import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
+import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResourceLoader;
+import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DMModelTypes;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
 
 import java.io.File;
 import java.io.FileInputStream;
