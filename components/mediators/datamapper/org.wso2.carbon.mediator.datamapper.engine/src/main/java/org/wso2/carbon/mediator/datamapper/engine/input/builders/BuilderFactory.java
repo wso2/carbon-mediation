@@ -16,7 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.builders;
 
-import org.wso2.carbon.mediator.datamapper.engine.utils.DMModelTypes;
+import org.wso2.carbon.mediator.datamapper.engine.utils.ModelTypes;
 
 import java.io.IOException;
 
@@ -25,7 +25,7 @@ import java.io.IOException;
  */
 public class BuilderFactory {
 
-    public static Builder getBuilder(DMModelTypes.ModelType inputType) throws IOException {
+    public static Builder getBuilder(ModelTypes inputType) throws IOException {
         switch (inputType) {
             case JSON_STRING:
                 return new JacksonJSONBuilder();

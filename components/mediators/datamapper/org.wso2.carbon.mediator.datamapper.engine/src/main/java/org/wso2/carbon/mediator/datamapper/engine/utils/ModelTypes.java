@@ -14,16 +14,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.mediator.datamapper.engine.core.callbacks;
+package org.wso2.carbon.mediator.datamapper.engine.utils;
 
-import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
-import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
-import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
+public enum ModelTypes {
 
-/**
- *
- */
-public interface InputVariableCallback {
+    JSON_STRING("JSON_STRING"),
+    JAVA_MAP("MAP");
 
-    void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException;
+    private String value;
+
+    ModelTypes(String value) {
+        this.value = value;
+    }
+
 }

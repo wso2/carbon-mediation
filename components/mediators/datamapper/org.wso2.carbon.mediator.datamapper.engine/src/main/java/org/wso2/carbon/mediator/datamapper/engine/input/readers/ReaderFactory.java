@@ -23,7 +23,7 @@ import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
  */
 public class ReaderFactory {
 
-    public static Reader getReader(InputOutputDataTypes.DataType inputType) {
+    public static Reader getReader(InputOutputDataTypes inputType) {
         switch (inputType) {
             case XML:
                 return new XMLReader();

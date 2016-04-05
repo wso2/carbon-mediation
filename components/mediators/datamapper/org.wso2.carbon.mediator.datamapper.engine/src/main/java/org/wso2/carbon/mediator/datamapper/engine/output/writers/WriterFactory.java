@@ -19,15 +19,15 @@ package org.wso2.carbon.mediator.datamapper.engine.output.writers;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes.DataType;
 
 /**
  * This class is a factory class to get {@link Writer} needed by the data mapper engine
  */
 public class WriterFactory {
 
-    public static Writer getWriter(DataType outputType, Schema outputSchema) throws SchemaException, WriterException {
+    public static Writer getWriter(InputOutputDataTypes outputType, Schema outputSchema) throws SchemaException, WriterException {
         switch (outputType) {
             case XML:
                 return new XMLWriter(outputSchema);

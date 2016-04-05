@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.JSFunction;
-import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResourceLoader;
+import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.MapModel;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
@@ -63,7 +63,7 @@ public class ScriptExecutor implements Executor {
     }
 
     @Override
-    public Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException, SchemaException {
+    public Model execute(MappingResource resourceModel, String inputRecord) throws JSException, SchemaException {
         try {
             JSFunction jsFunction = resourceModel.getFunction();
             injectInputVariableToEngine(resourceModel.getInputSchema().getName(), inputRecord);

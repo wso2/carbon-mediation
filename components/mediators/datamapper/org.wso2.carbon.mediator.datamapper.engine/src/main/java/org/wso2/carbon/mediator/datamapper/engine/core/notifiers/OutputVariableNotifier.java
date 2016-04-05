@@ -14,12 +14,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.mediator.datamapper.engine.core.callbacks;
+package org.wso2.carbon.mediator.datamapper.engine.core.notifiers;
 
 /**
  *
  */
-public interface OutputVariableCallback {
+public interface OutputVariableNotifier {
 
     void notifyOutputVariable(Object variable);
 }

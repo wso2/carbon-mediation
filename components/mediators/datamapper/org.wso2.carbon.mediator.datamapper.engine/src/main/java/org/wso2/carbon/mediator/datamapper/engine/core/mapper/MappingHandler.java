@@ -16,8 +16,8 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.core.mapper;
 
-import org.wso2.carbon.mediator.datamapper.engine.core.callbacks.InputVariableCallback;
-import org.wso2.carbon.mediator.datamapper.engine.core.callbacks.OutputVariableCallback;
+import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNotifier;
+import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
@@ -30,19 +30,24 @@ import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
 import java.io.InputStream;
 
 
-public class MappingHandler implements InputVariableCallback, OutputVariableCallback {
+public class MappingHandler implements InputVariableNotifier, OutputVariableNotifier {
 
     private String inputVariable;
     private String outputVariable;
-    private MappingResourceLoader mappingResourceLoader;
+    private MappingResource mappingResource;
     private OutputMessageBuilder outputMessageBuilder;
     private Executor scriptExecutor;
+    private InputModelBuilder inputModelBuilder;
 
-    public String doMap(InputStream inputMsg, MappingResourceLoader resourceModel, InputModelBuilder inputModelBuilder,
-                        OutputMessageBuilder outputMessageBuilder, Executor scriptExecutor) throws JSException, ReaderException {
-        this.mappingResourceLoader = resourceModel;
+    public MappingHandler(MappingResource mappingResource, Executor scriptExecutor,
+                          InputModelBuilder inputModelBuilder, OutputMessageBuilder outputMessageBuilder){
+        this.mappingResource = mappingResource;
         this.outputMessageBuilder = outputMessageBuilder;
         this.scriptExecutor = scriptExecutor;
+        this.inputModelBuilder = inputModelBuilder;
+    }
+
+    public String doMap(InputStream inputMsg) throws ReaderException {
         inputModelBuilder.buildInputModel(inputMsg, this);
         return outputVariable;
     }
@@ -51,7 +56,7 @@ public class MappingHandler implements InputVariableCallback, OutputVariableCall
     public void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException {
         this.inputVariable = (String) variable;
         Model outputModel = null;
-        outputModel = scriptExecutor.execute(mappingResourceLoader, inputVariable);
+        outputModel = scriptExecutor.execute(mappingResource, inputVariable);
         //TODO : move output message builder to output component
         try {
             outputMessageBuilder.buildOutputMessage(outputModel, this);

@@ -16,7 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.output;
 
-import org.wso2.carbon.mediator.datamapper.engine.core.callbacks.OutputVariableCallback;
+import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
@@ -27,7 +27,7 @@ import org.wso2.carbon.mediator.datamapper.engine.output.formatters.Formatter;
 import org.wso2.carbon.mediator.datamapper.engine.output.formatters.FormatterFactory;
 import org.wso2.carbon.mediator.datamapper.engine.output.writers.Writer;
 import org.wso2.carbon.mediator.datamapper.engine.output.writers.WriterFactory;
-import org.wso2.carbon.mediator.datamapper.engine.utils.DMModelTypes;
+import org.wso2.carbon.mediator.datamapper.engine.utils.ModelTypes;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
 
 /**
@@ -38,16 +38,16 @@ public class OutputMessageBuilder {
     private Formatter formatter;
     private Writer outputWriter;
     private Schema outputSchema;
-    private OutputVariableCallback mappingHandler;
+    private OutputVariableNotifier mappingHandler;
 
-    public OutputMessageBuilder(InputOutputDataTypes.DataType dataType, DMModelTypes.ModelType dmModelType
+    public OutputMessageBuilder(InputOutputDataTypes dataType, ModelTypes dmModelType
             , Schema outputSchema) throws SchemaException, WriterException {
         this.outputSchema = outputSchema;
         this.formatter = FormatterFactory.getFormatter(dmModelType);
         this.outputWriter = WriterFactory.getWriter(dataType, outputSchema);
     }
 
-    public void buildOutputMessage(Model outputModel, OutputVariableCallback mappingHandler) throws SchemaException, WriterException {
+    public void buildOutputMessage(Model outputModel, OutputVariableNotifier mappingHandler) throws SchemaException, WriterException {
         this.mappingHandler = mappingHandler;
         formatter.format(outputModel, this, outputSchema);
     }
@@ -96,7 +96,7 @@ public class OutputMessageBuilder {
         this.outputWriter = outputWriter;
     }
 
-    public OutputVariableCallback getMappingHandler() {
+    public OutputVariableNotifier getMappingHandler() {
         return mappingHandler;
     }
 

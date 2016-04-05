@@ -18,7 +18,7 @@ package org.wso2.carbon.mediator.datamapper.engine.core.executors;
 
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
-import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResourceLoader;
+import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 
 /**
@@ -27,7 +27,7 @@ import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 public interface Executor {
 
     /**
-     * Method to execute the mapping config in the {@link MappingResourceLoader} on
+     * Method to execute the mapping config in the {@link MappingResource} on
      * input generic record and returns the output generic record
      *
      * @param resourceModel mapping resource model
@@ -35,5 +35,5 @@ public interface Executor {
      * @return model model
      * @throws JSException
      */
-    public Model execute(MappingResourceLoader resourceModel, String inputRecord) throws JSException, SchemaException;
+    public Model execute(MappingResource resourceModel, String inputRecord) throws JSException, SchemaException;
 }

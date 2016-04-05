@@ -14,20 +14,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.mediator.datamapper.engine.output.formatters;
+package org.wso2.carbon.mediator.datamapper.engine.core.notifiers;
 
-import org.wso2.carbon.mediator.datamapper.engine.utils.ModelTypes;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 
-/**
- * This class is a factory class to get {@link Formatter} needed by the data mapper engine
- */
-public class FormatterFactory {
+public interface InputVariableNotifier {
 
-    public static Formatter getFormatter(ModelTypes formatterType) {
-        switch (formatterType) {
-            case JAVA_MAP:
-                return new MapOutputFormatter();
-        }
-        throw new IllegalArgumentException("Model fomatter for type " + formatterType + " is not implemented.");
-    }
+    void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException;
 }

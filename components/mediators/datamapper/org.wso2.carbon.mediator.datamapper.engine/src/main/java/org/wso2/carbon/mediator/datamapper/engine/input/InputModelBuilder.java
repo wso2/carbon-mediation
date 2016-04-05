@@ -16,7 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input;
 
-import org.wso2.carbon.mediator.datamapper.engine.core.callbacks.InputVariableCallback;
+import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
@@ -26,7 +26,7 @@ import org.wso2.carbon.mediator.datamapper.engine.input.builders.BuilderFactory;
 import org.wso2.carbon.mediator.datamapper.engine.input.readers.Reader;
 import org.wso2.carbon.mediator.datamapper.engine.input.readers.ReaderFactory;
 import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.DMReaderEvent;
-import org.wso2.carbon.mediator.datamapper.engine.utils.DMModelTypes;
+import org.wso2.carbon.mediator.datamapper.engine.utils.ModelTypes;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
 
 import java.io.IOException;
@@ -40,16 +40,16 @@ public class InputModelBuilder {
     private Reader inputReader;
     private Builder modelBuilder;
     private Schema inputSchema;
-    private InputVariableCallback mappingHandler;
+    private InputVariableNotifier mappingHandler;
 
-    public InputModelBuilder(InputOutputDataTypes.DataType inputType,
-                             DMModelTypes.ModelType modelType, Schema inputSchema) throws IOException {
-        inputReader = ReaderFactory.getReader(inputType);
-        modelBuilder = BuilderFactory.getBuilder(modelType);
+    public InputModelBuilder(InputOutputDataTypes inputType,
+                             ModelTypes modelType, Schema inputSchema) throws IOException {
+        this.inputReader = ReaderFactory.getReader(inputType);
+        this.modelBuilder = BuilderFactory.getBuilder(modelType);
         this.inputSchema = inputSchema;
     }
 
-    public void buildInputModel(InputStream inputStream, InputVariableCallback mappingHandler) throws ReaderException {
+    public void buildInputModel(InputStream inputStream, InputVariableNotifier mappingHandler) throws ReaderException {
         this.mappingHandler = mappingHandler;
         inputReader.read(inputStream, this, inputSchema);
     }

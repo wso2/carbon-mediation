@@ -29,8 +29,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MappingResourceLoader {
+public class MappingResource {
 
+    public static final String NAMESPACE_DELIMETER = ":";
     private Schema inputSchema;
     private Schema outputSchema;
     private String inputRootelement;
@@ -44,20 +45,16 @@ public class MappingResourceLoader {
      * @throws IOException when input errors, If there any parser exception occur while passing above schemas method
      *                     will this exception
      */
-    public MappingResourceLoader(InputStream inputSchema, InputStream outputSchema,
-                                 InputStream mappingConfig) throws IOException, SchemaException, JSException {
+    public MappingResource(InputStream inputSchema, InputStream outputSchema,
+                           InputStream mappingConfig) throws SchemaException, JSException {
         this.inputSchema = getJSONSchema(inputSchema);
         this.outputSchema = getJSONSchema(outputSchema);
         this.inputRootelement = this.inputSchema.getName();
         this.outputRootelement = this.outputSchema.getName();
         this.function = createFunction(mappingConfig);
-
-        if (this.function == null) {
-            throw new JSException("Mapping js function is null");
-        }
     }
 
-    private Schema getJSONSchema(InputStream inputSchema) throws IOException, SchemaException {
+    private Schema getJSONSchema(InputStream inputSchema) throws SchemaException {
         return new JacksonJSONSchema(inputSchema);
     }
 
@@ -80,32 +77,40 @@ public class MappingResourceLoader {
      *
      * @param mappingConfig mapping configuration
      * @return java script function
-     * @throws IOException
      */
-    private JSFunction createFunction(InputStream mappingConfig) throws IOException {
+    private JSFunction createFunction(InputStream mappingConfig) throws JSException {
         BufferedReader configReader = new BufferedReader(new InputStreamReader(mappingConfig, StandardCharsets.UTF_8));
         //need to identify the main method of the configuration because that method going to execute in engine
-        String[] inputRootelementArray = inputRootelement.split(":");
-        String inputRootElement = inputRootelementArray[inputRootelementArray.length - 1];
-        String[] outputRootelementArray = outputRootelement.split(":");
-        String outputRootElement = outputRootelementArray[outputRootelementArray.length - 1];
+        String[] inputRootElementArray = inputRootelement.split(NAMESPACE_DELIMETER);
+        String inputRootElement = inputRootElementArray[inputRootElementArray.length - 1];
+        String[] outputRootElementArray = outputRootelement.split(NAMESPACE_DELIMETER);
+        String outputRootElement = outputRootElementArray[outputRootElementArray.length - 1];
+
+        //TODO : remove (L|S)
         Pattern functionIdPattern = Pattern.compile(
                 "(function )(map_(L|S)_" + inputRootElement + "_(L|S)_" + outputRootElement + ")");
         String fnName = null;
-        String configLine = "";
-        StringBuilder configScriptbuilder = new StringBuilder();
-        while ((configLine = configReader.readLine()) != null) {
-            configScriptbuilder.append(configLine);
-            Matcher matcher = functionIdPattern.matcher(configLine);
-            if (matcher.find()) {
-                fnName = matcher.group(2);
+        String configLine;
+        StringBuilder configScriptBuilder = new StringBuilder();
+        try {
+            while ((configLine = configReader.readLine()) != null) {
+                configScriptBuilder.append(configLine);
+                Matcher matcher = functionIdPattern.matcher(configLine);
+                if (matcher.find()) {
+                    //get the second matching group for the function name
+                    fnName = matcher.group(2);
+                }
             }
+        } catch (IOException e) {
+            throw new JSException(e.getMessage());
         }
 
         if (fnName != null) {
-            return new JSFunction(fnName, configScriptbuilder.toString());
+            return new JSFunction(fnName, configScriptBuilder.toString());
+        } else {
+            throw new JSException("Could not find mapping JavaScript function. Expecting function name pattern is " +
+                    functionIdPattern.toString());
         }
-        return null;
     }
 
 }

@@ -55,22 +55,28 @@ public class JacksonJSONSchema implements Schema {
     private Map<String, String> namespaceMap;
 
     public JacksonJSONSchema(InputStream inputSchema) throws SchemaException {
-        namespaceMap = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             jsonSchemaMap = objectMapper.readValue(inputSchema, Map.class);
-            //populating name-space value map
-            ArrayList<Map> namespaceElementArray = (ArrayList) jsonSchemaMap.get(NAMESPACE_KEY);
-            if (namespaceElementArray != null) {
-                for (Map namespaceObject : namespaceElementArray) {
-                    String urlValue = (String) namespaceObject.get(URL_KEY);
-                    if (!namespaceMap.containsKey(urlValue)) {
-                        namespaceMap.put(urlValue, (String) namespaceObject.get(PREFIX_KEY));
-                    }
+        } catch (IOException e) {
+            throw new SchemaException("Error while reading input stream. " + e.getMessage());
+        }
+        initNamespaceMap();
+    }
+
+    /**
+     * populating name-space value map
+     */
+    private void initNamespaceMap() {
+        namespaceMap = new HashMap<>();
+        ArrayList<Map> namespaceElementArray = (ArrayList<Map>) jsonSchemaMap.get(NAMESPACE_KEY);
+        if (namespaceElementArray != null) {
+            for (Map namespaceObject : namespaceElementArray) {
+                String urlValue = (String) namespaceObject.get(URL_KEY);
+                if (!namespaceMap.containsKey(urlValue)) {
+                    namespaceMap.put(urlValue, (String) namespaceObject.get(PREFIX_KEY));
                 }
             }
-        } catch (IOException e) {
-            throw new SchemaException("Error while reading input stream" + e);
         }
     }
 
