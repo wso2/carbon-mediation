@@ -48,7 +48,7 @@ public class XMLWriter implements Writer {
     private Map<String, String> namespaceMap;
     private static final String NAMESPACE_SEPERATOR = "_";
 
-    public XMLWriter(Schema outputSchema) throws SchemaException {
+    public XMLWriter(Schema outputSchema) throws SchemaException, WriterException {
         this.outputSchema = outputSchema;
         arrayElementStack = new Stack<>();
         stringWriter = new StringWriter();
@@ -64,7 +64,7 @@ public class XMLWriter implements Writer {
                 xMLStreamWriter.writeNamespace(entry.getValue(), entry.getKey());
             }
         } catch (XMLStreamException e) {
-            log.error("Error while creating xml output factory");
+            throw new WriterException("Error while creating xml output factory. " + e.getMessage());
         }
     }
 

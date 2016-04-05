@@ -74,10 +74,8 @@ public class ScriptExecutor implements Executor {
                 return new MapModel((Map<String, Object>) result);
             }
         } catch (ScriptException e) {
-            log.error("Script execution failed", e);
             throw new JSException("Script engine unable to execute the script " + e);
         } catch (NoSuchMethodException e) {
-            log.error("Undefined method called to execute", e);
             throw new JSException("Undefined method called to execute " + e);
         }
         throw new JSException("Undefined method called to execute");

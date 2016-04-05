@@ -40,6 +40,7 @@ import org.apache.synapse.util.AXIOMUtils;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.executors.Executor;
 import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutorFactory;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
@@ -299,7 +300,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 JsonUtil.newJsonPayload(axis2MessageContext, outputVariable, true, true);
             }
         } catch (ReaderException | InterruptedException | JSException | XMLStreamException | SchemaException
-                | IOException e) {
+                | IOException | WriterException e) {
             handleException("DataMapper mediator : mapping failed", e, synCtx);
         }
     }

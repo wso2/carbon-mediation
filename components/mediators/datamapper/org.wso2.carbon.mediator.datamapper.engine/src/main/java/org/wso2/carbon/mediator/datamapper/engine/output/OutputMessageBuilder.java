@@ -41,7 +41,7 @@ public class OutputMessageBuilder {
     private OutputVariableCallback mappingHandler;
 
     public OutputMessageBuilder(InputOutputDataTypes.DataType dataType, DMModelTypes.ModelType dmModelType
-            , Schema outputSchema) throws SchemaException {
+            , Schema outputSchema) throws SchemaException, WriterException {
         this.outputSchema = outputSchema;
         this.formatter = FormatterFactory.getFormatter(dmModelType);
         this.outputWriter = WriterFactory.getWriter(dataType, outputSchema);

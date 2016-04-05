@@ -25,12 +25,16 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaExceptio
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.SchemaElement;
-import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 
 /**
  * This class implements {@link Writer} interface and json writer for data mapper engine using Jackson
@@ -43,7 +47,7 @@ public class JacksonJSONWriter implements Writer {
     private StringWriter writer;
     private List<SchemaElement> elementStack;
 
-    public JacksonJSONWriter(Schema outputSchema) throws SchemaException {
+    public JacksonJSONWriter(Schema outputSchema) throws SchemaException, WriterException {
         this.outputSchema = outputSchema;
         JsonFactory jsonFactory = new JsonFactory();
         writer = new StringWriter();
@@ -53,7 +57,7 @@ public class JacksonJSONWriter implements Writer {
             jsonGenerator = jsonFactory.createGenerator(writer);
             writeStartAnonymousObject();
         } catch (IOException e) {
-            log.error("Error while creating json generator" + e);
+            throw new WriterException("Error while creating json generator. " + e.getMessage());
         }
     }
 
@@ -61,8 +65,8 @@ public class JacksonJSONWriter implements Writer {
     public void writeStartObject(String name) throws WriterException {
         try {
             String schemaName = name;
-            if (name.endsWith(DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
-                schemaName = name.substring(0, name.lastIndexOf(DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
+            if (name.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
+                schemaName = name.substring(0, name.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
             }
             elementStack.add(new SchemaElement(schemaName));
             String type = null;
@@ -71,21 +75,21 @@ public class JacksonJSONWriter implements Writer {
             } catch (InvalidPayloadException | SchemaException e) {
                 throw new WriterException(e.getMessage());
             }
-            if (DataMapperEngineConstants.OBJECT_ELEMENT_TYPE.equals(type)) {
+            if (OBJECT_ELEMENT_TYPE.equals(type)) {
                 jsonGenerator.writeObjectFieldStart(name);
-            } else if (DataMapperEngineConstants.STRING_ELEMENT_TYPE.equals(type)) {
+            } else if (STRING_ELEMENT_TYPE.equals(type)) {
                 jsonGenerator.writeObjectFieldStart(name);
             } else {
                 jsonGenerator.writeArrayFieldStart(name);
                 jsonGenerator.writeStartObject();
             }
         } catch (IOException e) {
-            log.error("Error while creating starting object" + e);
+            throw new WriterException("Error while creating starting object. " + e.getMessage());
         }
     }
 
     @Override
-    public void writeField(String name, Object value) {
+    public void writeField(String name, Object value) throws WriterException {
         try {
             if (value instanceof String) {
                 jsonGenerator.writeStringField(name, (String) value);
@@ -97,32 +101,27 @@ public class JacksonJSONWriter implements Writer {
                 jsonGenerator.writeBooleanField(name, (Boolean) value);
             }
         } catch (IOException e) {
-            log.error("Error while creating writing field" + e);
+            throw new WriterException("Error while creating writing field. " + e.getMessage());
         }
     }
 
     @Override
-    public void writeEndObject(String objectName) {
+    public void writeEndObject(String objectName) throws WriterException {
         try {
-            if (elementStack.get(elementStack.size() - 1).getElementName().equals(objectName)) {
-                if ((!DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(elementStack)) && !elementStack.isEmpty())) {
-                    elementStack.remove(elementStack.size() - 1);
-                    jsonGenerator.writeEndObject();
-                } else {
-                    jsonGenerator.writeEndObject();
-                }
+            if ((!ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(elementStack)) &&
+                    !elementStack.isEmpty()) && elementStack.get(elementStack.size() - 1).getElementName().equals(objectName)) {
+                elementStack.remove(elementStack.size() - 1);
+                jsonGenerator.writeEndObject();
+            } else if (ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(elementStack))) {
+                jsonGenerator.writeEndObject();
             }
-        } catch (IOException e) {
-            log.error("Error while creating ending object" + e);
-        } catch (SchemaException e) {
-            log.error(e.getMessage(), e);
-        } catch (InvalidPayloadException e) {
-            log.error(e.getMessage(), e);
+        } catch (IOException | SchemaException | InvalidPayloadException e) {
+            throw new WriterException("Error while creating ending object. " + e.getMessage());
         }
     }
 
     @Override
-    public String terminateMessageBuilding() {
+    public String terminateMessageBuilding() throws WriterException {
         String inputJSVariable = null;
         try {
             writeEndObject(null);
@@ -131,9 +130,8 @@ public class JacksonJSONWriter implements Writer {
             writer.close();
             return inputJSVariable;
         } catch (IOException e) {
-            log.error("Error while creating terminating message building" + e);
+            throw new WriterException("Error while creating terminating message building. " + e.getMessage());
         }
-        return inputJSVariable;
     }
 
     @Override
@@ -142,7 +140,7 @@ public class JacksonJSONWriter implements Writer {
     }
 
     @Override
-    public void writeEndArray() {
+    public void writeEndArray() throws WriterException {
         try {
             elementStack.remove(elementStack.size() - 1);
             jsonGenerator.writeEndArray();
@@ -151,18 +149,17 @@ public class JacksonJSONWriter implements Writer {
                 jsonGenerator.writeEndObject();
                 jsonGenerator.writeEndArray();
             } catch (IOException e1) {
-                log.error(e.getMessage(), e);
+                throw new WriterException(e.getMessage());
             }
-            log.error("Error while creating end array" + e);
         }
     }
 
     @Override
-    public void writeStartAnonymousObject() {
+    public void writeStartAnonymousObject() throws WriterException {
         try {
             jsonGenerator.writeStartObject();
         } catch (IOException e) {
-            log.error("Error while creating anonymous object " + e);
+            throw new WriterException("Error while creating anonymous object. " + e.getMessage());
         }
     }
 }

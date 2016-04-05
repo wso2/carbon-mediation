@@ -17,6 +17,10 @@
 
 package sample;
 
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutor;
 import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutorType;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
@@ -28,6 +32,7 @@ import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 public class MapperMain {
@@ -63,7 +68,7 @@ public class MapperMain {
 
     }
 
-    private static String map(MappingContext c) throws Exception {
+    private static String map(MappingContext c) throws JSException, IOException, SchemaException, WriterException, ReaderException {
         MappingResourceLoader configModel = new MappingResourceLoader(c.getInputSchema(), c.getOutputSchema(),
                 c.getConfig());
         InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(c.getInputType()),

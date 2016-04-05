@@ -31,9 +31,9 @@ public interface Writer {
 
     String terminateMessageBuilding() throws WriterException;
 
-    void writeStartArray();
+    void writeStartArray() throws WriterException;
 
-    void writeEndArray();
+    void writeEndArray() throws WriterException;
 
     void writeStartAnonymousObject() throws WriterException;
 }

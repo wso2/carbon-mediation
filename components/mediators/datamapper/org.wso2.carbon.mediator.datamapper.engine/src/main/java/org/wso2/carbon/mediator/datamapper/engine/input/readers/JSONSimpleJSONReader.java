@@ -90,8 +90,7 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
                 String type = getInputSchema().getElementTypeByName(elementStack);
                 if (ReaderEventTypes.EventType.OBJECT_START.equals(stackElement.getEventType())) {
                     if (DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(type)) {
-                        log.error("Schema specifies an array of type " + type + ". But payload doesn't contain an array.");
-                        return false;
+                        throw new SimpleJSONParserException("Schema specifies an array of type " + type + ". But payload doesn't contain an array.");
                     }
                     sendObjectStartEvent(stackElement.getName());
                     return true;
@@ -293,7 +292,7 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
         getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.TERMINATE,
                 null, null));
         if (elementStack.size() != 1) {
-            log.error("elementStack contain more than one value in the end : " + elementStack.size());
+            throw new ReaderException("elementStack contain more than one value in the end : " + elementStack.size());
         } else {
             elementStack.remove(0);
         }
