@@ -16,43 +16,39 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.output;
 
-import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
-import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
+import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.DMReaderEvent;
+import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEvent;
 import org.wso2.carbon.mediator.datamapper.engine.output.formatters.Formatter;
 import org.wso2.carbon.mediator.datamapper.engine.output.formatters.FormatterFactory;
 import org.wso2.carbon.mediator.datamapper.engine.output.writers.Writer;
 import org.wso2.carbon.mediator.datamapper.engine.output.writers.WriterFactory;
-import org.wso2.carbon.mediator.datamapper.engine.utils.ModelTypes;
-import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
+import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
 
-/**
- *
- */
 public class OutputMessageBuilder {
 
     private Formatter formatter;
     private Writer outputWriter;
     private Schema outputSchema;
-    private OutputVariableNotifier mappingHandler;
+    private OutputVariableNotifier outputVariableNotifier;
 
-    public OutputMessageBuilder(InputOutputDataTypes dataType, ModelTypes dmModelType
+    public OutputMessageBuilder(InputOutputDataType dataType, ModelType modelType
             , Schema outputSchema) throws SchemaException, WriterException {
         this.outputSchema = outputSchema;
-        this.formatter = FormatterFactory.getFormatter(dmModelType);
+        this.formatter = FormatterFactory.getFormatter(modelType);
         this.outputWriter = WriterFactory.getWriter(dataType, outputSchema);
     }
 
     public void buildOutputMessage(Model outputModel, OutputVariableNotifier mappingHandler) throws SchemaException, WriterException {
-        this.mappingHandler = mappingHandler;
+        this.outputVariableNotifier = mappingHandler;
         formatter.format(outputModel, this, outputSchema);
     }
 
-    public void notifyEvent(DMReaderEvent readerEvent) throws SchemaException, WriterException {
+    public void notifyEvent(ReaderEvent readerEvent) throws SchemaException, WriterException {
         switch (readerEvent.getEventType()) {
             case OBJECT_START:
                 outputWriter.writeStartObject(readerEvent.getName());
@@ -64,7 +60,7 @@ public class OutputMessageBuilder {
                 outputWriter.writeEndObject(readerEvent.getName());
                 break;
             case TERMINATE:
-                mappingHandler.notifyOutputVariable(outputWriter.terminateMessageBuilding());
+                outputVariableNotifier.notifyOutputVariable(outputWriter.terminateMessageBuilding());
                 break;
             case ARRAY_START:
                 outputWriter.writeStartArray();
@@ -76,32 +72,8 @@ public class OutputMessageBuilder {
                 outputWriter.writeStartAnonymousObject();
                 break;
             default:
-                throw new IllegalArgumentException("Illegal Reader event found : " + readerEvent.getEventType());
+                throw new IllegalArgumentException("Unsupported reader event found : " + readerEvent.getEventType());
         }
-    }
-
-    public Formatter getFormatter() {
-        return formatter;
-    }
-
-    public void setFormatter(Formatter formatter) {
-        this.formatter = formatter;
-    }
-
-    public Writer getOutputWriter() {
-        return outputWriter;
-    }
-
-    public void setOutputWriter(Writer outputWriter) {
-        this.outputWriter = outputWriter;
-    }
-
-    public OutputVariableNotifier getMappingHandler() {
-        return mappingHandler;
-    }
-
-    public void setMappingHandler(MappingHandler mappingHandler) {
-        this.mappingHandler = mappingHandler;
     }
 
     public Schema getOutputSchema() {

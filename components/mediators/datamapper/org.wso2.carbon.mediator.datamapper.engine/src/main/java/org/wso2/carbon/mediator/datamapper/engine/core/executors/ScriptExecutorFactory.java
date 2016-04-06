@@ -18,7 +18,8 @@ package org.wso2.carbon.mediator.datamapper.engine.core.executors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
+
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.DEFAULT_DATAMAPPER_ENGINE_POOL_SIZE;
 
 /**
  * This class act as a factory to get the requested script executor
@@ -62,7 +63,7 @@ public class ScriptExecutorFactory {
                 log.debug("Script Engine set to Nashorn");
             }
 
-            int executorPoolSize = DataMapperEngineConstants.DEFAULT_DATAMAPPER_ENGINE_POOL_SIZE;
+            int executorPoolSize = DEFAULT_DATAMAPPER_ENGINE_POOL_SIZE;
             if (executorPoolSizeStr != null) {
                 executorPoolSize = Integer.parseInt(executorPoolSizeStr);
                 log.debug("Script executor pool size set to " + executorPoolSize);

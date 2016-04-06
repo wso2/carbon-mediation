@@ -16,22 +16,27 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.core.mapper;
 
-import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNotifier;
-import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.executors.Executor;
+import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutorFactory;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
+import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNotifier;
+import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
+import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 
 public class MappingHandler implements InputVariableNotifier, OutputVariableNotifier {
 
+    private String dmExecutorPoolSize;
     private String inputVariable;
     private String outputVariable;
     private MappingResource mappingResource;
@@ -39,34 +44,41 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
     private Executor scriptExecutor;
     private InputModelBuilder inputModelBuilder;
 
-    public MappingHandler(MappingResource mappingResource, Executor scriptExecutor,
-                          InputModelBuilder inputModelBuilder, OutputMessageBuilder outputMessageBuilder){
+    public MappingHandler(MappingResource mappingResource, String inputType, String outputType, String dmExecutorPoolSize) throws IOException, SchemaException, WriterException {
+        this.inputModelBuilder = new InputModelBuilder(InputOutputDataType.fromString(inputType),
+                ModelType.JSON_STRING, mappingResource.getInputSchema());
+        this.outputMessageBuilder = new OutputMessageBuilder(InputOutputDataType.fromString(outputType),
+                ModelType.JAVA_MAP, mappingResource.getOutputSchema());
+        this.dmExecutorPoolSize = dmExecutorPoolSize;
         this.mappingResource = mappingResource;
-        this.outputMessageBuilder = outputMessageBuilder;
-        this.scriptExecutor = scriptExecutor;
-        this.inputModelBuilder = inputModelBuilder;
     }
 
-    public String doMap(InputStream inputMsg) throws ReaderException {
-        inputModelBuilder.buildInputModel(inputMsg, this);
+    public String doMap(InputStream inputMsg) throws ReaderException, InterruptedException {
+        this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
+        this.inputModelBuilder.buildInputModel(inputMsg, this);
         return outputVariable;
     }
 
     @Override
     public void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException {
         this.inputVariable = (String) variable;
-        Model outputModel = null;
-        outputModel = scriptExecutor.execute(mappingResource, inputVariable);
-        //TODO : move output message builder to output component
+        Model outputModel = scriptExecutor.execute(mappingResource, inputVariable);
         try {
+            releaseExecutor();
             outputMessageBuilder.buildOutputMessage(outputModel, this);
-        } catch (WriterException e) {
-            throw new ReaderException(e.getMessage());//TODO to avoid throwing a writer exception on reader side. remove this
+        } catch (InterruptedException | WriterException e) {
+            throw new ReaderException(e.getMessage());
         }
+    }
+
+    private void releaseExecutor() throws InterruptedException {
+        ScriptExecutorFactory.releaseScriptExecutor(scriptExecutor);
+        this.scriptExecutor = null;
     }
 
     @Override
     public void notifyOutputVariable(Object variable) {
         outputVariable = (String) variable;
     }
+
 }

@@ -29,9 +29,8 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SimpleJSONPars
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.DMReaderEvent;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEventTypes;
-import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
+import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEvent;
+import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEventType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,12 +40,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class JSONSimpleJSONReader implements Reader, ContentHandler {
-    private static final Log log = LogFactory.getLog(JSONSimpleJSONReader.class);
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NULL_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
+
+/**
+ * This is a JSON reader implementation based on JSON Simple library.
+ */
+public class JSONReader implements Reader, ContentHandler {
+    private static final Log log = LogFactory.getLog(JSONReader.class);
     private InputModelBuilder modelBuilder;
     private Schema inputSchema;
-    private Stack<DMReaderEvent> dmEventStack;
-    private List<SchemaElement> elementStack;
+    private Stack<ReaderEvent> readerEventStack;
+    private List<SchemaElement> schemaElementList;
+
+    public JSONReader() {
+        this.readerEventStack = new Stack<>();
+        this.schemaElementList = new ArrayList<>();
+    }
 
     public Schema getInputSchema() {
         return inputSchema;
@@ -54,8 +69,7 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
 
     @Override
     public void read(InputStream input, InputModelBuilder inputModelBuilder, Schema inputSchema) throws ReaderException {
-        this.dmEventStack = new Stack<>();
-        this.elementStack = new ArrayList<>();
+
         this.modelBuilder = inputModelBuilder;
         this.inputSchema = inputSchema;
         java.io.Reader reader = new InputStreamReader(input, StandardCharsets.UTF_8);
@@ -85,18 +99,18 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
     @Override
     public boolean startObject() throws ParseException, IOException {
         try {
-            if (!getDmEventStack().isEmpty()) {
-                DMReaderEvent stackElement = getDmEventStack().peek();
-                String type = getInputSchema().getElementTypeByName(elementStack);
-                if (ReaderEventTypes.EventType.OBJECT_START.equals(stackElement.getEventType())) {
-                    if (DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(type)) {
+            if (!getReaderEventStack().isEmpty()) {
+                ReaderEvent stackElement = getReaderEventStack().peek();
+                String type = getInputSchema().getElementTypeByName(schemaElementList);
+                if (ReaderEventType.OBJECT_START.equals(stackElement.getEventType())) {
+                    if (ARRAY_ELEMENT_TYPE.equals(type)) {
                         throw new SimpleJSONParserException("Schema specifies an array of type " + type + ". But payload doesn't contain an array.");
                     }
                     sendObjectStartEvent(stackElement.getName());
                     return true;
                 }
             } else {
-                elementStack.add(new SchemaElement(getInputSchema().getName()));
+                schemaElementList.add(new SchemaElement(getInputSchema().getName()));
             }
             sendAnonymousObjectStartEvent();
         } catch (JSException | InvalidPayloadException | SchemaException | ReaderException e) {
@@ -107,8 +121,8 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
 
     @Override
     public boolean endObject() throws ParseException, IOException {
-        if (!getDmEventStack().isEmpty()) {
-            DMReaderEvent stackElement = getDmEventStack().peek();
+        if (!getReaderEventStack().isEmpty()) {
+            ReaderEvent stackElement = getReaderEventStack().peek();
             try {
                 sendObjectEndEvent(stackElement.getName());
             } catch (JSException | InvalidPayloadException | SchemaException | ReaderException e) {
@@ -121,15 +135,15 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
     @Override
     public boolean startObjectEntry(String s) throws ParseException, IOException {
         try {
-            elementStack.add(new SchemaElement(s));
-            String type = getInputSchema().getElementTypeByName(elementStack);
-            if (DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(type)) {
+            schemaElementList.add(new SchemaElement(s));
+            String type = getInputSchema().getElementTypeByName(schemaElementList);
+            if (ARRAY_ELEMENT_TYPE.equals(type)) {
                 pushObjectStartEvent(s);
-            } else if (DataMapperEngineConstants.OBJECT_ELEMENT_TYPE.equals(type)) {
+            } else if (OBJECT_ELEMENT_TYPE.equals(type)) {
                 pushObjectStartEvent(s);
-            } else if (DataMapperEngineConstants.STRING_ELEMENT_TYPE.equals(type) || DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE.equals(type)
-                    || DataMapperEngineConstants.NUMBER_ELEMENT_TYPE.equals(type) || DataMapperEngineConstants.INTEGER_ELEMENT_TYPE.equals(type) ||
-                    DataMapperEngineConstants.NULL_ELEMENT_TYPE.equals(type)) {
+            } else if (STRING_ELEMENT_TYPE.equals(type) || BOOLEAN_ELEMENT_TYPE.equals(type)
+                    || NUMBER_ELEMENT_TYPE.equals(type) || INTEGER_ELEMENT_TYPE.equals(type)
+                    || NULL_ELEMENT_TYPE.equals(type)) {
                 pushObjectStartEvent(s);
             }
         } catch (JSException | InvalidPayloadException | SchemaException e) {
@@ -140,11 +154,11 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
 
     @Override
     public boolean endObjectEntry() throws ParseException, IOException {
-        if (!getDmEventStack().isEmpty()) {
-            DMReaderEvent stackElement = getDmEventStack().peek();
+        if (!getReaderEventStack().isEmpty()) {
+            ReaderEvent stackElement = getReaderEventStack().peek();
             try {
                 popObjectEndEvent(stackElement.getName());
-                elementStack.remove(elementStack.size() - 1);
+                schemaElementList.remove(schemaElementList.size() - 1);
             } catch (JSException | InvalidPayloadException | SchemaException e) {
                 throw new SimpleJSONParserException("Error while sending end object entry. " + e.getMessage());
             }
@@ -155,11 +169,11 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
     @Override
     public boolean startArray() throws ParseException, IOException {
         try {
-            if (!getDmEventStack().isEmpty()) {
-                DMReaderEvent stackElement = getDmEventStack().peek();
-                String type = getInputSchema().getElementTypeByName(elementStack);
+            if (!getReaderEventStack().isEmpty()) {
+                ReaderEvent stackElement = getReaderEventStack().peek();
+                String type = getInputSchema().getElementTypeByName(schemaElementList);
 
-                if (DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(type)) {
+                if (ARRAY_ELEMENT_TYPE.equals(type)) {
                     try {
                         sendArrayStartEvent(stackElement.getName());
                     } catch (JSException | SchemaException | ReaderException e) {
@@ -177,15 +191,15 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
 
     @Override
     public boolean endArray() throws ParseException, IOException {
-        if (!getDmEventStack().isEmpty()) {
-            DMReaderEvent stackElement = getDmEventStack().peek();
+        if (!getReaderEventStack().isEmpty()) {
+            ReaderEvent stackElement = getReaderEventStack().peek();
             String type = null;
             try {
-                type = getInputSchema().getElementTypeByName(elementStack);
+                type = getInputSchema().getElementTypeByName(schemaElementList);
             } catch (InvalidPayloadException | SchemaException e) {
                 throw new SimpleJSONParserException(e.getMessage());
             }
-            if (DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(type)) {
+            if (ARRAY_ELEMENT_TYPE.equals(type)) {
                 try {
                     sendArrayEndEvent(stackElement.getName());
                 } catch (JSException | SchemaException | ReaderException e) {
@@ -200,8 +214,8 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
 
     @Override
     public boolean primitive(Object value) throws ParseException, IOException {
-        if (!getDmEventStack().isEmpty()) {
-            DMReaderEvent stackElement = getDmEventStack().peek();
+        if (!getReaderEventStack().isEmpty()) {
+            ReaderEvent stackElement = getReaderEventStack().peek();
             try {
                 String fieldType = getFieldType(value);
                 sendFieldEvent(stackElement.getName(), value, fieldType);
@@ -214,13 +228,13 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
 
     private String getFieldType(Object value) {
         if (value instanceof String) {
-            return DataMapperEngineConstants.STRING_ELEMENT_TYPE;
+            return STRING_ELEMENT_TYPE;
         } else if (value instanceof Integer || value instanceof Long) {
-            return DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+            return INTEGER_ELEMENT_TYPE;
         } else if (value instanceof Double || value instanceof Float) {
-            return DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
+            return NUMBER_ELEMENT_TYPE;
         } else if (value instanceof Boolean) {
-            return DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
+            return BOOLEAN_ELEMENT_TYPE;
         }
         throw new IllegalArgumentException("Unsupported value type found" + value.toString());
     }
@@ -229,79 +243,74 @@ public class JSONSimpleJSONReader implements Reader, ContentHandler {
         return modelBuilder;
     }
 
-    private void sendFieldEvent(String fieldName, Object value, String type) throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent fieldEvent = new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
+    private void sendFieldEvent(String fieldName, Object value, String type) throws IOException, JSException,
+            SchemaException, ReaderException {
+        ReaderEvent fieldEvent = new ReaderEvent(ReaderEventType.FIELD,
                 fieldName, value, type);
         getModelBuilder().notifyEvent(fieldEvent);
     }
 
     private void pushObjectStartEvent(String fieldName) throws IOException, JSException {
-        DMReaderEvent objectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START,
-                fieldName, null);
-        dmEventStack.push(objectStartEvent);
+        ReaderEvent objectStartEvent = new ReaderEvent(ReaderEventType.OBJECT_START, fieldName, null);
+        readerEventStack.push(objectStartEvent);
     }
 
     private void sendObjectStartEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent objectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START,
-                fieldName, null);
+        ReaderEvent objectStartEvent = new ReaderEvent(ReaderEventType.OBJECT_START, fieldName, null);
         getModelBuilder().notifyEvent(objectStartEvent);
-        dmEventStack.push(objectStartEvent);
+        readerEventStack.push(objectStartEvent);
     }
 
     private void sendObjectEndEvent(String fieldName) throws IOException, JSException, InvalidPayloadException, SchemaException, ReaderException {
-        DMReaderEvent objectEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END,
-                fieldName, null);
+        ReaderEvent objectEndEvent = new ReaderEvent(ReaderEventType.OBJECT_END, fieldName, null);
         getModelBuilder().notifyEvent(objectEndEvent);
         if (fieldName != null) {
-            if (!DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(elementStack))) {
-                dmEventStack.pop();
+            if (!ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(schemaElementList))) {
+                readerEventStack.pop();
             }
         } else {
-            dmEventStack.pop();
+            readerEventStack.pop();
         }
     }
 
     private void popObjectEndEvent(String fieldName) throws IOException, JSException, InvalidPayloadException,
             SchemaException {
-        DMReaderEvent objectEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END, fieldName, null);
-        if (!DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(elementStack)) ||
-                fieldName.equals(objectEndEvent.getName())) {
-            dmEventStack.pop();
+        ReaderEvent objectEndEvent = new ReaderEvent(ReaderEventType.OBJECT_END, fieldName, null);
+        if (!ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(schemaElementList))
+                || fieldName.equals(objectEndEvent.getName())) {
+            readerEventStack.pop();
         }
     }
 
     private void sendArrayStartEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent arrayStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_START,
+        ReaderEvent arrayStartEvent = new ReaderEvent(ReaderEventType.ARRAY_START,
                 fieldName, null);
         getModelBuilder().notifyEvent(arrayStartEvent);
-        dmEventStack.push(arrayStartEvent);
+        readerEventStack.push(arrayStartEvent);
     }
 
     private void sendArrayEndEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent arrayEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_END,
-                fieldName, null);
+        ReaderEvent arrayEndEvent = new ReaderEvent(ReaderEventType.ARRAY_END, fieldName, null);
         getModelBuilder().notifyEvent(arrayEndEvent);
-        dmEventStack.pop();
+        readerEventStack.pop();
     }
 
-    public Stack<DMReaderEvent> getDmEventStack() {
-        return dmEventStack;
+    public Stack<ReaderEvent> getReaderEventStack() {
+        return readerEventStack;
     }
 
     private void sendTerminateEvent() throws IOException, JSException, SchemaException, ReaderException {
-        getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.TERMINATE,
-                null, null));
-        if (elementStack.size() != 1) {
-            throw new ReaderException("elementStack contain more than one value in the end : " + elementStack.size());
+        getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.TERMINATE, null, null));
+        if (schemaElementList.size() != 1) {
+            throw new ReaderException("schemaElementList contain more than one value in the end : " + schemaElementList.size());
         } else {
-            elementStack.remove(0);
+            schemaElementList.remove(0);
         }
     }
 
     private void sendAnonymousObjectStartEvent() throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent anonymousObjectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START,
-                null, null);
+        ReaderEvent anonymousObjectStartEvent = new ReaderEvent(ReaderEventType.ANONYMOUS_OBJECT_START, null, null);
         getModelBuilder().notifyEvent(anonymousObjectStartEvent);
-        dmEventStack.push(anonymousObjectStartEvent);
+        readerEventStack.push(anonymousObjectStartEvent);
     }
 }

@@ -16,45 +16,42 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input;
 
-import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.input.builders.Builder;
 import org.wso2.carbon.mediator.datamapper.engine.input.builders.BuilderFactory;
 import org.wso2.carbon.mediator.datamapper.engine.input.readers.Reader;
 import org.wso2.carbon.mediator.datamapper.engine.input.readers.ReaderFactory;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.DMReaderEvent;
-import org.wso2.carbon.mediator.datamapper.engine.utils.ModelTypes;
-import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
+import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEvent;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
+import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- *
- */
 public class InputModelBuilder {
 
     private Reader inputReader;
     private Builder modelBuilder;
     private Schema inputSchema;
-    private InputVariableNotifier mappingHandler;
+    private InputVariableNotifier inputVariableNotifier;
 
-    public InputModelBuilder(InputOutputDataTypes inputType,
-                             ModelTypes modelType, Schema inputSchema) throws IOException {
+    public InputModelBuilder(InputOutputDataType inputType,
+                             ModelType modelType, Schema inputSchema) throws IOException {
         this.inputReader = ReaderFactory.getReader(inputType);
         this.modelBuilder = BuilderFactory.getBuilder(modelType);
         this.inputSchema = inputSchema;
     }
 
-    public void buildInputModel(InputStream inputStream, InputVariableNotifier mappingHandler) throws ReaderException {
-        this.mappingHandler = mappingHandler;
+    public void buildInputModel(InputStream inputStream, InputVariableNotifier inputVariableNotifier) throws ReaderException {
+        this.inputVariableNotifier = inputVariableNotifier;
         inputReader.read(inputStream, this, inputSchema);
     }
 
-    public void notifyEvent(DMReaderEvent readerEvent) throws IOException, JSException, SchemaException, ReaderException {
+    public void notifyEvent(ReaderEvent readerEvent) throws IOException, JSException, SchemaException, ReaderException {
         switch (readerEvent.getEventType()) {
             case OBJECT_START:
                 modelBuilder.writeObjectFieldStart(readerEvent.getName());
@@ -73,14 +70,13 @@ public class InputModelBuilder {
                 break;
             case TERMINATE:
                 modelBuilder.close();
-                //TODO : move this to an observer
-                mappingHandler.notifyInputVariable(modelBuilder.getContent());
+                inputVariableNotifier.notifyInputVariable(modelBuilder.getContent());
                 break;
             case ANONYMOUS_OBJECT_START:
                 modelBuilder.writeStartObject();
                 break;
             default:
-                throw new IllegalArgumentException("Illegal Reader event found : " + readerEvent.getEventType());
+                throw new IllegalArgumentException("Unsupported reader event found : " + readerEvent.getEventType());
         }
 
     }

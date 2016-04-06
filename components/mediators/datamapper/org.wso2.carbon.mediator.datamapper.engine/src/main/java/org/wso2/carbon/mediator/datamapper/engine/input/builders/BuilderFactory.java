@@ -16,7 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.builders;
 
-import org.wso2.carbon.mediator.datamapper.engine.utils.ModelTypes;
+import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
 
 import java.io.IOException;
 
@@ -25,12 +25,12 @@ import java.io.IOException;
  */
 public class BuilderFactory {
 
-    public static Builder getBuilder(ModelTypes inputType) throws IOException {
+    public static Builder getBuilder(ModelType inputType) throws IOException {
         switch (inputType) {
             case JSON_STRING:
-                return new JacksonJSONBuilder();
+                return new JSONBuilder();
+            default:
+                throw new IllegalArgumentException("Model builder for type " + inputType + " is not implemented.");
         }
-        throw new IllegalArgumentException("Model builder for type " + inputType + " is not implemented.");
     }
-
 }

@@ -14,17 +14,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.mediator.datamapper.engine.utils;
+package org.wso2.carbon.mediator.datamapper.engine.input.readers.events;
 
-public enum ModelTypes {
+public enum ReaderEventType {
 
-    JSON_STRING("JSON_STRING"),
-    JAVA_MAP("MAP");
+    OBJECT_START("ObjectStart"),
+    OBJECT_END("ObjectEnd"),
+    ARRAY_START("ArrayStart"),
+    ARRAY_END("ArrayEnd"),
+    FIELD("Field"),
+    TERMINATE("Terminate"),
+    ANONYMOUS_OBJECT_START("AnonymousObjectStart");
+    private final String value;
 
-    private String value;
-
-    ModelTypes(String value) {
+    ReaderEventType(String value) {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return value;
+    }
+
 }
+

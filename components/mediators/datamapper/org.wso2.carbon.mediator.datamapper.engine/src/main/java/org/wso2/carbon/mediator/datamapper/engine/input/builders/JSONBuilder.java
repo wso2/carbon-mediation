@@ -30,12 +30,12 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 /**
  * This class implements {@link Builder} interface and JSON builder for data mapper engine using jackson
  */
-public class JacksonJSONBuilder implements Builder {
+public class JSONBuilder implements Builder {
 
     private JsonGenerator jsonGenerator;
     private StringWriter writer;
 
-    public JacksonJSONBuilder() throws IOException {
+    public JSONBuilder() throws IOException {
         JsonFactory jsonFactory = new JsonFactory();
         writer = new StringWriter();
         jsonGenerator = jsonFactory.createGenerator(writer);

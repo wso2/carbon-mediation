@@ -14,30 +14,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.wso2.carbon.mediator.datamapper.engine.utils;
 
-public enum InputOutputDataTypes {
+public enum ModelType {
 
-    CSV("CSV"),
-    XML("XML"),
-    JSON("JSON");
+    JSON_STRING("JSON_STRING"),
+    JAVA_MAP("JAVA_MAP");
 
-    private String dataTypeValue;
+    private String value;
 
-    InputOutputDataTypes(String dataTypeValue) {
-        this.dataTypeValue = dataTypeValue;
+    ModelType(String value) {
+        this.value = value;
     }
 
-    // Use to get the DataType from the relevant input and output data type
-    public static InputOutputDataTypes fromString(String dataType) {
-        if (dataType != null) {
-            for (InputOutputDataTypes definedTypes : InputOutputDataTypes.values()) {
-                if (dataType.equalsIgnoreCase(definedTypes.toString())) {
-                    return definedTypes;
-                }
-            }
-        }
-        throw new IllegalArgumentException("Invalid input type found : " + dataType);
-    }
 }

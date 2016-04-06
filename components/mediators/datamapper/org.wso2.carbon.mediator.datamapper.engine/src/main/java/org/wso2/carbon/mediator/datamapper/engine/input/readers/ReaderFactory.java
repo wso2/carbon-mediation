@@ -16,20 +16,21 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.readers;
 
-import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 
 /**
  * This class is a factory class to get {@link Reader} needed by the data mapper engine
  */
 public class ReaderFactory {
 
-    public static Reader getReader(InputOutputDataTypes inputType) {
+    public static Reader getReader(InputOutputDataType inputType) {
         switch (inputType) {
             case XML:
                 return new XMLReader();
             case JSON:
-                return new JSONSimpleJSONReader();
+                return new JSONReader();
+            default:
+                throw new IllegalArgumentException("Input Reader for type " + inputType + " is not implemented.");
         }
-        throw new IllegalArgumentException("Input Reader for type " + inputType + " is not implemented.");
     }
 }

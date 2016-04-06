@@ -40,14 +40,9 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
-import org.wso2.carbon.mediator.datamapper.engine.core.executors.Executor;
-import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutorFactory;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
-import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
-import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
-import org.wso2.carbon.mediator.datamapper.engine.utils.ModelTypes;
-import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataTypes;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -142,8 +137,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         if (inputType != null) {
             return inputType;
         } else {
-            log.warn("Input data type not found. Set to default value : " + InputOutputDataTypes.XML);
-            return InputOutputDataTypes.XML.toString();
+            log.warn("Input data type not found. Set to default value : " + InputOutputDataType.XML);
+            return InputOutputDataType.XML.toString();
         }
     }
 
@@ -165,8 +160,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         if (outputType != null) {
             return outputType;
         } else {
-            log.warn("Output data type not found. Set to default value : " + InputOutputDataTypes.XML);
-            return InputOutputDataTypes.XML.toString();
+            log.warn("Output data type not found. Set to default value : " + InputOutputDataType.XML);
+            return InputOutputDataType.XML.toString();
         }
     }
 
@@ -228,40 +223,29 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * Does message conversion and gives the output message as the final result
      *
      * @param synCtx       the message synCtx
-     * @param configkey    registry location of the mapping configuration
+     * @param configKey    registry location of the mapping configuration
      * @param inSchemaKey  registry location of the input schema
      * @param outSchemaKey registry location of the output schema
      * @param inputType    input data type
      * @param outputType   output data type
      */
-    private void transform(MessageContext synCtx, String configkey,
+    private void transform(MessageContext synCtx, String configKey,
                            String inSchemaKey, String outSchemaKey, String inputType, String outputType) {
         try {
             // mapping resources needed to get the final output
-            MappingResource mappingResource = getMappingResource(synCtx, configkey, inSchemaKey, outSchemaKey);
-
-            // create input model builder to convert input payload to generic data holder
-            InputModelBuilder inputModelBuilder = new InputModelBuilder(getDataType(inputType),
-                    ModelTypes.JSON_STRING, mappingResource.getInputSchema());
-            //execute mapping on the input stream
-
-            OutputMessageBuilder outputMessageBuilder = new OutputMessageBuilder(getDataType(outputType),
-                    ModelTypes.JAVA_MAP, mappingResource.getOutputSchema());
+            MappingResource mappingResource = getMappingResource(synCtx, configKey, inSchemaKey, outSchemaKey);
 
             String dmExecutorPoolSize = SynapsePropertiesLoader.getPropertyValue(
                     ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
 
-            Executor executor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
+            MappingHandler mappingHandler = new MappingHandler(mappingResource, inputType, outputType,
+                    dmExecutorPoolSize);
 
-            MappingHandler mappingHandler = new MappingHandler(mappingResource, executor,
-                    inputModelBuilder, outputMessageBuilder);
+            //execute mapping on the input stream
+            String outputResult = mappingHandler.doMap(getInputStream(synCtx, inputType));
 
-            String outputVariable = mappingHandler.doMap(getInputStream(synCtx, inputType));
-
-            ScriptExecutorFactory.releaseScriptExecutor(executor);
-
-            if (InputOutputDataTypes.XML.toString().equals(outputType)) {
-                OMElement outputMessage = AXIOMUtil.stringToOM(outputVariable);
+            if (InputOutputDataType.XML.toString().equals(outputType)) {
+                OMElement outputMessage = AXIOMUtil.stringToOM(outputResult);
                 if (outputMessage != null) {
                     if (log.isDebugEnabled()) {
                         log.debug("Output message received ");
@@ -290,10 +274,10 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     synCtx.getEnvelope().getBody().getFirstElement().detach();
                 }
 
-            } else if (InputOutputDataTypes.JSON.toString().equals(outputType)) {
+            } else if (InputOutputDataType.JSON.toString().equals(outputType)) {
                 org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) synCtx)
                         .getAxis2MessageContext();
-                JsonUtil.newJsonPayload(axis2MessageContext, outputVariable, true, true);
+                JsonUtil.newJsonPayload(axis2MessageContext, outputResult, true, true);
             }
         } catch (ReaderException | InterruptedException | XMLStreamException | SchemaException
                 | IOException | WriterException e) {
@@ -301,14 +285,9 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         }
     }
 
-    private static InputOutputDataTypes getDataType(String inputType) {
-        return InputOutputDataTypes.fromString(inputType);
-    }
-
     private InputStream getInputStream(MessageContext context, String inputType) {
-
         InputStream inputStream = null;
-        switch (InputOutputDataTypes.fromString(inputType)) {
+        switch (InputOutputDataType.fromString(inputType)) {
             case XML:
             case CSV:
                 inputStream = new ByteArrayInputStream(
@@ -322,12 +301,10 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 break;
             default:
                 inputStream = new ByteArrayInputStream(
-                        context.getEnvelope().getBody().getFirstElement().toString().getBytes(StandardCharsets.UTF_8));
-                break;
+                        context.getEnvelope().toString().getBytes(StandardCharsets.UTF_8));
         }
         return inputStream;
     }
-
 
     /**
      * State that DataMapperMediator interacts with the message context
@@ -410,5 +387,4 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         }
         return inputStream;
     }
-
 }

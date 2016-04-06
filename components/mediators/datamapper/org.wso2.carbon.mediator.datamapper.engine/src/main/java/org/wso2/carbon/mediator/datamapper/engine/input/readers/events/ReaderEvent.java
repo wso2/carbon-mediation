@@ -16,37 +16,37 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.readers.events;
 
-public class DMReaderEvent {
+public class ReaderEvent {
 
-    private ReaderEventTypes.EventType eventType;
+    private ReaderEventType eventType;
     private String name;
     private Object value;
     private String fieldType;
 
-    public DMReaderEvent(ReaderEventTypes.EventType eventType, String name, Object value, String fieldType) {
+    public ReaderEvent(ReaderEventType eventType, String name, Object value, String fieldType) {
         this.eventType = eventType;
         this.name = name;
         this.value = value;
         this.fieldType = fieldType;
     }
 
-    public DMReaderEvent(ReaderEventTypes.EventType eventType, String name, Object value) {
+    public ReaderEvent(ReaderEventType eventType, String name, Object value) {
         this.eventType = eventType;
         this.name = name;
         this.value = value;
     }
 
-    public DMReaderEvent(ReaderEventTypes.EventType eventType, String name) {
+    public ReaderEvent(ReaderEventType eventType, String name) {
         this.eventType = eventType;
         this.name = name;
     }
 
-    public DMReaderEvent(ReaderEventTypes.EventType eventType) {
+    public ReaderEvent(ReaderEventType eventType) {
         this.eventType = eventType;
     }
 
 
-    public void setEventType(ReaderEventTypes.EventType eventType) {
+    public void setEventType(ReaderEventType eventType) {
         this.eventType = eventType;
     }
 
@@ -66,7 +66,7 @@ public class DMReaderEvent {
         this.value = value;
     }
 
-    public ReaderEventTypes.EventType getEventType() {
+    public ReaderEventType getEventType() {
         return eventType;
     }
 

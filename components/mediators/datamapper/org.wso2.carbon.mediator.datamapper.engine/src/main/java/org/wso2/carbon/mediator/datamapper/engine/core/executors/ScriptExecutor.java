@@ -53,7 +53,7 @@ public class ScriptExecutor implements Executor {
                 break;
             case RHINO:
                 scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
-                log.debug("Setting default Rhino as Script Engine");
+                log.debug("Setting Rhino as Script Engine");
                 break;
             default:
                 scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
@@ -63,10 +63,10 @@ public class ScriptExecutor implements Executor {
     }
 
     @Override
-    public Model execute(MappingResource resourceModel, String inputRecord) throws JSException, SchemaException {
+    public Model execute(MappingResource mappingResource, String inputVariable) throws JSException, SchemaException {
         try {
-            JSFunction jsFunction = resourceModel.getFunction();
-            injectInputVariableToEngine(resourceModel.getInputSchema().getName(), inputRecord);
+            JSFunction jsFunction = mappingResource.getFunction();
+            injectInputVariableToEngine(mappingResource.getInputSchema().getName(), inputVariable);
             scriptEngine.eval(jsFunction.getFunctionBody());
             Invocable invocable = (Invocable) scriptEngine;
             Object result = invocable.invokeFunction(jsFunction.getFunctionName());
@@ -78,7 +78,7 @@ public class ScriptExecutor implements Executor {
         } catch (NoSuchMethodException e) {
             throw new JSException("Undefined method called to execute " + e);
         }
-        throw new JSException("Undefined method called to execute");
+        throw new JSException("Failed to execute mapping function");
     }
 
     private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {

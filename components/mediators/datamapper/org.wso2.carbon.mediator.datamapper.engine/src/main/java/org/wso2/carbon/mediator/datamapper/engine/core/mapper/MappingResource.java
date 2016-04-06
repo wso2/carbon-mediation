@@ -86,9 +86,7 @@ public class MappingResource {
         String[] outputRootElementArray = outputRootelement.split(NAMESPACE_DELIMETER);
         String outputRootElement = outputRootElementArray[outputRootElementArray.length - 1];
 
-        //TODO : remove (L|S)
-        Pattern functionIdPattern = Pattern.compile(
-                "(function )(map_(L|S)_" + inputRootElement + "_(L|S)_" + outputRootElement + ")");
+        Pattern functionIdPattern = Pattern.compile("(function )(map_(L|S)_" + inputRootElement + "_(L|S)_" + outputRootElement + ")");
         String fnName = null;
         String configLine;
         StringBuilder configScriptBuilder = new StringBuilder();

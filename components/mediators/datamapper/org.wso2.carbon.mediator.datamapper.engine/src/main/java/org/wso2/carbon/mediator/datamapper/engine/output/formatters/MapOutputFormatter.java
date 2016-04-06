@@ -20,15 +20,18 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaExceptio
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.DMReaderEvent;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEventTypes;
+import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEvent;
+import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEventType;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
-import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_FIRST_NAME;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 
 /**
  * This class implements {@link Formatter} interface to read {@link Map} model and trigger events to read
@@ -69,22 +72,22 @@ public class MapOutputFormatter implements Formatter {
         tempKeys.addAll(mapKeys);
         //Attributes should come first than other fields. So attribute should be listed first
         for (String key : mapKeys) {
-            if (key.contains(DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX) && tempKeys.contains(key)) {
+            if (key.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX) && tempKeys.contains(key)) {
                 orderedKeyList.addFirst(key);
                 tempKeys.remove(key);
             } else {
-                if (key.endsWith(DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX) && tempKeys.contains(key)) {
-                    String elementName = key.substring(0, key.lastIndexOf(DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
+                if (key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX) && tempKeys.contains(key)) {
+                    String elementName = key.substring(0, key.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
                     orderedKeyList.addLast(key);
                     orderedKeyList.addLast(elementName);
                     tempKeys.remove(key);
                     tempKeys.remove(elementName);
                 } else if (tempKeys.contains(key)) {
-                    if (tempKeys.contains(key + DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
-                        orderedKeyList.addLast(key + DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                    if (tempKeys.contains(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
+                        orderedKeyList.addLast(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
                         orderedKeyList.addLast(key);
                         tempKeys.remove(key);
-                        tempKeys.remove(key + DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                        tempKeys.remove(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
                     } else {
                         orderedKeyList.addLast(key);
                         tempKeys.remove(key);
@@ -110,7 +113,7 @@ public class MapOutputFormatter implements Formatter {
                 } else {
                     sendObjectStartEvent(key);
                     traverseMap((Map<String, Object>) value);
-                    if (!key.endsWith(DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
+                    if (!key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
                         sendObjectEndEvent(key);
                     }
                 }
@@ -125,17 +128,17 @@ public class MapOutputFormatter implements Formatter {
     }
 
     private void sendAnonymousObjectStartEvent() throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START,
+        getOutputMessageBuilder().notifyEvent(new ReaderEvent(ReaderEventType.ANONYMOUS_OBJECT_START,
                 null, null));
     }
 
     private void sendArrayEndEvent() throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_END, null, null));
+        getOutputMessageBuilder().notifyEvent(new ReaderEvent(ReaderEventType.ARRAY_END, null, null));
     }
 
     private boolean isMapContainArray(Set<String> mapKeys) {
         for (String key : mapKeys) {
-            if (DataMapperEngineConstants.ARRAY_ELEMENT_FIRST_NAME.equals(key)) {
+            if (ARRAY_ELEMENT_FIRST_NAME.equals(key)) {
                 return true;
             } else {
                 return false;
@@ -145,33 +148,29 @@ public class MapOutputFormatter implements Formatter {
     }
 
     private void sendArrayStartEvent() throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_START, null, null));
+        getOutputMessageBuilder().notifyEvent(new ReaderEvent(ReaderEventType.ARRAY_START, null, null));
     }
 
     private void sendObjectStartEvent(String elementName) throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START,
+        getOutputMessageBuilder().notifyEvent(new ReaderEvent(ReaderEventType.OBJECT_START,
                 elementName, null));
     }
 
     private void sendObjectEndEvent(String objectName) throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END, objectName,
+        getOutputMessageBuilder().notifyEvent(new ReaderEvent(ReaderEventType.OBJECT_END, objectName,
                 null));
     }
 
     private void sendFieldEvent(String fieldName, Object value) throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD, fieldName, value));
+        getOutputMessageBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD, fieldName, value));
     }
 
     private void sendTerminateEvent() throws SchemaException, WriterException {
-        getOutputMessageBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.TERMINATE, null, null));
+        getOutputMessageBuilder().notifyEvent(new ReaderEvent(ReaderEventType.TERMINATE, null, null));
     }
-
 
     public OutputMessageBuilder getOutputMessageBuilder() {
         return outputMessageBuilder;
     }
 
-    public void setOutputMessageBuilder(OutputMessageBuilder outputMessageBuilder) {
-        this.outputMessageBuilder = outputMessageBuilder;
-    }
 }

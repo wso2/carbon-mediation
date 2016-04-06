@@ -40,28 +40,31 @@ public class XMLWriter implements Writer {
 
     private static final Log log = LogFactory.getLog(XMLWriter.class);
     private StringWriter stringWriter;
-    private XMLStreamWriter xMLStreamWriter;
+    private XMLStreamWriter xmlStreamWriter;
     private Schema outputSchema;
     private Stack<String> arrayElementStack;
     private String latestElementName;
-    private String latestFieldName;
     private Map<String, String> namespaceMap;
-    private static final String NAMESPACE_SEPERATOR = "_";
+    private static final String NAMESPACE_SEPARATOR = "_";
 
     public XMLWriter(Schema outputSchema) throws SchemaException, WriterException {
         this.outputSchema = outputSchema;
-        arrayElementStack = new Stack<>();
-        stringWriter = new StringWriter();
-        XMLOutputFactory xMLOutputFactory = XMLOutputFactory.newInstance();
+        this.arrayElementStack = new Stack<>();
+        this.stringWriter = new StringWriter();
+        init(outputSchema);
+    }
+
+    private void init(Schema outputSchema) throws SchemaException, WriterException {
+        XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
         try {
-            xMLStreamWriter = xMLOutputFactory.createXMLStreamWriter(stringWriter);
+            xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
             //creating root element of the xml message
             namespaceMap = outputSchema.getNamespaceMap();
-            writeStartElement(outputSchema.getName(), xMLStreamWriter);
+            writeStartElement(outputSchema.getName(), xmlStreamWriter);
             Iterator<Map.Entry<String, String>> namespaceEntryIterator = namespaceMap.entrySet().iterator();
             while (namespaceEntryIterator.hasNext()) {
                 Map.Entry<String, String> entry = namespaceEntryIterator.next();
-                xMLStreamWriter.writeNamespace(entry.getValue(), entry.getKey());
+                xmlStreamWriter.writeNamespace(entry.getValue(), entry.getKey());
             }
         } catch (XMLStreamException e) {
             throw new WriterException("Error while creating xml output factory. " + e.getMessage());
@@ -73,9 +76,9 @@ public class XMLWriter implements Writer {
         try {
             if (name.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
                 latestElementName = name.substring(0, name.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
-                writeStartElement(latestElementName, xMLStreamWriter);
+                writeStartElement(latestElementName, xmlStreamWriter);
             } else {
-                writeStartElement(name, xMLStreamWriter);
+                writeStartElement(name, xmlStreamWriter);
                 latestElementName = name;
             }
         } catch (XMLStreamException e) {
@@ -98,23 +101,23 @@ public class XMLWriter implements Writer {
                             while (entryIterator.hasNext()) {
                                 Map.Entry<String, String> entry = entryIterator.next();
                                 if (attributeNameArray[0].equals(entry.getValue())) {
-                                    xMLStreamWriter.writeAttribute(entry.getKey(),
+                                    xmlStreamWriter.writeAttribute(entry.getKey(),
                                             attributeNameArray[attributeNameArray.length - 1], value);
                                 }
                             }
                         } else {
-                            xMLStreamWriter.writeAttribute(attributeNameWithNamespace, value);
+                            xmlStreamWriter.writeAttribute(attributeNameWithNamespace, value);
                         }
                     } else {
-                        xMLStreamWriter.writeAttribute(attributeNameWithNamespace, value);
+                        xmlStreamWriter.writeAttribute(attributeNameWithNamespace, value);
                     }
                 } else if (name.equals(latestElementName)) {
-                    xMLStreamWriter.writeCharacters(value);
-                    xMLStreamWriter.writeEndElement();
+                    xmlStreamWriter.writeCharacters(value);
+                    xmlStreamWriter.writeEndElement();
                 } else {
-                    writeStartElement(name, xMLStreamWriter);
-                    xMLStreamWriter.writeCharacters(value);
-                    xMLStreamWriter.writeEndElement();
+                    writeStartElement(name, xmlStreamWriter);
+                    xmlStreamWriter.writeCharacters(value);
+                    xmlStreamWriter.writeEndElement();
                 }
             }
         } catch (XMLStreamException e) {
@@ -138,7 +141,7 @@ public class XMLWriter implements Writer {
     @Override
     public void writeEndObject(String objectName) throws WriterException {
         try {
-            xMLStreamWriter.writeEndElement();
+            xmlStreamWriter.writeEndElement();
         } catch (XMLStreamException e) {
             throw new WriterException(e.getMessage());
         }
@@ -147,9 +150,9 @@ public class XMLWriter implements Writer {
     @Override
     public String terminateMessageBuilding() throws WriterException {
         try {
-            xMLStreamWriter.writeEndElement();
-            xMLStreamWriter.flush();
-            xMLStreamWriter.close();
+            xmlStreamWriter.writeEndElement();
+            xmlStreamWriter.flush();
+            xmlStreamWriter.close();
             return stringWriter.getBuffer().toString();
         } catch (XMLStreamException e) {
             throw new WriterException(e.getMessage());
@@ -169,16 +172,16 @@ public class XMLWriter implements Writer {
     @Override
     public void writeStartAnonymousObject() throws WriterException {
         try {
-            writeStartElement(arrayElementStack.peek(), xMLStreamWriter);
+            writeStartElement(arrayElementStack.peek(), xmlStreamWriter);
         } catch (XMLStreamException e) {
             throw new WriterException(e.getMessage());
         }
     }
 
     private void writeStartElement(String name, XMLStreamWriter xMLStreamWriter) throws XMLStreamException {
-        String prefix = name.split(NAMESPACE_SEPERATOR)[0];
+        String prefix = name.split(NAMESPACE_SEPARATOR)[0];
         if (namespaceMap.values().contains(prefix)) {
-            String nameWithoutPrefix = name.split(NAMESPACE_SEPERATOR)[1];
+            String nameWithoutPrefix = name.split(NAMESPACE_SEPARATOR)[1];
             Iterator<Map.Entry<String, String>> entryIterator = namespaceMap.entrySet().iterator();
             while (entryIterator.hasNext()) {
                 Map.Entry<String, String> entry = entryIterator.next();

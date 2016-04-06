@@ -26,9 +26,8 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaExceptio
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.DMReaderEvent;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEventTypes;
-import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
+import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEvent;
+import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEventType;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -44,6 +43,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
+
 /**
  * This class implements {@link Reader} interface and xml reader for data mapper engine using SAX
  */
@@ -52,17 +61,22 @@ public class XMLReader extends DefaultHandler implements Reader {
     private static final Log log = LogFactory.getLog(XMLReader.class);
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACES = "http://xml.org/sax/features/namespaces";
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACE_PREFIXES = "http://xml.org/sax/features/namespace-prefixes";
+    public static final String XMLNS = "xmlns";
     private InputModelBuilder modelBuilder;
     private Schema inputSchema;
-    private Stack<DMReaderEvent> dmEventStack;
+    private Stack<ReaderEvent> eventStack;
     private String tempFieldValue;
-    private List<SchemaElement> elementStack;
+    private List<SchemaElement> schemaElementList;
+
+    public XMLReader() {
+        this.eventStack = new Stack<>();
+        this.schemaElementList = new ArrayList();
+    }
 
     @Override
     public void read(InputStream input, InputModelBuilder inputModelBuilder, Schema inputSchema) throws ReaderException {
-        dmEventStack = new Stack<>();
-        elementStack = new ArrayList();
-        modelBuilder = inputModelBuilder;
+
+        this.modelBuilder = inputModelBuilder;
         this.inputSchema = inputSchema;
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
@@ -85,7 +99,6 @@ public class XMLReader extends DefaultHandler implements Reader {
 
     @Override
     public void startDocument() throws SAXException {
-        System.out.println();
     }
 
     @Override
@@ -99,7 +112,6 @@ public class XMLReader extends DefaultHandler implements Reader {
 
     @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-
     }
 
     @Override
@@ -109,36 +121,36 @@ public class XMLReader extends DefaultHandler implements Reader {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         try {
-            elementStack.add(new SchemaElement(localName, uri));
-            String tempLocalName = getNamespaceAddedFieldName(uri, localName).replace(DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
-            if (!getDmEventStack().isEmpty()) {
-                DMReaderEvent stackElement = getDmEventStack().peek();
-                if (ReaderEventTypes.EventType.ARRAY_START.equals(stackElement.getEventType()) &&
-                        !(getInputSchema().isChildElement(elementStack.subList(0, elementStack.size() - 2), localName) ||
+            schemaElementList.add(new SchemaElement(localName, uri));
+            String tempLocalName = getNamespaceAddedFieldName(uri, localName).replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
+            if (!getEventStack().isEmpty()) {
+                ReaderEvent stackElement = getEventStack().peek();
+                if (ReaderEventType.ARRAY_START.equals(stackElement.getEventType()) &&
+                        !(getInputSchema().isChildElement(schemaElementList.subList(0, schemaElementList.size() - 2), localName) ||
                                 tempLocalName.equals(stackElement.getName()))) {
                     sendArrayEndEvent(localName);
-                    elementStack.add(new SchemaElement(localName, uri));
+                    schemaElementList.add(new SchemaElement(localName, uri));
                 }
             }
             localName = getNamespaceAddedFieldName(uri, localName);
-            String elementType = getInputSchema().getElementTypeByName(elementStack);
+            String elementType = getInputSchema().getElementTypeByName(schemaElementList);
             String schemaTitle = getInputSchema().getName();
             if (localName.equals(schemaTitle)) {
                 sendAnonymousObjectStartEvent(schemaTitle);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
-                    if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        elementStack.add(new SchemaElement(attributes.getQName(attributeCount), attributes.getURI(attributeCount)));
-                        String attributeType = getInputSchema().getElementTypeByName(elementStack);
-                        elementStack.remove(elementStack.size() - 1);
+                    if (!attributes.getQName(attributeCount).contains(XMLNS)) {
+                        schemaElementList.add(new SchemaElement(attributes.getQName(attributeCount), attributes.getURI(attributeCount)));
+                        String attributeType = getInputSchema().getElementTypeByName(schemaElementList);
+                        schemaElementList.remove(schemaElementList.size() - 1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount), attributes.getURI(attributeCount));
                         sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
-            } else if (DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(elementType)) {
+            } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
                 //first element of a array should fire array start element
-                if (!getDmEventStack().isEmpty()) {
-                    DMReaderEvent stackElement = getDmEventStack().peek();
-                    if (!(ReaderEventTypes.EventType.ARRAY_START.equals(stackElement.getEventType()) &&
+                if (!getEventStack().isEmpty()) {
+                    ReaderEvent stackElement = getEventStack().peek();
+                    if (!(ReaderEventType.ARRAY_START.equals(stackElement.getEventType()) &&
                             tempLocalName.equals(stackElement.getName()))) {
                         sendArrayStartEvent(localName);
                     }
@@ -147,42 +159,42 @@ public class XMLReader extends DefaultHandler implements Reader {
                 }
                 sendAnonymousObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
-                    if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        elementStack.add(new SchemaElement(attributes.getQName(attributeCount), attributes.getURI(attributeCount)));
-                        String attributeType = getInputSchema().getElementTypeByName(elementStack);
-                        elementStack.remove(elementStack.size() - 1);
+                    if (!attributes.getQName(attributeCount).contains(XMLNS)) {
+                        schemaElementList.add(new SchemaElement(attributes.getQName(attributeCount), attributes.getURI(attributeCount)));
+                        String attributeType = getInputSchema().getElementTypeByName(schemaElementList);
+                        schemaElementList.remove(schemaElementList.size() - 1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
                                 attributes.getURI(attributeCount));
                         sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
-            } else if (DataMapperEngineConstants.OBJECT_ELEMENT_TYPE.equals(elementType)) {
+            } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
                 sendObjectStartEvent(localName);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
-                    if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        elementStack.add(new SchemaElement(attributes.getQName(attributeCount), attributes.getURI(attributeCount)));
-                        String attributeType = getInputSchema().getElementTypeByName(elementStack);
-                        elementStack.remove(elementStack.size() - 1);
+                    if (!attributes.getQName(attributeCount).contains(XMLNS)) {
+                        schemaElementList.add(new SchemaElement(attributes.getQName(attributeCount), attributes.getURI(attributeCount)));
+                        String attributeType = getInputSchema().getElementTypeByName(schemaElementList);
+                        schemaElementList.remove(schemaElementList.size() - 1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
                                 attributes.getURI(attributeCount));
                         sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
-            } else if ((DataMapperEngineConstants.STRING_ELEMENT_TYPE.equals(elementType) || DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE.equals(elementType) ||
-                    DataMapperEngineConstants.NUMBER_ELEMENT_TYPE.equals(elementType) || DataMapperEngineConstants.INTEGER_ELEMENT_TYPE.equals(elementType))
+            } else if ((STRING_ELEMENT_TYPE.equals(elementType) || BOOLEAN_ELEMENT_TYPE.equals(elementType) ||
+                    NUMBER_ELEMENT_TYPE.equals(elementType) || INTEGER_ELEMENT_TYPE.equals(elementType))
                     && attributes.getLength() > 0) {
-                sendObjectStartEvent(localName + DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                sendObjectStartEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
-                    if (!attributes.getQName(attributeCount).contains("xmlns")) {
-                        elementStack.add(new SchemaElement(attributes.getQName(attributeCount), attributes.getURI(attributeCount)));
-                        String attributeType = getInputSchema().getElementTypeByName(elementStack);
-                        elementStack.remove(elementStack.size() - 1);
+                    if (!attributes.getQName(attributeCount).contains(XMLNS)) {
+                        schemaElementList.add(new SchemaElement(attributes.getQName(attributeCount), attributes.getURI(attributeCount)));
+                        String attributeType = getInputSchema().getElementTypeByName(schemaElementList);
+                        schemaElementList.remove(schemaElementList.size() - 1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount)
                                 , attributes.getURI(attributeCount));
                         sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
-                sendObjectEndEvent(localName + DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                sendObjectEndEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
             }
         } catch (IOException | JSException | InvalidPayloadException | SchemaException | ReaderException e) {
             throw new SAXException("Error occurred while processing start element event", e);
@@ -190,20 +202,20 @@ public class XMLReader extends DefaultHandler implements Reader {
     }
 
     private String getAttributeFieldName(String qName, String uri) {
-        String[] qNameOriginalArray = qName.split(DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR);
+        String[] qNameOriginalArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
         qName = getNamespaceAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length - 1]);
-        String[] qNameArray = qName.split(DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR);
+        String[] qNameArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
         if (qNameArray.length > 1) {
-            return qNameArray[0] + DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR + DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX + qNameArray[qNameArray.length - 1];
+            return qNameArray[0] + SCHEMA_NAMESPACE_NAME_SEPARATOR + SCHEMA_ATTRIBUTE_FIELD_PREFIX + qNameArray[qNameArray.length - 1];
         } else {
-            return DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX + qName;
+            return SCHEMA_ATTRIBUTE_FIELD_PREFIX + qName;
         }
     }
 
     private String getNamespaceAddedFieldName(String uri, String localName) {
         String prefix = getInputSchema().getPrefixForNamespace(uri);
         if (StringUtils.isNotEmpty(prefix)) {
-            return prefix + DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR + localName;
+            return prefix + SCHEMA_NAMESPACE_NAME_SEPARATOR + localName;
         } else {
             return localName;
         }
@@ -212,25 +224,25 @@ public class XMLReader extends DefaultHandler implements Reader {
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         try {
-            String elementType = getInputSchema().getElementTypeByName(elementStack);
+            String elementType = getInputSchema().getElementTypeByName(schemaElementList);
             localName = getNamespaceAddedFieldName(uri, localName);
             if (localName.equals(getInputSchema().getName())) {
                 sendObjectEndEvent(localName);
-            } else if (DataMapperEngineConstants.STRING_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue, DataMapperEngineConstants.STRING_ELEMENT_TYPE);
-            } else if (DataMapperEngineConstants.NUMBER_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue, DataMapperEngineConstants.NUMBER_ELEMENT_TYPE);
-            } else if (DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue, DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE);
-            } else if (DataMapperEngineConstants.INTEGER_ELEMENT_TYPE.equals(elementType)) {
-                sendFieldEvent(localName, tempFieldValue, DataMapperEngineConstants.INTEGER_ELEMENT_TYPE);
-            } else if (DataMapperEngineConstants.ARRAY_ELEMENT_TYPE.equals(elementType)) {
+            } else if (STRING_ELEMENT_TYPE.equals(elementType)) {
+                sendFieldEvent(localName, tempFieldValue, STRING_ELEMENT_TYPE);
+            } else if (NUMBER_ELEMENT_TYPE.equals(elementType)) {
+                sendFieldEvent(localName, tempFieldValue, NUMBER_ELEMENT_TYPE);
+            } else if (BOOLEAN_ELEMENT_TYPE.equals(elementType)) {
+                sendFieldEvent(localName, tempFieldValue, BOOLEAN_ELEMENT_TYPE);
+            } else if (INTEGER_ELEMENT_TYPE.equals(elementType)) {
+                sendFieldEvent(localName, tempFieldValue, INTEGER_ELEMENT_TYPE);
+            } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
                 sendObjectEndEvent(localName);
-            } else if (DataMapperEngineConstants.OBJECT_ELEMENT_TYPE.equals(elementType)) {
-                while (!getDmEventStack().isEmpty()) {
-                    DMReaderEvent stackElement = getDmEventStack().peek();
-                    if (ReaderEventTypes.EventType.ARRAY_START.equals(stackElement.getEventType())) {
-                        elementStack.add(new SchemaElement(stackElement.getName(), uri));
+            } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
+                while (!getEventStack().isEmpty()) {
+                    ReaderEvent stackElement = getEventStack().peek();
+                    if (ReaderEventType.ARRAY_START.equals(stackElement.getEventType())) {
+                        schemaElementList.add(new SchemaElement(stackElement.getName(), uri));
                         sendArrayEndEvent(stackElement.getName());
                     } else {
                         break;
@@ -267,82 +279,78 @@ public class XMLReader extends DefaultHandler implements Reader {
 
     private void sendFieldEvent(String fieldName, String valueString, String fieldType) throws IOException, JSException, SchemaException, ReaderException {
         switch (fieldType) {
-            case DataMapperEngineConstants.STRING_ELEMENT_TYPE:
-                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
+            case STRING_ELEMENT_TYPE:
+                getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD,
                         getModifiedFieldName(fieldName), valueString, fieldType));
                 break;
-            case DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE:
-                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
+            case BOOLEAN_ELEMENT_TYPE:
+                getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD,
                         getModifiedFieldName(fieldName), Boolean.parseBoolean(valueString), fieldType));
                 break;
-            case DataMapperEngineConstants.NUMBER_ELEMENT_TYPE:
-                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
-                        getModifiedFieldName(fieldName), Double.parseDouble((String) valueString), fieldType));
+            case NUMBER_ELEMENT_TYPE:
+                getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD,
+                        getModifiedFieldName(fieldName), Double.parseDouble(valueString), fieldType));
                 break;
-            case DataMapperEngineConstants.INTEGER_ELEMENT_TYPE:
-                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
-                        getModifiedFieldName(fieldName), Integer.parseInt((String) valueString), fieldType));
+            case INTEGER_ELEMENT_TYPE:
+                getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD,
+                        getModifiedFieldName(fieldName), Integer.parseInt(valueString), fieldType));
                 break;
             default:
-                getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.FIELD,
+                getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD,
                         getModifiedFieldName(fieldName), valueString, fieldType));
         }
 
-        if (!fieldName.contains(DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
-            elementStack.remove(elementStack.size() - 1);
+        if (!fieldName.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
+            schemaElementList.remove(schemaElementList.size() - 1);
         }
 
     }
 
     private void sendObjectStartEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent objectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_START,
+        ReaderEvent objectStartEvent = new ReaderEvent(ReaderEventType.OBJECT_START,
                 getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(objectStartEvent);
-        dmEventStack.push(objectStartEvent);
+        eventStack.push(objectStartEvent);
     }
 
     private void sendObjectEndEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent objectEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.OBJECT_END,
+        ReaderEvent objectEndEvent = new ReaderEvent(ReaderEventType.OBJECT_END,
                 getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(objectEndEvent);
-        /*if (!getInputSchema().getName().equals(fieldName)&&
-                !ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(fieldName))) {
-            dmEventStack.pop();
-        }*/
-        dmEventStack.pop();
-        if (!fieldName.contains(DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
-            elementStack.remove(elementStack.size() - 1);
+        eventStack.pop();
+        if (!fieldName.contains(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
+            schemaElementList.remove(schemaElementList.size() - 1);
         }
     }
 
     private void sendArrayStartEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent arrayStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_START,
+        ReaderEvent arrayStartEvent = new ReaderEvent(ReaderEventType.ARRAY_START,
                 getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(arrayStartEvent);
-        dmEventStack.push(arrayStartEvent);
+        eventStack.push(arrayStartEvent);
     }
 
     private void sendArrayEndEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent arrayEndEvent = new DMReaderEvent(ReaderEventTypes.EventType.ARRAY_END,
+        ReaderEvent arrayEndEvent = new ReaderEvent(ReaderEventType.ARRAY_END,
                 getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(arrayEndEvent);
-        dmEventStack.pop();
-        elementStack.remove(elementStack.size() - 1);
+        eventStack.pop();
+        schemaElementList.remove(schemaElementList.size() - 1);
     }
 
-    public Stack<DMReaderEvent> getDmEventStack() {
-        return dmEventStack;
+    public Stack<ReaderEvent> getEventStack() {
+        return eventStack;
     }
 
     private void sendTerminateEvent() throws IOException, JSException, SchemaException, ReaderException {
-        getModelBuilder().notifyEvent(new DMReaderEvent(ReaderEventTypes.EventType.TERMINATE));
+        getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.TERMINATE));
     }
 
     private void sendAnonymousObjectStartEvent(String fieldName) throws IOException, JSException, SchemaException, ReaderException {
-        DMReaderEvent anonymousObjectStartEvent = new DMReaderEvent(ReaderEventTypes.EventType.ANONYMOUS_OBJECT_START,
+        ReaderEvent anonymousObjectStartEvent = new ReaderEvent(ReaderEventType.ANONYMOUS_OBJECT_START,
                 getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(anonymousObjectStartEvent);
-        dmEventStack.push(anonymousObjectStartEvent);
+        eventStack.push(anonymousObjectStartEvent);
     }
 
 
@@ -356,7 +364,7 @@ public class XMLReader extends DefaultHandler implements Reader {
     }
 
     private String getModifiedFieldName(String fieldName) {
-        return fieldName.replace(DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
+        return fieldName.replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
     }
 
 }
