@@ -51,7 +51,18 @@ public class PublisherProfileManager {
 
     public List<PublisherProfile> getTenantPublisherProfilesList (int tenantId) {
         if (publisherProfiles.get(tenantId) == null) {
-            publisherProfiles.put(tenantId, new HashMap<String, PublisherProfile>());
+            List<PublisherConfig> publisherConfigs = registryPersistenceManager.load(tenantId);
+            List <PublisherProfile> profileList = new ArrayList<PublisherProfile>();
+
+            HashMap<String, PublisherProfile> profileMap = new HashMap<String, PublisherProfile>();
+
+
+            for (PublisherConfig config : publisherConfigs) {
+                profileList.add(new PublisherProfile(config));
+                profileMap.put(config.getServerId(), new PublisherProfile(config));
+            }
+
+            publisherProfiles.put(tenantId, profileMap);
         }
         if (publisherProfiles.get(tenantId).values() == null){
             return new ArrayList<PublisherProfile>();
