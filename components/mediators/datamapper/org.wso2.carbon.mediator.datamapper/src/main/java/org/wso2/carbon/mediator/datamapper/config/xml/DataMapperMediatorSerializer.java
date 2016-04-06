@@ -33,68 +33,67 @@ import org.wso2.carbon.mediator.datamapper.DataMapperMediator;
 
 public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
 
-    /**
-     * Gets the mediator class name which will be serialized by the serializer
-     *
-     * @return String representing the full class name of the mediator
-     */
-    @Override
-    public String getMediatorClassName() {
-        return DataMapperMediator.class.getName();
-    }
+	/**
+	 * Gets the mediator class name which will be serialized by the serializer
+	 *
+	 * @return String representing the full class name of the mediator
+	 */
+	@Override public String getMediatorClassName() {
+		return DataMapperMediator.class.getName();
+	}
 
-    /**
-     * Holds the serialization logic of the DataMapperMediator class to the
-     * relevant xml configuration
-     *
-     * @param mediator An instance of DataMapperMediator to be serialized
-     * @return OMElement describing the serialized configuration of the DataMapperMediator
-     */
-    @Override
-    protected OMElement serializeSpecificMediator(Mediator mediator) {
-        if (!(mediator instanceof DataMapperMediator)) {
-            handleException("Unsupported mediator passed in for serialization :"
-                    + mediator.getType());
-        }
+	/**
+	 * Holds the serialization logic of the DataMapperMediator class to the
+	 * relevant xml configuration
+	 *
+	 * @param mediator An instance of DataMapperMediator to be serialized
+	 * @return OMElement describing the serialized configuration of the DataMapperMediator
+	 */
+	@Override protected OMElement serializeSpecificMediator(Mediator mediator) {
+		if (!(mediator instanceof DataMapperMediator)) {
+			handleException("Unsupported mediator passed in for serialization :" + mediator.getType());
+		}
 
-        DataMapperMediator dataMapperMediator = (DataMapperMediator) mediator;
-        OMElement dataMapperElement = fac.createOMElement(DataMapperMediatorConstants.DATAMAPPER, synNS);
+		DataMapperMediator dataMapperMediator = (DataMapperMediator) mediator;
+		OMElement dataMapperElement = fac.createOMElement(DataMapperMediatorConstants.DATAMAPPER, synNS);
 
-        if (dataMapperMediator.getMappingConfigurationKey() != null) {
-            // Serialize Value using ValueSerializer
-            ValueSerializer keySerializer = new ValueSerializer();
-            keySerializer.serializeValue(dataMapperMediator.getMappingConfigurationKey(),
-                    DataMapperMediatorConstants.CONFIG, dataMapperElement);
-        } else {
-            handleException("Invalid DataMapper mediator. Configuration registry key is required");
-        }
+		if (dataMapperMediator.getMappingConfigurationKey() != null) {
+			// Serialize Value using ValueSerializer
+			ValueSerializer keySerializer = new ValueSerializer();
+			keySerializer
+					.serializeValue(dataMapperMediator.getMappingConfigurationKey(), DataMapperMediatorConstants
+							                .CONFIG, dataMapperElement);
+		} else {
+			handleException("Invalid DataMapper mediator. Configuration registry key is required");
+		}
 
-        if (dataMapperMediator.getInputSchemaKey() != null) {
-            ValueSerializer keySerializer = new ValueSerializer();
-            keySerializer.serializeValue(dataMapperMediator.getInputSchemaKey(),
-                    DataMapperMediatorConstants.INPUT_SCHEMA, dataMapperElement);
-        } else {
-            handleException("Invalid DataMapper mediator. InputSchema registry key is required");
-        }
+		if (dataMapperMediator.getInputSchemaKey() != null) {
+			ValueSerializer keySerializer = new ValueSerializer();
+			keySerializer
+					.serializeValue(dataMapperMediator.getInputSchemaKey(), DataMapperMediatorConstants.INPUT_SCHEMA,
+					                dataMapperElement);
+		} else {
+			handleException("Invalid DataMapper mediator. InputSchema registry key is required");
+		}
 
-        if (dataMapperMediator.getOutputSchemaKey() != null) {
-            ValueSerializer keySerializer = new ValueSerializer();
-            keySerializer.serializeValue(dataMapperMediator.getOutputSchemaKey(),
-                    DataMapperMediatorConstants.OUTPUT_SCHEMA, dataMapperElement);
-        } else {
-            handleException("Invalid DataMapper mediator. OutputSchema registry key is required");
-        }
+		if (dataMapperMediator.getOutputSchemaKey() != null) {
+			ValueSerializer keySerializer = new ValueSerializer();
+			keySerializer
+					.serializeValue(dataMapperMediator.getOutputSchemaKey(), DataMapperMediatorConstants.OUTPUT_SCHEMA,
+					                dataMapperElement);
+		} else {
+			handleException("Invalid DataMapper mediator. OutputSchema registry key is required");
+		}
 
-        dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.INPUT_TYPE,
-                nullNS, dataMapperMediator.getInputType()));
+		dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.INPUT_TYPE, nullNS,
+		                                                     dataMapperMediator.getInputType()));
 
-        dataMapperElement
-                .addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.OUTPUT_TYPE, nullNS,
-                        dataMapperMediator.getOutputType()));
+		dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.OUTPUT_TYPE, nullNS,
+		                                                     dataMapperMediator.getOutputType()));
 
-        saveTracingState(dataMapperElement, dataMapperMediator);
+		saveTracingState(dataMapperElement, dataMapperMediator);
 
-        return dataMapperElement;
-    }
+		return dataMapperElement;
+	}
 
 }

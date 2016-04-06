@@ -27,5 +27,6 @@ import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
  */
 public interface Formatter {
 
-    void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema) throws SchemaException, WriterException;
+	void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema)
+			throws SchemaException, WriterException;
 }

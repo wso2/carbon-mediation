@@ -21,31 +21,31 @@ package org.wso2.carbon.mediator.datamapper.engine.core.schemas;
  */
 public class SchemaElement {
 
-    private String elementName;
-    private String namespace;
+	private String elementName;
+	private String namespace;
 
-    public SchemaElement(String elementName, String namespace) {
-        this.elementName = elementName;
-        this.namespace = namespace;
-    }
+	public SchemaElement(String elementName, String namespace) {
+		this.elementName = elementName;
+		this.namespace = namespace;
+	}
 
-    public SchemaElement(String elementName) {
-        this.elementName = elementName;
-    }
+	public SchemaElement(String elementName) {
+		this.elementName = elementName;
+	}
 
-    public String getElementName() {
-        return elementName;
-    }
+	public String getElementName() {
+		return elementName;
+	}
 
-    public void setElementName(String elementName) {
-        this.elementName = elementName;
-    }
+	public void setElementName(String elementName) {
+		this.elementName = elementName;
+	}
 
-    public String getNamespace() {
-        return namespace;
-    }
+	public String getNamespace() {
+		return namespace;
+	}
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
+	public void setNamespace(String namespace) {
+		this.namespace = namespace;
+	}
 }

@@ -21,20 +21,20 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterExceptio
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 
-
 /**
  * This class is a factory class to get {@link Writer} needed by the data mapper engine
  */
 public class WriterFactory {
 
-    public static Writer getWriter(InputOutputDataType outputType, Schema outputSchema) throws SchemaException, WriterException {
-        switch (outputType) {
-            case XML:
-                return new XMLWriter(outputSchema);
-            case JSON:
-                return new JSONWriter(outputSchema);
-            default:
-                throw new IllegalArgumentException("Output Writer for type " + outputType + " is not implemented.");
-        }
-    }
+	public static Writer getWriter(InputOutputDataType outputType, Schema outputSchema)
+			throws SchemaException, WriterException {
+		switch (outputType) {
+			case XML:
+				return new XMLWriter(outputSchema);
+			case JSON:
+				return new JSONWriter(outputSchema);
+			default:
+				throw new IllegalArgumentException("Output Writer for type " + outputType + " is not implemented.");
+		}
+	}
 }
