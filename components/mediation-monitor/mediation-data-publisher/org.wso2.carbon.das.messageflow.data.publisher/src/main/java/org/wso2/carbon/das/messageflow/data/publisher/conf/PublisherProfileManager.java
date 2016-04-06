@@ -50,7 +50,14 @@ public class PublisherProfileManager {
     }
 
     public List<PublisherProfile> getTenantPublisherProfilesList (int tenantId) {
-        return new ArrayList<PublisherProfile>(publisherProfiles.get(tenantId).values());
+        if (publisherProfiles.get(tenantId) == null) {
+            publisherProfiles.put(tenantId, new HashMap<String, PublisherProfile>());
+        }
+        if (publisherProfiles.get(tenantId).values() == null){
+            return new ArrayList<PublisherProfile>();
+        } else {
+            return new ArrayList<PublisherProfile>(publisherProfiles.get(tenantId).values());
+        }
     }
 
     public void addPublisherProfile(int tenantId, String serverId, PublisherProfile profile) {
@@ -69,7 +76,11 @@ public class PublisherProfileManager {
             synapseConfigs.put(tenantId, new HashMap<String, StructuringArtifact>());
             return null;
         } else {
-            return new ArrayList<StructuringArtifact>(synapseConfigs.get(tenantId).values());
+            if (synapseConfigs.get(tenantId).values() == null) {
+                return new ArrayList<StructuringArtifact>();
+            } else {
+                return new ArrayList<StructuringArtifact>(synapseConfigs.get(tenantId).values());
+            }
         }
     }
 
