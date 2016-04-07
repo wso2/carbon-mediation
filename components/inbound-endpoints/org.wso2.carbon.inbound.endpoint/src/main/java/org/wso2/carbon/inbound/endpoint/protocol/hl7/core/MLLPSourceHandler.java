@@ -27,6 +27,7 @@ import org.apache.synapse.transport.passthru.util.ControlledByteBuffer;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.codec.HL7Codec;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContext;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContextFactory;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.HL7MessageUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -83,7 +84,13 @@ public class MLLPSourceHandler implements IOEventDispatch {
                     return;
                 } catch (HL7Exception e) {
                     handleException(session, mllpContext, e);
-                    clearInputBuffers(mllpContext);
+                    if (mllpContext.isAutoAck()) {
+                        mllpContext.setNackMode(true);
+                        mllpContext.setHl7Message(HL7MessageUtils.createDefaultNack(e.getMessage()));
+                        mllpContext.requestOutput();
+                    } else {
+                        hl7Processor.processError(mllpContext, e);
+                    }
                     return;
                 } catch (IOException e) {
                     shutdownConnection(session, mllpContext, e);
