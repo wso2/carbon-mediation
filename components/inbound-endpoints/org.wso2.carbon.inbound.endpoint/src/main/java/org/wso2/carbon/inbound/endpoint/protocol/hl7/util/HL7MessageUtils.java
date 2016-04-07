@@ -43,6 +43,7 @@ import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -113,6 +114,30 @@ public class HL7MessageUtils {
 
         try {
             synCtx.setEnvelope(createEnvelope(synCtx, message, params));
+        } catch (Exception e) {
+            throw new HL7Exception(e);
+        }
+
+        return synCtx;
+    }
+
+    public static MessageContext createErrorMessageContext(String rawMessage, Exception errorMsg,
+                                                           InboundProcessorParams params) throws AxisFault, HL7Exception {
+        MessageContext synCtx = createSynapseMessageContext(params.getProperties()
+                .getProperty(MLLPConstants.HL7_INBOUND_TENANT_DOMAIN));
+
+        if (params.getProperties().getProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED) != null) {
+            synCtx.setProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED,
+                    params.getProperties().getProperty(Axis2HL7Constants.HL7_VALIDATION_PASSED));
+        }
+
+        try {
+            synCtx.setProperty(SynapseConstants.ERROR_CODE, SynapseConstants.RCV_IO_ERROR_RECEIVING);
+            synCtx.setProperty(SynapseConstants.ERROR_MESSAGE, errorMsg.getMessage());
+            synCtx.setProperty(SynapseConstants.ERROR_DETAIL,
+                    (errorMsg.getCause() == null ? "null" : errorMsg.getCause().getMessage()));
+            synCtx.setProperty(SynapseConstants.ERROR_EXCEPTION, errorMsg);
+            synCtx.setEnvelope(createErrorEnvelope(synCtx, rawMessage, errorMsg.getMessage(), params));
         } catch (Exception e) {
             throw new HL7Exception(e);
         }
@@ -197,6 +222,25 @@ public class HL7MessageUtils {
         return envelope;
     }
 
+    private static SOAPEnvelope createErrorEnvelope(MessageContext synCtx, String rawMsg, String erroMsg,
+                                                    InboundProcessorParams params) {
+        SOAPEnvelope envelope = fac.getDefaultEnvelope();
+        OMElement messageEl;
+        boolean rawMessage = false;
+        if (params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE) != null &&
+                params.getProperties().getProperty(MLLPConstants.PARAM_HL7_BUILD_RAW_MESSAGE).equals("true")) {
+            rawMessage = true;
+        }
+
+        if (rawMessage) {
+            messageEl = generateHL7RawMessaegElement(rawMsg);
+            envelope.getBody().addChild(messageEl);
+        }
+
+        return envelope;
+
+    }
+
     public static OMElement generateHL7MessageElement(String hl7XmlMessage)
             throws XMLStreamException {
         OMElement hl7Element = AXIOMUtil.stringToOM(hl7XmlMessage);
@@ -228,6 +272,16 @@ public class HL7MessageUtils {
                 throw new HL7Exception(e);
             }
         }
+    }
+
+    public static Message createDefaultNack(String errorMsg) {
+        try {
+            return createDefaultNackMessage(errorMsg);
+        } catch (DataTypeException e) {
+            log.error("Error while creating default NACK message.", e);
+        }
+
+        return null;
     }
 
     private static Message createDefaultNackMessage(String errorMsg) throws DataTypeException {

@@ -21,10 +21,10 @@ package org.wso2.carbon.inbound.endpoint.protocol.hl7.codec;
 import ca.uhn.hl7v2.HL7Exception;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.HL7MessageUtils;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContext;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLPConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.MLLProtocolException;
-import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContext;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.HL7MessageUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -100,7 +100,7 @@ public class HL7Codec {
                 context.getRequestBuffer().setLength(0);
             } catch (HL7Exception e) {
                 log.error("Error while parsing request message: " + context.getRequestBuffer());
-                throw new MLLProtocolException(e);
+                throw e;
             }
         }
 
@@ -128,7 +128,7 @@ public class HL7Codec {
 
         if (this.state == READ_COMPLETE) {
 
-            if (context.isAutoAck() || context.isApplicationAck()) {
+            if ((context.isAutoAck() || context.isApplicationAck()) && !context.isNackMode()) {
                 responseBytes = context.getHl7Message().generateACK().encode().getBytes(charsetDecoder.charset());
                 context.setApplicationAck(false);
             } else {

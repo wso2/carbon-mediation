@@ -13,14 +13,15 @@ import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.context.MLLPContext;
-import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.HL7ExecutorServiceFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.Axis2HL7Constants;
+import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.HL7ExecutorServiceFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.util.HL7MessageUtils;
 
 import java.nio.charset.CharsetDecoder;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.concurrent.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
@@ -122,6 +123,60 @@ public class HL7Processor implements InboundResponseSender {
 
     }
 
+    public void processError(final MLLPContext mllpContext, final Exception ex) {
+        mllpContext.setRequestTime(System.currentTimeMillis());
+
+        // Prepare Synapse Context for message injection
+        MessageContext synCtx;
+        try {
+            if (mllpContext.getRequestBuffer() != null) {
+                synCtx = HL7MessageUtils.
+                        createErrorMessageContext(mllpContext.getRequestBuffer().toString(), ex, params);
+            } else {
+                synCtx = HL7MessageUtils.
+                        createErrorMessageContext("The message received is not parseable", ex, params);
+            }
+        } catch (HL7Exception e) {
+            handleException(mllpContext, e.getMessage());
+            return;
+        } catch (AxisFault e) {
+            handleException(mllpContext, e.getMessage());
+            return;
+        }
+
+        mllpContext.setMessageId(synCtx.getMessageID());
+        synCtx.setProperty("inbound.endpoint.name", params.getName());
+        InboundEndpoint inboundEndpoint = synCtx.getConfiguration().getInboundEndpoint(params.getName());
+        CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
+        synCtx.setProperty(MLLPConstants.HL7_INBOUND_MSG_ID, synCtx.getMessageID());
+
+        // If not AUTO ACK, we need response invocation through this processor
+        if (!autoAck) {
+            synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
+            synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, this);
+            synCtx.setProperty(MLLPConstants.MLLP_CONTEXT, mllpContext);
+        }
+
+        addProperties(synCtx, mllpContext);
+
+        SequenceMediator injectSeq = (SequenceMediator) synCtx.getEnvironment().getSynapseConfiguration().getSequence(onErrorSequence);
+        if (injectSeq == null) {
+            log.error("Could not find inbound error sequence '" + onErrorSequence + "'.");
+            handleException(mllpContext, "Could not find inbound error sequence.");
+            return;
+        } else if (!injectSeq.isInitialized()){
+            injectSeq.init(synCtx.getEnvironment());
+        }
+
+        if (!autoAck && timeOut > 0) {
+            executorService.schedule(new TimeoutHandler(mllpContext, synCtx.getMessageID()), timeOut, TimeUnit.MILLISECONDS);
+        }
+
+        CallableTask task = new CallableTask(synCtx, injectSeq);
+
+        executorService.submit(task);
+    }
+
     /**
      * We need to add several context properties that HL7 Axis2 transport sender depends on (also the
      * application/edi-hl7 formatter).
@@ -203,12 +258,16 @@ public class HL7Processor implements InboundResponseSender {
     }
 
     private void handleException(MLLPContext mllpContext, String msg) {
-        try {
-            mllpContext.setNackMode(true);
-            mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(), msg));
-            mllpContext.requestOutput();
-        } catch (HL7Exception e) {
-            log.error("Error while generating NACK response.", e);
+        if (mllpContext.isAutoAck()) {
+            try {
+                mllpContext.setNackMode(true);
+                mllpContext.setHl7Message(HL7MessageUtils.createNack(mllpContext.getHl7Message(), msg));
+                mllpContext.requestOutput();
+            } catch (HL7Exception e) {
+                log.error("Error while generating NACK response.", e);
+            }
+        } else {
+            processError(mllpContext, new Exception(msg));
         }
     }
 
