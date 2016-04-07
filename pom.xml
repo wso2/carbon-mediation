@@ -2406,7 +2406,7 @@
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.4.4</carbon.kernel.version>
+        <carbon.kernel.version>4.4.5</carbon.kernel.version>
         <carbon.kernel.imp.pkg.version>[4.4.0, 4.5.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
@@ -2423,7 +2423,7 @@
         <carbon.registry.imp.pkg.version>[4.5.0, 4.6.0)</carbon.registry.imp.pkg.version>
 
     <!-- Analytic Commons version-->
-        <carbon.analytics.common.version>5.0.6</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.0.11</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.0.6, 5.1.0)</carbon.analytics.common.imp.pkg.version>
 
         <!-- Carbon Identity version-->
