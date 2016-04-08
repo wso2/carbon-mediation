@@ -24,7 +24,8 @@ public enum ReaderEventType {
 	ARRAY_END("ArrayEnd"),
 	FIELD("Field"),
 	TERMINATE("Terminate"),
-	ANONYMOUS_OBJECT_START("AnonymousObjectStart");
+	ANONYMOUS_OBJECT_START("AnonymousObjectStart"),
+	PRIMITIVE("Primitive");
 	private final String value;
 
 	ReaderEventType(String value) {
