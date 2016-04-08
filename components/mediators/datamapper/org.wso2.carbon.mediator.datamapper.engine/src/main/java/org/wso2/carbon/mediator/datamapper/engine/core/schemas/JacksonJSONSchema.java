@@ -33,6 +33,7 @@ import java.util.Map;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.*;
 
 /**
  * This class implements {@link Schema} interface using Jackson JSON library to hold JSON schema
@@ -53,6 +54,7 @@ public class JacksonJSONSchema implements Schema {
     private static final String TITLE_KEY = "title";
     private static final String ITEMS_KEY = "items";
     private Map<String, String> namespaceMap;
+    private boolean currentArrayIsPrimitive;
 
     public JacksonJSONSchema(InputStream inputSchema) throws SchemaException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -102,13 +104,19 @@ public class JacksonJSONSchema implements Schema {
             if (elementName.equals(getName())) {
                 schema = (Map<String, Object>) jsonSchemaMap.get(PROPERTIES_KEY);
                 elementType = (String) jsonSchemaMap.get(TYPE_KEY);
+                if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
+                    setCurrentArrayType(schema, elementName);
+                }
                 elementFound = true;
             } else if (schema.containsKey(elementName)) {
                 elementType = (String) ((Map<String, Object>) schema.get(elementName)).get(TYPE_KEY);
                 if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
+                    setCurrentArrayType(schema, elementName);
                     schema = getSchemaItems((Map<String, Object>) schema.get(elementName));
                     schema = getSchemaProperties(schema);
                 } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
+                    schema = getSchemaProperties((Map<String, Object>) schema.get(elementName));
+                } else {
                     schema = getSchemaProperties((Map<String, Object>) schema.get(elementName));
                 }
                 elementFound = true;
@@ -118,6 +126,17 @@ public class JacksonJSONSchema implements Schema {
             }
         }
         return elementType;
+    }
+
+    private void setCurrentArrayType(Map<String, Object> schema, String elementName) {
+        Map<String, Object> tempSchema = getSchemaItems((Map<String, Object>) schema.get(elementName));
+        if (OBJECT_ELEMENT_TYPE.equals(tempSchema.get(TYPE_KEY))) {
+            currentArrayIsPrimitive = false;
+        } else if (STRING_ELEMENT_TYPE.equals(tempSchema.get(TYPE_KEY)) || BOOLEAN_ELEMENT_TYPE
+                .equals(tempSchema.get(TYPE_KEY)) || NUMBER_ELEMENT_TYPE.equals(tempSchema.get(TYPE_KEY))
+                || INTEGER_ELEMENT_TYPE.equals(tempSchema.get(TYPE_KEY))) {
+            currentArrayIsPrimitive = true;
+        }
     }
 
     public String getElementTypeByName(String elementName) throws SchemaException {
@@ -202,6 +221,8 @@ public class JacksonJSONSchema implements Schema {
                     tempSchema = getSchemaProperties(tempSchema);
                 } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
                     tempSchema = getSchemaProperties((Map<String, Object>) tempSchema.get(elementName));
+                } else {
+                    tempSchema = getSchemaProperties((Map<String, Object>) tempSchema.get(elementName));
                 }
             }
         }
@@ -246,6 +267,8 @@ public class JacksonJSONSchema implements Schema {
                     elementType = getElementTypeByName(elementName, subSchema);
                 } else if (ARRAY_ELEMENT_TYPE.equals(schemaType)) {
                     elementType = getElementTypeByName(elementName, getSchemaItems(subSchema));
+                } else {
+                    elementType = getElementTypeByName(elementName, subSchema);
                 }
                 if (elementType != null) {
                     return elementType;
@@ -272,6 +295,9 @@ public class JacksonJSONSchema implements Schema {
             Object propertyList = schema.get(ITEMS_KEY);
             if (propertyList instanceof Map) {
                 nextSchema.putAll((Map<? extends String, Object>) propertyList);
+                if (nextSchema.containsKey(ATTRIBUTES_KEY)) {
+                    nextSchema.putAll((Map<? extends String, Object>) nextSchema.get(ATTRIBUTES_KEY));
+                }
             } else {
                 nextSchema.putAll((Map<? extends String, Object>) ((ArrayList) propertyList).get(0));
             }
@@ -291,7 +317,7 @@ public class JacksonJSONSchema implements Schema {
                 return (String) type;
             } else {
                 throw new IllegalArgumentException("Illegal format " + type.getClass() + " value found under key : " +
-                                                   TYPE_KEY);
+                        TYPE_KEY);
             }
         } else {
             throw new IllegalArgumentException("Given schema does not contain value under key : " + TYPE_KEY);
@@ -308,6 +334,11 @@ public class JacksonJSONSchema implements Schema {
         }
     }
 
+   @Override
+   public boolean isCurrentArrayIsPrimitive() {
+       return currentArrayIsPrimitive;
+    }
+
     private String getNamespaceAddedFieldName(String uri, String localName) throws InvalidPayloadException {
         if (uri != null) {
             String prefix = getPrefixForNamespace(uri);
@@ -317,7 +348,7 @@ public class JacksonJSONSchema implements Schema {
                 return localName;
             } else {
                 throw new InvalidPayloadException(uri + " name-space is not defined in the schema with element " +
-                                                  localName);
+                        localName);
             }
         }
         return localName;

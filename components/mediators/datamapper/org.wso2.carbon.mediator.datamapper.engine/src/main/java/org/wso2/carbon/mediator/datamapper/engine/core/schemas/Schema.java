@@ -57,4 +57,6 @@ public interface Schema {
     String getPrefixForNamespace(String url);
 
     Map<String, String> getNamespaceMap();
+
+    boolean isCurrentArrayIsPrimitive();
 }
