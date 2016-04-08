@@ -22,5 +22,5 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaExceptio
 
 public interface InputVariableNotifier {
 
-    void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException;
+	void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException;
 }

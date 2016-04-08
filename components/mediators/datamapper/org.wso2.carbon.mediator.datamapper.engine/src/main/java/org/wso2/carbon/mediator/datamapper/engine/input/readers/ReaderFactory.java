@@ -23,14 +23,14 @@ import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
  */
 public class ReaderFactory {
 
-    public static Reader getReader(InputOutputDataType inputType) {
-        switch (inputType) {
-            case XML:
-                return new XMLReader();
-            case JSON:
-                return new JSONReader();
-            default:
-                throw new IllegalArgumentException("Input Reader for type " + inputType + " is not implemented.");
-        }
-    }
+	public static Reader getReader(InputOutputDataType inputType) {
+		switch (inputType) {
+			case XML:
+				return new XMLReader();
+			case JSON:
+				return new JSONReader();
+			default:
+				throw new IllegalArgumentException("Input Reader for type " + inputType + " is not implemented.");
+		}
+	}
 }

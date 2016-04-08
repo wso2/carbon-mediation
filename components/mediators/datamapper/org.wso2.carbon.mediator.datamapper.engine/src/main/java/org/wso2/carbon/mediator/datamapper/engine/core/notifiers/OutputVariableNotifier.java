@@ -21,5 +21,5 @@ package org.wso2.carbon.mediator.datamapper.engine.core.notifiers;
  */
 public interface OutputVariableNotifier {
 
-    void notifyOutputVariable(Object variable);
+	void notifyOutputVariable(Object variable);
 }
