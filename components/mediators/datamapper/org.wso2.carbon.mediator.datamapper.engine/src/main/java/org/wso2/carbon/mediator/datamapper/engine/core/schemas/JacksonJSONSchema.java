@@ -291,7 +291,7 @@ public class JacksonJSONSchema implements Schema {
                 return (String) type;
             } else {
                 throw new IllegalArgumentException("Illegal format " + type.getClass() + " value found under key : " +
-                        TYPE_KEY);
+                                                   TYPE_KEY);
             }
         } else {
             throw new IllegalArgumentException("Given schema does not contain value under key : " + TYPE_KEY);
@@ -317,7 +317,7 @@ public class JacksonJSONSchema implements Schema {
                 return localName;
             } else {
                 throw new InvalidPayloadException(uri + " name-space is not defined in the schema with element " +
-                        localName);
+                                                  localName);
             }
         }
         return localName;

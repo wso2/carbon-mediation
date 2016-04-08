@@ -89,20 +89,20 @@ public class JSONBuilder implements Builder {
 
     @Override public void writeField(String fieldName, Object value, String fieldType) throws IOException {
         switch (fieldType) {
-        case STRING_ELEMENT_TYPE:
-            writeStringField(fieldName, (String) value);
-            break;
-        case BOOLEAN_ELEMENT_TYPE:
-            writeBooleanField(fieldName, (Boolean) value);
-            break;
-        case NUMBER_ELEMENT_TYPE:
-            writeNumberField(fieldName, (Double) value);
-            break;
-        case INTEGER_ELEMENT_TYPE:
-            writeNumberField(fieldName, (Long) value);
-            break;
-        default:
-            writeStringField(fieldName, (String) value);
+            case STRING_ELEMENT_TYPE:
+                writeStringField(fieldName, (String) value);
+                break;
+            case BOOLEAN_ELEMENT_TYPE:
+                writeBooleanField(fieldName, (Boolean) value);
+                break;
+            case NUMBER_ELEMENT_TYPE:
+                writeNumberField(fieldName, (Double) value);
+                break;
+            case INTEGER_ELEMENT_TYPE:
+                writeNumberField(fieldName, (Long) value);
+                break;
+            default:
+                writeStringField(fieldName, (String) value);
         }
     }
 
@@ -142,20 +142,20 @@ public class JSONBuilder implements Builder {
 
     @Override public void writePrimitive(Object value, String fieldType) throws IOException {
         switch (fieldType) {
-        case STRING_ELEMENT_TYPE:
-            writeString((String) value);
-            break;
-        case BOOLEAN_ELEMENT_TYPE:
-            writeBoolean((Boolean) value);
-            break;
-        case NUMBER_ELEMENT_TYPE:
-            writeNumber((Double) value);
-            break;
-        case INTEGER_ELEMENT_TYPE:
-            writeNumber((Long) value);
-            break;
-        default:
-            writeString((String) value);
+            case STRING_ELEMENT_TYPE:
+                writeString((String) value);
+                break;
+            case BOOLEAN_ELEMENT_TYPE:
+                writeBoolean((Boolean) value);
+                break;
+            case NUMBER_ELEMENT_TYPE:
+                writeNumber((Double) value);
+                break;
+            case INTEGER_ELEMENT_TYPE:
+                writeNumber((Long) value);
+                break;
+            default:
+                writeString((String) value);
         }
     }
 

@@ -24,25 +24,25 @@ import org.wso2.carbon.mediator.service.MediatorService;
 
 public class DataMapperMediatorActivator implements BundleActivator {
 
-	private static final Log log = LogFactory.getLog(DataMapperMediatorActivator.class);
+    private static final Log log = LogFactory.getLog(DataMapperMediatorActivator.class);
 
-	public void start(BundleContext bundleContext) throws Exception {
+    public void start(BundleContext bundleContext) throws Exception {
 
-		if (log.isDebugEnabled()) {
-			log.debug("Starting the DataMapper mediator component ...");
-		}
+        if (log.isDebugEnabled()) {
+            log.debug("Starting the DataMapper mediator component ...");
+        }
 
-		//Properties props = new Properties();
-		bundleContext.registerService(MediatorService.class.getName(), new DataMapperMediatorService(), null);
+        //Properties props = new Properties();
+        bundleContext.registerService(MediatorService.class.getName(), new DataMapperMediatorService(), null);
 
-		if (log.isDebugEnabled()) {
-			log.debug("Successfully registered the DataMapper mediator service");
-		}
-	}
+        if (log.isDebugEnabled()) {
+            log.debug("Successfully registered the DataMapper mediator service");
+        }
+    }
 
-	public void stop(BundleContext bundleContext) throws Exception {
-		if (log.isDebugEnabled()) {
-			log.debug("Stopped the DataMapper mediator component ...");
-		}
-	}
+    public void stop(BundleContext bundleContext) throws Exception {
+        if (log.isDebugEnabled()) {
+            log.debug("Stopped the DataMapper mediator component ...");
+        }
+    }
 }

@@ -26,14 +26,14 @@ import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
  */
 public interface Executor {
 
-	/**
-	 * Method to execute the mapping config in the {@link MappingResource} on
-	 * input variable and returns the output model
-	 *
-	 * @param mappingResource mapping resource model
-	 * @param inputVariable   input variable
-	 * @return model output model
-	 * @throws JSException if mapping throws an exception
-	 */
-	public Model execute(MappingResource mappingResource, String inputVariable) throws JSException, SchemaException;
+    /**
+     * Method to execute the mapping config in the {@link MappingResource} on
+     * input variable and returns the output model
+     *
+     * @param mappingResource mapping resource model
+     * @param inputVariable   input variable
+     * @return model output model
+     * @throws JSException if mapping throws an exception
+     */
+    public Model execute(MappingResource mappingResource, String inputVariable) throws JSException, SchemaException;
 }
