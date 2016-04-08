@@ -21,8 +21,8 @@ package org.wso2.carbon.mediator.datamapper.engine.core.models;
  */
 public interface Model<T> {
 
-    void setModel(T model);
+	void setModel(T model);
 
-    T getModel();
+	T getModel();
 
 }

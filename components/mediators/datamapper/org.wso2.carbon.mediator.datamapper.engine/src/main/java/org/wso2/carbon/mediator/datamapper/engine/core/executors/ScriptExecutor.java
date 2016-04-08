@@ -38,51 +38,54 @@ import java.util.Map;
  */
 public class ScriptExecutor implements Executor {
 
-    private ScriptEngine scriptEngine;
-    private static final Log log = LogFactory.getLog(ScriptExecutor.class);
+	private ScriptEngine scriptEngine;
+	private static final Log log = LogFactory.getLog(ScriptExecutor.class);
 
-    /**
-     * Create a script executor of the provided script executor type
-     *
-     * @param scriptExecutorType
-     */
-    public ScriptExecutor(ScriptExecutorType scriptExecutorType) {
-        switch (scriptExecutorType) {
-            case NASHORN:
-                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
-                log.debug("Setting Nashorn as Script Engine");
-                break;
-            case RHINO:
-                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
-                log.debug("Setting Rhino as Script Engine");
-                break;
-            default:
-                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
-                log.debug("Setting default Rhino as Script Engine");
-                break;
-        }
-    }
+	/**
+	 * Create a script executor of the provided script executor type
+	 *
+	 * @param scriptExecutorType
+	 */
+	public ScriptExecutor(ScriptExecutorType scriptExecutorType) {
+		switch (scriptExecutorType) {
+			case NASHORN:
+				scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants
+						                                                         .NASHORN_ENGINE_NAME);
+				log.debug("Setting Nashorn as Script Engine");
+				break;
+			case RHINO:
+				scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants
+						                                                         .DEFAULT_ENGINE_NAME);
+				log.debug("Setting Rhino as Script Engine");
+				break;
+			default:
+				scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants
+						                                                         .DEFAULT_ENGINE_NAME);
+				log.debug("Setting default Rhino as Script Engine");
+				break;
+		}
+	}
 
-    @Override public Model execute(MappingResource mappingResource, String inputVariable)
-            throws JSException, SchemaException {
-        try {
-            JSFunction jsFunction = mappingResource.getFunction();
-            injectInputVariableToEngine(mappingResource.getInputSchema().getName(), inputVariable);
-            scriptEngine.eval(jsFunction.getFunctionBody());
-            Invocable invocable = (Invocable) scriptEngine;
-            Object result = invocable.invokeFunction(jsFunction.getFunctionName());
-            if (result instanceof Map) {
-                return new MapModel((Map<String, Object>) result);
-            }
-        } catch (ScriptException e) {
-            throw new JSException("Script engine unable to execute the script " + e);
-        } catch (NoSuchMethodException e) {
-            throw new JSException("Undefined method called to execute " + e);
-        }
-        throw new JSException("Failed to execute mapping function");
-    }
+	@Override public Model execute(MappingResource mappingResource, String inputVariable)
+			throws JSException, SchemaException {
+		try {
+			JSFunction jsFunction = mappingResource.getFunction();
+			injectInputVariableToEngine(mappingResource.getInputSchema().getName(), inputVariable);
+			scriptEngine.eval(jsFunction.getFunctionBody());
+			Invocable invocable = (Invocable) scriptEngine;
+			Object result = invocable.invokeFunction(jsFunction.getFunctionName());
+			if (result instanceof Map) {
+				return new MapModel((Map<String, Object>) result);
+			}
+		} catch (ScriptException e) {
+			throw new JSException("Script engine unable to execute the script " + e);
+		} catch (NoSuchMethodException e) {
+			throw new JSException("Undefined method called to execute " + e);
+		}
+		throw new JSException("Failed to execute mapping function");
+	}
 
-    private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
-        scriptEngine.eval("var input" + inputSchemaName.replace(':', '_') + "=" + inputVariable);
-    }
+	private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
+		scriptEngine.eval("var input" + inputSchemaName.replace(':', '_') + "=" + inputVariable);
+	}
 }

@@ -21,23 +21,23 @@ import org.wso2.carbon.mediator.service.ui.Mediator;
 
 public class DataMapperMediatorService extends AbstractMediatorService {
 
-    public String getTagLocalName() {
-        return "datamapper";
-    }
+	public String getTagLocalName() {
+		return "datamapper";
+	}
 
-    public String getDisplayName() {
-        return "DataMapper";
-    }
+	public String getDisplayName() {
+		return "DataMapper";
+	}
 
-    public String getLogicalName() {
-        return "DataMapperMediator";
-    }
+	public String getLogicalName() {
+		return "DataMapperMediator";
+	}
 
-    public String getGroupName() {
-        return "Advanced";
-    }
+	public String getGroupName() {
+		return "Advanced";
+	}
 
-    public Mediator getMediator() {
-        return new DataMapperMediator();
-    }
+	public Mediator getMediator() {
+		return new DataMapperMediator();
+	}
 }

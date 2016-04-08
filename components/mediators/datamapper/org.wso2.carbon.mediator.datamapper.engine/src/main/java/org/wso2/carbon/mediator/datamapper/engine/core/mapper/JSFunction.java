@@ -21,28 +21,28 @@ package org.wso2.carbon.mediator.datamapper.engine.core.mapper;
  */
 public class JSFunction {
 
-    private String functionName;
-    private String functionBody;
+	private String functionName;
+	private String functionBody;
 
-    public JSFunction(String name, String body) {
-        this.setFunctionName(name);
-        this.setFunctionBody(body);
-    }
+	public JSFunction(String name, String body) {
+		this.setFunctionName(name);
+		this.setFunctionBody(body);
+	}
 
-    public String getFunctionName() {
-        return functionName;
-    }
+	public String getFunctionName() {
+		return functionName;
+	}
 
-    public void setFunctionName(String functionName) {
-        this.functionName = functionName;
-    }
+	public void setFunctionName(String functionName) {
+		this.functionName = functionName;
+	}
 
-    public String getFunctionBody() {
-        return functionBody;
-    }
+	public String getFunctionBody() {
+		return functionBody;
+	}
 
-    public void setFunctionBody(String functionBody) {
-        this.functionBody = functionBody;
-    }
+	public void setFunctionBody(String functionBody) {
+		this.functionBody = functionBody;
+	}
 
 }

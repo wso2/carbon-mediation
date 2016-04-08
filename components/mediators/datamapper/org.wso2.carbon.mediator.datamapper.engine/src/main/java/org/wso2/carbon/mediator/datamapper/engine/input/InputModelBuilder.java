@@ -34,50 +34,51 @@ import java.io.InputStream;
 
 public class InputModelBuilder {
 
-    private Reader inputReader;
-    private Builder modelBuilder;
-    private Schema inputSchema;
-    private InputVariableNotifier inputVariableNotifier;
+	private Reader inputReader;
+	private Builder modelBuilder;
+	private Schema inputSchema;
+	private InputVariableNotifier inputVariableNotifier;
 
-    public InputModelBuilder(InputOutputDataType inputType, ModelType modelType, Schema inputSchema)
-            throws IOException {
-        this.inputReader = ReaderFactory.getReader(inputType);
-        this.modelBuilder = BuilderFactory.getBuilder(modelType);
-        this.inputSchema = inputSchema;
-    }
+	public InputModelBuilder(InputOutputDataType inputType, ModelType modelType, Schema inputSchema)
+			throws IOException {
+		this.inputReader = ReaderFactory.getReader(inputType);
+		this.modelBuilder = BuilderFactory.getBuilder(modelType);
+		this.inputSchema = inputSchema;
+	}
 
-    public void buildInputModel(InputStream inputStream, InputVariableNotifier inputVariableNotifier)
-            throws ReaderException {
-        this.inputVariableNotifier = inputVariableNotifier;
-        inputReader.read(inputStream, this, inputSchema);
-    }
+	public void buildInputModel(InputStream inputStream, InputVariableNotifier inputVariableNotifier)
+			throws ReaderException {
+		this.inputVariableNotifier = inputVariableNotifier;
+		inputReader.read(inputStream, this, inputSchema);
+	}
 
-    public void notifyEvent(ReaderEvent readerEvent) throws IOException, JSException, SchemaException, ReaderException {
-        switch (readerEvent.getEventType()) {
-            case OBJECT_START:
-                modelBuilder.writeObjectFieldStart(readerEvent.getName());
-                break;
-            case OBJECT_END:
-                modelBuilder.writeEndObject();
-                break;
-            case ARRAY_START:
-                modelBuilder.writeArrayFieldStart(readerEvent.getName());
-                break;
-            case FIELD:
-                modelBuilder.writeField(readerEvent.getName(), readerEvent.getValue(), readerEvent.getFieldType());
-                break;
-            case ARRAY_END:
-                modelBuilder.writeEndArray();
-                break;
-            case TERMINATE:
-                modelBuilder.close();
-                inputVariableNotifier.notifyInputVariable(modelBuilder.getContent());
-                break;
-            case ANONYMOUS_OBJECT_START:
-                modelBuilder.writeStartObject();
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported reader event found : " + readerEvent.getEventType());
-        }
-    }
+	public void notifyEvent(ReaderEvent readerEvent) throws IOException, JSException, SchemaException,
+	                                                        ReaderException {
+		switch (readerEvent.getEventType()) {
+			case OBJECT_START:
+				modelBuilder.writeObjectFieldStart(readerEvent.getName());
+				break;
+			case OBJECT_END:
+				modelBuilder.writeEndObject();
+				break;
+			case ARRAY_START:
+				modelBuilder.writeArrayFieldStart(readerEvent.getName());
+				break;
+			case FIELD:
+				modelBuilder.writeField(readerEvent.getName(), readerEvent.getValue(), readerEvent.getFieldType());
+				break;
+			case ARRAY_END:
+				modelBuilder.writeEndArray();
+				break;
+			case TERMINATE:
+				modelBuilder.close();
+				inputVariableNotifier.notifyInputVariable(modelBuilder.getContent());
+				break;
+			case ANONYMOUS_OBJECT_START:
+				modelBuilder.writeStartObject();
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported reader event found : " + readerEvent.getEventType());
+		}
+	}
 }
