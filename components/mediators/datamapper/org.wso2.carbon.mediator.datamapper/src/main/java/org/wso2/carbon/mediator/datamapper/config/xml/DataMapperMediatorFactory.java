@@ -38,87 +38,86 @@ import java.util.Properties;
  */
 
 public class DataMapperMediatorFactory extends AbstractMediatorFactory {
-	/**
-	 * Holds the QName for the DataMapperMediator xml configuration
-	 */
-	private static final QName TAG_QNAME =
-			new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, DataMapperMediatorConstants.DATAMAPPER);
+    /**
+     * Holds the QName for the DataMapperMediator xml configuration
+     */
+    private static final QName TAG_QNAME =
+            new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, DataMapperMediatorConstants.DATAMAPPER);
 
-	/**
-	 * Get the DataMapperMediator configuration tag name
-	 *
-	 * @return QName specifying the DataMapperMediator tag name of the xml
-	 * configuration
-	 */
-	@Override public QName getTagQName() {
-		return TAG_QNAME;
-	}
+    /**
+     * Get the DataMapperMediator configuration tag name
+     *
+     * @return QName specifying the DataMapperMediator tag name of the xml
+     * configuration
+     */
+    @Override public QName getTagQName() {
+        return TAG_QNAME;
+    }
 
-	/**
-	 * Creates the DataMapperMediator by parsing the given xml
-	 * configuration
-	 *
-	 * @param element    OMElement describing the configuration of the
-	 *                   DataMapperMediator
-	 * @param properties Properties passed
-	 * @return DataMapperMediator created from the given configuration
-	 */
-	@Override protected Mediator createSpecificMediator(OMElement element, Properties properties) {
+    /**
+     * Creates the DataMapperMediator by parsing the given xml
+     * configuration
+     *
+     * @param element    OMElement describing the configuration of the
+     *                   DataMapperMediator
+     * @param properties Properties passed
+     * @return DataMapperMediator created from the given configuration
+     */
+    @Override protected Mediator createSpecificMediator(OMElement element, Properties properties) {
 
-		DataMapperMediator datamapperMediator = new DataMapperMediator();
+        DataMapperMediator datamapperMediator = new DataMapperMediator();
 
-		OMAttribute configKeyAttribute = element.getAttribute(new QName(DataMapperMediatorConstants.CONFIG));
-		OMAttribute inputSchemaKeyAttribute = element.getAttribute(new QName(DataMapperMediatorConstants
-				                                                                     .INPUT_SCHEMA));
-		OMAttribute outputSchemaKeyAttribute =
-				element.getAttribute(new QName(DataMapperMediatorConstants.OUTPUT_SCHEMA));
-		OMAttribute inputTypeAttribute = element.getAttribute(new QName(DataMapperMediatorConstants.INPUT_TYPE));
-		OMAttribute outputTypeAttribute = element.getAttribute(new QName(DataMapperMediatorConstants.OUTPUT_TYPE));
+        OMAttribute configKeyAttribute = element.getAttribute(new QName(DataMapperMediatorConstants.CONFIG));
+        OMAttribute inputSchemaKeyAttribute = element.getAttribute(new QName(DataMapperMediatorConstants.INPUT_SCHEMA));
+        OMAttribute outputSchemaKeyAttribute =
+                element.getAttribute(new QName(DataMapperMediatorConstants.OUTPUT_SCHEMA));
+        OMAttribute inputTypeAttribute = element.getAttribute(new QName(DataMapperMediatorConstants.INPUT_TYPE));
+        OMAttribute outputTypeAttribute = element.getAttribute(new QName(DataMapperMediatorConstants.OUTPUT_TYPE));
 
 		/*
-		 * ValueFactory for creating dynamic or static Value and provide methods
+         * ValueFactory for creating dynamic or static Value and provide methods
 		 * to create value objects
 		 */
-		ValueFactory keyFac = new ValueFactory();
+        ValueFactory keyFac = new ValueFactory();
 
-		if (configKeyAttribute != null) {
-			// Create dynamic or static key based on OMElement
-			Value configKeyValue = keyFac.createValue(configKeyAttribute.getLocalName(), element);
-			// set key as the Value
-			datamapperMediator.setMappingConfigurationKey(configKeyValue);
-		} else {
-			handleException("The attribute config is required for the DataMapper mediator");
-		}
+        if (configKeyAttribute != null) {
+            // Create dynamic or static key based on OMElement
+            Value configKeyValue = keyFac.createValue(configKeyAttribute.getLocalName(), element);
+            // set key as the Value
+            datamapperMediator.setMappingConfigurationKey(configKeyValue);
+        } else {
+            handleException("The attribute config is required for the DataMapper mediator");
+        }
 
-		if (inputSchemaKeyAttribute != null) {
-			Value inputSchemaKeyValue = keyFac.createValue(inputSchemaKeyAttribute.getLocalName(), element);
-			datamapperMediator.setInputSchemaKey(inputSchemaKeyValue);
-		} else {
-			handleException("The attribute inputSchema is required for the DataMapper mediator");
-		}
+        if (inputSchemaKeyAttribute != null) {
+            Value inputSchemaKeyValue = keyFac.createValue(inputSchemaKeyAttribute.getLocalName(), element);
+            datamapperMediator.setInputSchemaKey(inputSchemaKeyValue);
+        } else {
+            handleException("The attribute inputSchema is required for the DataMapper mediator");
+        }
 
-		if (outputSchemaKeyAttribute != null) {
-			Value outputSchemaKeyValue = keyFac.createValue(outputSchemaKeyAttribute.getLocalName(), element);
-			datamapperMediator.setOutputSchemaKey(outputSchemaKeyValue);
-		} else {
-			handleException("The outputSchema attribute is required for the DataMapper mediator");
-		}
+        if (outputSchemaKeyAttribute != null) {
+            Value outputSchemaKeyValue = keyFac.createValue(outputSchemaKeyAttribute.getLocalName(), element);
+            datamapperMediator.setOutputSchemaKey(outputSchemaKeyValue);
+        } else {
+            handleException("The outputSchema attribute is required for the DataMapper mediator");
+        }
 
-		if (inputTypeAttribute != null) {
-			datamapperMediator.setInputType(inputTypeAttribute.getAttributeValue());
-		} else {
-			handleException("The input DataType is required for the DataMapper mediator");
-		}
+        if (inputTypeAttribute != null) {
+            datamapperMediator.setInputType(inputTypeAttribute.getAttributeValue());
+        } else {
+            handleException("The input DataType is required for the DataMapper mediator");
+        }
 
-		if (outputTypeAttribute != null) {
-			datamapperMediator.setOutputType(outputTypeAttribute.getAttributeValue());
-		} else {
-			handleException("The output DataType is required for the DataMapper mediator");
-		}
+        if (outputTypeAttribute != null) {
+            datamapperMediator.setOutputType(outputTypeAttribute.getAttributeValue());
+        } else {
+            handleException("The output DataType is required for the DataMapper mediator");
+        }
 
-		processAuditStatus(datamapperMediator, element);
+        processAuditStatus(datamapperMediator, element);
 
-		return datamapperMediator;
-	}
+        return datamapperMediator;
+    }
 
 }

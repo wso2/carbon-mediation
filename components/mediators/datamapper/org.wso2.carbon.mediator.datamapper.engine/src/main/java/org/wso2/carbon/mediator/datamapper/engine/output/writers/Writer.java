@@ -23,17 +23,17 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterExceptio
  */
 public interface Writer {
 
-	void writeStartObject(String name) throws WriterException;
+    void writeStartObject(String name) throws WriterException;
 
-	void writeField(String name, Object value) throws WriterException;
+    void writeField(String name, Object value) throws WriterException;
 
-	void writeEndObject(String objectName) throws WriterException;
+    void writeEndObject(String objectName) throws WriterException;
 
-	String terminateMessageBuilding() throws WriterException;
+    String terminateMessageBuilding() throws WriterException;
 
-	void writeStartArray() throws WriterException;
+    void writeStartArray() throws WriterException;
 
-	void writeEndArray() throws WriterException;
+    void writeEndArray() throws WriterException;
 
-	void writeStartAnonymousObject() throws WriterException;
+    void writeStartAnonymousObject() throws WriterException;
 }

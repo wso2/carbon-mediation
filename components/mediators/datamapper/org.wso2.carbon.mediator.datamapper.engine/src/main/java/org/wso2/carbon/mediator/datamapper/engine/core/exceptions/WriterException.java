@@ -21,18 +21,18 @@ package org.wso2.carbon.mediator.datamapper.engine.core.exceptions;
  */
 public class WriterException extends Exception {
 
-	private String message = null;
+    private String message = null;
 
-	public WriterException(String message) {
-		super(message);
-		this.message = message;
-	}
+    public WriterException(String message) {
+        super(message);
+        this.message = message;
+    }
 
-	@Override public String toString() {
-		return message;
-	}
+    @Override public String toString() {
+        return message;
+    }
 
-	@Override public String getMessage() {
-		return message;
-	}
+    @Override public String getMessage() {
+        return message;
+    }
 }

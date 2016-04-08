@@ -23,17 +23,17 @@ import java.util.Map;
  */
 public class MapModel implements Model<Map<String, Object>> {
 
-	private Map<String, Object> mapDataHolder;
+    private Map<String, Object> mapDataHolder;
 
-	public MapModel(Map<String, Object> model) {
-		mapDataHolder = model;
-	}
+    public MapModel(Map<String, Object> model) {
+        mapDataHolder = model;
+    }
 
-	@Override public void setModel(Map<String, Object> model) {
-		mapDataHolder = model;
-	}
+    @Override public void setModel(Map<String, Object> model) {
+        mapDataHolder = model;
+    }
 
-	@Override public Map<String, Object> getModel() {
-		return mapDataHolder;
-	}
+    @Override public Map<String, Object> getModel() {
+        return mapDataHolder;
+    }
 }
