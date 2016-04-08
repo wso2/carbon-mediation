@@ -19,13 +19,13 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-statistics</artifactId>
-        <version>4.6.1-SNAPSHOT</version>
+        <version>4.6.1-BETA2</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>org.wso2.carbon.mediation.statistics.ui</artifactId>
-    <version>4.6.1-SNAPSHOT</version>
+    <version>4.6.1-BETA2</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Mediation Statistics UI</name>
     <url>http://wso2.org</url>
