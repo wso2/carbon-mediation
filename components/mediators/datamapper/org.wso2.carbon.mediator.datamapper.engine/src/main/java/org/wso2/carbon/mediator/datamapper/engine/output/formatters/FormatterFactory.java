@@ -23,12 +23,12 @@ import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
  */
 public class FormatterFactory {
 
-	public static Formatter getFormatter(ModelType formatterType) {
-		switch (formatterType) {
-			case JAVA_MAP:
-				return new MapOutputFormatter();
-			default:
-				throw new IllegalArgumentException("Formatter for type " + formatterType + " is not implemented.");
-		}
-	}
+    public static Formatter getFormatter(ModelType formatterType) {
+        switch (formatterType) {
+            case JAVA_MAP:
+                return new MapOutputFormatter();
+            default:
+                throw new IllegalArgumentException("Formatter for type " + formatterType + " is not implemented.");
+        }
+    }
 }

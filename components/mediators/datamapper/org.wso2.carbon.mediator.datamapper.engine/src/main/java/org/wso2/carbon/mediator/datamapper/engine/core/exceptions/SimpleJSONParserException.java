@@ -23,18 +23,18 @@ import org.json.simple.parser.ParseException;
  */
 public class SimpleJSONParserException extends ParseException {
 
-	private String message = null;
+    private String message = null;
 
-	public SimpleJSONParserException(String message) {
-		super(ERROR_UNEXPECTED_EXCEPTION);
-		this.message = message;
-	}
+    public SimpleJSONParserException(String message) {
+        super(ERROR_UNEXPECTED_EXCEPTION);
+        this.message = message;
+    }
 
-	@Override public String toString() {
-		return message;
-	}
+    @Override public String toString() {
+        return message;
+    }
 
-	@Override public String getMessage() {
-		return message;
-	}
+    @Override public String getMessage() {
+        return message;
+    }
 }

@@ -102,7 +102,7 @@ public class JSONReader implements Reader, ContentHandler {
                 if (ReaderEventType.OBJECT_START.equals(stackElement.getEventType())) {
                     if (ARRAY_ELEMENT_TYPE.equals(type)) {
                         throw new SimpleJSONParserException("Schema specifies an array of type " + type + ". But " +
-                                "payload doesn't contain an array.");
+                                                            "payload doesn't contain an array.");
                     }
                     sendObjectStartEvent(stackElement.getName());
                     return true;
@@ -140,8 +140,8 @@ public class JSONReader implements Reader, ContentHandler {
             } else if (OBJECT_ELEMENT_TYPE.equals(type)) {
                 pushObjectStartEvent(s);
             } else if (STRING_ELEMENT_TYPE.equals(type) || BOOLEAN_ELEMENT_TYPE.equals(type) ||
-                    NUMBER_ELEMENT_TYPE.equals(type) || INTEGER_ELEMENT_TYPE.equals(type) ||
-                    NULL_ELEMENT_TYPE.equals(type)) {
+                       NUMBER_ELEMENT_TYPE.equals(type) || INTEGER_ELEMENT_TYPE.equals(type) ||
+                       NULL_ELEMENT_TYPE.equals(type)) {
                 pushObjectStartEvent(s);
             }
         } catch (JSException | InvalidPayloadException | SchemaException e) {
@@ -179,8 +179,8 @@ public class JSONReader implements Reader, ContentHandler {
                     }
                 } else {
                     throw new SimpleJSONParserException("Found an array in the payload but schema doesn't specify " +
-                            "any" +
-                            " array of type " + type);
+                                                        "any" +
+                                                        " array of type " + type);
                 }
             }
         } catch (InvalidPayloadException | SchemaException e) {
@@ -285,8 +285,8 @@ public class JSONReader implements Reader, ContentHandler {
     private void popObjectEndEvent(String fieldName)
             throws IOException, JSException, InvalidPayloadException, SchemaException {
         ReaderEvent objectEndEvent = new ReaderEvent(ReaderEventType.OBJECT_END, fieldName, null);
-        if (!ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(schemaElementList)) || fieldName
-                .equals(objectEndEvent.getName())) {
+        if (!ARRAY_ELEMENT_TYPE.equals(getInputSchema().getElementTypeByName(schemaElementList)) ||
+            fieldName.equals(objectEndEvent.getName())) {
             readerEventStack.pop();
         }
     }

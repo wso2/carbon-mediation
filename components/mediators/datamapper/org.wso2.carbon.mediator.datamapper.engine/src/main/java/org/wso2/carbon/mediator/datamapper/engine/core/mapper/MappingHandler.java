@@ -35,49 +35,49 @@ import java.io.InputStream;
 
 public class MappingHandler implements InputVariableNotifier, OutputVariableNotifier {
 
-	private String dmExecutorPoolSize;
-	private String inputVariable;
-	private String outputVariable;
-	private MappingResource mappingResource;
-	private OutputMessageBuilder outputMessageBuilder;
-	private Executor scriptExecutor;
-	private InputModelBuilder inputModelBuilder;
+    private String dmExecutorPoolSize;
+    private String inputVariable;
+    private String outputVariable;
+    private MappingResource mappingResource;
+    private OutputMessageBuilder outputMessageBuilder;
+    private Executor scriptExecutor;
+    private InputModelBuilder inputModelBuilder;
 
-	public MappingHandler(MappingResource mappingResource, String inputType, String outputType,
-	                      String dmExecutorPoolSize) throws IOException, SchemaException, WriterException {
-		this.inputModelBuilder = new InputModelBuilder(InputOutputDataType.fromString(inputType), ModelType.JSON_STRING,
-		                                               mappingResource.getInputSchema());
-		this.outputMessageBuilder =
-				new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
-				                         mappingResource.getOutputSchema());
-		this.dmExecutorPoolSize = dmExecutorPoolSize;
-		this.mappingResource = mappingResource;
-	}
+    public MappingHandler(MappingResource mappingResource, String inputType, String outputType,
+                          String dmExecutorPoolSize) throws IOException, SchemaException, WriterException {
+        this.inputModelBuilder = new InputModelBuilder(InputOutputDataType.fromString(inputType), ModelType.JSON_STRING,
+                                                       mappingResource.getInputSchema());
+        this.outputMessageBuilder =
+                new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
+                                         mappingResource.getOutputSchema());
+        this.dmExecutorPoolSize = dmExecutorPoolSize;
+        this.mappingResource = mappingResource;
+    }
 
-	public String doMap(InputStream inputMsg) throws ReaderException, InterruptedException {
-		this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
-		this.inputModelBuilder.buildInputModel(inputMsg, this);
-		return outputVariable;
-	}
+    public String doMap(InputStream inputMsg) throws ReaderException, InterruptedException {
+        this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
+        this.inputModelBuilder.buildInputModel(inputMsg, this);
+        return outputVariable;
+    }
 
-	@Override public void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException {
-		this.inputVariable = (String) variable;
-		Model outputModel = scriptExecutor.execute(mappingResource, inputVariable);
-		try {
-			releaseExecutor();
-			outputMessageBuilder.buildOutputMessage(outputModel, this);
-		} catch (InterruptedException | WriterException e) {
-			throw new ReaderException(e.getMessage());
-		}
-	}
+    @Override public void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException {
+        this.inputVariable = (String) variable;
+        Model outputModel = scriptExecutor.execute(mappingResource, inputVariable);
+        try {
+            releaseExecutor();
+            outputMessageBuilder.buildOutputMessage(outputModel, this);
+        } catch (InterruptedException | WriterException e) {
+            throw new ReaderException(e.getMessage());
+        }
+    }
 
-	private void releaseExecutor() throws InterruptedException {
-		ScriptExecutorFactory.releaseScriptExecutor(scriptExecutor);
-		this.scriptExecutor = null;
-	}
+    private void releaseExecutor() throws InterruptedException {
+        ScriptExecutorFactory.releaseScriptExecutor(scriptExecutor);
+        this.scriptExecutor = null;
+    }
 
-	@Override public void notifyOutputVariable(Object variable) {
-		outputVariable = (String) variable;
-	}
+    @Override public void notifyOutputVariable(Object variable) {
+        outputVariable = (String) variable;
+    }
 
 }
