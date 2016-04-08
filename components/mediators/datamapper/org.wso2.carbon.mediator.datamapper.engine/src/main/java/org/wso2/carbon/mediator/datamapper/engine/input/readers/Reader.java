@@ -27,9 +27,9 @@ import java.io.InputStream;
  */
 public interface Reader {
 
-	/**
-	 * @param input
-	 * @return
-	 */
-	void read(InputStream input, InputModelBuilder inputModelBuilder, Schema inputSchema) throws ReaderException;
+    /**
+     * @param input
+     * @return
+     */
+    void read(InputStream input, InputModelBuilder inputModelBuilder, Schema inputSchema) throws ReaderException;
 }
