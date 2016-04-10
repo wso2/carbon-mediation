@@ -378,10 +378,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     synLib.unLoadLibrary();
                     undeployingLocalEntries(synLib, synapseConfiguration, axisConfig);
                 }
-
-                // update synapse configuration.
-                MediationPersistenceManager mp = getMediationPersistenceManager(axisConfig);
-                mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
             }
 
         } catch (Exception e) {
@@ -465,9 +461,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 if (synLib != null) {
                     LibDeployerUtils.loadLibArtifacts(synapseImport, synLib);
                 }
-                MediationPersistenceManager mp = getMediationPersistenceManager(axisConfig);
-                mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
-
             } else {
                 String message = "Unable to create a Synapse Import for :  " + xml;
                 handleException(log, message, null);
@@ -701,10 +694,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     synLib.unLoadLibrary();
                     undeployingLocalEntries(synLib, configuration, axisConfig);
                 }
-
-                MediationPersistenceManager pm = getMediationPersistenceManager(axisConfig);
-                pm.deleteItem(synapseImport.getName(), fileName, ServiceBusConstants.ITEM_TYPE_IMPORT);
-
             }
         } catch (Exception e) {
             log.error("Error occured while deleting the synapse library import");
