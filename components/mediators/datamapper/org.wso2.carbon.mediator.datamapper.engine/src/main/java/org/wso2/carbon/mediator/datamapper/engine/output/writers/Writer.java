@@ -36,4 +36,7 @@ public interface Writer {
     void writeEndArray() throws WriterException;
 
     void writeStartAnonymousObject() throws WriterException;
+
+    void writePrimitive(Object value) throws WriterException;
+
 }

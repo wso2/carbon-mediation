@@ -29,10 +29,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_FIRST_NAME;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.*;
 
 /**
  * This class implements {@link Formatter} interface to read {@link Map} model and trigger events
@@ -42,11 +39,13 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 public class MapOutputFormatter implements Formatter {
 
     private OutputMessageBuilder outputMessageBuilder;
+    private Schema outputSchema;
 
     @Override public void format(Model model, OutputMessageBuilder outputMessageBuilder, Schema outputSchema)
             throws SchemaException, WriterException {
         if (model.getModel() instanceof Map) {
             this.outputMessageBuilder = outputMessageBuilder;
+            this.outputSchema = outputSchema;
             Map<String, Object> mapOutputModel = (Map<String, Object>) model.getModel();
             traverseMap(mapOutputModel);
             sendTerminateEvent();
@@ -101,6 +100,7 @@ public class MapOutputFormatter implements Formatter {
         for (String key : orderedKeyList) {
             Object value = outputMap.get(key);
             if (value instanceof Map) {
+                // key value is a type of object or an array
                 if (arrayType) {
                     /*If it is array type we need to compensate the already created object start
                     element.
@@ -122,13 +122,24 @@ public class MapOutputFormatter implements Formatter {
                     }
                 }
             } else {
-                sendFieldEvent(key, value);
+                // Primitive value recieved to write
+                if(arrayType){
+                    // if it is an array of primitive values
+                    sendPrimitiveEvent(key, value);
+                } else {
+                    // if field value
+                    sendFieldEvent(key, value);
+                }
             }
             mapKeyIndex++;
         }
         if (arrayType) {
             sendArrayEndEvent();
         }
+    }
+
+    private void sendPrimitiveEvent(String key, Object value) throws SchemaException, WriterException {
+        getOutputMessageBuilder().notifyEvent(new ReaderEvent(ReaderEventType.PRIMITIVE, key, value));
     }
 
     private void sendAnonymousObjectStartEvent() throws SchemaException, WriterException {

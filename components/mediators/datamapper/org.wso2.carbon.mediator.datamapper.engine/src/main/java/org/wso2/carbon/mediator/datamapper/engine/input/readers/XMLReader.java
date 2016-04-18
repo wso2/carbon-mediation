@@ -121,22 +121,13 @@ public class XMLReader extends DefaultHandler implements Reader {
             throws SAXException {
         try {
             schemaElementList.add(new SchemaElement(localName, uri));
-            String tempLocalName =
-                    getNamespaceAddedFieldName(uri, localName).replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
+            String tempLocalName = getNamespaceAddedFieldName(uri, localName)
+                    .replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
             if (!getEventStack().isEmpty()) {
                 ReaderEvent stackElement = getEventStack().peek();
                 if (ReaderEventType.ARRAY_START.equals(stackElement.getEventType()) && !(getInputSchema()
-                                                                                                 .isChildElement(
-                                                                                                         schemaElementList
-                                                                                                                 .subList(
-                                                                                                                         0,
-                                                                                                                         schemaElementList
-                                                                                                                                 .size() -
-                                                                                                                         2),
-                                                                                                         localName) ||
-                                                                                         tempLocalName
-                                                                                                 .equals(stackElement
-                                                                                                                 .getName()))) {
+                        .isChildElement(schemaElementList.subList(0, schemaElementList.size() - 2), localName)
+                        || tempLocalName.equals(stackElement.getName()))) {
                     sendArrayEndEvent(localName);
                     schemaElementList.add(new SchemaElement(localName, uri));
                 }
@@ -149,11 +140,11 @@ public class XMLReader extends DefaultHandler implements Reader {
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains(XMLNS)) {
                         schemaElementList.add(new SchemaElement(attributes.getQName(attributeCount),
-                                                                attributes.getURI(attributeCount)));
+                                attributes.getURI(attributeCount)));
                         String attributeType = getInputSchema().getElementTypeByName(schemaElementList);
                         schemaElementList.remove(schemaElementList.size() - 1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
-                                                                          attributes.getURI(attributeCount));
+                                attributes.getURI(attributeCount));
                         sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
@@ -161,8 +152,8 @@ public class XMLReader extends DefaultHandler implements Reader {
                 //first element of a array should fire array start element
                 if (!getEventStack().isEmpty()) {
                     ReaderEvent stackElement = getEventStack().peek();
-                    if (!(ReaderEventType.ARRAY_START.equals(stackElement.getEventType()) &&
-                          tempLocalName.equals(stackElement.getName()))) {
+                    if (!(ReaderEventType.ARRAY_START.equals(stackElement.getEventType()) && tempLocalName
+                            .equals(stackElement.getName()))) {
                         sendArrayStartEvent(localName);
                     }
                 } else {
@@ -172,11 +163,11 @@ public class XMLReader extends DefaultHandler implements Reader {
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains(XMLNS)) {
                         schemaElementList.add(new SchemaElement(attributes.getQName(attributeCount),
-                                                                attributes.getURI(attributeCount)));
+                                attributes.getURI(attributeCount)));
                         String attributeType = getInputSchema().getElementTypeByName(schemaElementList);
                         schemaElementList.remove(schemaElementList.size() - 1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
-                                                                          attributes.getURI(attributeCount));
+                                attributes.getURI(attributeCount));
                         sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
@@ -185,27 +176,27 @@ public class XMLReader extends DefaultHandler implements Reader {
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains(XMLNS)) {
                         schemaElementList.add(new SchemaElement(attributes.getQName(attributeCount),
-                                                                attributes.getURI(attributeCount)));
+                                attributes.getURI(attributeCount)));
                         String attributeType = getInputSchema().getElementTypeByName(schemaElementList);
                         schemaElementList.remove(schemaElementList.size() - 1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
-                                                                          attributes.getURI(attributeCount));
+                                attributes.getURI(attributeCount));
                         sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
             } else if ((STRING_ELEMENT_TYPE.equals(elementType) ||
-                        BOOLEAN_ELEMENT_TYPE.equals(elementType) ||
-                        NUMBER_ELEMENT_TYPE.equals(elementType) ||
-                        INTEGER_ELEMENT_TYPE.equals(elementType)) && attributes.getLength() > 0) {
+                    BOOLEAN_ELEMENT_TYPE.equals(elementType) ||
+                    NUMBER_ELEMENT_TYPE.equals(elementType) ||
+                    INTEGER_ELEMENT_TYPE.equals(elementType)) && attributes.getLength() > 0) {
                 sendObjectStartEvent(localName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
                 for (int attributeCount = 0; attributeCount < attributes.getLength(); attributeCount++) {
                     if (!attributes.getQName(attributeCount).contains(XMLNS)) {
                         schemaElementList.add(new SchemaElement(attributes.getQName(attributeCount),
-                                                                attributes.getURI(attributeCount)));
+                                attributes.getURI(attributeCount)));
                         String attributeType = getInputSchema().getElementTypeByName(schemaElementList);
                         schemaElementList.remove(schemaElementList.size() - 1);
                         String attributeFieldName = getAttributeFieldName(attributes.getQName(attributeCount),
-                                                                          attributes.getURI(attributeCount));
+                                attributes.getURI(attributeCount));
                         sendFieldEvent(attributeFieldName, attributes.getValue(attributeCount), attributeType);
                     }
                 }
@@ -223,8 +214,8 @@ public class XMLReader extends DefaultHandler implements Reader {
         String[] qNameArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
         if (qNameArray.length > 1) {
             return qNameArray[0] + SCHEMA_NAMESPACE_NAME_SEPARATOR +
-                   SCHEMA_ATTRIBUTE_FIELD_PREFIX +
-                   qNameArray[qNameArray.length - 1];
+                    SCHEMA_ATTRIBUTE_FIELD_PREFIX +
+                    qNameArray[qNameArray.length - 1];
         } else {
             return SCHEMA_ATTRIBUTE_FIELD_PREFIX + qName;
         }
@@ -294,27 +285,25 @@ public class XMLReader extends DefaultHandler implements Reader {
     private void sendFieldEvent(String fieldName, String valueString, String fieldType)
             throws IOException, JSException, SchemaException, ReaderException {
         switch (fieldType) {
-            case STRING_ELEMENT_TYPE:
-                getModelBuilder().notifyEvent(
-                        new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName), valueString,
-                                        fieldType));
-                break;
-            case BOOLEAN_ELEMENT_TYPE:
-                getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName),
-                                                              Boolean.parseBoolean(valueString), fieldType));
-                break;
-            case NUMBER_ELEMENT_TYPE:
-                getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName),
-                                                              Double.parseDouble(valueString), fieldType));
-                break;
-            case INTEGER_ELEMENT_TYPE:
-                getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName),
-                                                              Integer.parseInt(valueString), fieldType));
-                break;
-            default:
-                getModelBuilder().notifyEvent(
-                        new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName), valueString,
-                                        fieldType));
+        case STRING_ELEMENT_TYPE:
+            getModelBuilder().notifyEvent(
+                    new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName), valueString, fieldType));
+            break;
+        case BOOLEAN_ELEMENT_TYPE:
+            getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName),
+                    Boolean.parseBoolean(valueString), fieldType));
+            break;
+        case NUMBER_ELEMENT_TYPE:
+            getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName),
+                    Double.parseDouble(valueString), fieldType));
+            break;
+        case INTEGER_ELEMENT_TYPE:
+            getModelBuilder().notifyEvent(new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName),
+                    Integer.parseInt(valueString), fieldType));
+            break;
+        default:
+            getModelBuilder().notifyEvent(
+                    new ReaderEvent(ReaderEventType.FIELD, getModifiedFieldName(fieldName), valueString, fieldType));
         }
 
         if (!fieldName.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
@@ -364,8 +353,8 @@ public class XMLReader extends DefaultHandler implements Reader {
 
     private void sendAnonymousObjectStartEvent(String fieldName)
             throws IOException, JSException, SchemaException, ReaderException {
-        ReaderEvent anonymousObjectStartEvent =
-                new ReaderEvent(ReaderEventType.ANONYMOUS_OBJECT_START, getModifiedFieldName(fieldName));
+        ReaderEvent anonymousObjectStartEvent = new ReaderEvent(ReaderEventType.ANONYMOUS_OBJECT_START,
+                getModifiedFieldName(fieldName));
         getModelBuilder().notifyEvent(anonymousObjectStartEvent);
         eventStack.push(anonymousObjectStartEvent);
     }
