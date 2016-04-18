@@ -317,9 +317,9 @@
                 <version>${httpcore.wso2.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.httpcomponents.wso2</groupId>
+                <groupId>org.wso2.orbit.httpcomponents</groupId>
                 <artifactId>httpcore-nio</artifactId>
-                <version>${httpcore.wso2.version}</version>
+                <version>${httpcore-nio.wso2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents.wso2</groupId>
@@ -2461,8 +2461,9 @@
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>1.6.1.wso2v18</rampart.wso2.version>
         <httpcore.wso2.version>4.3.3.wso2v1</httpcore.wso2.version>
+        <httpcore-nio.wso2.version>4.3.3.wso2v3-SNAPSHOT</httpcore-nio.wso2.version>
         <httpclient.wso2.version>4.2.5.wso2v1</httpclient.wso2.version>
-        <org.apache.commons.wso2.version>2.0-wso2v13-SNAPSHOT</org.apache.commons.wso2.version>
+        <org.apache.commons.wso2.version>2.0-wso2v14-SNAPSHOT</org.apache.commons.wso2.version>
         <httpcore.nio.version>4.3.3</httpcore.nio.version>
         <httpcore.version>4.3.3</httpcore.version>
         <httpclient.version>4.2.5</httpclient.version>

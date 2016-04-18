@@ -358,10 +358,10 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
 
                         if (!wasRunning &&
                                 synapseConfig.getProxyService(proxyName).isRunning()) {
-                            synapseConfig.getProxyService(proxyName).stop(synapseConfig);
+                            stopProxyService(proxyName);
                         } else if (wasRunning &&
                                 !synapseConfig.getProxyService(proxyName).isRunning()) {
-                            synapseConfig.getProxyService(proxyName).start(synapseConfig);
+                            startProxyService(proxyName);
                         }
 
                         ProxyService proxy = synapseConfig.getProxyService(proxyName);

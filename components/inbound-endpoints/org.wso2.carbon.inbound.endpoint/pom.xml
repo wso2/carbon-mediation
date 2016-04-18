@@ -97,6 +97,7 @@
                             org.wso2.carbon.inbound.endpoint.protocol.http.management,
                             org.wso2.carbon.inbound.endpoint.protocol.http.multitenancy,
                             org.wso2.carbon.inbound.endpoint.protocol.generic,
+                            org.wso2.carbon.inbound.endpoint.protocol.hl7,
                             org.wso2.carbon.inbound.endpoint
                         </Export-Package>
                         <Import-Package>

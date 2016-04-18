@@ -17,6 +17,9 @@
  -->
 <transportConfig>
 
+    <transportReceiver name="ws" class="org.wso2.carbon.websocket.transport.WebsocketTransportListener">
+    </transportReceiver>
+
     <transportSender name="ws" class="org.wso2.carbon.websocket.transport.WebsocketTransportSender">
     </transportSender>
 
