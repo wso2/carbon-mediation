@@ -197,7 +197,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             }
         }
 
-        if (mappingResource != null) {
+        if (mappingResource == null) {
             String configKey = mappingConfigurationKey.evaluateValue(synCtx);
             String inSchemaKey = inputSchemaKey.evaluateValue(synCtx);
             String outSchemaKey = outputSchemaKey.evaluateValue(synCtx);
@@ -242,7 +242,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     dmExecutorPoolSize);
 
             //execute mapping on the input stream
-            String outputResult = mappingHandler.doMap(getInputStream(synCtx, inputType));
+            String outputResult = mappingHandler
+                    .doMap(getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
 
             if (InputOutputDataType.XML.toString().equals(outputType)) {
                 OMElement outputMessage = AXIOMUtil.stringToOM(outputResult);
@@ -286,12 +287,18 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         }
     }
 
-    private InputStream getInputStream(MessageContext context, String inputType) {
+    private InputStream getInputStream(MessageContext context, String inputType, String inputStartElement) {
         InputStream inputStream = null;
         switch (InputOutputDataType.fromString(inputType)) {
         case XML:
         case CSV:
-            inputStream = new ByteArrayInputStream(context.getEnvelope().toString().getBytes(StandardCharsets.UTF_8));
+            if ("soapenv:Envelope".equals(inputStartElement)) {
+                inputStream = new ByteArrayInputStream(
+                        context.getEnvelope().toString().getBytes(StandardCharsets.UTF_8));
+            } else {
+                inputStream = new ByteArrayInputStream(
+                        context.getEnvelope().getBody().getFirstElement().toString().getBytes(StandardCharsets.UTF_8));
+            }
             break;
         case JSON:
             org.apache.axis2.context.MessageContext a2mc = ((Axis2MessageContext) context).getAxis2MessageContext();
