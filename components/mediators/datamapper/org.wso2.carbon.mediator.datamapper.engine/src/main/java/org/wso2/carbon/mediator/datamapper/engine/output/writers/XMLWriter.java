@@ -173,6 +173,11 @@ public class XMLWriter implements Writer {
         }
     }
 
+    @Override public void writePrimitive(Object value) throws WriterException {
+        //TODO implement write primitive
+        writeField(latestElementName,value);
+    }
+
     private void writeStartElement(String name, XMLStreamWriter xMLStreamWriter) throws XMLStreamException {
         String prefix = name.split(NAMESPACE_SEPARATOR)[0];
         if (namespaceMap.values().contains(prefix)) {

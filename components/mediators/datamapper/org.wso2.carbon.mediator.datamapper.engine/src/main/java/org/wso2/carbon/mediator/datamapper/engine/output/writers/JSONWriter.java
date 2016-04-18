@@ -31,11 +31,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.*;
 
 /**
  * This class implements {@link Writer} interface and json writer for data mapper engine using
@@ -82,7 +78,10 @@ public class JSONWriter implements Writer {
                 jsonGenerator.writeObjectFieldStart(name);
             } else {
                 jsonGenerator.writeArrayFieldStart(name);
-                jsonGenerator.writeStartObject();
+                //start an object only if it is an object array
+                if (!outputSchema.isCurrentArrayIsPrimitive()) {
+                    jsonGenerator.writeStartObject();
+                }
             }
         } catch (IOException e) {
             throw new WriterException("Error while creating starting object. " + e.getMessage());
@@ -107,13 +106,15 @@ public class JSONWriter implements Writer {
 
     @Override public void writeEndObject(String objectName) throws WriterException {
         try {
-            if ((!ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(schemaElementList)) &&
-                 !schemaElementList.isEmpty()) &&
-                schemaElementList.get(schemaElementList.size() - 1).getElementName().equals(objectName)) {
+            if ((!ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(schemaElementList)) && !schemaElementList
+                    .isEmpty()) && schemaElementList.get(schemaElementList.size() - 1).getElementName()
+                    .equals(objectName)) {
                 schemaElementList.remove(schemaElementList.size() - 1);
                 jsonGenerator.writeEndObject();
             } else if (ARRAY_ELEMENT_TYPE.equals(outputSchema.getElementTypeByName(schemaElementList))) {
-                jsonGenerator.writeEndObject();
+                if (!outputSchema.isCurrentArrayIsPrimitive()) {
+                    jsonGenerator.writeEndObject();
+                }
             }
         } catch (IOException | SchemaException | InvalidPayloadException e) {
             throw new WriterException("Error while creating ending object. " + e.getMessage());
@@ -156,5 +157,23 @@ public class JSONWriter implements Writer {
         } catch (IOException e) {
             throw new WriterException("Error while creating anonymous object. " + e.getMessage());
         }
+    }
+
+    @Override public void writePrimitive(Object value) throws WriterException {
+
+        try {
+            if (value instanceof String) {
+                jsonGenerator.writeString((String) value);
+            } else if (value instanceof Boolean) {
+                jsonGenerator.writeBoolean((Boolean) value);
+            } else if (value instanceof Long) {
+                jsonGenerator.writeNumber((Long) value);
+            } else if (value instanceof Double) {
+                jsonGenerator.writeNumber((Double) value);
+            }
+        } catch (IOException e) {
+            throw new WriterException("Error while writing primitive. " + e.getMessage());
+        }
+
     }
 }

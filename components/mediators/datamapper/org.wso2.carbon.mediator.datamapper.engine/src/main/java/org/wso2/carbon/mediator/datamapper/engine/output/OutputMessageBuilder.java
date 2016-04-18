@@ -72,6 +72,9 @@ public class OutputMessageBuilder {
             case ANONYMOUS_OBJECT_START:
                 outputWriter.writeStartAnonymousObject();
                 break;
+        case PRIMITIVE:
+            outputWriter.writePrimitive(readerEvent.getValue());
+            break;
             default:
                 throw new IllegalArgumentException("Unsupported reader event found : " + readerEvent.getEventType());
         }
