@@ -235,6 +235,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      */
     private void transform(MessageContext synCtx, String configKey, String inSchemaKey) {
         try {
+            String outputResult = null;
 
             String dmExecutorPoolSize = SynapsePropertiesLoader
                     .getPropertyValue(ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
@@ -243,8 +244,13 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     dmExecutorPoolSize);
 
             //execute mapping on the input stream
-            String outputResult = mappingHandler
-                    .XMLOptimized_doMap(getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
+            if (InputOutputDataType.XML.toString().equals(outputType)) {
+                outputResult = mappingHandler.XMLOptimized_doMap(
+                        getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
+            } else {
+                outputResult = mappingHandler.doMap(
+                        getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
+            }
 
             if (InputOutputDataType.XML.toString().equals(outputType)) {
                 OMElement outputMessage = AXIOMUtil.stringToOM(outputResult);
