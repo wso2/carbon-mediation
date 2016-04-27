@@ -16,6 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.optimizedReaders;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMXMLBuilderFactory;
 import org.apache.axiom.om.OMXMLParserWrapper;
@@ -75,6 +76,10 @@ public class AxiomXMLReader {
      * Keep the state of "is the previous element of the current element, a member of an array"
      */
     private boolean isPrevElementArray;
+    /**
+     * Iterator for the Attribute elements
+     */
+    private Iterator<OMAttribute> it_attr;
 
     /**
      * Constructor
@@ -164,6 +169,13 @@ public class AxiomXMLReader {
             writeFieldElement(nameSpaceLocalName, omElement.getText(), elementType);
         }
 
+        /** writing attributes ******************/
+        it_attr = omElement.getAllAttributes();
+        if(it_attr.hasNext()){
+            writeAttributes(elementType);
+        }
+        /****************************************/
+
         it = omElement.getChildElements();
 
         /** Recursively call all the children */
@@ -191,7 +203,7 @@ public class AxiomXMLReader {
     }
 
     /**
-     * This method is used to get the name space URI of an XML element (OMElement)
+     * This method is used to get the namespace URI of an XML element (OMElement)
      *
      * @param omElement
      * @return Namespace URI of the given OMElement, if there is no Namespace return an empty String
@@ -202,6 +214,89 @@ public class AxiomXMLReader {
             nameSpaceURI = omElement.getNamespace().getNamespaceURI();
         }
         return nameSpaceURI;
+    }
+
+    /**
+     * This method is used to get the namespace URI of an XML attribute (OMAttribute)
+     *
+     * @param omAttribute
+     * @return Namespace URI of the given OMAttribute, if there is no Namespace return an empty String
+     */
+    private String getNameSpaceURI(OMAttribute omAttribute) {
+        String nameSpaceURI = "";
+        if (omAttribute.getNamespace() != null) {
+            nameSpaceURI = omAttribute.getNamespace().getNamespaceURI();
+        }
+        return nameSpaceURI;
+    }
+
+    /**
+     * This method writes attribute elements into the JSON input message
+     * @param elementType type of the parent element
+     * @throws JSException
+     * @throws SchemaException
+     * @throws ReaderException
+     * @throws IOException
+     * @throws InvalidPayloadException
+     */
+    private void writeAttributes(String elementType)
+            throws JSException, SchemaException, ReaderException, IOException, InvalidPayloadException {
+        /** object will be opened if the parent element is field type*/
+        boolean hasObjectOpened = false;
+        /** currently processing attribute element and its parameters*/
+        String attributeType;
+        String attributeFieldName;
+        String attributeLocalName;
+        String attributeNSURI;
+        OMAttribute omAttribute=null;
+
+        /** continue beyond this while loop only if there is at least one attribute without "XMLNS" tag */
+        while (it_attr.hasNext()){
+            omAttribute = it_attr.next();
+            if (!omAttribute.getLocalName().contains(XMLNS)) break;
+            if (!it_attr.hasNext()) return;
+        }
+
+        /** if the main XML element is only a field, open an object for attributes */
+        if (!ARRAY_ELEMENT_TYPE.equals(elementType) && !OBJECT_ELEMENT_TYPE.equals(elementType)){
+            writeObjectStartElement(nameSpaceLocalName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+            hasObjectOpened =true;
+        }
+
+        /** Write the first attribute to the JSON message */
+        //extracting parameters from the attribute element
+        attributeLocalName = omAttribute.getLocalName();
+        attributeNSURI = this.getNameSpaceURI(omAttribute);
+        attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI);
+        //get the type of the attribute element
+        schemaElementList.add(new SchemaElement(attributeLocalName, attributeNSURI));
+        attributeType = getInputSchema().getElementTypeByName(schemaElementList);
+        schemaElementList.remove(schemaElementList.size()-1);
+        //write the attribute to the JSON message
+        writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
+
+        /** Writing next attributes to the JSON message */
+        while (it_attr.hasNext()){
+            omAttribute = it_attr.next();
+            // skip if the attribute name contains "XMLNS"
+            attributeLocalName = omAttribute.getLocalName();
+            if (attributeLocalName.contains(XMLNS)) continue;
+
+            attributeNSURI = this.getNameSpaceURI(omAttribute);
+            attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI);
+            //get the type of the attribute element
+            schemaElementList.add(new SchemaElement(attributeLocalName, attributeNSURI));
+            attributeType = getInputSchema().getElementTypeByName(schemaElementList);
+            schemaElementList.remove(schemaElementList.size()-1);
+            //write the attribute to the JSON message
+            writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
+
+        }
+
+        /** if an object element was opened for writing this attributes, close it */
+        if (hasObjectOpened) {
+            writeObjectEndElement();
+        }
     }
 
     private String getAttributeFieldName(String qName, String uri) {
