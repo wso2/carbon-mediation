@@ -26,6 +26,7 @@ import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.input.InputXMLMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
@@ -42,11 +43,18 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
     private OutputMessageBuilder outputMessageBuilder;
     private Executor scriptExecutor;
     private InputModelBuilder inputModelBuilder;
+    private InputXMLMessageBuilder inputXMLMessageBuilder;
 
     public MappingHandler(MappingResource mappingResource, String inputType, String outputType,
                           String dmExecutorPoolSize) throws IOException, SchemaException, WriterException {
-        this.inputModelBuilder = new InputModelBuilder(InputOutputDataType.fromString(inputType), ModelType.JSON_STRING,
-                                                       mappingResource.getInputSchema());
+
+        if (InputOutputDataType.XML.toString().equals(inputType)) {
+            this.inputXMLMessageBuilder = new InputXMLMessageBuilder(mappingResource.getInputSchema());
+        } else {
+            this.inputModelBuilder = new InputModelBuilder(InputOutputDataType.fromString(inputType),
+                    ModelType.JSON_STRING, mappingResource.getInputSchema());
+        }
+
         this.outputMessageBuilder =
                 new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
                                          mappingResource.getOutputSchema());
@@ -80,4 +88,9 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         outputVariable = (String) variable;
     }
 
+    public String XMLOptimized_doMap(InputStream inputMsg) throws ReaderException, InterruptedException {
+        this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
+        this.inputXMLMessageBuilder.buildInputModel(inputMsg, this);
+        return outputVariable;
+    }
 }

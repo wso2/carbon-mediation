@@ -222,6 +222,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
+
         return true;
     }
 
@@ -243,7 +244,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
             //execute mapping on the input stream
             String outputResult = mappingHandler
-                    .doMap(getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
+                    .XMLOptimized_doMap(getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
 
             if (InputOutputDataType.XML.toString().equals(outputType)) {
                 OMElement outputMessage = AXIOMUtil.stringToOM(outputResult);

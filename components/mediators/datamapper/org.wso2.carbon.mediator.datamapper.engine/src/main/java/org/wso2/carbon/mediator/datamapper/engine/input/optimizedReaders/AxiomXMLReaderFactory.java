@@ -16,26 +16,14 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.optimizedReaders;
 
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.JSONReader;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.Reader;
-import org.wso2.carbon.mediator.datamapper.engine.input.readers.XMLReader;
-import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
-
 import java.io.IOException;
 
 /**
- * This class is a factory class to get {@link Reader} needed by the data mapper engine
+ * This class is a factory class to get instance of a AxiomXMLReader class
  */
 public class AxiomXMLReaderFactory {
 
-    public static AxiomXMLReader getReader(InputOutputDataType inputType) throws IOException {
-        switch (inputType) {
-            case XML:
-                return new AxiomXMLReader();
-//            case JSON:
-//                return new JSONReader();
-            default:
-                throw new IllegalArgumentException("Input Reader for type " + inputType + " is not implemented.");
-        }
+    public static AxiomXMLReader getReader() throws IOException {
+        return new AxiomXMLReader();
     }
 }
