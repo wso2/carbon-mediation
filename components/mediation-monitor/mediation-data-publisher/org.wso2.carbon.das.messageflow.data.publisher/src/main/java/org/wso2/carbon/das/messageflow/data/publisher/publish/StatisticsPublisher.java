@@ -59,7 +59,23 @@ public class StatisticsPublisher {
 			if (PublisherConfig.isMessageFlowPublishingEnabled()) {
 				addEventData(eventData, publishingFlow);
 				StreamDefinition streamDef = getComponentStreamDefinition(metaDataKeyList.toArray());
+
+				if(log.isDebugEnabled()) {
+					log.debug("Before sending to analytic server ------");
+
+                    /*
+                     Logs to print data sending to analytics server. Use log4j.properties to enable this logs
+                      */
+					for (int i = 0; i < eventData.size(); i++) {
+						log.debug(streamDef.getPayloadData().get(i).getName() + " -> " + eventData.get(i));
+					}
+				}
+
 				publishToAgent(eventData, metaDataValueList, PublisherConfig, streamDef);
+
+				if(log.isDebugEnabled()) {
+					log.debug("------ After sending to analytic server");
+				}
 			}
 		} catch (MalformedStreamDefinitionException e) {
 			log.error("Error while creating stream definition object", e);
@@ -92,7 +108,11 @@ public class StatisticsPublisher {
 		String jsonString = JSONObject.toJSONString(mapping);
 
 		eventData.add(compress(jsonString));
-		//        eventData.add((jsonString));
+
+		if (log.isDebugEnabled()){
+			log.debug("Uncompressed data :");
+			log.debug(jsonString);
+		}
 	}
 
 	private static void publishToAgent(List<Object> eventData, List<Object> metaDataValueList,
