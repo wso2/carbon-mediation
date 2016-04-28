@@ -28,6 +28,7 @@ import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableN
 import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputXMLMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.output.OutputXMLMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
 
@@ -44,9 +45,13 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
     private Executor scriptExecutor;
     private InputModelBuilder inputModelBuilder;
     private InputXMLMessageBuilder inputXMLMessageBuilder;
+    private OutputXMLMessageBuilder outputXMLMessageBuilder;
+    private String outputType;
 
     public MappingHandler(MappingResource mappingResource, String inputType, String outputType,
                           String dmExecutorPoolSize) throws IOException, SchemaException, WriterException {
+
+        this.outputType = outputType;
 
         if (InputOutputDataType.XML.toString().equals(inputType)) {
             this.inputXMLMessageBuilder = new InputXMLMessageBuilder(mappingResource.getInputSchema());
@@ -55,9 +60,15 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
                     ModelType.JSON_STRING, mappingResource.getInputSchema());
         }
 
-        this.outputMessageBuilder =
-                new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
-                                         mappingResource.getOutputSchema());
+        if (InputOutputDataType.XML.toString().equals(outputType)) {
+            this.outputXMLMessageBuilder = new OutputXMLMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
+                    mappingResource.getOutputSchema());
+        } else {
+            this.outputMessageBuilder =
+                    new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
+                            mappingResource.getOutputSchema());
+        }
+
         this.dmExecutorPoolSize = dmExecutorPoolSize;
         this.mappingResource = mappingResource;
     }
@@ -73,7 +84,7 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         Model outputModel = scriptExecutor.execute(mappingResource, inputVariable);
         try {
             releaseExecutor();
-            outputMessageBuilder.buildOutputMessage(outputModel, this);
+            buildOutputMessage(outputModel);
         } catch (InterruptedException | WriterException e) {
             throw new ReaderException(e.getMessage());
         }
@@ -92,5 +103,13 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
         this.inputXMLMessageBuilder.buildInputModel(inputMsg, this);
         return outputVariable;
+    }
+
+    public void buildOutputMessage (Model outputModel) throws SchemaException, WriterException {
+        if (InputOutputDataType.XML.toString().equals(outputType)){
+            outputXMLMessageBuilder.buildOutputMessage(outputModel,this);
+        } else {
+            outputMessageBuilder.buildOutputMessage(outputModel, this);
+        }
     }
 }
