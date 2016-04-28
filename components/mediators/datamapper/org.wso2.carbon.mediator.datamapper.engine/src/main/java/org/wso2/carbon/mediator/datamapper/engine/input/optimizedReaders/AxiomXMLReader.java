@@ -50,35 +50,31 @@ public class AxiomXMLReader {
             "http://xml" + ".org/sax/features/namespace-prefixes";
     public static final String XMLNS = "xmlns";
     private static final Log log = LogFactory.getLog(AxiomXMLReader.class);
-    /**
-     * Reference of the InputXMLMessageBuilder object to notify the built JSON message
-     */
+
+    /* Reference of the InputXMLMessageBuilder object to send the built JSON message */
     private InputXMLMessageBuilder messageBuilder;
-    /**
-     * JSON schema of the input message
-     */
+
+    /* JSON schema of the input message */
     private Schema inputSchema;
-    /**
-     * Name and NamespaceURI of the currently processing XML element
-     */
+
+    /* Name and NamespaceURI of the currently processing XML element */
     private String nameSpaceLocalName;
     private String localName;
     private String nameSpaceURI;
+
     /**
-     * List of parent schema elements of the currently processing element
+     * List of ancestor schema elements of the currently processing element.
+     * This list is maintained to get the element type from the schema using the element name
      */
     private List<SchemaElement> schemaElementList;
-    /**
-     * JSON Builder to build the respective JSON message
-     */
+
+    /* JSON Builder to build the respective JSON message */
     private JSONBuilder jsonBuilder;
-    /**
-     * Keep the state of "is the previous element of the current element, a member of an array"
-     */
+
+    /* Keep the state of "is the previous element of the current element, a member of an array" */
     private boolean isPrevElementArray;
-    /**
-     * Iterator for the Attribute elements
-     */
+
+    /* Iterator for the Attribute elements */
     private Iterator<OMAttribute> it_attr;
 
     /**
@@ -96,7 +92,7 @@ public class AxiomXMLReader {
      * Read, parse the XML and notify with the output JSON message
      *
      * @param input          XML message InputStream
-     * @param inputSchema
+     * @param inputSchema    Schema of the input message
      * @param messageBuilder Reference of the InputXMLMessageBuilder
      * @throws ReaderException Exceptions in the parsing stage
      */
@@ -138,21 +134,27 @@ public class AxiomXMLReader {
      */
     public boolean XMLTraverse(OMElement omElement)
             throws IOException, ReaderException, SchemaException, JSException, InvalidPayloadException {
+
         /** isObject becomes true if the current element is an object, therefor object end element can be written at
          * the end */
         boolean isObject = false;
+
         /** isArrayParent becomes true if it is a parent of an Array element. So that it can close the array before
          * closing itself as object */
         boolean isArrayParent = false;
-        /** iterator to hold the child elements of the passed OMElement */
+
+        String elementType;
+
+        /* iterator to hold the child elements of the passed OMElement */
         Iterator<OMElement> it;
 
+        /* Reading parameters of the currently processing OMElement */
         localName = omElement.getLocalName();
         nameSpaceURI = this.getNameSpaceURI(omElement);
         nameSpaceLocalName = getNamespaceAddedFieldName(nameSpaceURI, localName);
 
         schemaElementList.add(new SchemaElement(localName, nameSpaceURI));
-        String elementType = getInputSchema().getElementTypeByName(schemaElementList);
+        elementType = getInputSchema().getElementTypeByName(schemaElementList);
 
         if (nameSpaceLocalName.equals(getInputSchema().getName())) {
             writeAnonymousObjectStartElement();
@@ -169,22 +171,22 @@ public class AxiomXMLReader {
             writeFieldElement(nameSpaceLocalName, omElement.getText(), elementType);
         }
 
-        /** writing attributes ******************/
+        /* writing attributes to the JSON message */
         it_attr = omElement.getAllAttributes();
-        if(it_attr.hasNext()){
+        if (it_attr.hasNext()) {
             writeAttributes(elementType);
         }
-        /****************************************/
 
         it = omElement.getChildElements();
 
-        /** Recursively call all the children */
+        /* Recursively call all the children */
         while (it.hasNext()) {
             isArrayParent = XMLTraverse(it.next());
         }
 
         schemaElementList.remove(schemaElementList.size() - 1);
 
+        /* Closing the opened JSON objects and arrays */
         if (isArrayParent) {
             writeArrayEndElement();
         }
@@ -232,6 +234,7 @@ public class AxiomXMLReader {
 
     /**
      * This method writes attribute elements into the JSON input message
+     *
      * @param elementType type of the parent element
      * @throws JSException
      * @throws SchemaException
@@ -241,63 +244,78 @@ public class AxiomXMLReader {
      */
     private void writeAttributes(String elementType)
             throws JSException, SchemaException, ReaderException, IOException, InvalidPayloadException {
-        /** object will be opened if the parent element is field type*/
+
+        /* object will be opened if the parent element is field type*/
         boolean hasObjectOpened = false;
-        /** currently processing attribute element and its parameters*/
+
+        /* currently processing attribute element and its parameters*/
         String attributeType;
         String attributeFieldName;
         String attributeLocalName;
         String attributeNSURI;
-        OMAttribute omAttribute=null;
+        OMAttribute omAttribute = null;
 
-        /** continue beyond this while loop only if there is at least one attribute without "XMLNS" tag */
-        while (it_attr.hasNext()){
+        /* continue beyond this while loop only if there is at least one attribute without "XMLNS" tag */
+        while (it_attr.hasNext()) {
             omAttribute = it_attr.next();
-            if (!omAttribute.getLocalName().contains(XMLNS)) break;
-            if (!it_attr.hasNext()) return;
+            if (!omAttribute.getLocalName().contains(XMLNS))
+                break;
+            if (!it_attr.hasNext())
+                return;
         }
 
-        /** if the main XML element is only a field, open an object for attributes */
-        if (!ARRAY_ELEMENT_TYPE.equals(elementType) && !OBJECT_ELEMENT_TYPE.equals(elementType)){
+        /* if the main XML element is only a field, open an object to include the attributes */
+        if (!ARRAY_ELEMENT_TYPE.equals(elementType) && !OBJECT_ELEMENT_TYPE.equals(elementType)) {
             writeObjectStartElement(nameSpaceLocalName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
-            hasObjectOpened =true;
+            hasObjectOpened = true;
         }
 
         /** Write the first attribute to the JSON message */
-        //extracting parameters from the attribute element
+
+        /* extracting parameters from the attribute element */
         attributeLocalName = omAttribute.getLocalName();
         attributeNSURI = this.getNameSpaceURI(omAttribute);
         attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI);
-        //get the type of the attribute element
+
+        /* get the type of the attribute element */
         schemaElementList.add(new SchemaElement(attributeLocalName, attributeNSURI));
         attributeType = getInputSchema().getElementTypeByName(schemaElementList);
-        schemaElementList.remove(schemaElementList.size()-1);
-        //write the attribute to the JSON message
+        schemaElementList.remove(schemaElementList.size() - 1);
+
+        /* write the attribute to the JSON message */
         writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
 
         /** Writing next attributes to the JSON message */
-        while (it_attr.hasNext()){
+        while (it_attr.hasNext()) {
             omAttribute = it_attr.next();
-            // skip if the attribute name contains "XMLNS"
+
+            /* skip if the attribute name contains "XMLNS" */
             attributeLocalName = omAttribute.getLocalName();
-            if (attributeLocalName.contains(XMLNS)) continue;
+            if (attributeLocalName.contains(XMLNS))
+                continue;
 
             attributeNSURI = this.getNameSpaceURI(omAttribute);
             attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI);
-            //get the type of the attribute element
+
+            /* get the type of the attribute element */
             schemaElementList.add(new SchemaElement(attributeLocalName, attributeNSURI));
             attributeType = getInputSchema().getElementTypeByName(schemaElementList);
-            schemaElementList.remove(schemaElementList.size()-1);
-            //write the attribute to the JSON message
+            schemaElementList.remove(schemaElementList.size() - 1);
+
+            /* write the attribute to the JSON message */
             writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
 
         }
 
-        /** if an object element was opened for writing this attributes, close it */
+        /* if an object element was opened for writing this attributes, close it */
         if (hasObjectOpened) {
             writeObjectEndElement();
         }
     }
+
+    /**
+     * Elements Local name modifier methods
+     */
 
     private String getAttributeFieldName(String qName, String uri) {
         String[] qNameOriginalArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
