@@ -123,6 +123,15 @@ public class JMSPollingConsumer {
                 return null;
             }
             session = jmsConnectionFactory.getSession(connection);
+            //Fixing ESBJAVA-4446
+            //Closing the connection if we cannot get a session.
+            //Then in the next poll iteration it will create a new connection
+            //instead of using cached connection
+            if (session == null) {
+                logger.warn("Inbound JMS endpoint unable to get a session.");
+                jmsConnectionFactory.closeConnection();
+                return null;
+            }
             destination = jmsConnectionFactory.getDestination(connection);
             if (replyDestinationName != null && !replyDestinationName.trim().equals("")) {
                 if (logger.isDebugEnabled()) {
