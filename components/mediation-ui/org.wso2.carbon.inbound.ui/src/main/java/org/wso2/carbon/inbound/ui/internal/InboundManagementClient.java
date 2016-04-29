@@ -23,6 +23,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpSession;
@@ -141,9 +142,9 @@ public class InboundManagementClient {
                 ParameterDTO parameterDTO = new ParameterDTO();
                 parameterDTO.setName(parameter.getName());
                 String strValue = parameter.getValue();
-                if(strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)){
-               	 parameterDTO.setKey(strValue.replaceFirst(InboundDescription.REGISTRY_KEY_PREFIX, ""));	
-                }                 
+                if (strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)) {
+                    parameterDTO.setKey(strValue.replaceFirst(Pattern.quote(InboundDescription.REGISTRY_KEY_PREFIX), ""));
+                }
                 parameterDTO.setValue(strValue);
                 parameterDTOs[i++] = parameterDTO;
             }
@@ -321,9 +322,9 @@ public class InboundManagementClient {
                 ParameterDTO parameterDTO = new ParameterDTO();
                 parameterDTO.setName(parameter.getName());
                 String strValue = parameter.getValue();
-                if(strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)){
-               	 parameterDTO.setKey(strValue.replaceFirst(InboundDescription.REGISTRY_KEY_PREFIX, ""));	
-                }  
+                if (strValue != null && strValue.startsWith(InboundDescription.REGISTRY_KEY_PREFIX)) {
+                    parameterDTO.setKey(strValue.replaceFirst(Pattern.quote(InboundDescription.REGISTRY_KEY_PREFIX), ""));
+                }
                 parameterDTO.setValue(strValue);	 
                 parameterDTOs[i++] = parameterDTO;
             }
