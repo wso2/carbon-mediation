@@ -15,7 +15,8 @@
  */
 package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
-import net.minidev.json.JSONArray;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.structuring.StructuringArtifact;
@@ -42,6 +43,7 @@ import java.util.List;
 
 public class ConfigurationPublisher {
     private static Log log = LogFactory.getLog(ConfigurationPublisher.class);
+    private static ObjectMapper mapper = new ObjectMapper();
 
     public static void process(StructuringArtifact structuringArtifact, PublisherConfig PublisherConfig) {
         List<String> metaDataKeyList = new ArrayList<String>();
@@ -103,7 +105,12 @@ public class ConfigurationPublisher {
 
         ArrayList<StructuringElement> elementList = structuringArtifact.getList();
 
-        String jsonString = JSONArray.toJSONString(elementList);
+        String jsonString = null;
+        try {
+            jsonString = mapper.writeValueAsString(elementList);
+        } catch (JsonProcessingException e) {
+            log.error("Error while reading input stream. " + e.getMessage());
+        }
 
         eventData.add(jsonString);
     }
