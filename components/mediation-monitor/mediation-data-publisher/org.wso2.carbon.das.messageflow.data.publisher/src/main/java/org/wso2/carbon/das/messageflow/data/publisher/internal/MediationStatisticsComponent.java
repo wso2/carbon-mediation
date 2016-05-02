@@ -126,7 +126,7 @@ public class MediationStatisticsComponent {
         MessageFlowObserverStore observerStore = new MessageFlowObserverStore();
 
         MessageFlowReporterThread reporterThread = new MessageFlowReporterThread(synEnvService, observerStore);
-        reporterThread.setName("mediation-flow-tracer-" + tenantId);
+        reporterThread.setName("message-flow-reporter-" + tenantId);
         reporterThread.start();
         if (log.isDebugEnabled()) {
             log.debug("Registering the new mediation flow tracer service");
@@ -295,7 +295,7 @@ public class MediationStatisticsComponent {
         PublisherUtils.setTraceDataCollectingEnabled(flowStatisticsEnabled);
 
         if (!flowStatisticsEnabled) {
-            log.info("Statistic Reporter is Disabled");
+            log.info("Global Message-Flow Statistic Reporting is Disabled");
         }
 
     }

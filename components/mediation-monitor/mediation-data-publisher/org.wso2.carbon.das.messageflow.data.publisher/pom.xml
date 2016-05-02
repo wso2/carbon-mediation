@@ -90,6 +90,14 @@
             <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>

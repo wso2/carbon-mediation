@@ -57,7 +57,23 @@ public class ConfigurationPublisher {
 
                 addEventData(eventData, structuringArtifact);
                 StreamDefinition streamDef = getComponentStreamDefinition(metaDataKeyList.toArray());
+
+                if(log.isDebugEnabled()) {
+                    log.debug("Before sending to analytic server ------");
+
+                    /*
+                     Logs to print data sending to analytics server. Use log4j.properties to enable this logs
+                      */
+                    for (int i = 0; i < eventData.size(); i++) {
+                        log.debug(streamDef.getPayloadData().get(i).getName() + " -> " + eventData.get(i));
+                    }
+                }
+
                 publishToAgent(eventData, metaDataValueList, PublisherConfig, streamDef);
+
+                if(log.isDebugEnabled()) {
+                    log.debug("------ After sending to analytic server");
+                }
             }
 
         } catch (MalformedStreamDefinitionException e) {
