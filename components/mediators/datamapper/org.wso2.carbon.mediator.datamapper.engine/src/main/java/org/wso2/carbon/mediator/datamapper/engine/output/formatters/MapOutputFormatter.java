@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.*;
 
@@ -38,6 +40,7 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
  */
 public class MapOutputFormatter implements Formatter {
 
+    private static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
     private OutputMessageBuilder outputMessageBuilder;
     private Schema outputSchema;
 
@@ -109,6 +112,7 @@ public class MapOutputFormatter implements Formatter {
                     */
                     if (mapKeyIndex != 0) {
                         sendAnonymousObjectStartEvent();
+                        createAndSendIdentifierFieldEvent(key);
                     }
                     traverseMap((Map<String, Object>) value);
                     if (mapKeyIndex != mapKeys.size() - 1) {
@@ -116,6 +120,7 @@ public class MapOutputFormatter implements Formatter {
                     }
                 } else {
                     sendObjectStartEvent(key);
+                    createAndSendIdentifierFieldEvent(key);
                     traverseMap((Map<String, Object>) value);
                     if (!key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
                         sendObjectEndEvent(key);
@@ -135,6 +140,20 @@ public class MapOutputFormatter implements Formatter {
         }
         if (arrayType) {
             sendArrayEndEvent();
+        }
+    }
+
+    private void createAndSendIdentifierFieldEvent(String key) throws SchemaException, WriterException {
+        //sending events to create xsi:type attribute
+        Pattern identifierPattern = Pattern.compile("(_.+_type)");
+        Matcher matcher = identifierPattern.matcher(key);
+        while (matcher.find()) {
+            String s = matcher.group(0);
+            String stringArray[] = s.split("_");
+            String prefix = stringArray[stringArray.length - 2];
+            if (prefix.equals(outputSchema.getNamespaceMap().get(XSI_NAMESPACE_URI))) {
+                sendFieldEvent("attr_" + prefix + ":type", key.split("_" + prefix + "_type_")[1].replace('_', ':'));
+            }
         }
     }
 

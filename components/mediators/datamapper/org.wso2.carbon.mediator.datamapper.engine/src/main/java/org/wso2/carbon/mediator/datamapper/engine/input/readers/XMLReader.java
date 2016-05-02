@@ -65,8 +65,7 @@ public class XMLReader extends DefaultHandler implements Reader {
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACE_PREFIXES =
             "http://xml" + ".org/sax/features/namespace-prefixes";
     public static final String XMLNS = "xmlns";
-    public static final String XSI_TYPE = "xsi:type";
-    public static final String XSI_TYPE_WITH_CHARACTERS = ",xsi:type=";
+    public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
     private InputModelBuilder modelBuilder;
     private Schema inputSchema;
     private Stack<ReaderEvent> eventStack;
@@ -232,9 +231,12 @@ public class XMLReader extends DefaultHandler implements Reader {
             modifiedLocalName = localName;
         }
         if (attributes != null) {
-            String xsiType = attributes.getValue(XSI_TYPE);
-            if (xsiType != null) {
-                modifiedLocalName = modifiedLocalName + XSI_TYPE_WITH_CHARACTERS + xsiType;
+            String prefixInMap = inputSchema.getNamespaceMap().get(XSI_NAMESPACE_URI);
+            if(prefixInMap != null) {
+                String xsiType = attributes.getValue(prefixInMap + ":type");
+                if (xsiType != null) {
+                    modifiedLocalName = modifiedLocalName + "," + prefixInMap + ":type=" + xsiType;
+                }
             }
         }
         return modifiedLocalName;
