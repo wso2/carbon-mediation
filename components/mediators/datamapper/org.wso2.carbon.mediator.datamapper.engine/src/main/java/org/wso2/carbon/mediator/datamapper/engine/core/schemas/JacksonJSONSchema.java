@@ -100,7 +100,6 @@ public class JacksonJSONSchema implements Schema {
             elementFound = false;
             String elementName = element.getElementName();
             String elementNamespace = element.getNamespace();
-            elementName = getNamespaceAddedFieldName(elementNamespace, elementName);
             if (elementName.equals(getName())) {
                 schema = (Map<String, Object>) jsonSchemaMap.get(PROPERTIES_KEY);
                 elementType = (String) jsonSchemaMap.get(TYPE_KEY);

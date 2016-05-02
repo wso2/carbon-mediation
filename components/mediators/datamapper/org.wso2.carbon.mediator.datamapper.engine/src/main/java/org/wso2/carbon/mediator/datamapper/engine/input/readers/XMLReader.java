@@ -65,6 +65,7 @@ public class XMLReader extends DefaultHandler implements Reader {
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACE_PREFIXES =
             "http://xml" + ".org/sax/features/namespace-prefixes";
     public static final String XMLNS = "xmlns";
+    public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
     private InputModelBuilder modelBuilder;
     private Schema inputSchema;
     private Stack<ReaderEvent> eventStack;
@@ -120,8 +121,9 @@ public class XMLReader extends DefaultHandler implements Reader {
     @Override public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
         try {
+            localName = getNamespacesAndIdentifiersAddedFieldName(uri, localName, attributes);
             schemaElementList.add(new SchemaElement(localName, uri));
-            String tempLocalName = getNamespaceAddedFieldName(uri, localName)
+            String tempLocalName = getNamespacesAndIdentifiersAddedFieldName(uri, localName, null)
                     .replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
             if (!getEventStack().isEmpty()) {
                 ReaderEvent stackElement = getEventStack().peek();
@@ -132,7 +134,6 @@ public class XMLReader extends DefaultHandler implements Reader {
                     schemaElementList.add(new SchemaElement(localName, uri));
                 }
             }
-            localName = getNamespaceAddedFieldName(uri, localName);
             String elementType = getInputSchema().getElementTypeByName(schemaElementList);
             String schemaTitle = getInputSchema().getName();
             if (localName.equals(schemaTitle)) {
@@ -210,7 +211,7 @@ public class XMLReader extends DefaultHandler implements Reader {
 
     private String getAttributeFieldName(String qName, String uri) {
         String[] qNameOriginalArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
-        qName = getNamespaceAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length - 1]);
+        qName = getNamespacesAndIdentifiersAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length - 1], null);
         String[] qNameArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
         if (qNameArray.length > 1) {
             return qNameArray[0] + SCHEMA_NAMESPACE_NAME_SEPARATOR +
@@ -221,19 +222,30 @@ public class XMLReader extends DefaultHandler implements Reader {
         }
     }
 
-    private String getNamespaceAddedFieldName(String uri, String localName) {
+    private String getNamespacesAndIdentifiersAddedFieldName(String uri, String localName, Attributes attributes) {
+        String modifiedLocalName = null;
         String prefix = getInputSchema().getPrefixForNamespace(uri);
         if (StringUtils.isNotEmpty(prefix)) {
-            return prefix + SCHEMA_NAMESPACE_NAME_SEPARATOR + localName;
+            modifiedLocalName = prefix + SCHEMA_NAMESPACE_NAME_SEPARATOR + localName;
         } else {
-            return localName;
+            modifiedLocalName = localName;
         }
+        if (attributes != null) {
+            String prefixInMap = inputSchema.getNamespaceMap().get(XSI_NAMESPACE_URI);
+            if(prefixInMap != null) {
+                String xsiType = attributes.getValue(prefixInMap + ":type");
+                if (xsiType != null) {
+                    modifiedLocalName = modifiedLocalName + "," + prefixInMap + ":type=" + xsiType;
+                }
+            }
+        }
+        return modifiedLocalName;
     }
 
     @Override public void endElement(String uri, String localName, String qName) throws SAXException {
         try {
             String elementType = getInputSchema().getElementTypeByName(schemaElementList);
-            localName = getNamespaceAddedFieldName(uri, localName);
+            localName = getNamespacesAndIdentifiersAddedFieldName(uri, localName, null);
             if (localName.equals(getInputSchema().getName())) {
                 sendObjectEndEvent(localName);
             } else if (STRING_ELEMENT_TYPE.equals(elementType)) {
@@ -369,7 +381,7 @@ public class XMLReader extends DefaultHandler implements Reader {
     }
 
     private String getModifiedFieldName(String fieldName) {
-        return fieldName.replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
+        return fieldName.replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_").replace(",", "_").replace("=", "_");
     }
 
 }
