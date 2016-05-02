@@ -15,7 +15,6 @@
  */
 package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
-import net.minidev.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
@@ -36,6 +35,7 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayOutputStream;
@@ -47,6 +47,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class StatisticsPublisher {
 	private static Log log = LogFactory.getLog(StatisticsPublisher.class);
+	private static ObjectMapper mapper = new ObjectMapper();
 
 	public static void process(PublishingFlow publishingFlow, PublisherConfig PublisherConfig) {
 		List<String> metaDataKeyList = new ArrayList<String>();
@@ -100,18 +101,24 @@ public class StatisticsPublisher {
 	}
 
 	private static void addEventData(List<Object> eventData, PublishingFlow publishingFlow) {
+
 		eventData.add(publishingFlow.getMessageFlowId());
 
 		Map<String, Object> mapping = publishingFlow.getObjectAsMap();
 		mapping.put("host", PublisherUtil.getHostAddress()); // Adding host
 
-		String jsonString = JSONObject.toJSONString(mapping);
+		String jsonString;
+		try {
+			jsonString = mapper.writeValueAsString(mapping);
 
-		eventData.add(compress(jsonString));
+			eventData.add(compress(jsonString));
 
-		if (log.isDebugEnabled()){
-			log.debug("Uncompressed data :");
-			log.debug(jsonString);
+			if (log.isDebugEnabled()){
+				log.debug("Uncompressed data :");
+				log.debug(jsonString);
+			}
+		} catch (IOException e) {
+			log.error("Error while reading input stream. " + e.getMessage());
 		}
 	}
 
@@ -142,7 +149,7 @@ public class StatisticsPublisher {
 				}
 			}
 			dataPublisher = eventPublisherConfig.getDataPublisher();
-			dataPublisher.publish(DataBridgeCommonsUtils.generateStreamId(streamDef.getName(), streamDef.getVersion()),
+			dataPublisher.tryPublish(DataBridgeCommonsUtils.generateStreamId(streamDef.getName(), streamDef.getVersion()),
 			                      metaDataValueList.toArray(), null, eventData.toArray());
 		} else {
 			DataPublisher dataPublisher = null;
@@ -164,7 +171,7 @@ public class StatisticsPublisher {
 			}
 			dataPublisher = eventPublisherConfig.getLoadBalancingDataPublisher();
 
-			dataPublisher.publish(DataBridgeCommonsUtils.generateStreamId(streamDef.getName(), streamDef.getVersion()),
+			dataPublisher.tryPublish(DataBridgeCommonsUtils.generateStreamId(streamDef.getName(), streamDef.getVersion()),
 			                      metaDataValueList.toArray(), null, eventData.toArray());
 		}
 	}

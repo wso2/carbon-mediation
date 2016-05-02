@@ -67,6 +67,9 @@ public class MessageFlowReporterThread extends Thread {
     public void run() {
         while (!shutdownRequested) {
             try {
+                if(log.isDebugEnabled()) {
+                    log.debug("Executing reporter thread - " + this.getName());
+                }
                 collectDataAndReport();
                 delay();
             } catch (Throwable t) {
