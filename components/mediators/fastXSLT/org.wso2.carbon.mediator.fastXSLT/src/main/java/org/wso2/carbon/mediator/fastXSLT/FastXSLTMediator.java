@@ -134,7 +134,7 @@ public class FastXSLTMediator extends AbstractMediator implements ManagedLifecyc
 
     public boolean mediate(MessageContext context) {
 
-        if (context.getEnvironment().isDebugEnabled()) {
+        if (context.getEnvironment().isDebuggerEnabled()) {
             if (super.divertMediationRoute(context)) {
                 return true;
             }
