@@ -67,4 +67,7 @@ public class DASDataPublisherConstants {
     public static final String DAS_PREFIX_FOR_REGISTRY_HIDDEN_PROPERTIES = "registry.";
 
     public static final String DAS_PUBLISHING_ENABLED = "publishing-enabled";
+
+    // Carbon XML properties
+    public static final String FLOW_STATISTIC_REPORTING_INTERVAL = "MediationFlowStatisticsReportingInterval";
 }

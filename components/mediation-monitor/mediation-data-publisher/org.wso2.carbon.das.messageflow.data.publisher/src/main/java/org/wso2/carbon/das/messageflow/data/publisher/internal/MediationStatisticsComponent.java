@@ -22,7 +22,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
@@ -146,6 +148,19 @@ public class MediationStatisticsComponent {
         // Adding configuration reporting thread
         MediationConfigReporterThread configReporterThread = new MediationConfigReporterThread(synEnvService);
         configReporterThread.setName("mediation-config-reporter-" + tenantId);
+        // Set a custom interval value if required
+        ServerConfiguration serverConf = ServerConfiguration.getInstance();
+        String interval = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_REPORTING_INTERVAL);
+        if (interval != null) {
+            try {
+                reporterThread.setDelay(Long.parseLong(interval));
+            } catch (NumberFormatException ignored) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Invalid delay time for mediation-flow-tracer thread. It will use default value.");
+                }
+            }
+        }
+        reporterThread.init();
         configReporterThread.start();
         if (log.isDebugEnabled()) {
             log.debug("Registering the new mediation configuration reporter thread");
