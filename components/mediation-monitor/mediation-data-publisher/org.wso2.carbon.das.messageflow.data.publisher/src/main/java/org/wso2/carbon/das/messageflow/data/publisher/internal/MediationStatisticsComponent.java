@@ -160,7 +160,6 @@ public class MediationStatisticsComponent {
                 }
             }
         }
-        reporterThread.init();
         configReporterThread.start();
         if (log.isDebugEnabled()) {
             log.debug("Registering the new mediation configuration reporter thread");
