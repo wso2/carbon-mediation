@@ -24,7 +24,6 @@ import org.wso2.carbon.das.messageflow.data.publisher.data.MessageFlowObserverSt
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 
 import java.util.List;
-import java.util.Queue;
 
 public class MessageFlowReporterThread extends Thread {
     private static Logger log = Logger.getLogger(MessageFlowReporterThread.class);
@@ -37,12 +36,8 @@ public class MessageFlowReporterThread extends Thread {
     /** The reference to the synapse environment service */
     private SynapseEnvironmentService synapseEnvironmentService;
 
-	/**
-	 * Reference to completed statistic entries in synapse side.
-	 */
-	Queue<PublishingFlow> completedStatisticEntries;
+    private long delay = 5000;
 
-	private long delay = 1000;
 
 	public MessageFlowReporterThread(SynapseEnvironmentService synEnvSvc,
                                      MessageFlowObserverStore messageFlowObserverStore) {
@@ -56,17 +51,6 @@ public class MessageFlowReporterThread extends Thread {
         }
         this.delay = delay;
     }
-
-	public void init() {
-		if (synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore() != null) {
-			completedStatisticEntries = synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore()
-			                                                     .getCompletedStatisticEntries();
-		} else {
-			if (log.isDebugEnabled()) {
-				log.debug("Statistics collector is not available in the Synapse environment");
-			}
-		}
-	}
 
     private void delay() {
         if (delay <= 0) {
@@ -98,18 +82,28 @@ public class MessageFlowReporterThread extends Thread {
 	    if (log.isDebugEnabled()) {
 		    log.trace("Starting new mediation statistics collection cycle");
 	    }
-	    if (completedStatisticEntries == null) {
+
+        CompletedStatisticStore completedStatisticStore = synapseEnvironmentService.getSynapseEnvironment().getCompletedStatisticStore();
+
+        if (completedStatisticStore == null) {
 		    if (log.isDebugEnabled()) {
-			    log.debug("No completed statistics entries were found. Initializing the thread again.");
+                log.debug("Statistics collector is not available in the Synapse environment");
 		    }
-		    init();
+            delay();
 		    return;
 	    }
+
 	    try {
-		    int entriesToRead = completedStatisticEntries.size();
-		    for (int i = 0; i < entriesToRead; i++) {
-			    messageFlowObserverStore.notifyObservers(completedStatisticEntries.poll());
+            if (!completedStatisticStore.isEmpty()) {
+
+                List<PublishingFlow> publishingFlowList = completedStatisticStore.getCompletedStatisticEntries();
+
+                for (PublishingFlow aPublishingFlow : publishingFlowList) {
+                    messageFlowObserverStore.notifyObservers(aPublishingFlow);
 		    }
+
+            }
+
 	    } catch (Exception e) {
 		    log.error("Error while obtaining statistic data.", e);
 	    }
