@@ -25,6 +25,7 @@ import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.builder.SOAPBuilder;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.TransportUtils;
+import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
@@ -98,7 +99,7 @@ public class KAFKAInjectHandler implements InjectHandler {
         }
         OMElement documentElement = null;
         // set the message payload to the message context
-        InputStream in = new ByteArrayInputStream(msg);
+        InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(msg));
         try {
             documentElement = builder.processDocument(in, contentType,
                     axis2MsgCtx);
