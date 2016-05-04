@@ -96,6 +96,19 @@
     function addServiceParams() {
         addServiceParameter("store.rabbitmq.host.name", document.getElementById('host_name').value);
         addServiceParameter("store.rabbitmq.host.port", document.getElementById('host_port').value);
+        var sslEnabledDrpdwn = document.getElementById('rabbitmq.connection.ssl.enabled')
+        var sslEnabled = sslEnabledDrpdwn.options[sslEnabledDrpdwn.selectedIndex].value;
+
+        if (sslEnabled == "true") {
+            addServiceParameter("rabbitmq.connection.ssl.enabled", sslEnabled);
+            addServiceParameter("rabbitmq.connection.ssl.keystore.location", document.getElementById('rabbitmq.connection.ssl.keystore.location').value);
+            addServiceParameter("rabbitmq.connection.ssl.keystore.type", document.getElementById('rabbitmq.connection.ssl.keystore.type').value);
+            addServiceParameter("rabbitmq.connection.ssl.keystore.password", document.getElementById('rabbitmq.connection.ssl.keystore.password').value);
+            addServiceParameter("rabbitmq.connection.ssl.truststore.location", document.getElementById('rabbitmq.connection.ssl.truststore.location').value);
+            addServiceParameter("rabbitmq.connection.ssl.truststore.type", document.getElementById('rabbitmq.connection.ssl.truststore.type').value);
+            addServiceParameter("rabbitmq.connection.ssl.truststore.password", document.getElementById('rabbitmq.connection.ssl.truststore.password').value);
+            addServiceParameter("rabbitmq.connection.ssl.version", document.getElementById('rabbitmq.connection.ssl.version').value);
+        }
         addServiceParameter("store.rabbitmq.queue.name", document.getElementById('queue_name').value);
         addServiceParameter("store.rabbitmq.exchange.name", document.getElementById('exchange_name').value);
         addServiceParameter("store.rabbitmq.route.key", document.getElementById('route_key').value);
@@ -129,6 +142,29 @@
             formElem.style.display = 'none';
             document.getElementById(id + '_adv').innerHTML = '<a class="icon-link" ' +
                     'onclick="javascript:showAdvancedOptions(\'' + id + '\');" style="background-image: url(images/down.gif);">' + "<fmt:message key="show.additional.parameters"/>" + '</a>';
+        }
+    }
+
+    function showSSLOptions() {
+        var formElem = document.getElementById('rabbitmq.connection.ssl.keystore.location.table.row');
+        var sslEnabledDrpdwn = document.getElementById('rabbitmq.connection.ssl.enabled')
+        var sslEnabled = sslEnabledDrpdwn.options[sslEnabledDrpdwn.selectedIndex].value == "true" ? true : false;
+        if (sslEnabled) {
+            document.getElementById('rabbitmq.connection.ssl.keystore.location.table.row').style.display = '';
+            document.getElementById('rabbitmq.connection.ssl.keystore.type.table.row').style.display = '';
+            document.getElementById('rabbitmq.connection.ssl.keystore.password.table.row').style.display = '';
+            document.getElementById('rabbitmq.connection.ssl.truststore.location.table.row').style.display = '';
+            document.getElementById('rabbitmq.connection.ssl.truststore.type.table.row').style.display = '';
+            document.getElementById('rabbitmq.connection.ssl.truststore.password.table.row').style.display = '';
+            document.getElementById('rabbitmq.connection.ssl.version.table.row').style.display = '';
+        } else {
+            document.getElementById('rabbitmq.connection.ssl.keystore.location.table.row').style.display = 'none';
+            document.getElementById('rabbitmq.connection.ssl.keystore.type.table.row').style.display = 'none';
+            document.getElementById('rabbitmq.connection.ssl.keystore.password.table.row').style.display = 'none';
+            document.getElementById('rabbitmq.connection.ssl.truststore.location.table.row').style.display = 'none';
+            document.getElementById('rabbitmq.connection.ssl.truststore.type.table.row').style.display = 'none';
+            document.getElementById('rabbitmq.connection.ssl.truststore.password.table.row').style.display = 'none';
+            document.getElementById('rabbitmq.connection.ssl.version.table.row').style.display = 'none';
         }
     }
 
@@ -214,6 +250,12 @@
         messageStore.setClazz(msProvider);
     }
 
+    boolean sslEnabled = false;
+
+    if ((null != messageStore) && (messageStore.getParams().get("rabbitmq.connection.ssl.enabled") != null) && (messageStore.getParams().get("rabbitmq.connection.ssl.enabled").equals("true"))) {
+        sslEnabled = true;
+    }
+
 %>
 
 <table cellpadding="0" cellspacing="0" border="0" class="styledLeft noBorders">
@@ -276,6 +318,69 @@
                     <td><fmt:message key="rabbitmq.host.port"/><span class="required"> *</span></td>
                     <td><input type="text" size="60" id="host_port" name="host_port"
                                value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.host.port")!=null))?messageStore.getParams().get("store.rabbitmq.host.port"):""%>"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><fmt:message key="rabbitmq.connection.ssl.enabled"/></td>
+                    <td>
+                        <select id="rabbitmq.connection.ssl.enabled" name="rabbitmq.connection.ssl.enabled" onchange="showSSLOptions()">
+                            <%
+                                if (sslEnabled) {
+                            %>
+                            <option selected="selected" value="true">true</option>
+                            <option value="false">false</option>
+                            <%} else {%>
+                            <option value="true">true</option>
+                            <option selected="selected" value="false">false</option>
+                            <%}%>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr id="rabbitmq.connection.ssl.keystore.location.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
+                    <td><fmt:message key="rabbitmq.connection.ssl.keystore.location"/></td>
+                    <td><input type="text" size="60" id="rabbitmq.connection.ssl.keystore.location" name="rabbitmq.connection.ssl.keystore.location"
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.keystore.location")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.keystore.location"):""%>"/>
+                    </td>
+                </tr>
+
+                <tr id="rabbitmq.connection.ssl.keystore.type.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
+                    <td><fmt:message key="rabbitmq.connection.ssl.keystore.type"/></td>
+                    <td><input type="text" size="60" id="rabbitmq.connection.ssl.keystore.type" name="rabbitmq.connection.ssl.keystore.type"
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.keystore.type")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.keystore.type"):""%>"/>
+                    </td>
+                </tr>
+
+                <tr id="rabbitmq.connection.ssl.keystore.password.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
+                    <td><fmt:message key="rabbitmq.connection.ssl.keystore.password"/></td>
+                    <td><input type="password" size="60" id="rabbitmq.connection.ssl.keystore.password" name="rabbitmq.connection.ssl.keystore.password"
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.keystore.password")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.keystore.password"):""%>"/>
+                    </td>
+                </tr>
+
+                <tr id="rabbitmq.connection.ssl.truststore.location.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
+                    <td><fmt:message key="rabbitmq.connection.ssl.truststore.location"/></td>
+                    <td><input type="text" size="60" id="rabbitmq.connection.ssl.truststore.location" name="rabbitmq.connection.ssl.truststore.location"
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.truststore.location")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.truststore.location"):""%>"/>
+                    </td>
+                </tr>
+                <tr id="rabbitmq.connection.ssl.truststore.type.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
+                    <td><fmt:message key="rabbitmq.connection.ssl.truststore.type"/></td>
+                    <td><input type="text" size="60" id="rabbitmq.connection.ssl.truststore.type" name="rabbitmq.connection.ssl.truststore.type"
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.truststore.type")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.truststore.type"):""%>"/>
+                    </td>
+                </tr>
+                <tr id="rabbitmq.connection.ssl.truststore.password.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
+                    <td><fmt:message key="rabbitmq.connection.ssl.truststore.password"/></td>
+                    <td><input type="password" size="60" id="rabbitmq.connection.ssl.truststore.password" name="rabbitmq.connection.ssl.truststore.password"
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.truststore.password")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.truststore.password"):""%>"/>
+                    </td>
+                </tr>
+                <tr id="rabbitmq.connection.ssl.version.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
+                    <td><fmt:message key="rabbitmq.connection.ssl.version"/></td>
+                    <td><input type="text" size="60" id="rabbitmq.connection.ssl.version" name="rabbitmq.connection.ssl.version"
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.version")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.version"):""%>"/>
                     </td>
                 </tr>
 
