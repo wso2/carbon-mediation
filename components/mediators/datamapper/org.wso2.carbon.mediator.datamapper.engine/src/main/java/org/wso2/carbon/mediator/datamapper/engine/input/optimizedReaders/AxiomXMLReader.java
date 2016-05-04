@@ -153,7 +153,7 @@ public class AxiomXMLReader {
         nameSpaceURI = this.getNameSpaceURI(omElement);
         nameSpaceLocalName = getNamespaceAddedFieldName(nameSpaceURI, localName);
 
-        schemaElementList.add(new SchemaElement(localName, nameSpaceURI));
+        schemaElementList.add(new SchemaElement(nameSpaceLocalName, nameSpaceURI));
         elementType = getInputSchema().getElementTypeByName(schemaElementList);
 
         if (nameSpaceLocalName.equals(getInputSchema().getName())) {
