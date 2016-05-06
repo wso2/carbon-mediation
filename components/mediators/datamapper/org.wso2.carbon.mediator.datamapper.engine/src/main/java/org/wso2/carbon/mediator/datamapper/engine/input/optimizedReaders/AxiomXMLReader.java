@@ -16,10 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.optimizedReaders;
 
-import org.apache.axiom.om.OMAttribute;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMXMLBuilderFactory;
-import org.apache.axiom.om.OMXMLParserWrapper;
+import org.apache.axiom.om.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +29,7 @@ import org.wso2.carbon.mediator.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputXMLMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.input.builders.JSONBuilder;
 
+import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -48,6 +46,7 @@ public class AxiomXMLReader {
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACES = "http://xml.org/sax/features/namespaces";
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACE_PREFIXES =
             "http://xml" + ".org/sax/features/namespace-prefixes";
+    public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
     public static final String XMLNS = "xmlns";
     private static final Log log = LogFactory.getLog(AxiomXMLReader.class);
 
@@ -151,7 +150,7 @@ public class AxiomXMLReader {
         /* Reading parameters of the currently processing OMElement */
         localName = omElement.getLocalName();
         nameSpaceURI = this.getNameSpaceURI(omElement);
-        nameSpaceLocalName = getNamespaceAddedFieldName(nameSpaceURI, localName);
+        nameSpaceLocalName = getNamespacesAndIdentifiersAddedFieldName(nameSpaceURI, localName, omElement);
 
         schemaElementList.add(new SchemaElement(nameSpaceLocalName, nameSpaceURI));
         elementType = getInputSchema().getElementTypeByName(schemaElementList);
@@ -253,6 +252,7 @@ public class AxiomXMLReader {
         String attributeFieldName;
         String attributeLocalName;
         String attributeNSURI;
+        String attributeQName;
         OMAttribute omAttribute = null;
 
         /* continue beyond this while loop only if there is at least one attribute without "XMLNS" tag */
@@ -276,9 +276,10 @@ public class AxiomXMLReader {
         attributeLocalName = omAttribute.getLocalName();
         attributeNSURI = this.getNameSpaceURI(omAttribute);
         attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI);
+        attributeQName = getAttributeQName(omAttribute.getNamespace(), attributeLocalName);
 
         /* get the type of the attribute element */
-        schemaElementList.add(new SchemaElement(attributeLocalName, attributeNSURI));
+        schemaElementList.add(new SchemaElement(attributeQName, attributeNSURI));
         attributeType = getInputSchema().getElementTypeByName(schemaElementList);
         schemaElementList.remove(schemaElementList.size() - 1);
 
@@ -296,9 +297,10 @@ public class AxiomXMLReader {
 
             attributeNSURI = this.getNameSpaceURI(omAttribute);
             attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI);
+            attributeQName = getAttributeQName(omAttribute.getNamespace(), localName);
 
             /* get the type of the attribute element */
-            schemaElementList.add(new SchemaElement(attributeLocalName, attributeNSURI));
+            schemaElementList.add(new SchemaElement(attributeQName, attributeNSURI));
             attributeType = getInputSchema().getElementTypeByName(schemaElementList);
             schemaElementList.remove(schemaElementList.size() - 1);
 
@@ -319,7 +321,7 @@ public class AxiomXMLReader {
 
     private String getAttributeFieldName(String qName, String uri) {
         String[] qNameOriginalArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
-        qName = getNamespaceAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length - 1]);
+        qName = getNamespacesAndIdentifiersAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length - 1], null);
         String[] qNameArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
         if (qNameArray.length > 1) {
             return qNameArray[0] + SCHEMA_NAMESPACE_NAME_SEPARATOR +
@@ -330,10 +332,27 @@ public class AxiomXMLReader {
         }
     }
 
-    private String getNamespaceAddedFieldName(String uri, String localName) {
+    private String getNamespacesAndIdentifiersAddedFieldName(String uri, String localName, OMElement omElement) {
+        String modifiedLocalName = null;
         String prefix = getInputSchema().getPrefixForNamespace(uri);
         if (StringUtils.isNotEmpty(prefix)) {
-            return prefix + SCHEMA_NAMESPACE_NAME_SEPARATOR + localName;
+            modifiedLocalName = prefix + SCHEMA_NAMESPACE_NAME_SEPARATOR + localName;
+        } else {
+            modifiedLocalName = localName;
+        }
+        String prefixInMap = inputSchema.getNamespaceMap().get(XSI_NAMESPACE_URI);
+        if (prefixInMap != null && omElement != null) {
+            String xsiType = omElement.getAttributeValue(new QName(XSI_NAMESPACE_URI, "type", prefixInMap));
+            if (xsiType != null) {
+                modifiedLocalName = modifiedLocalName + "," + prefixInMap + ":type=" + xsiType;
+            }
+        }
+        return modifiedLocalName;
+    }
+
+    public String getAttributeQName(OMNamespace omNamespace, String localName) {
+        if (omNamespace != null) {
+            return omNamespace.getPrefix() + ":" + localName;
         } else {
             return localName;
         }
@@ -402,7 +421,7 @@ public class AxiomXMLReader {
     }
 
     private String getModifiedFieldName(String fieldName) {
-        return fieldName.replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
+        return fieldName.replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_").replace(",", "_").replace("=", "_");
     }
 
 }
