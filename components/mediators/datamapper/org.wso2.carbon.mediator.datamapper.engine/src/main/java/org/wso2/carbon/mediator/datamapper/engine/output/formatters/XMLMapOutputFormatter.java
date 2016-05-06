@@ -36,7 +36,7 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 /**
  * This class responsible for building the output XML message using the generated Map model
  */
-public class AxiomXMLMapOutputFormatter {
+public class XMLMapOutputFormatter {
 
     private static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
     private OutputXMLMessageBuilder outputXMLMessageBuilder;

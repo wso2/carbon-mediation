@@ -21,20 +21,20 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterExceptio
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
-import org.wso2.carbon.mediator.datamapper.engine.output.formatters.AxiomXMLMapOutputFormatter;
+import org.wso2.carbon.mediator.datamapper.engine.output.formatters.XMLMapOutputFormatter;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
 
 public class OutputXMLMessageBuilder {
 
-    private AxiomXMLMapOutputFormatter formatter;
+    private XMLMapOutputFormatter formatter;
     private Schema outputSchema;
     private OutputVariableNotifier outputVariableNotifier;
 
     public OutputXMLMessageBuilder(InputOutputDataType dataType, ModelType modelType, Schema outputSchema)
             throws SchemaException, WriterException {
         this.outputSchema = outputSchema;
-        this.formatter = new AxiomXMLMapOutputFormatter();
+        this.formatter = new XMLMapOutputFormatter();
     }
 
     public void buildOutputMessage(Model outputModel, OutputVariableNotifier mappingHandler)
