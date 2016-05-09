@@ -38,6 +38,7 @@
                             org.apache.axis2.*; version=${orbit.version.axis2},
                             org.apache.thrift.*,
                             org.osgi.framework.*,
+                            com.esotericsoftware.kryo.*;version=${esotericsoftware.kryo.version},
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
@@ -96,6 +97,14 @@
         <dependency>
             <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo-shaded</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>minlog</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

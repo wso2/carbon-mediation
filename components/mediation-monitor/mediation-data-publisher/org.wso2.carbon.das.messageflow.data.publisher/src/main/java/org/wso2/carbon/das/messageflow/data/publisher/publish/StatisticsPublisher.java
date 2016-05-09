@@ -17,7 +17,10 @@ package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.aspects.flow.statistics.publishing.PublishingEvent;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
+import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayload;
+import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayloadEvent;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
 import org.wso2.carbon.das.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.EventPublisherConfig;
@@ -35,7 +38,8 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.Kryo;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayOutputStream;
@@ -47,7 +51,7 @@ import java.util.zip.GZIPOutputStream;
 
 public class StatisticsPublisher {
 	private static Log log = LogFactory.getLog(StatisticsPublisher.class);
-	private static ObjectMapper mapper = new ObjectMapper();
+	private static Kryo kryo = new Kryo();
 
 	public static void process(PublishingFlow publishingFlow, PublisherConfig PublisherConfig) {
 		List<String> metaDataKeyList = new ArrayList<String>();
@@ -107,18 +111,21 @@ public class StatisticsPublisher {
 		Map<String, Object> mapping = publishingFlow.getObjectAsMap();
 		mapping.put("host", PublisherUtil.getHostAddress()); // Adding host
 
-		String jsonString;
-		try {
-			jsonString = mapper.writeValueAsString(mapping);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Output output = new Output(out);
+		kryo.register(PublishingEvent.class);
+		kryo.register(PublishingPayload.class);
+		kryo.register(PublishingPayloadEvent.class);
 
-			eventData.add(compress(jsonString));
+		kryo.writeObject(output, mapping);
 
-			if (log.isDebugEnabled()){
-				log.debug("Uncompressed data :");
-				log.debug(jsonString);
-			}
-		} catch (IOException e) {
-			log.error("Error while reading input stream. " + e.getMessage());
+		eventData.add(compress(output.getBuffer()));
+
+		if (log.isDebugEnabled()) {
+			log.debug("Uncompressed data :");
+			log.debug("messageFlowId" + mapping.get("messageFlowId"));
+			log.debug("events" + mapping.get("events"));
+			log.debug("payloads" + mapping.get("payloads"));
 		}
 	}
 
@@ -184,7 +191,6 @@ public class StatisticsPublisher {
 		eventStreamDefinition
 				.setDescription("This stream is use by WSO2 ESB to publish component specific data for tracing");
 		eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_COMPRESSED, AttributeType.BOOL);
-		//        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
 		for (Object aMetaData : metaData) {
 			eventStreamDefinition.addMetaData(aMetaData.toString(), AttributeType.STRING);
 		}
@@ -200,21 +206,21 @@ public class StatisticsPublisher {
 	 * @param str
 	 * @return
 	 */
-	private static String compress(String str) {
-		if (str == null || str.length() == 0) {
-			return str;
+	private static String compress(byte[] str) {
+		if (str == null || str.length == 0) {
+			return null;
 		}
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			GZIPOutputStream gzip = new GZIPOutputStream(out);
-			gzip.write(str.getBytes());
+			gzip.write(str);
 			gzip.close();
 			return DatatypeConverter.printBase64Binary(out.toByteArray());
 		} catch (IOException e) {
 			log.error("Unable to compress data", e);
 		}
 
-		return str;
+		return null;
 	}
 }
