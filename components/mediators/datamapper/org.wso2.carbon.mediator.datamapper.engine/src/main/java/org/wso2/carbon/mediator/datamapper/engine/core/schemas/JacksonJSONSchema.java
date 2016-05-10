@@ -121,7 +121,8 @@ public class JacksonJSONSchema implements Schema {
                 elementFound = true;
             }
             if (!elementFound) {
-                throw new IllegalArgumentException("Element name not found : " + elementName);
+                elementType = NULL_ELEMENT_TYPE;
+                log.warn("Element name not found : " + elementName);
             }
         }
         return elementType;
