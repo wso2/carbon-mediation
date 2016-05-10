@@ -17,7 +17,6 @@ package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.aspects.flow.statistics.publishing.PublishingEvent;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayload;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayloadEvent;
@@ -45,6 +44,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
@@ -113,13 +113,20 @@ public class StatisticsPublisher {
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Output output = new Output(out);
-		kryo.register(PublishingEvent.class);
-		kryo.register(PublishingPayload.class);
-		kryo.register(PublishingPayloadEvent.class);
+
+		/**
+		 * When registering classes use for serialization, the numbering order should be preserved and
+		 * SHOULD follow the same convention from Analytic Server as well. Otherwise deserialization fails.
+		 */
+		kryo.register(HashMap.class, 111);
+		kryo.register(ArrayList.class, 222);
+		kryo.register(PublishingPayload.class, 333);
+		kryo.register(PublishingPayloadEvent.class, 444);
 
 		kryo.writeObject(output, mapping);
 
-		eventData.add(compress(output.getBuffer()));
+		output.flush();
+		eventData.add(compress(out.toByteArray()));
 
 		if (log.isDebugEnabled()) {
 			log.debug("Uncompressed data :");
