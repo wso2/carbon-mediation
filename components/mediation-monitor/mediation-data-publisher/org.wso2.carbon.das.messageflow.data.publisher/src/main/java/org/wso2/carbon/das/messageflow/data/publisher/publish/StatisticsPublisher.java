@@ -15,6 +15,8 @@
  */
 package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
@@ -129,10 +131,15 @@ public class StatisticsPublisher {
 		eventData.add(compress(out.toByteArray()));
 
 		if (log.isDebugEnabled()) {
+			ObjectMapper mapper = new ObjectMapper();
+			String jsonString = null;
+			try {
+				jsonString = mapper.writeValueAsString(mapping);
+			} catch (JsonProcessingException e) {
+				log.error("Unable to convert", e);
+			}
 			log.debug("Uncompressed data :");
-			log.debug("messageFlowId" + mapping.get("messageFlowId"));
-			log.debug("events" + mapping.get("events"));
-			log.debug("payloads" + mapping.get("payloads"));
+			log.debug(jsonString);
 		}
 	}
 
