@@ -299,7 +299,7 @@
         givenParams = entries[0].getKey() + "#" + entries[0].getValue().replace("\n","");
         for (int i = 1; i < entries.length; i++) {
             if (entries[i] != null) {
-                givenParams += "::" + entries[i].getKey() + "#" + entries[i].getValue();
+                givenParams += "::" + entries[i].getKey() + "#" + entries[i].getValue().replace("\n","");
             }
         }
     }
