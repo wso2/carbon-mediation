@@ -15,9 +15,13 @@
  */
 package org.wso2.carbon.das.messageflow.data.publisher.publish;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
+import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayload;
+import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayloadEvent;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
 import org.wso2.carbon.das.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.EventPublisherConfig;
@@ -35,19 +39,21 @@ import org.wso2.carbon.databridge.commons.StreamDefinition;
 import org.wso2.carbon.databridge.commons.exception.MalformedStreamDefinitionException;
 import org.wso2.carbon.databridge.commons.exception.TransportException;
 import org.wso2.carbon.databridge.commons.utils.DataBridgeCommonsUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.Kryo;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 public class StatisticsPublisher {
 	private static Log log = LogFactory.getLog(StatisticsPublisher.class);
-	private static ObjectMapper mapper = new ObjectMapper();
+	private static Kryo kryo = new Kryo();
 
 	public static void process(PublishingFlow publishingFlow, PublisherConfig PublisherConfig) {
 		List<String> metaDataKeyList = new ArrayList<String>();
@@ -107,18 +113,33 @@ public class StatisticsPublisher {
 		Map<String, Object> mapping = publishingFlow.getObjectAsMap();
 		mapping.put("host", PublisherUtil.getHostAddress()); // Adding host
 
-		String jsonString;
-		try {
-			jsonString = mapper.writeValueAsString(mapping);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Output output = new Output(out);
 
-			eventData.add(compress(jsonString));
+		/**
+		 * When registering classes use for serialization, the numbering order should be preserved and
+		 * SHOULD follow the same convention from Analytic Server as well. Otherwise deserialization fails.
+		 */
+		kryo.register(HashMap.class, 111);
+		kryo.register(ArrayList.class, 222);
+		kryo.register(PublishingPayload.class, 333);
+		kryo.register(PublishingPayloadEvent.class, 444);
 
-			if (log.isDebugEnabled()){
-				log.debug("Uncompressed data :");
-				log.debug(jsonString);
+		kryo.writeObject(output, mapping);
+
+		output.flush();
+		eventData.add(compress(out.toByteArray()));
+
+		if (log.isDebugEnabled()) {
+			ObjectMapper mapper = new ObjectMapper();
+			String jsonString = null;
+			try {
+				jsonString = mapper.writeValueAsString(mapping);
+			} catch (JsonProcessingException e) {
+				log.error("Unable to convert", e);
 			}
-		} catch (IOException e) {
-			log.error("Error while reading input stream. " + e.getMessage());
+			log.debug("Uncompressed data :");
+			log.debug(jsonString);
 		}
 	}
 
@@ -184,7 +205,6 @@ public class StatisticsPublisher {
 		eventStreamDefinition
 				.setDescription("This stream is use by WSO2 ESB to publish component specific data for tracing");
 		eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_COMPRESSED, AttributeType.BOOL);
-		//        eventStreamDefinition.addMetaData(DASDataPublisherConstants.DAS_HOST, AttributeType.STRING);
 		for (Object aMetaData : metaData) {
 			eventStreamDefinition.addMetaData(aMetaData.toString(), AttributeType.STRING);
 		}
@@ -200,21 +220,21 @@ public class StatisticsPublisher {
 	 * @param str
 	 * @return
 	 */
-	private static String compress(String str) {
-		if (str == null || str.length() == 0) {
-			return str;
+	private static String compress(byte[] str) {
+		if (str == null || str.length == 0) {
+			return null;
 		}
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
 			GZIPOutputStream gzip = new GZIPOutputStream(out);
-			gzip.write(str.getBytes());
+			gzip.write(str);
 			gzip.close();
 			return DatatypeConverter.printBase64Binary(out.toByteArray());
 		} catch (IOException e) {
 			log.error("Unable to compress data", e);
 		}
 
-		return str;
+		return null;
 	}
 }

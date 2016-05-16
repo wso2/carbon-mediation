@@ -46,6 +46,7 @@ import java.util.Stack;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NULL_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
@@ -121,15 +122,18 @@ public class XMLReader extends DefaultHandler implements Reader {
     @Override public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
         try {
+            if("true".equals(attributes.getValue("xsi" + ":nil"))){
+                sendObjectStartEvent(localName);
+                schemaElementList.add(new SchemaElement(localName, uri));
+                return;
+            }
             localName = getNamespacesAndIdentifiersAddedFieldName(uri, localName, attributes);
             schemaElementList.add(new SchemaElement(localName, uri));
-            String tempLocalName = getNamespacesAndIdentifiersAddedFieldName(uri, localName, null)
-                    .replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_");
             if (!getEventStack().isEmpty()) {
                 ReaderEvent stackElement = getEventStack().peek();
                 if (ReaderEventType.ARRAY_START.equals(stackElement.getEventType()) && !(getInputSchema()
                         .isChildElement(schemaElementList.subList(0, schemaElementList.size() - 2), localName)
-                        || tempLocalName.equals(stackElement.getName()))) {
+                        || getModifiedFieldName(localName).equals(stackElement.getName()))) {
                     sendArrayEndEvent(localName);
                     schemaElementList.add(new SchemaElement(localName, uri));
                 }
@@ -153,8 +157,8 @@ public class XMLReader extends DefaultHandler implements Reader {
                 //first element of a array should fire array start element
                 if (!getEventStack().isEmpty()) {
                     ReaderEvent stackElement = getEventStack().peek();
-                    if (!(ReaderEventType.ARRAY_START.equals(stackElement.getEventType()) && tempLocalName
-                            .equals(stackElement.getName()))) {
+                    if (!(ReaderEventType.ARRAY_START.equals(stackElement.getEventType()) && getModifiedFieldName(
+                            localName).equals(stackElement.getName()))) {
                         sendArrayStartEvent(localName);
                     }
                 } else {
@@ -268,6 +272,8 @@ public class XMLReader extends DefaultHandler implements Reader {
                         break;
                     }
                 }
+                sendObjectEndEvent(localName);
+            } else if(NULL_ELEMENT_TYPE.equals(elementType)){
                 sendObjectEndEvent(localName);
             }
         } catch (IOException | JSException e) {

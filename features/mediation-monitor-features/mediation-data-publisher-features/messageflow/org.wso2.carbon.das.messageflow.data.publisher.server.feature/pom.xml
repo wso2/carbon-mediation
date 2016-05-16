@@ -71,6 +71,9 @@
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.das.messageflow.data.publisher:${carbon.mediation.version}</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.das.data.publisher.util:${carbon.mediation.version}</bundleDef>
+                                <bundleDef>com.esotericsoftware:kryo-shaded:${esotericsoftware.kryo.version}</bundleDef>
+                                <bundleDef>org.objenesis:objenesis:${org.objenesis.version}</bundleDef>
+                                <bundleDef>com.esotericsoftware:minlog:${esotericsoftware.minlog.version}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
