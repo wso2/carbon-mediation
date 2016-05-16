@@ -80,6 +80,7 @@
                                 <bundleDef>org.apache.synapse:synapse-nhttp-transport</bundleDef>
                                 <bundleDef>org.apache.httpcomponents.wso2:httpcore</bundleDef>
                                 <bundleDef>org.wso2.orbit.httpcomponents:httpcore-nio</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.apache.httpcomponents:httpclient</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
