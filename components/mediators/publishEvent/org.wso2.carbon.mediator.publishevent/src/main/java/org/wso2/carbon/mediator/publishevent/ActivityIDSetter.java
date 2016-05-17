@@ -21,6 +21,7 @@ package org.wso2.carbon.mediator.publishevent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 
@@ -46,7 +47,7 @@ public class ActivityIDSetter {
 	 * @param messageContext message context of message
 	 * @throws SynapseException
 	 */
-	public static void setActivityIdInTransportHeader(Axis2MessageContext messageContext) throws SynapseException {
+	public static void setActivityIdInTransportHeader(MessageContext messageContext) throws SynapseException {
 		try {
 			//get the unique ID used for correlating messages for BAM activity monitoring
 			String idString = getUniqueId();
@@ -54,7 +55,8 @@ public class ActivityIDSetter {
 			//Get activity ID form message context, if available.
 			Object idFromContext = messageContext.getProperty(MSG_CONTEXT_ACTIVITY_ID);
 
-			org.apache.axis2.context.MessageContext axis2MessageContext = messageContext.getAxis2MessageContext();
+			Axis2MessageContext axis2smc = (Axis2MessageContext) messageContext;
+			org.apache.axis2.context.MessageContext axis2MessageContext = axis2smc.getAxis2MessageContext();
 
 			Map headers = (Map) axis2MessageContext
 					.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
