@@ -19,11 +19,9 @@
 
 package org.wso2.carbon.mediator.publishevent;
 
-import org.apache.axis2.description.AxisService;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.databridge.commons.Attribute;
@@ -43,8 +41,7 @@ import java.util.Map;
  * Extracted information is sent as an event.
  */
 public class PublishEventMediator extends AbstractMediator {
-	private static final String ADMIN_SERVICE_PARAMETER = "adminService";
-	private static final String HIDDEN_SERVICE_PARAMETER = "hiddenService";
+	private static final String TASK_EXECUTING_TENANT_ID = "CURRENT_TASK_EXECUTING_TENANT_IDENTIFIER";
 
 	private EventSinkService eventSinkService = null;
 	private String streamName;
@@ -78,6 +75,17 @@ public class PublishEventMediator extends AbstractMediator {
 			}
 		}
 
+		/*
+		 Following will get the tenant-id if it's in the message context
+		 This is useful when injecting the message via a Scheduled Task, etc. which uses threads that are not tenant aware
+		 */
+		Integer tenantId = null;
+		if (messageContext.getProperty(TASK_EXECUTING_TENANT_ID) != null && messageContext.getProperty(TASK_EXECUTING_TENANT_ID) instanceof Integer){
+			tenantId = (Integer) messageContext.getProperty(TASK_EXECUTING_TENANT_ID);
+			PrivilegedCarbonContext.startTenantFlow();
+			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId);
+		}
+
 		// first "getEventSink() == null" check is done to avoid synchronized(this) block each time mediate()
 		// gets called (to improve performance).
 		// second "getEventSink() == null" check inside synchronized(this) block is used to ensure only one thread
@@ -96,6 +104,13 @@ public class PublishEventMediator extends AbstractMediator {
 			}
 		}
 
+		/*
+		Anything relates to tenant specific should be completed before this
+		 */
+		if(tenantId != null) {
+			PrivilegedCarbonContext.endTenantFlow();
+		}
+
 		SynapseLog synLog = getLog(messageContext);
 
 		if (synLog.isTraceOrDebugEnabled()) {
@@ -105,24 +120,7 @@ public class PublishEventMediator extends AbstractMediator {
 			}
 		}
 
-		if (messageContext instanceof Axis2MessageContext) {
-			Axis2MessageContext axis2MessageContext = (Axis2MessageContext) messageContext;
-			org.apache.axis2.context.MessageContext msgContext = axis2MessageContext.getAxis2MessageContext();
-
-			AxisService service = msgContext.getAxisService();
-			if (service == null) {
-				log.error("Cannot mediate message. Not an Axis2 service");
-				return true;
-			}
-			// When this is not inside an API theses parameters should be there
-			if ((!service.getName().equals("__SynapseService")) &&
-			    (service.getParameter(ADMIN_SERVICE_PARAMETER) != null ||
-			     service.getParameter(HIDDEN_SERVICE_PARAMETER) != null)) {
-				log.error("Cannot mediate message. Not a Synapse service");
-				return true;
-			}
-			ActivityIDSetter.setActivityIdInTransportHeader(axis2MessageContext);
-		}
+		ActivityIDSetter.setActivityIdInTransportHeader(messageContext);
 
 		try {
 			Object[] metaData = new Object[metaProperties.size()];
