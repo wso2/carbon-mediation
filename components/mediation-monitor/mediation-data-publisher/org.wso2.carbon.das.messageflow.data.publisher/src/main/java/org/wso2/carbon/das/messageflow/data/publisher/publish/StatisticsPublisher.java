@@ -53,7 +53,22 @@ import java.util.zip.GZIPOutputStream;
 
 public class StatisticsPublisher {
 	private static Log log = LogFactory.getLog(StatisticsPublisher.class);
-	private static Kryo kryo = new Kryo();
+	private static ThreadLocal<Kryo> kryoTL = new ThreadLocal<Kryo>() {
+		@Override protected Kryo initialValue() {
+			Kryo kryo = new Kryo();
+
+			/**
+			 * When registering classes use for serialization, the numbering order should be preserved and
+			 * SHOULD follow the same convention from Analytic Server as well. Otherwise deserialization fails.
+			 */
+			kryo.register(HashMap.class, 111);
+			kryo.register(ArrayList.class, 222);
+			kryo.register(PublishingPayload.class, 333);
+			kryo.register(PublishingPayloadEvent.class, 444);
+
+			return kryo;
+		}
+	};
 
 	public static void process(PublishingFlow publishingFlow, PublisherConfig PublisherConfig) {
 		List<String> metaDataKeyList = new ArrayList<String>();
@@ -116,16 +131,7 @@ public class StatisticsPublisher {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Output output = new Output(out);
 
-		/**
-		 * When registering classes use for serialization, the numbering order should be preserved and
-		 * SHOULD follow the same convention from Analytic Server as well. Otherwise deserialization fails.
-		 */
-		kryo.register(HashMap.class, 111);
-		kryo.register(ArrayList.class, 222);
-		kryo.register(PublishingPayload.class, 333);
-		kryo.register(PublishingPayloadEvent.class, 444);
-
-		kryo.writeObject(output, mapping);
+		kryoTL.get().writeObject(output, mapping);
 
 		output.flush();
 		eventData.add(compress(out.toByteArray()));
