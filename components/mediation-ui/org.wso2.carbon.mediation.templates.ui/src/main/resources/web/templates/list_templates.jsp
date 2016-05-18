@@ -329,14 +329,34 @@
            CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function(){
-                location.href = "../templates/delete_template.jsp?sequenceName=" + sequenceName;
+                $.ajax({
+                    type: 'POST',
+                    url: '../templates/delete_template.jsp',
+                    data: 'sequenceName=' + sequenceName,
+                    success: function () {
+                        location.href = "../templates/list_templates.jsp"
+                    },
+                    error: function () {
+                        CARBON.showErrorDialog('<fmt:message key="sequence.delete.fault"/>' + ' ' + sequenceName);
+                    }
+                });
             });
         }
     }
 
     function deleteEndpoint(sequenceName) {
-        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function() {
-            location.href = "../templates/delete_template.jsp?sequenceName=" + sequenceName + "&templateType=endpoint";
+        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + " ?", function () {
+            $.ajax({
+                type: 'POST',
+                url: '../templates/delete_template.jsp',
+                data: 'sequenceName=' + sequenceName + '&templateType=endpoint',
+                success: function () {
+                    location.href = "../templates/list_templates.jsp"
+                },
+                error: function () {
+                    CARBON.showErrorDialog('<fmt:message key="endpoint.delete.fault"/>' + ' ' + sequenceName);
+                }
+            });
         });
     }
 
@@ -379,15 +399,36 @@
         if (sequenceName == "main" || sequenceName == "fault") {
            CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
-            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function(){
-                location.href = "../templates/delete_template.jsp?type=registry&sequenceName=" + sequenceName;
+            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '../templates/delete_template.jsp',
+                    data: 'type=registry&sequenceName=' + sequenceName,
+                    success: function () {
+                        location.href = "../templates/list_templates.jsp"
+                    },
+                    error: function () {
+                        CARBON.showErrorDialog('<fmt:message key="registry.sequence.delete.fault"/>' + ' ' + sequenceName);
+                    }
+                });
             });
         }
     }
 
     function deleteRegistryEndpoint(sequenceName) {
-        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function() {
+        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function () {
             location.href = "../templates/delete_template.jsp?type=registry&sequenceName=" + sequenceName + "&templateType=endpoint";
+            $.ajax({
+                type: 'POST',
+                url: '../templates/delete_template.jsp',
+                data: 'type=registry&sequenceName=' + sequenceName + '&templateType=endpoint',
+                success: function () {
+                    location.href = "../templates/list_templates.jsp"
+                },
+                error: function () {
+                    CARBON.showErrorDialog('<fmt:message key="registry.endpoint.delete.fault"/>' + ' ' + sequenceName);
+                }
+            });
         });
     }
 
