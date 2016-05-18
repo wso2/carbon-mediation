@@ -65,7 +65,7 @@
                 <a target="_blank" href="<%= helpPage %>"><fmt:message key="sequence.mediator.help"/></a>
             </div>
 
-    <form action="mediator-update-ajaxprocessor.jsp" id="mediator-editor-form" name="mediator-editor-form">
+    <form action="mediator-update-ajaxprocessor.jsp" id="mediator-editor-form" name="mediator-editor-form" method="post">
         <jsp:include page="<%= editPage %>" flush="true">
             <jsp:param name="mediatorPosition" value="<%=mediatorPosition%>"/>
         </jsp:include>

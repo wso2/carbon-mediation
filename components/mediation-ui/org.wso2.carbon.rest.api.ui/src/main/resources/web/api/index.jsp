@@ -438,7 +438,7 @@
 <% } %>
 <p>&nbsp;</p>
 
-    <form action="index.jsp" name="searchForm">
+    <form action="index.jsp" name="searchForm" method="post">
         <table style="border:0; !important">
             <tbody>
             <tr style="border:0; !important">

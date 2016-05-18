@@ -45,7 +45,7 @@
     <div>
         <% if (endpointService.isChildEndpointFormAvailable()) { %>
         <form action="listEndpointDesigner/childEndpoint-update-ajaxprocessor.jsp" id="childEndpoint-editor-form"
-              name="childEndpoint-editor-form">
+              name="childEndpoint-editor-form" method="post">
             <jsp:include page="<%= editPage %>" flush="true">
                 <jsp:param name="endpointPosition" value="<%=endpointPosition%>"/>
             </jsp:include>

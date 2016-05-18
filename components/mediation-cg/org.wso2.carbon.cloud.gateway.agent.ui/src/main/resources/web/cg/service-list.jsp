@@ -132,7 +132,7 @@
         if(CarbonUIUtil.isUserAuthorized(request, CGConstant.ADMIN_PUBLISH_SERVICE_PERMISSION_STRING) ||
                 CarbonUIUtil.isUserAuthorized(request, CGConstant.ADMIN_UN_PUBLISH_SERVICE_PERMISSION_STRING)) {
     %>
-        <form action="service-list.jsp" name="searchForm">
+        <form action="service-list.jsp" name="searchForm" method="post">
 
         <table class="styledLeft">
             <tbody>

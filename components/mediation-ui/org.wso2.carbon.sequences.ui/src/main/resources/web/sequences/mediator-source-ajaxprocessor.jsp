@@ -55,7 +55,7 @@
                 request="<%=request%>" />
 
     <div>
-        <form action="mediator-source-update.jsp" id="mediator-source-form" name="mediator-source-form">
+        <form action="mediator-source-update.jsp" id="mediator-source-form" name="mediator-source-form" method="post">
             <table class="styledLeft" cellspacing="0" cellpadding="0" style="margin-left: 0px;">
                 <tbody>
                     <tr>

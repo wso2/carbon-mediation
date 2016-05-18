@@ -512,7 +512,7 @@
     %>
     </p>
     <br/>
-    <form action="list_sequences.jsp" name="searchForm">
+    <form action="list_sequences.jsp" name="searchForm" method="post">
         <table style="border:0; !important">
             <tbody>
             <tr style="border:0; !important">

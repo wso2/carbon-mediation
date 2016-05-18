@@ -105,7 +105,7 @@
 		%>
 		<div class="registryWriteOperation" id="propertiesAddDiv"
 			style="display: none;">
-			<form onsubmit="return setProperty();">
+			<form onsubmit="return setProperty();" method="post">
 
 				<input type="hidden" id="propRPath"
 					value="<%=propertiesBean.getPathWithVersion()%>" />

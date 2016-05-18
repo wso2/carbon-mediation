@@ -248,7 +248,7 @@
 </h2>
 
 <form action="updatePages/loadBalanceEndpoint-update.jsp" id="endpoint-editor-form"
-      name="endpoint-editor-form">
+      name="endpoint-editor-form" method="post">
 <div id="workArea">
 <table class="styledLeft" cellspacing="0">
     <thead>
