@@ -217,7 +217,7 @@ function onclassnamefieldchange(id) {
 
 function validateClass(className, group, form) {
     var url = '../task/validateclass-ajaxprocessor.jsp?taskClass=' + className + "&taskGroup=" + group;
-    jQuery.get(url, ({}),
+    jQuery.post(url, ({}),
             function(data, status) {
                 if (status != "success") {
                     CARBON.showWarningDialog(taskjsi18n['error.occurred']);

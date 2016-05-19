@@ -167,7 +167,7 @@ function testURL(url) {
     if (url == '') {
         CARBON.showWarningDialog(jsi18n['invalid.address.empty']);
     } else {
-        jQuery.get("ajaxprocessors/testConnection-ajaxprocessor.jsp?type=address&", {'url' : url},
+        jQuery.post("ajaxprocessors/testConnection-ajaxprocessor.jsp?type=address&", {'url' : url},
                    function(data, status) {
                        if (data.replace(/^\s+|\s+$/g, '') == 'success') {
                            CARBON.showInfoDialog(jsi18n['valid.address'] + " " + url);
@@ -260,7 +260,7 @@ function testWSDLConnection(url){
     if (url == '') {
         CARBON.showWarningDialog(jsi18n['wsdl.uri.field.cannot.be.empty']);
     } else {
-       jQuery.get("ajaxprocessors/testConnection-ajaxprocessor.jsp?type=wsdl&", {'url' : url},
+       jQuery.post("ajaxprocessors/testConnection-ajaxprocessor.jsp?type=wsdl&", {'url' : url},
                    function(data, status) {
                        if (data.replace(/^\s+|\s+$/g, '') == 'success') {
                            CARBON.showInfoDialog(jsi18n['valid.address'] + " " + url);

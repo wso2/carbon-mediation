@@ -129,7 +129,7 @@
     <script type="text/javascript">
 
         function validateAndDeleteServer(serverName, validationSucessCallback) {
-            jQuery.get("../cg/has-services_ajaxprocessor.jsp", {'serverName':serverName},
+            jQuery.post("../cg/has-services_ajaxprocessor.jsp", {'serverName':serverName},
                     function (data, status) {
                         var exists = false;
 

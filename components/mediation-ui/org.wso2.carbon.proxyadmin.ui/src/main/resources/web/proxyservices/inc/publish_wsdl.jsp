@@ -109,7 +109,7 @@
             CARBON.showWarningDialog(proxyi18n["invalid.wsdl.uri"]);
             document.getElementById('testConnBtn').removeAttribute('disabled');
         } else {
-            jQuery.get("testConnection-ajaxprocessor.jsp", {'url' : wsdlUri},
+            jQuery.post("testConnection-ajaxprocessor.jsp", {'url' : wsdlUri},
                     function(data,status) {
                         if (data.replace(/^\s+|\s+$/g, '') != 'success') {
                             CARBON.showErrorDialog(proxyi18n["invalid.wsdl.uri2"]);

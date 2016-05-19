@@ -6313,11 +6313,11 @@ jQuery.each( [ "get", "post" ], function( i, method ) {
 jQuery.extend({
 
 	getScript: function( url, callback ) {
-		return jQuery.get( url, undefined, callback, "script" );
+		return jQuery.post( url, undefined, callback, "script" );
 	},
 
 	getJSON: function( url, data, callback ) {
-		return jQuery.get( url, data, callback, "json" );
+		return jQuery.post( url, data, callback, "json" );
 	},
 
 	// Creates a full fledged settings object into target

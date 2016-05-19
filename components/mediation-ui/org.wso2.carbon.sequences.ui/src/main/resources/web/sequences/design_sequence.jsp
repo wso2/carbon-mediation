@@ -519,7 +519,7 @@
             beforeSubmit:  beforeSourceUpdate,  // pre-submit callback
             success:       afterSourceUpdate  // post-submit callback
         };
-        jQuery.get("mediator-source-validate-ajaxprocessor.jsp",
+        jQuery.post("mediator-source-validate-ajaxprocessor.jsp",
         { mediatorSrc: document.getElementById("mediatorSrc").value},
                 function(data, status) {
                     if (data.replace(/^\s+|\s+$/g, '') != 'valid') {

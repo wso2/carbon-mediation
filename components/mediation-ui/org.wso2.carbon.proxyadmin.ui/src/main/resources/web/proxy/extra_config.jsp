@@ -120,7 +120,7 @@
     }
 
     function redeployPS() {
-        jQuery.get("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' : 'redeploy'},
+        jQuery.post("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' : 'redeploy'},
                     function(data,status) {
                         handleProxyCallBack(data, status,
                                 "successfully.redeployed.proxy.service", "unable.to.redeploy.proxy.service", null, null);
@@ -130,13 +130,15 @@
     function statOnOffPS() {
         var command = arguments[1];
         if ("enable" == command) {
-            jQuery.get("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' : 'enableStat'},
+            jQuery.post("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' :
+                    'enableStat'},
                     function(data,status) {
                         handleProxyCallBack(data,status, "successfully.enabled.statistics", "unable.to.enable.statistics",
                                 "disableStat", "enableStat");
                     });
         } else if ("disable" == command) {
-            jQuery.get("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' : 'disableStat'},
+            jQuery.post("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' :
+                    'disableStat'},
                     function(data,status) {
                         handleProxyCallBack(data,status, "successfully.disabled.statistics", "unable.to.disable.statistics",
                                 "enableStat", "disableStat");
@@ -147,14 +149,16 @@
     function traceOnOffPS() {
         var command = arguments[1];
         if ("enable" == command) {
-            jQuery.get("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' : 'enableTrace'},
+            jQuery.post("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' :
+                    'enableTrace'},
                     function(data,status) {
                         handleProxyCallBack(data,status, "successfully.enabled.tracing", "unable.to.enable.tracing",
                                 "disableTracing", "enableTracing");
                         showHideIcon("disableStat", "enableStat");
                     });
         } else if ("disable" == command) {
-            jQuery.get("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' : 'disableTrace'},
+            jQuery.post("../proxyservices/config-ajaxprocessor.jsp", {'psName' : arguments[0], 'operation' :
+                    'disableTrace'},
                     function(data,status) {
                         handleProxyCallBack(data,status, "successfully.disabled.tracing", "unable.to.disable.tracing",
                                 "enableTracing", "disableTracing");

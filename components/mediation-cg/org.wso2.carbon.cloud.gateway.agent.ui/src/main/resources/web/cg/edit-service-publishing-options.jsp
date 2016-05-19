@@ -205,7 +205,8 @@
                     publishingMode = 'automatic';
                 }
                 document.getElementById('rotating_indicator_id').style.display = "";
-                jQuery.get("../cg/publish-service_ajaxprocessor.jsp", {'serviceName':serviceToPublish, 'serverName':serverName, 'action':serviceAction, 'publishMode':publishingMode},
+                jQuery.post("../cg/publish-service_ajaxprocessor.jsp", {'serviceName':serviceToPublish,
+                    'serverName':serverName, 'action':serviceAction, 'publishMode':publishingMode},
                         function (data, status) {
                             handlePublishingCallBack(data, status, 'service-publishing-option-table-id');
                         });
