@@ -73,24 +73,32 @@
         var cell = row.cells[0];
         var content = cell.firstChild.nodeValue;
 
-        function delEp() {
-            document.location.href = "deleteEntriesHandler.jsp?" + "entryName=" + content;
-        }
-
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.entry"/>", delEp);
+        CARBON.showConfirmationDialog('<fmt:message key="do.you.want.to.delete.the.entry"/> ', function () {
+            $.ajax({
+                type: 'POST',
+                url: 'deleteEntriesHandler.jsp',
+                data: 'entryName=' + content,
+                success: function () {
+                    location.href = "index.jsp"
+                },
+                error: function () {
+                    CARBON.showErrorDialog('<fmt:message key="local.entry.delete.failure"/>');
+                }
+            });
+        });
     }
 
     String.prototype.trim = function() {
         return this.replace(/^\s+|\s+$/g, "");
-    }
+    };
 
     String.prototype.ltrim = function() {
         return this.replace(/^\s+/, "");
-    }
+    };
 
     String.prototype.rtrim = function() {
         return this.replace(/\s+$/, "");
-    }
+    };
 
     function editRow(i, name) {
         var table = document.getElementById("myTable");
@@ -140,9 +148,19 @@
     }
 
     function confirmForceDelete(entry, msg) {
-        CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
-                + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            document.location.href = "deleteEntriesHandler.jsp?" + "entryName=" + entry + "&force=true";
+        CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/> <br/><br/>'
+                + msg + '<br/><fmt:message key="force.delete"/>', function () {
+            $.ajax({
+                type: 'POST',
+                url: 'deleteEntriesHandler.jsp',
+                data: "entryName=" + entry + "&force=true",
+                success: function () {
+                    location.href = "index.jsp"
+                },
+                error: function () {
+                    CARBON.showErrorDialog('<fmt:message key="local.entry.delete.failure"/>');
+                }
+            });
         });
     }
 

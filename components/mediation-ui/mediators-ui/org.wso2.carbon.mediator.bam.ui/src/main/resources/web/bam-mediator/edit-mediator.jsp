@@ -66,7 +66,7 @@
 
             function loadServerProfiles(serverProfileLocationPath, serverProfilePath) {
                 jQuery.ajax({
-                                type:"GET",
+                                type:"POST",
                                 url:"../bam-mediator/dropdown_ajaxprocessor.jsp",
                                 data:{action:"getServerProfiles", serverProfilePath:serverProfileLocationPath},
                                 success:function(data){
@@ -82,7 +82,7 @@
 
             function loadStreamNames(serverProfilePath, streamName) {
                 jQuery.ajax({
-                                type:"GET",
+                                type:"POST",
                                 url:"../bam-mediator/dropdown_ajaxprocessor.jsp",
                                 data:{action:"getStreamNames", serverProfilePath:serverProfilePath},
                                 success:function(data){
@@ -99,7 +99,7 @@
 
             function loadStreamVersions(serverProfilePath, streamName, streamVersion) {
                 jQuery.ajax({
-                                type:"GET",
+                                type:"POST",
                                 url:"../bam-mediator/dropdown_ajaxprocessor.jsp",
                                 data:{action:"getStreamVersions", serverProfilePath:serverProfilePath, streamName:streamName},
                                 success:function(data){

@@ -272,7 +272,7 @@
             CARBON.showInfoDialog("Please enter the URL correctly.");
         } else{
             jQuery.ajax({
-                            type:"GET",
+                            type:"POST",
                             url:"../daspubsvcstat/test_server_ajaxprocessor.jsp",
                             data:{action:"testServer", ip:serverIp, port:authPort},
                             success:function(data){

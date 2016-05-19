@@ -50,13 +50,27 @@
 
     <script type="text/javascript">
         function removeServerProfile(profileName){
-            window.location.href = "bam_server_profiles.jsp?serverProfileName=" + profileName + "&action=remove";
+            $.ajax({
+                type: 'POST',
+                url: 'bam_server_profiles.jsp',
+                data: "serverProfileName=" + profileName + "&action=remove",
+                success: function () {
+                    location.href = "bam_server_profiles.jsp"
+                }
+            });
         }
         function editServerProfile(profileName){
             window.location.href = "configure_server_profiles.jsp?txtServerProfileLocation=" + profileName + "&hfAction=load";
         }
         function removeForcefully(profileName){
-            window.location.href = "bam_server_profiles.jsp?serverProfileName=" + profileName + "&action=remove&force=true";
+            $.ajax({
+                type: 'POST',
+                url: 'bam_server_profiles.jsp',
+                data: "serverProfileName=" + profileName + "&action=remove&force=true",
+                success: function () {
+                    location.href = "bam_server_profiles.jsp"
+                }
+            });
         }
         function reloadPage(){
             window.location.href = "bam_server_profiles.jsp";

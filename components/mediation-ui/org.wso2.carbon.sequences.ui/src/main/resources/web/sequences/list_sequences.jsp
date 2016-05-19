@@ -38,7 +38,11 @@
     function confirmForceDelete(sequenceName, msg) {
         CARBON.showConfirmationDialog('<fmt:message key="sequence.dependency.mgt.warning"/><br/><br/>'
                 + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            location.href = "delete_sequence.jsp?sequenceName=" + sequenceName + "&force=true";
+            $.ajax({
+                type: 'POST',
+                url: 'delete_sequence.jsp',
+                data: "sequenceName=" + sequenceName + "&force=true"
+            });
         });
     }
 </script>
@@ -307,7 +311,11 @@
             CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function() {
-                location.href = "delete_sequence.jsp?sequenceName=" + sequenceName;
+                $.ajax({
+                    type: 'POST',
+                    url: 'delete_sequence.jsp',
+                    data: "sequenceName=" + sequenceName
+                });
             });
         }
     }
@@ -334,7 +342,11 @@
             CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function() {
-                location.href = "delete_sequence.jsp?type=registry&sequenceName=" + sequenceName;
+                $.ajax({
+                    type: 'POST',
+                    url: 'delete_sequence.jsp',
+                    data: "type=registry&sequenceName=" + sequenceName
+                });
             });
         }
     }

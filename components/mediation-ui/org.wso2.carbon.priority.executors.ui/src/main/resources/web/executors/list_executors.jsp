@@ -42,6 +42,11 @@
     function deleteExecutor(name) {
         CARBON.showConfirmationDialog('Are you sure you want to delete the executor ' + name + '?', function() {
             window.location.href = "delete_executor.jsp?name=" + name;
+            $.ajax({
+                type: 'POST',
+                url: 'delete_executor.jsp',
+                data: "name=" + name
+            });
         });
     }
 

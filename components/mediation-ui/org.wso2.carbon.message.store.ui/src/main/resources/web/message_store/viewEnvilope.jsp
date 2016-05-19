@@ -77,7 +77,11 @@
         var dlcName = document.getElementById("dlcName").value;
 
         function delEp() {
-            document.location.href = "deleteMessage.jsp?" + "dlcName=" + dlcName + "&messageId=" + content;
+            $.ajax({
+                type: 'POST',
+                url: 'deleteMessage.jsp',
+                data: "dlcName=" + dlcName + "&messageId=" + content
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", delEp);
@@ -92,7 +96,11 @@
         var dlcName = document.getElementById("dlcName").value;
 
         function delEp() {
-            document.location.href = "resendMessage.jsp?" + "dlcName=" + dlcName + "&messageId=" + content;
+            $.ajax({
+                type: 'POST',
+                url: 'resendMessage.jsp',
+                data: "dlcName=" + dlcName + "&messageId=" + content
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", delEp);
@@ -118,7 +126,11 @@
         var messageId = document.getElementById("messageId").value;
 
         function delEp() {
-            document.location.href = "deleteMessage.jsp?" + "messageStoreName=" + msName + "&messageId=" + messageId;
+            $.ajax({
+                type: 'POST',
+                url: 'deleteMessage.jsp',
+                data: "messageStoreName=" + msName + "&messageId=" + messageId
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", delEp);
@@ -129,7 +141,11 @@
         var msName = document.getElementById("msName").value;
 
         function delEp() {
-            document.location.href = "deleteFirstMessage.jsp?" + "messageStoreName=" + msName;
+            $.ajax({
+                type: 'POST',
+                url: 'deleteFirstMessage.jsp',
+                data: "messageStoreName=" + msName
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", delEp);
@@ -171,7 +187,11 @@
     function confirmForceDelete(entry, msg) {
         CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
                 + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            document.location.href = "deleteDLCsHandler.jsp?" + "entryName=" + entry + "&force=true";
+            $.ajax({
+                type: 'POST',
+                url: 'deleteDLCsHandler.jsp',
+                data: "entryName=" + entry + "&force=true"
+            });
         });
     }
 

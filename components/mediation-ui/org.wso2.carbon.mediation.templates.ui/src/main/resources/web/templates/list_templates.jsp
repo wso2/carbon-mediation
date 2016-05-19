@@ -39,8 +39,18 @@
 <script type="text/javascript">
     function confirmForceDelete(sequenceName, msg) {
         CARBON.showConfirmationDialog('<fmt:message key="sequence.dependency.mgt.warning"/><br/><br/>'
-                + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            location.href = "../templates/delete_template.jsp?sequenceName=" + sequenceName + "&force=true";
+                + msg + '<br/><fmt:message key="force.delete"/>', function () {
+            $.ajax({
+                type: 'POST',
+                url: '../templates/delete_template.jsp',
+                data: "sequenceName=" + sequenceName + "&force=true",
+                success: function () {
+                    location.href = "../templates/list_templates.jsp"
+                },
+                error: function () {
+                    CARBON.showErrorDialog('<fmt:message key="force.delete.fault"/>' + ' ' + sequenceName);
+                }
+            });
         });
     }
 </script>
@@ -417,7 +427,6 @@
 
     function deleteRegistryEndpoint(sequenceName) {
         CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function () {
-            location.href = "../templates/delete_template.jsp?type=registry&sequenceName=" + sequenceName + "&templateType=endpoint";
             $.ajax({
                 type: 'POST',
                 url: '../templates/delete_template.jsp',

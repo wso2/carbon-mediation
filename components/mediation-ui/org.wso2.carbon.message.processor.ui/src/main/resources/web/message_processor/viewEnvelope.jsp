@@ -77,7 +77,11 @@
         var dlcName = document.getElementById("dlcName").value;
 
         function delEp() {
-            document.location.href = "deleteMessage.jsp?" + "dlcName=" + dlcName + "&messageId=" + content;
+            $.ajax({
+                type: 'POST',
+                url: 'deleteMessage.jsp',
+                data: "dlcName=" + dlcName + "&messageId=" + content
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", delEp);
@@ -92,7 +96,11 @@
         var dlcName = document.getElementById("dlcName").value;
 
         function delEp() {
-            document.location.href = "resendMessage.jsp?" + "dlcName=" + dlcName + "&messageId=" + content;
+            $.ajax({
+                type: 'POST',
+                url: 'resendMessage.jsp',
+                data: "dlcName=" + dlcName + "&messageId=" + content
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", delEp);
@@ -103,7 +111,11 @@
         var messageId = document.getElementById("messageId").value;
 
         function delEp() {
-            document.location.href = "resendFirstMessage.jsp?" + "processorName=" + processorName + "&messageId=" + messageId;
+            $.ajax({
+                type: 'POST',
+                url: 'resendFirstMessage.jsp',
+                data: "processorName=" + processorName + "&messageId=" + messageId
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.first.message"/>", delEp);
@@ -130,7 +142,11 @@
         var messageId = document.getElementById("messageId").value;
 
         function delEp() {
-            document.location.href = "deleteMessage.jsp?" + "processorName=" + mpName + "&messageId=" + messageId;
+            $.ajax({
+                type: 'POST',
+                url: 'deleteMessage.jsp',
+                data: "processorName=" + mpName + "&messageId=" + messageId
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", delEp);
@@ -141,7 +157,11 @@
         var mpName = document.getElementById("processorName").value;
 
         function delEp() {
-            document.location.href = "deleteFirstMessage.jsp?" + "processorName=" + mpName;
+            $.ajax({
+                type: 'POST',
+                url: 'deleteFirstMessage.jsp',
+                data: "processorName=" + mpName
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.first.messages"/>", delEp);
@@ -183,7 +203,11 @@
     function confirmForceDelete(entry, msg) {
         CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
                 + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            document.location.href = "deleteDLCsHandler.jsp?" + "entryName=" + entry + "&force=true";
+            $.ajax({
+                type: 'POST',
+                url: 'deleteDLCsHandler.jsp',
+                data: "entryName=" + entry + "&force=true"
+            });
         });
     }
 

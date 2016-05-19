@@ -192,7 +192,7 @@
 
             function loadServerProfiles(serverProfileLocationPath, serverProfilePath) {
                 jQuery.ajax({
-                                type:"GET",
+                                type:"POST",
                                 url:"../bam-mediator-config/dropdown_ajaxprocessor.jsp",
                                 data:{action:"getServerProfiles", serverProfilePath:serverProfileLocationPath},
                                 success:function(data){
@@ -229,15 +229,36 @@
                                                 + "txtServerProfileLocation=" + "<%=request.getParameter("txtServerProfileLocation")%>";
 
             function saveOverwrite(){
-                window.location.href = "configure_server_profiles.jsp?" + commonParameterString + "&hfAction=save&force=true";
+                $.ajax({
+                    type: 'POST',
+                    url: 'configure_server_profiles.jsp',
+                    data: commonParameterString + "&hfAction=save&force=true",
+                    success: function () {
+                        location.href = "configure_server_profiles.jsp"
+                    }
+                });
             }
 
-            function removeOverwrite(){
-                window.location.href = "configure_server_profiles.jsp?" + commonParameterString + "&hfAction=remove&force=true";
+            function removeOverwrite() {
+                $.ajax({
+                    type: 'POST',
+                    url: 'configure_server_profiles.jsp',
+                    data: commonParameterString + "&hfAction=remove&force=true",
+                    success: function () {
+                        location.href = "configure_server_profiles.jsp"
+                    }
+                });
             }
 
-            function reloadPage(){
-                window.location.href = "configure_server_profiles.jsp?" + commonParameterString + "&hfAction=load";
+            function reloadPage() {
+                $.ajax({
+                    type: 'POST',
+                    url: 'configure_server_profiles.jsp',
+                    data: commonParameterString + "&hfAction=load",
+                    success: function () {
+                        location.href = "configure_server_profiles.jsp"
+                    }
+                });
             }
 
             function showHideDiv(divId) {
@@ -572,7 +593,7 @@
                     CARBON.showInfoDialog("Please enter the Authentication Port.");
                 } else{
                     jQuery.ajax({
-                                    type:"GET",
+                                    type:"POST",
                                     url:"../bam-mediator-config/dropdown_ajaxprocessor.jsp",
                                     data:{action:"testServer", ip:serverIp, port:authPort},
                                     success:function(data){

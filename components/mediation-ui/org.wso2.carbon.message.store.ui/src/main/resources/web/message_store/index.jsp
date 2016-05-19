@@ -75,7 +75,11 @@
         var content = cell.firstElementChild.innerHTML;
 
         function delEp() {
-            document.location.href = "deleteMessageStoresHandler.jsp?" + "messageStoreName=" + name;
+            $.ajax({
+                type: 'POST',
+                url: 'deleteMessageStoresHandler.jsp',
+                data: "messageStoreName=" + name
+            });
         }
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message.store"/>", delEp);

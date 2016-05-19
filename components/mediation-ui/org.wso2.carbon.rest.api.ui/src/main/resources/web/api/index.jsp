@@ -235,7 +235,11 @@
     
     function deleteApi(apiName) {
          CARBON.showConfirmationDialog("<fmt:message key="api.delete.confirmation"/> " + apiName + "?", function() {
-             location.href = "delete_api.jsp?apiName=" + apiName;
+             $.ajax({
+                 type: 'POST',
+                 url: 'delete_api.jsp',
+                 data: "apiName=" + apiName
+             });
          });
     }
     function searchSequence() {

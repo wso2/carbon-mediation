@@ -253,7 +253,7 @@ function treeColapse(icon) {
 
 function buildResourceTree() {
     jQuery.ajax({
-                    type: "GET",
+                    type: "POST",
                     <% if(isResourceUpdatePending) { %>
                         url: "treeBuilder-ajaxprocessor.jsp?updatePending=true",
                     <% } else { %>
@@ -268,7 +268,7 @@ function buildResourceTree() {
 
 function addResource() {
     jQuery.ajax({
-                    type: "GET",
+                    type: "POST",
                     url: "addResource-ajaxprocessor.jsp",
                     data:  "data=null",
                     success: function(data) {
@@ -284,7 +284,7 @@ function loadResource(index, isUpdatePending) {
     if(isUpdatePending) {
         CARBON.showConfirmationDialog('<fmt:message key="resource.update.pending"/>', function() {
             jQuery.ajax({
-                      type: "GET",
+                      type: "POST",
                       url: "loadResource-ajaxprocessor.jsp?discardResourceData=true",
                       cache: false,
                       data: { index:index },
@@ -299,7 +299,7 @@ function loadResource(index, isUpdatePending) {
         });
     } else {
         jQuery.ajax({
-                    type: "GET",
+                    type: "POST",
                     url: "loadResource-ajaxprocessor.jsp",
                     cache: false,
                     data: { index:index },
