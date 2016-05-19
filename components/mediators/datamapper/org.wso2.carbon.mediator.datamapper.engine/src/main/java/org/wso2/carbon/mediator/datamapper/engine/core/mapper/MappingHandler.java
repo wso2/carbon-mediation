@@ -61,8 +61,8 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         }
 
         if (InputOutputDataType.XML.toString().equals(outputType)) {
-            this.outputXMLMessageBuilder = new OutputXMLMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
-                    mappingResource.getOutputSchema());
+            this.outputXMLMessageBuilder = new OutputXMLMessageBuilder(InputOutputDataType.fromString(outputType),
+                    ModelType.JAVA_MAP, mappingResource.getOutputSchema());
         } else {
             this.outputMessageBuilder =
                     new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,

@@ -16,7 +16,11 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.optimizedReaders;
 
-import org.apache.axiom.om.*;
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMXMLBuilderFactory;
+import org.apache.axiom.om.OMXMLParserWrapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,14 +33,22 @@ import org.wso2.carbon.mediator.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputXMLMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.input.builders.JSONBuilder;
 
-import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.namespace.QName;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.*;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 
 /**
  * This class is capable of parsing XML through AXIOMS for the InputStream and build the respective JSON message
@@ -385,11 +397,6 @@ public class AxiomXMLReader {
             jsonBuilder.writeField(getModifiedFieldName(fieldName), valueString, fieldType);
 
         }
-
-        //        if (!fieldName.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX)) {
-        //            schemaElementList.remove(schemaElementList.size() - 1);
-        //        }
-
     }
 
     private void writeObjectStartElement(String fieldName)
