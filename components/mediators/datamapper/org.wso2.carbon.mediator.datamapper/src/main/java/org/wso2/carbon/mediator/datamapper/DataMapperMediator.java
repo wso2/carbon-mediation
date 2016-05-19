@@ -289,7 +289,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 JsonUtil.newJsonPayload(axis2MessageContext, outputResult, true, true);
             }
         } catch (ReaderException | InterruptedException | XMLStreamException | SchemaException
-                | IOException | WriterException e) {
+                | IOException | JSException | WriterException e ) {
             handleException("DataMapper mediator : mapping failed", e, synCtx);
         }
     }

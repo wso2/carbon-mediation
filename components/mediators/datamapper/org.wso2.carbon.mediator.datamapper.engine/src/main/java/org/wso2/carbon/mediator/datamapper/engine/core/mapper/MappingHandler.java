@@ -32,8 +32,10 @@ import org.wso2.carbon.mediator.datamapper.engine.output.OutputXMLMessageBuilder
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class MappingHandler implements InputVariableNotifier, OutputVariableNotifier {
 
@@ -43,7 +45,6 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
     private MappingResource mappingResource;
     private OutputMessageBuilder outputMessageBuilder;
     private Executor scriptExecutor;
-    private InputModelBuilder inputModelBuilder;
     private InputXMLMessageBuilder inputXMLMessageBuilder;
     private OutputXMLMessageBuilder outputXMLMessageBuilder;
     private String outputType;
@@ -55,9 +56,6 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
 
         if (InputOutputDataType.XML.toString().equals(inputType)) {
             this.inputXMLMessageBuilder = new InputXMLMessageBuilder(mappingResource.getInputSchema());
-        } else {
-            this.inputModelBuilder = new InputModelBuilder(InputOutputDataType.fromString(inputType),
-                    ModelType.JSON_STRING, mappingResource.getInputSchema());
         }
 
         if (InputOutputDataType.XML.toString().equals(outputType)) {
@@ -73,9 +71,10 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         this.mappingResource = mappingResource;
     }
 
-    public String doMap(InputStream inputMsg) throws ReaderException, InterruptedException {
+    public String doMap(InputStream inputMsg)
+            throws ReaderException, InterruptedException, IOException, SchemaException, JSException {
         this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
-        this.inputModelBuilder.buildInputModel(inputMsg, this);
+        notifyInputVariable(readFromInputStream(inputMsg));
         return outputVariable;
     }
 
@@ -99,17 +98,52 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         outputVariable = (String) variable;
     }
 
+    /**
+     * This will be used to build a JSON message from an input XML message
+     *
+     * @param inputMsg XML message InputStream
+     * @return Output message as a String
+     * @throws ReaderException
+     * @throws InterruptedException
+     */
     public String XMLOptimized_doMap(InputStream inputMsg) throws ReaderException, InterruptedException {
         this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
         this.inputXMLMessageBuilder.buildInputModel(inputMsg, this);
         return outputVariable;
     }
 
+    /**
+     * This method will decide the suitable output builder based on the request output type
+     *
+     * @param outputModel Model returned by the script engine
+     * @throws SchemaException
+     * @throws WriterException
+     */
     public void buildOutputMessage (Model outputModel) throws SchemaException, WriterException {
         if (InputOutputDataType.XML.toString().equals(outputType)){
             outputXMLMessageBuilder.buildOutputMessage(outputModel,this);
         } else {
             outputMessageBuilder.buildOutputMessage(outputModel, this);
         }
+    }
+
+    /**
+     * Method added to convert the input directly into a string and to return
+     * This method is used only when the JSON input is present
+     *
+     * @param inputStream JSON message as a InputStream
+     * @return JSON message as a String
+     * @throws IOException
+     */
+    private String readFromInputStream(InputStream inputStream) throws IOException {
+        InputStreamReader isr = new InputStreamReader((inputStream));
+        BufferedReader br = new BufferedReader(isr);
+
+        StringBuilder out = new StringBuilder("");
+        String line;
+        while ((line = br.readLine()) != null) {
+            out.append(line);
+        }
+        return out.toString();
     }
 }
