@@ -245,7 +245,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
             //execute mapping on the input stream
             if (InputOutputDataType.XML.toString().equals(outputType)) {
-                outputResult = mappingHandler.XMLOptimized_doMap(
+                outputResult = mappingHandler.doMapXML(
                         getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
             } else {
                 outputResult = mappingHandler.doMap(

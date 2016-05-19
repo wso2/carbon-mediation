@@ -106,7 +106,7 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
      * @throws ReaderException
      * @throws InterruptedException
      */
-    public String XMLOptimized_doMap(InputStream inputMsg) throws ReaderException, InterruptedException {
+    public String doMapXML(InputStream inputMsg) throws ReaderException, InterruptedException {
         this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
         this.inputXMLMessageBuilder.buildInputModel(inputMsg, this);
         return outputVariable;
