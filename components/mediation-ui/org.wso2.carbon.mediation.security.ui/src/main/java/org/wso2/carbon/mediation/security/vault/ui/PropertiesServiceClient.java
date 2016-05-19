@@ -78,7 +78,7 @@ public class PropertiesServiceClient {
 			//
 			securityAdminServiceStub = new MediationSecurityAdminServiceStub(configContext, mediationSecurityEPR);
 
-			ServiceClient securityclient = propertAdminServicestub._getServiceClient();
+			ServiceClient securityclient = securityAdminServiceStub._getServiceClient();
 			Options securityoption = securityclient.getOptions();
 			securityoption.setManageSession(true);
 			securityoption.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
