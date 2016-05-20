@@ -53,14 +53,14 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 /**
  * This class is capable of parsing XML through AXIOMS for the InputStream and build the respective JSON message
  */
-public class AxiomXMLReader implements InputReader {
+public class XMLInputReader implements InputReader {
 
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACES = "http://xml.org/sax/features/namespaces";
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACE_PREFIXES =
             "http://xml" + ".org/sax/features/namespace-prefixes";
     public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
     public static final String XMLNS = "xmlns";
-    private static final Log log = LogFactory.getLog(AxiomXMLReader.class);
+    private static final Log log = LogFactory.getLog(XMLInputReader.class);
 
     /* Reference of the InputXMLMessageBuilder object to send the built JSON message */
     private InputBuilder messageBuilder;
@@ -93,7 +93,7 @@ public class AxiomXMLReader implements InputReader {
      *
      * @throws IOException
      */
-    public AxiomXMLReader() throws IOException {
+    public XMLInputReader() throws IOException {
         this.schemaElementList = new ArrayList();
         this.jsonBuilder = new JSONBuilder();
         this.isPrevElementArray = false;
