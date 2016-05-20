@@ -322,6 +322,11 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         return true;
     }
 
+    @Override
+    public boolean isContentAltering() {
+        return true;
+    }
+
     @Override public void init(SynapseEnvironment se) {
 
     }
