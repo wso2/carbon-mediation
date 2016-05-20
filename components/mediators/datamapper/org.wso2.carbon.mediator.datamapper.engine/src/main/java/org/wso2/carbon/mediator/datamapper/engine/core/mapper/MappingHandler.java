@@ -25,7 +25,6 @@ import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutorF
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
-import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputXMLMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputXMLMessageBuilder;
@@ -59,8 +58,7 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         }
 
         if (InputOutputDataType.XML.toString().equals(outputType)) {
-            this.outputXMLMessageBuilder = new OutputXMLMessageBuilder(InputOutputDataType.fromString(outputType),
-                    ModelType.JAVA_MAP, mappingResource.getOutputSchema());
+            this.outputXMLMessageBuilder = new OutputXMLMessageBuilder(mappingResource.getOutputSchema());
         } else {
             this.outputMessageBuilder =
                     new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
