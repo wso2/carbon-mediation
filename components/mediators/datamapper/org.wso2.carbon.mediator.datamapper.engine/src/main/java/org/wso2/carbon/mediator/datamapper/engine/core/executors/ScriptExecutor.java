@@ -83,6 +83,7 @@ public class ScriptExecutor implements Executor {
     }
 
     private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
-        scriptEngine.eval("var input" + inputSchemaName.replace(':', '_') + "=" + inputVariable);
+        scriptEngine.eval("var input" + inputSchemaName.replace(':', '_').replace('=', '_').replace(',', '_') + "="
+                + inputVariable);
     }
 }
