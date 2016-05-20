@@ -147,10 +147,15 @@ public class EventSink {
 			throw new EventSinkException("Failed to decrypt password");
 		}
 		eventSink.setName(name);
+
+		String authenticationUrlSet = null;
+		if(eventSink.getAuthenticationUrlSet().trim().length() > 0){
+			authenticationUrlSet = eventSink.getAuthenticationUrlSet();
+		}
 		try {
 			eventSink.setDataPublisher(
 					new DataPublisher(DataEndpointConstants.THRIFT_DATA_AGENT_TYPE, eventSink.getReceiverUrlSet(),
-					                  eventSink.getAuthenticationUrlSet(), eventSink.getUsername(),
+					                  authenticationUrlSet, eventSink.getUsername(),
 					                  eventSink.getPassword()));
 		} catch (DataEndpointAgentConfigurationException | DataEndpointException | DataEndpointConfigurationException
 				| DataEndpointAuthenticationException | TransportException e) {

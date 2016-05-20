@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.task.Task;
 import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.ntask.core.AbstractTask;
 import org.wso2.carbon.ntask.core.TaskInfo;
@@ -63,6 +64,13 @@ public class NTaskAdapter extends AbstractTask {
         if (!(taskInstance instanceof Task)) {
             return;
         }
+
+        // Add runtimeProperties
+        if(taskInstance instanceof org.apache.synapse.startup.tasks.MessageInjector){
+            org.apache.synapse.startup.tasks.MessageInjector messageInjectorTask = (org.apache.synapse.startup.tasks.MessageInjector) taskInstance;
+            messageInjectorTask.addRuntimeProperty(Constants.TASK_EXECUTING_TENANT_ID, PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
+        }
+
         synapseTask = (Task) taskInstance;
         initialized = true;
     }

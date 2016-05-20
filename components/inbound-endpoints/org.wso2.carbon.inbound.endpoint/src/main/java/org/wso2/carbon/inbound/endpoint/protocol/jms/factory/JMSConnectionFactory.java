@@ -78,7 +78,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         try {
             ctx = new InitialContext(properties);
         } catch (NamingException e) {
-            logger.error("NamingException while obtaining initial context. " + e.getMessage());
+            logger.error("NamingException while obtaining initial context. " + e.getMessage(), e);
         }
 
         String connectionFactoryType = properties.getProperty(JMSConstants.CONNECTION_FACTORY_TYPE);
@@ -187,7 +187,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             }
         } catch (NamingException e) {
             logger.error("Naming exception while obtaining connection factory for '"
-                    + this.connectionFactoryString + "'");
+                    + this.connectionFactoryString + "'", e);
         }
 
         return this.connectionFactory;
@@ -199,7 +199,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
     public Connection createConnection() {
         if (connectionFactory == null) {
-            logger.error("Connection cannot bb establish to the broke. Plese check the broker libs provided.");
+            logger.error("Connection cannot be establish to the broker. Please check the broker libs provided.");
             return null;
         }
         Connection connection = null;
@@ -234,7 +234,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             }
         } catch (JMSException e) {
 			logger.error("JMS Exception while creating connection through factory '" +
-			             this.connectionFactoryString + "' " + e.getMessage());
+			             this.connectionFactoryString + "' " + e.getMessage(), e);
 			// Need to close the connection in the case if durable subscriptions
 			if (connection != null) {
 				try {
@@ -300,7 +300,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             return ((QueueConnectionFactory) (this.connectionFactory)).createQueueConnection();
         } catch (JMSException e) {
             logger.error("JMS Exception while creating queue connection through factory '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+                    + this.connectionFactoryString + "' " + e.getMessage(), e);
         }
         return null;
     }
@@ -312,7 +312,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                     userName, password);
         } catch (JMSException e) {
             logger.error("JMS Exception while creating queue connection through factory '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+                    + this.connectionFactoryString + "' " + e.getMessage(), e);
         }
 
         return null;
@@ -323,7 +323,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             return ((TopicConnectionFactory) (this.connectionFactory)).createTopicConnection();
         } catch (JMSException e) {
             logger.error("JMS Exception while creating topic connection through factory '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+                    + this.connectionFactoryString + "' " + e.getMessage(), e);
         }
 
         return null;
@@ -336,7 +336,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                     userName, password);
         } catch (JMSException e) {
             logger.error("JMS Exception while creating topic connection through factory '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+                    + this.connectionFactoryString + "' " + e.getMessage(), e);
         }
 
         return null;
@@ -384,7 +384,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 }
             }
         } catch (JMSException e) {
-            logger.error("JMS Exception while creating consumer. " + e.getMessage());
+            logger.error("JMS Exception while creating consumer. " + e.getMessage(), e);
         }
         return null;
     }
@@ -447,7 +447,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             } catch (JMSException e1) {
                 logger.error("Could not find nor create '" + destinationName
                         + "' on connection factory for '" + this.connectionFactoryString + "'. "
-                        + e.getMessage());
+                        + e.getMessage(), e);
             } finally {
                 try {
                     createSession.close();
@@ -458,7 +458,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
 
         } catch (NamingException e) {
             logger.error("Naming exception while obtaining connection factory for '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+                    + this.connectionFactoryString + "' " + e.getMessage(), e);
         }
 
         return destination;
@@ -484,7 +484,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             }
         } catch (JMSException e) {
             logger.error("JMS Exception while obtaining session for factory '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+                    + this.connectionFactoryString + "' " + e.getMessage(), e);
         }
 
         return null;
@@ -495,7 +495,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             connection.start();
         } catch (JMSException e) {
             logger.error("JMS Exception while starting connection for factory '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+                    + this.connectionFactoryString + "' " + e.getMessage(), e);
         }
     }
 
@@ -504,7 +504,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             connection.stop();
         } catch (JMSException e) {
             logger.error("JMS Exception while stopping connection for factory '"
-                    + this.connectionFactoryString + "' " + e.getMessage());
+                    + this.connectionFactoryString + "' " + e.getMessage(), e);
         }
     }
 
