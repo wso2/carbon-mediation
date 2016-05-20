@@ -58,7 +58,7 @@ public class JSONInputReader implements InputReader {
      * @param messageBuilder Reference of the InputXMLMessageBuilder
      * @throws ReaderException Exceptions in the parsing stage
      */
-    public void read(InputStream input, Schema inputSchema, InputBuilder messageBuilder)
+    @Override public void read(InputStream input, Schema inputSchema, InputBuilder messageBuilder)
             throws ReaderException {
         String inputJSONMessage ;
         try {
