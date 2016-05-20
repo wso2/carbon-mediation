@@ -14,7 +14,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.carbon.mediator.datamapper.engine.input.optimizedReaders;
+package org.wso2.carbon.mediator.datamapper.engine.input.readers;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
@@ -30,7 +30,7 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderExceptio
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.SchemaElement;
-import org.wso2.carbon.mediator.datamapper.engine.input.InputXMLMessageBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.input.InputBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.input.builders.JSONBuilder;
 
 import java.io.IOException;
@@ -53,7 +53,7 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 /**
  * This class is capable of parsing XML through AXIOMS for the InputStream and build the respective JSON message
  */
-public class AxiomXMLReader {
+public class AxiomXMLReader implements InputReader {
 
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACES = "http://xml.org/sax/features/namespaces";
     public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACE_PREFIXES =
@@ -63,7 +63,7 @@ public class AxiomXMLReader {
     private static final Log log = LogFactory.getLog(AxiomXMLReader.class);
 
     /* Reference of the InputXMLMessageBuilder object to send the built JSON message */
-    private InputXMLMessageBuilder messageBuilder;
+    private InputBuilder messageBuilder;
 
     /* JSON schema of the input message */
     private Schema inputSchema;
@@ -107,7 +107,7 @@ public class AxiomXMLReader {
      * @param messageBuilder Reference of the InputXMLMessageBuilder
      * @throws ReaderException Exceptions in the parsing stage
      */
-    public void read(InputStream input, Schema inputSchema, InputXMLMessageBuilder messageBuilder)
+    public void read(InputStream input, Schema inputSchema, InputBuilder messageBuilder)
             throws ReaderException {
 
         this.messageBuilder = messageBuilder;

@@ -243,14 +243,9 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             MappingHandler mappingHandler = new MappingHandler(mappingResource, inputType, outputType,
                     dmExecutorPoolSize);
 
-            //execute mapping on the input stream
-            if (InputOutputDataType.XML.toString().equals(outputType)) {
-                outputResult = mappingHandler.doMapXML(
+            /* execute mapping on the input stream */
+            outputResult = mappingHandler.doMap(
                         getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
-            } else {
-                outputResult = mappingHandler.doMap(
-                        getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
-            }
 
             if (InputOutputDataType.XML.toString().equals(outputType)) {
                 OMElement outputMessage = AXIOMUtil.stringToOM(outputResult);
