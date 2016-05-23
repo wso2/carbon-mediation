@@ -69,7 +69,6 @@ public class XMLInputReader implements InputReader {
     private Schema inputSchema;
 
     /* Name and NamespaceURI of the currently processing XML element */
-    private String nameSpaceLocalName;
     private String localName;
     private String nameSpaceURI;
 
@@ -117,7 +116,7 @@ public class XMLInputReader implements InputReader {
         OMElement root = parserWrapper.getDocumentElement();
 
         try {
-            XMLTraverse(root);
+            XMLTraverse(root, null);
             jsonBuilder.writeEndObject();
             writeTerminateElement();
         } catch (IOException e) {
@@ -136,6 +135,7 @@ public class XMLInputReader implements InputReader {
      * This method will perform a Depth First Search on the XML message and build the json message
      *
      * @param omElement initially the root element will be passed-in
+     * @param prevElementName name of the previous element only if the previous element was an array, a null otherwise
      * @return true it is an array element, otherwise false
      * @throws IOException
      * @throws ReaderException
@@ -143,7 +143,7 @@ public class XMLInputReader implements InputReader {
      * @throws JSException
      * @throws InvalidPayloadException
      */
-    public boolean XMLTraverse(OMElement omElement)
+    public String XMLTraverse(OMElement omElement, String prevElementName)
             throws IOException, ReaderException, SchemaException, JSException, InvalidPayloadException {
 
         /** isObject becomes true if the current element is an object, therefor object end element can be written at
@@ -152,7 +152,8 @@ public class XMLInputReader implements InputReader {
 
         /** isArrayParent becomes true if it is a parent of an Array element. So that it can close the array before
          * closing itself as object */
-        boolean isArrayParent = false;
+
+        String prevElementNameSpaceLocalName = null;
 
         String elementType;
 
@@ -162,15 +163,21 @@ public class XMLInputReader implements InputReader {
         /* Reading parameters of the currently processing OMElement */
         localName = omElement.getLocalName();
         nameSpaceURI = this.getNameSpaceURI(omElement);
-        nameSpaceLocalName = getNamespacesAndIdentifiersAddedFieldName(nameSpaceURI, localName, omElement);
+        String nameSpaceLocalName = getNamespacesAndIdentifiersAddedFieldName(nameSpaceURI, localName, omElement);
 
         schemaElementList.add(new SchemaElement(nameSpaceLocalName, nameSpaceURI));
         elementType = getInputSchema().getElementTypeByName(schemaElementList);
 
+        /* if this is new object preceding an array, close the array before writing the new element */
+        if (prevElementName != null && !nameSpaceLocalName.equals(prevElementName)) {
+            writeArrayEndElement();
+            prevElementName = null;
+        }
+
         if (nameSpaceLocalName.equals(getInputSchema().getName())) {
             writeAnonymousObjectStartElement();
         } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
-            if (!isPrevElementArray) {
+            if (prevElementName == null) {
                 writeArrayStartElement(nameSpaceLocalName);
             }
             writeAnonymousObjectStartElement();
@@ -185,20 +192,20 @@ public class XMLInputReader implements InputReader {
         /* writing attributes to the JSON message */
         it_attr = omElement.getAllAttributes();
         if (it_attr.hasNext()) {
-            writeAttributes(elementType);
+            writeAttributes(elementType, nameSpaceLocalName);
         }
 
         it = omElement.getChildElements();
 
         /* Recursively call all the children */
         while (it.hasNext()) {
-            isArrayParent = XMLTraverse(it.next());
+            prevElementNameSpaceLocalName = XMLTraverse(it.next(), prevElementNameSpaceLocalName);
         }
 
         schemaElementList.remove(schemaElementList.size() - 1);
 
         /* Closing the opened JSON objects and arrays */
-        if (isArrayParent) {
+        if (prevElementNameSpaceLocalName != null) {
             writeArrayEndElement();
         }
 
@@ -207,12 +214,9 @@ public class XMLInputReader implements InputReader {
         }
 
         if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
-            isPrevElementArray = true;
-            return true;
-        } else {
-            isPrevElementArray = false;
+            return nameSpaceLocalName;
         }
-        return false;
+        return null;
     }
 
     /**
@@ -247,13 +251,14 @@ public class XMLInputReader implements InputReader {
      * This method writes attribute elements into the JSON input message
      *
      * @param elementType type of the parent element
+     * @param nameSpaceLocalName name of the parent element
      * @throws JSException
      * @throws SchemaException
      * @throws ReaderException
      * @throws IOException
      * @throws InvalidPayloadException
      */
-    private void writeAttributes(String elementType)
+    private void writeAttributes(String elementType, String nameSpaceLocalName)
             throws JSException, SchemaException, ReaderException, IOException, InvalidPayloadException {
 
         /* object will be opened if the parent element is field type*/
