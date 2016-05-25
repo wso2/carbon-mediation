@@ -27,7 +27,6 @@ import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNo
 import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
-import org.wso2.carbon.mediator.datamapper.engine.output.OutputXMLMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
 
@@ -43,24 +42,16 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
     private OutputMessageBuilder outputMessageBuilder;
     private Executor scriptExecutor;
     private InputBuilder inputBuilder;
-    private OutputXMLMessageBuilder outputXMLMessageBuilder;
-    private String outputType;
 
     public MappingHandler(MappingResource mappingResource, String inputType, String outputType,
                           String dmExecutorPoolSize) throws IOException, SchemaException, WriterException {
 
-        this.outputType = outputType;
-
         this.inputBuilder = new InputBuilder(InputOutputDataType.fromString(inputType),
                 mappingResource.getInputSchema());
 
-        if (InputOutputDataType.XML.toString().equals(outputType)) {
-            this.outputXMLMessageBuilder = new OutputXMLMessageBuilder(mappingResource.getOutputSchema());
-        } else {
-            this.outputMessageBuilder =
+        this.outputMessageBuilder =
                     new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
                             mappingResource.getOutputSchema());
-        }
 
         this.dmExecutorPoolSize = dmExecutorPoolSize;
         this.mappingResource = mappingResource;
@@ -78,7 +69,7 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         Model outputModel = scriptExecutor.execute(mappingResource, inputVariable);
         try {
             releaseExecutor();
-            buildOutputMessage(outputModel);
+            outputMessageBuilder.buildOutputMessage(outputModel, this);
         } catch (InterruptedException | WriterException e) {
             throw new ReaderException(e.getMessage());
         }
@@ -93,18 +84,4 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         outputVariable = (String) variable;
     }
 
-    /**
-     * This method will decide the suitable output builder based on the request output type
-     *
-     * @param outputModel Model returned by the script engine
-     * @throws SchemaException
-     * @throws WriterException
-     */
-    public void buildOutputMessage (Model outputModel) throws SchemaException, WriterException {
-        if (InputOutputDataType.XML.toString().equals(outputType)){
-            outputXMLMessageBuilder.buildOutputMessage(outputModel,this);
-        } else {
-            outputMessageBuilder.buildOutputMessage(outputModel, this);
-        }
-    }
 }
