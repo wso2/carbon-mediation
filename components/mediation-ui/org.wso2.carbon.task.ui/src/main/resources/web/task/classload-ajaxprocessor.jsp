@@ -101,9 +101,9 @@
                 </select>
             </td>
             <td>
-                <input id="textField<%=i%>" name="textField<%=i%>" type="text" class="longInput"/>
+                <input id="textField<%=i%>" name="textField<%=i%>" type="text" class="longInput" for-label="<%=name%>"/>
                 <textarea id="textArea<%=i%>" name="textArea<%=i%>" class="longInput"
-                          style="display:none;"></textarea>
+                          style="display:none;" for-label="<%=name%>"></textarea>
             </td>
 
 

@@ -81,28 +81,37 @@ function tasksave(namemsg, classmsg, cronmsg, countmsg, intervalmsg, msgEntryInf
     // whether message exists or not when using org.apache.synapse.startup.tasks.MessageInjector class, as if message is
     // not set there will be an exception thrown in the console
     if ((document.getElementById('taskClass') != null) && (document.getElementById('taskClass').value.trim() == 'org.apache.synapse.startup.tasks.MessageInjector')) {
-        var propertyTable = document.getElementById('property_table');
-        if (propertyTable != null) {
-            var propertyTableRows = propertyTable.getElementsByTagName('tr');
-            if (propertyTableRows != null) {
-                for (var i = 0; i < propertyTableRows.length; i++) {
-                    var inputs = propertyTableRows[i].getElementsByTagName('input');
-                    if ((inputs != null) && (inputs.length > 0)) {
-                        if (inputs[0].value.trim() == 'message') {
-                            if (propertyTableRows[i].getElementsByTagName('textarea')[0].value.trim() != '') {
-                                break;
-                            }
-                            if (inputs[2].value.trim() != '') {
-                                break;
-                            }
-                            CARBON.showWarningDialog(msgEntryInfo);
-                            return false;
-                        }
-                    }
-                }
-            }
-        } else {
+
+        if (document.getElementById('property_table') == null){
             CARBON.showWarningDialog(propertyTableErrorMsg);
+            return false;
+        }
+
+        var valid = false;
+
+        if(document.querySelectorAll('[for-label=registryKey]').length > 0) {
+           var regKeyInInputField = document.querySelectorAll('input[for-label=registryKey]')[0].value.trim() != '';
+           var regKeyInTextAreaField = document.querySelectorAll('textarea[for-label=registryKey]')[0].value.trim() != '';
+
+           if (regKeyInInputField || regKeyInTextAreaField) {
+                valid = true;
+           }
+
+        }
+
+        if (document.querySelectorAll('[for-label=message]').length > 0) {
+
+            var messageInInputField = document.querySelectorAll('input[for-label=message]')[0].value.trim() != '';
+            var messageInTextAreaField = document.querySelectorAll('textarea[for-label=message]')[0].value.trim() != '';
+
+            if (messageInInputField || messageInTextAreaField) {
+                valid = true;
+            }
+
+        }
+
+        if (!valid) {
+            CARBON.showWarningDialog(msgEntryInfo);
             return false;
         }
     }

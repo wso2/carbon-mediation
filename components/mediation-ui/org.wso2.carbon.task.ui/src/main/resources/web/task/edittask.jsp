@@ -223,9 +223,9 @@
                     <td>
                         <input id="textField<%=i%>" name="textField<%=i%>" type="text"
                                value="<%=value%>"
-                               style="<%=textFieldStyle%>" class="longInput"/>
+                               style="<%=textFieldStyle%>" class="longInput" for-label="<%=propName%>"/>
                         <textarea id="textArea<%=i%>" name="textArea<%=i%>" class="longInput"
-                                  style="<%=textAreaStyle%>"><%=xmlString%>
+                                  style="<%=textAreaStyle%>" for-label="<%=propName%>"><%=xmlString%>
                         </textarea>
                     </td>
                     <td valign="top"><a href="#" class="delete-icon-link-nofloat"
