@@ -34,6 +34,7 @@ import org.wso2.carbon.ndatasource.ui.stub.core.services.xsd.WSDataSourceInfo;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MessageStoreAdminServiceClient {
 
@@ -338,6 +339,18 @@ public class MessageStoreAdminServiceClient {
         }
 
         return sourceList;
+    }
+
+    public boolean isMBbased(String name) throws Exception{
+        if ("org.apache.synapse.message.store.impl.jms.JmsStore".equals(getClassName(name))) {
+            MessageStoreData data = getMessageStore(name);
+            Map<String, String> paramsMap = data.getParams();
+            // Only WSO2MB directly integrated stores must contain the following parameter
+            if(paramsMap.containsKey("connectionfactory.QueueConnectionFactory")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void handleException(Exception e) throws Exception {

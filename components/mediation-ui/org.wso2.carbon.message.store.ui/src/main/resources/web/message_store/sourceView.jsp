@@ -141,7 +141,11 @@
         String designViewUrl = "";
 
         if (provider.equals("org.apache.synapse.message.store.impl.jms.JmsStore")) {
-            designViewUrl = "jmsMessageStore.jsp?origin=source";
+            if ((session.getAttribute("MBbased") != null) && ((Boolean) session.getAttribute("MBbased") == true)) {
+                designViewUrl = "wso2mbMessageStore.jsp?origin=source";
+            } else {
+                designViewUrl = "jmsMessageStore.jsp?origin=source";
+            }
         } else if (provider.equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) {
             designViewUrl = "rabbitmqMessageStore.jsp?origin=source";
         } else if (provider.equals("org.apache.synapse.message.store.impl.memory.InMemoryStore")) {

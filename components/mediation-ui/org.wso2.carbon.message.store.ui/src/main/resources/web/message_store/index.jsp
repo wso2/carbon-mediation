@@ -93,13 +93,18 @@
         return this.replace(/\s+$/, "");
     }
 
-    function editRow(i, storeType, name) {
+    function editRow(i, storeType, name, isMBbased) {
         var table = document.getElementById("myTable");
         var row = table.rows[i];
         var cell = row.cells[0];
         var type = row.cells[1];
         if (storeType == "org.apache.synapse.message.store.impl.jms.JmsStore") {
-            document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + name;
+            if (isMBbased) {
+                document.location.href = "wso2mbMessageStore.jsp?" + "messageStoreName=" + name;
+            }
+            else {
+                document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + name;
+            }
         } else if (storeType == "org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore") {
             document.location.href = "rabbitmqMessageStore.jsp?" + "messageStoreName=" + name;
         } else if (storeType == "org.apache.synapse.message.store.impl.memory.InMemoryStore") {
@@ -111,13 +116,17 @@
         }
     }
 
-    function editCAppStore(i, storeType,name) {
+    function editCAppStore(i, storeType, name, isMBbased) {
         CARBON.showConfirmationDialog('<fmt:message key="edit.artifactContainer.store.on.page.prompt"/>', function() {
             $.ajax({
                 type: 'POST',
                 success: function() {
                     if (storeType == "org.apache.synapse.message.store.impl.jms.JmsStore") {
-                        document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + name;
+                        if (isMBbased) {
+                            document.location.href = "wso2mbMessageStore.jsp?" + "messageStoreName=" + name;
+                        } else {
+                            document.location.href = "jmsMessageStore.jsp?" + "messageStoreName=" + name;
+                        }
                     } else if (storeType == "org.apache.synapse.message.store.impl.memory.InMemoryStore") {
                         document.location.href = "inMemoryMessageStore.jsp?" + "messageStoreName=" + name;
                     } else {
@@ -231,9 +240,11 @@
                             String name = msData.getName();
                             String type = "Not defined";
                             int size = 0;
+                            boolean isMBbased = false;
                             try {
                                 size = client.getSize(name);
                                 type = client.getClassName(name);
+                                isMBbased = client.isMBbased(name);
                             } catch (Exception e) {
 
                             }
@@ -274,7 +285,7 @@
 
                         <td>
                             <% if (msData.getArtifactContainerName() != null) { %>
-                            <a onclick="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"return false":"editCAppStore(this.parentNode.parentNode.rowIndex,"+"'" + type + "',"+"'" + name + "');"%>"
+                            <a onclick="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"return false":"editCAppStore(this.parentNode.parentNode.rowIndex,"+"'" + type + "',"+"'" + name + "',"+"'" + isMBbased + "');"%>"
                                class="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"icon-link-disabled":"icon-link"%>"
                                style="background-image:url(../admin/images/edit.gif);" href="#"><fmt:message
                                     key="edit"/></a>
@@ -284,7 +295,7 @@
                                style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                                     key="delete"/></a>
                             <% } else {%>
-                            <a onclick="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"return false":"editRow(this.parentNode.parentNode.rowIndex,"+"'" + type + "',"+"'" + name + "');"%>"
+                            <a onclick="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"return false":"editRow(this.parentNode.parentNode.rowIndex,"+"'" + type + "',"+"'" + name + "',"+"'" + isMBbased + "');"%>"
                                class="<%=("org.apache.synapse.message.store.impl.memory.InMemoryStore".equals(type.trim()))?"icon-link-disabled":"icon-link"%>"
                                style="background-image:url(../admin/images/edit.gif);" href="#"><fmt:message
                                     key="edit"/></a>
@@ -344,6 +355,18 @@
                         </td>
                         <td>
                             <fmt:message key="jms.message.store.desc"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a class="icon-link"
+                               href="wso2mbMessageStore.jsp"
+                               style="background-image: url(../admin/images/add.gif);">
+                                <fmt:message key="wso2mb.message.store"/>
+                            </a>
+                        </td>
+                        <td>
+                            <fmt:message key="wso2mb.message.store.desc"/>
                         </td>
                     </tr>
                     <tr>
