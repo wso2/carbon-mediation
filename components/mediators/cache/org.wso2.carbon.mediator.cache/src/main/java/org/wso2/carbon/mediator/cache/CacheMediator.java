@@ -271,7 +271,11 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
 							(Map) msgCtx.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
 					String messageType = (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
 					Map<String, Object> headerProperties = new HashMap<String, Object>();
-					headerProperties.put(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headers);
+					//Individually copying All TRANSPORT_HEADERS to headerProperties Map instead putting whole
+					//TRANSPORT_HEADERS map as single Key/Value pair to fix hazelcast serialization issue.
+					for (Map.Entry<String, String> entry : headers.entrySet()) {
+						headerProperties.put(entry.getKey(), entry.getValue());
+					}
 					headerProperties.put(Constants.Configuration.MESSAGE_TYPE, messageType);
 					response.setHeaderProperties(headerProperties);
 				}
@@ -359,8 +363,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
 							omSOAPEnv = SOAPMessageHelper.buildSOAPEnvelopeFromBytes(responseEnvelop, cachedResponse.isSOAP11());
 							msgCtx.removeProperty("NO_ENTITY_BODY");
 							msgCtx.removeProperty(Constants.Configuration.CONTENT_TYPE);
-							msgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
-							                   headerProperties.get(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS));
+							msgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headerProperties);
 							msgCtx.setProperty(Constants.Configuration.MESSAGE_TYPE,
 							                   headerProperties.get(Constants.Configuration.MESSAGE_TYPE));
 						}
