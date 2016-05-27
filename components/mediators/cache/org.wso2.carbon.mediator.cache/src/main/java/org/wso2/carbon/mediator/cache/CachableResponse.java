@@ -86,7 +86,7 @@ public class CachableResponse implements Serializable {
 	/**
 	 * This holds the HTTP Header Properties of the response.
 	 * */
-	private transient Map<String,Object> headerProperties;
+	private Map<String,Object> headerProperties;
 
 	/**
 	 * This method checks whether this cached response is expired or not
