@@ -229,7 +229,7 @@ public class RabbitMQConnectionConsumer {
         }
 
         if (routeKey == null) {
-            log.info("No routing key specified. Using queue name as the routing key.");
+            log.info("No routing key specified. Using queue name as the " + "routing key.");
             routeKey = queueName;
         }
 
@@ -352,7 +352,7 @@ public class RabbitMQConnectionConsumer {
         try {
             connection = rabbitMQConnectionFactory.createConnection();
             log.info("RabbitMQ connection created for inbound " + inboundName);
-        } catch (IOException e) {
+        } catch (Exception e) {
             handleException("Error while creating RabbitMQ connection for inbound " + inboundName, e);
         }
         return connection;
