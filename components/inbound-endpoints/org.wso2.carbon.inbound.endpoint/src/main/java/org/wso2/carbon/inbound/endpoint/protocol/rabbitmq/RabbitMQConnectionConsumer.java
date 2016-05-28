@@ -249,16 +249,12 @@ public class RabbitMQConnectionConsumer {
                 }
             }
             channel.queueBind(queueName, exchangeName, routeKey);
-            if (log.isDebugEnabled()) {
-                log.debug("Bind queue '" + queueName + "' to exchange '" + exchangeName + "' with route key '" + routeKey + "'");
-            }
+            log.debug("Bind queue '" + queueName + "' to exchange '" + exchangeName + "' with route key '" + routeKey + "'");
         }
 
         if (!channel.isOpen()) {
             channel = connection.createChannel();
-            if (log.isDebugEnabled()) {
-                log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
-            }
+            log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
         }
 
         queueingConsumer = new QueueingConsumer(channel);
@@ -266,14 +262,10 @@ public class RabbitMQConnectionConsumer {
         consumerTagString = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_TAG);
         if (consumerTagString != null) {
             channel.basicConsume(queueName, autoAck, consumerTagString, queueingConsumer);
-            if (log.isDebugEnabled()) {
-                log.debug("Start consuming queue '" + queueName + "' with consumer tag '" + consumerTagString + "' for inbound " + inboundName);
-            }
+            log.debug("Start consuming queue '" + queueName + "' with consumer tag '" + consumerTagString + "' for inbound " + inboundName);
         } else {
             consumerTagString = channel.basicConsume(queueName, autoAck, queueingConsumer);
-            if (log.isDebugEnabled()) {
-                log.debug("Start consuming queue '" + queueName + "' with consumer tag '" + consumerTagString + "' for inbound " + inboundName);
-            }
+            log.debug("Start consuming queue '" + queueName + "' with consumer tag '" + consumerTagString + "' for inbound " + inboundName);
         }
     }
 
@@ -289,9 +281,7 @@ public class RabbitMQConnectionConsumer {
         RabbitMQMessage message = new RabbitMQMessage();
         QueueingConsumer.Delivery delivery = null;
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Waiting for next delivery from queue for inbound " + inboundName);
-            }
+            log.debug("Waiting for next delivery from queue for inbound " + inboundName);
             delivery = consumer.nextDelivery();
         } catch (ShutdownSignalException e) {
             return null;
@@ -326,9 +316,7 @@ public class RabbitMQConnectionConsumer {
                 }
             }
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Queue delivery item is null for inbound " + inboundName);
-            }
+            log.debug("Queue delivery item is null for inbound " + inboundName);
             return null;
         }
         return message;

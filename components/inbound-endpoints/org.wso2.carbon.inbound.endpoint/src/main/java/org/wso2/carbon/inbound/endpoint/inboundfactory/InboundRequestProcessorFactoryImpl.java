@@ -72,7 +72,7 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
                 inboundRequestProcessor = new KAFKAProcessor(params);
             }else if (Protocols.mqtt.toString().equals(protocol)) {
                 inboundRequestProcessor = new MqttListener(params);
-            } else if (Protocols.rabbitmq.toString().equals(protocol)) {
+            }else if (Protocols.rabbitmq.toString().equals(protocol)) {
                 inboundRequestProcessor = new RabbitMQListener(params);
             }
         } else if (params.getClassImpl() != null) {
