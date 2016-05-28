@@ -23,10 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.wso2.carbon.inbound.endpoint.common.OneTimeTriggerInboundTask;
 
-/**
- * RabbitMQTask class is used to schedule the inbound execution when the coordination
- * is required.
- */
 public class RabbitMQTask extends OneTimeTriggerInboundTask {
 
     private static final Log log = LogFactory.getLog(RabbitMQTask.class.getName());

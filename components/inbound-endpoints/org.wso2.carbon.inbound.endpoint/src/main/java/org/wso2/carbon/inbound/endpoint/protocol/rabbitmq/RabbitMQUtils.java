@@ -28,9 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import java.io.IOException;
 import java.util.Hashtable;
 
-/**
- * Maintain the common methods used by inbound RabbitMQ protocol.
- */
+
 public class RabbitMQUtils {
 
     private static final Log log = LogFactory.getLog(RabbitMQUtils.class);
@@ -62,9 +60,9 @@ public class RabbitMQUtils {
     public static boolean isQueueAvailable(Connection connection, String queueName) throws IOException {
         Channel channel = connection.createChannel();
         try {
-            // check availability of the named queue.
+            // check availability of the named queue
             // if an error is encountered, including if the queue does not exist and if the
-            // queue is exclusively owned by another connection.
+            // queue is exclusively owned by another connection
             channel.queueDeclarePassive(queueName);
             return true;
         } catch (IOException e) {
@@ -133,7 +131,7 @@ public class RabbitMQUtils {
         String durable = properties.get(RabbitMQConstants.EXCHANGE_DURABLE);
         try {
             // check availability of the named exchange.
-            // The server will raise an IOException.
+            // The server will raise an IOException
             // if the named exchange already exists.
             channel.exchangeDeclarePassive(exchangeName);
             exchangeAvailable = true;

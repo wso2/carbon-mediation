@@ -33,9 +33,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
-/**
- * Connection consumer for RabbitMQ listener which delegates connection attempts and subscription.
- */
 public class RabbitMQConnectionConsumer {
     private static final Log log = LogFactory.getLog(RabbitMQConnectionConsumer.class);
     private RabbitMQConnectionFactory rabbitMQConnectionFactory;
@@ -126,7 +123,7 @@ public class RabbitMQConnectionConsumer {
     /**
      * Used to start message consuming messages. This method is called in startup and when
      * connection is re-connected. This method will request for the connection and create
-     * channel, queues, exchanges and bind queues to exchanges before consuming messages.
+     * channel, queues, exchanges and bind queues to exchanges before consuming messages
      *
      * @throws ShutdownSignalException
      * @throws IOException
@@ -202,7 +199,7 @@ public class RabbitMQConnectionConsumer {
     }
 
     /**
-     * Create a queue consumer using the properties from inbound listener configuration.
+     * Create a queue consumer using the properties from inbound listener configuration
      *
      * @throws IOException on error
      */
@@ -281,7 +278,7 @@ public class RabbitMQConnectionConsumer {
     }
 
     /**
-     * Returns the delivery from the consumer.
+     * Returns the delivery from the consumer
      *
      * @param consumer the consumer to get the delivery
      * @return RabbitMQMessage consumed by the consumer

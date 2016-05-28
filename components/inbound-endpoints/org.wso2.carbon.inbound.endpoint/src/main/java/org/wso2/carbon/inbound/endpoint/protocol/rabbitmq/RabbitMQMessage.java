@@ -39,7 +39,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Get body of the message.
+     * Get body of the message
      *
      * @return bytes of the message body
      */
@@ -48,7 +48,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Get content type of the message.
+     * Get content type of the message
      *
      * @return content type
      */
@@ -57,7 +57,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Set content type for the message.
+     * Set content type for the message
      *
      * @param contentType content type to set for the message
      */
@@ -66,7 +66,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Get content encoding of the message.
+     * Get content encoding of the message
      *
      * @return content encoding
      */
@@ -75,7 +75,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Set content encoding for the message.
+     * Set content encoding for the message
      *
      * @param contentEncoding return content encoding
      */
@@ -84,7 +84,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Get correlation id of the message.
+     * Get correlation id of the message
      *
      * @return correlation id
      */
@@ -93,7 +93,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Set correlation id of the message.
+     * Set correlation id of the message
      *
      * @param correlationId correlation id to set
      */
@@ -102,7 +102,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * get header 'Replyto' of RabbitMQ.
+     * get header 'Replyto' of RabbitMQ
      *
      * @return return header value of 'replyTo'
      */
@@ -111,7 +111,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * set 'ReplyTo' RabbitMQ header.
+     * set 'ReplyTo' RabbitMQ header
      *
      * @param replyTo value of the header to set
      */
@@ -120,7 +120,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Get identifier of the message.
+     * Get identifier of the message
      *
      * @return message id (unique)
      */
@@ -129,7 +129,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Set id for the message.
+     * Set id for the message
      *
      * @param messageId unique id for the message
      */
@@ -138,7 +138,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Get soap action message bares.
+     * Get soap action message bares
      *
      * @return Soap Action set to the message
      */
@@ -147,7 +147,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * Set soap action to the message.
+     * Set soap action to the message
      *
      * @param soapAction soap action to e set
      */
@@ -156,7 +156,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * get all headers of the message as a map.
+     * get all headers of the message as a map
      *
      * @return map of headers
      */
@@ -165,7 +165,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * set all headers for the message.
+     * set all headers for the message
      *
      * @param headers a map of headers to be set
      */
@@ -174,7 +174,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * set body of the message.
+     * set body of the message
      *
      * @param body bytes representing body
      */
@@ -183,7 +183,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * set delivery tag of the message assigned by the transport.
+     * set delivery tag of the message assigned by the transport
      *
      * @param deliveryTag delivery tag to set
      */
@@ -192,7 +192,7 @@ public class RabbitMQMessage {
     }
 
     /**
-     * get delivery tag of the message set by transport.
+     * get delivery tag of the message set by transport
      *
      * @return delivery tag of the message
      */

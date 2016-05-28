@@ -28,7 +28,7 @@ import java.util.Properties;
 
 
 /**
- * Listener to get a RabbitMQ client from the factory.
+ * Listener to get a rabbitmq client from the factory
  */
 public class RabbitMQListener extends InboundOneTimeTriggerRequestProcessor {
 
