@@ -132,9 +132,7 @@ public class RabbitMQConnectionConsumer {
         connection = getConnection();
         if (channel == null || !channel.isOpen()) {
             channel = connection.createChannel();
-            if (log.isDebugEnabled()) {
-                log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
-            }
+            log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
         }
         //set the qos value for the consumer//
         String qos = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_QOS);
