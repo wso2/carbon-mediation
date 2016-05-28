@@ -73,12 +73,12 @@ public class RabbitMQUtils {
     }
 
     /**
-     * Declare a queue.
-     * @param connection   the rabbitmq connection
-     * @param queueName    the name of the queue
-     * @param isDurable    true if we are declaring a durable queue
-     * @param isExclusive  true if we are declaring an exclusive queue
-     * @param isAutoDelete true if we are declaring an autodelete queue
+     *
+     * @param connection
+     * @param queueName
+     * @param isDurable
+     * @param isExclusive
+     * @param isAutoDelete
      * @throws IOException
      */
     public static void declareQueue(Connection connection, String queueName, boolean isDurable,
