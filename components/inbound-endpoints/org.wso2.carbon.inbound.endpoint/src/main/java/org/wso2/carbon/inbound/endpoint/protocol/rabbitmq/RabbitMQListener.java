@@ -89,6 +89,7 @@ public class RabbitMQListener extends InboundOneTimeTriggerRequestProcessor {
     }
 
     public void start() {
+
         RabbitMQTask rabbitMQTask = new RabbitMQTask(connectionConsumer);
         start(rabbitMQTask, ENDPOINT_POSTFIX);
     }
