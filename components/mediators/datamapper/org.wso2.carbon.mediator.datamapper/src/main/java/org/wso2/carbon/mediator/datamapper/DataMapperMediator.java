@@ -222,6 +222,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 synLog.traceTrace("Message : " + synCtx.getEnvelope());
             }
         }
+
         return true;
     }
 
@@ -234,6 +235,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      */
     private void transform(MessageContext synCtx, String configKey, String inSchemaKey) {
         try {
+            String outputResult = null;
 
             String dmExecutorPoolSize = SynapsePropertiesLoader
                     .getPropertyValue(ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
@@ -241,9 +243,9 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             MappingHandler mappingHandler = new MappingHandler(mappingResource, inputType, outputType,
                     dmExecutorPoolSize);
 
-            //execute mapping on the input stream
-            String outputResult = mappingHandler
-                    .doMap(getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
+            /* execute mapping on the input stream */
+            outputResult = mappingHandler.doMap(
+                        getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
 
             if (InputOutputDataType.XML.toString().equals(outputType)) {
                 OMElement outputMessage = AXIOMUtil.stringToOM(outputResult);
@@ -282,7 +284,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 JsonUtil.newJsonPayload(axis2MessageContext, outputResult, true, true);
             }
         } catch (ReaderException | InterruptedException | XMLStreamException | SchemaException
-                | IOException | WriterException e) {
+                | IOException | JSException | WriterException e ) {
             handleException("DataMapper mediator : mapping failed", e, synCtx);
         }
     }
