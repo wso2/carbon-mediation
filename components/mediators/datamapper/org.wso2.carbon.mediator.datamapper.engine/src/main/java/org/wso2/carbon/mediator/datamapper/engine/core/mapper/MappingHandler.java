@@ -25,7 +25,7 @@ import org.wso2.carbon.mediator.datamapper.engine.core.executors.ScriptExecutorF
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.InputVariableNotifier;
 import org.wso2.carbon.mediator.datamapper.engine.core.notifiers.OutputVariableNotifier;
-import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.input.InputBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
@@ -41,22 +41,26 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
     private MappingResource mappingResource;
     private OutputMessageBuilder outputMessageBuilder;
     private Executor scriptExecutor;
-    private InputModelBuilder inputModelBuilder;
+    private InputBuilder inputBuilder;
 
     public MappingHandler(MappingResource mappingResource, String inputType, String outputType,
                           String dmExecutorPoolSize) throws IOException, SchemaException, WriterException {
-        this.inputModelBuilder = new InputModelBuilder(InputOutputDataType.fromString(inputType), ModelType.JSON_STRING,
-                                                       mappingResource.getInputSchema());
+
+        this.inputBuilder = new InputBuilder(InputOutputDataType.fromString(inputType),
+                mappingResource.getInputSchema());
+
         this.outputMessageBuilder =
-                new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
-                                         mappingResource.getOutputSchema());
+                    new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
+                            mappingResource.getOutputSchema());
+
         this.dmExecutorPoolSize = dmExecutorPoolSize;
         this.mappingResource = mappingResource;
     }
 
-    public String doMap(InputStream inputMsg) throws ReaderException, InterruptedException {
+    public String doMap(InputStream inputMsg)
+            throws ReaderException, InterruptedException, IOException, SchemaException, JSException {
         this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
-        this.inputModelBuilder.buildInputModel(inputMsg, this);
+        inputBuilder.buildInputModel(inputMsg, this);
         return outputVariable;
     }
 
