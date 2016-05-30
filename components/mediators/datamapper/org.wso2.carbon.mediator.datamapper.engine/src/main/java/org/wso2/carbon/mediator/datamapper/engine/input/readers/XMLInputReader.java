@@ -28,21 +28,22 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.InvalidPayload
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
+import org.wso2.carbon.mediator.datamapper.engine.core.schemas.JacksonJSONSchema;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
-import org.wso2.carbon.mediator.datamapper.engine.core.schemas.SchemaElement;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.input.builders.JSONBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import javax.xml.namespace.QName;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NULL_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
@@ -60,6 +61,10 @@ public class XMLInputReader implements InputReader {
             "http://xml" + ".org/sax/features/namespace-prefixes";
     public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
     public static final String XMLNS = "xmlns";
+    private static final String PROPERTIES_KEY = "properties";
+    private static final String ATTRIBUTES_KEY = "attributes";
+    private static final String TYPE_KEY = "type";
+
     private static final Log log = LogFactory.getLog(XMLInputReader.class);
 
     /* Reference of the InputXMLMessageBuilder object to send the built JSON message */
@@ -72,20 +77,14 @@ public class XMLInputReader implements InputReader {
     private String localName;
     private String nameSpaceURI;
 
-    /**
-     * List of ancestor schema elements of the currently processing element.
-     * This list is maintained to get the element type from the schema using the element name
-     */
-    private List<SchemaElement> schemaElementList;
-
     /* JSON Builder to build the respective JSON message */
     private JSONBuilder jsonBuilder;
 
-    /* Keep the state of "is the previous element of the current element, a member of an array" */
-    private boolean isPrevElementArray;
-
     /* Iterator for the Attribute elements */
     private Iterator<OMAttribute> it_attr;
+
+    /* JSON schema for input message */
+    private Map jsonSchema;
 
     /**
      * Constructor
@@ -93,9 +92,7 @@ public class XMLInputReader implements InputReader {
      * @throws IOException
      */
     public XMLInputReader() throws IOException {
-        this.schemaElementList = new ArrayList();
         this.jsonBuilder = new JSONBuilder();
-        this.isPrevElementArray = false;
     }
 
     /**
@@ -106,17 +103,18 @@ public class XMLInputReader implements InputReader {
      * @param messageBuilder Reference of the InputXMLMessageBuilder
      * @throws ReaderException Exceptions in the parsing stage
      */
-    @Override public void read(InputStream input, Schema inputSchema, InputBuilder messageBuilder)
-            throws ReaderException {
+    @Override
+    public void read(InputStream input, Schema inputSchema, InputBuilder messageBuilder) throws ReaderException {
 
         this.messageBuilder = messageBuilder;
         this.inputSchema = inputSchema;
 
         OMXMLParserWrapper parserWrapper = OMXMLBuilderFactory.createOMBuilder(input);
         OMElement root = parserWrapper.getDocumentElement();
+        this.jsonSchema = getInputSchema().getSchemaMap();
 
         try {
-            XMLTraverse(root, null);
+            XMLTraverse(root, null, jsonSchema);
             jsonBuilder.writeEndObject();
             writeTerminateElement();
         } catch (IOException e) {
@@ -134,28 +132,28 @@ public class XMLInputReader implements InputReader {
     /**
      * This method will perform a Depth First Search on the XML message and build the json message
      *
-     * @param omElement initially the root element will be passed-in
+     * @param omElement       initially the root element will be passed-in
      * @param prevElementName name of the previous element only if the previous element was an array, a null otherwise
-     * @return true it is an array element, otherwise false
+     * @param jsonSchemaMap   reduced json input schema map that is applicable to this level
+     * @return the name of the previous element if the element was an array element, null otherwise
      * @throws IOException
      * @throws ReaderException
      * @throws SchemaException
      * @throws JSException
      * @throws InvalidPayloadException
      */
-    public String XMLTraverse(OMElement omElement, String prevElementName)
+    public String XMLTraverse(OMElement omElement, String prevElementName, Map jsonSchemaMap)
             throws IOException, ReaderException, SchemaException, JSException, InvalidPayloadException {
 
         /** isObject becomes true if the current element is an object, therefor object end element can be written at
          * the end */
         boolean isObject = false;
 
-        /** isArrayParent becomes true if it is a parent of an Array element. So that it can close the array before
-         * closing itself as object */
-
         String prevElementNameSpaceLocalName = null;
 
         String elementType;
+
+        Map nextJSONMap;
 
         /* iterator to hold the child elements of the passed OMElement */
         Iterator<OMElement> it;
@@ -165,8 +163,12 @@ public class XMLInputReader implements InputReader {
         nameSpaceURI = this.getNameSpaceURI(omElement);
         String nameSpaceLocalName = getNamespacesAndIdentifiersAddedFieldName(nameSpaceURI, localName, omElement);
 
-        schemaElementList.add(new SchemaElement(nameSpaceLocalName, nameSpaceURI));
-        elementType = getInputSchema().getElementTypeByName(schemaElementList);
+        elementType = getElementType(jsonSchemaMap, nameSpaceLocalName);
+        if (NULL_ELEMENT_TYPE.equals(elementType) && !localName.equals("Header")) {
+            log.warn("Element name not found : " + nameSpaceLocalName);
+        }
+
+        nextJSONMap = buildNextSchema(jsonSchemaMap, elementType, nameSpaceLocalName);
 
         /* if this is new object preceding an array, close the array before writing the new element */
         if (prevElementName != null && !nameSpaceLocalName.equals(prevElementName)) {
@@ -192,17 +194,15 @@ public class XMLInputReader implements InputReader {
         /* writing attributes to the JSON message */
         it_attr = omElement.getAllAttributes();
         if (it_attr.hasNext()) {
-            writeAttributes(elementType, nameSpaceLocalName);
+            writeAttributes(elementType, nameSpaceLocalName, nextJSONMap);
         }
 
         it = omElement.getChildElements();
 
         /* Recursively call all the children */
         while (it.hasNext()) {
-            prevElementNameSpaceLocalName = XMLTraverse(it.next(), prevElementNameSpaceLocalName);
+            prevElementNameSpaceLocalName = XMLTraverse(it.next(), prevElementNameSpaceLocalName, nextJSONMap);
         }
-
-        schemaElementList.remove(schemaElementList.size() - 1);
 
         /* Closing the opened JSON objects and arrays */
         if (prevElementNameSpaceLocalName != null) {
@@ -250,7 +250,7 @@ public class XMLInputReader implements InputReader {
     /**
      * This method writes attribute elements into the JSON input message
      *
-     * @param elementType type of the parent element
+     * @param elementType        type of the parent element
      * @param nameSpaceLocalName name of the parent element
      * @throws JSException
      * @throws SchemaException
@@ -258,7 +258,7 @@ public class XMLInputReader implements InputReader {
      * @throws IOException
      * @throws InvalidPayloadException
      */
-    private void writeAttributes(String elementType, String nameSpaceLocalName)
+    private void writeAttributes(String elementType, String nameSpaceLocalName, Map jsonSchemaMap)
             throws JSException, SchemaException, ReaderException, IOException, InvalidPayloadException {
 
         /* object will be opened if the parent element is field type*/
@@ -296,9 +296,7 @@ public class XMLInputReader implements InputReader {
         attributeQName = getAttributeQName(omAttribute.getNamespace(), attributeLocalName);
 
         /* get the type of the attribute element */
-        schemaElementList.add(new SchemaElement(attributeQName, attributeNSURI));
-        attributeType = getInputSchema().getElementTypeByName(schemaElementList);
-        schemaElementList.remove(schemaElementList.size() - 1);
+        attributeType = getElementType(jsonSchemaMap, attributeQName);
 
         /* write the attribute to the JSON message */
         writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
@@ -317,9 +315,7 @@ public class XMLInputReader implements InputReader {
             attributeQName = getAttributeQName(omAttribute.getNamespace(), localName);
 
             /* get the type of the attribute element */
-            schemaElementList.add(new SchemaElement(attributeQName, attributeNSURI));
-            attributeType = getInputSchema().getElementTypeByName(schemaElementList);
-            schemaElementList.remove(schemaElementList.size() - 1);
+            attributeType = getElementType(jsonSchemaMap, attributeQName);
 
             /* write the attribute to the JSON message */
             writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
@@ -330,6 +326,70 @@ public class XMLInputReader implements InputReader {
         if (hasObjectOpened) {
             writeObjectEndElement();
         }
+    }
+
+    /**
+     * Get the element type by referring to the input schema
+     *
+     * @param jsonSchemaMap Current level of the schema map
+     * @param elementName   Name of the OMElement
+     * @return Type of the element
+     * @throws SchemaException
+     */
+    private String getElementType(Map jsonSchemaMap, String elementName) throws SchemaException {
+
+        String elementType = NULL_ELEMENT_TYPE;
+
+        if (elementName.equals(getInputSchema().getName())) {
+            elementType = (String) jsonSchemaMap.get(TYPE_KEY);
+        } else if (jsonSchemaMap.containsKey(elementName)) {
+            elementType = (String) ((Map<String, Object>) jsonSchemaMap.get(elementName)).get(TYPE_KEY);
+        }
+        return elementType;
+    }
+
+    /**
+     * Get the next schema level to pass to the next element search
+     *
+     * @param jsonSchemaMap Current level of the schema map
+     * @param elementType   Type of the parent element
+     * @param elementName   Name of the parent element
+     * @return Next level schema map
+     * @throws SchemaException
+     */
+    private Map buildNextSchema(Map jsonSchemaMap, String elementType, String elementName) throws SchemaException {
+
+        Map nextSchema = null;
+
+        if (elementName.equals(getInputSchema().getName())) {
+            nextSchema = (Map<String, Object>) jsonSchemaMap.get(PROPERTIES_KEY);
+        } else if (jsonSchemaMap.containsKey(elementName)) {
+            if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
+                nextSchema = ((JacksonJSONSchema) inputSchema)
+                        .getSchemaItems((Map<String, Object>) jsonSchemaMap.get(elementName));
+                nextSchema = getSchemaProperties(nextSchema);
+            } else {
+                nextSchema = getSchemaProperties((Map<String, Object>) jsonSchemaMap.get(elementName));
+            }
+        }
+        return nextSchema;
+    }
+
+    /**
+     * Go to the next level of the schema
+     *
+     * @param schema Current level of the schema
+     * @return next level schema
+     */
+    private Map<String, Object> getSchemaProperties(Map<String, Object> schema) {
+        Map<String, Object> nextSchema = new HashMap<>();
+        if (schema.containsKey(PROPERTIES_KEY)) {
+            nextSchema.putAll((Map<? extends String, Object>) schema.get(PROPERTIES_KEY));
+        }
+        if (schema.containsKey(ATTRIBUTES_KEY)) {
+            nextSchema.putAll((Map<? extends String, Object>) schema.get(ATTRIBUTES_KEY));
+        }
+        return nextSchema;
     }
 
     /**
