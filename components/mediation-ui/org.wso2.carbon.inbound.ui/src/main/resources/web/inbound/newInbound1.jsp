@@ -92,7 +92,11 @@ var kafkaSpecialParameters = null;
                         <td style="width:150px"><fmt:message key="inbound.type"/></td>
                         <td align="left">
                             <%=request.getParameter("inboundType")%>
-                            <input name="inboundType" id="inboundType" type="hidden" value="<%=request.getParameter("inboundType")%>"/>                      
+                            <%
+                                String inboundTypeValue = request.getParameter("inboundType");
+                                if (InboundClientConstants.TYPE_WSO2MB.equals(inboundTypeValue)) inboundTypeValue = InboundClientConstants.TYPE_JMS;
+                            %>
+                            <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundTypeValue%>"/>
                         </td>
                         <td></td>
                     </tr>

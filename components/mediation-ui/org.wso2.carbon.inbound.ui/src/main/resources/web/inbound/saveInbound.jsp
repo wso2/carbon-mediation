@@ -21,6 +21,7 @@
 <%@page import="java.util.List"%>
 <%@page import="java.lang.Long"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient"%>
+<%@page import="org.wso2.carbon.inbound.ui.internal.InboundClientConstants"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -114,6 +115,19 @@
                     if(strVal != null && !strVal.equals("")){
                         sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
                     }
+                } else if(strKey.startsWith("wso2mb.")) {
+                	String strVal = request.getParameter(strKey);
+                	if(strVal == null || strVal.equals("")){
+                		continue;
+                	}
+                	String factoryType = request.getParameter("transport.jms.ConnectionFactoryType");
+                	String keyString = "";
+                	if (factoryType.equalsIgnoreCase("topic")) {
+                		keyString = "connectionfactory.TopicConnectionFactory";
+                	} else {
+                		keyString = "connectionfactory.QueueConnectionFactory";
+                	}
+             	    sParams.add(new ParamDTO(keyString, strVal));
                 }
 			}
 		boolean added =	client.addInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl, request.getParameter("inboundSuspend"), sParams);
