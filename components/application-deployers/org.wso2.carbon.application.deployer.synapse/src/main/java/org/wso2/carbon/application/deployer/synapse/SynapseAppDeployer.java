@@ -44,6 +44,7 @@ import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.libraries.imports.SynapseImport;
 import org.apache.synapse.libraries.model.Library;
 import org.apache.synapse.libraries.util.LibDeployerUtils;
+import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.application.deployer.AppDeployerConstants;
 import org.wso2.carbon.application.deployer.AppDeployerUtils;
 import org.wso2.carbon.application.deployer.CarbonApplication;
@@ -133,6 +134,10 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     } catch (DeploymentException e) {
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
                         throw e;
+                    } finally {
+                        //clear the log appender once deployment is finished to avoid appending the
+                        //same log to other classes.
+                        CustomLogSetter.getInstance().clearThreadLocalContent();
                     }
                 }
             }
