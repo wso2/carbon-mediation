@@ -16,7 +16,6 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.readers;
 
-import org.apache.axiom.om.OMAttribute;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
@@ -24,13 +23,11 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderExceptio
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputBuilder;
-import org.wso2.carbon.mediator.datamapper.engine.input.builders.JSONBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Iterator;
 
 /**
  * This class is capable of parsing XML through AXIOMS for the InputStream and build the respective JSON message
@@ -38,9 +35,6 @@ import java.util.Iterator;
 public class JSONInputReader implements InputReader {
 
     private static final Log log = LogFactory.getLog(JSONInputReader.class);
-
-    /* Reference of the InputXMLMessageBuilder object to send the built JSON message */
-    private InputBuilder messageBuilder;
 
     /**
      * Constructor
@@ -58,9 +52,9 @@ public class JSONInputReader implements InputReader {
      * @param messageBuilder Reference of the InputXMLMessageBuilder
      * @throws ReaderException Exceptions in the parsing stage
      */
-    @Override public void read(InputStream input, Schema inputSchema, InputBuilder messageBuilder)
-            throws ReaderException {
-        String inputJSONMessage ;
+    @Override
+    public void read(InputStream input, Schema inputSchema, InputBuilder messageBuilder) throws ReaderException {
+        String inputJSONMessage;
         try {
             inputJSONMessage = readFromInputStream(input);
             messageBuilder.notifyWithResult(inputJSONMessage);

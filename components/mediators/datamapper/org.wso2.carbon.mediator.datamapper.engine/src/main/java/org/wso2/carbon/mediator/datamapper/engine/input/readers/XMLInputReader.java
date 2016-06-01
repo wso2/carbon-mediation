@@ -56,9 +56,6 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
  */
 public class XMLInputReader implements InputReader {
 
-    public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACES = "http://xml.org/sax/features/namespaces";
-    public static final String HTTP_XML_ORG_SAX_FEATURES_NAMESPACE_PREFIXES =
-            "http://xml" + ".org/sax/features/namespace-prefixes";
     public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
     public static final String XMLNS = "xmlns";
     private static final String PROPERTIES_KEY = "properties";

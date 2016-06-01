@@ -44,15 +44,14 @@ import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE;
 
 /**
  * By using the input schema, output schema and mapping configuration,
@@ -291,25 +290,31 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
     private InputStream getInputStream(MessageContext context, String inputType, String inputStartElement) {
         InputStream inputStream = null;
-        switch (InputOutputDataType.fromString(inputType)) {
-        case XML:
-        case CSV:
-            if ("soapenv:Envelope".equals(inputStartElement)) {
+        try {
+            switch (InputOutputDataType.fromString(inputType)) {
+            case XML:
+            case CSV:
+                if ("soapenv:Envelope".equals(inputStartElement)) {
+                    inputStream = new ByteArrayInputStream(
+                            context.getEnvelope().toString().getBytes(StandardCharsets.UTF_8));
+                } else {
+                    inputStream = new ByteArrayInputStream(context.getEnvelope().getBody().getFirstElement().toString()
+                            .getBytes(StandardCharsets.UTF_8));
+                }
+                break;
+            case JSON:
+                org.apache.axis2.context.MessageContext a2mc = ((Axis2MessageContext) context).getAxis2MessageContext();
+                if (JsonUtil.hasAJsonPayload(a2mc)) {
+                    inputStream = JsonUtil.getJsonPayload(a2mc);
+                }
+                break;
+            default:
                 inputStream = new ByteArrayInputStream(
                         context.getEnvelope().toString().getBytes(StandardCharsets.UTF_8));
-            } else {
-                inputStream = new ByteArrayInputStream(
-                        context.getEnvelope().getBody().getFirstElement().toString().getBytes(StandardCharsets.UTF_8));
             }
-            break;
-        case JSON:
-            org.apache.axis2.context.MessageContext a2mc = ((Axis2MessageContext) context).getAxis2MessageContext();
-            if (JsonUtil.hasAJsonPayload(a2mc)) {
-                inputStream = JsonUtil.getJsonPayload(a2mc);
-            }
-            break;
-        default:
-            inputStream = new ByteArrayInputStream(context.getEnvelope().toString().getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            handleException("Unable to read input message in Data Mapper mediator reason : " + e.getMessage(), e,
+                    context);
         }
         return inputStream;
     }
