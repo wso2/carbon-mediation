@@ -302,7 +302,10 @@ var kafkaSpecialParameters = null;
                              <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundupdateform" rows="8" cols="35">
                              <%=inboundDescription.getParameters().get(defaultParam)%>
                               </textarea>
-                             <%}else{ %>
+                             <%}else if (isMBbased && (defaultParam.equals("wso2mb.connection.url"))) {%>
+                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
+                                (eg: amqp://admin:admin@clientID/carbon?brokerlist='tcp://localhost:5673' )
+                             <%} else{ %>
                                 <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
                              <%} %>
                             <%} %>                       

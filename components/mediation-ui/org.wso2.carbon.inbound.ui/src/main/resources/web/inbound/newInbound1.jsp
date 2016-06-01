@@ -94,7 +94,11 @@ var kafkaSpecialParameters = null;
                             <%=request.getParameter("inboundType")%>
                             <%
                                 String inboundTypeValue = request.getParameter("inboundType");
-                                if (InboundClientConstants.TYPE_WSO2MB.equals(inboundTypeValue)) inboundTypeValue = InboundClientConstants.TYPE_JMS;
+                                boolean isMBbased = false;
+                                if (InboundClientConstants.TYPE_WSO2MB.equals(inboundTypeValue)) {
+                                    inboundTypeValue = InboundClientConstants.TYPE_JMS;
+                                    isMBbased = true;
+                                }
                             %>
                             <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundTypeValue%>"/>
                         </td>
@@ -257,7 +261,10 @@ var kafkaSpecialParameters = null;
 	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
 	                            <%}%>                                
                                 </select>
-							<%}else{ %>
+							<%} else if (isMBbased && (defaultParam.equals("wso2mb.connection.url"))) {%>
+								<input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=defaultVal%>"/>
+								(eg: amqp://admin:admin@clientID/carbon?brokerlist='tcp://localhost:5673' )
+							<%} else{ %>
 							        <%if(InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType")) && defaultParam.equals("keystore")){%>
 							        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundcreationform" rows="8" cols="35">
 							        </textarea>
