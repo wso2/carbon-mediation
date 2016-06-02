@@ -197,8 +197,10 @@ public class XMLInputReader implements InputReader {
         it = omElement.getChildElements();
 
         /* Recursively call all the children */
-        while (it.hasNext()) {
-            prevElementNameSpaceLocalName = XMLTraverse(it.next(), prevElementNameSpaceLocalName, nextJSONMap);
+        if (!isXsiNil(omElement)) {
+            while (it.hasNext()) {
+                prevElementNameSpaceLocalName = XMLTraverse(it.next(), prevElementNameSpaceLocalName, nextJSONMap);
+            }
         }
 
         /* Closing the opened JSON objects and arrays */
@@ -294,6 +296,9 @@ public class XMLInputReader implements InputReader {
 
         /* get the type of the attribute element */
         attributeType = getElementType(jsonSchemaMap, attributeQName);
+        if (NULL_ELEMENT_TYPE.equals(attributeType)) {
+            log.warn("Attribute name not found : " + attributeQName);
+        }
 
         /* write the attribute to the JSON message */
         writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
@@ -309,10 +314,13 @@ public class XMLInputReader implements InputReader {
 
             attributeNSURI = this.getNameSpaceURI(omAttribute);
             attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI);
-            attributeQName = getAttributeQName(omAttribute.getNamespace(), localName);
+            attributeQName = getAttributeQName(omAttribute.getNamespace(), attributeLocalName);
 
             /* get the type of the attribute element */
             attributeType = getElementType(jsonSchemaMap, attributeQName);
+            if (NULL_ELEMENT_TYPE.equals(attributeType)) {
+                log.warn("Attribute name not found : " + attributeQName);
+            }
 
             /* write the attribute to the JSON message */
             writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
@@ -422,6 +430,17 @@ public class XMLInputReader implements InputReader {
             }
         }
         return modifiedLocalName;
+    }
+
+    private boolean isXsiNil(OMElement omElement) {
+        String prefixInMap = inputSchema.getNamespaceMap().get(XSI_NAMESPACE_URI);
+        if (prefixInMap != null && omElement != null) {
+            String xsiNilValue = omElement.getAttributeValue(new QName(XSI_NAMESPACE_URI, "nil", prefixInMap));
+            if (xsiNilValue != null && "true".equalsIgnoreCase(xsiNilValue)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getAttributeQName(OMNamespace omNamespace, String localName) {
