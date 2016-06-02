@@ -98,8 +98,11 @@
         }
         if ("org.apache.synapse.message.store.impl.jms.JmsStore".
                 equals(provider.trim())) {
-            if (!paramList.containsKey("java.naming.factory.initial") ||
-                    !paramList.containsKey("java.naming.provider.url")) {
+            if (!paramList.containsKey("java.naming.factory.initial")) {
+                throw new Exception();
+            }
+            if (!paramList.containsKey("java.naming.provider.url") &&
+                    !paramList.containsKey("connectionfactory.QueueConnectionFactory")) {
                 throw new Exception();
             }
         }
