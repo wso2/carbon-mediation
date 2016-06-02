@@ -92,7 +92,15 @@ var kafkaSpecialParameters = null;
                         <td style="width:150px"><fmt:message key="inbound.type"/></td>
                         <td align="left">
                             <%=request.getParameter("inboundType")%>
-                            <input name="inboundType" id="inboundType" type="hidden" value="<%=request.getParameter("inboundType")%>"/>                      
+                            <%
+                                String inboundTypeValue = request.getParameter("inboundType");
+                                boolean isMBbased = false;
+                                if (InboundClientConstants.TYPE_WSO2MB.equals(inboundTypeValue)) {
+                                    inboundTypeValue = InboundClientConstants.TYPE_JMS;
+                                    isMBbased = true;
+                                }
+                            %>
+                            <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundTypeValue%>"/>
                         </td>
                         <td></td>
                     </tr>
@@ -253,7 +261,14 @@ var kafkaSpecialParameters = null;
 	                                <option value="<%=arrParamOri[i].trim()%>"><%=arrParamOri[i].trim()%></option>
 	                            <%}%>                                
                                 </select>
-							<%}else{ %>
+							<%} else if (isMBbased) {
+									if (defaultParam.equals("wso2mb.connection.url")) { %>
+										<input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=defaultVal%>"/>
+										(eg: amqp://admin:admin@clientID/carbon?brokerlist='tcp://localhost:5673' )
+									<%} else if (defaultParam.equals("java.naming.factory.initial")) {%>
+										<input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="org.wso2.andes.jndi.PropertiesFileInitialContextFactory"/>
+									<%}
+								} else{ %>
 							        <%if(InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType")) && defaultParam.equals("keystore")){%>
 							        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundcreationform" rows="8" cols="35">
 							        </textarea>

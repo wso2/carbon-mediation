@@ -112,7 +112,20 @@
                     if(strVal != null && !strVal.equals("")){
                         sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
                     }
-                }
+                } else if(strKey.startsWith("wso2mb.")) {
+                    String strVal = request.getParameter(strKey);
+                    if(strVal == null || strVal.equals("")){
+                        continue;
+                    }
+                    String factoryType = request.getParameter("transport.jms.ConnectionFactoryType");
+                    String keyString = "";
+                    if (factoryType.equalsIgnoreCase("topic")) {
+                        keyString = "connectionfactory.TopicConnectionFactory";
+                    } else {
+                        keyString = "connectionfactory.QueueConnectionFactory";
+                    }
+                    sParams.add(new ParamDTO(keyString, strVal));
+                 }
            }
 		boolean added =	client.updteInboundEndpoint(request.getParameter("inboundName"), request.getParameter("inboundSequence"),request.getParameter("inboundErrorSequence"),protocol, classImpl,request.getParameter("inboundSuspend"), sParams);
 			if(!added){
