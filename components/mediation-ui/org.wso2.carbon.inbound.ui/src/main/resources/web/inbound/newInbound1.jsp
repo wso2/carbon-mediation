@@ -267,8 +267,10 @@ var kafkaSpecialParameters = null;
 										(eg: amqp://admin:admin@clientID/carbon?brokerlist='tcp://localhost:5673' )
 									<%} else if (defaultParam.equals("java.naming.factory.initial")) {%>
 										<input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="org.wso2.andes.jndi.PropertiesFileInitialContextFactory"/>
-									<%}
-								} else{ %>
+									<%} else { %>
+									    <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=defaultVal%>"/>
+									<% } %>
+								<% } else{ %>
 							        <%if(InboundClientConstants.TYPE_HTTPS.equals(request.getParameter("inboundType")) && defaultParam.equals("keystore")){%>
 							        <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundcreationform" rows="8" cols="35">
 							        </textarea>
