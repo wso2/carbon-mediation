@@ -3,7 +3,10 @@ package org.wso2.carbon.mediation.initializer.handler;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.description.AxisService;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.handlers.AbstractHandler;
+import org.apache.synapse.SynapseConstants;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
@@ -19,7 +22,8 @@ public class CarbonContextConfigurator extends AbstractHandler {
 
         //if cc is already populated ( servlet transport ) just return
         //TODO: Ideally only tenant domain need to check, but there are some admin calls comes with null domain and tenant ID
-        if (cc.getTenantDomain() != null || cc.getTenantId() != MultitenantConstants.INVALID_TENANT_ID) {
+        if (!isDispatchingToSynapse(messageContext) && (cc.getTenantDomain() != null
+                || cc.getTenantId() != MultitenantConstants.INVALID_TENANT_ID)) {
             return InvocationResponse.CONTINUE;
         }
 
@@ -48,5 +52,30 @@ public class CarbonContextConfigurator extends AbstractHandler {
             //don't care if anything failed
         }
         return InvocationResponse.CONTINUE;
+    }
+
+    /**
+     * Check whether request is going to a Proxy service, API or Main Sequence
+     *
+     * @param messageContext axis2 message context
+     * @return whether request is going to synapse artifact
+     */
+    private boolean isDispatchingToSynapse(MessageContext messageContext) {
+
+        AxisService axisService = messageContext.getAxisService();
+        if (axisService != null) {
+
+            // For API and Main Sequence
+            if (SynapseConstants.SYNAPSE_SERVICE_NAME.equalsIgnoreCase(axisService.getName())) {
+                return true;
+            }
+
+            // For Proxy Service
+            Parameter val = axisService.getParameter("serviceType");
+            if (val != null && val.getValue().toString().equalsIgnoreCase("Proxy")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
