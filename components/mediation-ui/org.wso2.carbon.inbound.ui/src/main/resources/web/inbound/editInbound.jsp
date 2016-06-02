@@ -63,8 +63,25 @@ var kafkaSpecialParameters = null;
         try {
             client = InboundManagementClient.getInstance(config, session);
             InboundDescription inboundDescription = client.getInboundDescription(request.getParameter("name"));
-            List<String>defaultParams = client.getDefaultParameters(inboundDescription.getType());            
-            List<String>advParams = client.getAdvParameters(inboundDescription.getType()); 
+            String inboundTypeValue = inboundDescription.getType();
+            boolean isMBbased = false;
+            
+            if (InboundClientConstants.TYPE_JMS.equalsIgnoreCase(inboundTypeValue)) {
+            	if (inboundDescription.getParameters().containsKey("connectionfactory.QueueConnectionFactory")) {
+            		isMBbased = true;
+            		inboundTypeValue = InboundClientConstants.TYPE_WSO2MB;
+            		String connectionURL = inboundDescription.getParameters().get("connectionfactory.QueueConnectionFactory");
+            		inboundDescription.getParameters().put("wso2mb.connection.url", connectionURL);
+            	} else if (inboundDescription.getParameters().containsKey("connectionfactory.TopicConnectionFactory")) {
+            		isMBbased = true;
+            		inboundTypeValue = InboundClientConstants.TYPE_WSO2MB;
+            		String connectionURL = inboundDescription.getParameters().get("connectionfactory.TopicConnectionFactory");
+            		inboundDescription.getParameters().put("wso2mb.connection.url", connectionURL);
+            	}
+            }
+            
+            List<String>defaultParams = client.getDefaultParameters(inboundTypeValue);            
+            List<String>advParams = client.getAdvParameters(inboundTypeValue); 
             Set<String>defaultParamNames = new HashSet<String>();
             String specialParams = client.getKAFKASpecialParameters();
             String topicListParams = client.getKAFKATopicListParameters();
@@ -97,7 +114,7 @@ var kafkaSpecialParameters = null;
                     <tr>
                         <td style="width:150px"><fmt:message key="inbound.type"/></td>
                         <td align="left">
-                            <%=inboundDescription.getType()%>
+                            <%=inboundTypeValue%>
                             <input name="inboundType" id="inboundType" type="hidden" value="<%=inboundDescription.getType()%>"/> 
                             <input name="inboundMode" id="inboundMode" type="hidden" value="edit"/>                                                  
                         </td>
@@ -285,7 +302,10 @@ var kafkaSpecialParameters = null;
                              <textarea name="<%=defaultParam%>" id="<%=defaultParam%>" form="inboundupdateform" rows="8" cols="35">
                              <%=inboundDescription.getParameters().get(defaultParam)%>
                               </textarea>
-                             <%}else{ %>
+                             <%}else if (isMBbased && (defaultParam.equals("wso2mb.connection.url"))) {%>
+                                <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
+                                (eg: amqp://admin:admin@clientID/carbon?brokerlist='tcp://localhost:5673' )
+                             <%} else{ %>
                                 <input id="<%=defaultParam%>" name="<%=defaultParam%>" class="longInput" type="text" value="<%=inboundDescription.getParameters().get(defaultParam)%>"/>
                              <%} %>
                             <%} %>                       

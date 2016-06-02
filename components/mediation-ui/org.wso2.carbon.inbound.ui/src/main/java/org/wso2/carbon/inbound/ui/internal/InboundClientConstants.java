@@ -25,6 +25,7 @@ public class InboundClientConstants {
     public static final String TYPE_WSS = "wss";
     public static final String TYPE_FILE = "file";
     public static final String TYPE_JMS = "jms";
+    public static final String TYPE_WSO2MB = "wso2mb";
     public static final String TYPE_HL7 = "hl7";
     public static final String TYPE_KAFKA = "kafka";
     public static final String TYPE_MQTT = "mqtt";
