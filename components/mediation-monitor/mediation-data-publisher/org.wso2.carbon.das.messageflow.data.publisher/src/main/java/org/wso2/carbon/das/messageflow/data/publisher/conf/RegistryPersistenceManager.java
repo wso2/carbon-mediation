@@ -21,6 +21,7 @@ package org.wso2.carbon.das.messageflow.data.publisher.conf;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
+import org.wso2.carbon.das.messageflow.data.publisher.internal.MessageFlowDataPublisherDataHolder;
 import org.wso2.carbon.das.messageflow.data.publisher.util.MediationDataPublisherConstants;
 import org.wso2.carbon.registry.core.Registry;
 import org.wso2.carbon.registry.core.Resource;
@@ -33,14 +34,9 @@ import java.util.Properties;
 public class RegistryPersistenceManager {
 
     private static Log log = LogFactory.getLog(RegistryPersistenceManager.class);
-    private static RegistryService dasRegistryService;
     public static final String EMPTY_STRING = "";
 
     private static String IDS = "ids";
-
-    public static void setDasRegistryService(RegistryService registryServiceParam) {
-        dasRegistryService = registryServiceParam;
-    }
 
     /**
      * Get a DAS server information
@@ -51,6 +47,7 @@ public class RegistryPersistenceManager {
      */
     public PublisherConfig get(String serverId, int tenantId) {
         PublisherConfig PublisherConfig = new PublisherConfig();
+        RegistryService dasRegistryService = MessageFlowDataPublisherDataHolder.getInstance().getRegistryService();
 
         // First set it to defaults, but do not persist
         PublisherConfig.setMessageFlowPublishingEnabled(false);
@@ -100,6 +97,8 @@ public class RegistryPersistenceManager {
      * @param config
      */
     public void update(int tenantId, PublisherConfig config) {
+        RegistryService dasRegistryService = MessageFlowDataPublisherDataHolder.getInstance().getRegistryService();
+
         try {
             Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
             String serverId = config.getServerId();
@@ -155,6 +154,7 @@ public class RegistryPersistenceManager {
      */
     public List<PublisherConfig> load(int tenantId) {
         List<PublisherConfig> publisherConfigList = new ArrayList<>();
+        RegistryService dasRegistryService = MessageFlowDataPublisherDataHolder.getInstance().getRegistryService();
 
         try {
             Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
@@ -203,7 +203,7 @@ public class RegistryPersistenceManager {
      * @return
      */
     public boolean remove(int tenantId, String serverId) {
-
+        RegistryService dasRegistryService = MessageFlowDataPublisherDataHolder.getInstance().getRegistryService();
         try {
             Registry registry = dasRegistryService.getConfigSystemRegistry(tenantId);
             String resourcePath = MediationDataPublisherConstants.DAS_MEDIATION_MESSAGE_FLOW_REG_PATH + serverId;

@@ -571,6 +571,11 @@
                 <version>${carbon.analytics.common.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wso2.carbon.analytics-common</groupId>
+                <artifactId>org.wso2.carbon.event.stream.core</artifactId>
+                <version>${carbon.analytics.common.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.wso2.carbon.commons</groupId>
                 <artifactId>org.wso2.carbon.event.core</artifactId>
                 <version>${carbon.commons.version}</version>

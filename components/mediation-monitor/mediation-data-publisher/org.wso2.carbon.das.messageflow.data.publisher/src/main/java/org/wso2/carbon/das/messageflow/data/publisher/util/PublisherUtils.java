@@ -27,10 +27,7 @@ import java.util.Map;
 public class PublisherUtils {
 
     private static ConfigurationContext axisConfigurationContext;
-    private static ConfigurationContextService configurationContextService;
     private static DASMessageFlowPublisherAdmin dasMessageFlowPublisherAdmin;
-
-    private static final String TRANSPORT = "https"; // TODO: it is not ideal to assume https is always available
 
     private static boolean isTraceDataCollectingEnabled = false;
 
@@ -61,15 +58,6 @@ public class PublisherUtils {
     public static ConfigurationContext getConfigurationContext() {
         return axisConfigurationContext;
     }
-
-    public static void setConfigurationContextService(ConfigurationContextService contextService) {
-        configurationContextService = contextService;
-    }
-
-    public static ConfigurationContextService getConfigurationContextService() {
-        return configurationContextService;
-    }
-
 
     public static DASMessageFlowPublisherAdmin getMediationStatPublisherAdmin() {
         return dasMessageFlowPublisherAdmin;

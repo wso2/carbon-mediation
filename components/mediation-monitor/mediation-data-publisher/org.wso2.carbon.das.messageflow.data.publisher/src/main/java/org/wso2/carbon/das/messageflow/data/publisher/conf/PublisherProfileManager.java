@@ -37,10 +37,6 @@ public class PublisherProfileManager {
     private static Map<Integer, HashMap<String, PublisherProfile>> publisherProfiles =
             new HashMap<Integer, HashMap<String, PublisherProfile>>();
 
-    // Common place for storing all synapse-configurations
-    private static Map<Integer, HashMap<String, StructuringArtifact>> synapseConfigs =
-            new HashMap<Integer, HashMap<String, StructuringArtifact>>();
-
     public PublisherProfileManager() {
         registryPersistenceManager = new RegistryPersistenceManager();
     }
@@ -82,25 +78,6 @@ public class PublisherProfileManager {
                 && registryPersistenceManager.remove(tenantId, serverId);
     }
 
-    public List<StructuringArtifact> getSynapseArtifactList(int tenantId) {
-        if (synapseConfigs.get(tenantId) == null){
-            synapseConfigs.put(tenantId, new HashMap<String, StructuringArtifact>());
-            return null;
-        } else {
-            if (synapseConfigs.get(tenantId).values() == null) {
-                return new ArrayList<StructuringArtifact>();
-            } else {
-                return new ArrayList<StructuringArtifact>(synapseConfigs.get(tenantId).values());
-            }
-        }
-    }
-
-    public void addSynapseConfig(int tenantId, StructuringArtifact artifact) {
-        if (synapseConfigs.get(tenantId) == null){
-            synapseConfigs.put(tenantId, new HashMap<String, StructuringArtifact>());
-        }
-        synapseConfigs.get(tenantId).put(artifact.getName(), artifact);
-    }
 
     /**
      * This will load publishing-server-configurations from the registry.

@@ -26,7 +26,6 @@ import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
@@ -35,6 +34,7 @@ import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServic
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 
 import org.wso2.carbon.das.messageflow.data.publisher.data.MessageFlowObserverStore;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MessageFlowReporterThread;
@@ -59,6 +59,10 @@ import java.util.Set;
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
  * cardinality="1..n" policy="dynamic" bind="setSynapseRegistrationsService"
  * unbind="unsetSynapseRegistrationsService"
+ * @scr.reference name="eventStreamManager.service"
+ * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
+ * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
+ * unbind="unsetEventStreamService"
  */
 public class MediationStatisticsComponent {
 
@@ -223,28 +227,31 @@ public class MediationStatisticsComponent {
     }
 
     protected void setConfigurationContextService(ConfigurationContextService contextService) {
-        PublisherUtils.setConfigurationContextService(contextService);
+        MessageFlowDataPublisherDataHolder.getInstance().setContextService(contextService);
 
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
-        PublisherUtils.setConfigurationContextService(null);
+        MessageFlowDataPublisherDataHolder.getInstance().setContextService(null);
     }
 
     protected void setRegistryService(RegistryService registryService) {
-        try {
-            RegistryPersistenceManager.setDasRegistryService(registryService);
-        } catch (Exception e) {
-            log.error("Cannot retrieve System Registry", e);
-        }
+        MessageFlowDataPublisherDataHolder.getInstance().setRegistryService(registryService);
     }
 
     protected void unsetRegistryService(RegistryService registryService) {
-        RegistryPersistenceManager.setDasRegistryService(null);
+        MessageFlowDataPublisherDataHolder.getInstance().setRegistryService(null);
+    }
+
+    protected void setEventStreamService(EventStreamService publisherService) {
+        MessageFlowDataPublisherDataHolder.getInstance().setPublisherService(publisherService);
+    }
+
+    protected void unsetEventStreamService(EventStreamService publisherService) {
+        MessageFlowDataPublisherDataHolder.getInstance().setPublisherService(null);
     }
 
     protected void setSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
-
         if (log.isDebugEnabled()) {
             log.debug("SynapseEnvironmentService bound to the mediation tracer initialization");
         }
@@ -253,14 +260,12 @@ public class MediationStatisticsComponent {
     }
 
     protected void unsetSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
-
         if (log.isDebugEnabled()) {
             log.debug("SynapseEnvironmentService unbound from the mediation tracer collector");
         }
 
         synapseEnvServices.remove(synapseEnvironmentService.getTenantId());
     }
-
 
     protected void setSynapseRegistrationsService(SynapseRegistrationsService registrationsService) {
         ServiceRegistration synEnvSvcRegistration = registrationsService.getSynapseEnvironmentServiceRegistration();
