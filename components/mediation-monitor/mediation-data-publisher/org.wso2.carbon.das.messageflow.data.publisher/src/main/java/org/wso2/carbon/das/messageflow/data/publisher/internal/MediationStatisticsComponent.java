@@ -28,7 +28,6 @@ import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
-import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -172,9 +171,6 @@ public class MediationStatisticsComponent {
     }
 
     protected void deactivate(ComponentContext ctxt) {
-        // unregistered DASMediationStatsPublisherAdmin service from the OSGi Service Register.
-//        statAdminServiceRegistration.unregister();
-
         Set<Map.Entry<Integer, MessageFlowReporterThread>> threadEntries = reporterThreads.entrySet();
         for (Map.Entry<Integer, MessageFlowReporterThread> threadEntry : threadEntries) {
             MessageFlowReporterThread reporterThread = threadEntry.getValue();
@@ -311,7 +307,7 @@ public class MediationStatisticsComponent {
 
     private void checkPublishingEnabled() {
         flowStatisticsEnabled = RuntimeStatisticCollector.isStatisticsEnabled();
-        PublisherUtils.setTraceDataCollectingEnabled(flowStatisticsEnabled);
+        MessageFlowDataPublisherDataHolder.getInstance().setGlobalStatisticsEnabled(flowStatisticsEnabled);
 
         if (!flowStatisticsEnabled) {
             log.info("Global Message-Flow Statistic Reporting is Disabled");

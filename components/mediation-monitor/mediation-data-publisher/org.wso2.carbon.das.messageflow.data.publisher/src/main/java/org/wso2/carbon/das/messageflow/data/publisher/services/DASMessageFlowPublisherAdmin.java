@@ -17,14 +17,12 @@
  */
 package org.wso2.carbon.das.messageflow.data.publisher.services;
 
-import org.apache.synapse.aspects.flow.statistics.structuring.StructuringArtifact;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherConfig;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfile;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.core.AbstractAdmin;
-import org.wso2.carbon.das.messageflow.data.publisher.publish.ConfigurationPublisher;
-import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
+import org.wso2.carbon.das.messageflow.data.publisher.internal.MessageFlowDataPublisherDataHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +59,6 @@ public class DASMessageFlowPublisherAdmin extends AbstractAdmin {
     }
 
     public boolean isCollectingEnabled() {
-        return PublisherUtils.isTraceDataCollectingEnabled();
+        return MessageFlowDataPublisherDataHolder.getInstance().isGlobalStatisticsEnabled();
     }
 }

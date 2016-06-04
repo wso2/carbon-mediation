@@ -26,6 +26,7 @@ public class MessageFlowDataPublisherDataHolder {
     private EventStreamService publisherService;
     private RegistryService registryService;
     private ConfigurationContextService contextService;
+    private boolean isGlobalStatisticsEnabled;
 
     private static MessageFlowDataPublisherDataHolder serviceHolder = new MessageFlowDataPublisherDataHolder();
 
@@ -59,5 +60,13 @@ public class MessageFlowDataPublisherDataHolder {
 
     public void setContextService(ConfigurationContextService contextService) {
         this.contextService = contextService;
+    }
+
+    public boolean isGlobalStatisticsEnabled() {
+        return isGlobalStatisticsEnabled;
+    }
+
+    public void setGlobalStatisticsEnabled(boolean globalStatisticsEnabled) {
+        isGlobalStatisticsEnabled = globalStatisticsEnabled;
     }
 }

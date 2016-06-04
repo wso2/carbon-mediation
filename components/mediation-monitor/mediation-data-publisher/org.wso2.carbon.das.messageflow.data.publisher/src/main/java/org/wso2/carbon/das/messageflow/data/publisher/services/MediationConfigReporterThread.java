@@ -91,7 +91,6 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
     }
 
     private void updateConfigurations(List<StructuringArtifact> completedStructureList) {
-
         for (StructuringArtifact structuringArtifact : completedStructureList) {
             ConfigurationPublisher.process(structuringArtifact);
         }
