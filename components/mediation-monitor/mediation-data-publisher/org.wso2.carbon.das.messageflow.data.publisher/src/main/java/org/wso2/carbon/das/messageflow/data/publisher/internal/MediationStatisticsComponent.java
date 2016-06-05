@@ -28,6 +28,7 @@ import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
+import org.wso2.carbon.das.messageflow.data.publisher.observer.jmx.JMXMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
@@ -135,7 +136,16 @@ public class MediationStatisticsComponent {
         }
         reporterThreads.put(tenantId, reporterThread);
 
+        ServerConfiguration serverConf = ServerConfiguration.getInstance();
+        String disableJmxStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_JMX_PUBLISHING);
+        boolean disableJmx = Boolean.parseBoolean(disableJmxStr);
+        if (!disableJmx) {
+            JMXMediationFlowObserver jmxObserver = new JMXMediationFlowObserver();
+            observerStore.registerObserver(jmxObserver);
+            log.info("JMX mediation statistic publishing enabled for tenant: "+ tenantId);
+        }
         DASMediationFlowObserver dasObserver = new DASMediationFlowObserver();
+        log.info("DAS mediation statistic publishing enabled for tenant: "+ tenantId);
         observerStore.registerObserver(dasObserver);
         dasObserver.setTenantId(tenantId);
         // 'MediationStat service' will be deployed per tenant (cardinality="1..n")
@@ -149,7 +159,6 @@ public class MediationStatisticsComponent {
         MediationConfigReporterThread configReporterThread = new MediationConfigReporterThread(synEnvService);
         configReporterThread.setName("mediation-config-reporter-" + tenantId);
         // Set a custom interval value if required
-        ServerConfiguration serverConf = ServerConfiguration.getInstance();
         String interval = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_REPORTING_INTERVAL);
         if (interval != null) {
             try {
