@@ -25,7 +25,6 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
@@ -101,9 +100,6 @@ public class MediationStatisticsComponent {
 
         SynapseEnvironmentService synapseEnvService = synapseEnvServices.get(tenantId);
 
-        // Create list of profiles for data publishers
-        createPublisherProfiles();
-
         // Create observer store for super-tenant
         createStores(synapseEnvService);
 
@@ -113,12 +109,6 @@ public class MediationStatisticsComponent {
             log.debug("DAS Message Flow Publishing Component activate");
         }
     }
-
-    private void createPublisherProfiles() {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        new PublisherProfileManager().loadTenantPublisherProfilesFromRegistry(tenantId);
-    }
-
 
     /**
      * Create the observers store using the synapse environment and configuration context.
@@ -269,7 +259,6 @@ public class MediationStatisticsComponent {
             if (activated && compCtx != null) {
                 SynapseEnvironmentService synEnvSvc = (SynapseEnvironmentService) compCtx.getBundleContext().getService(
                         synEnvSvcRegistration.getReference());
-                createPublisherProfiles();
                 createStores(synEnvSvc);
             }
         } catch (Throwable t) {

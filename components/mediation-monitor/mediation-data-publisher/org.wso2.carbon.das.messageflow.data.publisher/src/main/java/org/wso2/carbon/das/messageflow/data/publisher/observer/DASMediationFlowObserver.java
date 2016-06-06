@@ -21,14 +21,10 @@ package org.wso2.carbon.das.messageflow.data.publisher.observer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfile;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.das.messageflow.data.publisher.internal.MessageFlowDataPublisherDataHolder;
 import org.wso2.carbon.das.messageflow.data.publisher.publish.StatisticsPublisher;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediation.statistics.*;
-
-import java.util.List;
 
 
 public class DASMediationFlowObserver implements MessageFlowObserver,
