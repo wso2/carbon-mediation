@@ -72,4 +72,5 @@ public class DASDataPublisherConstants {
     public static final String STAT_CONFIG_ELEMENT = "MediationFlowStatisticConfig";
     public static final String FLOW_STATISTIC_REPORTING_INTERVAL = STAT_CONFIG_ELEMENT + ".AnalyticsServerPublishingInterval";
     public static final String FLOW_STATISTIC_JMX_PUBLISHING = STAT_CONFIG_ELEMENT + ".JmxPublishingDisable";
+    public static final String STAT_OBSERVERS = STAT_CONFIG_ELEMENT + ".Observers";
 }

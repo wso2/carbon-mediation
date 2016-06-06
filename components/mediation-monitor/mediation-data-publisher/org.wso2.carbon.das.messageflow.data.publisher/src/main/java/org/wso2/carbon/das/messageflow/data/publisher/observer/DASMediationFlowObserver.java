@@ -25,7 +25,6 @@ import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfile;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.das.messageflow.data.publisher.publish.StatisticsPublisher;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.mediation.statistics.*;
 
 import java.util.List;
 
