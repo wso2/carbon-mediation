@@ -28,6 +28,8 @@ import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
 import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
+import org.wso2.carbon.das.messageflow.data.publisher.observer.MessageFlowObserver;
+import org.wso2.carbon.das.messageflow.data.publisher.observer.TenantInformation;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.jmx.JMXMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
 import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
@@ -142,12 +144,31 @@ public class MediationStatisticsComponent {
         if (!disableJmx) {
             JMXMediationFlowObserver jmxObserver = new JMXMediationFlowObserver();
             observerStore.registerObserver(jmxObserver);
+            jmxObserver.setTenantId(tenantId);
             log.info("JMX mediation statistic publishing enabled for tenant: "+ tenantId);
         }
         DASMediationFlowObserver dasObserver = new DASMediationFlowObserver();
-        log.info("DAS mediation statistic publishing enabled for tenant: "+ tenantId);
         observerStore.registerObserver(dasObserver);
         dasObserver.setTenantId(tenantId);
+        log.info("DAS mediation statistic publishing enabled for tenant: " + tenantId);
+        // Engage custom observer implementations (user written extensions)
+        String observers = serverConf.getFirstProperty(DASDataPublisherConstants.STAT_OBSERVERS);
+        if (observers != null && !"".equals(observers)) {
+            String[] classNames = observers.split(",");
+            for (String className : classNames) {
+                try {
+                    Class clazz = this.getClass().getClassLoader().loadClass(className.trim());
+                    MessageFlowObserver o = (MessageFlowObserver) clazz.newInstance();
+                    observerStore.registerObserver(o);
+                    if (o instanceof TenantInformation) {
+                        TenantInformation tenantInformation = (TenantInformation) o;
+                        tenantInformation.setTenantId(synEnvService.getTenantId());
+                    }
+                } catch (Exception e) {
+                    log.error("Error while initializing the mediation statistics observer : " + className, e);
+                }
+            }
+        }
         // 'MediationStat service' will be deployed per tenant (cardinality="1..n")
 
         if (log.isDebugEnabled()) {

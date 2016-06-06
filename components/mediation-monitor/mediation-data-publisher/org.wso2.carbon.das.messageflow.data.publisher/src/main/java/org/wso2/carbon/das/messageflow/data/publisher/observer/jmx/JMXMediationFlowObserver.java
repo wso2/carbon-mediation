@@ -24,6 +24,7 @@ import org.apache.synapse.aspects.flow.statistics.publishing.PublishingEvent;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.MessageFlowObserver;
+import org.wso2.carbon.das.messageflow.data.publisher.observer.TenantInformation;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.jmx.data.StatisticCollectionViewMXBean;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.jmx.data.StatisticsCompositeObject;
 import org.apache.synapse.aspects.flow.statistics.util.StatisticsConstants;
@@ -35,13 +36,15 @@ import java.util.Map;
 /**
  * Publish statistics data for JMX monitoring.
  */
-public class JMXMediationFlowObserver implements StatisticCollectionViewMXBean, MessageFlowObserver {
+public class JMXMediationFlowObserver implements StatisticCollectionViewMXBean, MessageFlowObserver, TenantInformation {
 
     private static final Log log = LogFactory.getLog(JMXMediationFlowObserver.class);
 
     public static final String MBEAN_CATEGORY = "Mediation Flow Statistic View";
 
     public static final String MBEAN_ID = "MediationFlowStatisticView";
+
+    private int tenantId = -1234;
 
     private final Map<String, SummeryStatisticObject> proxyStatistics = new HashMap<>();
 
@@ -185,5 +188,15 @@ public class JMXMediationFlowObserver implements StatisticCollectionViewMXBean, 
                 }
             }
         }
+    }
+
+    @Override
+    public int getTenantId() {
+        return tenantId;
+    }
+
+    @Override
+    public void setTenantId(int i) {
+        tenantId = i;
     }
 }
