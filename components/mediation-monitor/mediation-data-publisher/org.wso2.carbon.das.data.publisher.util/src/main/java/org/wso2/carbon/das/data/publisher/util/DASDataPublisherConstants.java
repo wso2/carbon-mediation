@@ -69,5 +69,7 @@ public class DASDataPublisherConstants {
     public static final String DAS_PUBLISHING_ENABLED = "publishing-enabled";
 
     // Carbon XML properties
-    public static final String FLOW_STATISTIC_REPORTING_INTERVAL = "MediationFlowStatisticsReportingInterval";
+    public static final String STAT_CONFIG_ELEMENT = "MediationFlowStatisticConfig";
+    public static final String FLOW_STATISTIC_REPORTING_INTERVAL = STAT_CONFIG_ELEMENT + ".AnalyticsServerPublishingInterval";
+    public static final String FLOW_STATISTIC_JMX_PUBLISHING = STAT_CONFIG_ELEMENT + ".JmxPublishingDisable";
 }
