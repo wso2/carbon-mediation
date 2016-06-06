@@ -43,6 +43,8 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
 
     private long delay = 2 * 1000;
 
+    private boolean isPublishingAnalyticESB = true;
+
     public MediationConfigReporterThread(SynapseEnvironmentService synEnvSvc) {
         this.synapseEnvironmentService = synEnvSvc;
         this.publisherProfileManager = new PublisherProfileManager();
@@ -72,6 +74,14 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
                 log.debug("Statistics collector is not available in the Synapse environment");
             }
             delay();
+            return;
+        }
+
+        if (!isPublishingAnalyticESB) {
+            //Not publishing configuration data to analytic esb
+            if (!completedStructureStore.isEmpty()) {
+                completedStructureStore.getCompletedStructureEntries();
+            }
             return;
         }
 
@@ -148,4 +158,7 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
         tenantId = i;
     }
 
+    public void setPublishingAnalyticESB(boolean publishingAnalyticESB) {
+        isPublishingAnalyticESB = publishingAnalyticESB;
+    }
 }
