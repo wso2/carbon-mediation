@@ -162,6 +162,7 @@ public class XMLInputReader implements InputReader {
 
         elementType = getElementType(jsonSchemaMap, nameSpaceLocalName);
         if (NULL_ELEMENT_TYPE.equals(elementType) && !localName.equals("Header")) {
+            /* Check whether the input payload has empty tags. */
             log.warn("Element name not found : " + nameSpaceLocalName);
         }
 
@@ -297,6 +298,7 @@ public class XMLInputReader implements InputReader {
         /* get the type of the attribute element */
         attributeType = getElementType(jsonSchemaMap, attributeQName);
         if (NULL_ELEMENT_TYPE.equals(attributeType)) {
+             /* Check whether the input payload has empty tags. */
             log.warn("Attribute name not found : " + attributeQName);
         }
 
@@ -319,6 +321,7 @@ public class XMLInputReader implements InputReader {
             /* get the type of the attribute element */
             attributeType = getElementType(jsonSchemaMap, attributeQName);
             if (NULL_ELEMENT_TYPE.equals(attributeType)) {
+                 /* Check whether the input payload has empty tags. */
                 log.warn("Attribute name not found : " + attributeQName);
             }
 
