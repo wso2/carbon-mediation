@@ -140,17 +140,21 @@ public class MediationStatisticsComponent {
 
         ServerConfiguration serverConf = ServerConfiguration.getInstance();
         String disableJmxStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_JMX_PUBLISHING);
-        boolean disableJmx = Boolean.parseBoolean(disableJmxStr);
-        if (!disableJmx) {
+        boolean enableJmxPublishing = !Boolean.parseBoolean(disableJmxStr);
+        if (enableJmxPublishing) {
             JMXMediationFlowObserver jmxObserver = new JMXMediationFlowObserver();
             observerStore.registerObserver(jmxObserver);
             jmxObserver.setTenantId(tenantId);
-            log.info("JMX mediation statistic publishing enabled for tenant: "+ tenantId);
+            log.info("JMX mediation statistic publishing enabled for tenant: " + tenantId);
         }
-        DASMediationFlowObserver dasObserver = new DASMediationFlowObserver();
-        observerStore.registerObserver(dasObserver);
-        dasObserver.setTenantId(tenantId);
-        log.info("DAS mediation statistic publishing enabled for tenant: " + tenantId);
+        String disableAnalyticStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_JMX_PUBLISHING);
+        boolean enableAnalyticsPublishing = !Boolean.parseBoolean(disableAnalyticStr);
+        if (enableAnalyticsPublishing) {
+            DASMediationFlowObserver dasObserver = new DASMediationFlowObserver();
+            observerStore.registerObserver(dasObserver);
+            dasObserver.setTenantId(tenantId);
+            log.info("DAS mediation statistic publishing enabled for tenant: " + tenantId);
+        }
         // Engage custom observer implementations (user written extensions)
         String observers = serverConf.getFirstProperty(DASDataPublisherConstants.STAT_OBSERVERS);
         if (observers != null && !"".equals(observers)) {
@@ -179,6 +183,7 @@ public class MediationStatisticsComponent {
         // Adding configuration reporting thread
         MediationConfigReporterThread configReporterThread = new MediationConfigReporterThread(synEnvService);
         configReporterThread.setName("mediation-config-reporter-" + tenantId);
+        configReporterThread.setPublishingAnalyticESB(enableAnalyticsPublishing);
         // Set a custom interval value if required
         String interval = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_REPORTING_INTERVAL);
         if (interval != null) {
