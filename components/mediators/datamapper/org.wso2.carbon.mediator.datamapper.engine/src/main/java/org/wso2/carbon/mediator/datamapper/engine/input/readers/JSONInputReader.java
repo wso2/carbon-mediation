@@ -58,12 +58,8 @@ public class JSONInputReader implements InputReader {
         try {
             inputJSONMessage = readFromInputStream(input);
             messageBuilder.notifyWithResult(inputJSONMessage);
-        } catch (IOException e) {
-            throw new ReaderException("IO Error while reading input stream. " + e.getMessage());
-        } catch (JSException e) {
-            throw new ReaderException("JSException while reading input stream. " + e.getMessage());
-        } catch (SchemaException e) {
-            throw new ReaderException("SchemaException while reading input stream. " + e.getMessage());
+        } catch (IOException | JSException | SchemaException e) {
+            throw new ReaderException("Error while reading input stream. " + e.getMessage());
         }
 
     }
@@ -82,8 +78,13 @@ public class JSONInputReader implements InputReader {
 
         StringBuilder out = new StringBuilder("");
         String line;
-        while ((line = br.readLine()) != null) {
-            out.append(line);
+        try {
+            while ((line = br.readLine()) != null) {
+                out.append(line);
+            }
+        } finally {
+            br.close();
+            isr.close();
         }
         return out.toString();
     }

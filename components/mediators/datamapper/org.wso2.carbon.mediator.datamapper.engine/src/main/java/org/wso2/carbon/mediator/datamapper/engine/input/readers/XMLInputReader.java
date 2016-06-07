@@ -114,14 +114,8 @@ public class XMLInputReader implements InputReader {
             XMLTraverse(root, null, jsonSchema);
             jsonBuilder.writeEndObject();
             writeTerminateElement();
-        } catch (IOException e) {
-            throw new ReaderException("IO Error while parsing xml input stream. " + e.getMessage());
-        } catch (JSException e) {
-            throw new ReaderException("JSException while parsing xml input stream. " + e.getMessage());
-        } catch (SchemaException e) {
-            throw new ReaderException("SchemaException while parsing xml input stream. " + e.getMessage());
-        } catch (InvalidPayloadException e) {
-            throw new ReaderException("InvalidPayLoad while parsing xml input stream. " + e.getMessage());
+        } catch (IOException | JSException | SchemaException | InvalidPayloadException e) {
+            throw new ReaderException("Error while parsing XML input stream. " + e.getMessage());
         }
 
     }
