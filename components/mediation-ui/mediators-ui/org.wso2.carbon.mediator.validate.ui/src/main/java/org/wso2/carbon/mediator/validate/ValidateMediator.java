@@ -156,7 +156,7 @@ public class ValidateMediator extends AbstractListMediator {
 
         if (attSource != null) {
             try {
-                source = SynapseXPathFactory.getSynapseXPath(elem, ATT_SOURCE);
+                source = SynapsePathFactory.getSynapsePath(elem, ATT_SOURCE);
             } catch (JaxenException e) {
                 throw new MediatorException("Invalid XPath expression specified for attribute 'source'");
             }
