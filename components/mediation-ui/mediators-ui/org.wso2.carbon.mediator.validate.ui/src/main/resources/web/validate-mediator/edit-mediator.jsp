@@ -18,7 +18,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map"%>
-<%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
 <%@ page import="org.apache.synapse.mediators.Value" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.util.MediatorProperty" %>
@@ -44,7 +44,7 @@
     List<Value> keys = validateMediator.getSchemaKeys();
 
     // source
-    SynapseXPath sourceXpth = validateMediator.getSource();
+    SynapsePath sourceXpth = validateMediator.getSource();
     String source = "";
     NameSpacesRegistrar namespacRegister = NameSpacesRegistrar.getInstance();
     if (sourceXpth != null) {
@@ -91,7 +91,7 @@
                                 int i = 0;
                                 boolean isStaticKey = true;
                                 String showValue = "";
-                                SynapseXPath synapseXPath = null;
+                                SynapsePath synapseXPath = null;
 
                                 if (!keys.isEmpty()) {
 
@@ -99,7 +99,7 @@
 
                                         if (schemaKey != null) {
                                             showValue = schemaKey.getKeyValue();
-                                            synapseXPath = (SynapseXPath) schemaKey.getExpression();
+                                            synapseXPath = schemaKey.getExpression();
 
                                             isStaticKey = showValue != null && !"".equals(showValue);
 
