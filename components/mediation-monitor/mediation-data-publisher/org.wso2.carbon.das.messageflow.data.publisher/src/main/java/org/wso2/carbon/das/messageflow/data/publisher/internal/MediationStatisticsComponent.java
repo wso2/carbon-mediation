@@ -25,19 +25,17 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.RegistryPersistenceManager;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.DASMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.MessageFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.TenantInformation;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.jmx.JMXMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
-import org.wso2.carbon.das.messageflow.data.publisher.util.PublisherUtils;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 import org.wso2.carbon.utils.ConfigurationContextService;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+import org.wso2.carbon.event.stream.core.EventStreamService;
 
 import org.wso2.carbon.das.messageflow.data.publisher.data.MessageFlowObserverStore;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MessageFlowReporterThread;
@@ -62,6 +60,10 @@ import java.util.Set;
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
  * cardinality="1..n" policy="dynamic" bind="setSynapseRegistrationsService"
  * unbind="unsetSynapseRegistrationsService"
+ * @scr.reference name="eventStreamManager.service"
+ * interface="org.wso2.carbon.event.stream.core.EventStreamService" cardinality="1..1"
+ * policy="dynamic" bind="setEventStreamService" unbind="unsetEventStreamService"
+ * unbind="unsetEventStreamService"
  */
 public class MediationStatisticsComponent {
 
@@ -101,9 +103,6 @@ public class MediationStatisticsComponent {
 
         SynapseEnvironmentService synapseEnvService = synapseEnvServices.get(tenantId);
 
-        // Create list of profiles for data publishers
-        createPublisherProfiles();
-
         // Create observer store for super-tenant
         createStores(synapseEnvService);
 
@@ -113,12 +112,6 @@ public class MediationStatisticsComponent {
             log.debug("DAS Message Flow Publishing Component activate");
         }
     }
-
-    private void createPublisherProfiles() {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        new PublisherProfileManager().loadTenantPublisherProfilesFromRegistry(tenantId);
-    }
-
 
     /**
      * Create the observers store using the synapse environment and configuration context.
@@ -203,9 +196,6 @@ public class MediationStatisticsComponent {
     }
 
     protected void deactivate(ComponentContext ctxt) {
-        // unregistered DASMediationStatsPublisherAdmin service from the OSGi Service Register.
-//        statAdminServiceRegistration.unregister();
-
         Set<Map.Entry<Integer, MessageFlowReporterThread>> threadEntries = reporterThreads.entrySet();
         for (Map.Entry<Integer, MessageFlowReporterThread> threadEntry : threadEntries) {
             MessageFlowReporterThread reporterThread = threadEntry.getValue();
@@ -258,28 +248,31 @@ public class MediationStatisticsComponent {
     }
 
     protected void setConfigurationContextService(ConfigurationContextService contextService) {
-        PublisherUtils.setConfigurationContextService(contextService);
+        MessageFlowDataPublisherDataHolder.getInstance().setContextService(contextService);
 
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService contextService) {
-        PublisherUtils.setConfigurationContextService(null);
+        MessageFlowDataPublisherDataHolder.getInstance().setContextService(null);
     }
 
     protected void setRegistryService(RegistryService registryService) {
-        try {
-            RegistryPersistenceManager.setDasRegistryService(registryService);
-        } catch (Exception e) {
-            log.error("Cannot retrieve System Registry", e);
-        }
+        MessageFlowDataPublisherDataHolder.getInstance().setRegistryService(registryService);
     }
 
     protected void unsetRegistryService(RegistryService registryService) {
-        RegistryPersistenceManager.setDasRegistryService(null);
+        MessageFlowDataPublisherDataHolder.getInstance().setRegistryService(null);
+    }
+
+    protected void setEventStreamService(EventStreamService publisherService) {
+        MessageFlowDataPublisherDataHolder.getInstance().setPublisherService(publisherService);
+    }
+
+    protected void unsetEventStreamService(EventStreamService publisherService) {
+        MessageFlowDataPublisherDataHolder.getInstance().setPublisherService(null);
     }
 
     protected void setSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
-
         if (log.isDebugEnabled()) {
             log.debug("SynapseEnvironmentService bound to the mediation tracer initialization");
         }
@@ -288,7 +281,6 @@ public class MediationStatisticsComponent {
     }
 
     protected void unsetSynapseEnvironmentService(SynapseEnvironmentService synapseEnvironmentService) {
-
         if (log.isDebugEnabled()) {
             log.debug("SynapseEnvironmentService unbound from the mediation tracer collector");
         }
@@ -296,14 +288,12 @@ public class MediationStatisticsComponent {
         synapseEnvServices.remove(synapseEnvironmentService.getTenantId());
     }
 
-
     protected void setSynapseRegistrationsService(SynapseRegistrationsService registrationsService) {
         ServiceRegistration synEnvSvcRegistration = registrationsService.getSynapseEnvironmentServiceRegistration();
         try {
             if (activated && compCtx != null) {
                 SynapseEnvironmentService synEnvSvc = (SynapseEnvironmentService) compCtx.getBundleContext().getService(
                         synEnvSvcRegistration.getReference());
-                createPublisherProfiles();
                 createStores(synEnvSvc);
             }
         } catch (Throwable t) {
@@ -341,7 +331,7 @@ public class MediationStatisticsComponent {
 
     private void checkPublishingEnabled() {
         flowStatisticsEnabled = RuntimeStatisticCollector.isStatisticsEnabled();
-        PublisherUtils.setTraceDataCollectingEnabled(flowStatisticsEnabled);
+        MessageFlowDataPublisherDataHolder.getInstance().setGlobalStatisticsEnabled(flowStatisticsEnabled);
 
         if (!flowStatisticsEnabled) {
             log.info("Global Message-Flow Statistic Reporting is Disabled");

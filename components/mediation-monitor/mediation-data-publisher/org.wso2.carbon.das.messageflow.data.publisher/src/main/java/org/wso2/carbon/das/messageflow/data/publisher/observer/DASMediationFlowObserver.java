@@ -21,12 +21,9 @@ package org.wso2.carbon.das.messageflow.data.publisher.observer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfile;
-import org.wso2.carbon.das.messageflow.data.publisher.conf.PublisherProfileManager;
+import org.wso2.carbon.das.messageflow.data.publisher.internal.MessageFlowDataPublisherDataHolder;
 import org.wso2.carbon.das.messageflow.data.publisher.publish.StatisticsPublisher;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
-
-import java.util.List;
 
 
 public class DASMediationFlowObserver implements MessageFlowObserver,
@@ -35,10 +32,7 @@ public class DASMediationFlowObserver implements MessageFlowObserver,
     private static final Log log = LogFactory.getLog(DASMediationFlowObserver.class);
     private int tenantId = -1234;
 
-    private PublisherProfileManager publisherProfileManager;
-
     public DASMediationFlowObserver() {
-        this.publisherProfileManager = new PublisherProfileManager();
     }
 
     @Override
@@ -53,25 +47,15 @@ public class DASMediationFlowObserver implements MessageFlowObserver,
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId,true);
-            updateStatisticsInternal(flow);
+
+            // No need to publish if there's no stream
+            if (MessageFlowDataPublisherDataHolder.getInstance().getPublisherService().getStreamIds().size() > 0) {
+                StatisticsPublisher.process(flow);
+            }
         } catch (Exception e) {
             log.error("failed to update statics from DAS publisher", e);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
-        }
-    }
-
-    private void updateStatisticsInternal(PublishingFlow flow)
-            throws Exception {
-        int tenantID = getTenantId();
-        List<PublisherProfile> publisherProfiles = publisherProfileManager.getTenantPublisherProfilesList(tenantID);
-
-        if (publisherProfiles.isEmpty()) {
-            return;
-        }
-
-        for (PublisherProfile aProfile : publisherProfiles) {
-            StatisticsPublisher.process(flow, aProfile.getConfig());
         }
     }
 
