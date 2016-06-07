@@ -32,8 +32,6 @@
     <url>http://wso2.org</url>
 
     <modules>
-        <module>service</module>
-	    <module>mediation</module>
         <module>messageflow</module>
     </modules>
 

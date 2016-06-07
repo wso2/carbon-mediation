@@ -42,7 +42,6 @@
                 <module>components/carbon-transports</module>
                 <module>components/carbon-mediation-startup</module>
                 <module>service-stubs/mediation-admin</module>
-                <module>service-stubs/mediation-monitor</module>
                 <module>service-stubs/application-mgt</module>
                 <module>service-stubs/mediation-cg</module>
                 <module>components/mediation-registry</module>
@@ -757,16 +756,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.statistics.stub</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.flow.statistics.stub</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.cloud.gateway.agent.stub</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -847,16 +836,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.tracer.stub</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.das.messageflow.data.publisher.stub</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.library.stub</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -899,31 +878,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.bam.service.data.publisher</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency> 
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.bam.service.data.publisher.ui</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>     
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.bam.mediationstats.data.publisher.ui</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.bam.mediationstats.data.publisher</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.bam.data.publisher.util</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.security</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -935,11 +889,6 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.application.mgt.synapse.ui</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.tracer</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
@@ -1000,11 +949,6 @@
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.mediation.throttle</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.tracer.ui</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
@@ -1549,26 +1493,6 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.statistics</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.statistics.ui</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.flow.statistics</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.flow.statistics.ui</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.relay.module</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
@@ -1602,37 +1526,8 @@
                 <artifactId>org.wso2.carbon.event.sink.config.ui</artifactId>
                 <version>${carbon.mediation.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.das.messageflow.data.publisher.stub</artifactId>
-                <version>${carbon.mediation.version}</version>
-            </dependency>
 
             <!--10.3 Features -->
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.bam.service.agent.server.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-	    </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.bam.service.agent.ui.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-	    </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.bam.mediation.agent.server.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-	    </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.bam.mediation.agent.ui.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-	    </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
                 <artifactId>org.wso2.carbon.cloud.gateway.agent.server.feature</artifactId>
@@ -1683,56 +1578,9 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.statistics.server.feature</artifactId>
+                <artifactId>org.wso2.carbon.das.messageflow.data.publisher.feature</artifactId>
                 <version>${carbon.mediation.version}</version>
                 <type>zip</type>
-	        </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.statistics.ui.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-	        </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.flow.statistics.server.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.flow.statistics.ui.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.tracer.server.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-	        </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.mediation.tracer.ui.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-	        </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.das.messageflow.data.publisher.server.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.das.messageflow.data.publisher.ui.feature</artifactId>
-                <version>${carbon.mediation.version}</version>
-                <type>zip</type>
-            </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon.mediation</groupId>
-                <artifactId>org.wso2.carbon.das.messageflow.data.publisher.ui</artifactId>
-                <version>${carbon.mediation.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.mediation</groupId>
