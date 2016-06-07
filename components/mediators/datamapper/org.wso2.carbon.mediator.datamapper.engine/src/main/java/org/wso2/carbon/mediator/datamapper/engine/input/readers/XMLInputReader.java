@@ -32,9 +32,11 @@ import org.wso2.carbon.mediator.datamapper.engine.core.schemas.JacksonJSONSchema
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.input.InputBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.input.builders.JSONBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,7 +49,6 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
 
@@ -61,6 +62,9 @@ public class XMLInputReader implements InputReader {
     private static final String PROPERTIES_KEY = "properties";
     private static final String ATTRIBUTES_KEY = "attributes";
     private static final String TYPE_KEY = "type";
+    private static final String ITEMS_KEY = "items";
+    private static final String VALUE_KEY = "value";
+    private static final String ELEMENT_TEXT = "_ELEMVAL";
 
     private static final Log log = LogFactory.getLog(XMLInputReader.class);
 
@@ -140,11 +144,13 @@ public class XMLInputReader implements InputReader {
          * the end */
         boolean isObject = false;
 
+        boolean isArrayElement = false;
+
         String prevElementNameSpaceLocalName = null;
 
         String elementType;
 
-        Map nextJSONMap;
+        Map nextJSONSchemaMap;
 
         /* iterator to hold the child elements of the passed OMElement */
         Iterator<OMElement> it;
@@ -155,12 +161,12 @@ public class XMLInputReader implements InputReader {
         String nameSpaceLocalName = getNamespacesAndIdentifiersAddedFieldName(nameSpaceURI, localName, omElement);
 
         elementType = getElementType(jsonSchemaMap, nameSpaceLocalName);
-        if (NULL_ELEMENT_TYPE.equals(elementType) && !localName.equals("Header")) {
+        if (NULL_ELEMENT_TYPE.equals(elementType)) {
             /* Check whether the input payload has empty tags. */
             log.warn("Element name not found : " + nameSpaceLocalName);
         }
 
-        nextJSONMap = buildNextSchema(jsonSchemaMap, elementType, nameSpaceLocalName);
+        nextJSONSchemaMap = buildNextSchema(jsonSchemaMap, elementType, nameSpaceLocalName);
 
         /* if this is new object preceding an array, close the array before writing the new element */
         if (prevElementName != null && !nameSpaceLocalName.equals(prevElementName)) {
@@ -168,25 +174,44 @@ public class XMLInputReader implements InputReader {
             prevElementName = null;
         }
 
-        if (nameSpaceLocalName.equals(getInputSchema().getName())) {
-            writeAnonymousObjectStartElement();
-        } else if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
+        if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
             if (prevElementName == null) {
                 writeArrayStartElement(nameSpaceLocalName);
             }
+            elementType = getArraySubElementType(jsonSchemaMap, nameSpaceLocalName);
+            isArrayElement = true;
+        }
+
+        if (nameSpaceLocalName.equals(getInputSchema().getName())) {
             writeAnonymousObjectStartElement();
-            isObject = true;
         } else if (OBJECT_ELEMENT_TYPE.equals(elementType)) {
-            writeObjectStartElement(nameSpaceLocalName);
             isObject = true;
-        } else {
-            writeFieldElement(nameSpaceLocalName, omElement.getText(), elementType);
+            if (isArrayElement) {
+                writeAnonymousObjectStartElement();
+                elementType = getArrayObjectTextElementType(jsonSchemaMap, nameSpaceLocalName);
+            } else {
+                writeObjectStartElement(nameSpaceLocalName);
+                elementType = getObjectTextElementType(jsonSchemaMap, nameSpaceLocalName);
+            }
+        }
+        /* If there is text in the OMElement */
+        if (DataMapperEngineConstants.STRING_ELEMENT_TYPE.equals(elementType)
+                || DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE.equals(elementType)
+                || DataMapperEngineConstants.INTEGER_ELEMENT_TYPE.equals(elementType)
+                || DataMapperEngineConstants.NUMBER_ELEMENT_TYPE.equals(elementType)) {
+            if (isObject) { // if it is a normal object or an array element object
+                writeFieldElement(ELEMENT_TEXT, omElement.getText(), elementType);
+            } else if (!isArrayElement) { // if it is a normal XML element (not a object or part of an array)
+                writeFieldElement(nameSpaceLocalName, omElement.getText(), elementType);
+            } else { // primitive array elements
+                writePrimitiveElement(omElement.getText(), elementType);
+            }
         }
 
         /* writing attributes to the JSON message */
         it_attr = omElement.getAllAttributes();
         if (it_attr.hasNext()) {
-            writeAttributes(elementType, nameSpaceLocalName, nextJSONMap);
+            writeAttributes(nextJSONSchemaMap);
         }
 
         it = omElement.getChildElements();
@@ -194,7 +219,8 @@ public class XMLInputReader implements InputReader {
         /* Recursively call all the children */
         if (!isXsiNil(omElement)) {
             while (it.hasNext()) {
-                prevElementNameSpaceLocalName = XMLTraverse(it.next(), prevElementNameSpaceLocalName, nextJSONMap);
+                prevElementNameSpaceLocalName = XMLTraverse(it.next(), prevElementNameSpaceLocalName,
+                        nextJSONSchemaMap);
             }
         }
 
@@ -207,7 +233,7 @@ public class XMLInputReader implements InputReader {
             writeObjectEndElement();
         }
 
-        if (ARRAY_ELEMENT_TYPE.equals(elementType)) {
+        if (isArrayElement) {
             return nameSpaceLocalName;
         }
         return null;
@@ -244,19 +270,15 @@ public class XMLInputReader implements InputReader {
     /**
      * This method writes attribute elements into the JSON input message
      *
-     * @param elementType        type of the parent element
-     * @param nameSpaceLocalName name of the parent element
+     * @param jsonSchemaMap     current level JSON Schema
      * @throws JSException
      * @throws SchemaException
      * @throws ReaderException
      * @throws IOException
      * @throws InvalidPayloadException
      */
-    private void writeAttributes(String elementType, String nameSpaceLocalName, Map jsonSchemaMap)
+    private void writeAttributes(Map jsonSchemaMap)
             throws JSException, SchemaException, ReaderException, IOException, InvalidPayloadException {
-
-        /* object will be opened if the parent element is field type*/
-        boolean hasObjectOpened = false;
 
         /* currently processing attribute element and its parameters*/
         String attributeType;
@@ -264,40 +286,7 @@ public class XMLInputReader implements InputReader {
         String attributeLocalName;
         String attributeNSURI;
         String attributeQName;
-        OMAttribute omAttribute = null;
-
-        /* continue beyond this while loop only if there is at least one attribute without "XMLNS" tag */
-        while (it_attr.hasNext()) {
-            omAttribute = it_attr.next();
-            if (!omAttribute.getLocalName().contains(XMLNS))
-                break;
-            if (!it_attr.hasNext())
-                return;
-        }
-
-        /* if the main XML element is only a field, open an object to include the attributes */
-        if (!ARRAY_ELEMENT_TYPE.equals(elementType) && !OBJECT_ELEMENT_TYPE.equals(elementType)) {
-            writeObjectStartElement(nameSpaceLocalName + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
-            hasObjectOpened = true;
-        }
-
-        /** Write the first attribute to the JSON message */
-
-        /* extracting parameters from the attribute element */
-        attributeLocalName = omAttribute.getLocalName();
-        attributeNSURI = this.getNameSpaceURI(omAttribute);
-        attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI);
-        attributeQName = getAttributeQName(omAttribute.getNamespace(), attributeLocalName);
-
-        /* get the type of the attribute element */
-        attributeType = getElementType(jsonSchemaMap, attributeQName);
-        if (NULL_ELEMENT_TYPE.equals(attributeType)) {
-             /* Check whether the input payload has empty tags. */
-            log.warn("Attribute name not found : " + attributeQName);
-        }
-
-        /* write the attribute to the JSON message */
-        writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
+        OMAttribute omAttribute;
 
         /** Writing next attributes to the JSON message */
         while (it_attr.hasNext()) {
@@ -321,12 +310,6 @@ public class XMLInputReader implements InputReader {
 
             /* write the attribute to the JSON message */
             writeFieldElement(attributeFieldName, omAttribute.getAttributeValue(), attributeType);
-
-        }
-
-        /* if an object element was opened for writing this attributes, close it */
-        if (hasObjectOpened) {
-            writeObjectEndElement();
         }
     }
 
@@ -392,6 +375,58 @@ public class XMLInputReader implements InputReader {
             nextSchema.putAll((Map<? extends String, Object>) schema.get(ATTRIBUTES_KEY));
         }
         return nextSchema;
+    }
+
+    /**
+     * Get the array elements sub-type. It can either be an object or primitive type
+     *
+     * @param jsonSchemaMap Current level json schema
+     * @param elementName Name of the element
+     * @return sub-type of the array element
+     */
+    private String getArraySubElementType(Map jsonSchemaMap, String elementName) {
+        ArrayList itemsList = (ArrayList) ((Map<String, Object>) jsonSchemaMap.get(elementName)).get(ITEMS_KEY);
+        String output = (String) ((Map) itemsList.get(0)).get(TYPE_KEY);
+        return output;
+    }
+
+    /**
+     * Get the primitive type of an element
+     *                  Main type :array
+     *                  Sub-type :object
+     * @param jsonSchemaMap Current level json schema
+     * @param elementName Name of the element
+     * @return Primitive type or NULL_TYPE if there is not primitive text in the object
+     */
+    private String getArrayObjectTextElementType(Map jsonSchemaMap, String elementName) {
+        ArrayList itemsList = (ArrayList) ((Map<String, Object>) jsonSchemaMap.get(elementName)).get(ITEMS_KEY);
+        Map itemsMap = (Map) itemsList.get(0);
+        return getTextElementType(itemsMap);
+    }
+
+    /**
+     *  Get the primitive type of an element
+     *                  Main type :object
+     * @param jsonSchemaMap Current level json schema
+     * @param elementName Name of the element
+     * @return Primitive type or NULL_TYPE if there is not primitive text in the object
+     */
+    private String getObjectTextElementType(Map jsonSchemaMap, String elementName) {
+        Map objectsMap = (Map<String, Object>) jsonSchemaMap.get(elementName);
+        return getTextElementType(objectsMap);
+    }
+
+    /**
+     * Get primitive type (used for getArrayObjectTextElementType, getObjectTextElementType methods)
+     * @param objectsMap
+     * @return primitive type or NULL_TYPE of there is no primitive text
+     */
+    private String getTextElementType(Map objectsMap){
+        if (!objectsMap.containsKey(VALUE_KEY)) {
+            return NULL_ELEMENT_TYPE;
+        }
+        String output = (String) ((Map<String, Object>) (objectsMap.get(VALUE_KEY))).get(TYPE_KEY);
+        return output;
     }
 
     /**
@@ -473,6 +508,27 @@ public class XMLInputReader implements InputReader {
             break;
         default:
             jsonBuilder.writeField(getModifiedFieldName(fieldName), valueString, fieldType);
+
+        }
+    }
+
+    private void writePrimitiveElement(String valueString, String fieldType)
+            throws IOException, JSException, SchemaException, ReaderException {
+        switch (fieldType) {
+        case STRING_ELEMENT_TYPE:
+            jsonBuilder.writePrimitive(valueString, fieldType);
+            break;
+        case BOOLEAN_ELEMENT_TYPE:
+            jsonBuilder.writePrimitive(Boolean.parseBoolean(valueString), fieldType);
+            break;
+        case NUMBER_ELEMENT_TYPE:
+            jsonBuilder.writePrimitive(Double.parseDouble(valueString), fieldType);
+            break;
+        case INTEGER_ELEMENT_TYPE:
+            jsonBuilder.writePrimitive(Integer.parseInt(valueString), fieldType);
+            break;
+        default:
+            jsonBuilder.writePrimitive(valueString, fieldType);
 
         }
     }
