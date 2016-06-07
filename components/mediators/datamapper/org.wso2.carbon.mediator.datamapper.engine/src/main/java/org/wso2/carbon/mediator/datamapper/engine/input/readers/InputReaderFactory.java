@@ -16,22 +16,23 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.input.readers;
 
-import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
-import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
-import org.wso2.carbon.mediator.datamapper.engine.input.InputModelBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 
-import java.io.InputStream;
+import java.io.IOException;
 
 /**
- * This interface should be implemented by data-mapper input readers.
+ * This class is a factory class to get {@link InputReader} needed by the data mapper engine
  */
-public interface Reader {
+public class InputReaderFactory {
 
-    /**
-     * Method to read given input stream.
-     *
-     * @param input
-     * @return
-     */
-    void read(InputStream input, InputModelBuilder inputModelBuilder, Schema inputSchema) throws ReaderException;
+    public static InputReader getReader(InputOutputDataType inputType) throws IOException {
+        switch (inputType) {
+        case XML:
+            return new XMLInputReader();
+        case JSON:
+            return new JSONInputReader();
+        default:
+            throw new IllegalArgumentException("Input Reader for type " + inputType + " is not implemented.");
+        }
+    }
 }

@@ -289,7 +289,7 @@ public class JacksonJSONSchema implements Schema {
         return nextSchema;
     }
 
-    private Map<String, Object> getSchemaItems(Map<String, Object> schema) {
+    public Map<String, Object> getSchemaItems(Map<String, Object> schema) {
         Map<String, Object> nextSchema = new HashMap<>();
         if (schema.containsKey(ITEMS_KEY)) {
             Object propertyList = schema.get(ITEMS_KEY);
@@ -354,4 +354,8 @@ public class JacksonJSONSchema implements Schema {
         return localName;
     }
 
+    @Override
+    public Map getSchemaMap() {
+        return jsonSchemaMap;
+    }
 }
