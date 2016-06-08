@@ -23,7 +23,7 @@ import org.apache.synapse.aspects.flow.statistics.structuring.StructuringArtifac
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.messageflow.data.publisher.publish.ConfigurationPublisher;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
-import org.wso2.carbon.mediation.statistics.TenantInformation;
+import org.wso2.carbon.das.messageflow.data.publisher.observer.TenantInformation;
 
 import java.util.List;
 
