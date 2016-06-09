@@ -49,7 +49,7 @@ public class ActivityIDSetter {
 	 */
 	public static void setActivityIdInTransportHeader(MessageContext messageContext) throws SynapseException {
 		try {
-			//get the unique ID used for correlating messages for BAM activity monitoring
+			//get the unique ID used for correlating messages for DAS activity monitoring
 			String idString = getUniqueId();
 
 			//Get activity ID form message context, if available.

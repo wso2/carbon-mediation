@@ -19,7 +19,7 @@
   -->
 
 <eventSinks xmlns="http://ws.apache.org/ns/synapse">
-    <eventSink name="bam_event_sink">
+    <eventSink name="das_event_sink">
         <receiverUrl>tcp://localhost:7611</receiverUrl>
         <authenticatorUrl>ssl://localhost:7711</authenticatorUrl>
         <userName>admin</userName>

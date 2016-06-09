@@ -28,7 +28,7 @@
     <version>4.6.1-SNAPSHOT</version>
     <artifactId>data-agents-features</artifactId>
     <packaging>pom</packaging>
-    <name>WSO2 Carbon - BAM Data Agents Aggregator Module</name>
+    <name>WSO2 Carbon - Data Publishing Agents Aggregator Module</name>
     <url>http://wso2.org</url>
 
     <modules>

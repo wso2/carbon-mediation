@@ -41,7 +41,6 @@
         <module>org.wso2.carbon.mediation.library.stub</module>
         <module>org.wso2.carbon.mediation.security.stub</module>
         <module>org.wso2.carbon.mediation.templates.stub</module>
-        <module>org.wso2.carbon.mediator.bam.config.stub</module>
         <module>org.wso2.carbon.mediators.clazz.admin.stub</module>
         <module>org.wso2.carbon.mediators.command.admin.stub</module>
         <module>org.wso2.carbon.mediators.event.admin.stub</module>

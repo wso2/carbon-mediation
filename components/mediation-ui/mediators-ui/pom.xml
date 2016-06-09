@@ -32,7 +32,6 @@
 
     <modules>
         <module>org.wso2.carbon.mediator.aggregate.ui</module>
-        <module>org.wso2.carbon.mediator.bam.ui</module>
         <module>org.wso2.carbon.mediator.bean.ui</module>
         <module>org.wso2.carbon.mediator.cache.ui</module>
         <module>org.wso2.carbon.mediator.callout.ui</module>
