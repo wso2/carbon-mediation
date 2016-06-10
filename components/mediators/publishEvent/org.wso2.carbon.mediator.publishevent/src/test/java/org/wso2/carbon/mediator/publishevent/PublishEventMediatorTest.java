@@ -32,7 +32,7 @@ public class PublishEventMediatorTest extends XMLTestCase {
 
 	private static final String mediatorXml =
 			"<publishEvent xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
-			"    <eventSink>bam_event_sink</eventSink>\n" +
+			"    <eventSink>das_event_sink</eventSink>\n" +
 			"    <streamName>stream_3</streamName>\n" +
 			"    <streamVersion>1.0.0</streamVersion>\n" +
 			"    <attributes>\n" +
@@ -65,7 +65,7 @@ public class PublishEventMediatorTest extends XMLTestCase {
 
 		assertEquals(mediator.getStreamName(), "stream_3");
 		assertEquals(mediator.getStreamVersion(), "1.0.0");
-		assertEquals(mediator.getEventSink(), "bam_event_sink");
+		assertEquals(mediator.getEventSink(), "das_event_sink");
 		assertEquals(mediator.getMetaProperties().size(), 2);
 		assertEquals(mediator.getCorrelationProperties().size(), 1);
 		assertEquals(mediator.getPayloadProperties().size(), 2);
