@@ -438,8 +438,7 @@ public class XMLInputReader implements InputReader {
         qName = getNamespacesAndIdentifiersAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length - 1], null);
         String[] qNameArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
         if (qNameArray.length > 1) {
-            return qNameArray[0] + SCHEMA_NAMESPACE_NAME_SEPARATOR +
-                    SCHEMA_ATTRIBUTE_FIELD_PREFIX +
+            return SCHEMA_ATTRIBUTE_FIELD_PREFIX + qNameArray[0] + SCHEMA_NAMESPACE_NAME_SEPARATOR +
                     qNameArray[qNameArray.length - 1];
         } else {
             return SCHEMA_ATTRIBUTE_FIELD_PREFIX + qName;

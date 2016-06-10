@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
+        .SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
@@ -47,6 +49,8 @@ public class XMLWriter implements Writer {
     private String latestElementName;
     private Map<String, String> namespaceMap;
     private static final String NAMESPACE_SEPARATOR = "_";
+    private static final String XSI_TYPE_IDENTIFIER = "_xsi_type_";
+
 
     public XMLWriter(Schema outputSchema) throws SchemaException, WriterException {
         this.outputSchema = outputSchema;
@@ -111,6 +115,8 @@ public class XMLWriter implements Writer {
                     } else {
                         xmlStreamWriter.writeAttribute(attributeNameWithNamespace, value);
                     }
+                } else if (name.equals(SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD)){
+                    xmlStreamWriter.writeCharacters(value);
                 } else if (name.equals(latestElementName)) {
                     xmlStreamWriter.writeCharacters(value);
                     xmlStreamWriter.writeEndElement();
@@ -174,8 +180,11 @@ public class XMLWriter implements Writer {
     }
 
     @Override public void writePrimitive(Object value) throws WriterException {
-        //TODO implement write primitive
-        writeField(latestElementName,value);
+        try {
+            xmlStreamWriter.writeCharacters(getFieldValueAsString(value));
+        } catch (XMLStreamException e) {
+            throw new WriterException(e.getMessage());
+        }
     }
 
     private void writeStartElement(String name, XMLStreamWriter xMLStreamWriter) throws XMLStreamException {
@@ -189,6 +198,8 @@ public class XMLWriter implements Writer {
                     xMLStreamWriter.writeStartElement(prefix, nameWithoutPrefix, entry.getKey());
                 }
             }
+        } else if (name.contains(XSI_TYPE_IDENTIFIER)) {
+            xMLStreamWriter.writeStartElement(prefix);
         } else {
             xMLStreamWriter.writeStartElement(name);
         }
