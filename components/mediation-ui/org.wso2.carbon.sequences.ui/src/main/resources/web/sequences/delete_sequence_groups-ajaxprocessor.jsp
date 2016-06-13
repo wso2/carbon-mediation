@@ -23,6 +23,11 @@
 
 
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
     String[] sequenceGroups = null;
     String sequenceString = request.getParameter("sequenceGroupsString");
     if (sequenceString != null && !sequenceString.equalsIgnoreCase("")) {
