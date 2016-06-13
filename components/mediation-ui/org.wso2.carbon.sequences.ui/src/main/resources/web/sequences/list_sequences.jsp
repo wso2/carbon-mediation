@@ -38,7 +38,17 @@
     function confirmForceDelete(sequenceName, msg) {
         CARBON.showConfirmationDialog('<fmt:message key="sequence.dependency.mgt.warning"/><br/><br/>'
                 + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            location.href = "delete_sequence.jsp?sequenceName=" + sequenceName + "&force=true";
+            jQuery.ajax({
+                type: "POST",
+                url: "delete_sequence.jsp",
+                data: {"sequenceName": sequenceName, "force": "true"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("list_sequences.jsp");
+                    }
+                }
+            });
         });
     }
 </script>
@@ -307,7 +317,17 @@
             CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function() {
-                location.href = "delete_sequence.jsp?sequenceName=" + sequenceName;
+                jQuery.ajax({
+                    type: "POST",
+                    url: "delete_sequence.jsp",
+                    data: {"sequenceName": sequenceName},
+                    async: false,
+                    success: function (result, status, xhr) {
+                        if (status == "success") {
+                            location.assign("list_sequences.jsp");
+                        }
+                    }
+                });
             });
         }
     }
@@ -334,7 +354,17 @@
             CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function() {
-                location.href = "delete_sequence.jsp?type=registry&sequenceName=" + sequenceName;
+                jQuery.ajax({
+                    type: "POST",
+                    url: "delete_sequence.jsp",
+                    data: {"type": "registry", "sequenceName": sequenceName},
+                    async: false,
+                    success: function (result, status, xhr) {
+                        if (status == "success") {
+                            location.assign("list_sequences.jsp");
+                        }
+                    }
+                });
             });
         }
     }
