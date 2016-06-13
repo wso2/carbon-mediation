@@ -16,6 +16,7 @@
             configContext, backendServerURL, cookie, request.getLocale());
 
     if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
         return;
     }
 
