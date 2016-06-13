@@ -15,6 +15,10 @@
     ProxyServiceAdminClient client = new ProxyServiceAdminClient(
             configContext, backendServerURL, cookie, request.getLocale());
 
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        return;
+    }
+
     String psName = request.getParameter("psName");
     String operation = request.getParameter("operation");
     String returnValue = null;
