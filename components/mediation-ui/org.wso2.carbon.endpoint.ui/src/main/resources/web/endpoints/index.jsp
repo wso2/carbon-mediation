@@ -232,27 +232,40 @@ function deleteEndpoint(endpointName) {
 
 function loadEndpointAfterBulkDeletion(){
     window.location.href = "index.jsp?pageNumber=<%=endpointPageNumber%>";
+    location.reload();
 }
 
 function loadEndpointsAfterDeletion() {
-    var url = "ajaxprocessors/deleteEndpoint-ajaxprocessor.jsp?loadpage=true&pageNumber=<%=endpointPageNumber%>";
-    jQuery("#tabs-1").load(url, null, function (responseText, status, XMLHttpRequest) {
-        if (status != "success") {
-            CARBON.showErrorDialog(jsi18n["endpoint.design.load.error"]);
+    jQuery.ajax({
+        type: "POST",
+        url: "ajaxprocessors/deleteEndpoint-ajaxprocessor.jsp",
+        data: {"loadpage": true, "pageNumber": <%=endpointPageNumber%>},
+        async: false,
+        success: function (result, status, xhr) {
+            if (status != "success") {
+                CARBON.showErrorDialog(jsi18n["endpoint.design.load.error"]);
+            }
+            window.location.href = "index.jsp?pageNumber=<%=endpointPageNumber%>";
+            location.reload();
         }
     });
 }
 
 function deleteDynamicEndpoint(key) {
-    CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.endpoint"/> " + key + "?", function() {
-        var url = "ajaxprocessors/deleteDynamicEndpoint-ajaxprocessor.jsp?endpointName=" + key+"&dynamicPageNumber=<%=dynamicEnpointPageNumber%>";
-        jQuery("#tabs-2").load(url, null, function (responseText, status, XMLHttpRequest) {
-            if (status != "success") {
-                CARBON.showErrorDialog(jsi18n["endpoint.design.load.error"]);
+    CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.endpoint"/> " + key + "?", function () {
+        jQuery.ajax({
+            type: "POST",
+            url: "ajaxprocessors/deleteDynamicEndpoint-ajaxprocessor.jsp",
+            data: {"endpointName": key, "dynamicPageNumber": <%=dynamicEnpointPageNumber%>},
+            async: false,
+            success: function (result, status, xhr) {
+                if (status != "success") {
+                    CARBON.showErrorDialog(jsi18n["endpoint.design.load.error"]);
+                }
+                location.reload();
             }
         });
     });
-
 }
 
 function confirmForceDelete(endpointName, msg) {

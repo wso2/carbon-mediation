@@ -26,6 +26,12 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
+
     String isloadPage = request.getParameter("loadpage");
     String pageNumberStr = request.getParameter("pageNumber");
 
