@@ -217,7 +217,17 @@ function isContainRaw(tbody) {
 
 function deleteRow(name, group){
     CARBON.showConfirmationDialog(taskjsi18n["task.delete.waring"] + " ' " + name + " ' ?", function() {
-        document.location.href = "deletetask.jsp?" + "taskName=" + name + "&taskGroup=" + group;
+        jQuery.ajax({
+            type: "POST",
+            url: "deletetask.jsp",
+            data: {"taskName": name, "taskGroup": group},
+            async: false,
+            success: function (result, status, xhr) {
+                if (status == "success") {
+                    location.assign("index.jsp");
+                }
+            }
+        });
     });
 }
 
