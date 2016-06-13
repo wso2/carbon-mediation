@@ -22,6 +22,12 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
+
     String[] endpointGroups = null;
     String endpointString   =  request.getParameter("endpointGroupsString");
     if (endpointString != null && !endpointString.equalsIgnoreCase("") ) {

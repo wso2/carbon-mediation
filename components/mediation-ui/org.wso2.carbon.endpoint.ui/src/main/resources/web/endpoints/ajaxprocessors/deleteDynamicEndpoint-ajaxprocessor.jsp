@@ -22,6 +22,12 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
+
     String endpointName = request.getParameter("endpointName");
     String dynamicPageNumberStr = request.getParameter("dynamicPageNumber");
 
