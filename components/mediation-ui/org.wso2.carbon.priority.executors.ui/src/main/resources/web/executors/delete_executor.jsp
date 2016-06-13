@@ -21,6 +21,11 @@
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
     String executorName = request.getParameter("name");
 
     PriorityAdminClient client = new PriorityAdminClient(getServletConfig(), session);

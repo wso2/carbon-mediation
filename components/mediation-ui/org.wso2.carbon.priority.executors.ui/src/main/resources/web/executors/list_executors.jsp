@@ -40,8 +40,18 @@
 <script type="text/javascript">
 
     function deleteExecutor(name) {
-        CARBON.showConfirmationDialog('Are you sure you want to delete the executor ' + name + '?', function() {
-            window.location.href = "delete_executor.jsp?name=" + name;
+        CARBON.showConfirmationDialog('Are you sure you want to delete the executor ' + name + '?', function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "delete_executor.jsp",
+                data: {"name": name},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("list_executors.jsp");
+                    }
+                }
+            });
         });
     }
 
