@@ -33,6 +33,11 @@
 %>
 
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
     String dlcName = request.getParameter("dlcName").trim();
     req = request;
     ses = session;
