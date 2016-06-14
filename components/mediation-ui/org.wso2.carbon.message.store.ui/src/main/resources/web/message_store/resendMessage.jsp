@@ -47,6 +47,11 @@
 
 
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
     String dlcName = request.getParameter("dlcName").trim();
     String messageId = request.getParameter("messageId").trim();
     String messageContent = request.getParameter("messageContent");

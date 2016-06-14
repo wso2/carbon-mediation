@@ -42,6 +42,12 @@
 
 
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
+
     String messageStoreName = request.getParameter("messageStoreName").trim();
     req = request;
     ses = session;
