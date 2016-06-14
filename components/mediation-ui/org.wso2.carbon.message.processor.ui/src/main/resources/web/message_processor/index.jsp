@@ -68,12 +68,20 @@
 
 <script type="text/javascript">
     function deleteRow(name) {
-
-        function delEp() {
-            document.location.href = "deleteMessageProcessorHandler.jsp?" + "processorName=" + name;
-        }
-
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.processor"/>", delEp);
+        var url = window.location.href;
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.activate.the.processor"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteMessageProcessorHandler.jsp",
+                data: {"processorName": name},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
     String.prototype.trim = function() {
@@ -119,22 +127,37 @@
     }
 
     function deactivateRow(name) {
-
-        function deacEp() {
-            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + name +
-                    "&action=Deactivate";
-        }
-
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.deactivate.the.processor"/>", deacEp);
+        var url = window.location.href;
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.deactivate.the.processor"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "ScheduledProcessorActionHandler.jsp",
+                data: {"processorName": name, "action": "Deactivate"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
     function activateRow(name) {
-        function deacEp() {
-            document.location.href = "ScheduledProcessorActionHandler.jsp?" + "processorName=" + name +
-                    "&action=Activate";
-        }
-
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.activate.the.processor"/>", deacEp);
+        var url = window.location.href;
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.activate.the.processor"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "ScheduledProcessorActionHandler.jsp",
+                data: {"processorName": name, "action": "Activate"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
     function redirect(selNode) {
@@ -143,9 +166,20 @@
     }
 
     function confirmForceDelete(entry, msg) {
+        var url = window.location.href;
         CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
-                + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            document.location.href = "deleteMessageProcessorHandler.jsp?" + "entryName=" + entry + "&force=true";
+                + msg + '<br/><fmt:message key="force.delete"/>', function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteMessageProcessorHandler.jsp",
+                data: {"entryName": entry, "force": "true"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
         });
     }
 
@@ -260,17 +294,6 @@
         %>
 
         <tr>
-            <%--<%--%>
-                <%--if ("Scheduled Message Forwarding Processor".--%>
-                        <%--equalsIgnoreCase(type) && !client.isActive(name)) {--%>
-            <%--%>--%>
-            <%--<td><a href="ScheduledForwardingProcessorView.jsp?processorName=<%=name%>"><%=name%>--%>
-            <%--</a>--%>
-            <%--</td>--%>
-            <%--<%} else { %>--%>
-            <%--<td><%=name%>--%>
-            <%--</td>--%>
-            <%--<%} %>--%>
             <td>
                 <% if (mspData.getArtifactContainerName() != null) { %>
                     <img src="images/applications.gif">

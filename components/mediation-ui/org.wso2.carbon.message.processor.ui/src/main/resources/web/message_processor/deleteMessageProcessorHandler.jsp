@@ -31,6 +31,11 @@
 
 <body>
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+         response.sendError(405);
+         return;
+     }
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
                                                   session);
     ConfigurationContext configContext =
