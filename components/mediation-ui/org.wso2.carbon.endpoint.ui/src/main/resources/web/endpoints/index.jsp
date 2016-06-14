@@ -231,8 +231,7 @@ function deleteEndpoint(endpointName) {
 }
 
 function loadEndpointAfterBulkDeletion(){
-    window.location.href = "index.jsp?pageNumber=<%=endpointPageNumber%>";
-    location.reload();
+    location.assign("index.jsp?pageNumber=<%=endpointPageNumber%>");
 }
 
 function loadEndpointsAfterDeletion() {
@@ -245,8 +244,7 @@ function loadEndpointsAfterDeletion() {
             if (status != "success") {
                 CARBON.showErrorDialog(jsi18n["endpoint.design.load.error"]);
             }
-            window.location.href = "index.jsp?pageNumber=<%=endpointPageNumber%>";
-            location.reload();
+            location.assign("index.jsp?pageNumber=<%=endpointPageNumber%>");
         }
     });
 }
@@ -262,7 +260,7 @@ function deleteDynamicEndpoint(key) {
                 if (status != "success") {
                     CARBON.showErrorDialog(jsi18n["endpoint.design.load.error"]);
                 }
-                location.reload();
+                location.assign("index.jsp?pageNumber=<%=endpointPageNumber%>");
             }
         });
     });
