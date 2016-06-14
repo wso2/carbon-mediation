@@ -40,19 +40,24 @@
 	src="../dialog/js/jqueryui/tabs/jquery.cookie.js"></script>
 
 <%
-    PropertiesServiceClient client_ = new PropertiesServiceClient(config, session);
-    try {
-    if (request.getParameter("name") != null) {
-        if (request.getParameter("oldName") != null) {
-            client_.updateProperty(request);
-        } else if (request.getParameter("remove") != null) {
-            client_.removeProperty(request);
-        } else {
-            client_.setProperty(request);
-        }
-    }
-    } catch (Exception e) {
-        response.setStatus(500);
+	PropertiesServiceClient client_ = new PropertiesServiceClient(config, session);
+	try {
+		if (request.getParameter("name") != null) {
+			if (request.getParameter("oldName") != null) {
+				client_.updateProperty(request);
+			} else if (request.getParameter("remove") != null) {
+				//ignore methods other than post
+				if (!request.getMethod().equalsIgnoreCase("POST")) {
+					response.sendError(405);
+					return;
+				}
+				client_.removeProperty(request);
+			} else {
+				client_.setProperty(request);
+			}
+		}
+	} catch (Exception e) {
+		response.setStatus(500);
 %>
 <%=e.getMessage()%>
 <%
