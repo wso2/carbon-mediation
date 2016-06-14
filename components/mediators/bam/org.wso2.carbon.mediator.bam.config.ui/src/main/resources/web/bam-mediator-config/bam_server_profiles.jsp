@@ -49,19 +49,28 @@
     %>
 
     <script type="text/javascript">
-        function removeServerProfile(profileName){
-            window.location.href = "bam_server_profiles.jsp?serverProfileName=" + profileName + "&action=remove";
+        function removeServerProfile(profileName) {
+            CARBON.showConfirmationDialog("Are you sure you want to remove the existing Server Profile?", function () {
+                jQuery.ajax({
+                    type: "POST",
+                    url: "delete_ajaxprocessor.jsp",
+                    data: {"serverProfileName": profileName, "action": "remove"},
+                    async: false,
+                    success: function (result, status, xhr) {
+                        if (status == "success") {
+                            location.assign("bam_server_profiles.jsp");
+                        }
+                    }
+                });
+            });
         }
-        function editServerProfile(profileName){
+        function editServerProfile(profileName) {
             window.location.href = "configure_server_profiles.jsp?txtServerProfileLocation=" + profileName + "&hfAction=load";
         }
-        function removeForcefully(profileName){
-            window.location.href = "bam_server_profiles.jsp?serverProfileName=" + profileName + "&action=remove&force=true";
-        }
-        function reloadPage(){
+        function reloadPage() {
             window.location.href = "bam_server_profiles.jsp";
         }
-        function addServerProfile(){
+        function addServerProfile() {
             window.location.href = "configure_server_profiles.jsp";
         }
     </script>
@@ -79,39 +88,7 @@
             if(!bamServerProfilesHelper.resourceAlreadyExists(SERVER_PROFILE_LOCATION)){
                 bamServerProfilesHelper.addCollection(SERVER_PROFILE_LOCATION);
             }
-
             String[] serverNameList = bamServerProfilesHelper.getServerProfileList(SERVER_PROFILE_LOCATION);
-            String action = request.getParameter("action");
-            String profileName = request.getParameter("serverProfileName");
-            String force = request.getParameter("force");
-            if(bamServerProfilesHelper.isNotNullOrEmpty(action) && action.equals("remove") &&
-               bamServerProfilesHelper.isNotNullOrEmpty(profileName)){
-                if(bamServerProfilesHelper.isNotNullOrEmpty(force) && force.equals("true")){
-                    bamServerProfilesHelper.removeResource(SERVER_PROFILE_LOCATION + "/" + profileName);
-            %>
-
-            <script type="text/javascript">
-                CARBON.showInfoDialog("Server Profile was successfully deleted.", reloadPage);
-            </script>
-
-            <%
-                } else {
-                    %>
-
-                    <script type="text/javascript">
-                        //CARBON.showConfirmationDialog("Are you sure you want to remove the existing Server Profile?", removeForcefully, reloadPage, true);
-                        var remove = confirm("Are you sure you want to remove the existing Server Profile?");
-                        if(remove){
-                            removeForcefully("<%=profileName%>");
-                        } else {
-                            reloadPage();
-                        }
-                    </script>
-
-                    <%
-                }
-            } else {
-
         %>
 
         <h2>
@@ -120,35 +97,38 @@
         <div id="workArea">
             <table width="100%" class="styledLeft" style="margin-left: 0px;">
                 <thead>
-                    <tr>
-                        <th>
-                            <fmt:message key="server.profile.name"/>
-                        </th>
-                        <th></th>
-                    </tr>
+                <tr>
+                    <th>
+                        <fmt:message key="server.profile.name"/>
+                    </th>
+                    <th></th>
+                </tr>
                 </thead>
                 <tbody>
-                    <%
-                        for (String serverName : serverNameList) {
-                            %>
-                                 <tr>
-                                     <td>
-                                         <%=serverName%>
-                                     </td>
-                                     <td>
-                                         <span><a onClick='javaScript:removeServerProfile("<%=serverName%>")' style='background-image:url(../admin/images/delete.gif);'class='icon-link addIcon'>Remove Profile</a></span>
-                                         <span><a onClick='javaScript:editServerProfile("<%=serverName%>")' style='background-image:url(../admin/images/edit.gif);'class='icon-link addIcon'>Edit Profile</a></span>
-                                     </td>
-                                 </tr>
-                            <%
-                        }
+                <%
+                    for (String serverName : serverNameList) {
+                %>
+                <tr>
+                    <td>
+                        <%=serverName%>
+                    </td>
+                    <td>
+                        <span><a onClick='javaScript:removeServerProfile("<%=serverName%>")'
+                                 style='background-image:url(../admin/images/delete.gif);' class='icon-link addIcon'>Remove
+                            Profile</a></span>
+                        <span><a onClick='javaScript:editServerProfile("<%=serverName%>")'
+                                 style='background-image:url(../admin/images/edit.gif);' class='icon-link addIcon'>Edit
+                            Profile</a></span>
+                    </td>
+                </tr>
+                <%
                     }
-                    %>
+                %>
                 </tbody>
             </table>
         </div>
         <span><a onClick='javaScript:addServerProfile()' style='background-image:
-                                        url(../admin/images/add.gif);'class='icon-link addIcon'>Add Profile</a></span>
+                                        url(../admin/images/add.gif);' class='icon-link addIcon'>Add Profile</a></span>
     </div>
 
 </fmt:bundle>
