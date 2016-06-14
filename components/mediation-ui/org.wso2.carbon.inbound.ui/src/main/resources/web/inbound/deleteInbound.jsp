@@ -25,6 +25,11 @@
 <fmt:bundle basename="org.wso2.carbon.task.ui.i18n.Resources">
 
     <%
+        //ignore methods other than post
+        if (!request.getMethod().equalsIgnoreCase("POST")) {
+            response.sendError(405);
+            return;
+        }
         InboundManagementClient client;
         try {
         	client = InboundManagementClient.getInstance(config, session);
