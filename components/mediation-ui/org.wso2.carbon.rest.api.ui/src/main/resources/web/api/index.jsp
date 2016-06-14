@@ -234,9 +234,19 @@
     }
     
     function deleteApi(apiName) {
-         CARBON.showConfirmationDialog("<fmt:message key="api.delete.confirmation"/> " + apiName + "?", function() {
-             location.href = "delete_api.jsp?apiName=" + apiName;
-         });
+        CARBON.showConfirmationDialog("<fmt:message key="api.delete.confirmation"/> " + apiName + "?", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "delete_api.jsp",
+                data: {"apiName": apiName},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("index.jsp");
+                    }
+                }
+            });
+        });
     }
     function searchSequence() {
         document.searchForm.submit();
