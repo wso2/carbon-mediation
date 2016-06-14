@@ -29,6 +29,11 @@
 
 
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
     String serverName = request.getParameter("serverName");
     String serviceName = request.getParameter("serviceName");
     String action = request.getParameter("action");

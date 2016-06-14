@@ -458,7 +458,7 @@
                 action == '<%=CGConstant.CG_SERVICE_ACTION_AUTOMATIC%>') {
             CARBON.showConfirmationDialog("<fmt:message key="csg.are.you.sure"/> ", function () {
                 document.getElementById('rotating_indicator_id').style.display = "";
-                jQuery.get("../cg/publish-service_ajaxprocessor.jsp", {'serviceName':serviceName, 'action':action},
+                jQuery.post("../cg/publish-service_ajaxprocessor.jsp", {'serviceName':serviceName, 'action':action},
                         function (data, status) {
                             handleCallBack(data, status, action, isAutomatic);
                         });
@@ -473,7 +473,7 @@
         if (action == '<%=CGConstant.CG_SERVICE_ACTION_MANUAL%>') {
             CARBON.showConfirmationDialog("<fmt:message key="csg.are.you.sure"/> ", function () {
                 document.getElementById('rotating_indicator_id').style.display = "";
-                jQuery.get("../cg/publish-service_ajaxprocessor.jsp", {'serviceName':serviceName, 'action':action},
+                jQuery.post("../cg/publish-service_ajaxprocessor.jsp", {'serviceName':serviceName, 'action':action},
                         function (data, status) {
                             handleCallBack(data, status, action, false);
                         });
