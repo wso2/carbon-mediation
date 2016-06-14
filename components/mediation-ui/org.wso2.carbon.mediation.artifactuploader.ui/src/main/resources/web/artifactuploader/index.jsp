@@ -47,9 +47,18 @@
 </style>
 <script type="text/javascript">
     function removeArtifact(artifactName) {
-
-         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.artifact"/> " + artifactName + " ?", function() {
-            location.href = "remove-artifact.jsp?artifactName=" + artifactName;
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.artifact"/> " + artifactName + " ?", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "remove-artifact.jsp",
+                data: {"artifactName": artifactName},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("index.jsp?ordinal=1");
+                    }
+                }
+            });
         });
     }
 </script>
