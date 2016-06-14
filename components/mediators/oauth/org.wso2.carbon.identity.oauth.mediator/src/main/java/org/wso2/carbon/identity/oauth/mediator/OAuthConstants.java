@@ -23,7 +23,7 @@ public final class OAuthConstants {
 	
 	public static final String ASSOCIATION_OAUTH_CONSUMER_TOKEN = "ASSOCIATION_OAUTH_CONSUMER_TOKEN";
 	public static final String OAUTHORIZED_USER = "OAUTHORIZED_USER";
-	public static final String OAUTH2_SCOPE_VALIDATION_ENABLED = "OAUTH2_SCOPE_VALIDATION_ENABLED";
+	public static final String OAUTH2_SCOPE_VALIDATION_ENABLED = "oauth2_scope_validation_enabled";
 
 	// OAuth 2.0 parameters
 	public static final String BEARER = "Bearer ";
