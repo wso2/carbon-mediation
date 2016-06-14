@@ -187,7 +187,17 @@ function isContainRaw(tbody) {
 
 function deleteRecord(name){
     CARBON.showConfirmationDialog(taskjsi18n["inbound.delete.waring"] + " ' " + name + " ' ?", function() {
-        document.location.href = "deleteInbound.jsp?" + "inboundName=" + name ;
+        jQuery.ajax({
+            type: "POST",
+            url: "deleteInbound.jsp",
+            data: {"inboundName": name},
+            async: false,
+            success: function (result, status, xhr) {
+                if (status == "success") {
+                    location.assign("index.jsp?region=region1&item=inbound_menu");
+                }
+            }
+        });
     });
 }
 
