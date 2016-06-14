@@ -294,17 +294,6 @@
         %>
 
         <tr>
-            <%--<%--%>
-                <%--if ("Scheduled Message Forwarding Processor".--%>
-                        <%--equalsIgnoreCase(type) && !client.isActive(name)) {--%>
-            <%--%>--%>
-            <%--<td><a href="ScheduledForwardingProcessorView.jsp?processorName=<%=name%>"><%=name%>--%>
-            <%--</a>--%>
-            <%--</td>--%>
-            <%--<%} else { %>--%>
-            <%--<td><%=name%>--%>
-            <%--</td>--%>
-            <%--<%} %>--%>
             <td>
                 <% if (mspData.getArtifactContainerName() != null) { %>
                     <img src="images/applications.gif">
