@@ -76,7 +76,7 @@
         var content = cell.firstChild.nodeValue;
         var dlcName = document.getElementById("dlcName").value;
 
-        var url = window.location.href;
+        var url = document.referrer;
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", function () {
             jQuery.ajax({
                 type: "POST",
@@ -100,7 +100,7 @@
         var content = cell.firstChild.nodeValue;
         var dlcName = document.getElementById("dlcName").value;
 
-        var url = window.location.href;
+        var url = document.referrer;
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", function () {
             jQuery.ajax({
@@ -136,7 +136,7 @@
         var msName = document.getElementById("msName").value;
         var messageId = document.getElementById("messageId").value;
 
-        var url = window.location.href;
+        var url = document.referrer;
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", function () {
             jQuery.ajax({
@@ -157,7 +157,7 @@
     function deleteFirstMsg() {
         var msName = document.getElementById("msName").value;
 
-        var url = window.location.href;
+        var url = document.referrer;
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", function() {
             jQuery.ajax({
