@@ -67,6 +67,11 @@
             }
         }
     } else if (action.equals("delete")) {
+        //ignore methods other than post
+        if (!request.getMethod().equalsIgnoreCase("POST")) {
+            response.sendError(405);
+            return;
+        }
         String name = request.getParameter("name");
         if (!(publishEventMediatorConfigAdminClient.deleteEventSink(name))) {
             responseText="false";
