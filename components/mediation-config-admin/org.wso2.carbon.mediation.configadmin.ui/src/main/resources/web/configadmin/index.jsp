@@ -42,7 +42,7 @@
 
 
 <script type="text/javascript">
-    function lo() {
+    function modifyToolbar() {
         var iFrame = document.getElementById('frame_rawConfig');
         var innerDoc = iFrame.contentDocument || iFrame.contentWindow.document;
         innerDoc.getElementById("toolbar_1").style.display = "block";
@@ -148,7 +148,7 @@
             ,start_highlight: true  // to display with highlight mode on start-up
             ,toolbar: "search, go_to_line, fullscreen, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap"
             ,is_editable: false
-            ,EA_load_callback: 'lo'
+            ,EA_load_callback: 'modifyToolbar'
         });
 
     </script>
@@ -157,44 +157,42 @@
     <div id="middle">
         <h2><fmt:message key="manage.synapse.config"/></h2>
         <div id="workArea">
-            <form method="post" name="configform" id="configform" action="index.jsp">
-                <div id="saveConfiguration">
+            <div id="saveConfiguration">
                             <span style="margin-top:10px;margin-bottom:10px; display:block;_margin-top:0px;">
-                                <fmt:message key="save.advice"/>
+                                <fmt:message key="advice"/>
                             </span>
-                </div>
-                <table class="styledLeft" style="width:100%">
-                    <thead>
-                    <tr>
-                        <th>
-                            <fmt:message key="esb.configuration"/>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td class="formRow">
-                            <table class="normal" style="width:100%">
-                                <tr>
-                                    <td id="rawConfigTD">
+            </div>
+            <table class="styledLeft" style="width:100%">
+                <thead>
+                <tr>
+                    <th>
+                        <fmt:message key="esb.configuration"/>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="formRow">
+                        <table class="normal" style="width:100%">
+                            <tr>
+                                <td id="rawConfigTD">
                                                     <textarea name="rawConfig" id="rawConfig"
                                                               style="border:solid 1px #cccccc; width: 99%; height:
                                                               400px; margin-top:5px;"
                                                               disabled><%=synapseConfig%></textarea>
 
-                                        <% if (!loadEditArea) { %>'
-                                        <div style="padding:10px;color:#444;">
-                                            <fmt:message key="syntax.disabled"/>
-                                        </div>
-                                        <% } %>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </form>
+                                    <% if (!loadEditArea) { %>'
+                                    <div style="padding:10px;color:#444;">
+                                        <fmt:message key="syntax.disabled"/>
+                                    </div>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </fmt:bundle>
