@@ -25,6 +25,8 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.task.SynapseTaskException;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskManager;
@@ -325,10 +327,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     NtaskService.addObserver(this);
                     return false;
                 }
-                boolean isStandaloneNode = NtaskService.getCcServiceInstance().getServerConfigContext()
-                        .getAxisConfiguration().getClusteringAgent() == null;
-                boolean isWorkerNode = !isStandaloneNode && CarbonUtils.isWorkerNode();
-                logger.debug("#init standalone node: [" + isStandaloneNode + "] worker node: [" + isWorkerNode + "] " + managerId());
                 if ((taskManager = getTaskManager(false)) == null) {
                     logger.debug("#init Could not initialize task manager. " + managerId());
                     return false;
@@ -337,14 +335,16 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 }
 
                 initialized = true;
-                if (isStandaloneNode || isWorkerNode) {
+                if (isTaskRunningNode()) {
                     taskService.registerTaskType(Constants.TASK_TYPE_ESB);
                     updateAndCleanupObservers();
                 }
 
-                logger.info("Initialized task manager" + (!(isStandaloneNode || isWorkerNode) ? " on manager node. " : ". ") + "Tenant [" + getCurrentTenantId() + "]");
-                logger.debug("#init Initialized task manager : " + managerId());
-                logger.debug("#init Scheduling existing tasks if any. : " + managerId());
+                logger.info("Initialized task manager. Tenant [" + getCurrentTenantId() + "]");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("#init Initialized task manager : " + managerId());
+                    logger.debug("#init Scheduling existing tasks if any. : " + managerId());
+                }
                 Object[] taskDescriptions = pendingTasks();
                 for (Object d : taskDescriptions) {
                     schedule((TaskDescription) d);
@@ -355,6 +355,57 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 initialized = false;
             }
         }
+        return false;
+    }
+
+    /**
+     * Helper method to decide whether this node is task running node or not.
+     *
+     * @return true if this node supposed to run tasks, false otherwise
+     */
+    private boolean isTaskRunningNode() {
+        boolean isStandaloneNode = NtaskService.getCcServiceInstance().getServerConfigContext()
+                                           .getAxisConfiguration().getClusteringAgent() == null;
+        boolean isWorkerNode = !isStandaloneNode && CarbonUtils.isWorkerNode();
+        if (logger.isDebugEnabled()) {
+            logger.debug("#init standalone node: [" + isStandaloneNode + "] worker node: [" + isWorkerNode + "] " + managerId());
+        }
+        if (isStandaloneNode || isWorkerNode) {
+            return true;
+        }
+        /**
+         * If this is a manager node in a cluster, then use MEDIATION_NTASK_SKIP_RUNNING_TASKS property to decide
+         * whether to run tasks in this node or not, and that defaults to not running tasks(because it's a manager node)
+         */
+        Properties props = MiscellaneousUtil.loadProperties(
+                SynapseConstants.SYNAPSE_PROPERTIES);
+
+        if (props == null) {
+            logger.warn("Error loading synapse property file. Hence using default 'true' for the property - " +
+                        Constants.MEDIATION_NTASK_SKIP_RUNNING_TASKS);
+            //default true means this node is not a task running node, hence return false.
+            return false;
+        }
+        String skipTaskProp = MiscellaneousUtil.getProperty(props,
+                                      Constants.MEDIATION_NTASK_SKIP_RUNNING_TASKS,
+                                      Constants.MEDIATION_NTASK_SKIP_RUNNING_TASKS_DEFAULT_VALUE);
+        if (skipTaskProp != null) {
+            if (skipTaskProp.equals("false")) {
+                return true;
+            } else if (skipTaskProp.equals("true")) {
+                return false;
+            } else {
+                logger.warn("Wrong value(possible values 'true' or 'false') provided for property - " +
+                            Constants.MEDIATION_NTASK_SKIP_RUNNING_TASKS + ", provided value - '" +
+                            skipTaskProp + "', hence defaults to 'true'");
+                return false;
+            }
+
+        }
+        /**
+         * MEDIATION_NTASK_SKIP_RUNNING_TASKS property is not mentioned in synapse.properties file, hence defaults to
+         * 'true'
+         */
         return false;
     }
 
