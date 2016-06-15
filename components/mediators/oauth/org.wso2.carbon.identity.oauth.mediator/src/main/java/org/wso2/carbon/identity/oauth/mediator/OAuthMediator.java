@@ -19,6 +19,7 @@ package org.wso2.carbon.identity.oauth.mediator;
 
 import java.lang.String;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -183,6 +184,36 @@ public class OAuthMediator extends AbstractMediator {
         if(respDTO.getAuthorizationContextToken() != null){
             headersMap.put("X-JWT-Assertion", respDTO.getAuthorizationContextToken().getTokenString());
         }
+
+		// Scope validation.
+		if(synCtx.getProperty(OAuthConstants.OAUTH2_SCOPE_VALIDATION_ENABLED) != null &&
+		   Boolean.parseBoolean((String)synCtx.getProperty(OAuthConstants.OAUTH2_SCOPE_VALIDATION_ENABLED))){
+			String[] scopes = respDTO.getScope();
+			if(scopes != null) {
+
+				String apiScope = (String) synCtx.getProperty(OAuthConstants.SCOPE);
+
+				// if API, default value
+				if(apiScope == null) {
+					apiScope = (String) synCtx.getProperty("SYNAPSE_REST_API");
+				}
+
+				// if proxy service, default value.
+				if(apiScope == null){
+					apiScope = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getAxisService().getName();
+				}
+
+				List<String> values = new ArrayList<String>(Arrays.asList(scopes));
+				if(!values.contains(apiScope)){
+					log.debug("Valid Scope is not match for given access token. OAuth2 scope validation is failed.");
+					throw new SynapseException("OAuth 2.0 authentication failed");
+				}
+			} else {
+				log.debug("Scope is null for given access token.  OAuth2 scope validation is failed.");
+				throw new SynapseException("OAuth 2.0 authentication failed");
+			}
+		}
+
 		return true;
 	}
 

@@ -28,5 +28,6 @@ public final class OAuthConstants {
 	public static final String BEARER = "Bearer ";
 	public static final String ACCESS_TOKEN = "access_token";
 	public static final String BEARER_TOKEN_TYPE="bearer";
+	public static final String OAUTH2_SCOPE_VALIDATION_ENABLED = "oauth2_scope_validation_enabled";
 
 }
