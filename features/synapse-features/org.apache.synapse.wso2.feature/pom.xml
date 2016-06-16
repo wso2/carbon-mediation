@@ -75,6 +75,14 @@
             <groupId>com.damnhandy.wso2</groupId>
             <artifactId>handy-uri-templates</artifactId>
 	    </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.github.fge</groupId>
+            <artifactId>json-schema-validator-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.googlecode.libphonenumber</groupId>
+            <artifactId>com.googlecode.libphonenumber</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -111,6 +119,8 @@
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
                                 <bundleDef>net.minidev:json-smart</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.googlecode.libphonenumber:com.googlecode.libphonenumber</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.github.fge:json-schema-validator-all</bundleDef>
                             </bundles>
                         </configuration>
                     </execution>
