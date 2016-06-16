@@ -331,6 +331,11 @@
                 <version>${org.apache.bsf.wso2.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity</artifactId>
+                <version>${org.apache.velocity.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.openjpa.wso2</groupId>
                 <artifactId>openjpa-all</artifactId>
                 <version>${openjpa.version.wso2}</version>
@@ -2274,7 +2279,7 @@
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.4.5</carbon.kernel.version>
+        <carbon.kernel.version>4.4.6</carbon.kernel.version>
         <carbon.kernel.imp.pkg.version>[4.4.0, 4.5.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
@@ -2385,6 +2390,7 @@
         <orbit.version.woden>1.0.0.M8-wso2v1</orbit.version.woden>
         <libthrift.wso2.version>0.8.0.wso2v1</libthrift.wso2.version>
         <org.apache.bsf.wso2.version>3.0.0.wso2v5</org.apache.bsf.wso2.version>
+        <org.apache.velocity.version>1.7</org.apache.velocity.version>
         <rhino.wso2.js.version>1.7.0.R4.wso2v1</rhino.wso2.js.version>
         <spring.version>3.0.7.RELEASE</spring.version>
         <aopalliance.version>1.0</aopalliance.version>
