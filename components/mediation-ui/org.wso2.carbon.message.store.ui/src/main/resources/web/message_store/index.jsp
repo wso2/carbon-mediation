@@ -74,11 +74,21 @@
         var cell = row.cells[0];
         var content = cell.firstElementChild.innerHTML;
 
-        function delEp() {
-            document.location.href = "deleteMessageStoresHandler.jsp?" + "messageStoreName=" + name;
-        }
+        var url = window.location.href;
 
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message.store"/>", delEp);
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message.store"/>", function() {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteMessageStoresHandler.jsp",
+                data: {"messageStoreName": name},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
     String.prototype.trim = function() {
@@ -143,9 +153,20 @@
     }
 
     function confirmForceDelete(entry, msg) {
+        var url = window.location.href;
         CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
-                + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            document.location.href = "deleteMessageStoresHandler.jsp?" + "entryName=" + entry + "&force=true";
+                + msg + '<br/><fmt:message key="force.delete"/>', function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteMessageStoresHandler.jsp",
+                data: {"entryName": entry, "force": "true"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
         });
     }
 

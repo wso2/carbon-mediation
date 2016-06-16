@@ -20,6 +20,11 @@
 <%@ page import="org.wso2.carbon.sequences.ui.client.EditorUIClient" %>
 
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
     String sequenceName = request.getParameter("sequenceName");
     String action = request.getParameter("action");    
 

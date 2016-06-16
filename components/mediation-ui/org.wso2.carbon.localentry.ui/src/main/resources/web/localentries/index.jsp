@@ -73,11 +73,19 @@
         var cell = row.cells[0];
         var content = cell.firstChild.nodeValue;
 
-        function delEp() {
-            document.location.href = "deleteEntriesHandler.jsp?" + "entryName=" + content;
-        }
-
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.entry"/>", delEp);
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.entry"/>", function() {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteEntriesHandler.jsp",
+                data: {"entryName": content},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("index.jsp");
+                    }
+                }
+            });
+        });
     }
 
     String.prototype.trim = function() {
@@ -142,7 +150,17 @@
     function confirmForceDelete(entry, msg) {
         CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
                 + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            document.location.href = "deleteEntriesHandler.jsp?" + "entryName=" + entry + "&force=true";
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteEntriesHandler.jsp",
+                data: {"entryName": entry, "force": "true"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("index.jsp");
+                    }
+                }
+            });
         });
     }
 

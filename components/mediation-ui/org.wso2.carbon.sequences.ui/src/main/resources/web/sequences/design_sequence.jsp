@@ -206,7 +206,7 @@
     }
 
     function showHideName() {
-        if ('<%=SequenceEditorHelper.getEditingSequenceAction(session)%>' == 'anonify' && '<%=session.getAttribute("sequenceAnonOriginator")%>' != "registry_sequence.jsp") {
+        if ('<%=SequenceEditorHelper.getEditingSequenceAction(session)%>' == 'anonify') {
             document.getElementById('sequenceNameSection').style.display ="none";
         }
     }

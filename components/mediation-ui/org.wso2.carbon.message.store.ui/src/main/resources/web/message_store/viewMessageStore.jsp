@@ -74,22 +74,40 @@
         var content = cell.firstChild.nodeValue;
         var msName = document.getElementById("messageStoreName_elem").value;
 
-        function delEp() {
-            document.location.href = "deleteMessage.jsp?" + "messageStoreName=" + msName + "&messageId=" + content;
-        }
+        var url = window.location.href;
 
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", delEp);
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteMessage.jsp",
+                data: {"messageStoreName": msName, "messageId": content},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
     function deleteFirstRow() {
         var msName = document.getElementById("messageStoreName_elem").value;
+        var url = window.location.href;
 
-        function delEp() {
-            document.location.href = "deleteFirstMessage.jsp?" + "messageStoreName=" + msName;
-        }
-
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", delEp);
-
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteFirstMessage.jsp",
+                data: {"messageStoreName": msName},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
 
@@ -100,11 +118,21 @@
         var content = cell.firstChild.nodeValue;
         var dlcName = document.getElementById("messageStoreName_elem").value;
 
-        function delEp() {
-            document.location.href = "resendMessage.jsp?" + "messageStoreName=" + dlcName + "&messageId=" + content;
-        }
+        var url = window.location.href;
 
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", delEp);
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "resendMessage.jsp",
+                data: {"messageStoreName": dlcName, "messageId": content},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
     function viewEnvRow(i) {
@@ -122,23 +150,42 @@
     function deleteAll() {
         var msName = document.getElementById("messageStoreName_elem").value;
 
-        function delEp() {
-            document.location.href = "deleteAll.jsp?" + "messageStoreName=" + msName;
-        }
+        var url = window.location.href;
 
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.all.messages"/>", delEp);
-
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.all.messages"/>", function() {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteAll.jsp",
+                data: {"messageStoreName": msName},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
     function resendAll() {
 
         var dlcName = document.getElementById("messageStoreName_elem").value;
 
-        function delEp() {
-            document.location.href = "resendAll.jsp?" + "dlcName=" + dlcName;
-        }
+        var url = window.location.href;
 
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.all.messages"/>", delEp);
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.all.messages"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "resendAll.jsp",
+                data: {"dlcName": dlcName},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
 
@@ -173,10 +220,22 @@
         if (selected != "")window.location.href = selNode.options[selNode.selectedIndex].value;
     }
 
+    var url = window.location.href;
+
     function confirmForceDelete(entry, msg) {
         CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
-                + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            document.location.href = "deleteMessageStoresHandler.jsp?" + "entryName=" + entry + "&force=true";
+                + msg + '<br/><fmt:message key="force.delete"/>', function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteMessageStoresHandler.jsp",
+                data: {"entryName": entry, "force": "true"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
         });
     }
 

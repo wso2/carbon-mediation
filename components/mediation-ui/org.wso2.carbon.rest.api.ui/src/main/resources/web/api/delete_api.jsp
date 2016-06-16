@@ -24,6 +24,11 @@
 <%@ page import="java.util.ResourceBundle" %>
 
 <%
+	//ignore methods other than post
+	if (!request.getMethod().equalsIgnoreCase("POST")) {
+		response.sendError(405);
+		return;
+	}
 	String apiName = request.getParameter("apiName");
 
 	ResourceBundle bundle = ResourceBundle.getBundle(

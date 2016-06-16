@@ -37,5 +37,6 @@ public class DataMapperEngineConstants {
     public static final String ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE =
             "org.apache.synapse.datamapper.executor.pool.size";
     public static final String SCHEMA_NAMESPACE_NAME_SEPARATOR = ":";
+    public static final String SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD = "_ELEMVAL";
 
 }

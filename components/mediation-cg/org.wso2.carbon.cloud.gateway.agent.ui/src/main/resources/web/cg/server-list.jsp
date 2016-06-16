@@ -149,7 +149,17 @@
         function deleteServer(serverName) {
         	var onValidationSuccess = function() {
         		CARBON.showConfirmationDialog("<fmt:message key="csg.delete.server"/> " + serverName + "?", function () {
-                	location.href = "delete-server.jsp?&serverName=" + serverName;
+                    jQuery.ajax({
+                        type: "POST",
+                        url: "delete-server.jsp",
+                        data: {"serverName": serverName},
+                        async: false,
+                        success: function (result, status, xhr) {
+                            if (status == "success") {
+                                location.assign("server-list.jsp");
+                            }
+                        }
+                    });
             	});
         	};
         	

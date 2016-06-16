@@ -76,11 +76,20 @@
         var content = cell.firstChild.nodeValue;
         var dlcName = document.getElementById("dlcName").value;
 
-        function delEp() {
-            document.location.href = "deleteMessage.jsp?" + "dlcName=" + dlcName + "&messageId=" + content;
-        }
-
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", delEp);
+        var url = document.referrer;
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteMessage.jsp",
+                data: {"dlcName": dlcName, "messageId": content},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
 
@@ -91,11 +100,21 @@
         var content = cell.firstChild.nodeValue;
         var dlcName = document.getElementById("dlcName").value;
 
-        function delEp() {
-            document.location.href = "resendMessage.jsp?" + "dlcName=" + dlcName + "&messageId=" + content;
-        }
+        var url = document.referrer;
 
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", delEp);
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "resendMessage.jsp",
+                data: {"dlcName": dlcName, "messageId": content},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
     function resendMsg() {
@@ -117,23 +136,42 @@
         var msName = document.getElementById("msName").value;
         var messageId = document.getElementById("messageId").value;
 
-        function delEp() {
-            document.location.href = "deleteMessage.jsp?" + "messageStoreName=" + msName + "&messageId=" + messageId;
-        }
+        var url = document.referrer;
 
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", delEp);
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteMessage.jsp",
+                data: {"messageStoreName": msName, "messageId": messageId},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
 
     }
 
     function deleteFirstMsg() {
         var msName = document.getElementById("msName").value;
 
-        function delEp() {
-            document.location.href = "deleteFirstMessage.jsp?" + "messageStoreName=" + msName;
-        }
+        var url = document.referrer;
 
-        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", delEp);
-
+        CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", function() {
+            jQuery.ajax({
+                type: "POST",
+                url: "deleteFirstMessage.jsp",
+                data: {"messageStoreName": msName},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign(url);
+                    }
+                }
+            });
+        });
     }
 
 

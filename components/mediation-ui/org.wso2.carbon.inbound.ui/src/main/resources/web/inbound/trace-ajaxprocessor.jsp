@@ -24,6 +24,11 @@
 <%@ page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient" %>
 
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
     String inboundEndpointName = request.getParameter("inboundEndpointName");
     String action = request.getParameter("action");
 

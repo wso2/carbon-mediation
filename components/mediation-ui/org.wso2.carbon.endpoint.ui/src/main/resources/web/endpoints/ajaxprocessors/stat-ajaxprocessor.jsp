@@ -21,6 +21,12 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
+
     String endpointName = request.getParameter("endpointName");
     String action = request.getParameter("action");
 

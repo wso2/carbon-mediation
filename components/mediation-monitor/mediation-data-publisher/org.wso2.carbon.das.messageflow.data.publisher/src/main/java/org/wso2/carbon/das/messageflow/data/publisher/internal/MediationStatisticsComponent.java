@@ -140,7 +140,7 @@ public class MediationStatisticsComponent {
             jmxObserver.setTenantId(tenantId);
             log.info("JMX mediation statistic publishing enabled for tenant: " + tenantId);
         }
-        String disableAnalyticStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_JMX_PUBLISHING);
+        String disableAnalyticStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_ANALYTICS_PUBLISHING);
         boolean enableAnalyticsPublishing = !Boolean.parseBoolean(disableAnalyticStr);
         if (enableAnalyticsPublishing) {
             DASMediationFlowObserver dasObserver = new DASMediationFlowObserver();

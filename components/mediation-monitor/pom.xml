@@ -31,8 +31,6 @@
     <url>http://wso2.org</url>
     <modules>
         <module>message-relay</module>
-        <module>mediation-statistics</module>
-        <module>mediation-tracer</module>
         <module>mediation-data-publisher</module>
     </modules>
 </project>

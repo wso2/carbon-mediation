@@ -23,6 +23,12 @@
 <%@ page import="org.wso2.carbon.mediation.templates.ui.EndpointTemplateAdminClient" %>
 
 <%
+
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
     String templateName = request.getParameter("sequenceName");
     String locationType = request.getParameter("type");
     String templateType = request.getParameter("templateType");

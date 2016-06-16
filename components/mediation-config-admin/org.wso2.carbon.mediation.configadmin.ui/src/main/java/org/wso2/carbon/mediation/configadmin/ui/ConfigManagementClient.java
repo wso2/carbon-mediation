@@ -1,17 +1,17 @@
 /**
- *  Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.wso2.carbon.mediation.configadmin.ui;
@@ -61,9 +61,9 @@ public class ConfigManagementClient {
         stub = new ConfigServiceAdminStub(configCtx, serviceURL);
         ServiceClient client = stub._getServiceClient();
         Options option = client.getOptions();
-		option.setTimeOutInMilliSeconds(15 * 60 * 1000);
+        option.setTimeOutInMilliSeconds(15 * 60 * 1000);
         option.setProperty(HTTPConstants.SO_TIMEOUT, 15 * 60 * 1000);
-        option.setProperty(HTTPConstants.CONNECTION_TIMEOUT,15 * 60 * 1000);
+        option.setProperty(HTTPConstants.CONNECTION_TIMEOUT, 15 * 60 * 1000);
         option.setManageSession(true);
         option.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
 
@@ -92,49 +92,10 @@ public class ConfigManagementClient {
         return responseInformation;
     }
 
-    public ResponseInformation updateConfiguration(String configElement, HttpSession session) {
-        ResponseInformation responseInformation = new ResponseInformation();
-        try {
-            stub.updateConfiguration(createOMElement(configElement));
-            ConfigManagementClientUtils.setCachedConfiguration(configElement, session);
-        } catch (Exception e) {
-            responseInformation.setFault(true);
-            responseInformation.setMessage(e.getMessage());
-        }
-        return responseInformation;
-    }
-
-    public ResponseInformation validateConfiguration(String configElement) {
-        ResponseInformation responseInformation = new ResponseInformation();
-        try {
-            ValidationError[] errors = stub.validateConfiguration(createOMElement(configElement));
-            if (errors == null || errors.length == 0 || errors[0] == null) {
-                responseInformation.setResult(null);
-            } else {
-                responseInformation.setResult(errors);
-            }
-        } catch (Exception e) {
-            responseInformation.setFault(true);
-            responseInformation.setMessage(e.getMessage());
-        }
-        return responseInformation;
-    }
-
-    public ResponseInformation saveConfigurationToDisk() {
-        ResponseInformation responseInformation = new ResponseInformation();
-        try {
-            stub.saveConfigurationToDisk();
-        } catch (Exception e) {
-            responseInformation.setFault(true);
-            responseInformation.setMessage(e.getMessage());
-        }
-        return responseInformation;
-    }
-
     public ResponseInformation getConfigurations() {
         ResponseInformation responseInformation = new ResponseInformation();
         try {
-            ConfigurationInformation[]list = stub.getConfigurationList();
+            ConfigurationInformation[] list = stub.getConfigurationList();
 
             List<ConfigurationInformation> configList = new ArrayList<ConfigurationInformation>();
             if (list != null) {
@@ -146,70 +107,7 @@ public class ConfigManagementClient {
         } catch (Exception e) {
             responseInformation.setFault(true);
             responseInformation.setMessage(e.getMessage());
-        }         
-        return responseInformation;
-    }
-
-    public ResponseInformation deleteConfiguration(String name) {
-        ResponseInformation responseInformation = new ResponseInformation();
-        try {
-            stub.deleteConfiguration(name);
-        } catch (Exception e) {
-            responseInformation.setFault(true);
-            responseInformation.setMessage(e.getMessage());
         }
         return responseInformation;
     }
-
-    public ResponseInformation loadConfiguration(String name) {
-        ResponseInformation responseInformation = new ResponseInformation();
-        try {
-            stub.activate(name);
-        } catch (Exception e) {
-            responseInformation.setFault(true);
-            responseInformation.setMessage(e.getMessage());
-        }
-        return responseInformation;
-    }
-
-    public ResponseInformation newConfiguration(String name, String description) {
-        ResponseInformation responseInformation = new ResponseInformation();
-        try {
-            stub.create(name, description);
-        } catch (Exception e) {
-            responseInformation.setFault(true);
-            responseInformation.setMessage(e.getMessage());
-        }
-        return responseInformation;
-    }
-
-    public ResponseInformation addConfiguration(String name) {
-        ResponseInformation responseInformation = new ResponseInformation();
-        try {
-            stub.addExistingConfiguration(name);
-        } catch (Exception e) {
-            responseInformation.setFault(true);
-            responseInformation.setMessage(e.getMessage());
-        }
-        return responseInformation;
-    }
-
-    private static OMElement createOMElement(String xml) throws ServletException {
-        try {
-
-            XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(new StringReader(xml));
-            StAXOMBuilder builder = new StAXOMBuilder(reader);
-            return builder.getDocumentElement();
-
-        } catch (XMLStreamException e) {
-            handleException("Invalid XML " + xml);
-        }
-        return null;
-    }
-
-    private static void handleException(String msg) throws ServletException {
-        log.error(msg);
-        throw new ServletException(msg);
-    }
-
 }

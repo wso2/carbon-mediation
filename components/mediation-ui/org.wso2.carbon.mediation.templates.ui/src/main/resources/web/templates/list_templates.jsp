@@ -40,7 +40,17 @@
     function confirmForceDelete(sequenceName, msg) {
         CARBON.showConfirmationDialog('<fmt:message key="sequence.dependency.mgt.warning"/><br/><br/>'
                 + msg + '<br/><fmt:message key="force.delete"/>', function() {
-            location.href = "../templates/delete_template.jsp?sequenceName=" + sequenceName + "&force=true";
+            jQuery.ajax({
+                type: "POST",
+                url: "../templates/delete_template.jsp",
+                data: {"sequenceName": sequenceName, "force": "true"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("list_templates.jsp");
+                    }
+                }
+            });
         });
     }
 </script>
@@ -329,14 +339,34 @@
            CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function(){
-                location.href = "../templates/delete_template.jsp?sequenceName=" + sequenceName;
+                jQuery.ajax({
+                    type: "POST",
+                    url: "../templates/delete_template.jsp",
+                    data: {"sequenceName": sequenceName},
+                    async: false,
+                    success: function (result, status, xhr) {
+                        if (status == "success") {
+                            location.assign("list_templates.jsp");
+                        }
+                    }
+                });
             });
         }
     }
 
     function deleteEndpoint(sequenceName) {
-        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function() {
-            location.href = "../templates/delete_template.jsp?sequenceName=" + sequenceName + "&templateType=endpoint";
+        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function() {;
+            jQuery.ajax({
+                type: "POST",
+                url: "../templates/delete_template.jsp",
+                data: {"sequenceName": sequenceName, "templateType": "endpoint"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("list_templates.jsp");
+                    }
+                }
+            });
         });
     }
 
@@ -380,14 +410,34 @@
            CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function(){
-                location.href = "../templates/delete_template.jsp?type=registry&sequenceName=" + sequenceName;
+                jQuery.ajax({
+                    type: "POST",
+                    url: "../templates/delete_template.jsp",
+                    data: {"type": "registry", "sequenceName": sequenceName},
+                    async: false,
+                    success: function (result, status, xhr) {
+                        if (status == "success") {
+                            location.assign("list_templates.jsp");
+                        }
+                    }
+                });
             });
         }
     }
 
     function deleteRegistryEndpoint(sequenceName) {
         CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function() {
-            location.href = "../templates/delete_template.jsp?type=registry&sequenceName=" + sequenceName + "&templateType=endpoint";
+            jQuery.ajax({
+                type: "POST",
+                url: "../templates/delete_template.jsp",
+                data: {"type": "registry", "sequenceName": sequenceName, "templateType": "endpoint"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("list_templates.jsp");
+                    }
+                }
+            });
         });
     }
 

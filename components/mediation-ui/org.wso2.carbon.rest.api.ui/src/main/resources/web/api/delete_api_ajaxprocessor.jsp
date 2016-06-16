@@ -23,6 +23,11 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%
+    //ignore methods other than post
+    if (!request.getMethod().equalsIgnoreCase("POST")) {
+        response.sendError(405);
+        return;
+    }
     String[] apiGroups = null;
     String apiString = request.getParameter("apiGroupsString");
     if (apiString != null && !apiString.equalsIgnoreCase("")) {
