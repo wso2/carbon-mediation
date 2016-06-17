@@ -38,5 +38,12 @@ public class DataMapperEngineConstants {
             "org.apache.synapse.datamapper.executor.pool.size";
     public static final String SCHEMA_NAMESPACE_NAME_SEPARATOR = ":";
     public static final String SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD = "_ELEMVAL";
+    public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
+    public static final String XMLNS = "xmlns";
+    public static final String PROPERTIES_KEY = "properties";
+    public static final String ATTRIBUTES_KEY = "attributes";
+    public static final String TYPE_KEY = "type";
+    public static final String ITEMS_KEY = "items";
+    public static final String VALUE_KEY = "value";
 
 }
