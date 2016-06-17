@@ -227,7 +227,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 } else if (tConFac != null) {
                     connection = tConFac.createTopicConnection();
                 }
-                if (isDurable) {
+                if (isDurable && !isSharedSubscription) {
                     connection.setClientID(clientId);
                 }
                 return connection;
