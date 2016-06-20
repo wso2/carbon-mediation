@@ -60,13 +60,16 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
  */
 public class DataMapperMediator extends AbstractMediator implements ManagedLifecycle {
 
+    private static final Log log = LogFactory.getLog(DataMapperMediator.class);
+    private static final String cSVToXMLOpeningTag = "<text xmlns=\"http://ws.apache.org/commons/ns/payload\">";
+    private static final String cSVToXMLClosingTag = "</text>";
     private Value mappingConfigurationKey = null;
     private Value inputSchemaKey = null;
     private Value outputSchemaKey = null;
     private String inputType = null;
     private String outputType = null;
     private MappingResource mappingResource = null;
-    private static final Log log = LogFactory.getLog(DataMapperMediator.class);
+
 
     /**
      * Gets the key which is used to pick the mapping configuration from the
@@ -246,7 +249,12 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             outputResult = mappingHandler.doMap(
                         getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
 
-            if (InputOutputDataType.XML.toString().equals(outputType)) {
+            if (InputOutputDataType.CSV.toString().equals(outputType)) {
+                outputResult = cSVToXMLOpeningTag + outputResult + cSVToXMLClosingTag;
+            }
+
+            if (InputOutputDataType.XML.toString().equals(outputType) || InputOutputDataType.CSV.toString()
+                    .equals(outputType)) {
                 OMElement outputMessage = AXIOMUtil.stringToOM(outputResult);
                 if (outputMessage != null) {
                     if (log.isDebugEnabled()) {

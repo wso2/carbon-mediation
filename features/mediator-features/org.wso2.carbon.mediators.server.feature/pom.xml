@@ -49,6 +49,10 @@
             <artifactId>bsf-all</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+        </dependency>
+        <dependency>
             <groupId>rhino.wso2</groupId>
             <artifactId>js</artifactId>
         </dependency>
@@ -85,6 +89,7 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.router.impl</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.fastXSLT</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.event</bundleDef>
+                                <bundleDef>org.apache.velocity:velocity</bundleDef>
                             </bundles>
                             <importBundles>
                                 <importBundleDef>org.apache.bsf.wso2:bsf-all</importBundleDef>

@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.*;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_FIRST_NAME;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 
 /**
  * This class implements {@link Formatter} interface to read {@link Map} model and trigger events
@@ -48,7 +48,7 @@ public class MapOutputFormatter implements Formatter {
         if (model.getModel() instanceof Map) {
             this.outputMessageBuilder = outputMessageBuilder;
             this.outputSchema = outputSchema;
-            Map<String, Object> mapOutputModel = (Map<String, Object>) model.getModel();
+            Map<Object, Object> mapOutputModel = (Map<Object, Object>) model.getModel();
             traverseMap(mapOutputModel);
             sendTerminateEvent();
         } else {
@@ -63,44 +63,53 @@ public class MapOutputFormatter implements Formatter {
      *
      * @param outputMap
      */
-    private void traverseMap(Map<String, Object> outputMap) throws SchemaException, WriterException {
-        Set<String> mapKeys = outputMap.keySet();
-        LinkedList<String> orderedKeyList = new LinkedList<>();
+    private void traverseMap(Map<Object, Object> outputMap) throws SchemaException, WriterException {
+        Set<Object> mapKeys = outputMap.keySet();
+        LinkedList<Object> orderedKeyList = new LinkedList<>();
         boolean arrayType = false;
         if (isMapContainArray(mapKeys)) {
             sendArrayStartEvent();
             arrayType = true;
         }
-        ArrayList<String> tempKeys = new ArrayList<>();
+        ArrayList<Object> tempKeys = new ArrayList<>();
         tempKeys.addAll(mapKeys);
         //Attributes should come first than other fields. So attribute should be listed first
-        for (String key : mapKeys) {
-            if (key.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX) && tempKeys.contains(key)) {
-                orderedKeyList.addFirst(key);
-                tempKeys.remove(key);
-            } else {
-                if (key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX) && tempKeys.contains(key)) {
-                    String elementName = key.substring(0, key.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
-                    orderedKeyList.addLast(key);
-                    orderedKeyList.addLast(elementName);
+        for (Object keyVal : mapKeys) {
+            if(keyVal instanceof String) {
+                String key= (String) keyVal;
+                if (key.contains(SCHEMA_ATTRIBUTE_FIELD_PREFIX) && tempKeys.contains(key)) {
+                    orderedKeyList.addFirst(key);
                     tempKeys.remove(key);
-                    tempKeys.remove(elementName);
-                } else if (tempKeys.contains(key)) {
-                    if (tempKeys.contains(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
-                        orderedKeyList.addLast(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                } else {
+                    if (key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX) && tempKeys.contains(key)) {
+                        String elementName = key.substring(0, key.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
                         orderedKeyList.addLast(key);
+                        orderedKeyList.addLast(elementName);
                         tempKeys.remove(key);
-                        tempKeys.remove(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
-                    } else {
-                        orderedKeyList.addLast(key);
-                        tempKeys.remove(key);
+                        tempKeys.remove(elementName);
+                    } else if (tempKeys.contains(key)) {
+                        if (tempKeys.contains(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
+                            orderedKeyList.addLast(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                            orderedKeyList.addLast(key);
+                            tempKeys.remove(key);
+                            tempKeys.remove(key + SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX);
+                        } else {
+                            orderedKeyList.addLast(key);
+                            tempKeys.remove(key);
+                        }
                     }
                 }
+            }else if(keyVal instanceof Integer){
+                if (tempKeys.contains(keyVal)) {
+                        orderedKeyList.addLast(((Integer)keyVal).intValue());
+                        tempKeys.remove(keyVal);
+                    }
             }
         }
         int mapKeyIndex = 0;
-        for (String key : orderedKeyList) {
-            Object value = outputMap.get(key);
+        for (Object keyVal : orderedKeyList) {
+            Object value = outputMap.get(keyVal);
+            String key = String.valueOf(keyVal);
             if (value instanceof Map) {
                 // key value is a type of object or an array
                 if (arrayType) {
@@ -112,13 +121,13 @@ public class MapOutputFormatter implements Formatter {
                     if (mapKeyIndex != 0) {
                         sendAnonymousObjectStartEvent();
                     }
-                    traverseMap((Map<String, Object>) value);
+                    traverseMap((Map<Object, Object>) value);
                     if (mapKeyIndex != mapKeys.size() - 1) {
                         sendObjectEndEvent(key);
                     }
                 } else {
                     sendObjectStartEvent(key);
-                    traverseMap((Map<String, Object>) value);
+                    traverseMap((Map<Object, Object>) value);
                     if (!key.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
                         sendObjectEndEvent(key);
                     }
@@ -158,8 +167,8 @@ public class MapOutputFormatter implements Formatter {
         getOutputMessageBuilder().notifyEvent(new ReaderEvent(ReaderEventType.ARRAY_END, null, null));
     }
 
-    private boolean isMapContainArray(Set<String> mapKeys) {
-        for (String key : mapKeys) {
+    private boolean isMapContainArray(Set<Object> mapKeys) {
+        for (Object key : mapKeys) {
             if (ARRAY_ELEMENT_FIRST_NAME.equals(key)) {
                 return true;
             } else {
