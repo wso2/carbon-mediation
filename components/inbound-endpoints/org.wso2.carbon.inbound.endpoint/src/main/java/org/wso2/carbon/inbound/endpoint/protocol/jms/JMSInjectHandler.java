@@ -203,7 +203,7 @@ public class JMSInjectHandler {
             // Setting JMSXDeliveryCount header on the message context
             try {
                 int deliveryCount = msg.getIntProperty("JMSXDeliveryCount");
-                axis2MsgCtx.setProperty(JMSConstants.DELIVERY_COUNT, deliveryCount);
+                msgCtx.setProperty(JMSConstants.DELIVERY_COUNT, deliveryCount);
             } catch (NumberFormatException nfe) {
                 if (log.isDebugEnabled()) {
                     log.debug("JMSXDeliveryCount is not set in the received message");

@@ -33,6 +33,8 @@ public class WriterFactory {
                 return new XMLWriter(outputSchema);
             case JSON:
                 return new JSONWriter(outputSchema);
+            case CSV:
+                return new CSVWriter(outputSchema);
             default:
                 throw new IllegalArgumentException("Output Writer for type " + outputType + " is not implemented.");
         }
