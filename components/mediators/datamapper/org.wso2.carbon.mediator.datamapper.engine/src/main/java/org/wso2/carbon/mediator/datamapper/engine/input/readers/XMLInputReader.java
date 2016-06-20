@@ -43,28 +43,27 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ATTRIBUTES_KEY;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ITEMS_KEY;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NULL_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_KEY;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.STRING_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.TYPE_KEY;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.VALUE_KEY;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.XMLNS;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.XSI_NAMESPACE_URI;
 
 /**
  * This class is capable of parsing XML through AXIOMS for the InputStream and build the respective JSON message
  */
 public class XMLInputReader implements InputReader {
-
-    public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
-    public static final String XMLNS = "xmlns";
-    private static final String PROPERTIES_KEY = "properties";
-    private static final String ATTRIBUTES_KEY = "attributes";
-    private static final String TYPE_KEY = "type";
-    private static final String ITEMS_KEY = "items";
-    private static final String VALUE_KEY = "value";
-    private static final String ELEMENT_TEXT = "_ELEMVAL";
 
     private static final Log log = LogFactory.getLog(XMLInputReader.class);
 
@@ -200,7 +199,7 @@ public class XMLInputReader implements InputReader {
                 || DataMapperEngineConstants.INTEGER_ELEMENT_TYPE.equals(elementType)
                 || DataMapperEngineConstants.NUMBER_ELEMENT_TYPE.equals(elementType)) {
             if (isObject) { // if it is a normal object or an array element object
-                writeFieldElement(ELEMENT_TEXT, omElement.getText(), elementType);
+                writeFieldElement(SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD, omElement.getText(), elementType);
             } else if (!isArrayElement) { // if it is a normal XML element (not a object or part of an array)
                 writeFieldElement(nameSpaceLocalName, omElement.getText(), elementType);
             } else { // primitive array elements
@@ -270,7 +269,7 @@ public class XMLInputReader implements InputReader {
     /**
      * This method writes attribute elements into the JSON input message
      *
-     * @param jsonSchemaMap     current level JSON Schema
+     * @param jsonSchemaMap current level JSON Schema
      * @throws JSException
      * @throws SchemaException
      * @throws ReaderException
@@ -381,7 +380,7 @@ public class XMLInputReader implements InputReader {
      * Get the array elements sub-type. It can either be an object or primitive type
      *
      * @param jsonSchemaMap Current level json schema
-     * @param elementName Name of the element
+     * @param elementName   Name of the element
      * @return sub-type of the array element
      */
     private String getArraySubElementType(Map jsonSchemaMap, String elementName) {
@@ -392,10 +391,11 @@ public class XMLInputReader implements InputReader {
 
     /**
      * Get the primitive type of an element
-     *                  Main type :array
-     *                  Sub-type :object
+     * Main type :array
+     * Sub-type :object
+     *
      * @param jsonSchemaMap Current level json schema
-     * @param elementName Name of the element
+     * @param elementName   Name of the element
      * @return Primitive type or NULL_TYPE if there is not primitive text in the object
      */
     private String getArrayObjectTextElementType(Map jsonSchemaMap, String elementName) {
@@ -405,10 +405,11 @@ public class XMLInputReader implements InputReader {
     }
 
     /**
-     *  Get the primitive type of an element
-     *                  Main type :object
+     * Get the primitive type of an element
+     * Main type :object
+     *
      * @param jsonSchemaMap Current level json schema
-     * @param elementName Name of the element
+     * @param elementName   Name of the element
      * @return Primitive type or NULL_TYPE if there is not primitive text in the object
      */
     private String getObjectTextElementType(Map jsonSchemaMap, String elementName) {
@@ -418,10 +419,11 @@ public class XMLInputReader implements InputReader {
 
     /**
      * Get primitive type (used for getArrayObjectTextElementType, getObjectTextElementType methods)
+     *
      * @param objectsMap
      * @return primitive type or NULL_TYPE of there is no primitive text
      */
-    private String getTextElementType(Map objectsMap){
+    private String getTextElementType(Map objectsMap) {
         if (!objectsMap.containsKey(VALUE_KEY)) {
             return NULL_ELEMENT_TYPE;
         }
