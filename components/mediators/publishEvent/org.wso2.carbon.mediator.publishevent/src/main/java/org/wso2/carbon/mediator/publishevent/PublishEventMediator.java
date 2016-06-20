@@ -91,18 +91,18 @@ public class PublishEventMediator extends AbstractMediator {
 		// second "getEventSink() == null" check inside synchronized(this) block is used to ensure only one thread
 		// sets event sink.
 		if (getEventSink() == null) {
-			synchronized (this) {
-				if (getEventSink() == null) {
-					try {
-						setEventSink(loadEventSink());
-					} catch (SynapseException e) {
-						log.error("Cannot mediate message. Failed to load event sink '" + getEventSinkName() +
-						          "'. Error: " + e.getLocalizedMessage());
-						return true;
-					}
-				}
-			}
-		}
+            synchronized (this) {
+                if (getEventSink() == null) {
+                    try {
+                        setEventSink(loadEventSink());
+                    } catch (SynapseException e) {
+                        String errorMsg = "Cannot mediate message. Failed to load event sink '" + getEventSinkName() +
+                                          "'. Error: " + e.getLocalizedMessage();
+                        handleException(errorMsg, e, messageContext);
+                    }
+                }
+            }
+        }
 
 		/*
 		Anything relates to tenant specific should be completed before this
@@ -149,13 +149,13 @@ public class PublishEventMediator extends AbstractMediator {
 			         .publish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()), metaData,
 			                  correlationData, payloadData, arbitraryData);
 
-		} catch (SynapseException e) {
-			String errorMsg = "Error occurred while constructing the event: " + e.getLocalizedMessage();
-			log.error(errorMsg, e);
-		} catch (Exception e) {
-			String errorMsg = "Error occurred while sending the event: " + e.getLocalizedMessage();
-			log.error(errorMsg, e);
-		}
+        } catch (SynapseException e) {
+            String errorMsg = "Error occurred while constructing the event: " + e.getLocalizedMessage();
+            handleException(errorMsg, e, messageContext);
+        } catch (Exception e) {
+            String errorMsg = "Error occurred while sending the event: " + e.getLocalizedMessage();
+            handleException(errorMsg, e, messageContext);
+        }
 
 		if (synLog.isTraceOrDebugEnabled()) {
 			synLog.traceOrDebug("End : " + PublishEventMediatorFactory.getTagName() + " mediator");
