@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MappingResource {
 
@@ -88,19 +86,12 @@ public class MappingResource {
         String[] outputRootElementArray = outputRootelement.split(NAMESPACE_DELIMETER);
         String outputRootElement = outputRootElementArray[outputRootElementArray.length - 1];
 
-        Pattern functionIdPattern = Pattern.compile("(function )(map_(L|S)_" + inputRootElement + "_(L|S)_" +
-                                                    outputRootElement + ")");
-        String fnName = null;
+        String fnName = "map_S_" + inputRootElement + "_S_" + outputRootElement;
         String configLine;
         StringBuilder configScriptBuilder = new StringBuilder();
         try {
             while ((configLine = configReader.readLine()) != null) {
                 configScriptBuilder.append(configLine);
-                Matcher matcher = functionIdPattern.matcher(configLine);
-                if (matcher.find()) {
-                    //get the second matching group for the function name
-                    fnName = matcher.group(2);
-                }
             }
         } catch (IOException e) {
             throw new JSException(e.getMessage());
@@ -109,10 +100,7 @@ public class MappingResource {
         if (fnName != null) {
             return new JSFunction(fnName, configScriptBuilder.toString());
         } else {
-            throw new JSException("Could not find mapping JavaScript function. Expecting function name pattern" +
-                                  " " +
-                                  "is " +
-                                  functionIdPattern.toString());
+            throw new JSException("Could not find mapping JavaScript function.");
         }
     }
 
