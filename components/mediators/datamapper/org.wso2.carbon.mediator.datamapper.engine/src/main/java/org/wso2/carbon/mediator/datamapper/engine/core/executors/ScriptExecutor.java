@@ -16,6 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.core.executors;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
@@ -48,18 +49,18 @@ public class ScriptExecutor implements Executor {
      */
     public ScriptExecutor(ScriptExecutorType scriptExecutorType) {
         switch (scriptExecutorType) {
-            case NASHORN:
-                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
-                log.debug("Setting Nashorn as Script Engine");
-                break;
-            case RHINO:
-                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
-                log.debug("Setting Rhino as Script Engine");
-                break;
-            default:
-                scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
-                log.debug("Setting default Rhino as Script Engine");
-                break;
+        case NASHORN:
+            scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.NASHORN_ENGINE_NAME);
+            log.debug("Setting Nashorn as Script Engine");
+            break;
+        case RHINO:
+            scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
+            log.debug("Setting Rhino as Script Engine");
+            break;
+        default:
+            scriptEngine = new ScriptEngineManager().getEngineByName(DataMapperEngineConstants.DEFAULT_ENGINE_NAME);
+            log.debug("Setting default Rhino as Script Engine");
+            break;
         }
     }
 
@@ -68,7 +69,14 @@ public class ScriptExecutor implements Executor {
         try {
             JSFunction jsFunction = mappingResource.getFunction();
             injectInputVariableToEngine(mappingResource.getInputSchema().getName(), inputVariable);
-            scriptEngine.eval(jsFunction.getFunctionBody());
+            //getting all function definitions
+            String[] functionsArray = getFunctionsArray(jsFunction.getFunctionBody());
+            for (String function : functionsArray) {
+                function = function.trim();
+                if (StringUtils.isNotEmpty(function)) {
+                    scriptEngine.eval(DataMapperEngineConstants.DMC_FILE_FUNCTION_PREFIX + function);
+                }
+            }
             Invocable invocable = (Invocable) scriptEngine;
             Object result = invocable.invokeFunction(jsFunction.getFunctionName());
             if (result instanceof Map) {
@@ -80,6 +88,11 @@ public class ScriptExecutor implements Executor {
             throw new JSException("Undefined method called to execute " + e);
         }
         throw new JSException("Failed to execute mapping function");
+    }
+
+    private String[] getFunctionsArray(String functions) {
+        String[] functionArray = functions.split(DataMapperEngineConstants.DMC_FILE_DOLLAR_FUNCTION_PREFIX);
+        return functionArray;
     }
 
     private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
