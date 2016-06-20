@@ -31,6 +31,8 @@ public class InputReaderFactory {
             return new XMLInputReader();
         case JSON:
             return new JSONInputReader();
+        case CSV:
+            return new CSVInputReader();
         default:
             throw new IllegalArgumentException("Input Reader for type " + inputType + " is not implemented.");
         }
