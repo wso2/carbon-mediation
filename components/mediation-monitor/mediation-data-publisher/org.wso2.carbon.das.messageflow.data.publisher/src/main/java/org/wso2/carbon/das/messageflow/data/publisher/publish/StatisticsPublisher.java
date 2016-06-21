@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingFlow;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayload;
 import org.apache.synapse.aspects.flow.statistics.publishing.PublishingPayloadEvent;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.das.messageflow.data.publisher.internal.MessageFlowDataPublisherDataHolder;
 import org.wso2.carbon.das.messageflow.data.publisher.util.MediationDataPublisherConstants;
@@ -97,6 +98,7 @@ public class StatisticsPublisher {
 
 		Map<String, Object> mapping = publishingFlow.getObjectAsMap();
 		mapping.put("host", PublisherUtil.getHostAddress()); // Adding host
+		mapping.put("tenantId", PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Output output = new Output(out);
