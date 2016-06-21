@@ -28,6 +28,11 @@ public class WriterException extends Exception {
         this.message = message;
     }
 
+    public WriterException(String message,Exception e) {
+        super(message,e);
+        this.message = message;
+    }
+
     @Override public String toString() {
         return message;
     }
