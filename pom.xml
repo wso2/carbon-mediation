@@ -2275,7 +2275,7 @@
             </dependency>
             <dependency>
                 <groupId>org.wso2.orbit.com.googlecode.libphonenumber</groupId>
-                <artifactId>com.googlecode.libphonenumber</artifactId>
+                <artifactId>libphonenumber</artifactId>
                 <version>${com.googlecode.libphonenumber.version}</version>
             </dependency>
         </dependencies>

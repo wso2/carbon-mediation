@@ -81,7 +81,7 @@
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.com.googlecode.libphonenumber</groupId>
-            <artifactId>com.googlecode.libphonenumber</artifactId>
+            <artifactId>libphonenumber</artifactId>
         </dependency>
     </dependencies>
 
