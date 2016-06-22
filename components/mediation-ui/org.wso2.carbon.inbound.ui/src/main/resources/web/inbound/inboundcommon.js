@@ -189,7 +189,7 @@ function deleteRecord(name){
     CARBON.showConfirmationDialog(taskjsi18n["inbound.delete.waring"] + " ' " + name + " ' ?", function() {
         jQuery.ajax({
             type: "POST",
-            url: "deleteInbound.jsp",
+            url: "deleteInbound-ajaxprocessor.jsp",
             data: {"inboundName": name},
             async: false,
             success: function (result, status, xhr) {

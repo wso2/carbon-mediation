@@ -17,11 +17,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.message.store.ui.MessageStoreAdminServiceClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="org.wso2.carbon.message.processor.ui.MessageProcessorAdminServiceClient" %>
 
 <script type="text/javascript">
     function forward() {
@@ -33,25 +33,25 @@
 <%
     //ignore methods other than post
     if (!request.getMethod().equalsIgnoreCase("POST")) {
-         response.sendError(405);
+         response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
          return;
-    }
-
+     }
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
                                                   session);
     ConfigurationContext configContext =
     (ConfigurationContext)config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
 
-    MessageStoreAdminServiceClient client = new MessageStoreAdminServiceClient(cookie,url,configContext);
-    String msName = request.getParameter("messageStoreName");
+    MessageProcessorAdminServiceClient client =
+    new MessageProcessorAdminServiceClient(cookie,url,configContext);
+    String processorName = request.getParameter("processorName");
 
-    if (msName != null) {
+    if (processorName != null) {
 
             try {
-                    client.deleteMessageStore(msName);
+                    client.deleteMessageProcessor(processorName);
             } catch (Exception e) {
-                String msg = "Could not delete Message Store : " + e.getMessage();
+                String msg = "Could not delete Message Processor : " + e.getMessage();
                 CarbonUIMessage.sendCarbonUIMessage(msg, CarbonUIMessage.ERROR, request);
             }
 

@@ -40,7 +40,7 @@
                 + msg + '<br/><fmt:message key="force.delete"/>', function() {
             jQuery.ajax({
                 type: "POST",
-                url: "delete_sequence.jsp",
+                url: "delete_sequence-ajaxprocessor.jsp",
                 data: {"sequenceName": sequenceName, "force": "true"},
                 async: false,
                 success: function (result, status, xhr) {
@@ -319,7 +319,7 @@
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function() {
                 jQuery.ajax({
                     type: "POST",
-                    url: "delete_sequence.jsp",
+                    url: "delete_sequence-ajaxprocessor.jsp",
                     data: {"sequenceName": sequenceName},
                     async: false,
                     success: function (result, status, xhr) {
@@ -356,7 +356,7 @@
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function() {
                 jQuery.ajax({
                     type: "POST",
-                    url: "delete_sequence.jsp",
+                    url: "delete_sequence-ajaxprocessor.jsp",
                     data: {"type": "registry", "sequenceName": sequenceName},
                     async: false,
                     success: function (result, status, xhr) {

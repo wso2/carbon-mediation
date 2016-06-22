@@ -25,11 +25,6 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 
 <%
-    //ignore methods other than post
-    if (!request.getMethod().equalsIgnoreCase("POST")) {
-        response.sendError(405);
-        return;
-    }
     String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
     ConfigurationContext configContext = (ConfigurationContext) config.getServletContext()
             .getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);

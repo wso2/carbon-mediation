@@ -49,7 +49,7 @@
 <%
     //ignore methods other than post
     if (!request.getMethod().equalsIgnoreCase("POST")) {
-        response.sendError(405);
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         return;
     }
     String dlcName = request.getParameter("dlcName").trim();

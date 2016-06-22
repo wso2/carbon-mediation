@@ -326,7 +326,7 @@ function deleteServices() {
         CARBON.showConfirmationDialog("<fmt:message key="delete.endpoint.on.all.prompt"/>", function() {
             $.ajax({
                 type: 'POST',
-                url: 'ajaxprocessors/delete_endpoint_groups.jsp',
+                url: 'ajaxprocessors/delete_endpoint_groups-ajaxprocessor.jsp',
                 data: 'deleteAllEndpointGroups=true',
                 success: function(msg) {
                     loadEndpointAfterBulkDeletion();
@@ -345,7 +345,7 @@ function deleteServices() {
         CARBON.showConfirmationDialog("<fmt:message key="delete.endpoint.on.page.prompt"/>",function() {
             $.ajax({
                 type: 'POST',
-                url: 'ajaxprocessors/delete_endpoint_groups.jsp',
+                url: 'ajaxprocessors/delete_endpoint_groups-ajaxprocessor.jsp',
                 data: 'endpointGroupsString='+ endpointGroupsString,
                 success: function(msg) {
                     loadEndpointAfterBulkDeletion();
@@ -588,7 +588,7 @@ function resetVars() {
                               addRemoveKey="delete"
                               numberOfPages="<%=numberOfPages%>"/>
     <br/>
-    <form name="endpointForm" action="ajaxprocessors/delete_endpoint_groups.jsp" method="post">
+    <form name="endpointForm" action="ajaxprocessors/delete_endpoint_groups-ajaxprocessor.jsp" method="post">
         <input type="hidden" name="pageNumberEndpoint" value="<%= pageNumberStr%>"/>
         <table class="styledLeft" cellpadding="1" id="endpointListTable">
         <thead>
