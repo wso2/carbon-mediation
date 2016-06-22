@@ -33,9 +33,9 @@
 <%
     //ignore methods other than post
     if (!request.getMethod().equalsIgnoreCase("POST")) {
-        response.sendError(405);
-        return;
-    }
+         response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+         return;
+     }
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
                                                   session);
     ConfigurationContext configContext =
@@ -45,28 +45,25 @@
     MessageProcessorAdminServiceClient client =
     new MessageProcessorAdminServiceClient(cookie,url,configContext);
     String processorName = request.getParameter("processorName");
-    String action = request.getParameter("action");
 
+    if (processorName != null) {
 
-    if ( (processorName != null) && (action != null)) {
             try {
-                action = action.trim();
-                if("Deactivate".equalsIgnoreCase(action)) {
-                    client.deactivate(processorName);
-                } else if("Activate".equalsIgnoreCase(action)){
-                    client.activate(processorName);
-                }
-            } catch (Throwable e) {
-                String msg = "Could not Deactivate/Activate Message Processor : " + e.getMessage();
+                    client.deleteMessageProcessor(processorName);
+            } catch (Exception e) {
+                String msg = "Could not delete Message Processor : " + e.getMessage();
                 CarbonUIMessage.sendCarbonUIMessage(msg, CarbonUIMessage.ERROR, request);
             }
 
     }
 %>
-
+<%-- Get the endpoint name and then call the service to delete
+     the relevant endpoint with the given name and move back
+     to the index page
+--%>
 
 <script type="text/javascript">
-   forward();
+    forward();
 </script>
 <%--<jsp:forward page="<%="index.jsp"%>"/>--%>
-</body>
+

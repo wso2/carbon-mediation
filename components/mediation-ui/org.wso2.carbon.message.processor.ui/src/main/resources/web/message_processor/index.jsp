@@ -72,7 +72,7 @@
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.activate.the.processor"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteMessageProcessorHandler.jsp",
+                url: "deleteMessageProcessorHandler-ajaxprocessor.jsp",
                 data: {"processorName": name},
                 async: false,
                 success: function (result, status, xhr) {
@@ -131,7 +131,7 @@
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.deactivate.the.processor"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "ScheduledProcessorActionHandler.jsp",
+                url: "ScheduledProcessorActionHandler-ajaxprocessor.jsp",
                 data: {"processorName": name, "action": "Deactivate"},
                 async: false,
                 success: function (result, status, xhr) {
@@ -148,7 +148,7 @@
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.activate.the.processor"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "ScheduledProcessorActionHandler.jsp",
+                url: "ScheduledProcessorActionHandler-ajaxprocessor.jsp",
                 data: {"processorName": name, "action": "Activate"},
                 async: false,
                 success: function (result, status, xhr) {
@@ -171,7 +171,7 @@
                 + msg + '<br/><fmt:message key="force.delete"/>', function () {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteMessageProcessorHandler.jsp",
+                url: "deleteMessageProcessorHandler-ajaxprocessor.jsp",
                 data: {"entryName": entry, "force": "true"},
                 async: false,
                 success: function (result, status, xhr) {
