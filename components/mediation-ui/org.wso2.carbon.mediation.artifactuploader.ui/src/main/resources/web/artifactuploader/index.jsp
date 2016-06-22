@@ -50,7 +50,7 @@
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.artifact"/> " + artifactName + " ?", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "remove-artifact.jsp",
+                url: "remove-artifact-ajaxprocessor.jsp",
                 data: {"artifactName": artifactName},
                 async: false,
                 success: function (result, status, xhr) {
