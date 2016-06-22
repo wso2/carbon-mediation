@@ -17,9 +17,9 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"
         import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
-<%@ page import="org.wso2.carbon.eip.dlc.ui.client.DLCAdminClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="org.wso2.carbon.message.store.ui.MessageStoreAdminServiceClient" %>
 <%@ taglib prefix="carbon" uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" %>
 <carbon:jsi18n resourceBundle="org.wso2.carbon.localentry.ui.i18n.Resources"
                request="<%=request%>" />
@@ -31,14 +31,24 @@
     private static final String gt = ">";
     private static final String lt = "<";
 %>
+<script type="text/javascript">
+
+    function forward() {
+        location.href = 'index.jsp';
+    }
+
+</script>
+
+
 
 <%
     //ignore methods other than post
     if (!request.getMethod().equalsIgnoreCase("POST")) {
-        response.sendError(405);
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         return;
     }
-    String dlcName = request.getParameter("dlcName").trim();
+    String messageStoreName = request.getParameter("messageStoreName").trim();
+    String messageId = request.getParameter("messageId").trim();
     req = request;
     ses = session;
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
@@ -46,12 +56,12 @@
     ConfigurationContext configContext =
             (ConfigurationContext) config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-    DLCAdminClient client = new DLCAdminClient(cookie, url, configContext);
+    MessageStoreAdminServiceClient client = new MessageStoreAdminServiceClient(cookie, url, configContext);
     int error =0;
 
-    if(dlcName != null) {
+    if(messageStoreName != null && messageId != null) {
         try{
-            client.resendAll(dlcName);
+            client.deleteMessage(messageStoreName,messageId);
         }catch(Exception e) {
 
             error = 1;
@@ -68,7 +78,7 @@
 
             history.go(-1);
         }
-        CARBON.showErrorDialog('Can not resend Messages' + '<%=errMsg%>', gotoPage);
+        CARBON.showErrorDialog('Can not delete Message' + '<%=errMsg%>', gotoPage);
     });
 </script>
 
@@ -77,20 +87,16 @@
         }
 
     } else {
-
+                   
 
     }
 %>
 
-<script type="text/javascript">
 
-    function forward() {
-        location.href = 'index.jsp';
-    }
-
-</script>
 <%if (error == 0) {%>
 <script type="text/javascript">
-    forward();
+    jQuery(document).ready(function() {
+        location.href = 'viewMessageStore.jsp?messageStoreName=<%=messageStoreName%>';
+    });
 </script>
 <%}%>

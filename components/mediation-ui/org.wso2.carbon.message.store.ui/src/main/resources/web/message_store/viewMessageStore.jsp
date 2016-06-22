@@ -74,17 +74,15 @@
         var content = cell.firstChild.nodeValue;
         var msName = document.getElementById("messageStoreName_elem").value;
 
-        var url = window.location.href;
-
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteMessage.jsp",
+                url: "deleteMessage-ajaxprocessor.jsp",
                 data: {"messageStoreName": msName, "messageId": content},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("viewMessageStore.jsp?messageStoreName=" + msName);
                     }
                 }
             });
@@ -93,17 +91,16 @@
 
     function deleteFirstRow() {
         var msName = document.getElementById("messageStoreName_elem").value;
-        var url = window.location.href;
 
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteFirstMessage.jsp",
+                url: "deleteFirstMessage-ajaxprocessor.jsp",
                 data: {"messageStoreName": msName},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("viewMessageStore.jsp?messageStoreName=" + msName);
                     }
                 }
             });
@@ -118,17 +115,15 @@
         var content = cell.firstChild.nodeValue;
         var dlcName = document.getElementById("messageStoreName_elem").value;
 
-        var url = window.location.href;
-
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "resendMessage.jsp",
+                url: "resendMessage-ajaxprocessor.jsp",
                 data: {"messageStoreName": dlcName, "messageId": content},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("viewMessageStore.jsp?messageStoreName=" + dlcName);
                     }
                 }
             });
@@ -150,17 +145,15 @@
     function deleteAll() {
         var msName = document.getElementById("messageStoreName_elem").value;
 
-        var url = window.location.href;
-
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.all.messages"/>", function() {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteAll.jsp",
+                url: "deleteAll-ajaxprocessor.jsp",
                 data: {"messageStoreName": msName},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("viewMessageStore.jsp?messageStoreName=" + msName);
                     }
                 }
             });
@@ -176,12 +169,12 @@
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.all.messages"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "resendAll.jsp",
+                url: "resendAll-ajaxprocessor.jsp",
                 data: {"dlcName": dlcName},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("viewMessageStore.jsp?messageStoreName=" + dlcName);
                     }
                 }
             });
@@ -220,19 +213,17 @@
         if (selected != "")window.location.href = selNode.options[selNode.selectedIndex].value;
     }
 
-    var url = window.location.href;
-
     function confirmForceDelete(entry, msg) {
         CARBON.showConfirmationDialog('<fmt:message key="dependency.mgt.warning"/><br/><br/>'
                 + msg + '<br/><fmt:message key="force.delete"/>', function () {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteMessageStoresHandler.jsp",
+                url: "deleteMessageStoresHandler-ajaxprocessor.jsp",
                 data: {"entryName": entry, "force": "true"},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("index.jsp");
                     }
                 }
             });
