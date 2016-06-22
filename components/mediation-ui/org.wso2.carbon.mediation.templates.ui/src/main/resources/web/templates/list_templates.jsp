@@ -42,7 +42,7 @@
                 + msg + '<br/><fmt:message key="force.delete"/>', function() {
             jQuery.ajax({
                 type: "POST",
-                url: "../templates/delete_template.jsp",
+                url: "../templates/delete_template-ajaxprocessor.jsp",
                 data: {"sequenceName": sequenceName, "force": "true"},
                 async: false,
                 success: function (result, status, xhr) {
@@ -341,7 +341,7 @@
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function(){
                 jQuery.ajax({
                     type: "POST",
-                    url: "../templates/delete_template.jsp",
+                    url: "../templates/delete_template-ajaxprocessor.jsp",
                     data: {"sequenceName": sequenceName},
                     async: false,
                     success: function (result, status, xhr) {
@@ -358,7 +358,7 @@
         CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function() {;
             jQuery.ajax({
                 type: "POST",
-                url: "../templates/delete_template.jsp",
+                url: "../templates/delete_template-ajaxprocessor.jsp",
                 data: {"sequenceName": sequenceName, "templateType": "endpoint"},
                 async: false,
                 success: function (result, status, xhr) {
@@ -412,7 +412,7 @@
             CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function(){
                 jQuery.ajax({
                     type: "POST",
-                    url: "../templates/delete_template.jsp",
+                    url: "../templates/delete_template-ajaxprocessor.jsp",
                     data: {"type": "registry", "sequenceName": sequenceName},
                     async: false,
                     success: function (result, status, xhr) {
@@ -429,7 +429,7 @@
         CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function() {
             jQuery.ajax({
                 type: "POST",
-                url: "../templates/delete_template.jsp",
+                url: "../templates/delete_template-ajaxprocessor.jsp",
                 data: {"type": "registry", "sequenceName": sequenceName, "templateType": "endpoint"},
                 async: false,
                 success: function (result, status, xhr) {
