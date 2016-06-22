@@ -43,7 +43,7 @@
         CARBON.showConfirmationDialog('Are you sure you want to delete the executor ' + name + '?', function () {
             jQuery.ajax({
                 type: "POST",
-                url: "delete_executor.jsp",
+                url: "delete_executor-ajaxprocessor.jsp",
                 data: {"name": name},
                 async: false,
                 success: function (result, status, xhr) {
