@@ -108,7 +108,7 @@ if(tabs!=null && tabs.equals("0")) {
 
     function deleteApplication(libQName) {
         CARBON.showConfirmationDialog("<fmt:message key="confirm.delete.app"/>" , function(){
-            document.applicationsForm.action = "delete_artifact.jsp?artifactName=" + libQName+ "&type=library";
+            document.applicationsForm.action = "delete_artifact-ajaxprocessor.jsp?artifactName=" + libQName+ "&type=library";
             document.applicationsForm.submit();
         });
     }
@@ -128,7 +128,7 @@ if(tabs!=null && tabs.equals("0")) {
 
     function deleteImport(importName) {
         CARBON.showConfirmationDialog("<fmt:message key="confirm.delete.app"/>" , function(){
-            document.applicationsForm.action = "delete_artifact.jsp?artifactName=" + importName+"&type=import";
+            document.applicationsForm.action = "delete_artifact-ajaxprocessor.jsp?artifactName=" + importName+"&type=import";
             document.applicationsForm.submit();
         });
     }
