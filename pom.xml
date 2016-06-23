@@ -2283,6 +2283,11 @@
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${google.guava.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2445,6 +2450,7 @@
         <fge.json.schema.validator.version>2.2.6.wso2v1</fge.json.schema.validator.version>
         <com.googlecode.libphonenumber.version>7.4.2.wso2v1</com.googlecode.libphonenumber.version>
         <joda-time.version>2.8.2.wso2v1</joda-time.version>
+        <google.guava.version>15.0</google.guava.version>
 
         <!-- Cache mediator dependency versions -->
         <axis2-saaj.version>1.6.1-wso2v11</axis2-saaj.version>
