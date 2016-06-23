@@ -28,4 +28,13 @@ public class DataMapperMediatorConstants {
     public static final String OUTPUT_SCHEMA = "outputSchema";
     public static final String INPUT_TYPE = "inputType";
     public static final String OUTPUT_TYPE = "outputType";
+
+    /* Names of the different contexts used in the ESB */
+    public static final String DEFAULT_CONTEXT = "DEFAULT";
+    public static final String SYNAPSE_CONTEXT = "SYNAPSE";
+    public static final String AXIS2_CONTEXT = "AXIS2";
+    public static final String AXIS2_CLIENT_CONTEXT = "AXIS2-CLIENT";
+    public static final String TRANSPORT_CONTEXT = "TRANSPORT";
+    public static final String OPERATIONS_CONTEXT = "OPERATIONS";
+    public static final String TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
 }

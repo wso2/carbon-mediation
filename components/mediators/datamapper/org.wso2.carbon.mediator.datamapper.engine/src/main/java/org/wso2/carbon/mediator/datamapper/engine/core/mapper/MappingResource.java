@@ -26,6 +26,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MappingResource {
 
@@ -35,6 +39,7 @@ public class MappingResource {
     private String inputRootelement;
     private String outputRootelement;
     private JSFunction function;
+    private List<String> propertiesList;
 
     /**
      * @param inputSchema   respective output json schema as a a stream of bytes
@@ -50,6 +55,7 @@ public class MappingResource {
         this.outputSchema = getJSONSchema(outputSchema);
         this.inputRootelement = this.inputSchema.getName();
         this.outputRootelement = this.outputSchema.getName();
+        this.propertiesList = new ArrayList<>();
         this.function = createFunction(mappingConfig);
     }
 
@@ -69,6 +75,10 @@ public class MappingResource {
         return function;
     }
 
+    public List getPropertiesList() {
+        return propertiesList;
+    }
+
     /**
      * need to create java script function by passing the configuration file
      * Since this function going to execute every time when message hit the mapping backend
@@ -85,6 +95,11 @@ public class MappingResource {
         String inputRootElement = inputRootElementArray[inputRootElementArray.length - 1];
         String[] outputRootElementArray = outputRootelement.split(NAMESPACE_DELIMETER);
         String outputRootElement = outputRootElementArray[outputRootElementArray.length - 1];
+        String jsFunctionBody;
+
+        String propertiesPattern = "(DM_PROPERTIES.)([a-zA-Z_$][a-zA-Z_$0-9]*)\\['([a-zA-Z_$][a-zA-Z-_.$0-9]*)'\\]";
+        Pattern pattern = Pattern.compile(propertiesPattern);
+        Matcher match;
 
         String fnName = "map_S_" + inputRootElement + "_S_" + outputRootElement;
         String configLine;
@@ -97,8 +112,15 @@ public class MappingResource {
             throw new JSException(e.getMessage());
         }
 
+        jsFunctionBody = configScriptBuilder.toString();
+        match = pattern.matcher(jsFunctionBody);
+
+        while (match.find()) {
+            propertiesList.add(match.group(2) + "['" + match.group(3)+"']");
+        }
+
         if (fnName != null) {
-            return new JSFunction(fnName, configScriptBuilder.toString());
+            return new JSFunction(fnName, jsFunctionBody);
         } else {
             throw new JSException("Could not find mapping JavaScript function.");
         }

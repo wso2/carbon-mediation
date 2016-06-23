@@ -16,6 +16,8 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.core.mapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
@@ -32,6 +34,7 @@ import org.wso2.carbon.mediator.datamapper.engine.utils.ModelType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 public class MappingHandler implements InputVariableNotifier, OutputVariableNotifier {
 
@@ -42,31 +45,33 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
     private OutputMessageBuilder outputMessageBuilder;
     private Executor scriptExecutor;
     private InputBuilder inputBuilder;
+    private String propertiesInJSON;
 
     public MappingHandler(MappingResource mappingResource, String inputType, String outputType,
-                          String dmExecutorPoolSize) throws IOException, SchemaException, WriterException {
+            String dmExecutorPoolSize) throws IOException, SchemaException, WriterException {
 
         this.inputBuilder = new InputBuilder(InputOutputDataType.fromString(inputType),
                 mappingResource.getInputSchema());
 
-        this.outputMessageBuilder =
-                    new OutputMessageBuilder(InputOutputDataType.fromString(outputType), ModelType.JAVA_MAP,
-                            mappingResource.getOutputSchema());
+        this.outputMessageBuilder = new OutputMessageBuilder(InputOutputDataType.fromString(outputType),
+                ModelType.JAVA_MAP, mappingResource.getOutputSchema());
 
         this.dmExecutorPoolSize = dmExecutorPoolSize;
         this.mappingResource = mappingResource;
     }
 
-    public String doMap(InputStream inputMsg)
+    public String doMap(InputStream inputMsg, Map propertiesMap)
             throws ReaderException, InterruptedException, IOException, SchemaException, JSException {
         this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
+        this.propertiesInJSON = propertiesMapToJSON(propertiesMap);
         inputBuilder.buildInputModel(inputMsg, this);
         return outputVariable;
     }
 
-    @Override public void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException {
+    @Override
+    public void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException {
         this.inputVariable = (String) variable;
-        Model outputModel = scriptExecutor.execute(mappingResource, inputVariable);
+        Model outputModel = scriptExecutor.execute(mappingResource, inputVariable, propertiesInJSON);
         try {
             releaseExecutor();
             outputMessageBuilder.buildOutputMessage(outputModel, this);
@@ -80,8 +85,27 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         this.scriptExecutor = null;
     }
 
-    @Override public void notifyOutputVariable(Object variable) {
+    @Override
+    public void notifyOutputVariable(Object variable) {
         outputVariable = (String) variable;
+    }
+
+    /**
+     * Coinvert the properties map to a JSON String
+     * @param propertiesMap
+     * @return JSON String
+     * @throws ReaderException
+     */
+    private String propertiesMapToJSON(Map<String, String> propertiesMap) throws ReaderException {
+        ObjectMapper mapperObj = new ObjectMapper();
+        String propertiesInJSON = null;
+
+        try {
+            propertiesInJSON = mapperObj.writeValueAsString(propertiesMap);
+        } catch (JsonProcessingException e) {
+            throw new ReaderException("Error while parsing the input properties. " + e.getMessage());
+        }
+        return propertiesInJSON;
     }
 
 }

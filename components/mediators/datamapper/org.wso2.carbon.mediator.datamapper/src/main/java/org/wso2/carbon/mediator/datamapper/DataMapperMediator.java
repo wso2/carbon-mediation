@@ -48,9 +48,19 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CLIENT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.DEFAULT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.OPERATIONS_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.SYNAPSE_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_HEADERS;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE;
 
 /**
@@ -70,6 +80,26 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private String outputType = null;
     private MappingResource mappingResource = null;
 
+    /**
+     * Returns registry resources as input streams to create the MappingResourceLoader object
+     *
+     * @param synCtx Message context
+     * @param key    registry key
+     * @return mapping configuration, inputSchema and outputSchema as inputStreams
+     */
+    private static InputStream getRegistryResource(MessageContext synCtx, String key) {
+        InputStream inputStream = null;
+        Object entry = synCtx.getEntry(key);
+        if (entry instanceof OMTextImpl) {
+            if (log.isDebugEnabled()) {
+                log.debug("Value for the key is ");
+            }
+            OMTextImpl text = (OMTextImpl) entry;
+            String content = text.getText();
+            inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+        }
+        return inputStream;
+    }
 
     /**
      * Gets the key which is used to pick the mapping configuration from the
@@ -183,7 +213,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @param synCtx current message for the mediation
      * @return true if mediation happened successfully else false.
      */
-    @Override public boolean mediate(MessageContext synCtx) {
+    @Override
+    public boolean mediate(MessageContext synCtx) {
 
         SynapseLog synLog = getLog(synCtx);
 
@@ -238,6 +269,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private void transform(MessageContext synCtx, String configKey, String inSchemaKey) {
         try {
             String outputResult = null;
+            Map<String, String> propertiesMap;
 
             String dmExecutorPoolSize = SynapsePropertiesLoader
                     .getPropertyValue(ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
@@ -245,9 +277,12 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             MappingHandler mappingHandler = new MappingHandler(mappingResource, inputType, outputType,
                     dmExecutorPoolSize);
 
+            propertiesMap = getPropertiesMap(mappingResource.getPropertiesList(), synCtx);
+
             /* execute mapping on the input stream */
-            outputResult = mappingHandler.doMap(
-                        getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()));
+            outputResult = mappingHandler
+                    .doMap(getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()),
+                            propertiesMap);
 
             if (InputOutputDataType.CSV.toString().equals(outputType)) {
                 outputResult = cSVToXMLOpeningTag + outputResult + cSVToXMLClosingTag;
@@ -291,7 +326,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 JsonUtil.newJsonPayload(axis2MessageContext, outputResult, true, true);
             }
         } catch (ReaderException | InterruptedException | XMLStreamException | SchemaException
-                | IOException | JSException | WriterException e ) {
+                | IOException | JSException | WriterException e) {
             handleException("DataMapper mediator : mapping failed", e, synCtx);
         }
     }
@@ -333,7 +368,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @return true if the DataMapperMediator is intending to interact with the
      * message context
      */
-    @Override public boolean isContentAware() {
+    @Override
+    public boolean isContentAware() {
         return true;
     }
 
@@ -342,14 +378,16 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         return true;
     }
 
-    @Override public void init(SynapseEnvironment se) {
+    @Override
+    public void init(SynapseEnvironment se) {
 
     }
 
     /**
      * destroy the generated unique ID for the DataMapperMediator instance
      */
-    @Override public void destroy() {
+    @Override
+    public void destroy() {
     }
 
     /**
@@ -392,23 +430,64 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     }
 
     /**
-     * Returns registry resources as input streams to create the MappingResourceLoader object
+     * Retrieve property values and insert into a map
      *
-     * @param synCtx Message context
-     * @param key    registry key
-     * @return mapping configuration, inputSchema and outputSchema as inputStreams
+     * @param propertiesNamesList Required properties
+     * @param synCtx              Message context
+     * @return Map filed with property name and the value
      */
-    private static InputStream getRegistryResource(MessageContext synCtx, String key) {
-        InputStream inputStream = null;
-        Object entry = synCtx.getEntry(key);
-        if (entry instanceof OMTextImpl) {
-            if (log.isDebugEnabled()) {
-                log.debug("Value for the key is ");
+    private Map getPropertiesMap(List<String> propertiesNamesList, MessageContext synCtx) {
+        Map<String, Map<String, String>> propertiesMap = new HashMap<>();
+        String[] contextAndName;
+        String value = "";
+        org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
+        for (String propertyName : propertiesNamesList) {
+            contextAndName = propertyName.split("\\['|'\\]");
+            switch (contextAndName[0].toUpperCase()) {
+            case DEFAULT_CONTEXT:
+            case SYNAPSE_CONTEXT:
+                value = (String) synCtx.getProperty(contextAndName[1]);
+                break;
+            case TRANSPORT_CONTEXT:
+                value = (String) ((Map) axis2MsgCtx.getProperty(TRANSPORT_HEADERS)).get(contextAndName[1]);
+                break;
+            case AXIS2_CONTEXT:
+                value = (String) axis2MsgCtx.getProperty(contextAndName[1]);
+                break;
+            case AXIS2_CLIENT_CONTEXT:
+                value = (String) axis2MsgCtx.getOptions().getProperty(contextAndName[1]);
+                break;
+            case OPERATIONS_CONTEXT:
+                value = (String) axis2MsgCtx.getOperationContext().getProperty(contextAndName[1]);
+                break;
+            default:
+                log.warn(contextAndName[0] + " scope is not found. Setting it to an empty value.");
+                value = "";
             }
-            OMTextImpl text = (OMTextImpl) entry;
-            String content = text.getText();
-            inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+            if (value == null) {
+                log.warn(propertyName + "not found. Setting it to an empty value.");
+                value = "";
+            }
+            insertToMap(propertiesMap, contextAndName, value);
         }
-        return inputStream;
+
+        return propertiesMap;
+    }
+
+    /**
+     * Insert a given value to the properties map
+     *
+     * @param propertiesMap  Reference to the properties map
+     * @param contextAndName Context and the name of the property
+     * @param value          Current value of the property
+     */
+    private void insertToMap(Map<String, Map<String, String>> propertiesMap, String[] contextAndName, String value) {
+        Map<String, String> insideMap = propertiesMap.get(contextAndName[0]);
+        if (insideMap == null) {
+            insideMap = new HashMap();
+            propertiesMap.put(contextAndName[0], insideMap);
+        }
+        insideMap.put(contextAndName[1], value);
     }
 }

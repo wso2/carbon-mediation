@@ -47,5 +47,6 @@ public class DataMapperEngineConstants {
     public static final String TYPE_KEY = "type";
     public static final String ITEMS_KEY = "items";
     public static final String VALUE_KEY = "value";
+    public static final String PROPERTIES_OBJECT_NAME = "DM_PROPERTIES";
 
 }
