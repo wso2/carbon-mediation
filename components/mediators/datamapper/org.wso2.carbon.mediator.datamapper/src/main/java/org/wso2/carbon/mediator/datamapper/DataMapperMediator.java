@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.commons.json.JsonUtil;
 import org.apache.synapse.config.SynapsePropertiesLoader;
@@ -35,6 +36,7 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.AbstractMediator;
 import org.apache.synapse.mediators.Value;
+import org.apache.synapse.mediators.template.TemplateContext;
 import org.apache.synapse.util.AXIOMUtils;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.ReaderException;
@@ -51,12 +53,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CLIENT_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.DEFAULT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.FUNCTION_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.OPERATIONS_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.SYNAPSE_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_CONTEXT;
@@ -441,7 +445,13 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         String[] contextAndName;
         String value = "";
         org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-
+        HashMap functionProperties = new HashMap();
+        Stack<TemplateContext> templeteContextStack = ((Stack) synCtx
+                .getProperty(SynapseConstants.SYNAPSE__FUNCTION__STACK));
+        if (templeteContextStack != null) {
+            TemplateContext templateContext = templeteContextStack.peek();
+            functionProperties.putAll(templateContext.getMappedValues());
+        }
         for (String propertyName : propertiesNamesList) {
             contextAndName = propertyName.split("\\['|'\\]");
             switch (contextAndName[0].toUpperCase()) {
@@ -460,6 +470,9 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 break;
             case OPERATIONS_CONTEXT:
                 value = (String) axis2MsgCtx.getOperationContext().getProperty(contextAndName[1]);
+                break;
+            case FUNCTION_CONTEXT:
+                value = (String) functionProperties.get(contextAndName[1]);
                 break;
             default:
                 log.warn(contextAndName[0] + " scope is not found. Setting it to an empty value.");
