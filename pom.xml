@@ -2278,6 +2278,11 @@
                 <artifactId>libphonenumber</artifactId>
                 <version>${com.googlecode.libphonenumber.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda-time.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2439,6 +2444,7 @@
         <project.scm.id>wso2-scm-server</project.scm.id>
         <fge.json.schema.validator.version>2.2.6.wso2v1</fge.json.schema.validator.version>
         <com.googlecode.libphonenumber.version>7.4.2.wso2v1</com.googlecode.libphonenumber.version>
+        <joda-time.version>2.8.2.wso2v1</joda-time.version>
 
         <!-- Cache mediator dependency versions -->
         <axis2-saaj.version>1.6.1-wso2v11</axis2-saaj.version>
