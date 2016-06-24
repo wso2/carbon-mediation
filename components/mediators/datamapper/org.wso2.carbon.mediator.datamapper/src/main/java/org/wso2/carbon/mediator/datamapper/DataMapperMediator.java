@@ -60,6 +60,7 @@ import javax.xml.stream.XMLStreamException;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CLIENT_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.DEFAULT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.EMPTY_STRING;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.FUNCTION_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.OPERATIONS_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.SYNAPSE_CONTEXT;
@@ -88,7 +89,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * Returns registry resources as input streams to create the MappingResourceLoader object
      *
      * @param synCtx Message context
-     * @param key    registry key
+     * @param key    location in the registry
      * @return mapping configuration, inputSchema and outputSchema as inputStreams
      */
     private static InputStream getRegistryResource(MessageContext synCtx, String key) {
@@ -96,7 +97,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         Object entry = synCtx.getEntry(key);
         if (entry instanceof OMTextImpl) {
             if (log.isDebugEnabled()) {
-                log.debug("Value for the key is ");
+                log.debug("Retrieving the key :" + key);
             }
             OMTextImpl text = (OMTextImpl) entry;
             String content = text.getText();
@@ -443,7 +444,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private Map getPropertiesMap(List<String> propertiesNamesList, MessageContext synCtx) {
         Map<String, Map<String, String>> propertiesMap = new HashMap<>();
         String[] contextAndName;
-        String value = "";
+        String value = EMPTY_STRING;
         org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
         HashMap functionProperties = new HashMap();
         Stack<TemplateContext> templeteContextStack = ((Stack) synCtx
@@ -476,11 +477,11 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 break;
             default:
                 log.warn(contextAndName[0] + " scope is not found. Setting it to an empty value.");
-                value = "";
+                value = EMPTY_STRING;
             }
             if (value == null) {
                 log.warn(propertyName + "not found. Setting it to an empty value.");
-                value = "";
+                value = EMPTY_STRING;
             }
             insertToMap(propertiesMap, contextAndName, value);
         }

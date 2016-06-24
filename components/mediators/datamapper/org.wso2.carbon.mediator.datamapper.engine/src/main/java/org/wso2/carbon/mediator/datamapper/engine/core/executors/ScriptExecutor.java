@@ -32,6 +32,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.EQUALS_SIGN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;
 
 /**
@@ -92,6 +93,6 @@ public class ScriptExecutor implements Executor {
     }
 
     private void injectPropertiesToEngine(String properties) throws ScriptException {
-        scriptEngine.eval("var " + PROPERTIES_OBJECT_NAME + "= " + properties);
+        scriptEngine.eval("var " + PROPERTIES_OBJECT_NAME + EQUALS_SIGN + properties);
     }
 }

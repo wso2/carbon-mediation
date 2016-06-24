@@ -38,4 +38,5 @@ public class DataMapperMediatorConstants {
     public static final String OPERATIONS_CONTEXT = "OPERATIONS";
     public static final String TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
     public static final String FUNCTION_CONTEXT = "FUNCTION";
+    public static final String EMPTY_STRING = "";
 }
