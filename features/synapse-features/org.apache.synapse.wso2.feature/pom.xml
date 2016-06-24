@@ -83,6 +83,26 @@
             <groupId>org.wso2.orbit.com.googlecode.libphonenumber</groupId>
             <artifactId>libphonenumber</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -120,6 +140,11 @@
                                 <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
                                 <bundleDef>net.minidev:json-smart</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.googlecode.libphonenumber:libphonenumber</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-core:${fasterxml.jackson.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.databind.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-annotations:${fasterxml.jackson.version}</bundleDef>
+                                <!--<bundleDef>org.wso2.orbit.joda-time:joda-time:${joda-time.version}</bundleDef>-->
+                                <bundleDef>com.google.guava:guava:${google.guava.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.github.fge:json-schema-validator-all</bundleDef>
                             </bundles>
                         </configuration>
