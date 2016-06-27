@@ -49,5 +49,10 @@ public class DataMapperEngineConstants {
     public static final String VALUE_KEY = "value";
     public static final String PROPERTIES_OBJECT_NAME = "DM_PROPERTIES";
     public static final String EQUALS_SIGN = "=";
+    public static final String JS_STRINGIFY = "JSON.stringify";
+    public static final String BRACKET_OPEN = "(";
+    public static final String BRACKET_CLOSE = ")";
+    public static final String FUNCTION_NAME_CONST_1 = "map_S_";
+    public static final String FUNCTION_NAME_CONST_2 = "_S_";
 
 }

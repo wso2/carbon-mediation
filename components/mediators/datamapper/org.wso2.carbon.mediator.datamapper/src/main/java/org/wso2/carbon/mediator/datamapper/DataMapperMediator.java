@@ -427,7 +427,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
 
         try {
             // Creates a new mappingResourceLoader
-            return new MappingResource(inputSchemaStream, outputSchemaStream, configFileInputStream);
+            return new MappingResource(inputSchemaStream, outputSchemaStream, configFileInputStream, outputType);
         } catch (SchemaException | JSException e) {
             handleException(e.getMessage(), synCtx);
         }

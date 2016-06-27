@@ -20,6 +20,7 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.JacksonJSONSchema;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BRACKET_CLOSE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BRACKET_OPEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_1;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_2;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.JS_STRINGIFY;
 
 public class MappingResource {
 
@@ -49,14 +56,14 @@ public class MappingResource {
      *                     above schemas method
      *                     will this exception
      */
-    public MappingResource(InputStream inputSchema, InputStream outputSchema, InputStream mappingConfig)
-            throws SchemaException, JSException {
+    public MappingResource(InputStream inputSchema, InputStream outputSchema, InputStream mappingConfig,
+            String outputType) throws SchemaException, JSException {
         this.inputSchema = getJSONSchema(inputSchema);
         this.outputSchema = getJSONSchema(outputSchema);
         this.inputRootelement = this.inputSchema.getName();
         this.outputRootelement = this.outputSchema.getName();
         this.propertiesList = new ArrayList<>();
-        this.function = createFunction(mappingConfig);
+        this.function = createFunction(mappingConfig, outputType);
     }
 
     private Schema getJSONSchema(InputStream inputSchema) throws SchemaException {
@@ -87,7 +94,7 @@ public class MappingResource {
      * @param mappingConfig mapping configuration
      * @return java script function
      */
-    private JSFunction createFunction(InputStream mappingConfig) throws JSException {
+    private JSFunction createFunction(InputStream mappingConfig, String outputType) throws JSException {
         BufferedReader configReader = new BufferedReader(new InputStreamReader(mappingConfig, StandardCharsets.UTF_8));
         //need to identify the main method of the configuration because that method going to
         // execute in engine
@@ -101,7 +108,12 @@ public class MappingResource {
         Pattern pattern = Pattern.compile(propertiesPattern);
         Matcher match;
 
-        String fnName = "map_S_" + inputRootElement + "_S_" + outputRootElement;
+        String fnName =
+                FUNCTION_NAME_CONST_1 + inputRootElement + FUNCTION_NAME_CONST_2 + outputRootElement + BRACKET_OPEN
+                        + BRACKET_CLOSE;
+        if (InputOutputDataType.JSON.toString().equals(outputType)) {
+            fnName = JS_STRINGIFY + BRACKET_OPEN + fnName + BRACKET_CLOSE;
+        }
         String configLine;
         StringBuilder configScriptBuilder = new StringBuilder();
         try {
