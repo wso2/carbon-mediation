@@ -35,5 +35,6 @@ public interface Executor {
      * @return model output model
      * @throws JSException if mapping throws an exception
      */
-    public Model execute(MappingResource mappingResource, String inputVariable) throws JSException, SchemaException;
+    public Model execute(MappingResource mappingResource, String inputVariable, String properties)
+            throws JSException, SchemaException;
 }

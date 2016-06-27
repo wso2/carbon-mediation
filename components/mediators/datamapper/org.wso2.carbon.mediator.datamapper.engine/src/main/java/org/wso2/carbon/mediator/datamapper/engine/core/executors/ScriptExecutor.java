@@ -26,11 +26,14 @@ import org.wso2.carbon.mediator.datamapper.engine.core.models.MapModel;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 
+import java.util.Map;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.util.Map;
+
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.EQUALS_SIGN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;
 
 /**
  * This class implements script executor for data mapper using java script executor (Rhino or
@@ -38,8 +41,8 @@ import java.util.Map;
  */
 public class ScriptExecutor implements Executor {
 
-    private ScriptEngine scriptEngine;
     private static final Log log = LogFactory.getLog(ScriptExecutor.class);
+    private ScriptEngine scriptEngine;
 
     /**
      * Create a script executor of the provided script executor type
@@ -63,10 +66,12 @@ public class ScriptExecutor implements Executor {
         }
     }
 
-    @Override public Model execute(MappingResource mappingResource, String inputVariable)
+    @Override
+    public Model execute(MappingResource mappingResource, String inputVariable, String properties)
             throws JSException, SchemaException {
         try {
             JSFunction jsFunction = mappingResource.getFunction();
+            injectPropertiesToEngine(properties);
             injectInputVariableToEngine(mappingResource.getInputSchema().getName(), inputVariable);
             scriptEngine.eval(jsFunction.getFunctionBody());
             Invocable invocable = (Invocable) scriptEngine;
@@ -85,5 +90,9 @@ public class ScriptExecutor implements Executor {
     private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
         scriptEngine.eval("var input" + inputSchemaName.replace(':', '_').replace('=', '_').replace(',', '_') + "="
                 + inputVariable);
+    }
+
+    private void injectPropertiesToEngine(String properties) throws ScriptException {
+        scriptEngine.eval("var " + PROPERTIES_OBJECT_NAME + EQUALS_SIGN + properties);
     }
 }
