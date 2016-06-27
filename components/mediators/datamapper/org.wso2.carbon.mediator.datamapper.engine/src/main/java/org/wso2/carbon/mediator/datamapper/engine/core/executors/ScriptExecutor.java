@@ -24,10 +24,10 @@ import org.wso2.carbon.mediator.datamapper.engine.core.mapper.JSFunction;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.MapModel;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
+import org.wso2.carbon.mediator.datamapper.engine.core.models.StringModel;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 
 import java.util.Map;
-import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -74,15 +74,14 @@ public class ScriptExecutor implements Executor {
             injectPropertiesToEngine(properties);
             injectInputVariableToEngine(mappingResource.getInputSchema().getName(), inputVariable);
             scriptEngine.eval(jsFunction.getFunctionBody());
-            Invocable invocable = (Invocable) scriptEngine;
-            Object result = invocable.invokeFunction(jsFunction.getFunctionName());
+            Object result = scriptEngine.eval(jsFunction.getFunctionName());
             if (result instanceof Map) {
                 return new MapModel((Map<String, Object>) result);
+            } else if ( result instanceof String) {
+                return new StringModel((String)result);
             }
         } catch (ScriptException e) {
             throw new JSException("Script engine unable to execute the script " + e);
-        } catch (NoSuchMethodException e) {
-            throw new JSException("Undefined method called to execute " + e);
         }
         throw new JSException("Failed to execute mapping function");
     }

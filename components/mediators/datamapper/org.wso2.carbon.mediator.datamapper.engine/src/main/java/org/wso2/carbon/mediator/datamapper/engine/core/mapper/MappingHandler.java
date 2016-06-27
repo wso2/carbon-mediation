@@ -74,7 +74,12 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         Model outputModel = scriptExecutor.execute(mappingResource, inputVariable, propertiesInJSON);
         try {
             releaseExecutor();
-            outputMessageBuilder.buildOutputMessage(outputModel, this);
+            if (outputModel.getModel() instanceof Map) {
+                outputMessageBuilder.buildOutputMessage(outputModel, this);
+            } else {
+                notifyOutputVariable(outputModel.getModel());
+            }
+
         } catch (InterruptedException | WriterException e) {
             throw new ReaderException(e.getMessage());
         }
