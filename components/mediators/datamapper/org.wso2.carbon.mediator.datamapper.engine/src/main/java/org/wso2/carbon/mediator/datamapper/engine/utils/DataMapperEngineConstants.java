@@ -52,5 +52,7 @@ public class DataMapperEngineConstants {
     public static final String JS_STRINGIFY = "JSON.stringify";
     public static final String BRACKET_OPEN = "(";
     public static final String BRACKET_CLOSE = ")";
+    public static final String FUNCTION_NAME_CONST_1 = "map_S_";
+    public static final String FUNCTION_NAME_CONST_2 = "_S_";
 
 }

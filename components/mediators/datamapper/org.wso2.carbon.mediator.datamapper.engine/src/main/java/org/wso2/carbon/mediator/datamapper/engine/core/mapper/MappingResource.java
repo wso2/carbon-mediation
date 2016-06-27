@@ -34,6 +34,8 @@ import java.util.regex.Pattern;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BRACKET_CLOSE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BRACKET_OPEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_1;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_2;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.JS_STRINGIFY;
 
 public class MappingResource {
@@ -106,7 +108,9 @@ public class MappingResource {
         Pattern pattern = Pattern.compile(propertiesPattern);
         Matcher match;
 
-        String fnName = "map_S_" + inputRootElement + "_S_" + outputRootElement + BRACKET_OPEN + BRACKET_CLOSE;
+        String fnName =
+                FUNCTION_NAME_CONST_1 + inputRootElement + FUNCTION_NAME_CONST_2 + outputRootElement + BRACKET_OPEN
+                        + BRACKET_CLOSE;
         if (InputOutputDataType.JSON.toString().equals(outputType)) {
             fnName = JS_STRINGIFY + BRACKET_OPEN + fnName + BRACKET_CLOSE;
         }
