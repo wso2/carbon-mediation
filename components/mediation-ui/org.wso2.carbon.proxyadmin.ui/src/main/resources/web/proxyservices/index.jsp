@@ -735,8 +735,8 @@
     }
 
     function generateServiceParamTable() {
-        var str = '<%=givenParams%>';
-        if (str != '') {
+        var str = "<%=givenParams%>";
+        if (str != "") {
             var params;
             params = str.split("::");
             var i, param;
