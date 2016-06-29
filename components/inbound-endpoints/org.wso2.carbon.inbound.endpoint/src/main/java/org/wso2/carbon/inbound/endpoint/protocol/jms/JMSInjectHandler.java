@@ -113,7 +113,10 @@ public class JMSInjectHandler {
                 log.debug("Processed JMS Message of Content-type : " + contentType);
             }
             MessageContext axis2MsgCtx =
-                                         ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx).getAxis2MessageContext();
+                    ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx).getAxis2MessageContext();
+            //setting transport headers
+            axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS
+                    , JMSUtils.getTransportHeaders(msg, axis2MsgCtx));
             // set the JMS Message ID as the Message ID of the MessageContext
             try {
                 msgCtx.setMessageID(msg.getJMSMessageID());
