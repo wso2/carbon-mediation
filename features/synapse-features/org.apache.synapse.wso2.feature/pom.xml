@@ -139,6 +139,7 @@
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
                                 <bundleDef>net.minidev:json-smart</bundleDef>
+                                <!-- Json schema validator dependencies -->
                                 <bundleDef>org.wso2.orbit.com.googlecode.libphonenumber:libphonenumber</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-core:${fasterxml.jackson.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.databind.version}</bundleDef>
