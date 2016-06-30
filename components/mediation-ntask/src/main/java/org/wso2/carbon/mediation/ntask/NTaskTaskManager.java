@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
@@ -374,39 +375,30 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
             return true;
         }
         /**
-         * If this is a manager node in a cluster, then use MEDIATION_NTASK_SKIP_RUNNING_TASKS property to decide
-         * whether to run tasks in this node or not, and that defaults to not running tasks(because it's a manager node)
+         * If this is not a worker node node in a cluster, then use "clusteringPattern" parameter in axis2.xml
+         * clustering configs to decide whether to run tasks in this node or not, and that defaults to not
+         * running tasks(defaulting to "WorkerManager" clustering pattern and this node is a manager node, hence
+         * not running tasks in this node)
          */
-        Properties props = MiscellaneousUtil.loadProperties(
-                SynapseConstants.SYNAPSE_PROPERTIES);
-
-        if (props == null) {
-            logger.warn("Error loading synapse property file. Hence using default 'true' for the property - " +
-                        Constants.MEDIATION_NTASK_SKIP_RUNNING_TASKS);
-            //default true means this node is not a task running node, hence return false.
+        Parameter parameter = NtaskService.getCcServiceInstance().getServerConfigContext()
+                .getAxisConfiguration().getClusteringAgent().getParameter(Constants.CLUSTERING_PATTERN);
+        if (parameter == null || parameter.getValue() == null || parameter.getValue().toString().isEmpty()) {
+            logger.warn("clusteringPattern parameter not configured correctly in clustering configuration, " +
+                        "hence defaults to worker manager clustering pattern, and since this node is a manager node, " +
+                        "skips running tasks in this node" );
             return false;
-        }
-        String skipTaskProp = MiscellaneousUtil.getProperty(props,
-                                      Constants.MEDIATION_NTASK_SKIP_RUNNING_TASKS,
-                                      Constants.MEDIATION_NTASK_SKIP_RUNNING_TASKS_DEFAULT_VALUE);
-        if (skipTaskProp != null) {
-            if (skipTaskProp.equals("false")) {
-                return true;
-            } else if (skipTaskProp.equals("true")) {
-                return false;
-            } else {
-                logger.warn("Wrong value(possible values 'true' or 'false') provided for property - " +
-                            Constants.MEDIATION_NTASK_SKIP_RUNNING_TASKS + ", provided value - '" +
-                            skipTaskProp + "', hence defaults to 'true'");
-                return false;
+        } else if (parameter.getValue().toString().equals(Constants.CLUSTERING_PATTERN_WORKER_MANAGER)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("clustering pattern is worker manager clustering pattern, and this node is a " +
+                             "manager node, hence skip running tasks");
             }
-
+            return false;
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Non worker manager clustering pattern mentioned, hence running tasks in this node");
+            }
+            return true;
         }
-        /**
-         * MEDIATION_NTASK_SKIP_RUNNING_TASKS property is not mentioned in synapse.properties file, hence defaults to
-         * 'true'
-         */
-        return false;
     }
 
     @Override
