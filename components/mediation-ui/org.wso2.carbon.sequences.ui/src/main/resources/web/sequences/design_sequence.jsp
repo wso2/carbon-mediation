@@ -361,6 +361,10 @@
 
     function saveSequenceAs() {
 
+        var options = {
+            success: onRegistryUpdSuccess  // post-submit callback
+        };
+
         if ('<%=SequenceEditorHelper.getEditingSequenceAction(session)%>' == 'anonify') {
             CARBON.showErrorDialog('Unable to save the sequence to the synapse registry in current mode');
             return false;
@@ -371,22 +375,71 @@
         <%
         }
         %>
-        var key = document.getElementById('synRegKey').value;
-        if (key == '') {
-            CARBON.showWarningDialog('The key value must not be empty when saving to the Synapse registry');
-            return false;
-        }
+        var mediator_edit_tab = document.getElementById('mediator-edit-tab');
+        var mediatorDesign = document.getElementById("mediatorDesign");
+        var mediatorSource = document.getElementById("mediatorSource");
+        if (mediator_edit_tab && mediator_edit_tab.style.display != "none") {
+            if (mediatorDesign && mediatorDesign.style.display != "none") {
+                var funcName = currentMedTLN + "MediatorValidate";
+                if (eval("typeof " + funcName + " == 'function'")) {
+                    if (eval(funcName + "()")) {
+                        jQuery('#mediator-editor-form').ajaxForm(options);
+                        jQuery('#mediator-editor-form').submit();
+                    } else {
+                        return false;
+                    }
+                } else {
+                    jQuery('#mediator-editor-form').ajaxForm(options);
+                    jQuery('#mediator-editor-form').submit();
+                }
+            } else if (mediatorSource && mediatorSource.style.display != "none") {
+                YAHOO.util.Event.onAvailable("mediatorSrc",
+                        function () {
+                            document.getElementById("mediatorSrc").value = editAreaLoader.getValue("mediatorSrc");
+                        }
+                );
 
-        var registry;
-        if (document.getElementById("config_reg").checked == true) {
-            registry = 'conf';
-        } else {
-            registry = 'gov';
+                jQuery('#mediator-source-form').ajaxForm(options);
+                jQuery('#mediator-source-form').submit();
+            }
         }
-        var onErrorKey = document.getElementById("sequence.onerror.key").value;
-        var seqDescription = document.getElementById("seqeunceDescription").value;
-        document.location.href = "save_sequence_as.jsp?registry=" + registry + "&regKey=" + key + "&onErrorKey="
-                + onErrorKey + "&seqDescription=" + seqDescription;
+    }
+
+    function onRegistryUpdSuccess() {
+        if ('<%=SequenceEditorHelper.getEditingSequenceAction(session)%>' == 'anonify') {
+            var seqName = document.getElementById("sequence.name").value;
+            var onErrorKey = document.getElementById("sequence.onerror.key").value;
+            var seqDescription = document.getElementById("seqeunceDescription").value;
+
+            if (onErrorKey != '') {
+                document.location.href = "save_sequence.jsp?sequence=<%=seq%>&onErrorKey="
+                        + onErrorKey;
+            } else if (seqDescription != '') {
+                document.location.href = "save_sequence.jsp?sequence=<%=seq%>"
+                        + "&seqDescription=" + seqDescription;
+            } else {
+                document.location.href = "save_sequence.jsp?sequence=<%=seq%>";
+            }
+        } else {
+
+            var key = document.getElementById('synRegKey').value;
+            if (key == '') {
+                CARBON.showWarningDialog('The key value must not be empty when saving to the Synapse registry');
+                return false;
+            }
+
+            var registry;
+            if (document.getElementById("config_reg").checked == true) {
+                registry = 'conf';
+            } else {
+                registry = 'gov';
+            }
+            var onErrorKey = document.getElementById("sequence.onerror.key").value;
+            var seqDescription = document.getElementById("seqeunceDescription").value;
+            document.location.href = "save_sequence_as.jsp?registry=" + registry + "&regKey=" + key + "&onErrorKey="
+                    + onErrorKey + "&seqDescription=" + seqDescription;
+
+        }
     }
 
     function applySequence() {
