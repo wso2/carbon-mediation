@@ -23,8 +23,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 
+import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.commons.util.MiscellaneousUtil;
 import org.apache.synapse.task.SynapseTaskException;
 import org.apache.synapse.task.TaskDescription;
 import org.apache.synapse.task.TaskManager;
@@ -325,10 +328,6 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     NtaskService.addObserver(this);
                     return false;
                 }
-                boolean isStandaloneNode = NtaskService.getCcServiceInstance().getServerConfigContext()
-                        .getAxisConfiguration().getClusteringAgent() == null;
-                boolean isWorkerNode = !isStandaloneNode && CarbonUtils.isWorkerNode();
-                logger.debug("#init standalone node: [" + isStandaloneNode + "] worker node: [" + isWorkerNode + "] " + managerId());
                 if ((taskManager = getTaskManager(false)) == null) {
                     logger.debug("#init Could not initialize task manager. " + managerId());
                     return false;
@@ -337,14 +336,16 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                 }
 
                 initialized = true;
-                if (isStandaloneNode || isWorkerNode) {
+                if (isTaskRunningNode()) {
                     taskService.registerTaskType(Constants.TASK_TYPE_ESB);
                     updateAndCleanupObservers();
                 }
 
-                logger.info("Initialized task manager" + (!(isStandaloneNode || isWorkerNode) ? " on manager node. " : ". ") + "Tenant [" + getCurrentTenantId() + "]");
-                logger.debug("#init Initialized task manager : " + managerId());
-                logger.debug("#init Scheduling existing tasks if any. : " + managerId());
+                logger.info("Initialized task manager. Tenant [" + getCurrentTenantId() + "]");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("#init Initialized task manager : " + managerId());
+                    logger.debug("#init Scheduling existing tasks if any. : " + managerId());
+                }
                 Object[] taskDescriptions = pendingTasks();
                 for (Object d : taskDescriptions) {
                     schedule((TaskDescription) d);
@@ -356,6 +357,48 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
             }
         }
         return false;
+    }
+
+    /**
+     * Helper method to decide whether this node is task running node or not.
+     *
+     * @return true if this node supposed to run tasks, false otherwise
+     */
+    private boolean isTaskRunningNode() {
+        boolean isStandaloneNode = NtaskService.getCcServiceInstance().getServerConfigContext()
+                                           .getAxisConfiguration().getClusteringAgent() == null;
+        boolean isWorkerNode = !isStandaloneNode && CarbonUtils.isWorkerNode();
+        if (logger.isDebugEnabled()) {
+            logger.debug("#init standalone node: [" + isStandaloneNode + "] worker node: [" + isWorkerNode + "] " + managerId());
+        }
+        if (isStandaloneNode || isWorkerNode) {
+            return true;
+        }
+        /**
+         * If this is not a worker node node in a cluster, then use "clusteringPattern" parameter in axis2.xml
+         * clustering configs to decide whether to run tasks in this node or not, and that defaults to not
+         * running tasks(defaulting to "WorkerManager" clustering pattern and this node is a manager node, hence
+         * not running tasks in this node)
+         */
+        Parameter parameter = NtaskService.getCcServiceInstance().getServerConfigContext()
+                .getAxisConfiguration().getClusteringAgent().getParameter(Constants.CLUSTERING_PATTERN);
+        if (parameter == null || parameter.getValue() == null || parameter.getValue().toString().isEmpty()) {
+            logger.warn("clusteringPattern parameter not configured correctly in clustering configuration, " +
+                        "hence defaults to worker manager clustering pattern, and since this node is a manager node, " +
+                        "skips running tasks in this node" );
+            return false;
+        } else if (parameter.getValue().toString().equals(Constants.CLUSTERING_PATTERN_WORKER_MANAGER)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("clustering pattern is worker manager clustering pattern, and this node is a " +
+                             "manager node, hence skip running tasks");
+            }
+            return false;
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Non worker manager clustering pattern mentioned, hence running tasks in this node");
+            }
+            return true;
+        }
     }
 
     @Override
