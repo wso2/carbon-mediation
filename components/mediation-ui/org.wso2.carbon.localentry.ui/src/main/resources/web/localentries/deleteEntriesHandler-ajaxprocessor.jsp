@@ -24,17 +24,10 @@
 <%@ page import="org.wso2.carbon.localentry.stub.types.ConfigurationObject" %>
 <%@ page import="java.util.ResourceBundle" %>
 
-<script type="text/javascript">
-    function forward() {
-        location.href = "index.jsp";
-    }
-</script>
-
-<body>
 <%
     //ignore methods other than post
     if (!request.getMethod().equalsIgnoreCase("POST")) {
-         response.sendError(405);
+         response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
          return;
      }
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
@@ -75,16 +68,6 @@
         }
     }
 %>
-<%-- Get the endpoint name and then call the service to delete
-     the relevant endpoint with the given name and move back
-     to the index page
---%>
-
-<script type="text/javascript">
-    forward();
-</script>
-<%-- <jsp:forward page="<%="index.jsp"%>"/>--%>
-
 <%!
     private void doForceDelete(LocalEntryAdminClient adminClient, String entry,
                              HttpServletRequest request) {

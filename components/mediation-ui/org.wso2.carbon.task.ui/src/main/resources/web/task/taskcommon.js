@@ -219,7 +219,7 @@ function deleteRow(name, group){
     CARBON.showConfirmationDialog(taskjsi18n["task.delete.waring"] + " ' " + name + " ' ?", function() {
         jQuery.ajax({
             type: "POST",
-            url: "deletetask.jsp",
+            url: "deletetask-ajaxprocessor.jsp",
             data: {"taskName": name, "taskGroup": group},
             async: false,
             success: function (result, status, xhr) {

@@ -76,7 +76,7 @@
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.entry"/>", function() {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteEntriesHandler.jsp",
+                url: "deleteEntriesHandler-ajaxprocessor.jsp",
                 data: {"entryName": content},
                 async: false,
                 success: function (result, status, xhr) {
@@ -152,7 +152,7 @@
                 + msg + '<br/><fmt:message key="force.delete"/>', function() {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteEntriesHandler.jsp",
+                url: "deleteEntriesHandler-ajaxprocessor.jsp",
                 data: {"entryName": entry, "force": "true"},
                 async: false,
                 success: function (result, status, xhr) {

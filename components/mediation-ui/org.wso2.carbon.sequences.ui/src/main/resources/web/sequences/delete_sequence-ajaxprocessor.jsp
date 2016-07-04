@@ -23,7 +23,7 @@
 <%
     //ignore methods other than post
     if (!request.getMethod().equalsIgnoreCase("POST")) {
-        response.sendError(405);
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         return;
     }
     String sequenceName = request.getParameter("sequenceName");
@@ -64,10 +64,6 @@
         // TODO: error handling
     }
 %>
-
-<script type="text/javascript">
-    document.location.href = "list_sequences.jsp";
-</script>
 
 <%!
     private void doForceDelete(SequenceAdminClient adminClient, String sequenceName,

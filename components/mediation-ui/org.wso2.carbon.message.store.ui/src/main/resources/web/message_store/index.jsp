@@ -74,17 +74,15 @@
         var cell = row.cells[0];
         var content = cell.firstElementChild.innerHTML;
 
-        var url = window.location.href;
-
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message.store"/>", function() {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteMessageStoresHandler.jsp",
+                url: "deleteMessageStoresHandler-ajaxprocessor.jsp",
                 data: {"messageStoreName": name},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("index.jsp");
                     }
                 }
             });
@@ -158,12 +156,12 @@
                 + msg + '<br/><fmt:message key="force.delete"/>', function () {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteMessageStoresHandler.jsp",
+                url: "deleteMessageStoresHandler-ajaxprocessor.jsp",
                 data: {"entryName": entry, "force": "true"},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("index.jsp");
                     }
                 }
             });

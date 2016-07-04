@@ -22,6 +22,8 @@
 <%@ page import="org.wso2.carbon.mediator.validate.ValidateMediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
+<%@ page import="org.apache.synapse.util.xpath.SynapseJsonPath" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.synapse.mediators.Value" %>
@@ -74,7 +76,13 @@
     String sourceParameter = request.getParameter("mediator.validate.source");
 
     if (sourceParameter != null && !"".equals(sourceParameter)) {
-        validateMediator.setSource(xPathFactory.createSynapseXPath("mediator.validate.source", sourceParameter.trim(), session));
+        if(sourceParameter.trim().startsWith("json-eval(")) {
+             SynapsePath path = new SynapseJsonPath(sourceParameter.trim()
+                                    .substring(10, sourceParameter.trim().length() - 1));
+             validateMediator.setSource(path);
+         } else {
+             validateMediator.setSource(xPathFactory.createSynapseXPath("mediator.validate.source", sourceParameter.trim(), session));
+         }
     } else if ("".equals(sourceParameter)) {
         validateMediator.setSource(null);
     }

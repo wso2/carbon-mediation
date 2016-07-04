@@ -237,7 +237,7 @@
         CARBON.showConfirmationDialog("<fmt:message key="api.delete.confirmation"/> " + apiName + "?", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "delete_api.jsp",
+                url: "delete_api-ajaxprocessor.jsp",
                 data: {"apiName": apiName},
                 async: false,
                 success: function (result, status, xhr) {

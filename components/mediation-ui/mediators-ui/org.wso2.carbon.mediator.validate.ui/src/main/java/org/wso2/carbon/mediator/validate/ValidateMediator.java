@@ -21,7 +21,6 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.config.xml.*;
 import org.apache.synapse.mediators.Value;
-import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
@@ -40,7 +39,7 @@ public class ValidateMediator extends AbstractListMediator {
     private static final QName SCHEMA_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "schema");
 
     private List<Value> schemaKeys = new ArrayList<Value>();
-    private SynapseXPath source = null;
+    private SynapsePath source = null;
     private final List<MediatorProperty> explicityFeatures = new ArrayList<MediatorProperty>();
     
 	Map<String, String> resources = new HashMap<String, String>();
@@ -54,7 +53,7 @@ public class ValidateMediator extends AbstractListMediator {
         saveTracingState(validate, this);
 
         if (source != null) {
-            SynapseXPathSerializer.serializeXPath(source, validate, "source");
+            SynapsePathSerializer.serializePath(source, validate, "source");
         }
 
         for (Value key : schemaKeys) {
@@ -157,7 +156,7 @@ public class ValidateMediator extends AbstractListMediator {
 
         if (attSource != null) {
             try {
-                source = SynapseXPathFactory.getSynapseXPath(elem, ATT_SOURCE);
+                source = SynapsePathFactory.getSynapsePath(elem, ATT_SOURCE);
             } catch (JaxenException e) {
                 throw new MediatorException("Invalid XPath expression specified for attribute 'source'");
             }
@@ -219,11 +218,11 @@ public class ValidateMediator extends AbstractListMediator {
         this.schemaKeys = schemaKeys;
     }
 
-    public void setSource(SynapseXPath source) {
+    public void setSource(SynapsePath source) {
        this.source = source;
     }
 
-    public SynapseXPath getSource() {
+    public SynapsePath getSource() {
         return source;
     }
 

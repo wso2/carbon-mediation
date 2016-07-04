@@ -20,12 +20,23 @@ import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.JacksonJSONSchema;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
+import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BRACKET_CLOSE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BRACKET_OPEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_1;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_2;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.JS_STRINGIFY;
 
 public class MappingResource {
 
@@ -35,6 +46,7 @@ public class MappingResource {
     private String inputRootelement;
     private String outputRootelement;
     private JSFunction function;
+    private List<String> propertiesList;
 
     /**
      * @param inputSchema   respective output json schema as a a stream of bytes
@@ -44,13 +56,14 @@ public class MappingResource {
      *                     above schemas method
      *                     will this exception
      */
-    public MappingResource(InputStream inputSchema, InputStream outputSchema, InputStream mappingConfig)
-            throws SchemaException, JSException {
+    public MappingResource(InputStream inputSchema, InputStream outputSchema, InputStream mappingConfig,
+            String outputType) throws SchemaException, JSException {
         this.inputSchema = getJSONSchema(inputSchema);
         this.outputSchema = getJSONSchema(outputSchema);
         this.inputRootelement = this.inputSchema.getName();
         this.outputRootelement = this.outputSchema.getName();
-        this.function = createFunction(mappingConfig);
+        this.propertiesList = new ArrayList<>();
+        this.function = createFunction(mappingConfig, outputType);
     }
 
     private Schema getJSONSchema(InputStream inputSchema) throws SchemaException {
@@ -69,6 +82,10 @@ public class MappingResource {
         return function;
     }
 
+    public List getPropertiesList() {
+        return propertiesList;
+    }
+
     /**
      * need to create java script function by passing the configuration file
      * Since this function going to execute every time when message hit the mapping backend
@@ -77,7 +94,7 @@ public class MappingResource {
      * @param mappingConfig mapping configuration
      * @return java script function
      */
-    private JSFunction createFunction(InputStream mappingConfig) throws JSException {
+    private JSFunction createFunction(InputStream mappingConfig, String outputType) throws JSException {
         BufferedReader configReader = new BufferedReader(new InputStreamReader(mappingConfig, StandardCharsets.UTF_8));
         //need to identify the main method of the configuration because that method going to
         // execute in engine
@@ -85,8 +102,18 @@ public class MappingResource {
         String inputRootElement = inputRootElementArray[inputRootElementArray.length - 1];
         String[] outputRootElementArray = outputRootelement.split(NAMESPACE_DELIMETER);
         String outputRootElement = outputRootElementArray[outputRootElementArray.length - 1];
+        String jsFunctionBody;
 
-        String fnName = "map_S_" + inputRootElement + "_S_" + outputRootElement;
+        String propertiesPattern = "(DM_PROPERTIES.)([a-zA-Z_$][a-zA-Z_$0-9]*)\\['([a-zA-Z_$][a-zA-Z-_.$0-9]*)'\\]";
+        Pattern pattern = Pattern.compile(propertiesPattern);
+        Matcher match;
+
+        String fnName =
+                FUNCTION_NAME_CONST_1 + inputRootElement + FUNCTION_NAME_CONST_2 + outputRootElement + BRACKET_OPEN
+                        + BRACKET_CLOSE;
+        if (InputOutputDataType.JSON.toString().equals(outputType)) {
+            fnName = JS_STRINGIFY + BRACKET_OPEN + fnName + BRACKET_CLOSE;
+        }
         String configLine;
         StringBuilder configScriptBuilder = new StringBuilder();
         try {
@@ -97,8 +124,15 @@ public class MappingResource {
             throw new JSException(e.getMessage());
         }
 
+        jsFunctionBody = configScriptBuilder.toString();
+        match = pattern.matcher(jsFunctionBody);
+
+        while (match.find()) {
+            propertiesList.add(match.group(2) + "['" + match.group(3)+"']");
+        }
+
         if (fnName != null) {
-            return new JSFunction(fnName, configScriptBuilder.toString());
+            return new JSFunction(fnName, jsFunctionBody);
         } else {
             throw new JSException("Could not find mapping JavaScript function.");
         }

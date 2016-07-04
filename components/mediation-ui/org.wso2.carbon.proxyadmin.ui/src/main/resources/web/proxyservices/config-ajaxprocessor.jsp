@@ -16,7 +16,7 @@
             configContext, backendServerURL, cookie, request.getLocale());
 
     if (!request.getMethod().equalsIgnoreCase("POST")) {
-        response.sendError(405);
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         return;
     }
 

@@ -151,7 +151,7 @@
         		CARBON.showConfirmationDialog("<fmt:message key="csg.delete.server"/> " + serverName + "?", function () {
                     jQuery.ajax({
                         type: "POST",
-                        url: "delete-server.jsp",
+                        url: "delete-server-ajaxprocessor.jsp",
                         data: {"serverName": serverName},
                         async: false,
                         success: function (result, status, xhr) {

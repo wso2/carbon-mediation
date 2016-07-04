@@ -81,7 +81,7 @@
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.datamapper.engine</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-core:${fasterxml.jackson.version}</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.version}</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.databind.version}</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.fasterxml.jackson.core:jackson-annotations:${fasterxml.jackson.version}</bundleDef>
                                 <bundleDef>com.googlecode.json-simple:json-simple:${json.simple.version}</bundleDef>
                             </bundles>

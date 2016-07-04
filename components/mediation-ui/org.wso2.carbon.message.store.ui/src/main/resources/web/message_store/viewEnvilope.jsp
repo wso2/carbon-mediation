@@ -76,16 +76,15 @@
         var content = cell.firstChild.nodeValue;
         var dlcName = document.getElementById("dlcName").value;
 
-        var url = document.referrer;
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteMessage.jsp",
+                url: "deleteMessage-ajaxprocessor.jsp",
                 data: {"dlcName": dlcName, "messageId": content},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("viewMessageStore.jsp?messageStoreName=" + dlcName);
                     }
                 }
             });
@@ -100,17 +99,15 @@
         var content = cell.firstChild.nodeValue;
         var dlcName = document.getElementById("dlcName").value;
 
-        var url = document.referrer;
-
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.resend.the.message"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "resendMessage.jsp",
+                url: "resendMessage-ajaxprocessor.jsp",
                 data: {"dlcName": dlcName, "messageId": content},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("viewMessageStore.jsp?messageStoreName=" + dlcName);
                     }
                 }
             });
@@ -136,17 +133,15 @@
         var msName = document.getElementById("msName").value;
         var messageId = document.getElementById("messageId").value;
 
-        var url = document.referrer;
-
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.message"/>", function () {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteMessage.jsp",
+                url: "deleteMessage-ajaxprocessor.jsp",
                 data: {"messageStoreName": msName, "messageId": messageId},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("viewMessageStore.jsp?messageStoreName=" + msName);
                     }
                 }
             });
@@ -157,17 +152,15 @@
     function deleteFirstMsg() {
         var msName = document.getElementById("msName").value;
 
-        var url = document.referrer;
-
         CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.first.messages"/>", function() {
             jQuery.ajax({
                 type: "POST",
-                url: "deleteFirstMessage.jsp",
+                url: "deleteFirstMessage-ajaxprocessor.jsp",
                 data: {"messageStoreName": msName},
                 async: false,
                 success: function (result, status, xhr) {
                     if (status == "success") {
-                        location.assign(url);
+                        location.assign("viewMessageStore.jsp?messageStoreName=" + msName);
                     }
                 }
             });
@@ -327,7 +320,7 @@
             <h3><fmt:message key="message.content"/></h3>
 
             <div id="workArea">
-                <form name="editform" action="resendMessage.jsp" method="POST">
+                <form name="editform" action="resendMessage-ajaxprocessor.jsp" method="POST">
                     <table id="msgTable" border="0" cellspacing="0" cellpadding="0" class="styledLeft">
 
                         <tbody>
