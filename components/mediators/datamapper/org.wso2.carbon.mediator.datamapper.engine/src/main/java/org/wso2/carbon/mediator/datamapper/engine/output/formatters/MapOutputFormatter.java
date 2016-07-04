@@ -24,12 +24,15 @@ import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEve
 import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEventType;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_FIRST_NAME;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 
@@ -40,6 +43,7 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
  */
 public class MapOutputFormatter implements Formatter {
 
+    private static final String RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME = "sun.org.mozilla.javascript.internal.NativeArray";
     private OutputMessageBuilder outputMessageBuilder;
     private Schema outputSchema;
 
@@ -110,6 +114,39 @@ public class MapOutputFormatter implements Formatter {
         for (Object keyVal : orderedKeyList) {
             Object value = outputMap.get(keyVal);
             String key = String.valueOf(keyVal);
+            // When Data Mapper runs in Java 7 array element is given as a Native Array object.
+            // This array object doesn't give values inside. That's why we used reflections in here
+            if (value.getClass().toString().contains(RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME)) {
+                try {
+                    final Class<?> cls = Class.forName(RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME);
+                    if (cls.isAssignableFrom(value.getClass())) {
+                        Map<Object,Object> tempValue = new HashMap();
+                        final Method getIds = cls.getMethod("getIds");
+                        Method get = null;
+                        Method[] allMethods = cls.getDeclaredMethods();
+                        for (Method method : allMethods) {
+                            String methodName = method.getName();
+                            // find the method with name get
+                            if ("get".equals(methodName)) {
+                                Type[] pType = method.getGenericParameterTypes();
+                                //find the get method with two parameters and first one a int
+                                if ((pType.length == 2) && ((Class)pType[0]).getName().equals("int")) {
+                                    get=method;
+                                    break;
+                                }
+                            }
+                        }
+                        final Object[] result = (Object[]) getIds.invoke(value);
+                        for(Object id:result){
+                            Object childValue=get.invoke(value, id, value);
+                            tempValue.put(id.toString(),childValue);
+                        }
+                        value=tempValue;
+                    }
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
+                    throw new WriterException("Error while parsing rhino native array values",e);
+                }
+            }
             if (value instanceof Map) {
                 // key value is a type of object or an array
                 if (arrayType) {
@@ -169,13 +206,18 @@ public class MapOutputFormatter implements Formatter {
 
     private boolean isMapContainArray(Set<Object> mapKeys) {
         for (Object key : mapKeys) {
-            if (ARRAY_ELEMENT_FIRST_NAME.equals(key)) {
-                return true;
-            } else {
+            try {
+                if(key instanceof String) {
+                    Integer.parseInt((String) key);
+                    continue;
+                }else if(key instanceof Integer){
+                    continue;
+                }
+            } catch (NumberFormatException e) {
                 return false;
             }
         }
-        return false;
+        return true;
     }
 
     private void sendArrayStartEvent() throws SchemaException, WriterException {
