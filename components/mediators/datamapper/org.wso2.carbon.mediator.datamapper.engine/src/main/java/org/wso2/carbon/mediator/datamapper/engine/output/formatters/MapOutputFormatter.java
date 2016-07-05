@@ -116,7 +116,7 @@ public class MapOutputFormatter implements Formatter {
             String key = String.valueOf(keyVal);
             // When Data Mapper runs in Java 7 array element is given as a Native Array object.
             // This array object doesn't give values inside. That's why we used reflections in here
-            if (value.getClass().toString().contains(RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME)) {
+            if (value != null && value.getClass().toString().contains(RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME)) {
                 try {
                     final Class<?> cls = Class.forName(RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME);
                     if (cls.isAssignableFrom(value.getClass())) {
