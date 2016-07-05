@@ -31,6 +31,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.llom.OMDocumentImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.registry.core.*;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -751,8 +752,13 @@ public class WSO2Registry extends AbstractRegistry {
         //Current context does not need to be destroyed at this level.
         //PrivilegedCarbonContext.destroyCurrentContext();
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
-        cc.setTenantDomain(domain);
-        cc.setTenantId(tenantId);
+
+        if (cc.getTenantDomain() == null) {
+            cc.setTenantDomain(domain);
+        }
+        if (cc.getTenantId() == MultitenantConstants.INVALID_TENANT_ID) {
+            cc.setTenantId(tenantId);
+        }
         if (username != null) {         // Set back the user name
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setUsername(username);
         }
