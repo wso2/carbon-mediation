@@ -47,8 +47,6 @@ import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,6 +55,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CLIENT_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CONTEXT;
@@ -292,7 +292,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private void transform(MessageContext synCtx, String configKey, String inSchemaKey) {
         try {
             String outputResult = null;
-            Map<String, String> propertiesMap;
+            Map<String, Map<String, Object>> propertiesMap;
 
             String dmExecutorPoolSize = SynapsePropertiesLoader
                     .getPropertyValue(ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
@@ -459,10 +459,10 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @param synCtx              Message context
      * @return Map filed with property name and the value
      */
-    private Map getPropertiesMap(List<String> propertiesNamesList, MessageContext synCtx) {
-        Map<String, Map<String, String>> propertiesMap = new HashMap<>();
+    private Map<String, Map<String, Object>> getPropertiesMap(List<String> propertiesNamesList, MessageContext synCtx) {
+        Map<String, Map<String, Object>> propertiesMap = new HashMap<>();
         String[] contextAndName;
-        String value = EMPTY_STRING;
+        Object value;
         org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
         HashMap functionProperties = new HashMap();
         Stack<TemplateContext> templeteContextStack = ((Stack) synCtx
@@ -476,22 +476,22 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             switch (contextAndName[0].toUpperCase()) {
             case DEFAULT_CONTEXT:
             case SYNAPSE_CONTEXT:
-                value = (String) synCtx.getProperty(contextAndName[1]);
+                value = synCtx.getProperty(contextAndName[1]);
                 break;
             case TRANSPORT_CONTEXT:
-                value = (String) ((Map) axis2MsgCtx.getProperty(TRANSPORT_HEADERS)).get(contextAndName[1]);
+                value = ((Map) axis2MsgCtx.getProperty(TRANSPORT_HEADERS)).get(contextAndName[1]);
                 break;
             case AXIS2_CONTEXT:
-                value = (String) axis2MsgCtx.getProperty(contextAndName[1]);
+                value = axis2MsgCtx.getProperty(contextAndName[1]);
                 break;
             case AXIS2_CLIENT_CONTEXT:
-                value = (String) axis2MsgCtx.getOptions().getProperty(contextAndName[1]);
+                value = axis2MsgCtx.getOptions().getProperty(contextAndName[1]);
                 break;
             case OPERATIONS_CONTEXT:
-                value = (String) axis2MsgCtx.getOperationContext().getProperty(contextAndName[1]);
+                value = axis2MsgCtx.getOperationContext().getProperty(contextAndName[1]);
                 break;
             case FUNCTION_CONTEXT:
-                value = (String) functionProperties.get(contextAndName[1]);
+                value = functionProperties.get(contextAndName[1]);
                 break;
             default:
                 log.warn(contextAndName[0] + " scope is not found. Setting it to an empty value.");
@@ -514,8 +514,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @param contextAndName Context and the name of the property
      * @param value          Current value of the property
      */
-    private void insertToMap(Map<String, Map<String, String>> propertiesMap, String[] contextAndName, String value) {
-        Map<String, String> insideMap = propertiesMap.get(contextAndName[0]);
+    private void insertToMap(Map<String, Map<String, Object>> propertiesMap, String[] contextAndName, Object value) {
+        Map<String, Object> insideMap = propertiesMap.get(contextAndName[0]);
         if (insideMap == null) {
             insideMap = new HashMap();
             propertiesMap.put(contextAndName[0], insideMap);
