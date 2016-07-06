@@ -421,7 +421,7 @@
                                     <%--<font style="color: red; font-size: 8pt;"> *</font>--%>
                                 </td>
                                 <td><input type="password" name="password" id="password" style="width:300px"
-                                           value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jdbc.password")!=null))?messageStore.getParams().get("store.jdbc.password"):""%>"/></td>
+                                           value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jdbc.password")!=null))?messageStore.getParams().get("store.jdbc.password"):""%>" autocomplete="off"/></td>
                             </tr>
                             <tr>
                                 <td>

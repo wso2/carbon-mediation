@@ -334,7 +334,7 @@
                         <td><fmt:message key="store.jms.password"/></td>
                         <td><input type="password" id="jms_password" name="jms_password"
                                    value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jms.password")!=null))?messageStore.getParams().get("store.jms.password"):""%>"
-                                   size="75"/>
+                                   size="75" autocomplete="off"/>
                         </td>
                     </tr>
                     <tr>
