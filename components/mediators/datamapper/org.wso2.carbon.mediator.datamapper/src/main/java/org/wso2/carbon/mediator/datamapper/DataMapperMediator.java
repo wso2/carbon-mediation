@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.commons.json.JsonUtil;
 import org.apache.synapse.config.SynapsePropertiesLoader;
@@ -46,6 +47,8 @@ import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingHandler;
 import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,8 +57,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
 
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CLIENT_CONTEXT;
 import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CONTEXT;
@@ -253,6 +254,23 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         }
         // Does message conversion and gives the final result
         transform(synCtx, getInputType(), getOutputType());
+        //setting output type in the axis2 message context
+        switch (getOutputType()) {
+        case "JSON":
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "application/json");
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "application/json");
+            break;
+        case "XML":
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "application/xml");
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "application/xml");
+            break;
+        case "CSV":
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("messageType", "text/xml");
+            ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty("ContentType", "text/xml");
+            break;
+        default:
+            throw new SynapseException("Unsupported output data type found : " + getOutputType());
+        }
 
         if (synLog.isTraceOrDebugEnabled()) {
             synLog.traceOrDebug("End : DataMapper mediator");
