@@ -16,6 +16,7 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.output.formatters;
 
+import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.JSException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
@@ -23,13 +24,13 @@ import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
 import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEvent;
 import org.wso2.carbon.mediator.datamapper.engine.input.readers.events.ReaderEventType;
 import org.wso2.carbon.mediator.datamapper.engine.output.OutputMessageBuilder;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_FIRST_NAME;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX;
 
@@ -40,6 +41,7 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
  */
 public class MapOutputFormatter implements Formatter {
 
+    public static final String RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME = "sun.org.mozilla.javascript.internal.NativeArray";
     private OutputMessageBuilder outputMessageBuilder;
     private Schema outputSchema;
 
@@ -110,6 +112,15 @@ public class MapOutputFormatter implements Formatter {
         for (Object keyVal : orderedKeyList) {
             Object value = outputMap.get(keyVal);
             String key = String.valueOf(keyVal);
+            // When Data Mapper runs in Java 7 array element is given as a Native Array object.
+            // This array object doesn't give values inside. That's why we used reflections in here
+            if (value != null && value.getClass().toString().contains(RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME)) {
+                try {
+                    value = DataMapperEngineUtils.getMapFromNativeArray(value);
+                } catch (JSException e) {
+                    throw new WriterException(e.getMessage(),e);
+                }
+            }
             if (value instanceof Map) {
                 // key value is a type of object or an array
                 if (arrayType) {
@@ -169,13 +180,18 @@ public class MapOutputFormatter implements Formatter {
 
     private boolean isMapContainArray(Set<Object> mapKeys) {
         for (Object key : mapKeys) {
-            if (ARRAY_ELEMENT_FIRST_NAME.equals(key)) {
-                return true;
-            } else {
+            try {
+                if(key instanceof String) {
+                    Integer.parseInt((String) key);
+                    continue;
+                }else if(key instanceof Integer){
+                    continue;
+                }
+            } catch (NumberFormatException e) {
                 return false;
             }
         }
-        return false;
+        return true;
     }
 
     private void sendArrayStartEvent() throws SchemaException, WriterException {

@@ -25,12 +25,14 @@ import org.wso2.carbon.mediator.datamapper.engine.core.mapper.MappingResource;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.MapModel;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.Model;
 import org.wso2.carbon.mediator.datamapper.engine.core.models.StringModel;
+import org.wso2.carbon.mediator.datamapper.engine.output.formatters.MapOutputFormatter;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineUtils;
 
-import java.util.Map;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.util.Map;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.EQUALS_SIGN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;
@@ -77,8 +79,11 @@ public class ScriptExecutor implements Executor {
             Object result = scriptEngine.eval(jsFunction.getFunctionName());
             if (result instanceof Map) {
                 return new MapModel((Map<String, Object>) result);
-            } else if ( result instanceof String) {
-                return new StringModel((String)result);
+            } else if (result instanceof String) {
+                return new StringModel((String) result);
+            } else if (result != null && result.getClass().toString()
+                    .contains(MapOutputFormatter.RHINO_NATIVE_ARRAY_FULL_QUALIFIED_CLASS_NAME)) {
+                return new MapModel(DataMapperEngineUtils.getMapFromNativeArray(result));
             }
         } catch (ScriptException e) {
             throw new JSException("Script engine unable to execute the script " + e);

@@ -28,6 +28,11 @@ public class JSException extends Exception {
         this.message = message;
     }
 
+    public JSException(String message,Exception e) {
+        super(message,e);
+        this.message = message;
+    }
+
     @Override public String toString() {
         return message;
     }
