@@ -2509,27 +2509,6 @@
         </pluginRepository>
     </pluginRepositories>
     <repositories>
-
-        <repository>
-            <id>wso2-staging</id>
-            <name>WSO2 staging Repository</name>
-            <url>http://maven.wso2.org/nexus/content/repositories/orgwso2carbon-1025/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
-        <repository>
-            <id>wso2-staging2</id>
-            <name>WSO2 staging Repository2</name>
-            <url>https://maven.wso2.org/nexus/content/repositories/orgwso2carbonregistry-1005/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-                <checksumPolicy>ignore</checksumPolicy>
-            </releases>
-        </repository>
         <repository>
             <id>wso2-nexus</id>
             <name>WSO2 internal Repository</name>
