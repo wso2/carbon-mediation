@@ -802,7 +802,7 @@
                     <fmt:message key="password"/><span class="required">*</span>
                 </td>
                 <td>
-                    <input type="password" name="txtPassword" id="txtPassword" value="<%=password%>"/>
+                    <input type="password" name="txtPassword" id="txtPassword" value="<%=password%>" autocomplete="off"/>
                 </td>
             </tr>
             <tr>
