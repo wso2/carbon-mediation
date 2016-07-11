@@ -2361,7 +2361,7 @@
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
         <rampart.wso2.version>1.6.1.wso2v18</rampart.wso2.version>
         <httpcore.wso2.version>4.3.3.wso2v1</httpcore.wso2.version>
-        <httpcore-nio.wso2.version>4.3.3.wso2v4-SNAPSHOT</httpcore-nio.wso2.version>
+        <httpcore-nio.wso2.version>4.3.3.wso2v4</httpcore-nio.wso2.version>
         <httpclient.wso2.version>4.3.2.wso2v1</httpclient.wso2.version>
         <org.apache.commons.wso2.version>2.0-wso2v15-SNAPSHOT</org.apache.commons.wso2.version>
         <httpcore.nio.version>4.3.3</httpcore.nio.version>
