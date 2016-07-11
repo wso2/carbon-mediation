@@ -610,12 +610,12 @@
             <dependency>
                 <groupId>org.wso2.carbon.identity</groupId>
                 <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
-                <version>${carbon.identity.version}</version>
+                <version>${carbon.identity.oauth.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.wso2.carbon.identity</groupId>
                 <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
-                <version>${carbon.identity.version}</version>
+                <version>${carbon.identity.entitlement.proxy.version}</version>
             </dependency>
 
             <!--8 Carbon-Rules -->
@@ -2320,7 +2320,7 @@
         <carbon.analytics.common.imp.pkg.version>[5.0.6, 5.1.0)</carbon.analytics.common.imp.pkg.version>
 
         <!-- Carbon Identity version-->
-        <carbon.identity.version>5.1.1-SNAPSHOT</carbon.identity.version>
+        <carbon.identity.version>5.2.0</carbon.identity.version>
         <carbon.identity.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->
@@ -2329,6 +2329,13 @@
 
         <!-- Synapse Version -->
         <synapse.version>2.1.7-wso2v3-SNAPSHOT</synapse.version>
+
+        <carbon.identity.entitlement.proxy.version>5.1.1</carbon.identity.entitlement.proxy.version>
+        <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
+
+        <carbon.identity.oauth.version>5.1.1</carbon.identity.oauth.version>
+        <carbon.identity.oauth.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.oauth.imp.pkg.version>
+
 
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1.wso2v12</orbit.version.axis2>

@@ -86,7 +86,7 @@
                             !org.pache.axis2.databinding.utils.writer,
                             !org.wso2.carbon.identity.oauth.mediator.*,
                             org.wso2.carbon.identity.oauth2.stub.*;version="${carbon.identity.imp.pkg.version}",
-                            org.wso2.carbon.identity.oauth.stub.*;version="${carbon.identity.imp.pkg.version}",
+                            org.wso2.carbon.identity.oauth.stub.*;version="${carbon.identity.oauth.imp.pkg.version}",
                             *; resolution:=optional
                         </Import-Package>
                         <Fragment-Host>synapse-core</Fragment-Host>
