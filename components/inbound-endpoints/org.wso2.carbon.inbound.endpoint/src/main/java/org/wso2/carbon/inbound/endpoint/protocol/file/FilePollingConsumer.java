@@ -715,7 +715,7 @@ public class FilePollingConsumer {
             vfsParamDTO.setAutoLockRelease(autoLockRelease);
             vfsParamDTO.setAutoLockReleaseSameNode(autoLockReleaseSameNode);
             vfsParamDTO.setAutoLockReleaseInterval(autoLockReleaseInterval);
-            rtnValue = VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO, fso);
+            rtnValue = VFSUtils.acquireLock(fsManager, fileObject, vfsParamDTO, fso, true);
         } finally {
             if (distributedLock) {
                 ClusteringServiceUtil.releaseLock(strContext);
