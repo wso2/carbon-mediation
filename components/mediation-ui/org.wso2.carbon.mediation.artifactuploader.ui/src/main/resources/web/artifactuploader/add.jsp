@@ -24,6 +24,7 @@
 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+<%@ taglib uri="http://www.owasp.org/index.php/Category:OWASP_CSRFGuard_Project/Owasp.CsrfGuard.tld" prefix="csrf" %>
 
 <script type="text/javascript" src="global-params.js"></script>
 
@@ -84,7 +85,8 @@
                 <tbody>
                 <tr>
                     <td>
-                        <form action="../../fileupload/synapseArtifact" method="post"
+                        <form action="../../fileupload/synapseArtifact?<csrf:tokenname/>=<csrf:tokenvalue/>"
+                        method="post"
                               enctype="multipart/form-data" name="uploadForm">
                             <table class="normal">
                                 <tbody>
