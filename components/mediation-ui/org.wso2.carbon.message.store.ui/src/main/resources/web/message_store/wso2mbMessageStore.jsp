@@ -68,6 +68,11 @@
             form.provider_url.focus();
             return false;
         }
+        else if (IsEmpty(form.jms_destination)) {
+            CARBON.showWarningDialog('<fmt:message key="jms_destination.cannot.be.empty"/>')
+            form.provider_url.focus();
+            return false;
+        }
         else if (document.getElementById('enable_guaranteed_delivery').options[document.getElementById
         ('enable_guaranteed_delivery').selectedIndex].value == "true" && document.getElementById
         ('failover_message_store_name').selectedIndex == -1) {
@@ -283,13 +288,40 @@
                 </tr>
 
                 <tr>
-                    <td>
-                                 <span id="_adv" style="float: left; position: relative;">
-                                <a class="icon-link" onclick="javascript:showAdvancedOptions('');"
-                                   style="background-image: url(images/down.gif);"><fmt:message
-                                        key="show.additional.parameters"/></a>
-                                </span>
-                    </td>
+                    <div id="_advancedForm">
+                        <table class="normal-nopadding">
+                            <tbody>
+                            <tr>
+                                <td colspan="2" class="sub-header"><fmt:message key="additional.parameters"/></td>
+                            </tr>
+                            <tr>
+                                <td><fmt:message key="store.jms.destination"/><span class="required"> *</span></td>
+                                <td><input type="text" id="jms_destination" name="jms_destination"
+                                           value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jms.destination")!=null))?messageStore.getParams().get("store.jms.destination"):""%>"
+                                           size="75"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><fmt:message key="store.jms.JMSSpecVersion"/></td>
+                                <td>
+                                    <select id="jms_spec_version">
+                                        <%
+                                            if ((null != messageStore) && (messageStore.getParams().get("store.jms.JMSSpecVersion") != null) && (messageStore.getParams().get("store.jms.JMSSpecVersion").equals("1.0"))) {
+                                        %>
+                                        <option value="1.1">1.1</option>
+                                        <option selected="selected" value="1.0">1.0</option>
+
+                                        <%} else {%>
+
+                                        <option selected="selected" value="1.1">1.1</option>
+                                        <option value="1.0">1.0</option>
+                                        <%}%>
+                                    </select>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </tr>
 
                 <tr>
@@ -305,41 +337,7 @@
                 </tbody>
             </table>
 
-            <div id="_advancedForm" style="display:none">
 
-                <table class="normal-nopadding">
-                    <tbody>
-                    <tr>
-                        <td colspan="2" class="sub-header"><fmt:message key="additional.parameters"/></td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="store.jms.destination"/></td>
-                        <td><input type="text" id="jms_destination" name="jms_destination"
-                                   value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.jms.destination")!=null))?messageStore.getParams().get("store.jms.destination"):""%>"
-                                   size="75"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><fmt:message key="store.jms.JMSSpecVersion"/></td>
-                        <td>
-                            <select id="jms_spec_version">
-                                <%
-                                    if ((null != messageStore) && (messageStore.getParams().get("store.jms.JMSSpecVersion") != null) && (messageStore.getParams().get("store.jms.JMSSpecVersion").equals("1.0"))) {
-                                %>
-                                <option value="1.1">1.1</option>
-                                <option selected="selected" value="1.0">1.0</option>
-
-                                <%} else {%>
-
-                                <option selected="selected" value="1.1">1.1</option>
-                                <option value="1.0">1.0</option>
-                                <%}%>
-                            </select>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
 
 
 
