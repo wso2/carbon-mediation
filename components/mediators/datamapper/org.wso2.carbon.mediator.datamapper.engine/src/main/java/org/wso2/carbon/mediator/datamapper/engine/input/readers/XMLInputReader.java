@@ -166,7 +166,9 @@ public class XMLInputReader implements InputReader {
         }
 
         nextJSONSchemaMap = buildNextSchema(jsonSchemaMap, elementType, nameSpaceLocalName);
-
+        if (nextJSONSchemaMap == null) {
+            throw new ReaderException("Invalid element found in the message payload :" + nameSpaceLocalName);
+        }
         /* if this is new object preceding an array, close the array before writing the new element */
         if (prevElementName != null && !nameSpaceLocalName.equals(prevElementName)) {
             writeArrayEndElement();
