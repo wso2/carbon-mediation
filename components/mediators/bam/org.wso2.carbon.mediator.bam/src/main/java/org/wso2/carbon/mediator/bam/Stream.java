@@ -108,7 +108,7 @@ public class Stream {
 				try {
 					if (this.bamServerConfig.isSecure()) {
 						asyncDataPublisher = new DataPublisher("Thrift", "ssl://" + this.bamServerConfig.getIp() + ":" +
-						                                                 this.bamServerConfig.getReceiverPort(),
+						                                                 this.bamServerConfig.getAuthenticationPort(),
 						                                       "ssl://" + this.bamServerConfig.getIp() + ":" +
 						                                       this.bamServerConfig.getAuthenticationPort(),
 						                                       this.bamServerConfig.getUsername(),
@@ -117,7 +117,7 @@ public class Stream {
 						asyncDataPublisher = new DataPublisher("Thrift", "tcp://" + this.bamServerConfig.getIp() + ":" +
 						                                                 this.bamServerConfig.getReceiverPort(),
 						                                       "ssl://" + this.bamServerConfig.getIp() + ":" +
-						                                       this.bamServerConfig.getReceiverPort(),
+						                                       this.bamServerConfig.getAuthenticationPort(),
 						                                       this.bamServerConfig.getUsername(),
 						                                       this.bamServerConfig.getPassword());
 					}
