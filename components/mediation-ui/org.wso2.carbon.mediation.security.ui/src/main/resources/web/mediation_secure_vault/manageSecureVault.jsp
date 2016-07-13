@@ -128,13 +128,13 @@
 						<tr>
 							<td><fmt:message key="value" />
 							</td>
-							<td><input type="password" id="propValue" />
+							<td><input type="password" id="propValue" autocomplete="off"/>
 							</td>
 						</tr>
 						<tr>
 							<td><fmt:message key="valueEnter" />
 							</td>
-							<td><input type="password" id="propValueConfirm" />
+							<td><input type="password" id="propValueConfirm" autocomplete="off"/>
 							</td>
 						</tr>
 						<tr>

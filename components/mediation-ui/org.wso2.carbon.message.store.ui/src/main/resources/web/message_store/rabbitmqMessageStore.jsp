@@ -355,7 +355,7 @@
                 <tr id="rabbitmq.connection.ssl.keystore.password.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
                     <td><fmt:message key="rabbitmq.connection.ssl.keystore.password"/></td>
                     <td><input type="password" size="60" id="rabbitmq.connection.ssl.keystore.password" name="rabbitmq.connection.ssl.keystore.password"
-                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.keystore.password")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.keystore.password"):""%>"/>
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.keystore.password")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.keystore.password"):""%>" autocomplete="off"/>
                     </td>
                 </tr>
 
@@ -374,7 +374,7 @@
                 <tr id="rabbitmq.connection.ssl.truststore.password.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
                     <td><fmt:message key="rabbitmq.connection.ssl.truststore.password"/></td>
                     <td><input type="password" size="60" id="rabbitmq.connection.ssl.truststore.password" name="rabbitmq.connection.ssl.truststore.password"
-                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.truststore.password")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.truststore.password"):""%>"/>
+                               value="<%=((null!=messageStore)&&(messageStore.getParams().get("rabbitmq.connection.ssl.truststore.password")!=null)&&sslEnabled)?messageStore.getParams().get("rabbitmq.connection.ssl.truststore.password"):""%>" autocomplete="off"/>
                     </td>
                 </tr>
                 <tr id="rabbitmq.connection.ssl.version.table.row" style="display:<%=sslEnabled ? "" : "none" %>">
@@ -444,7 +444,7 @@
                         <td><fmt:message key="store.rabbitmq.password"/></td>
                         <td><input type="password" id="rabbitmq_password" name="rabbitmq_password"
                                    value="<%=((null!=messageStore)&&(messageStore.getParams().get("store.rabbitmq.password")!=null))?messageStore.getParams().get("store.rabbitmq.password"):""%>"
-                                   size="75"/>
+                                   size="75" autocomplete="off"/>
                         </td>
                     </tr>
                     <tr>

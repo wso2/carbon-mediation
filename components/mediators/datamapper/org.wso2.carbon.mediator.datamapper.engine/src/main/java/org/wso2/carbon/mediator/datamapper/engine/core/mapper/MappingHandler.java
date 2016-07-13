@@ -60,7 +60,7 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         this.mappingResource = mappingResource;
     }
 
-    public String doMap(InputStream inputMsg, Map propertiesMap)
+    public String doMap(InputStream inputMsg, Map<String, Map<String, Object>> propertiesMap)
             throws ReaderException, InterruptedException, IOException, SchemaException, JSException {
         this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
         this.propertiesInJSON = propertiesMapToJSON(propertiesMap);
@@ -101,7 +101,7 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
      * @return JSON String
      * @throws ReaderException
      */
-    private String propertiesMapToJSON(Map<String, String> propertiesMap) throws ReaderException {
+    private String propertiesMapToJSON(Map<String, Map<String, Object>> propertiesMap) throws ReaderException {
         ObjectMapper mapperObj = new ObjectMapper();
         String propertiesInJSON = null;
 
