@@ -19,6 +19,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+<%@ taglib uri="http://www.owasp.org/index.php/Category:OWASP_CSRFGuard_Project/Owasp.CsrfGuard.tld" prefix="csrf" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.event.sink.config.ui.PublishEventMediatorConfigAdminClient" %>
@@ -271,7 +272,7 @@
                                         </div>
                                     </td>
                                     <td><a href="#" class="edit-icon-link"
-                                           onclick="editEveSinkWithPost('add_event_sink.jsp',<%=i%>);return false;
+                                           onclick="editEveSinkWithPost('add_event_sink.jsp?<csrf:tokenname/>=<csrf:tokenvalue/>',<%=i%>);return false;
                                         ">Edit</a></td>
 
                                     <td><a href="#" class="delete-icon-link"
