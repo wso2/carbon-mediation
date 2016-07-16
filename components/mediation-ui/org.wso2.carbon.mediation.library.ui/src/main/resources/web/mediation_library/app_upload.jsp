@@ -46,7 +46,7 @@
         <h2><fmt:message key="libs.headertext"/></h2>
 
         <div id="workArea">
-.            <form method="post" name="appsUpload" action="../../fileupload/mediationlib?<csrf:tokenname/>=<csrf:tokenvalue/>"
+            <form method="post" name="appsUpload" action="../../fileupload/mediationlib?<csrf:tokenname/>=<csrf:tokenvalue/>"
                   enctype="multipart/form-data" target="_self">
                 <table class="styledLeft">
                     <thead>

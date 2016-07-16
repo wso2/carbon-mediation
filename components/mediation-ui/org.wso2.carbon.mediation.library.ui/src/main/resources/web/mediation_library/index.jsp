@@ -108,8 +108,17 @@ if(tabs!=null && tabs.equals("0")) {
 
     function deleteApplication(libQName) {
         CARBON.showConfirmationDialog("<fmt:message key="confirm.delete.app"/>" , function(){
-            document.applicationsForm.action = "delete_artifact-ajaxprocessor.jsp?artifactName=" + libQName+ "&type=library";
-            document.applicationsForm.submit();
+            jQuery.ajax({
+                type: "POST",
+                url: "delete_artifact-ajaxprocessor.jsp",
+                data: {"artifactName": libQName, "type": "library"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("index.jsp");
+                    }
+                }
+            });
         });
     }
 
@@ -128,8 +137,17 @@ if(tabs!=null && tabs.equals("0")) {
 
     function deleteImport(importName) {
         CARBON.showConfirmationDialog("<fmt:message key="confirm.delete.app"/>" , function(){
-            document.applicationsForm.action = "delete_artifact-ajaxprocessor.jsp?artifactName=" + importName+"&type=import";
-            document.applicationsForm.submit();
+            jQuery.ajax({
+                type: "POST",
+                url: "delete_artifact-ajaxprocessor.jsp",
+                data: {"artifactName": importName, "type": "import"},
+                async: false,
+                success: function (result, status, xhr) {
+                    if (status == "success") {
+                        location.assign("index.jsp");
+                    }
+                }
+            });
         });
     }
 
