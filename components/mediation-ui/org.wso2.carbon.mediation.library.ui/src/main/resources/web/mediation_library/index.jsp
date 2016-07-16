@@ -161,13 +161,6 @@ if(tabs!=null && tabs.equals("0")) {
 	<div id="middle">
 
 
-		<div id="tabs">
-			<li><a href="#tabs-1"><fmt:message key="libs.tabs.libraries" />
-			</a>
-			</li>
-
-
-			<div id="tabs-1">
 				<h2>
 					<fmt:message key="libs.list.headertext" />
 				</h2>
@@ -269,9 +262,6 @@ if(tabs!=null && tabs.equals("0")) {
                 %>
 					</form>
 				</div>
-			</div>
-
-		</div>
 	</div>
 
 	<%--<%--%>
