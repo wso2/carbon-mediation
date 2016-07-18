@@ -20,13 +20,11 @@ package org.wso2.carbon.das.data.publisher.util;
 
 
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.utils.CarbonUtils;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -39,21 +37,14 @@ import java.util.regex.Pattern;
 
 public class PublisherUtil {
 
-    private static final String PORTS_OFFSET = "Ports.Offset";
-    private static final int CARBON_SERVER_DEFAULT_PORT = 9763;
-
     private static Log log = LogFactory.getLog(PublisherUtil.class);
-    private static final String UNKNOWN_HOST = "UNKNOWN_HOST";
 
-    private static String hostAddressAndPort = null;
-    public static final String CLOUD_DEPLOYMENT_PROP = "IsCloudDeployment";
+    private static String hostAddress = null;
     public static final String HOST_NAME = "HostName";
 
-
     public static String getHostAddress() {
-
-        if (hostAddressAndPort != null) {
-            return hostAddressAndPort;
+        if (hostAddress != null) {
+            return hostAddress;
         }
         String hostAddress =   ServerConfiguration.getInstance().getFirstProperty(HOST_NAME);
         if (null == hostAddress) {
@@ -64,11 +55,8 @@ public class PublisherUtil {
                 hostAddress = "localhost"; // Defaults to localhost
                 log.warn("Unable to get the ip address, hence using hostname as localhost");
             }
-            int portsOffset = Integer.parseInt(CarbonUtils.getServerConfiguration().getFirstProperty(
-                    PORTS_OFFSET));
-            int portValue = CARBON_SERVER_DEFAULT_PORT + portsOffset;
-            hostAddressAndPort = hostAddress + ":" + portValue;
-            return hostAddressAndPort;
+            PublisherUtil.hostAddress = hostAddress;
+            return PublisherUtil.hostAddress;
         } else {
             return hostAddress.trim();
         }
