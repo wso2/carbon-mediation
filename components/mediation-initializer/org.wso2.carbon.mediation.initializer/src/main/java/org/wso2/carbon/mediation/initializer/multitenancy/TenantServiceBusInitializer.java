@@ -29,7 +29,6 @@ import org.apache.axis2.deployment.DeploymentEngine;
 import org.apache.axis2.description.AxisServiceGroup;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.engine.AxisConfiguration;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.ServerConfigurationInformation;
@@ -138,9 +137,6 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                 createTenantSynapseConfigHierarchy(synapseConfigDir, tenantDomain);
             }
 
-            // Adding analytics data publishing streams and publishers
-            createTenantAnalyticConfig(tenantAxis2Repo);
-
             axisConfig.addParameter(SynapseConstants.Axis2Param.SYNAPSE_HOME,
                     tenantAxis2Repo.getAbsolutePath());
             axisConfig.addParameter(SynapseConstants.Axis2Param.SYNAPSE_SERVER_NAME,
@@ -224,25 +220,6 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             log.fatal("Failed to initialize ESB for tenant:"
                     + tenantDomain + "due to a fatal error", t);
         }
-    }
-
-    private void createTenantAnalyticConfig(File tenantAxis2Repo) throws Exception {
-        String pathToDeploymentServer = tenantAxis2Repo.getParentFile().getParentFile()+ File.separator + "deployment" + File.separator + "server" + File.separator;
-        String EVENTPUBLISHERS = "eventpublishers";
-        String EVENTSTREAMS = "eventstreams";
-
-        File eventPublishersDir = new File(tenantAxis2Repo, EVENTPUBLISHERS);
-        if (!eventPublishersDir.exists()) {
-            File superTenantEventPublishersDir = new File(pathToDeploymentServer + EVENTPUBLISHERS);
-            FileUtils.copyDirectory(superTenantEventPublishersDir, eventPublishersDir);
-        }
-
-        File eventStreamsDir = new File(tenantAxis2Repo, EVENTSTREAMS);
-        if (!eventStreamsDir.exists()) {
-            File superTenantEventStreamsDir = new File(pathToDeploymentServer + EVENTSTREAMS);
-            FileUtils.copyDirectory(superTenantEventStreamsDir, eventStreamsDir);
-        }
-
     }
 
     /**
