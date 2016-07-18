@@ -283,7 +283,7 @@
             <dependency>
                 <groupId>org.apache.commons.wso2</groupId>
                 <artifactId>commons-vfs2</artifactId>
-                <version>${org.apache.commons.wso2.version}</version>
+                <version>${commons.vfs.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.neethi.wso2</groupId>
@@ -2363,7 +2363,7 @@
         <httpcore.wso2.version>4.3.3.wso2v1</httpcore.wso2.version>
         <httpcore-nio.wso2.version>4.3.3.wso2v5-SNAPSHOT</httpcore-nio.wso2.version>
         <httpclient.wso2.version>4.3.2.wso2v1</httpclient.wso2.version>
-        <org.apache.commons.wso2.version>2.0-wso2v15-SNAPSHOT</org.apache.commons.wso2.version>
+        <commons.vfs.version>2.0-wso2v15-SNAPSHOT</commons.vfs.version>
         <httpcore.nio.version>4.3.3</httpcore.nio.version>
         <httpcore.version>4.3.3</httpcore.version>
         <httpclient.version>4.3.2</httpclient.version>
