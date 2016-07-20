@@ -59,11 +59,11 @@ public class StatisticsPublisher {
 		}
 	};
 
-	public static void process(PublishingFlow publishingFlow) {
-		Object[] metaData = new Object[1];
+	public static void process(PublishingFlow publishingFlow, int tenantId) {
+		Object[] metaData = new Object[2];
 		Object[] eventData = new Object[2];
 
-		addMetaData(metaData);
+		addMetaData(metaData, tenantId);
 		addEventData(eventData, publishingFlow);
 
 		if (log.isDebugEnabled()) {
@@ -85,10 +85,13 @@ public class StatisticsPublisher {
 
 	}
 
-	private static void addMetaData(Object[] metaDataValueList) {
+	private static void addMetaData(Object[] metaDataValueList, int tenantId) {
 
 		/* [0] -> compressed */
 		metaDataValueList[0] = true; // payload-data is in compressed form
+
+		/* [1] -> tenantId */
+		metaDataValueList[1] = tenantId;
 	}
 
 	private static void addEventData(Object[] eventData, PublishingFlow publishingFlow) {
@@ -98,7 +101,6 @@ public class StatisticsPublisher {
 
 		Map<String, Object> mapping = publishingFlow.getObjectAsMap();
 		mapping.put("host", PublisherUtil.getHostAddress()); // Adding host
-		mapping.put("tenantId", PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId());
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Output output = new Output(out);
