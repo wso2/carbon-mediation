@@ -53,10 +53,12 @@ public class DependencyTracker extends AbstractSynapseObserver {
         } else if (entryObject.getType() == ConfigurationObject.TYPE_UNKNOWN) {
             dependencyGraph.resolveObject(entryObject, ConfigurationObject.TYPE_ENTRY);
         }
+        super.entryAdded(entry);
     }
 
     public void entryRemoved(Entry entry) {
         dependencyGraph.remove(ConfigurationObject.TYPE_ENTRY, entry.getKey());
+        super.entryRemoved(entry);
     }
 
     public void sequenceAdded(Mediator sequence) {
@@ -77,6 +79,7 @@ public class DependencyTracker extends AbstractSynapseObserver {
         }
 
         resolveSequenceMediator(seqMediator, seqObject, true);
+        super.sequenceAdded(sequence);
     }
 
     public void endpointAdded(Endpoint endpoint) {
@@ -98,6 +101,7 @@ public class DependencyTracker extends AbstractSynapseObserver {
         }
 
         resolveEndpoint(endpoint, endpointObject);
+        super.endpointAdded(endpoint);
     }
 
     public void endpointRemoved(Endpoint endpoint) {
@@ -111,10 +115,12 @@ public class DependencyTracker extends AbstractSynapseObserver {
         dependencyGraph.add(proxyObject);
 
         resolveProxyService(proxyService, proxyObject);
+        super.proxyServiceAdded(proxyService);
     }
 
     public void proxyServiceRemoved(ProxyService proxy) {
         dependencyGraph.remove(ConfigurationObject.TYPE_PROXY, proxy.getName());
+        super.proxyServiceRemoved(proxy);
     }
 
     public boolean hasDependents(int type, String id) {
@@ -352,14 +358,7 @@ public class DependencyTracker extends AbstractSynapseObserver {
         if (sequence instanceof SequenceMediator) {
             dependencyGraph.remove(ConfigurationObject.TYPE_SEQUENCE,
                     ((SequenceMediator) sequence).getName());
+            super.sequenceRemoved(sequence);
         }
-    }
-
-    public void startupAdded(Startup startup) {
-        // Do nothing
-    }
-
-    public void startupRemoved(Startup startup) {
-        // Do nothing
     }
 }
