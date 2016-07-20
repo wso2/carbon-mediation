@@ -176,6 +176,7 @@ public class MediationStatisticsComponent {
         // Adding configuration reporting thread
         MediationConfigReporterThread configReporterThread = new MediationConfigReporterThread(synEnvService);
         configReporterThread.setName("mediation-config-reporter-" + tenantId);
+        configReporterThread.setTenantId(tenantId);
         configReporterThread.setPublishingAnalyticESB(enableAnalyticsPublishing);
         // Set a custom interval value if required
         String interval = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_REPORTING_INTERVAL);

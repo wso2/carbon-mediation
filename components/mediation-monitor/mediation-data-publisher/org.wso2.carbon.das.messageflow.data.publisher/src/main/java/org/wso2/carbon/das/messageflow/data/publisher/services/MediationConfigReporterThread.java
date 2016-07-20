@@ -86,7 +86,8 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
                 List<StructuringArtifact> completedStructureList = completedStructureStore.getCompletedStructureEntries();
                 try {
                     PrivilegedCarbonContext.startTenantFlow();
-                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(tenantId,true);
+                    // Using super tenant for all the publishing, data-bridge looks for thread-local tenantId
+                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(-1234, true);
                     updateConfigurations(completedStructureList);
                 } catch (Exception e) {
                     log.error("Failed to update configuration from DAS configuration-publisher", e);
@@ -102,7 +103,7 @@ public class MediationConfigReporterThread extends Thread implements TenantInfor
 
     private void updateConfigurations(List<StructuringArtifact> completedStructureList) {
         for (StructuringArtifact structuringArtifact : completedStructureList) {
-            ConfigurationPublisher.process(structuringArtifact);
+            ConfigurationPublisher.process(structuringArtifact, tenantId);
         }
     }
 

@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.structuring.StructuringArtifact;
 import org.apache.synapse.aspects.flow.statistics.structuring.StructuringElement;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.messageflow.data.publisher.internal.MessageFlowDataPublisherDataHolder;
 import org.wso2.carbon.das.messageflow.data.publisher.util.MediationDataPublisherConstants;
 import org.wso2.carbon.databridge.commons.Event;
@@ -34,10 +35,11 @@ public class ConfigurationPublisher {
     private static String streamId = DataBridgeCommonsUtils.generateStreamId(MediationDataPublisherConstants.CONFIG_STREAM_NAME, MediationDataPublisherConstants.CONFIG_STREAM_VERSION);
     private static ObjectMapper mapper = new ObjectMapper();
 
-    public static void process(StructuringArtifact structuringArtifact) {
-
+    public static void process(StructuringArtifact structuringArtifact, int tenantId) {
+        Object[] metaData = new Object[1];
         Object[] eventData = new Object[3];
 
+        addMetaData(metaData, tenantId);
         addEventData(eventData, structuringArtifact);
 
         if (log.isDebugEnabled()) {
@@ -51,13 +53,19 @@ public class ConfigurationPublisher {
             }
         }
 
-        publishToAgent(eventData);
+        publishToAgent(eventData, metaData);
 
         if (log.isDebugEnabled()) {
             log.debug("------ After sending to analytic server");
         }
 
 
+    }
+
+    private static void addMetaData(Object[] metaDataValueList, int tenantId) {
+
+		/* [1] -> tenantId */
+        metaDataValueList[0] = tenantId;
     }
 
     private static void addEventData(Object[] eventData, StructuringArtifact structuringArtifact) {
@@ -80,9 +88,9 @@ public class ConfigurationPublisher {
         eventData[2] = jsonString;
     }
 
-    private static void publishToAgent(Object[] eventData) {
+    private static void publishToAgent(Object[] eventData, Object[] metaData) {
         // Creating Event
-        Event event = new Event(streamId, System.currentTimeMillis(), null, null, eventData);
+        Event event = new Event(streamId, System.currentTimeMillis(), metaData, null, eventData);
 
         // Has to use try-publish for asynchronous publishing
         MessageFlowDataPublisherDataHolder.getInstance().getPublisherService().publish(event);
