@@ -33,7 +33,7 @@ public class DataMapperMediatorConstants {
     public static final String DEFAULT_CONTEXT = "DEFAULT";
     public static final String SYNAPSE_CONTEXT = "SYNAPSE";
     public static final String AXIS2_CONTEXT = "AXIS2";
-    public static final String AXIS2_CLIENT_CONTEXT = "AXIS2-CLIENT";
+    public static final String AXIS2_CLIENT_CONTEXT = "AXIS2CLIENT";
     public static final String TRANSPORT_CONTEXT = "TRANSPORT";
     public static final String OPERATIONS_CONTEXT = "OPERATION";
     public static final String TRANSPORT_HEADERS = "TRANSPORT_HEADERS";
