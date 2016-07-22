@@ -32,4 +32,6 @@ public class PollingConstants {
 
    public static final String INBOUND_PINNED_SERVER = "pinnedServers";
 
+   public static final String INBOUND_CONCURRENT_CONSUMERS = "concurrent.consumers";
+
 }

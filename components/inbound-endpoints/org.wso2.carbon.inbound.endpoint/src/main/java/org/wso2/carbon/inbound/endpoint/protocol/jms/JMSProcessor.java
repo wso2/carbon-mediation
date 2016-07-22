@@ -17,18 +17,18 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.jms;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
-import org.apache.synapse.task.Task;
 import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
-import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 
 public class JMSProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
 
@@ -36,11 +36,12 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
 
     private static final String ENDPOINT_POSTFIX = "JMS" + COMMON_ENDPOINT_POSTFIX;
 
-    private JMSPollingConsumer pollingConsumer;
+    private List<JMSPollingConsumer> pollingConsumers = new ArrayList<>();
     private Properties jmsProperties;
     private boolean sequential;
     private String injectingSeq;
     private String onErrorSeq;
+    private int concurrentConsumers;
 
     public JMSProcessor(InboundProcessorParams params) {
         this.name = params.getName();
@@ -64,6 +65,14 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
         if (inboundCoordination != null) {
             this.coordination = Boolean.parseBoolean(inboundCoordination);
         }
+        this.concurrentConsumers = 1;
+        String concurrentConsumers = jmsProperties.getProperty(PollingConstants.INBOUND_CONCURRENT_CONSUMERS);
+        if (concurrentConsumers != null) {
+            if (Integer.parseInt(concurrentConsumers) == 0) {
+                throw new SynapseException("Number of Concurrent Consumers should be Greater than 0");
+            }
+            this.concurrentConsumers = Integer.parseInt(concurrentConsumers);
+        }
         this.injectingSeq = params.getInjectingSeq();
         this.onErrorSeq = params.getOnErrorSeq();
         this.synapseEnvironment = params.getSynapseEnvironment();
@@ -74,26 +83,31 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
      * This will be called at the time of synapse artifact deployment.
      */
     public void init() {
-        log.info("Initializing inbound JMS listener for inbound endpoint " + name);        
-        pollingConsumer = new JMSPollingConsumer( jmsProperties, interval, name);
-        pollingConsumer.registerHandler(new JMSInjectHandler(injectingSeq, onErrorSeq, sequential,
-                synapseEnvironment, jmsProperties));
-        start();
+        log.info("Initializing inbound JMS listener for inbound endpoint " + name);
+        for (int consumers = 0; consumers < concurrentConsumers; consumers++) {
+            JMSPollingConsumer jmsPollingConsumer = new JMSPollingConsumer( jmsProperties, interval, name);
+            jmsPollingConsumer.registerHandler(new JMSInjectHandler(injectingSeq, onErrorSeq, sequential,
+                    synapseEnvironment, jmsProperties));
+            pollingConsumers.add(jmsPollingConsumer);
+            start(jmsPollingConsumer, consumers);
+        }
     }
     /**
      * Stop the inbound polling processor This will be called when inbound is
      * undeployed/redeployed or when server stop
      */
     public void destroy() {
-        pollingConsumer.destroy();
+        for (JMSPollingConsumer pollingConsumer : pollingConsumers) {
+            pollingConsumer.destroy();
+        }
         super.destroy();
     }
     /**
      * Register/start the schedule service
      * */
-    public void start() {
+    public void start(JMSPollingConsumer pollingConsumer, int consumer) {
         InboundTask task = new JMSTask(pollingConsumer, interval);
-        start(task, ENDPOINT_POSTFIX);
+        start(task, (ENDPOINT_POSTFIX + consumer));
     }
 
     public String getName() {

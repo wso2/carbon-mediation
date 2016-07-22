@@ -36,10 +36,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * 
@@ -48,14 +45,13 @@ import java.util.StringTokenizer;
  */
 public abstract class InboundRequestProcessorImpl implements InboundRequestProcessor {
 
-    protected StartUpController startUpController;
     protected SynapseEnvironment synapseEnvironment;
     protected long interval;
     protected String name;
     protected boolean coordination;
 
-    private InboundRunner inboundRunner;
-    private Thread runningThread;
+    private List<StartUpController> startUpControllersList = new ArrayList<>();
+    private HashMap<Thread, InboundRunner> inboundRunnersThreadsMap = new HashMap<>();
     private static final Log log = LogFactory.getLog(InboundRequestProcessorImpl.class);
     private InboundEndpointsDataStore dataStore;
     
@@ -89,9 +85,10 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
                 taskDescription.setIntervalInMs(true);
                 taskDescription.addResource(TaskDescription.INSTANCE, task);
                 taskDescription.addResource(TaskDescription.CLASSNAME, task.getClass().getName());
-                startUpController = new StartUpController();
+                StartUpController startUpController = new StartUpController();
                 startUpController.setTaskDescription(taskDescription);
                 startUpController.init(synapseEnvironment);
+                startUpControllersList.add(startUpController);
             } catch (Exception e) {
                 log.error("Error starting the inbound endpoint " + name
                         + ". Unable to schedule the task. " + e.getLocalizedMessage(), e);
@@ -124,8 +121,9 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
     }
 
     private void startInboundRunnerThread(InboundTask task, String tenantDomain, boolean mgrOverride) {
-        inboundRunner = new InboundRunner(task, interval, tenantDomain, mgrOverride);
-        runningThread = new Thread(inboundRunner);
+        InboundRunner inboundRunner = new InboundRunner(task, interval, tenantDomain, mgrOverride);
+        Thread runningThread = new Thread(inboundRunner);
+        inboundRunnersThreadsMap.put(runningThread, inboundRunner);
         runningThread.start();
     }
 
@@ -140,15 +138,27 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
         if(tenantId != MultitenantConstants.SUPER_TENANT_ID){                      
             dataStore.unregisterPollingEndpoint(carbonContext.getTenantDomain(), name);
         }         
-        if (startUpController != null) {
-            startUpController.destroy();
-        } else if (runningThread != null) {
-            inboundRunner.terminate();
-            try {
-                runningThread.join();
-            } catch (InterruptedException e) {
-                log.error("Error while stopping the inbound thread.");
+        if (!startUpControllersList.isEmpty()) {
+            for (StartUpController sc : startUpControllersList) {
+                sc.destroy();
             }
+            startUpControllersList.clear();
+        } else if (!inboundRunnersThreadsMap.isEmpty()) {
+
+            Iterator itr = inboundRunnersThreadsMap.entrySet().iterator();
+            while (itr.hasNext()) {
+                Map.Entry entry = (Map.Entry)itr.next();
+                Thread thread = (Thread)entry.getKey();
+                InboundRunner inboundRunner = (InboundRunner)entry.getValue();
+
+                inboundRunner.terminate();
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    log.error("Error while stopping the inbound thread.");
+                }
+            }
+            inboundRunnersThreadsMap.clear();
         }
     }
 
