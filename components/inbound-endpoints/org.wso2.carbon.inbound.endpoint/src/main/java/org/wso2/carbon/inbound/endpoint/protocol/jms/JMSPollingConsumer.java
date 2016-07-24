@@ -143,14 +143,15 @@ public class JMSPollingConsumer {
                                                                           replyDestinationName);
             }
             messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);            
-            Message msg = receiveMessage(messageConsumer);         
+            Message msg = receiveMessage(messageConsumer);
             if (msg == null) {
                 logger.debug("Inbound JMS Endpoint. No JMS message received.");
                 return null;
             }
             while (msg != null) {
                 if (!JMSUtils.inferJMSMessageType(msg).equals(TextMessage.class.getName())) {
-                    logger.error("JMS Inbound transport support JMS TextMessage type only. Found message type "
+                    logger.error("JMS " +
+                            "Inbound transport support JMS TextMessage type only. Found message type "
                             + JMSUtils.inferJMSMessageType(msg));
                     return null;
                 }
