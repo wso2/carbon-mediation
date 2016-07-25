@@ -26,6 +26,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="java.util.Collection" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -613,21 +614,21 @@ function resetVars() {
                 <% if (endpoint.getArtifactContainerName() != null) { %>
                     <span href="#">
                         <img src="images/applications.gif">
-                        <%= endpoint.getName()%>
+                        <%= Encode.forHtmlContent(endpoint.getName())%>
                         <% if(endpoint.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                     </span>
                 <% } else { %>
-                    span href="#"><%= endpoint.getName()%></span>
+                    span href="#"><%= Encode.forHtmlContent(endpoint.getName())%></span>
                 <% } %>
                 <% } else { %>
                 <% if (endpoint.getArtifactContainerName() != null) { %>
                     <span href="#">
                         <img src="images/applications.gif">
-                            <%= endpoint.getName()%>
+                            <%= Encode.forHtmlContent(endpoint.getName())%>
                             <% if(endpoint.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                     </span>
                 <% } else { %>
-                    <span href="#"><%= endpoint.getName()%></span>
+                    <span href="#"><%= Encode.forHtmlContent(endpoint.getName())%></span>
                 <% } %>
                 <% } %>
 

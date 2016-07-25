@@ -27,6 +27,17 @@ function isEmptyField(id) {
     return false;
 }
 
+function isValidName(id){
+    var elementId = document.getElementById(id);
+    var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+    if (elementId != null && elementId != undefined) {
+        if (regEx.test(elementId.value) || elementId.value == null || elementId.value == undefined) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function hasKeyWord(id) {
     var elementId = document.getElementById(id);
 

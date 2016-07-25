@@ -15,8 +15,8 @@
  */
 
 function validateLoadBalanceEndpoint(isAnonymous, validateChildEpsAvailability) {
-    if (!isAnonymous && isEmptyField('listEndpointName')) {
-        CARBON.showWarningDialog(jsi18n['name.field.cannot.be.empty']);
+    if (!isAnonymous && isValidName('listEndpointName')) {
+        CARBON.showWarningDialog(jsi18n['name.field.should.be.valid']);
         return false;
     }
 
