@@ -21,9 +21,9 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.localentry.stub.types.EntryData" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
-<%@ page import="org.owasp.encoder.Encode" %>
 <fmt:bundle basename="org.wso2.carbon.localentry.ui.i18n.Resources">
     <carbon:breadcrumb
             label="source.url.entry"

@@ -21,9 +21,9 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.message.processor.ui.MessageProcessorAdminServiceClient" %>
 <%@ page import="org.wso2.carbon.message.processor.service.xsd.MessageProcessorMetaData" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
-<%@ page import="org.owasp.encoder.Encode" %>
 <fmt:bundle basename="org.wso2.carbon.message.processor.ui.i18n.Resources">
 <carbon:jsi18n resourceBundle="org.wso2.carbon.message.processor.ui.i18n.Resources"
                request="<%=request%>"/>
