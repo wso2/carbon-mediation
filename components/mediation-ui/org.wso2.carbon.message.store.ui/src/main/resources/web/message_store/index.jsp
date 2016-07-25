@@ -21,6 +21,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.message.store.ui.MessageStoreAdminServiceClient" %>
 <%@ page import="org.wso2.carbon.message.store.ui.utils.MessageStoreData" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.message.store.ui.i18n.Resources">
@@ -275,20 +276,20 @@
                             <a href="viewMessageStore.jsp?messageStoreName=<%=name%>">
                                 <% if (msData.getArtifactContainerName() != null) { %>
                                     <img src="images/applications.gif">
-                                    <%=name%>
+                                    <%=Encode.forHtmlContent(name)%>
                                     <% if(msData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                                 <% } else {%>
-                                    <%=name%>
+                                    <%=Encode.forHtmlContent(name)%>
                                 <%}%>
                             </a>
                         <%} else {%>
                             <a>
                                 <% if (msData.getArtifactContainerName() != null) { %>
                                     <img src="images/applications.gif">
-                                    <%=name%>
+                                    <%=Encode.forHtmlContent(name)%>
                                 <% if(msData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                                 <% } else {%>
-                                    <%=name%>
+                                    <%=Encode.forHtmlContent(name)%>
                                 <%}%>
                             </a>
                         <%}%>
