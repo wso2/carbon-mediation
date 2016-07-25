@@ -15,8 +15,8 @@
  */
 
 function validateTemplateEndpoint(isAnonymous,isFromTemplateEditor) {
-    if (isAnonymous == 'false' && isEmptyField('endpointName')) {
-        CARBON.showWarningDialog(jsi18n['name.field.cannot.be.empty']);
+    if (isAnonymous == 'false' && isValidName('endpointName')) {
+        CARBON.showWarningDialog(jsi18n['name.field.should.be.valid']);
         return false;
     }
     /*if (isEmptyField('address')) {

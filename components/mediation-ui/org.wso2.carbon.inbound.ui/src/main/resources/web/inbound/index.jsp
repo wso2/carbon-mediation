@@ -15,13 +15,14 @@
  ~ specific language governing permissions and limitations
  ~ under the License.
  -->
-<%@page import="org.wso2.carbon.inbound.ui.internal.InboundClientConstants"%>
-<%@page import="org.wso2.carbon.inbound.ui.internal.InboundDescription"%>
+<%@ page import="org.wso2.carbon.inbound.ui.internal.InboundClientConstants"%>
+<%@ page import="org.wso2.carbon.inbound.ui.internal.InboundDescription"%>
 <%@ page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.Comparator" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -69,7 +70,7 @@
                         <% if (inboundDescription.getArtifactContainerName() != null) { %>
                             <img src="images/applications.gif">
                         <% } %>
-                        <%=name%>
+                        <%=Encode.forHtmlContent(name)%>
                         <% if (inboundDescription.getIsEdited()) { %>
                             <span style="color:grey"> ( Edited )</span>
                         <% } %>

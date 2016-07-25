@@ -331,6 +331,7 @@
     }
 
     function onUpdSuccess() {
+        var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
         if ('<%=SequenceEditorHelper.getEditingSequenceAction(session)%>' == 'anonify') {
             var seqName = document.getElementById("sequence.name").value;
             var onErrorKey = document.getElementById("sequence.onerror.key").value;
@@ -348,7 +349,7 @@
             var seqName = document.getElementById("sequence.name").value;
             var onErrorKey = document.getElementById("sequence.onerror.key").value;
             var seqDescription = document.getElementById("seqeunceDescription").value;
-            if (seqName == "") {
+            if (regEx.test(seqName)) {
                 CARBON.showWarningDialog('<fmt:message key="sequence.name.required"/>');
                 return;
             }
@@ -427,13 +428,14 @@
     }
 
     function onUpdateSucess() {
+        var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
         if ('<%=SequenceEditorHelper.getEditingSequenceAction(session)%>' == 'anonify') {
             document.location.href = "save_sequence.jsp?sequence=<%=seq%>&forwardTo=design_sequence.jsp";
         } else {
             var seqName = document.getElementById("sequence.name").value;
             var onErrorKey = document.getElementById("sequence.onerror.key").value;
             var seqDescription = document.getElementById("seqeunceDescription").value;
-            if (seqName == "") {
+            if (regEx.test(seqName)) {
                 CARBON.showWarningDialog('<fmt:message key="sequence.name.required"/>');
                 return;
             }
