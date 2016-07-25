@@ -23,6 +23,7 @@
 <%@ page import="org.wso2.carbon.message.processor.service.xsd.MessageProcessorMetaData" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <fmt:bundle basename="org.wso2.carbon.message.processor.ui.i18n.Resources">
 <carbon:jsi18n resourceBundle="org.wso2.carbon.message.processor.ui.i18n.Resources"
                request="<%=request%>"/>
@@ -297,7 +298,7 @@
             <td>
                 <% if (mspData.getArtifactContainerName() != null) { %>
                     <img src="images/applications.gif">
-                    <%=mspData.getName()%>
+                    <%=Encode.forHtmlContent(mspData.getName())%>
                     <% if(mspData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                 <% } else { %>
                     <%=mspData.getName()%>

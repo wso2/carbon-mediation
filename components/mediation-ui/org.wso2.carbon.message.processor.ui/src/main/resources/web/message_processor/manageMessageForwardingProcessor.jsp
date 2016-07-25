@@ -27,6 +27,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <fmt:bundle basename="org.wso2.carbon.message.processor.ui.i18n.Resources">
 <carbon:jsi18n resourceBundle="org.wso2.carbon.message.processor.ui.i18n.JSResources"
                request="<%=request%>" i18nObjectName="messageStorei18n"/>
@@ -66,8 +67,8 @@
     }
 
     function ValidateTextForm(form) {
-        if (IsEmpty(form.Name)) {
-            CARBON.showWarningDialog('<fmt:message key="name.field.cannot.be.empty"/>')
+        if (isFieldValid(form.Name)) {
+            CARBON.showWarningDialog('<fmt:message key="name.field.not.valid"/>')
             form.Name.focus();
             return false;
         }
@@ -84,8 +85,8 @@
             return false;
         }
 
-        if (IsEmpty(form.TargetEndpoint)) {
-            CARBON.showWarningDialog('<fmt:message key="endpoint.field.cannot.be.empty"/>')
+        if (isFieldValid(form.TargetEndpoint)) {
+            CARBON.showWarningDialog('<fmt:message key="endpoint.field.not.valid"/>')
             form.TargetEndpoint.focus();
             return false;
         }
@@ -125,6 +126,18 @@
         else {
             return false;
         }
+    }
+
+    function isFieldValid(aTetxField) {
+        var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+        var textValue = aTetxField.value.trim();
+        if (textValue != null && textValue != undefined) {
+            if (regEx.test(textValue)) {
+                return true;
+            }
+        }
+
+        return false;
     }
     
     function isNumber(aTextField) {
@@ -307,8 +320,8 @@
                     <td width="276px"><fmt:message key="name"/><span class="required"> *</span></td>
                     <td>
                         <input id="Name" name="Name" type="hidden"
-                               value="<%=processorData.getName()%>"/>
-                        <label for="Name"><%=processorData.getName()%>
+                               value="<%=Encode.forHtmlAttribute(processorData.getName())%>"/>
+                        <label for="Name"><%=Encode.forHtmlContent(processorData.getName())%>
                         </label>
                     </td>
                 </tr>
@@ -323,7 +336,7 @@
                     <td>
                         <input type="text" size="60" id="TargetEndpoint" name="TargetEndpoint"
                                value="<%=((null!=processorData)&& processorData.getTargetEndpoint() != null
-                                        && !processorData.getTargetEndpoint().isEmpty())? processorData.getTargetEndpoint():""%>"/>
+                                        && !processorData.getTargetEndpoint().isEmpty())? Encode.forHtmlAttribute(processorData.getTargetEndpoint()):""%>"/>
                     <td>
                         <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('TargetEndpoint','/_system/config')"><fmt:message key="processor.conf.registry.browser"/></a>
                         <a href="#" class="registry-picker-icon-link"  onclick="showRegistryBrowser('TargetEndpoint','/_system/governance')"><fmt:message key="processor.gov.registry.browser"/></a>
