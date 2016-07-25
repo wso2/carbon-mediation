@@ -23,6 +23,7 @@
 <%@ page import="org.wso2.carbon.localentry.stub.types.EntryData" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <fmt:bundle basename="org.wso2.carbon.localentry.ui.i18n.Resources">
 <carbon:jsi18n resourceBundle="org.wso2.carbon.localentry.ui.i18n.Resources"
                request="<%=request%>" />
@@ -248,10 +249,10 @@
                         <td>
                             <% if (entry.getArtifactContainerName() != null) { %>
                                 <img src="images/applications.gif">
-                                <%= entry.getName()%>
+                                <%= Encode.forHtmlContent(entry.getName())%>
                                 <% if(entry.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                             <% } else { %>
-                                <%= entry.getName()%>
+                                <%= Encode.forHtmlContent(entry.getName())%>
                             <% } %>
                         </td>
                         <td><%= entry.getType()%>

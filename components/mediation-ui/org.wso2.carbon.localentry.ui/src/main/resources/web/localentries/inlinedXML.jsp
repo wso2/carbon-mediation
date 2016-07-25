@@ -23,6 +23,7 @@
 <%@ page import="org.wso2.carbon.localentry.stub.types.EntryData" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <carbon:jsi18n resourceBundle="org.wso2.carbon.localentry.ui.i18n.JSResources"
                request="<%=request%>" i18nObjectName="localentryi18n"/>
@@ -216,8 +217,8 @@
                                     <fmt:message key="name"/><span class="required">*</span>
                                 </td>
                                 <td>
-                                    <input id="Name" type="hidden" name="Name" value="<%=entry.getName()%>"/>
-                                    <label for="Name"><%=entry.getName()%>
+                                    <input id="Name" type="hidden" name="Name" value="<%=Encode.forHtmlAttribute(entry.getName())%>"/>
+                                    <label for="Name"><%=Encode.forHtmlContent(entry.getName())%>
                                     </label>
                                 </td>
                             </tr>
