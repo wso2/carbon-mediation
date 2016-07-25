@@ -20,6 +20,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -615,7 +616,7 @@
             <tr>
                 <td width="10px" style="text-align:center; !important">
                     <input type="checkbox" name="sequenceGroups"
-                           value="<%=sequence.getName()%>"
+                           value="<%=Encode.forHtmlAttribute(sequence.getName())%>"
                            onclick="resetVars()" class="chkBox"/>
                     &nbsp;
                 </td>
@@ -626,12 +627,12 @@
                         <% } %>>
                         <% if (sequence.getArtifactContainerName() != null) { %>
                             <img src="images/applications.gif">
-                            <%=sequence.getName()%>
+                            <%=Encode.forHtmlContent(sequence.getName())%>
                             <% if(sequence.getIsEdited()) { %>
                                 <span style="color:grey"> ( Edited )</span>
                             <% } %>
                         <% } else { %>
-                            <%=sequence.getName()%>
+                            <%=Encode.forHtmlContent(sequence.getName())%>
                         <% } %>
                     </span>
                 </td>
