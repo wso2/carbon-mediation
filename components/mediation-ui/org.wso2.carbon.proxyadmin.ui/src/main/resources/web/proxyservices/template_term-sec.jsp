@@ -262,7 +262,7 @@
         if (submitted && proxyName != null) {
     %>
     <script type="text/javascript">
-        document.getElementById('proxy_name').value = '<%=Encode.forHtmlContent(proxyName)%>';
+        document.getElementById('proxy_name').value = '<%=proxyName%>';
     </script>
     <%
         }
