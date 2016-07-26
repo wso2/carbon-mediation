@@ -31,6 +31,7 @@
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.Entry" %>
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.ProxyServicePolicyInfo" %>
 <%@ page import="org.wso2.carbon.proxyadmin.ui.client.ProxyAdminClientUtils" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <jsp:include page="../dialog/display_messages.jsp"/>
@@ -558,9 +559,10 @@
     function validatePage(num) {
         var elem;
         var isOneSpecified = false;
+        var proxyNameRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
 
-        if ((elem = getElement('psName')).value == null || elem.value == '') {
-            return 'Empty proxy service name';
+        if ((elem = getElement('psName')).value == null || proxyNameRegex.test(elem.value)) {
+            return 'Proxy service name is empty or contains invalid characters';
         }
         if (num == 0) {
             var wsdl = getElement('publishWsdlCombo');
@@ -1146,19 +1148,19 @@
         </div>
         <div id="step1">
             <h2><fmt:message key="proxy.service.page1"/></h2>
-            <strong><fmt:message key="proxy.service.name"/>: <span id="proxyServiceName1"><%=name%></span></strong>
+            <strong><fmt:message key="proxy.service.name"/>: <span id="proxyServiceName1"><%=Encode.forHtmlContent(name)%></span></strong>
             <p>
                 <fmt:message key="proxy.service.page1.desc"/>
             </p>
         </div>
         <div id="step2">
             <h2><fmt:message key="proxy.service.page2"/></h2>
-            <strong><fmt:message key="proxy.service.name"/>: <span id="proxyServiceName2"><%=name%></span></strong>
+            <strong><fmt:message key="proxy.service.name"/>: <span id="proxyServiceName2"><%=Encode.forHtmlContent(name)%></span></strong>
             <p>
                 <fmt:message key="proxy.service.page2.desc"/>
             </p>
         </div>
-        <input id="psName" name="psName" type="hidden" value="<%=name%>">
+        <input id="psName" name="psName" type="hidden" value="<%=Encode.forHtmlAttribute(name)%>">
         <input name="proxy.secured" type="hidden" value="<%=securityEnabled%>"/>
         <input name="proxy.policies" type="hidden" value="<%=policyKeys%>" />
     </td>

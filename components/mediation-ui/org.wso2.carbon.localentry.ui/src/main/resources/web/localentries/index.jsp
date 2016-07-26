@@ -21,6 +21,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.localentry.stub.types.EntryData" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.localentry.ui.i18n.Resources">
@@ -248,10 +249,10 @@
                         <td>
                             <% if (entry.getArtifactContainerName() != null) { %>
                                 <img src="images/applications.gif">
-                                <%= entry.getName()%>
+                                <%= Encode.forHtmlContent(entry.getName())%>
                                 <% if(entry.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                             <% } else { %>
-                                <%= entry.getName()%>
+                                <%= Encode.forHtmlContent(entry.getName())%>
                             <% } %>
                         </td>
                         <td><%= entry.getType()%>

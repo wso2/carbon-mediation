@@ -23,6 +23,7 @@
 <%@ page import="org.wso2.carbon.message.store.ui.utils.MessageStoreData" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.message.store.ui.i18n.Resources">
@@ -92,8 +93,8 @@
     }
 
     function ValidateTextForm(form) {
-        if (IsEmpty(form.Name)) {
-            CARBON.showWarningDialog('<fmt:message key="name.field.cannot.be.empty"/>')
+        if (isFieldValid(form.Name)) {
+            CARBON.showWarningDialog('<fmt:message key="name.field.not.valid"/>')
             form.Name.focus();
             return false;
         }
@@ -109,6 +110,18 @@
         else {
             return false;
         }
+    }
+
+    function isFieldValid(aTetxField) {
+        var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+        var textValue = aTetxField.value.trim();
+        if (textValue != null && textValue != undefined) {
+            if (regEx.test(textValue)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     function submitTextContent(value) {
@@ -166,8 +179,8 @@
                                 <td width="271px"><fmt:message key="name"/><span class="required"> *</span></td>
                                 <td>
                                     <input id="Name" name="Name" type="hidden"
-                                           value="<%=messageStore.getName()%>"/>
-                                    <label for="Name"><%=messageStore.getName()%>
+                                           value="<%=Encode.forHtmlAttribute(messageStore.getName())%>"/>
+                                    <label for="Name"><%=Encode.forHtmlContent(messageStore.getName())%>
                                     </label>
                                 </td>
                             </tr>
