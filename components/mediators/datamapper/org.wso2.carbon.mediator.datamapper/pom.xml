@@ -41,8 +41,8 @@
                         <Bundle-Description>${project.description}</Bundle-Description>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Export-Package>
+                            !org.wso2.carbon.mediator.datamapper.engine.*,
                             org.wso2.carbon.mediator.datamapper.*,
-                            org.wso2.carbon.mediator.datamapper.config.xml.*,
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
