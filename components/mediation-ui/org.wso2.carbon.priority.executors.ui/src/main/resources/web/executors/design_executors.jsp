@@ -200,9 +200,10 @@
     }
 
     function validate() {
+        var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
         var ele = document.getElementById("executor.name_1");
-        if (ele && ele.value == "") {
-            CARBON.showErrorDialog("Name is required");
+        if (ele && regEx.test(ele.value)) {
+            CARBON.showErrorDialog("Name is empty or contains invalid characters");
             return false;
         }
 

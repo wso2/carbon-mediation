@@ -93,7 +93,7 @@
                     %>
                     <tr>
                     <td>
-                            <%=Encode.forHtmlAttribute(serverName)%>
+                            <%=Encode.forHtmlContent(serverName)%>
                     </td>
                     <td>
                         <a href="add-edit-csg-server.jsp?serverName=<%=serverName%>&mode=edit" class="icon-link" style="background-image:url(../admin/images/edit.gif);"><fmt:message key="edit.server"/></a>
@@ -149,7 +149,7 @@
 
         function deleteServer(serverName) {
         	var onValidationSuccess = function() {
-        		CARBON.showConfirmationDialog("<fmt:message key="csg.delete.server"/> " + serverName + "?", function () {
+        		CARBON.showConfirmationDialog("<fmt:message key="csg.delete.server"/> " + escape(serverName) + "?", function () {
                     jQuery.ajax({
                         type: "POST",
                         url: "delete-server-ajaxprocessor.jsp",

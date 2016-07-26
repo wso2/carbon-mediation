@@ -19,6 +19,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.priority.executors.ui.PriorityAdminClient" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -92,7 +93,7 @@
             <% for (String executor : executors) { %>
             <tr>
                 <td>
-                    <%= executor %>
+                    <%= Encode.forHtmlContent(executor) %>
                 </td>
                 <td style="border-left:none;border-right:none;width:100px">
                     <div class="inlineDiv">
