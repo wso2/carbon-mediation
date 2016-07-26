@@ -30,6 +30,7 @@ import org.wso2.carbon.das.messageflow.data.publisher.observer.MessageFlowObserv
 import org.wso2.carbon.das.messageflow.data.publisher.observer.TenantInformation;
 import org.wso2.carbon.das.messageflow.data.publisher.observer.jmx.JMXMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
+import org.wso2.carbon.das.messageflow.data.publisher.services.MessageFlowReporterObserver;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -123,13 +124,18 @@ public class MediationStatisticsComponent {
 
         MessageFlowObserverStore observerStore = new MessageFlowObserverStore();
 
-        MessageFlowReporterThread reporterThread = new MessageFlowReporterThread(synEnvService, observerStore);
-        reporterThread.setName("message-flow-reporter-" + tenantId);
-        reporterThread.start();
-        if (log.isDebugEnabled()) {
-            log.debug("Registering the new mediation flow tracer service");
+        MessageFlowReporterThread reporterThread = null;
+        for (int i = 0; i < 100; i++) {
+            reporterThread = new MessageFlowReporterThread(synEnvService, observerStore);
+            reporterThread.setName("message-flow-reporter-" + i + "-tenant-" + tenantId);
+            reporterThread.start();
+//        MessageFlowReporterObserver observer = new MessageFlowReporterObserver(observerStore);
+//        synEnvService.getSynapseEnvironment().getStatisticsObservable().addObserver(observer);
+            if (log.isDebugEnabled()) {
+                log.debug("Registering the new mediation flow tracer service");
+            }
+            reporterThreads.put(tenantId, reporterThread);
         }
-        reporterThreads.put(tenantId, reporterThread);
 
         ServerConfiguration serverConf = ServerConfiguration.getInstance();
         String disableJmxStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_JMX_PUBLISHING);
