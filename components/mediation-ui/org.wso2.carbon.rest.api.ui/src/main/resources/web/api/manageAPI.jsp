@@ -587,7 +587,7 @@ function validateAndSaveApi() {
     var port = document.getElementById('api.port').value;
     var apiNameRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
 
-    if (apiNameValue == null || apiNameValue == "" || apiNameRegex.test(apiNameValue)) {
+    if (apiNameValue == null || apiNameRegex.test(apiNameValue)) {
         CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
         return false;
     }

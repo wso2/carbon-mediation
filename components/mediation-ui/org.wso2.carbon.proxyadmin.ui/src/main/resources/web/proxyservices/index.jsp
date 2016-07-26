@@ -561,7 +561,7 @@
         var isOneSpecified = false;
         var proxyNameRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
 
-        if ((elem = getElement('psName')).value == null || elem.value == '' || proxyNameRegex.test(elem.value)) {
+        if ((elem = getElement('psName')).value == null || proxyNameRegex.test(elem.value)) {
             return 'Proxy service name is empty or contains invalid characters';
         }
         if (num == 0) {

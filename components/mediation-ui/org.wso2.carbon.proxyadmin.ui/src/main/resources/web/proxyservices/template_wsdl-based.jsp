@@ -171,7 +171,7 @@
         if (submitted) {
             try {
                 proxyName = request.getParameter("proxyName");
-                if (proxyName == null || "".equals(proxyName) || proxyNameRegex.matcher(proxyName).find()) {
+                if (proxyName == null || proxyNameRegex.matcher(proxyName).find()) {
                     throw new Exception("The proxy service name is empty or contains invalid characters");
                 }
 
@@ -328,7 +328,7 @@
             if (proxyName != null) {
     %>
         <script type="text/javascript">
-            document.getElementById('proxy_name').value = '<%=Encode.forHtmlContent(proxyName)%>';
+            document.getElementById('proxy_name').value = '<%=Encode.forHtmlAttribute(proxyName)%>';
         </script>
     <%
             }
