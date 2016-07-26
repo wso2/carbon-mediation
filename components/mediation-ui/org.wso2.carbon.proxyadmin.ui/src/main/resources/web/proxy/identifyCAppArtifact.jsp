@@ -21,6 +21,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.proxyadmin.ui.client.ProxyServiceAdminClient" %>
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.ProxyData" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <script type="text/javascript" src="../resources/js/resource_util.js"></script>
@@ -47,17 +48,17 @@
     <% if(pd.getArtifactContainerName() != null) { %>
         <img src="images/applications.gif">
         <% if (loggedIn) { %>
-            <a href="./service_info.jsp?serviceName=<%=serviceName%>"><%=name%>
+            <a href="./service_info.jsp?serviceName=<%=serviceName%>"><%=Encode.forHtmlContent(name)%>
             <% if(pd.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
             </a>
         <% } else { %>
-            <%=name%>
+            <%=Encode.forHtmlContent(name)%>
         <% } %>
     <% } else { %>
         <% if (loggedIn) { %>
-            <a href="./service_info.jsp?serviceName=<%=serviceName%>"><%=name%></a>
+            <a href="./service_info.jsp?serviceName=<%=serviceName%>"><%=Encode.forHtmlContent(name)%></a>
         <% } else { %>
-            <%=name%>
+            <%=Encode.forHtmlContent(name)%>
         <% } %>
     <% } %>
 </td>
