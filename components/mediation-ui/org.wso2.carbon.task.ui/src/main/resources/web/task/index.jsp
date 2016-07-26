@@ -23,6 +23,7 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.Comparator" %>
 <%@ page import="org.wso2.carbon.task.stub.types.carbon.TaskData" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -83,10 +84,10 @@
                     <td>
                         <% if(taskData.getArtifactContainerName() != null) { %>
                         <img src="images/applications.gif">
-                        <%=name%>
+                        <%=Encode.forHtmlContent(name)%>
                         <% if(taskData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                         <% } else { %>
-                        <%=name%>
+                        <%=Encode.forHtmlContent(name)%>
                         <% } %>
                     </td>
                     <% if (taskData.getArtifactContainerName() != null) { %>

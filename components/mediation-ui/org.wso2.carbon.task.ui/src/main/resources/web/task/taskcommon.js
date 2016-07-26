@@ -216,7 +216,7 @@ function isContainRaw(tbody) {
 }
 
 function deleteRow(name, group){
-    CARBON.showConfirmationDialog(taskjsi18n["task.delete.waring"] + " ' " + name + " ' ?", function() {
+    CARBON.showConfirmationDialog(taskjsi18n["task.delete.waring"] + " ' " + escape(name) + " ' ?", function() {
         jQuery.ajax({
             type: "POST",
             url: "deletetask-ajaxprocessor.jsp",

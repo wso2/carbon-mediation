@@ -19,6 +19,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.priority.executors.ui.PriorityAdminClient" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -40,7 +41,7 @@
 <script type="text/javascript">
 
     function deleteExecutor(name) {
-        CARBON.showConfirmationDialog('Are you sure you want to delete the executor ' + name + '?', function () {
+        CARBON.showConfirmationDialog('Are you sure you want to delete the executor ' + escape(name) + '?', function () {
             jQuery.ajax({
                 type: "POST",
                 url: "delete_executor-ajaxprocessor.jsp",
@@ -92,7 +93,7 @@
             <% for (String executor : executors) { %>
             <tr>
                 <td>
-                    <%= executor %>
+                    <%= Encode.forHtmlContent(executor) %>
                 </td>
                 <td style="border-left:none;border-right:none;width:100px">
                     <div class="inlineDiv">

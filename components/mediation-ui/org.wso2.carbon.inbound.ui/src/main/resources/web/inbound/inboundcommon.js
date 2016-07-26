@@ -186,7 +186,7 @@ function isContainRaw(tbody) {
 }
 
 function deleteRecord(name){
-    CARBON.showConfirmationDialog(taskjsi18n["inbound.delete.waring"] + " ' " + name + " ' ?", function() {
+    CARBON.showConfirmationDialog(taskjsi18n["inbound.delete.waring"] + " ' " + escape(name) + " ' ?", function() {
         jQuery.ajax({
             type: "POST",
             url: "deleteInbound-ajaxprocessor.jsp",

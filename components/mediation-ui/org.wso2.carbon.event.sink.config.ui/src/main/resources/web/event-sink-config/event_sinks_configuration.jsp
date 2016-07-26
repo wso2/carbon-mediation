@@ -113,7 +113,7 @@
     function deleteproperty(i) {
         var eventSinkName = document.getElementById("propertyName" + i).innerHTML.trim();
 
-        CARBON.showConfirmationDialog("Are you sure, you want to delete event sink '" + eventSinkName + "'?", function () {
+        CARBON.showConfirmationDialog("Are you sure, you want to delete event sink '" + escape(eventSinkName) + "'?", function () {
             jQuery.ajax({
                 type: "POST",
                 url: "../event-sink-config/update_event_sink_ajaxprocessor.jsp",

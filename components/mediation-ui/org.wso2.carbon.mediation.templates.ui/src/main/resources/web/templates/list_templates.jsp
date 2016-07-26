@@ -338,7 +338,7 @@
         if (sequenceName == "main" || sequenceName == "fault") {
            CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
-            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function(){
+            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + escape(sequenceName) + "?", function(){
                 jQuery.ajax({
                     type: "POST",
                     url: "../templates/delete_template-ajaxprocessor.jsp",
@@ -355,7 +355,7 @@
     }
 
     function deleteEndpoint(sequenceName) {
-        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function() {;
+        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + escape(sequenceName) + "?", function() {;
             jQuery.ajax({
                 type: "POST",
                 url: "../templates/delete_template-ajaxprocessor.jsp",
@@ -409,7 +409,7 @@
         if (sequenceName == "main" || sequenceName == "fault") {
            CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
-            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function(){
+            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + escape(sequenceName) + "?", function(){
                 jQuery.ajax({
                     type: "POST",
                     url: "../templates/delete_template-ajaxprocessor.jsp",
@@ -426,7 +426,7 @@
     }
 
     function deleteRegistryEndpoint(sequenceName) {
-        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + sequenceName + "?", function() {
+        CARBON.showConfirmationDialog("<fmt:message key="endpoint.delete.confirmation"/> " + escape(sequenceName) + "?", function() {
             jQuery.ajax({
                 type: "POST",
                 url: "../templates/delete_template-ajaxprocessor.jsp",

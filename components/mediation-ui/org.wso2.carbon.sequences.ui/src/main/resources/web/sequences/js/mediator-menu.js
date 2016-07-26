@@ -21,9 +21,10 @@ function childMenuItemClicked(e, e2, objx) {
     var addingOn = objx[1];
     var todo = objx[2];
 
+    var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
     var sequenceName = document.getElementById("sequence.name").value;
-    if (sequenceName == "") {
-        CARBON.showWarningDialog("Please specify the sequence name before adding mediators");
+    if (regEx.test(sequenceName)) {
+        CARBON.showWarningDialog("Please specify a valid sequence name before adding mediators");
         return;
     }
 

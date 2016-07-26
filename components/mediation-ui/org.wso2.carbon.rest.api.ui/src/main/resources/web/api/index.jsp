@@ -28,6 +28,7 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
 <!-- This page is included to display messages which are set to request scope or session scope -->
@@ -234,7 +235,7 @@
     }
     
     function deleteApi(apiName) {
-        CARBON.showConfirmationDialog("<fmt:message key="api.delete.confirmation"/> " + apiName + "?", function () {
+        CARBON.showConfirmationDialog("<fmt:message key="api.delete.confirmation"/> " + escape(apiName) + "?", function () {
             jQuery.ajax({
                 type: "POST",
                 url: "delete_api-ajaxprocessor.jsp",
@@ -529,7 +530,7 @@
                     <% } %>
             <td width="10px" style="text-align:center; !important">
                 <input type="checkbox" name="apiGroups"
-                       value="<%=apiData.getName()%>"
+                       value="<%=Encode.forHtmlAttribute(apiData.getName())%>"
                        onclick="resetVars()" class="chkBox"/>
                 &nbsp;
             </td>
@@ -537,10 +538,10 @@
                 <nobr>
                     <% if (apiData.getArtifactContainerName() != null) { %>
                         <img src="images/applications.gif">
-                        <%=apiData.getName()%>
+                        <%=Encode.forHtmlContent(apiData.getName())%>
                         <% if(apiData.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                     <% } else { %>
-                        <%=apiData.getName()%>
+                        <%=Encode.forHtmlContent(apiData.getName())%>
                     <% } %>
                 </nobr>
             </td>

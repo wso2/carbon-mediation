@@ -29,6 +29,7 @@
 <%@ page import="org.wso2.carbon.cloud.gateway.agent.stub.types.carbon.CGServerBean" %>
 <%@ page import="org.wso2.carbon.cloud.gateway.common.CGUtils" %>
 <%@ page import="org.wso2.carbon.cloud.gateway.common.CGConstant" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -111,8 +112,8 @@
 
     function doValidation() {
         var serverName = document.getElementById('csg_server_name_id').value;
-        if (isEmpty(serverName)) {
-            CARBON.showWarningDialog("<fmt:message key="csg.error.empty.servername"/>");
+        if (isFieldNotValid(serverName)) {
+            CARBON.showWarningDialog("<fmt:message key="csg.error.invalid.servername"/>");
             return false;
         }
 
@@ -161,6 +162,15 @@
 
     function isEmpty(fieldName) {
         return fieldName == null || fieldName == undefined || fieldName == 'undefined' || fieldName.length == 0;
+    }
+
+    function isFieldNotValid(fieldContent) {
+        var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+        if (fieldContent == null || fieldContent == undefined || fieldContent == 'undefined' || regEx.test(fieldContent)) {
+            return true;
+        }
+
+        return false;
     }
 
     function isValidDomain(nname) {
@@ -259,14 +269,14 @@
                                 <td align="left" colspan="2">
                                     <label for="csg_server_name_id"></label>
                                     <input type="text" name="csg_server_name_id"
-                                           id="csg_server_name_id" value="<%=serverName%>"
+                                           id="csg_server_name_id" value="<%=Encode.forHtmlAttribute(serverName)%>"
                                             <%=isEditMode ? "disabled=\"disabled\"" : ""%>
                                            onkeypress="return validateText(event);"/>
                                     <%
                                         if (isEditMode) {
                                     %>
                                     <input type="hidden" name="csg_server_name_id_hidden"
-                                           id="csg_server_name_id_hidden" value="<%=serverName%>"/>
+                                           id="csg_server_name_id_hidden" value="<%=Encode.forHtmlAttribute(serverName)%>"/>
                                     <%
                                         }
                                     %>
@@ -312,7 +322,7 @@
                                 </td>
                                 <td align="left" colspan="2">
                                     <label for="csg_user_password_id"></label>
-                                    <input type="password" name="csg_user_password_id"
+                                    <input type="password" autocomplete="off" name="csg_user_password_id"
                                            id="csg_user_password_id" value="<%=passWord%>"/>
                                 </td>
                             </tr>

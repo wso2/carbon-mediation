@@ -28,6 +28,7 @@
 <%@ page import="org.wso2.carbon.cloud.gateway.agent.stub.types.carbon.CGServerBean" %>
 <%@ page import="org.wso2.carbon.cloud.gateway.agent.ui.CGAgentAdminClient" %>
 <%@ page import="org.wso2.carbon.cloud.gateway.common.CGConstant" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -92,7 +93,7 @@
                     %>
                     <tr>
                     <td>
-                            <%=serverName%>
+                            <%=Encode.forHtmlContent(serverName)%>
                     </td>
                     <td>
                         <a href="add-edit-csg-server.jsp?serverName=<%=serverName%>&mode=edit" class="icon-link" style="background-image:url(../admin/images/edit.gif);"><fmt:message key="edit.server"/></a>
@@ -148,7 +149,7 @@
 
         function deleteServer(serverName) {
         	var onValidationSuccess = function() {
-        		CARBON.showConfirmationDialog("<fmt:message key="csg.delete.server"/> " + serverName + "?", function () {
+        		CARBON.showConfirmationDialog("<fmt:message key="csg.delete.server"/> " + escape(serverName) + "?", function () {
                     jQuery.ajax({
                         type: "POST",
                         url: "delete-server-ajaxprocessor.jsp",

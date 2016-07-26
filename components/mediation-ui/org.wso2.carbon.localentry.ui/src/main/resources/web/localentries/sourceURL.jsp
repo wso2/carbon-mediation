@@ -21,6 +21,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.localentry.stub.types.EntryData" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.localentry.ui.i18n.Resources">
@@ -108,9 +109,9 @@
                                         <span class="required">*</span>
                                     </td>
                                     <td>
-                                        <input id="Name" type="hidden" name="Name" value="<%=entry.getName()%>"
+                                        <input id="Name" type="hidden" name="Name" value="<%=Encode.forHtmlAttribute(entry.getName())%>"
                                                class="longInput"/>
-                                        <label for="Name"><%=entry.getName()%>
+                                        <label for="Name"><%=Encode.forHtmlContent(entry.getName())%>
                                         </label>
                                     </td>
                                 </tr>

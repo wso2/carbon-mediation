@@ -25,6 +25,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="java.util.Iterator" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <fmt:bundle basename="org.wso2.carbon.message.processor.ui.i18n.Resources">
@@ -55,8 +56,8 @@ String.prototype.rtrim = function() {
 }
 
 function ValidateTextForm(form) {
-    if (IsEmpty(form.Name)) {
-        CARBON.showWarningDialog('<fmt:message key="name.field.cannot.be.empty"/>')
+    if (isFieldValid(form.Name)) {
+        CARBON.showWarningDialog('<fmt:message key="name.field.not.valid"/>')
         form.Name.focus();
         return false;
     }
@@ -84,6 +85,18 @@ function IsEmpty(aTextField) {
     else {
         return false;
     }
+}
+
+function isFieldValid(aTetxField) {
+    var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+    var textValue = aTetxField.value.trim();
+    if (textValue != null && textValue != undefined) {
+        if (regEx.test(textValue)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function specialCharValidator() {
@@ -359,8 +372,8 @@ function switchToSource() {
                     <td width="276px"><fmt:message key="name"/><span class="required"> *</span></td>
                     <td>
                         <input id="Name" name="Name" type="hidden"
-                               value="<%=processorData.getName()%>"/>
-                        <label for="Name"><%=processorData.getName()%>
+                               value="<%=Encode.forHtmlAttribute(processorData.getName())%>"/>
+                        <label for="Name"><%=Encode.forHtmlContent(processorData.getName())%>
                         </label>
                     </td>
                 </tr>
