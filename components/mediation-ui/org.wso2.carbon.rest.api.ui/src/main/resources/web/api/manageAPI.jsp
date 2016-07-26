@@ -25,6 +25,7 @@
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -440,7 +441,13 @@ function updateResource(v) {
     var apiContextValue = document.getElementById('api.context').value;
     var apiHostnameValue = document.getElementById('api.hostname').value;
     var apiPortValue = document.getElementById('api.port').value;
+    var apiNameRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
 
+
+    if (apiNameRegex.test(apiNameValue)) {
+        CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
+        return false;
+    }
     var methodList = document.apiForm.methods;
     var isTemp;
     if (v) {
@@ -578,9 +585,10 @@ function validateAndSaveApi() {
     var apiContextValue = document.getElementById('api.context').value;
     var hostname = document.getElementById('api.hostname').value;
     var port = document.getElementById('api.port').value;
+    var apiNameRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
 
-    if (apiNameValue == null || apiNameValue == "") {
-        CARBON.showWarningDialog('<fmt:message key="api.name.required"/>');
+    if (apiNameValue == null || apiNameValue == "" || apiNameRegex.test(apiNameValue)) {
+        CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
         return false;
     }
     else if (apiNameValue.indexOf(' ')>=0) {
@@ -734,11 +742,11 @@ function sourceView() {
                                         class="required">*</span>
                                 </td>
                                 <td>
-                                    <input type="text" id="api.name" value="<%=apiName%>"
+                                    <input type="text" id="api.name" value="<%=Encode.forHtmlAttribute(apiName)%>"
                                             <%if (!"add".equals(mode)) { %>
                                            disabled="disabled" <%}%>/>
                                     <input type="hidden" name="apiName"
-                                           value="<%=apiName%>"/>
+                                           value="<%=Encode.forHtmlAttribute(apiName)%>"/>
                                 </td>
                             </tr>
                             <!-- API Context Path -->
