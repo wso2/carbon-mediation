@@ -52,8 +52,8 @@
     }
 
     function ValidateTextForm(form) {
-        if (IsEmpty(form.Name)) {
-            CARBON.showWarningDialog('<fmt:message key="name.field.cannot.be.empty"/>')
+        if (isFieldValid(form.Name)) {
+            CARBON.showWarningDialog('<fmt:message key="name.field.not.valid"/>')
             form.Name.focus();
             return false;
         }
@@ -61,14 +61,16 @@
         return true;
     }
 
-    function IsEmpty(aTextField) {
-        if ((aTextField.value.trim().length == 0) ||
-                (aTextField.value.trim() == null) || (aTextField.value.trim() == '')) {
-            return true;
+    function isFieldValid(aTetxField) {
+        var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+        var textValue = aTetxField.value.trim();
+        if (textValue != null && textValue != undefined) {
+            if (regEx.test(textValue)) {
+                return true;
+            }
         }
-        else {
-            return false;
-        }
+
+        return false;
     }
 
     function specialCharValidator() {
