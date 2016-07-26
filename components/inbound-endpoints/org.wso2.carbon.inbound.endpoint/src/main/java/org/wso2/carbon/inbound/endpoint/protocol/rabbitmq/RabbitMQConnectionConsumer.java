@@ -18,7 +18,14 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.rabbitmq;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConsumerCancelledException;
+import com.rabbitmq.client.ShutdownSignalException;
+import com.rabbitmq.client.QueueingConsumer;
+
+import org.apache.axiom.om.OMException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,6 +83,8 @@ public class RabbitMQConnectionConsumer {
                                 " was disconnected", sse);
                         waitForConnection();
                     }
+                } catch (OMException e){
+                    log.error("Invalid Message Format while consuming the message", e);
                 } catch (IOException e) {
                     log.error("RabbitMQ Listener of the inbound " + inboundName +
                             " was disconnected", e);
