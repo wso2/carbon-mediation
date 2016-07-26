@@ -40,7 +40,7 @@
 <script type="text/javascript">
 
     function deleteExecutor(name) {
-        CARBON.showConfirmationDialog('Are you sure you want to delete the executor ' + name + '?', function () {
+        CARBON.showConfirmationDialog('Are you sure you want to delete the executor ' + escape(name) + '?', function () {
             jQuery.ajax({
                 type: "POST",
                 url: "delete_executor-ajaxprocessor.jsp",

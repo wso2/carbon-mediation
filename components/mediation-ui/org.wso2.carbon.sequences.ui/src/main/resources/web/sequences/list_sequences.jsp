@@ -317,7 +317,7 @@
         if (sequenceName == "main" || sequenceName == "fault") {
             CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
-            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function() {
+            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + escape(sequenceName) + "?", function() {
                 jQuery.ajax({
                     type: "POST",
                     url: "delete_sequence-ajaxprocessor.jsp",
@@ -354,7 +354,7 @@
         if (sequenceName == "main" || sequenceName == "fault") {
             CARBON.showWarningDialog('<fmt:message key="sequence.main.fault.cannot.delete"/>');
         } else {
-            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + sequenceName + "?", function() {
+            CARBON.showConfirmationDialog("<fmt:message key="sequence.delete.confirmation"/> " + escape(sequenceName) + "?", function() {
                 jQuery.ajax({
                     type: "POST",
                     url: "delete_sequence-ajaxprocessor.jsp",

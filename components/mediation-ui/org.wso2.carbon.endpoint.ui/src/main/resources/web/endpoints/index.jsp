@@ -213,7 +213,7 @@ function goBack(orginiator) {
 }
 
 function deleteEndpoint(endpointName) {
-    CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.endpoint"/> " + endpointName + " ?", function() {
+    CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.endpoint"/> " + escape(endpointName) + " ?", function() {
         $.ajax({
                    type: 'POST',
                    url: 'ajaxprocessors/deleteEndpoint-ajaxprocessor.jsp',
@@ -251,7 +251,7 @@ function loadEndpointsAfterDeletion() {
 }
 
 function deleteDynamicEndpoint(key) {
-    CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.endpoint"/> " + key + "?", function () {
+    CARBON.showConfirmationDialog("<fmt:message key="do.you.want.to.delete.the.endpoint"/> " + escape(key) + "?", function () {
         jQuery.ajax({
             type: "POST",
             url: "ajaxprocessors/deleteDynamicEndpoint-ajaxprocessor.jsp",

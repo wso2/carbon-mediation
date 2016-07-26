@@ -76,7 +76,7 @@
 
             if (action == "add") {
                 var name = document.getElementById("propertyName0").value;
-                CARBON.showConfirmationDialog("Are you sure, you want to add event sink '" + name + "'?", function () {
+                CARBON.showConfirmationDialog("Are you sure, you want to add event sink '" + escape(name) + "'?", function () {
                     jQuery.ajax({
                         type: "GET",
                         url: "../event-sink-config/update_event_sink_ajaxprocessor.jsp",
@@ -91,7 +91,7 @@
                 });
             } else if (action == "edit") {
                 var name = document.getElementById("propertyName0").innerHTML.trim();
-                CARBON.showConfirmationDialog("Are you sure, you want to update event sink '" + name + "'?", function () {
+                CARBON.showConfirmationDialog("Are you sure, you want to update event sink '" + escape(name) + "'?", function () {
                     jQuery.ajax({
                         type: "GET",
                         url: "../event-sink-config/update_event_sink_ajaxprocessor.jsp",

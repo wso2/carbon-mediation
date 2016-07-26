@@ -234,7 +234,7 @@
     }
     
     function deleteApi(apiName) {
-        CARBON.showConfirmationDialog("<fmt:message key="api.delete.confirmation"/> " + apiName + "?", function () {
+        CARBON.showConfirmationDialog("<fmt:message key="api.delete.confirmation"/> " + escape(apiName) + "?", function () {
             jQuery.ajax({
                 type: "POST",
                 url: "delete_api-ajaxprocessor.jsp",
