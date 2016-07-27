@@ -29,7 +29,7 @@ function isEmptyField(id) {
 
 function isValidName(id){
     var elementId = document.getElementById(id);
-    var regEx = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+    var regEx = /[~!@#%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
     if (elementId != null && elementId != undefined) {
         if (regEx.test(elementId.value) || elementId.value == null || elementId.value == undefined) {
             return true;
