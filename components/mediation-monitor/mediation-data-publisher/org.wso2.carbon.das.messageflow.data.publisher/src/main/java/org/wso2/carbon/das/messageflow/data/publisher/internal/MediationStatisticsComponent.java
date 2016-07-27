@@ -20,6 +20,7 @@ package org.wso2.carbon.das.messageflow.data.publisher.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
+import org.apache.synapse.aspects.flow.statistics.log.StatisticsProcessorPool;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
@@ -31,6 +32,7 @@ import org.wso2.carbon.das.messageflow.data.publisher.observer.TenantInformation
 import org.wso2.carbon.das.messageflow.data.publisher.observer.jmx.JMXMediationFlowObserver;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MediationConfigReporterThread;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MessageFlowReporterObserver;
+import org.wso2.carbon.das.messageflow.data.publisher.services.MessageFlowReporterThread2;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -76,7 +78,7 @@ public class MediationStatisticsComponent {
 
     private Map<Integer, MessageFlowObserverStore> stores = new HashMap<Integer, MessageFlowObserverStore>();
 
-    private Map<Integer, MessageFlowReporterThread> reporterThreads = new HashMap<Integer, MessageFlowReporterThread>();
+    private Map<Integer, MessageFlowReporterThread2> reporterThreads = new HashMap<Integer, MessageFlowReporterThread2>();
 
     private Map<Integer, MediationConfigReporterThread> configReporterThreads = new HashMap<Integer, MediationConfigReporterThread>();
 
@@ -124,18 +126,26 @@ public class MediationStatisticsComponent {
 
         MessageFlowObserverStore observerStore = new MessageFlowObserverStore();
 
-        MessageFlowReporterThread reporterThread = null;
+        MessageFlowReporterThread2 reporterThread = null;
         for (int i = 0; i < 100; i++) {
-            reporterThread = new MessageFlowReporterThread(synEnvService, observerStore);
+            reporterThread = new MessageFlowReporterThread2(synEnvService, observerStore);
             reporterThread.setName("message-flow-reporter-" + i + "-tenant-" + tenantId);
-            reporterThread.start();
-//        MessageFlowReporterObserver observer = new MessageFlowReporterObserver(observerStore);
-//        synEnvService.getSynapseEnvironment().getStatisticsObservable().addObserver(observer);
-            if (log.isDebugEnabled()) {
-                log.debug("Registering the new mediation flow tracer service");
-            }
+            StatisticsProcessorPool.getInstance().execute(reporterThread);
             reporterThreads.put(tenantId, reporterThread);
         }
+
+//        MessageFlowReporterThread reporterThread = null;
+//        for (int i = 0; i < 100; i++) {
+//            reporterThread = new MessageFlowReporterThread(synEnvService, observerStore);
+//            reporterThread.setName("message-flow-reporter-" + i + "-tenant-" + tenantId);
+//            reporterThread.start();
+////        MessageFlowReporterObserver observer = new MessageFlowReporterObserver(observerStore);
+////        synEnvService.getSynapseEnvironment().getStatisticsObservable().addObserver(observer);
+//            if (log.isDebugEnabled()) {
+//                log.debug("Registering the new mediation flow tracer service");
+//            }
+//            reporterThreads.put(tenantId, reporterThread);
+//        }
 
         ServerConfiguration serverConf = ServerConfiguration.getInstance();
         String disableJmxStr = serverConf.getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_JMX_PUBLISHING);
@@ -203,9 +213,9 @@ public class MediationStatisticsComponent {
     }
 
     protected void deactivate(ComponentContext ctxt) {
-        Set<Map.Entry<Integer, MessageFlowReporterThread>> threadEntries = reporterThreads.entrySet();
-        for (Map.Entry<Integer, MessageFlowReporterThread> threadEntry : threadEntries) {
-            MessageFlowReporterThread reporterThread = threadEntry.getValue();
+        Set<Map.Entry<Integer, MessageFlowReporterThread2>> threadEntries = reporterThreads.entrySet();
+        for (Map.Entry<Integer, MessageFlowReporterThread2> threadEntry : threadEntries) {
+            MessageFlowReporterThread2 reporterThread = threadEntry.getValue();
             if (reporterThread != null && reporterThread.isAlive()) {
                 reporterThread.shutdown();
                 reporterThread.interrupt(); // This should wake up the thread if it is asleep
@@ -311,7 +321,7 @@ public class MediationStatisticsComponent {
     protected void unsetSynapseRegistrationsService(SynapseRegistrationsService registrationsService) {
         try {
             int tenantId = registrationsService.getTenantId();
-            MessageFlowReporterThread reporterThread = reporterThreads.get(tenantId);
+            MessageFlowReporterThread2 reporterThread = reporterThreads.get(tenantId);
             if (reporterThread != null && reporterThread.isAlive()) {
                 reporterThread.shutdown();
                 reporterThread.interrupt(); // This should wake up the thread if it is asleep
