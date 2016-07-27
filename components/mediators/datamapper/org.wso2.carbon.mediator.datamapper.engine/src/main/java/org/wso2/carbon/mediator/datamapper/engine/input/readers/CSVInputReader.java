@@ -78,6 +78,10 @@ public class CSVInputReader implements InputReader {
      */
     private void populateCSVContents(String csvContent, Map jsonSchemaMap)
             throws IOException, ReaderException, SchemaException, JSException {
+        if (csvContent == null) {
+            throw new ReaderException(
+                    "Request csv data not found. The csv records should contain in a <text></text> tag.");
+        }
         String[] lines = csvContent.split("\\r?\\n");
 
         Map<String, Object> fieldMap;
