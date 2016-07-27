@@ -176,7 +176,7 @@ public class SequenceAdminClient implements EditorUIClient {
         } catch (Exception e) {
             if (e.getMessage().toString().toLowerCase().contains("this name already exists".toLowerCase())) {
                 //Error Related to name already exits
-                handleException(e.getMessage(), e);
+                throw new SequenceEditorException(e.getMessage(), e);
 
             } else {
                 handleException("Error in adding the sequence with the configuration '"
