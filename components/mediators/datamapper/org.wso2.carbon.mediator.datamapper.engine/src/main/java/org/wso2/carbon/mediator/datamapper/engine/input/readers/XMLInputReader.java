@@ -114,7 +114,7 @@ public class XMLInputReader implements InputReader {
         this.jsonSchema = getInputSchema().getSchemaMap();
 
         try {
-            XMLTraverse(root, null, jsonSchema);
+            xmlTraverse(root, null, jsonSchema);
             jsonBuilder.writeEndObject();
             writeTerminateElement();
         } catch (IOException | JSException | SchemaException | InvalidPayloadException e) {
@@ -136,7 +136,7 @@ public class XMLInputReader implements InputReader {
      * @throws JSException
      * @throws InvalidPayloadException
      */
-    public String XMLTraverse(OMElement omElement, String prevElementName, Map jsonSchemaMap)
+    public String xmlTraverse(OMElement omElement, String prevElementName, Map jsonSchemaMap)
             throws IOException, ReaderException, SchemaException, JSException, InvalidPayloadException {
 
         /** isObject becomes true if the current element is an object, therefor object end element can be written at
@@ -221,7 +221,7 @@ public class XMLInputReader implements InputReader {
         /* Recursively call all the children */
         if (!isXsiNil(omElement)) {
             while (it.hasNext()) {
-                prevElementNameSpaceLocalName = XMLTraverse(it.next(), prevElementNameSpaceLocalName,
+                prevElementNameSpaceLocalName = xmlTraverse(it.next(), prevElementNameSpaceLocalName,
                         nextJSONSchemaMap);
             }
         }
