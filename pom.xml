@@ -2333,7 +2333,7 @@
         <carbon.identity.entitlement.proxy.version>5.1.1</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
 
-        <carbon.identity.oauth.version>5.1.1</carbon.identity.oauth.version>
+        <carbon.identity.oauth.version>5.1.2</carbon.identity.oauth.version>
         <carbon.identity.oauth.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.oauth.imp.pkg.version>
 
 
