@@ -101,7 +101,6 @@ public class MessageFlowReporterThread2 extends Thread {
     private void processAndPublishEventList(List<StatisticsReportingEvent> eventList) {
 
 
-
         List<StatisticsReportingEvent> remainingEvents = new ArrayList<>();
         List<StatisticsLog> messageFlowLogs = new ArrayList<>();
 
@@ -114,9 +113,9 @@ public class MessageFlowReporterThread2 extends Thread {
             }
         }
 
-        for (StatisticsReportingEvent event:remainingEvents) {
+        for (StatisticsReportingEvent event : remainingEvents) {
 
-            switch (event.getEventType()){
+            switch (event.getEventType()) {
                 case STATISTICS_CLOSE_EVENT:
 
                     StatisticDataUnit dataUnit = (StatisticDataUnit) event.getDataUnit();
@@ -124,11 +123,16 @@ public class MessageFlowReporterThread2 extends Thread {
                     StatisticsLog statisticsLog = messageFlowLogs.get(dataUnit.getCurrentIndex());
 
                     int parentIndex = statisticsLog.getParentIndex();
-                    if (parentIndex == -1) {
-                        //statisticsLog.setParentIndex(parentIndex);
-                    }else {
+                    if (parentIndex == -1 || messageFlowLogs.get(parentIndex).isFlowSplittingMediator()) {
+                        statisticsLog.setParentIndex(parentIndex);
+                    } else {
                         statisticsLog.setParentIndex(getParent(messageFlowLogs, parentIndex));
                     }
+
+                    if (statisticsLog.getHashCode() == null) {
+                        statisticsLog.setHashCode(messageFlowLogs.get(parentIndex).getHashCode());
+                    }
+
                     statisticsLog.setEndTime(dataUnit.getTime());
                     statisticsLog.setAfterPayload(dataUnit.getPayload());
                     updateParents(messageFlowLogs, statisticsLog.getParentIndex(), dataUnit.getTime());
@@ -149,7 +153,7 @@ public class MessageFlowReporterThread2 extends Thread {
                     break;
                 case FAULT_EVENT:
                     BasicStatisticDataUnit basicDataUnit = event.getDataUnit();
-                    addFaultsToParents(messageFlowLogs,basicDataUnit.getCurrentIndex());
+                    addFaultsToParents(messageFlowLogs, basicDataUnit.getCurrentIndex());
                     break;
                 case PARENT_REOPEN_EVENT:
                     break;
@@ -169,12 +173,11 @@ public class MessageFlowReporterThread2 extends Thread {
         log.info("came");
 
 
-
         //messageFlowObserverStore.notifyObservers(statisticsEntry.getMessageFlowLogs());
     }
 
-    void updateParents(List<StatisticsLog> messageFlowLogs, int index, long endTime){
-        while(index > -1){
+    void updateParents(List<StatisticsLog> messageFlowLogs, int index, long endTime) {
+        while (index > -1) {
             StatisticsLog dataUnit = messageFlowLogs.get(index);
             dataUnit.setEndTime(endTime);
             index = dataUnit.getParentIndex();
@@ -194,8 +197,8 @@ public class MessageFlowReporterThread2 extends Thread {
         return trueParentIndex;
     }
 
-    void addFaultsToParents(List<StatisticsLog> messageFlowLogs, int index){
-        while(index > -1){
+    void addFaultsToParents(List<StatisticsLog> messageFlowLogs, int index) {
+        while (index > -1) {
             StatisticsLog updatingLog = messageFlowLogs.get(index);
             updatingLog.incrementNoOfFaults();
             index = updatingLog.getParentIndex();
