@@ -107,6 +107,12 @@ public class MessageFlowReporterThread2 extends Thread {
         for (StatisticsReportingEvent event : eventList) {
             if (event.getEventType() == AbstractStatisticEvent.EventType.STATISTICS_OPEN_EVENT) {
                 StatisticsLog statisticsLog = new StatisticsLog((StatisticDataUnit) event.getDataUnit());
+                if ((messageFlowLogs.size()) < statisticsLog.getCurrentIndex()) {
+                    int missingCount = statisticsLog.getCurrentIndex() - messageFlowLogs.size();
+                    for (int j = 0; j < missingCount; j++) {
+                        messageFlowLogs.add(null);
+                    }
+                }
                 messageFlowLogs.add(statisticsLog.getCurrentIndex(), statisticsLog);
             } else {
                 remainingEvents.add(event);
@@ -121,6 +127,9 @@ public class MessageFlowReporterThread2 extends Thread {
                     StatisticDataUnit dataUnit = (StatisticDataUnit) event.getDataUnit();
 
                     StatisticsLog statisticsLog = messageFlowLogs.get(dataUnit.getCurrentIndex());
+                    if (statisticsLog == null) {
+                        int mm = 9;
+                    }
 
                     int parentIndex = statisticsLog.getParentIndex();
                     if (parentIndex == -1 || messageFlowLogs.get(parentIndex).isFlowSplittingMediator()) {
@@ -132,7 +141,7 @@ public class MessageFlowReporterThread2 extends Thread {
                     if (statisticsLog.getHashCode() == null) {
                         statisticsLog.setHashCode(messageFlowLogs.get(parentIndex).getHashCode());
                     }
-
+                    statisticsLog.decrementOpenTimes();
                     statisticsLog.setEndTime(dataUnit.getTime());
                     statisticsLog.setAfterPayload(dataUnit.getPayload());
                     updateParents(messageFlowLogs, statisticsLog.getParentIndex(), dataUnit.getTime());
@@ -144,9 +153,9 @@ public class MessageFlowReporterThread2 extends Thread {
                     }
                     break;
                 case CALLBACK_RECEIVED_EVENT:
-                    callbackDataUnit = (CallbackDataUnit) event.getDataUnit();
-                    if (!callbackDataUnit.isOutOnlyFlow()) {
-                        updateParents(messageFlowLogs, callbackDataUnit.getCurrentIndex(), callbackDataUnit.getTime());
+                    CallbackDataUnit callbackReceivedDataUnit = (CallbackDataUnit) event.getDataUnit();
+                    if (!callbackReceivedDataUnit.isOutOnlyFlow()) {
+                        updateParents(messageFlowLogs, callbackReceivedDataUnit.getCurrentIndex(), callbackReceivedDataUnit.getTime());
                     }
                     break;
                 case ENDFLOW_EVENT:
@@ -156,22 +165,17 @@ public class MessageFlowReporterThread2 extends Thread {
                     addFaultsToParents(messageFlowLogs, basicDataUnit.getCurrentIndex());
                     break;
                 case PARENT_REOPEN_EVENT:
+                    BasicStatisticDataUnit parentReopenDataUnit = event.getDataUnit();
+                    openFlowContinuableMediators(messageFlowLogs, parentReopenDataUnit.getCurrentIndex());
                     break;
                 default:
                     break;
             }
-            //messageFlowLogs.get(0).setEndTime(eventList.get(event.));
-
-
         }
 
         PublishingFlow publishingFlow = TracingDataCollectionHelper.createPublishingFlow(messageFlowLogs);
-        logEvent(publishingFlow);
+//        logEvent(publishingFlow);
         messageFlowObserverStore.notifyObservers(publishingFlow);
-
-
-        log.info("came");
-
 
         //messageFlowObserverStore.notifyObservers(statisticsEntry.getMessageFlowLogs());
     }
@@ -179,7 +183,12 @@ public class MessageFlowReporterThread2 extends Thread {
     void updateParents(List<StatisticsLog> messageFlowLogs, int index, long endTime) {
         while (index > -1) {
             StatisticsLog dataUnit = messageFlowLogs.get(index);
-            dataUnit.setEndTime(endTime);
+            if (dataUnit == null) {
+                int mm = 0;
+            }
+            if (dataUnit.getEndTime() == -1 || dataUnit.getEndTime() < endTime) {
+                dataUnit.setEndTime(endTime);
+            }
             index = dataUnit.getParentIndex();
         }
     }
@@ -188,13 +197,28 @@ public class MessageFlowReporterThread2 extends Thread {
         int trueParentIndex = 0;
         while (parentIndex > -1) {
             StatisticsLog updatingLog = messageFlowLogs.get(parentIndex);
-            if (updatingLog.getEndTime() == -1) {
+            if (updatingLog.isOpenLog()) {
                 trueParentIndex = updatingLog.getCurrentIndex();
                 break;
             }
             parentIndex = updatingLog.getParentIndex();
         }
         return trueParentIndex;
+    }
+
+    /**
+     * Set flow continuable mediators in parent path to open state. This is used when there is a continuation call.
+     *
+     * @param messageFlowLogs raw statistic data unit
+     */
+    private void openFlowContinuableMediators(List<StatisticsLog> messageFlowLogs, int index) {
+        StatisticsLog statisticsLog = messageFlowLogs.get(index);
+        while (statisticsLog.getCurrentIndex() > 0) {
+            if (statisticsLog.isFlowContinuable()) {
+                statisticsLog.incrementOpenTimes();
+            }
+            statisticsLog = messageFlowLogs.get(statisticsLog.getParentIndex());
+        }
     }
 
     void addFaultsToParents(List<StatisticsLog> messageFlowLogs, int index) {
