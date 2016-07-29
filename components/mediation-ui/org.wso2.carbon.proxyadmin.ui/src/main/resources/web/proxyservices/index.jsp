@@ -671,7 +671,7 @@
         if ((result = validatePage(2)) == 'successful') {
             populateServiceParams();
             populateWsdlResources();
-            document.designForm.action = "designToData.jsp?submit=<%=saveOrModify%>&anonEpAction=" + anonEpAction + "&header=<%=header%>&forwardTo=../service-mgt/index.jsp&pageNum=" + pageNum + "&originator=index.jsp&anonInAction" + anonInAction + "&anonOutAction=" + anonOutAction + "&anonFaultAction=" + anonFaultAction;
+            document.designForm.action = "designToData.jsp?submit=<%=saveOrModify%>&anonEpAction=" + anonEpAction + "&header=<%=Encode.forJavaScriptBlock(header)%>&forwardTo=../service-mgt/index.jsp&pageNum=" + pageNum + "&originator=index.jsp&anonInAction" + anonInAction + "&anonOutAction=" + anonOutAction + "&anonFaultAction=" + anonFaultAction;
             document.designForm.submit();
         } else {
             CARBON.showErrorDialog(result);
@@ -685,7 +685,7 @@
     function sourceView() {
         populateServiceParams();
         populateWsdlResources();
-        document.designForm.action = "designToData.jsp?return=source.jsp&header=<%=header%>&anonEpAction=" + anonEpAction + "&pageNum=" + pageNum + "&originator=index.jsp&anonInAction" + anonInAction + "&anonOutAction=" + anonOutAction + "&anonFaultAction=" + anonFaultAction;
+        document.designForm.action = "designToData.jsp?return=source.jsp&header=<%=Encode.forJavaScriptBlock(header)%>&anonEpAction=" + anonEpAction + "&pageNum=" + pageNum + "&originator=index.jsp&anonInAction" + anonInAction + "&anonOutAction=" + anonOutAction + "&anonFaultAction=" + anonFaultAction;
         document.designForm.submit();
     }
 
@@ -752,7 +752,7 @@
     function  anonEpAddEdit() {
         populateServiceParams();
         populateWsdlResources();
-        document.designForm.action = "designToData.jsp?return=anonEpHandler.jsp&header=<%=header%>&anonEpAction=" + anonEpAction + "&pageNum=" + pageNum + "&originator=index.jsp&anonInAction" + anonInAction + "&anonOutAction=" + anonOutAction + "&anonFaultAction=" + anonFaultAction;
+        document.designForm.action = "designToData.jsp?return=anonEpHandler.jsp&header=<%=Encode.forJavaScriptBlock(header)%>&anonEpAction=" + anonEpAction + "&pageNum=" + pageNum + "&originator=index.jsp&anonInAction" + anonInAction + "&anonOutAction=" + anonOutAction + "&anonFaultAction=" + anonFaultAction;
         document.designForm.submit();
     }
 
@@ -817,7 +817,7 @@
     function anonSeqAddEdit(sequence) {
         populateServiceParams();
         populateWsdlResources();
-        document.designForm.action = "designToData.jsp?return=anonSequenceHandler.jsp&anonEpAction=" + anonEpAction + "&header=<%=header%>&pageNum=" + pageNum + "&originator=index.jsp&sequence=" + sequence + "&anonInAction" + anonInAction + "&anonOutAction=" + anonOutAction + "&anonFaultAction=" + anonFaultAction;
+        document.designForm.action = "designToData.jsp?return=anonSequenceHandler.jsp&anonEpAction=" + anonEpAction + "&header=<%=Encode.forJavaScriptBlock(header)%>&pageNum=" + pageNum + "&originator=index.jsp&sequence=" + sequence + "&anonInAction" + anonInAction + "&anonOutAction=" + anonOutAction + "&anonFaultAction=" + anonFaultAction;
         document.designForm.submit();
     }
 
@@ -1108,7 +1108,7 @@
 </script>
 
 <div id="middle"  <%=switchimmed ? "style=visibility: hidden" : ""%>>
-<h2><%=header%> Proxy Service</h2>
+<h2><%=Encode.forHtmlContent(header)%> Proxy Service</h2>
 
 <div id="workArea">
 <link type="text/css" rel="stylesheet" href="../proxyservices/css/proxyservices.css"/>

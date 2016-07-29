@@ -25,6 +25,7 @@
 <%@ page import="java.text.MessageFormat" %>
 <%@ page import="org.apache.axis2.AxisFault" %>
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.ProxyData" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%
     ResourceBundle bundle = ResourceBundle.getBundle("org.wso2.carbon.proxyadmin.ui.i18n.Resources",
             request.getLocale());
@@ -82,7 +83,7 @@
         if ('<%=forwardTo%>' == '../service-mgt/index.jsp') {
             window.location.href = '../service-mgt/index.jsp?region=region1&item=services_list_menu';
         } else {
-            window.location.href='<%=forwardTo%>?header=<%=header%>';
+            window.location.href='<%=Encode.forJavaScriptBlock(forwardTo)%>?header=<%=Encode.forJavaScriptBlock(header)%>';
         }
     } else {
         window.location.href = '..service-mgt/index.jsp?region=region1&item=services_list_menu/service-mgt/index.jsp';
