@@ -25,6 +25,7 @@
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.ProxyData" %>
 <%@ page import="java.util.regex.Pattern" %>
 <%@ page import="org.owasp.encoder.Encode" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -265,17 +266,17 @@
             if (proxyName != null) {
     %>
         <script type="text/javascript">
-            document.getElementById('proxy_name').value = '<%=proxyName%>';
+            document.getElementById('proxy_name').value = '<%=Encode.forJavaScriptBlock(proxyName)%>';
         </script>
     <%
             }
     %>
         <script type="text/javascript">
-            document.getElementById('log_level').value = '<%=logLevel%>';
+            document.getElementById('log_level').value = '<%=Encode.forJavaScriptBlock(logLevel)%>';
             if ('<%=logResponses%>' == 'true') {
                 document.getElementById('log_responses').checked = 'true';
                 enableLevelSelect();
-                document.getElementById('response_log_level').value = '<%=responseLogLevel%>';
+                document.getElementById('response_log_level').value = '<%=Encode.forJavaScriptBlock(responseLogLevel)%>';
             }
         </script>
     <%
