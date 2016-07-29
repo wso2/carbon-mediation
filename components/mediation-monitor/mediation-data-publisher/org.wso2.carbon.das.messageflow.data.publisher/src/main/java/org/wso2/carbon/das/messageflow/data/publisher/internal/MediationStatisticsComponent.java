@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.wso2.carbon.base.CarbonBaseUtils;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.das.data.publisher.util.DASDataPublisherConstants;
@@ -40,6 +41,10 @@ import org.wso2.carbon.event.stream.core.EventStreamService;
 import org.wso2.carbon.das.messageflow.data.publisher.data.MessageFlowObserverStore;
 import org.wso2.carbon.das.messageflow.data.publisher.services.MessageFlowReporterThread;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -119,7 +124,7 @@ public class MediationStatisticsComponent {
      * @param synEnvService information about synapse runtime
      */
     private void createStores(SynapseEnvironmentService synEnvService) {
-        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        int tenantId = resolveTenantId();
 
         MessageFlowObserverStore observerStore = new MessageFlowObserverStore();
 
@@ -194,6 +199,44 @@ public class MediationStatisticsComponent {
             log.debug("Registering the new mediation configuration reporter thread");
         }
         configReporterThreads.put(tenantId, configReporterThread);
+    }
+
+    /**
+     * If CARBON_HOME contains tenantIdFile, take tenant-id from there (cloud installations), else take from carbon context
+     *
+     * @return tenant-id
+     */
+    private int resolveTenantId() {
+
+        int tenantId = -1;
+        String TENANT_ID_FILE_NAME = "tenantIdFile";
+        File tenantIdFile = new File(CarbonBaseUtils.getCarbonHome(), TENANT_ID_FILE_NAME);
+
+        if (tenantIdFile.exists()) {
+            try {
+                // Read the file first line
+                BufferedReader br = null;
+                br = new BufferedReader(new FileReader(tenantIdFile));
+
+                String line = null;
+
+                while ((line = br.readLine()) != null) {
+                    tenantId = Integer.parseInt(line);
+                    log.info("Message publisher detected tenant id: " + tenantId + " from file");
+                }
+                br.close();
+            } catch (IOException | NumberFormatException e) {
+                log.error("Failed to read tenant-id from file", e);
+            }
+
+            // Need to delete file after use
+            tenantIdFile.delete();
+        }
+
+        if(tenantId == -1)
+            return PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        else
+            return tenantId;
     }
 
     protected void deactivate(ComponentContext ctxt) {
