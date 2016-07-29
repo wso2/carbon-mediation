@@ -93,7 +93,7 @@ public class MessageFlowReporterThread extends Thread {
                 } else {
                     delay();
                 }
-            } catch (Exception exception) {
+            } catch (Exception exception) {//catching throwable since this shouldn't fail
                 log.error("Error in mediation flow statistic data consumer while consuming data", exception);
             }
         }

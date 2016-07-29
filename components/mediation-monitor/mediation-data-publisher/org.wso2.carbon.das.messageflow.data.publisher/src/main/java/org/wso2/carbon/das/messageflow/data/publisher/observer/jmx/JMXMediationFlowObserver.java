@@ -42,7 +42,7 @@ public class JMXMediationFlowObserver implements StatisticCollectionViewMXBean, 
 
     public static final String MBEAN_CATEGORY = "Mediation Flow Statistic View";
 
-    public static final String MBEAN_ID = "MediationFlowStatisticView:";
+    public static final String MBEAN_ID = "MediationFlowStatisticView_";
 
     private int tenantId = -1234;
 
