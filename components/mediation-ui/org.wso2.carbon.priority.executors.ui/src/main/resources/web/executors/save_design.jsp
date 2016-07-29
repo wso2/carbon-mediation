@@ -19,6 +19,7 @@
 <%@ page import="org.wso2.carbon.priority.executors.ui.Executor" %>
 <%@ page import="org.wso2.carbon.priority.executors.ui.Queue" %>
 <%@ page import="org.wso2.carbon.priority.executors.ui.PriorityAdminClient" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -106,8 +107,8 @@
 
 <script type="text/javascript">
     <% if (forwardTo == null) { %>
-        document.location.href = 'list_executors.jsp?action=<%=action%>&mode=<%=mode%>';
+        document.location.href = 'list_executors.jsp?action=<%=Encode.forHtml(action)%>&mode=<%=Encode.forHtml(mode)%>';
     <% } else { %>
-        document.location.href = '<%=forwardTo%>' + '?action=<%=action%>&mode=<%=mode%>';
+        document.location.href = '<%=Encode.forHtml(forwardTo)%>' + '?action=<%=Encode.forHtml(action)%>&mode=<%=Encode.forHtml(mode)%>';
     <% } %>
 </script>

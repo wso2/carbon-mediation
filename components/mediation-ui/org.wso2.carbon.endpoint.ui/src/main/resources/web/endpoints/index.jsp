@@ -529,7 +529,7 @@ function resetVars() {
                         <fmt:message key="search.endPoint"/>
                         <label>
                             <input type="text" name="sequenceSearchString"
-                                   value="<%= sequenceSearchString != null? sequenceSearchString : ""%>"/>
+                                   value="<%= sequenceSearchString != null? Encode.forHtml(sequenceSearchString) : ""%>"/>
                         </label>&nbsp;
                     </nobr>
                 </td>

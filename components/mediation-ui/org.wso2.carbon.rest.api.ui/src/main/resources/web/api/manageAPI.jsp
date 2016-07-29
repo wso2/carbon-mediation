@@ -668,7 +668,7 @@ function resourceSourceView() {
     
     var result = updateResource("true");
     if (result != false)  {
-        document.location.href = "sourceView_resource.jsp?ordinal=1&mode=" + "<%=mode%>" +
+        document.location.href = "sourceView_resource.jsp?ordinal=1&mode=" + "<%=Encode.forHtml(mode)%>" +
                              "&apiName=" + apiNameValue +
                              "&apiContext=" + apiContextValue +
                              "&hostname=" + hostname + 
@@ -692,7 +692,7 @@ function sourceView() {
     	}
     }
 
-    document.location.href = "sourceview_api.jsp?ordinal=1&mode=" + "<%=mode%>" +
+    document.location.href = "sourceview_api.jsp?ordinal=1&mode=" + "<%=Encode.forHtml(mode)%>" +
                              "&apiName=" + apiNameValue +
                              "&apiContext=" + apiContextValue + 
                              "&hostname=" + hostname + 
