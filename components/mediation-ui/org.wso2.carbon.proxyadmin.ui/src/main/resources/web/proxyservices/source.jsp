@@ -29,6 +29,7 @@
 <%@ page import="org.apache.axiom.om.util.AXIOMUtil" %>
 <%@ page import="javax.xml.stream.XMLStreamException" %>
 <%@ page import="java.io.ByteArrayOutputStream" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <jsp:include page="../dialog/display_messages.jsp"/>
@@ -61,7 +62,7 @@
                         CarbonUIMessage.ERROR, request);
                 %>
                 <script type="text/javascript">
-                    window.location.href = '<%=forwardTo%>';
+                    window.location.href = '<%=Encode.forJavaScriptBlock(forwardTo)%>';
                 </script>
                 <%
                 return;
@@ -112,13 +113,13 @@
     <script type="text/javascript">
         function designView(){
             document.getElementById("srcTextArea").value = editAreaLoader.getValue("srcTextArea");            
-            document.sourceForm.action = "sourceToData.jsp?return=index.jsp&header=<%=header%>&originator=source.jsp";
+            document.sourceForm.action = "sourceToData.jsp?return=index.jsp&header=<%=Encode.forJavaScriptBlock(header)%>&originator=source.jsp";
             document.sourceForm.submit();
         }
 
         function saveData() {
             document.getElementById("srcTextArea").value = editAreaLoader.getValue("srcTextArea");
-            document.sourceForm.action = "sourceToData.jsp?submit=<%=saveOrModify%>&header=<%=header%>&forwardTo=../service-mgt/index.jsp&originator=source.jsp";
+            document.sourceForm.action = "sourceToData.jsp?submit=<%=saveOrModify%>&header=<%=Encode.forJavaScriptBlock(header)%>&forwardTo=../service-mgt/index.jsp&originator=source.jsp";
             document.sourceForm.submit();
         }
 
@@ -137,7 +138,7 @@
     });
     </script>
     <div id="middle">
-        <h2><%=header%> Proxy Service</h2>
+        <h2><%=Encode.forHtmlContent(header)%> Proxy Service</h2>
         <div id="workArea">
             <form id="form1" name="sourceForm" method="post" action="">
                 <table cellspacing="0" cellpadding="0" border="0" class="styledLeft noBorders">

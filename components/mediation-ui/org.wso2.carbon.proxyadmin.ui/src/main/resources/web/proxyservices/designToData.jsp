@@ -27,6 +27,7 @@
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.ProxyData" %>
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.Entry" %>
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.ProxyServicePolicyInfo" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%
     ResourceBundle bundle = ResourceBundle.getBundle("org.wso2.carbon.proxyadmin.ui.i18n.Resources",
             request.getLocale());
@@ -298,7 +299,7 @@
 %>
 <script type="text/javascript">
     if (window.location.href.indexOf("originator") != -1) {
-        window.location.href='<%=forwardTo%>';
+        window.location.href='<%=Encode.forJavaScriptBlock(forwardTo)%>';
     } else {
         window.location.href='index.jsp';
     }
