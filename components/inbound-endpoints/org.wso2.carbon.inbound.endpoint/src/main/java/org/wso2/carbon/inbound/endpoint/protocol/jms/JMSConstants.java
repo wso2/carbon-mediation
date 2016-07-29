@@ -179,7 +179,9 @@ public class JMSConstants {
 
     public static final String HYPHEN_REPLACEMENT_STR = "_DASHED_";
 
-    public static final String DEFAULT_HYPHEN_SUPPORT = HYPHEN_MODE_NONE;     
+    public static final String DEFAULT_HYPHEN_SUPPORT = HYPHEN_MODE_NONE;
+
+    public static final String JMS_RETRY_DURATION = "transport.jms.retry.duration";
 
     /**
      *  JMS 2.0 Parameters

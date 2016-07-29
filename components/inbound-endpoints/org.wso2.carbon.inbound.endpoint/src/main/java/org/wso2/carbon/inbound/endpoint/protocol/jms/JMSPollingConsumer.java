@@ -17,9 +17,12 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.jms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
+
 import java.util.Date;
 import java.util.Properties;
-
 import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -27,10 +30,6 @@ import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 
 public class JMSPollingConsumer {
 
@@ -46,7 +45,13 @@ public class JMSPollingConsumer {
     private String replyDestinationName;
     private String name;
     private Properties jmsProperties;
-    
+    private boolean isConnected;
+    private Long reconnectDuration;
+    private long retryDuration;
+    private int retryIteration;
+    private double reconnectionProgressionFactor;
+    private long maxReconnectDuration;
+
     private Connection connection = null;
     private Session session = null;
     private Destination destination = null;
@@ -58,6 +63,10 @@ public class JMSPollingConsumer {
         strUserName = jmsProperties.getProperty(JMSConstants.PARAM_JMS_USERNAME);
         strPassword = jmsProperties.getProperty(JMSConstants.PARAM_JMS_PASSWORD);
         this.name = name;
+        this.retryIteration = 0;
+        this.reconnectionProgressionFactor = 2.0;
+        this.maxReconnectDuration = 60000;
+        this.retryDuration = 1000;
         
         String strReceiveTimeout = jmsProperties.getProperty(JMSConstants.RECEIVER_TIMEOUT);
         if(strReceiveTimeout != null){
@@ -66,6 +75,16 @@ public class JMSPollingConsumer {
             }catch(NumberFormatException e){
                 logger.warn("Invalid value for transport.jms.ReceiveTimeout : " + strReceiveTimeout);
                 iReceiveTimeout = null;
+            }
+        }
+
+        String strReconnectDuration = jmsProperties.getProperty(JMSConstants.JMS_RETRY_DURATION);
+        if (strReconnectDuration != null) {
+            try {
+                this.reconnectDuration = Long.parseLong(strReconnectDuration.trim());
+            } catch (NumberFormatException e) {
+                logger.warn("Invalid value for transport.jms.retry.duration : " + strReconnectDuration);
+                this.reconnectDuration = null;
             }
         }
         this.replyDestinationName = jmsProperties.getProperty(JMSConstants.PARAM_REPLY_DESTINATION);
@@ -120,8 +139,16 @@ public class JMSPollingConsumer {
             connection = jmsConnectionFactory.getConnection(strUserName, strPassword);
             if (connection == null) {
                 logger.warn("Inbound JMS endpoint unable to get a connection.");
+                isConnected = false;
                 return null;
             }
+            if (retryIteration != 0) {
+                logger.info("Reconnection attempt: " + retryIteration + " for the JMS Inbound: " + name +
+                        " was successful!");
+                this.retryIteration = 0;
+                this.retryDuration = 1;
+            }
+            isConnected = true;
             session = jmsConnectionFactory.getSession(connection);
             //Fixing ESBJAVA-4446
             //Closing the connection if we cannot get a session.
@@ -135,7 +162,7 @@ public class JMSPollingConsumer {
             destination = jmsConnectionFactory.getDestination(connection);
             if (replyDestinationName != null && !replyDestinationName.trim().equals("")) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Using the reply destnation as " + replyDestinationName +
+                    logger.debug("Using the reply destination as " + replyDestinationName +
                                  " in inbound endpoint.");
                 }
                 replyDestination =
@@ -228,6 +255,27 @@ public class JMSPollingConsumer {
         } catch (Exception e) {
             logger.error("Error while receiving JMS message. " + e.getMessage(), e);
         } finally {
+            if (!isConnected) {
+                if (reconnectDuration != null) {
+                    retryDuration = reconnectDuration;
+                    logger.error("Reconnection attempt : " + (retryIteration++) + " for JMS Inbound : " +
+                            name + " failed. Next retry in " + (retryDuration / 1000) +
+                            " seconds. (Fixed Interval)");
+                } else {
+                    retryDuration = (long) (retryDuration * reconnectionProgressionFactor);
+                    if (retryDuration > maxReconnectDuration) {
+                        retryDuration = maxReconnectDuration;
+                        logger.info("InitialReconnectDuration reached to MaxReconnectDuration.");
+                    }
+                    logger.error("Reconnection attempt : " + (retryIteration++) + " for JMS Inbound : " +
+                            name + " failed. Next retry in " + (retryDuration / 1000) +
+                            " seconds");
+                }
+                try {
+                    Thread.sleep(retryDuration);
+                } catch (InterruptedException ignore) {
+                }
+            }
             if (messageConsumer != null) {
                 jmsConnectionFactory.closeConsumer(messageConsumer);
             }
