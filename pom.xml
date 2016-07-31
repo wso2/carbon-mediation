@@ -2316,7 +2316,7 @@
         <carbon.registry.imp.pkg.version>[4.5.0, 4.6.0)</carbon.registry.imp.pkg.version>
 
         <!-- Analytic Commons version-->
-        <carbon.analytics.common.version>5.1.0</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.1.1</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.1.0, 6.0.0)</carbon.analytics.common.imp.pkg.version>
 
         <!-- Carbon Identity version-->
