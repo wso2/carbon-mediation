@@ -42,7 +42,7 @@ public class JMXMediationFlowObserver implements StatisticCollectionViewMXBean, 
 
     public static final String MBEAN_CATEGORY = "Mediation Flow Statistic View";
 
-    public static final String MBEAN_ID = "MediationFlowStatisticView";
+    public static final String MBEAN_ID = "MediationFlowStatisticView_";
 
     private int tenantId = -1234;
 
@@ -56,8 +56,9 @@ public class JMXMediationFlowObserver implements StatisticCollectionViewMXBean, 
 
     private final Map<String, SummeryStatisticObject> endpointStatistics = new HashMap<>();
 
-    public JMXMediationFlowObserver() {
-        MBeanRegistrar.getInstance().registerMBean(this, MBEAN_CATEGORY, MBEAN_ID);
+    public JMXMediationFlowObserver(int tenantId) {
+        this.tenantId = tenantId;
+        MBeanRegistrar.getInstance().registerMBean(this, MBEAN_CATEGORY, MBEAN_ID + this.tenantId);
     }
 
     @Override
