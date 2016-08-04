@@ -704,6 +704,11 @@ public class FilePollingConsumer {
             // there is still a chance of file processed by another process.
             // Need to check the source file before processing.
             try {
+                String parentURI = fileObject.getParent().getName().getURI();
+                if(parentURI.contains("?")) {
+                    String suffix = parentURI.substring(parentURI.indexOf("?"));
+                    strContext += suffix;
+                }
                 FileObject sourceFile = fsManager.resolveFile(strContext);
                 if (!sourceFile.exists()) {
                     return false;
