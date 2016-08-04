@@ -416,6 +416,8 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             } else {
                 handleException("Invalid sequence definition");
             }
+        } catch (Exception fault) {
+            throw new SequenceEditorException("Error adding sequence : " + fault.getMessage(), fault);
         } catch (Error error) {
             throw new SequenceEditorException("Unexpected error occured while " +
                     "adding the sequence : " + error.getMessage(), error);
