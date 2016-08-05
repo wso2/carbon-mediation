@@ -100,7 +100,26 @@ public class StatisticsPublisher {
 		eventData[0] = publishingFlow.getMessageFlowId();
 
 		Map<String, Object> mapping = publishingFlow.getObjectAsMap();
-		mapping.put("host", PublisherUtil.getHostAddress()); // Adding host
+        String host = null;
+        String port = null;
+        if (publishingFlow.getHost() != null) {
+            if (publishingFlow.getHost().contains(":")) {
+                String[] hostPort = publishingFlow.getHost().split(":");
+                host = hostPort[0];
+                if (hostPort.length > 1) {
+                    port = hostPort[1];
+                }
+            } else {
+                host = publishingFlow.getHost();
+            }
+        } else {
+            host = PublisherUtil.getHostAddress();
+        }
+
+		mapping.put("host", host); // Adding host
+        if (port != null) {
+            mapping.put("port", port);
+        }
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Output output = new Output(out);

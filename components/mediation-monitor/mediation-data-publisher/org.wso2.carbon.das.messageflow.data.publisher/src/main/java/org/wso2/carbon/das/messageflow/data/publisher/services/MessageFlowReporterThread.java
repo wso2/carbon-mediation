@@ -89,7 +89,7 @@ public class MessageFlowReporterThread extends Thread {
 
 //                    log.info("******* event list size - " + statisticsReportingEventHolder.getQueueSize() + " holder " +
 //                            "count - " + statisticsReportingEventHolder.countHolder.getStatCount() + " callback - " + statisticsReportingEventHolder.countHolder.getCallBackCount());
-                    processAndPublishEventList(statisticsReportingEventHolder.getEventList());
+                    processAndPublishEventList(statisticsReportingEventHolder);
                 } else {
                     delay();
                 }
@@ -99,13 +99,13 @@ public class MessageFlowReporterThread extends Thread {
         }
     }
 
-    private void processAndPublishEventList(List<StatisticsReportingEvent> eventList) {
+    private void processAndPublishEventList(StatisticsReportingEventHolder statisticsReportingEventHolder) {
 
 
         List<StatisticsReportingEvent> remainingEvents = new ArrayList<>();
         List<StatisticsLog> messageFlowLogs = new ArrayList<>();
 
-        for (StatisticsReportingEvent event : eventList) {
+        for (StatisticsReportingEvent event : statisticsReportingEventHolder.getEventList()) {
             if (event.getEventType() == AbstractStatisticEvent.EventType.STATISTICS_OPEN_EVENT) {
                 StatisticDataUnit statisticDataUnit = (StatisticDataUnit) event.getDataUnit();
                 StatisticsLog statisticsLog = new StatisticsLog(statisticDataUnit);
@@ -192,6 +192,7 @@ public class MessageFlowReporterThread extends Thread {
         }
 
         PublishingFlow publishingFlow = TracingDataCollectionHelper.createPublishingFlow(messageFlowLogs);
+        publishingFlow.setHost(statisticsReportingEventHolder.getHost());
 //        logEvent(publishingFlow);
         messageFlowObserverStore.notifyObservers(publishingFlow);
     }
