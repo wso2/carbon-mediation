@@ -17,6 +17,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -78,9 +79,12 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
         if (mqttAsyncClient != null) {
             try {
                 connectionListener = new MqttConnectionListener(connectionConsumer);
-                mqttAsyncClient.connect(connectOptions, connectionListener);
+                IMqttToken token = mqttAsyncClient.connect(connectOptions);
 
-                connectionConsumer.acquireTaskSuspension();
+                token.waitForCompletion();
+                if (!mqttAsyncClient.isConnected()) {
+                    connectionListener.onFailure();
+                }
 
                 if (mqttAsyncClient.isConnected()) {
                     int qosLevel = Integer.parseInt(mqttProperties
@@ -88,12 +92,11 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
                     if (confac.getTopic() != null) {
                         mqttAsyncClient.subscribe(confac.getTopic(), qosLevel);
                     }
-                    log.info("Re-Connected to the remote server.");
+                    log.info("MQTT inbound endpoint " + name + " re-connected to the broker");
                 }
             } catch (MqttException ex) {
                 log.error("Error while trying to subscribe to the remote.", ex);
-            } catch (InterruptedException ex) {
-                log.error("Error while trying to subscribe to the remote.", ex);
+                connectionListener.onFailure();
             }
         }
     }
@@ -102,7 +105,6 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
         if (log.isDebugEnabled()) {
             log.debug("Received Message: Topic:" + topic + "  Message: " + mqttMessage);
         }
-        log.info("Received Message: Topic: " + topic);
         MqttClientManager clientManager = MqttClientManager.getInstance();
         String inboundIdentifier = clientManager.buildIdentifier
                 (mqttAsyncClient.getClientId(), confac.getServerHost(), confac.getServerPort());
@@ -129,7 +131,6 @@ public class MqttAsyncCallback extends OneTimeTriggerAbstractCallback implements
     }
 
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-        log.info("message delivered .. : " + iMqttDeliveryToken.toString());
     }
 
     public void setMqttConnectionConsumer(MqttConnectionConsumer connectionConsumer) {
