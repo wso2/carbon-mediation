@@ -19,10 +19,6 @@
 
 package org.wso2.carbon.mediation.initializer.multitenancy;
 
-import java.io.File;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.deployment.DeploymentEngine;
@@ -41,6 +37,8 @@ import org.apache.synapse.config.SynapseConfigurationBuilder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationSerializer;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.debug.SynapseDebugInterface;
+import org.apache.synapse.debug.SynapseDebugManager;
 import org.apache.synapse.deployers.ExtensionDeployer;
 import org.apache.synapse.deployers.InboundEndpointDeployer;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
@@ -76,6 +74,15 @@ import org.wso2.carbon.mediation.registry.WSO2Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
+import org.wso2.carbon.utils.ServerConstants;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This creates the {@link org.apache.synapse.config.SynapseConfiguration}
@@ -146,7 +153,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
 
             // Initialize Synapse
             contextInfo = initESB(manger.getTracker().getCurrentConfigurationName(),
-                    configurationContext);
+                    configurationContext,tenantDomain);
 
             if (contextInfo == null) {
                 handleFatal("Failed to intilize the ESB for tenent:" + tenantDomain);
@@ -245,8 +252,8 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                         + File.separator + inboundEndpoint.getFileName());
             }
         }
-        deploymentEngine.addDeployer(new InboundEndpointDeployer(),
-                inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+        deploymentEngine.addDeployer(new InboundEndpointDeployer(), inboundDirPath,
+                ServiceBusConstants.ARTIFACT_EXTENSION);
     }    
     
     public void terminatingConfigurationContext(ConfigurationContext configurationContext) {
@@ -317,8 +324,8 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         }
     }
 
-    private ServerContextInformation initESB(String configurationName,
-                                             ConfigurationContext configurationContext)
+    private ServerContextInformation initESB(String configurationName, ConfigurationContext configurationContext,
+            String tenantDomain)
             throws AxisFault {
         ServerConfigurationInformation configurationInformation =
                 ServerConfigurationInformationFactory.createServerConfigurationInformation(
@@ -383,6 +390,11 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             axisConf.addParameter(new Parameter(
                     ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION,
                     configurationName));
+
+        if (isRunningDebugMode(tenantDomain)) {
+            log.info("ESB Started in Debug mode for " + tenantDomain);
+            createSynapseDebugEnvironment(contextInfo);
+        }
 
         serverManager.init(configurationInformation, contextInfo);
         serverManager.start();
@@ -487,6 +499,40 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             deploymentEngine.addDeployer(deployer, extensionsPath, "jar");
         }
     }
+
+    /**
+     * creates Synapse debug environment
+     * creates TCP channels using command and event ports which initializes the interface to outer debugger
+     * set the relevant information in the server configuration so that it can be used when Synapse environment
+     * initializes
+     *
+     * @param contextInfo Server Context Information
+     */
+    public void createSynapseDebugEnvironment(ServerContextInformation contextInfo) {
+
+        try {
+            String carbonHome = System.getProperty(ServerConstants.CARBON_HOME);
+            File synapseProperties = new File(carbonHome + File.separator + "repository" + File.separator + "conf" +
+                    File.separator + "synapse.properties");
+            Properties properties = new Properties();
+            InputStream inputStream = new FileInputStream(synapseProperties);
+            properties.load(inputStream);
+            inputStream.close();
+            int event_port = Integer.parseInt(properties.getProperty(ServiceBusConstants.ESB_DEBUG_EVENT_PORT));
+            int command_port = Integer.parseInt(properties.getProperty(ServiceBusConstants.ESB_DEBUG_COMMAND_PORT));
+            SynapseDebugInterface debugInterface = SynapseDebugInterface.getInstance();
+            debugInterface.init(command_port, event_port);
+            contextInfo.setServerDebugModeEnabled(true);
+            contextInfo.setSynapseDebugInterface(debugInterface);
+            SynapseDebugManager debugManager = SynapseDebugManager.getInstance();
+            contextInfo.setSynapseDebugManager(debugManager);
+            log.info("Synapse debug Environment created successfully");
+        } catch (IOException ex) {
+            log.error("Error while creating Synapse debug environment ", ex);
+        } catch (InterruptedException ex) {
+            log.error("Error while creating Synapse debug environment ", ex);
+        }
+    }
     
     
     /**
@@ -502,6 +548,13 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
 		}
 		return true;
 	}
+
+    public boolean isRunningDebugMode(String tenantDomain) {
+        if (tenantDomain == null) {
+            return false;
+        }
+        return tenantDomain.equals(System.getProperty(ServiceBusConstants.ESB_DEBUG_SYSTEM_PROPERTY));
+    }
 
 	public String getProviderClass() {
 		return this.getClass().getName();
