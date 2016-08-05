@@ -20,6 +20,7 @@
 <%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesInformation" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -150,11 +151,11 @@
                                href="#"
                                value="<fmt:message key="ns.add"/>"/>
                         <input id="saveNSButton" class="button" name="saveNSButton" type="button"
-                               onclick="javascript: saveNameSpace('<%=divID%>', '<%=currentID%>', '<%=linkID%>','<fmt:message key="ns.prefixemptyerror.save"/>','<fmt:message key="ns.uriemptyerror.save"/>', <%=isSingle ? "true" : "false"%>); return false;"
+                               onclick="javascript: saveNameSpace('<%=Encode.forJavaScriptAttribute(divID)%>', '<%=Encode.forJavaScriptAttribute(currentID)%>', '<%=linkID%>','<fmt:message key="ns.prefixemptyerror.save"/>','<fmt:message key="ns.uriemptyerror.save"/>', <%=isSingle ? "true" : "false"%>); return false;"
                                href="#"
                                value="<fmt:message key="ns.save"/>"/>
                         <input id="cancelNSButton" class="button" name="cancelNSButton" type="button"
-                               onclick="javascript: hideNameSpaceEditor('<%=divID%>', '<%=linkID%>'); return false;"
+                               onclick="javascript: hideNameSpaceEditor('<%=Encode.forJavaScriptAttribute(divID)%>', '<%=linkID%>'); return false;"
                                href="#"
                                value="<fmt:message key="ns.cancel"/>"/>
                         <input style="<%=isSingle ? "" : "display:none;"%>" id="clearNameSpace" class="button" name="clearNameSpace"

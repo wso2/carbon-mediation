@@ -328,7 +328,7 @@
             if (proxyName != null) {
     %>
         <script type="text/javascript">
-            document.getElementById('proxy_name').value = '<%=proxyName%>';
+            document.getElementById('proxy_name').value = '<%=Encode.forJavaScriptBlock(proxyName)%>';
         </script>
     <%
             }
@@ -336,7 +336,7 @@
             if (wsdlURL != null) {
     %>
         <script type="text/javascript">
-            document.getElementById('main_wsdl_url').value = '<%=wsdlURL%>';
+            document.getElementById('main_wsdl_url').value = '<%=Encode.forJavaScriptBlock(wsdlURL)%>';
         </script>
     <%
             }
@@ -344,7 +344,7 @@
             if (wsdlPort != null) {
     %>
         <script type="text/javascript">
-            document.getElementById('wsdl_port').value = '<%=wsdlPort%>';
+            document.getElementById('wsdl_port').value = '<%=Encode.forJavaScriptBlock(wsdlPort)%>';
         </script>
     <%
             }
@@ -352,7 +352,7 @@
             if (wsdlService != null) {
     %>
         <script type="text/javascript">
-            document.getElementById('wsdl_service').value = '<%=wsdlService%>';
+            document.getElementById('wsdl_service').value = '<%=Encode.forJavaScriptBlock(wsdlService)%>';
         </script>
     <%
             }

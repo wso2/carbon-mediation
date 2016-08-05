@@ -18,6 +18,7 @@
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.ProxyData" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.net.URISyntaxException" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <%
     Object proxyObj = request.getAttribute("proxyDataObject");
@@ -30,7 +31,7 @@
                 try {
                 	targetURL = targetURL.replaceAll("&", "&amp;");
                     URI url = new URI(targetURL);
-                    proxy.setEndpointXML("<endpoint xmlns=\"http://ws.apache.org/ns/synapse\"><address uri=\"" + url.toString() + "\"/></endpoint>");
+                    proxy.setEndpointXML("<endpoint xmlns=\"http://ws.apache.org/ns/synapse\"><address uri=\"" + Encode.forHtmlAttribute(url.toString()) + "\"/></endpoint>");
                 } catch (URISyntaxException e) {
                     request.setAttribute("proxyCreationError", "The target URL provided is malformed");
                 }

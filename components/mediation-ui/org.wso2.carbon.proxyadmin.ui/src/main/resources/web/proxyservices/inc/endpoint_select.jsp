@@ -17,6 +17,7 @@
  -->
 <%@ page import="org.wso2.carbon.proxyadmin.stub.types.carbon.MetaData" %>
 <%@ page import="org.wso2.carbon.proxyadmin.ui.client.ProxyAdminClientUtils" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -158,7 +159,7 @@
     %>
             <script type="text/javascript">
                  YAHOO.util.Event.onDOMReady(function(){
-                     document.getElementById('targetURLTxt').value = '<%=request.getParameter("targetURL").trim()%>';
+                     document.getElementById('targetURLTxt').value = '<%=Encode.forJavaScriptBlock(request.getParameter("targetURL").trim())%>';
                     document.getElementById('url_targetEndpointMode').checked = true;
                 });
             </script>

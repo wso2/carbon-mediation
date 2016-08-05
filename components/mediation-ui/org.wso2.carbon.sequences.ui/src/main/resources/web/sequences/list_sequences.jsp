@@ -552,7 +552,7 @@
                         <fmt:message key="search.sequence"/>
                         <label>
                             <input type="text" name="sequenceSearchString"
-                                   value="<%= sequenceSearchString != null? sequenceSearchString : ""%>"/>
+                                   value="<%= sequenceSearchString != null? Encode.forHtmlAttribute(sequenceSearchString)) : ""%>"/>
                         </label>&nbsp;
                     </nobr>
                 </td>

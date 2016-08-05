@@ -19,6 +19,7 @@
 <%@ page import="org.wso2.carbon.sequences.ui.client.SequenceAdminClient" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="org.wso2.carbon.sequences.ui.client.EditorUIClient" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -57,7 +58,7 @@
     %>
 
     <div id="nsEditorContent" style="margin-top:10px;">
-        <select id="local-registry-keys-selection" name="local-registry-keys-selection" onchange="onchangelocalregistrykeys('<%=resourceConsumer%>')">
+        <select id="local-registry-keys-selection" name="local-registry-keys-selection" onchange="onchangelocalregistrykeys('<%=Encode.forJavaScriptAttribute(resourceConsumer)%>')">
             <option value="Select A Value"><fmt:message key="select.a.value"/></option>
             <% for (String value : entries) {
                 if (value != null && !"".equals(value)) {%>
