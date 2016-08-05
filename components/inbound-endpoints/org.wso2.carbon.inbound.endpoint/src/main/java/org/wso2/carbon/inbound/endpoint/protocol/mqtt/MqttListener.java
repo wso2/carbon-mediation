@@ -185,7 +185,7 @@ public class MqttListener extends InboundOneTimeTriggerRequestProcessor {
                     confac, connectOptions, mqttProperties);
             mqttAsyncCallback.setName(params.getName());
             connectionConsumer = new MqttConnectionConsumer(connectOptions, mqttAsyncClient,
-                    confac, mqttProperties);
+                    confac, mqttProperties, name);
             mqttAsyncCallback.setMqttConnectionConsumer(connectionConsumer);
             mqttAsyncClient.setCallback(mqttAsyncCallback);
             //here we register the callback handler

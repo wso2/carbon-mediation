@@ -18,7 +18,6 @@ package org.wso2.carbon.inbound.endpoint.protocol.mqtt;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
@@ -26,7 +25,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
  * MQTT connection Listener bounded per MQTT client, this the listener registered per client
  * when mqtt connection is being made. Delegates logic per successful and failed connection scenarios
  */
-public class MqttConnectionListener implements IMqttActionListener {
+public class MqttConnectionListener {
 
     private static final Log log = LogFactory.getLog(MqttConnectionListener.class);
     private MqttConnectionConsumer mqttConnectionConsumer;
@@ -37,28 +36,33 @@ public class MqttConnectionListener implements IMqttActionListener {
         this.mqttConnectionConsumer = mqttConnectionConsumer;
     }
 
-    public void onSuccess(IMqttToken token) {
-        mqttConnectionConsumer.releaseTaskSuspension();
-    }
-
-    public void onFailure(IMqttToken token, Throwable exception) {
+    public void onFailure() {
         try {
 
             int retryInterval = mqttConnectionConsumer.getMqttConnectionFactory().
                     getReconnectionInterval();
-            if (retryInterval != -1) {
-                Thread.sleep(retryInterval);
-            } else {
-                Thread.sleep(DEFAULT_RECONNECTION_INTERVAL);
-            }
+            boolean isConnected = false;
+            int retryCount = 1;
+            while (execute && !isConnected) {
+                if (retryInterval != -1) {
+                    Thread.sleep(retryInterval);
+                } else {
+                    Thread.sleep(DEFAULT_RECONNECTION_INTERVAL);
+                }
+                try {
+                    IMqttToken connectionToken = mqttConnectionConsumer.getMqttAsyncClient().connect(mqttConnectionConsumer.getConnectOptions());
+                    connectionToken.waitForCompletion();
+                    if (mqttConnectionConsumer.getMqttAsyncClient().isConnected()) {
+                        isConnected = true;
+                        log.info("Successfully reconnected MQTT inbound endpoint: " + mqttConnectionConsumer.getName());
+                    }
+                } catch (MqttException ex) {
+                    log.error("MQTT inbound endpoint " + mqttConnectionConsumer.getName()
+                            + " error while reconnecting to the broker attempt " + retryCount++);
+                }
 
-            if (execute) {
-                mqttConnectionConsumer.getMqttAsyncClient()
-                        .connect(mqttConnectionConsumer.getConnectOptions(), this);
             }
-        } catch (MqttException ex) {
-            log.error("Error while trying to subscribe to the remote", ex);
-        } catch (InterruptedException ex) {
+        }  catch (InterruptedException ex) {
             log.error("Error while trying to subscribe to the remote", ex);
         }
     }
