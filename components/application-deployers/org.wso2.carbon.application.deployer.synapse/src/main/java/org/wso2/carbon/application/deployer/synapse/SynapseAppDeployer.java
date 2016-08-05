@@ -129,7 +129,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     try {
                         setCustomLogContent(deployer, carbonApp);
                         deployer.deploy(new DeploymentFileData(new File(artifactPath), deployer));
-                        setCustomLogContent(deployer, null);
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_DEPLOYED);
                     } catch (DeploymentException e) {
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
@@ -137,6 +136,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     } finally {
                         //clear the log appender once deployment is finished to avoid appending the
                         //same log to other classes.
+                        setCustomLogContent(deployer, null);
                         CustomLogSetter.getInstance().clearThreadLocalContent();
                     }
                 }
