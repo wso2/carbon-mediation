@@ -444,7 +444,7 @@ public class ServiceBusInitializer {
                     new Parameter(ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION, name));
 
             if (isRunningDebugMode()) {
-                log.info("ESB Started in Debug mode");
+                log.info("ESB Started in Debug mode for super tenant");
                 createSynapseDebugEnvironment(contextInfo);
             }
 
@@ -495,7 +495,7 @@ public class ServiceBusInitializer {
     }
 
     public static boolean isRunningDebugMode() {
-        return System.getProperty(ServiceBusConstants.ESB_DEBUG_SYSTEM_PROPERTY) != null;
+        return "super".equals(System.getProperty(ServiceBusConstants.ESB_DEBUG_SYSTEM_PROPERTY));
     }
 
     /**
