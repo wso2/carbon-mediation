@@ -80,24 +80,24 @@ public class RabbitMQInjectHandler {
                     msgCtx.getMessageID() + " setting to text/plain");
             contentType = RabbitMQConstants.DEFAULT_CONTENT_TYPE;
             message.setContentType(contentType);
-        } else {
-            int index = contentType.indexOf(';');
-            String type = index > 0 ? contentType.substring(0, index)
-                    : contentType;
-            try {
-                builder = BuilderUtil.getBuilderFromSelector(type, axis2MsgCtx);
-            } catch (AxisFault axisFault) {
-                log.error("Error while creating message builder :: "
-                        + axisFault.getMessage());
+        }
 
+        int index = contentType.indexOf(';');
+        String type = index > 0 ? contentType.substring(0, index)
+                                : contentType;
+        try {
+            builder = BuilderUtil.getBuilderFromSelector(type, axis2MsgCtx);
+        } catch (AxisFault axisFault) {
+            log.error("Error while creating message builder :: "
+                      + axisFault.getMessage());
+
+        }
+        if (builder == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("No message builder found for type '" + type
+                          + "'. Falling back to SOAP.");
             }
-            if (builder == null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("No message builder found for type '" + type
-                            + "'. Falling back to SOAP.");
-                }
-                builder = new SOAPBuilder();
-            }
+            builder = new SOAPBuilder();
         }
 
         OMElement documentElement = null;
