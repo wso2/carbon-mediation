@@ -237,7 +237,9 @@ public class FilePollingConsumer {
             return null;
         } finally {
             try {
-                fsManager.closeFileSystem(fileObject.getParent().getFileSystem());
+                if (fsManager != null) {
+                    fsManager.closeFileSystem(fileObject.getParent().getFileSystem());
+                }
                 fileObject.close();
             } catch (Exception e) {
                 log.error("Unable to close the file system. " + e.getMessage());
