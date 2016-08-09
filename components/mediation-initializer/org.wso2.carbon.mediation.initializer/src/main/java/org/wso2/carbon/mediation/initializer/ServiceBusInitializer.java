@@ -495,7 +495,8 @@ public class ServiceBusInitializer {
     }
 
     public static boolean isRunningDebugMode() {
-        return "super".equals(System.getProperty(ServiceBusConstants.ESB_DEBUG_SYSTEM_PROPERTY));
+        String debugMode = System.getProperty(ServiceBusConstants.ESB_DEBUG_SYSTEM_PROPERTY);
+        return "true".equals(debugMode) || "super".equals(debugMode);
     }
 
     /**
