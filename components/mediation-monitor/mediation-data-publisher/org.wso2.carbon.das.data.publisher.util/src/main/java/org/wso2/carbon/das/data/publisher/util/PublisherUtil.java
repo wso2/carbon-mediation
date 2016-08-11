@@ -46,7 +46,11 @@ public class PublisherUtil {
         if (hostAddress != null) {
             return hostAddress;
         }
-        String hostAddress =   ServerConfiguration.getInstance().getFirstProperty(HOST_NAME);
+        String hostAddress =   ServerConfiguration.getInstance().getFirstProperty(DASDataPublisherConstants.FLOW_STATISTIC_NODE_HOST_NAME);
+
+        if (hostAddress == null) {
+            hostAddress =   ServerConfiguration.getInstance().getFirstProperty(HOST_NAME);
+        }
         if (null == hostAddress) {
             InetAddress localAddress = getLocalAddress();
             if (localAddress != null) {

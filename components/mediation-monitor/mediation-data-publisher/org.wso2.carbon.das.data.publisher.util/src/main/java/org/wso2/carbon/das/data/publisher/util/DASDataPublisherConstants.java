@@ -29,4 +29,5 @@ public class DASDataPublisherConstants {
     public static final int FLOW_STATISTIC_WORKER_COUNT_DEFAULT = 2;
     public static final String FLOW_STATISTIC_ANALYTICS_PUBLISHING = STAT_CONFIG_ELEMENT + ".AnalyticPublishingDisable";
     public static final String STAT_OBSERVERS = STAT_CONFIG_ELEMENT + ".Observers";
+    public static final String FLOW_STATISTIC_NODE_HOST_NAME = STAT_CONFIG_ELEMENT + ".NodeHostName";
 }
