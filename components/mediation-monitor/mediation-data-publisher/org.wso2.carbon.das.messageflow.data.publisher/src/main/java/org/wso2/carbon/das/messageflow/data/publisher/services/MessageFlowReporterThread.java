@@ -192,7 +192,6 @@ public class MessageFlowReporterThread extends Thread {
         }
 
         PublishingFlow publishingFlow = TracingDataCollectionHelper.createPublishingFlow(messageFlowLogs);
-        publishingFlow.setHost(statisticsReportingEventHolder.getHost());
 //        logEvent(publishingFlow);
         messageFlowObserverStore.notifyObservers(publishingFlow);
     }
