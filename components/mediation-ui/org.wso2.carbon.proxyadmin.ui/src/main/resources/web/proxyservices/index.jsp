@@ -307,6 +307,7 @@
 
 	givenParams = givenParams.replaceAll("\\\\", "\\\\\\\\");
 	givenParams = givenParams.replaceAll("'","\\\\'");
+    givenParams = givenParams.replaceAll(" xmlns=\"http://ws.apache.org/ns/synapse\"","");
 	
     // sets pinned servers
     String pinnedServers = "";
