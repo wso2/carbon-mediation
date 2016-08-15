@@ -30,7 +30,6 @@
 <%@ page import="javax.xml.stream.XMLStreamException" %>
 <%@ page import="java.io.ByteArrayOutputStream" %>
 <%@ page import="org.owasp.encoder.Encode" %>
-<%@ page import="org.wso2.carbon.proxyadmin.ui.client.Util" %>
 <%@ page import="java.io.ByteArrayInputStream" %>
 <%@ page import="org.apache.axis2.util.XMLUtils" %>
 <%@ page import="javax.xml.parsers.DocumentBuilder" %>
