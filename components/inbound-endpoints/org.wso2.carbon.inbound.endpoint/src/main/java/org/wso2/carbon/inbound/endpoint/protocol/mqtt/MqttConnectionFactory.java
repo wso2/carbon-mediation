@@ -293,11 +293,7 @@ public class MqttConnectionFactory {
 
         MqttAsyncClient mqttClient = null;
         try {
-            if (dataStore != null) {
-                mqttClient = new MqttAsyncClient(mqttEndpointURL, uniqueClientId, dataStore);
-            } else {
-                mqttClient = new MqttAsyncClient(mqttEndpointURL, uniqueClientId);
-            }
+            mqttClient = new MqttAsyncClient(mqttEndpointURL, uniqueClientId, dataStore);
             log.info("Successfully created MQTT client");
         } catch (MqttException ex) {
             log.error("Error while creating the MQTT asynchronous client", ex);
