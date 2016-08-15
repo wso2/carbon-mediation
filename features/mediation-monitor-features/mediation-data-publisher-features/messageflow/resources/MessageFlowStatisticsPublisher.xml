@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <eventPublisher name="MessageFlowStatisticsPublisher" statistics="disable" trace="disable" xmlns="http://wso2.org/carbon/eventpublisher">
-  <from streamName="esb-flow-entry-stream" version="1.0.0"/>
+  <from streamName="org.wso2.esb.analytics.stream.FlowEntry" version="1.0.0"/>
   <mapping customMapping="disable" type="wso2event"/>
   <to eventAdapterType="wso2event">
     <property name="username">admin</property>
