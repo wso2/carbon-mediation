@@ -30,6 +30,17 @@
 <%@ page import="javax.xml.stream.XMLStreamException" %>
 <%@ page import="java.io.ByteArrayOutputStream" %>
 <%@ page import="org.owasp.encoder.Encode" %>
+<%@ page import="java.io.ByteArrayInputStream" %>
+<%@ page import="org.apache.axis2.util.XMLUtils" %>
+<%@ page import="javax.xml.parsers.DocumentBuilder" %>
+<%@ page import="javax.xml.parsers.ParserConfigurationException" %>
+<%@ page import="javax.xml.parsers.DocumentBuilderFactory" %>
+<%@ page import="javax.xml.XMLConstants" %>
+<%@ page import="org.xml.sax.EntityResolver" %>
+<%@ page import="org.xml.sax.InputSource" %>
+<%@ page import="org.xml.sax.SAXException" %>
+<%@ page import="java.io.IOException" %>
+<%@ page import="org.wso2.carbon.proxyadmin.ui.client.ProxyAdminClientUtils" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <jsp:include page="../dialog/display_messages.jsp"/>
@@ -92,7 +103,8 @@
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             OMElement elem;
             try {
-                elem= AXIOMUtil.stringToOM(source);
+                elem = XMLUtils.toOM((ProxyAdminClientUtils.getSecuredDocumentBuilder(true)).
+                        parse(new ByteArrayInputStream(source.getBytes())).getDocumentElement());
                 XMLPrettyPrinter.prettify(elem,stream);
             } catch (XMLStreamException e) {
                 e.printStackTrace();
