@@ -1,5 +1,5 @@
 {
-  "name": "esb-flow-entry-stream",
+  "name": "org.wso2.esb.analytics.stream.FlowEntry",
   "version": "1.0.0",
   "nickName": "",
   "description": "This stream is use by WSO2 ESB to publish statistical data",

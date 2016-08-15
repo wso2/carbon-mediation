@@ -63,9 +63,9 @@
                                     <includes>
                                         <include>p2.inf</include>
                                         <include>MessageFlowConfigurationPublisher.xml</include>
-                                        <include>esb-config-entry-stream_1.0.0.json</include>
+                                        <include>org.wso2.esb.analytics.stream.ConfigEntry_1.0.0.json</include>
                                         <include>MessageFlowStatisticsPublisher.xml</include>
-                                        <include>esb-flow-entry-stream_1.0.0.json</include>
+                                        <include>org.wso2.esb.analytics.stream.FlowEntry_1.0.0.json</include>
                                     </includes>
                                 </resource>
                             </resources>
