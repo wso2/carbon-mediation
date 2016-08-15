@@ -304,7 +304,7 @@ public class TaskManagementHelper {
         documentBuilder.setEntityResolver(new EntityResolver() {
             @Override
             public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-                throw new SAXException("Possible XML External Entity (XXE) attack. Skip resolving entity");
+                throw new SAXException("Possible XML External Entity (XXE) attack. Skipping entity resolving");
             }
         });
         return documentBuilder;
