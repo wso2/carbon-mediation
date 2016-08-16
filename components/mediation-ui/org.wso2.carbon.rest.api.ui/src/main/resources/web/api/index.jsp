@@ -553,14 +553,14 @@
             <% if (apiData.getStatisticsEnable()) { %>
             <td style="border-right:none;border-left:none;width:100px">
                 <div class="inlineDiv">
-                    <div id="disableStat<%= apiData.getName()%>">
-                        <a href="#" onclick="disableStat('<%= apiData.getName() %>')"
+                    <div id="disableStat<%= Encode.forHtmlAttribute(apiData.getName()) %>">
+                        <a href="#" onclick="disableStat('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')"
                            class="icon-link"
                            style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
                                 key="api.stat.disable.link"/></a>
                     </div>
-                    <div id="enableStat<%= apiData.getName()%>" style="display:none;">
-                        <a href="#" onclick="enableStat('<%= apiData.getName() %>')"
+                    <div id="enableStat<%= Encode.forHtmlAttribute(apiData.getName()) %>" style="display:none;">
+                        <a href="#" onclick="enableStat('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')"
                            class="icon-link"
                            style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
                                 key="api.stat.enable.link"/></a>
@@ -570,14 +570,14 @@
             <% } else { %>
             <td style="border-right:none;border-left:none;width:100px">
                 <div class="inlineDiv">
-                    <div id="enableStat<%= apiData.getName()%>">
-                        <a href="#" onclick="enableStat('<%=apiData.getName()%>')"
+                    <div id="enableStat<%= Encode.forHtmlAttribute(apiData.getName()) %>">
+                        <a href="#" onclick="enableStat('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')"
                            class="icon-link"
                            style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
                                 key="api.stat.enable.link"/></a>
                     </div>
-                    <div id="disableStat<%= apiData.getName()%>" style="display:none">
-                        <a href="#" onclick="disableStat('<%=apiData.getName()%>')"
+                    <div id="disableStat<%= Encode.forHtmlAttribute(apiData.getName()) %>" style="display:none">
+                        <a href="#" onclick="disableStat('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')"
                            class="icon-link"
                            style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
                                 key="api.stat.disable.link"/></a>
@@ -589,14 +589,14 @@
             <% if (apiData.getTracingEnable()) { %>
                 <td style="border-right:none;border-left:none;width:100px">
                     <div class="inlineDiv">
-                        <div id="disableTrace<%= apiData.getName()%>">
-                            <a href="#" onclick="disableTrace('<%= apiData.getName() %>')"
+                        <div id="disableTrace<%= Encode.forHtmlAttribute(apiData.getName()) %>">
+                            <a href="#" onclick="disableTrace('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
                                     key="api.trace.disable.link"/></a>
                         </div>
-                        <div id="enableTrace<%= apiData.getName()%>" style="display:none;">
-                            <a href="#" onclick="enableTrace('<%= apiData.getName() %>')"
+                        <div id="enableTrace<%= Encode.forHtmlAttribute(apiData.getName()) %>" style="display:none;">
+                            <a href="#" onclick="enableTrace('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
                                     key="api.trace.enable.link"/></a>
@@ -606,14 +606,14 @@
                 <% } else { %>
                 <td style="border-right:none;border-left:none;width:100px">
                     <div class="inlineDiv">
-                        <div id="enableTrace<%= apiData.getName()%>">
-                            <a href="#" onclick="enableTrace('<%=apiData.getName()%>')"
+                        <div id="enableTrace<%= Encode.forHtmlAttribute(apiData.getName()) %>">
+                            <a href="#" onclick="enableTrace('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
                                     key="api.trace.enable.link"/></a>
                         </div>
-                        <div id="disableTrace<%= apiData.getName()%>" style="display:none">
-                            <a href="#" onclick="disableTrace('<%=apiData.getName()%>')"
+                        <div id="disableTrace<%= Encode.forHtmlAttribute(apiData.getName()) %>" style="display:none">
+                            <a href="#" onclick="disableTrace('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
                                     key="api.trace.disable.link"/></a>
@@ -625,9 +625,9 @@
             <td width="20px" style="text-align:left;border-left:none;border-right:none;width:100px;">
                 <div class="inlineDiv">
                     <% if (apiData.getArtifactContainerName() != null) { %>
-                        <a style="background-image:url(../admin/images/edit.gif);" class="icon-link"  onclick="editCAppApi('<%=apiData.getName()%>')">Edit</a>
+                        <a style="background-image:url(../admin/images/edit.gif);" class="icon-link"  onclick="editCAppApi('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')">Edit</a>
                     <% } else { %>
-                        <a style="background-image:url(../admin/images/edit.gif);" class="icon-link"  onclick="editApi('<%=apiData.getName()%>')">Edit</a>
+                        <a style="background-image:url(../admin/images/edit.gif);" class="icon-link"  onclick="editApi('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')">Edit</a>
                     <% } %>
                 </div>
             </td>
@@ -638,7 +638,7 @@
                            onclick="#">Delete</a>
                     <% } else {%>
                         <a style="background-image:url(../admin/images/delete.gif);" class="icon-link" href="#"
-                           onclick="deleteApi('<%=apiData.getName()%>')">Delete</a>
+                           onclick="deleteApi('<%= Encode.forJavaScriptAttribute(apiData.getName()) %>')">Delete</a>
                     <% } %>
                 </div>
             </td>
