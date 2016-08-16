@@ -640,14 +640,14 @@
                 <% if (sequence.isEnableStatistics()) { %>
                 <td style="border-right:none;border-left:none;width:200px">
                     <div class="inlineDiv">
-                        <div id="disableStat<%= sequence.getName()%>">
-                            <a href="#" onclick="disableStat('<%= sequence.getName() %>')"
+                        <div id="disableStat<%= Encode.forHtmlAttribute(sequence.getName())%>">
+                            <a href="#" onclick="disableStat('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
                                     key="sequence.stat.disable.link"/></a>
                         </div>
-                        <div id="enableStat<%= sequence.getName()%>" style="display:none;">
-                            <a href="#" onclick="enableStat('<%= sequence.getName() %>')"
+                        <div id="enableStat<%= Encode.forHtmlAttribute(sequence.getName())%>" style="display:none;">
+                            <a href="#" onclick="enableStat('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
                                     key="sequence.stat.enable.link"/></a>
@@ -657,14 +657,14 @@
                 <% } else { %>
                 <td style="border-right:none;border-left:none;width:200px">
                     <div class="inlineDiv">
-                        <div id="enableStat<%= sequence.getName()%>">
-                            <a href="#" onclick="enableStat('<%= sequence.getName() %>')"
+                        <div id="enableStat<%= Encode.forHtmlAttribute(sequence.getName())%>">
+                            <a href="#" onclick="enableStat('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message
                                     key="sequence.stat.enable.link"/></a>
                         </div>
-                        <div id="disableStat<%= sequence.getName()%>" style="display:none">
-                            <a href="#" onclick="disableStat('<%= sequence.getName() %>')"
+                        <div id="disableStat<%= Encode.forHtmlAttribute(sequence.getName())%>" style="display:none">
+                            <a href="#" onclick="disableStat('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/static-icon.gif);"><fmt:message
                                     key="sequence.stat.disable.link"/></a>
@@ -675,16 +675,16 @@
                 <% if (sequence.isEnableTracing()) { %>
                 <td style="border-right:none;border-left:none;width:200px">
                     <div class="inlineDiv">
-                        <div id="disableTracing<%= sequence.getName()%>">
+                        <div id="disableTracing<%= Encode.forHtmlAttribute(sequence.getName())%>">
                             <a href="#"
-                               onclick="disableTracing('<%= sequence.getName() %>')"
+                               onclick="disableTracing('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
                                     key="sequence.trace.disable.link"/></a>
                         </div>
-                        <div id="enableTracing<%= sequence.getName()%>"
+                        <div id="enableTracing<%= Encode.forHtmlAttribute(sequence.getName())%>"
                              style="display:none;">
-                            <a href="#" onclick="enableTracing('<%= sequence.getName() %>')"
+                            <a href="#" onclick="enableTracing('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
                                     key="sequence.trace.enable.link"/></a>
@@ -694,16 +694,16 @@
                 <% } else { %>
                 <td style="border-right:none;border-left:none;width:200px">
                     <div class="inlineDiv">
-                        <div id="enableTracing<%= sequence.getName()%>">
-                            <a href="#" onclick="enableTracing('<%= sequence.getName() %>')"
+                        <div id="enableTracing<%= Encode.forHtmlAttribute(sequence.getName())%>">
+                            <a href="#" onclick="enableTracing('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message
                                     key="sequence.trace.enable.link"/></a>
                         </div>
-                        <div id="disableTracing<%= sequence.getName()%>"
+                        <div id="disableTracing<%= Encode.forHtmlAttribute(sequence.getName())%>"
                              style="display:none">
                             <a href="#"
-                               onclick="disableTracing('<%= sequence.getName() %>')"
+                               onclick="disableTracing('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message
                                     key="sequence.trace.disable.link"/></a>
@@ -715,7 +715,7 @@
                 <% if (sequence.getArtifactContainerName() != null) { %>
                     <td style="border-left:none;border-right:none;width:100px">
                         <div class="inlineDiv">
-                            <a href="#" onclick="editCAppSequence('<%= sequence.getName() %>')"
+                            <a href="#" onclick="editCAppSequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                 class="icon-link"
                                 style="background-image:url(../admin/images/edit.gif);"><fmt:message
                                     key="sequence.edit.action"/></a>
@@ -733,7 +733,7 @@
                 <% } else { %>
                     <td style="border-left:none;border-right:none;width:100px">
                         <div class="inlineDiv">
-                            <a href="#" onclick="editSequence('<%= sequence.getName() %>')"
+                            <a href="#" onclick="editSequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                 class="icon-link"
                                 style="background-image:url(../admin/images/edit.gif);"><fmt:message
                                     key="sequence.edit.action"/></a>
@@ -741,7 +741,7 @@
                     </td>
                     <td style="border-left:none;width:100px">
                         <div class="inlineDiv">
-                            <a href="#" onclick="deleteSequence('<%= sequence.getName() %>')"
+                            <a href="#" onclick="deleteSequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                                 class="icon-link"
                                 style="background-image:url(../admin/images/delete.gif);"><fmt:message
                                     key="sequence.delete.action"/></a>
@@ -804,12 +804,12 @@
         <% for (SequenceInfo sequence : dynamicSequences) { %>
         <tr>
             <td style="width:200px">
-                <%= sequence.getName() %>
+                <%= Encode.forHtmlContent(sequence.getName()) %>
             </td>
             <td class="registryWriteOperation" style="border-right:none;width:100px">
                 <div class="inlineDiv">
                     <a href="#"
-                       onclick="editRegistrySequence('<%= sequence.getName() %>')"
+                       onclick="editRegistrySequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                        class="icon-link"
                        style="background-image:url(../admin/images/edit.gif);"><fmt:message
                             key="sequence.edit.action"/></a>
@@ -818,7 +818,7 @@
             <td class="registryWriteOperation" style="border-left:none;width:100px">
                 <div class="inlineDiv">
                     <a href="#"
-                       onclick="deleteRegistrySequence('<%= sequence.getName() %>')"
+                       onclick="deleteRegistrySequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')"
                        class="icon-link"
                        style="background-image:url(../admin/images/delete.gif);"><fmt:message
                             key="sequence.delete.action"/></a>
