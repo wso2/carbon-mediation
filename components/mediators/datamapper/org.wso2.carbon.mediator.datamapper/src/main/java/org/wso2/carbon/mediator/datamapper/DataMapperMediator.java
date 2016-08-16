@@ -467,7 +467,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         HashMap functionProperties = new HashMap();
         Stack<TemplateContext> templeteContextStack = ((Stack) synCtx
                 .getProperty(SynapseConstants.SYNAPSE__FUNCTION__STACK));
-        if (templeteContextStack != null) {
+        if (templeteContextStack != null && !templeteContextStack.isEmpty()) {
             TemplateContext templateContext = templeteContextStack.peek();
             functionProperties.putAll(templateContext.getMappedValues());
         }
