@@ -23,6 +23,7 @@
 <%@ page import="org.wso2.carbon.mediation.templates.ui.factory.TemplateEditorClientFactory" %>
 <%@ page import="org.wso2.carbon.mediation.templates.ui.EndpointTemplateAdminClient" %>
 <%@ page import="org.wso2.carbon.mediation.templates.common.EndpointTemplateInfo" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -545,10 +546,10 @@
                     <td>
                         <% if (sequence.getArtifactContainerName() != null) { %>
                             <img src="images/applications.gif">
-                            <%= sequence.getName() %>
+                            <%= Encode.forHtmlContent(sequence.getName()) %>
                             <% if(sequence.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                         <% } else {%>
-                            <%= sequence.getName() %>
+                            <%= Encode.forHtmlContent(sequence.getName()) %>
                         <% } %>
                     </td>
                     <%--<td>
@@ -557,22 +558,22 @@
                             <% if (sequence.isEnableStatistics()) { %>
                             <td style="border-right:none;border-left:none;width:200px">
                                 <div class="inlineDiv">
-                            <div id="disableStat<%= sequence.getName()%>">
-                                <a href="#" onclick="disableStat('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/static-icon.gif);"><fmt:message key="sequence.stat.disable.link"/></a>
+                            <div id="disableStat<%= Encode.forHtmlAttribute(sequence.getName())%>">
+                                <a href="#" onclick="disableStat('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/static-icon.gif);"><fmt:message key="sequence.stat.disable.link"/></a>
                             </div>
-                            <div id="enableStat<%= sequence.getName()%>" style="display:none;">
-                                <a href="#" onclick="enableStat('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message key="sequence.stat.enable.link"/></a>
+                            <div id="enableStat<%= Encode.forHtmlAttribute(sequence.getName())%>" style="display:none;">
+                                <a href="#" onclick="enableStat('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message key="sequence.stat.enable.link"/></a>
                             </div>
                                     </div>
                                 </td>
                             <% } else { %>
                                     <td style="border-right:none;border-left:none;width:200px">
                                 <div class="inlineDiv">
-                            <div id="enableStat<%= sequence.getName()%>">
-                                <a href="#" onclick="enableStat('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message key="sequence.stat.enable.link"/></a>
+                            <div id="enableStat<%= Encode.forHtmlAttribute(sequence.getName())%>">
+                                <a href="#" onclick="enableStat('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/static-icon-disabled.gif);"><fmt:message key="sequence.stat.enable.link"/></a>
                             </div>
-                            <div id="disableStat<%= sequence.getName()%>" style="display:none">
-                                <a href="#" onclick="disableStat('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/static-icon.gif);"><fmt:message key="sequence.stat.disable.link"/></a>
+                            <div id="disableStat<%= Encode.forHtmlAttribute(sequence.getName())%>" style="display:none">
+                                <a href="#" onclick="disableStat('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/static-icon.gif);"><fmt:message key="sequence.stat.disable.link"/></a>
                             </div>
                                     </div>
                                 </td>
@@ -580,22 +581,22 @@
                             <% if (sequence.isEnableTracing()) { %>
                                     <td style="border-right:none;border-left:none;width:200px">
                                 <div class="inlineDiv">
-                            <div id="disableTracing<%= sequence.getName()%>">
-                                <a href="#" onclick="disableTracing('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message key="sequence.trace.disable.link"/></a>
+                            <div id="disableTracing<%= Encode.forHtmlAttribute(sequence.getName())%>">
+                                <a href="#" onclick="disableTracing('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message key="sequence.trace.disable.link"/></a>
                             </div>
-                            <div id="enableTracing<%= sequence.getName()%>" style="display:none;">
-                                <a href="#" onclick="enableTracing('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message key="sequence.trace.enable.link"/></a>
+                            <div id="enableTracing<%= Encode.forHtmlAttribute(sequence.getName())%>" style="display:none;">
+                                <a href="#" onclick="enableTracing('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message key="sequence.trace.enable.link"/></a>
                             </div>
                                     </div>
                                 </td>
                             <% } else { %>
                                     <td style="border-right:none;border-left:none;width:200px">
                                 <div class="inlineDiv">
-                            <div id="enableTracing<%= sequence.getName()%>">
-                                <a href="#" onclick="enableTracing('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message key="sequence.trace.enable.link"/></a>
+                            <div id="enableTracing<%= Encode.forHtmlAttribute(sequence.getName())%>">
+                                <a href="#" onclick="enableTracing('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/trace-icon-disabled.gif);"><fmt:message key="sequence.trace.enable.link"/></a>
                             </div>
-                            <div id="disableTracing<%= sequence.getName()%>" style="display:none">
-                                <a href="#" onclick="disableTracing('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message key="sequence.trace.disable.link"/></a>
+                            <div id="disableTracing<%= Encode.forHtmlAttribute(sequence.getName())%>" style="display:none">
+                                <a href="#" onclick="disableTracing('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/trace-icon.gif);"><fmt:message key="sequence.trace.disable.link"/></a>
                             </div>
                                     </div>
                                 </td>
@@ -603,9 +604,9 @@
                             <td style="border-left:none;border-right:none;width:100px">
                                 <div class="inlineDiv">
                                     <% if (sequence.getArtifactContainerName() != null) { %>
-                                        <a href="#" onclick="editCAppSequence('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/edit.gif);"><fmt:message key="sequence.edit.action"/></a>
+                                        <a href="#" onclick="editCAppSequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/edit.gif);"><fmt:message key="sequence.edit.action"/></a>
                                     <% } else { %>
-                                        <a href="#" onclick="editSequence('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/edit.gif);"><fmt:message key="sequence.edit.action"/></a>
+                                        <a href="#" onclick="editSequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/edit.gif);"><fmt:message key="sequence.edit.action"/></a>
                                     <% } %>
                                 </div>
                             </td>
@@ -614,7 +615,7 @@
                                     <% if (sequence.getArtifactContainerName() != null) { %>
                                         <a href="#" onclick="#" class="icon-link" style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message key="sequence.delete.action"/></a>
                                     <% } else { %>
-                                        <a href="#" onclick="deleteSequence('<%= sequence.getName() %>')" class="icon-link" style="background-image:url(../admin/images/delete.gif);"><fmt:message key="sequence.delete.action"/></a>
+                                        <a href="#" onclick="deleteSequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link" style="background-image:url(../admin/images/delete.gif);"><fmt:message key="sequence.delete.action"/></a>
                                     <% } %>
                                 </div>
                             </td>
@@ -661,18 +662,18 @@
             <% for (SequenceInfo sequence : dynamicSequences) { %>
             <tr>
                 <td style="width:200px">
-                    <%= sequence.getName() %>
+                    <%= Encode.forHtmlContent(sequence.getName()) %>
                 </td>
                 <td class="registryWriteOperation" style="border-right:none;width:100px">
                     <div class="inlineDiv">
-                        <a href="#" onclick="editRegistrySequence('<%= sequence.getName() %>')" class="icon-link"
+                        <a href="#" onclick="editRegistrySequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link"
                            style="background-image:url(../admin/images/edit.gif);"><fmt:message
                                 key="sequence.edit.action"/></a>
                     </div>
                 </td>
                 <td class="registryWriteOperation" style="border-left:none;width:100px">
                     <div class="inlineDiv">
-                        <a href="#" onclick="deleteRegistrySequence('<%= sequence.getName() %>')" class="icon-link"
+                        <a href="#" onclick="deleteRegistrySequence('<%= Encode.forJavaScriptAttribute(sequence.getName()) %>')" class="icon-link"
                            style="background-image:url(../admin/images/delete.gif);"><fmt:message
                                 key="sequence.delete.action"/></a>
                     </div>
@@ -770,10 +771,10 @@
                 <td>
                     <% if (endpoint.getArtifactContainerName() != null) { %>
                         <img src="images/applications.gif">
-                        <%= endpoint.getTemplateName() %>
+                        <%= Encode.forHtmlContent(endpoint.getTemplateName()) %>
                         <% if(endpoint.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                     <% } else {%>
-                        <%= endpoint.getTemplateName() %>
+                        <%= Encode.forHtmlContent(endpoint.getTemplateName()) %>
                     <% } %>
                 </td>
                 <%--<td>
@@ -783,7 +784,7 @@
                 <% if (endpoint.getArtifactContainerName() != null) { %>
                     <td style="border-left:none;border-right:none;width:100px">
                         <div class="inlineDiv">
-                            <a href="#" onclick="editCAppEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>','<%= endpoint.getParamColelctionString() %>')"
+                            <a href="#" onclick="editCAppEndpoint('<%= Encode.forJavaScriptAttribute(endpoint.getTemplateName()) %>','<%= endpoint.getEndpointType() %>','<%= endpoint.getParamColelctionString() %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/edit.gif);"><fmt:message
                                     key="endpoint.edit.action"/></a>
@@ -800,7 +801,7 @@
                 <% } else { %>
                     <td style="border-left:none;border-right:none;width:100px">
                         <div class="inlineDiv">
-                            <a href="#" onclick="editEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>','<%= endpoint.getParamColelctionString() %>')"
+                            <a href="#" onclick="editEndpoint('<%= Encode.forJavaScriptAttribute(endpoint.getTemplateName()) %>','<%= endpoint.getEndpointType() %>','<%= endpoint.getParamColelctionString() %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/edit.gif);"><fmt:message
                                     key="endpoint.edit.action"/></a>
@@ -808,7 +809,7 @@
                     </td>
                     <td style="border-left:none;width:100px">
                         <div class="inlineDiv">
-                            <a href="#" onclick="deleteEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>')"
+                            <a href="#" onclick="deleteEndpoint('<%= Encode.forJavaScriptAttribute(endpoint.getTemplateName()) %>','<%= endpoint.getEndpointType() %>')"
                                class="icon-link"
                                style="background-image:url(../admin/images/delete.gif);"><fmt:message
                                     key="endpoint.delete.action"/></a>
@@ -862,15 +863,15 @@
             <% for (EndpointTemplateInfo endpoint : dynamicEndpointTemplates) { %>
             <tr>
                 <td>
-                    <%= endpoint.getTemplateName() %>
+                    <%= Encode.forHtmlContent(endpoint.getTemplateName()) %>
                 </td>
                 <td>
-                    <%= endpoint.getDescription() != null ? endpoint.getDescription() : "" %>
+                    <%= endpoint.getDescription() != null ? Encode.forHtmlContent(endpoint.getDescription()) : "" %>
                 </td>
 
                 <td class="registryWriteOperation" style="border-left:none;border-right:none;width:100px">
                     <div class="inlineDiv">
-                        <a href="#" onclick="editRegistryEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>','<%= endpoint.getParamColelctionString() %>')"
+                        <a href="#" onclick="editRegistryEndpoint('<%= Encode.forJavaScriptAttribute(endpoint.getTemplateName()) %>','<%= endpoint.getEndpointType() %>','<%= endpoint.getParamColelctionString() %>')"
                            class="icon-link"
                            style="background-image:url(../admin/images/edit.gif);"><fmt:message
                                 key="endpoint.edit.action"/></a>
@@ -878,7 +879,7 @@
                 </td>
                 <td class="registryWriteOperation" style="border-left:none;width:100px">
                     <div class="inlineDiv">
-                        <a href="#" onclick="deleteRegistryEndpoint('<%= endpoint.getTemplateName() %>','<%= endpoint.getEndpointType() %>')"
+                        <a href="#" onclick="deleteRegistryEndpoint('<%= Encode.forJavaScriptAttribute(endpoint.getTemplateName()) %>','<%= endpoint.getEndpointType() %>')"
                            class="icon-link"
                            style="background-image:url(../admin/images/delete.gif);"><fmt:message
                                 key="endpoint.delete.action"/></a>

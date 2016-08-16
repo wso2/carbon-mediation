@@ -19,6 +19,7 @@
 <%@ page import="org.wso2.carbon.sequences.ui.SequenceEditorConstants" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 <%@ page import="java.util.ResourceBundle" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils"%>
@@ -60,7 +61,7 @@
                     SequenceEditorHelper.getEditingSequence(session), (String)session.getAttribute("sequence"));
             } else {
                 sequenceXML = SequenceEditorHelper.parseAnonSequenceToPrettyfiedString(
-                        SequenceEditorHelper.getEditingSequence(session));    
+                        SequenceEditorHelper.getEditingSequence(session));
             }
         } else {
             sequenceXML = SequenceEditorHelper.parseSequenceToPrettyfiedString(
@@ -86,7 +87,7 @@
 	    h3OK = 1
 	    checkXML(x)
 	}
-	
+
 	function checkXML(n)
 	{
 	    var l,i,nam
@@ -118,7 +119,7 @@
 	        var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
 	        xmlDoc.async = "false";
 	        xmlDoc.loadXML(txt);
-	
+
 	        if (xmlDoc.parseError.errorCode != 0)
 	        {
 	            txt = "Error Code: " + xmlDoc.parseError.errorCode + "\n";
@@ -133,16 +134,16 @@
 	        var parser = new DOMParser();
 	        var text = txt;
 	        var xmlDoc = parser.parseFromString(text, "text/xml");
-	
+
 	        if (xmlDoc.getElementsByTagName("parsererror").length > 0)
 	        {
 	            checkErrorXML(xmlDoc.getElementsByTagName("parsererror")[0]);
 	            error = xt;
 	        }
-	
+
 	    }
 	    return error;
-	
+
 	}
     function cancelSequence() {
         <%
@@ -158,7 +159,7 @@
     }
 
     function saveSequence() {
-        document.getElementById("sequence_source").value = editAreaLoader.getValue("sequence_source");        
+        document.getElementById("sequence_source").value = editAreaLoader.getValue("sequence_source");
         document.seqSrcForm.action = "save_sequence.jsp";
         document.seqSrcForm.submit();
     }
@@ -189,7 +190,7 @@
 	if(error != "")
 	{
 		CARBON.showErrorDialog("<fmt:message key="invalid.value.error.parsing.xml"/><br />"+ error);
-		return false;		
+		return false;
 	}
         source_form.action = "design_sequence.jsp?ordinal=1";
         source_form.submit();
@@ -282,7 +283,7 @@
                                     </tr>
                                     <tr>
                                         <td><fmt:message key="sequence.save.as.key"/></td>
-                                        <td><input type="text" size="75" id="synRegKey"/><input type="hidden" id="sequenceName" value="<% out.println(sequenceName);%>"></td>
+                                        <td><input type="text" size="75" id="synRegKey"/><input type="hidden" id="sequenceName" value="<% out.println(Encode.forHtmlAttribute(sequenceName));%>"></td>
                                     </tr>
                                 </table>
                             </td>
