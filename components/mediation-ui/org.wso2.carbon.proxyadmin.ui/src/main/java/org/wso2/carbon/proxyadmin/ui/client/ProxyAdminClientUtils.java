@@ -18,6 +18,8 @@
 
 package org.wso2.carbon.proxyadmin.ui.client;
 
+import org.apache.xerces.impl.Constants;
+import org.apache.xerces.util.SecurityManager;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -63,6 +65,11 @@ public class ProxyAdminClientUtils {
         documentBuilderFactory.setNamespaceAware(true);
         documentBuilderFactory.setExpandEntityReferences(false);
         documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        documentBuilderFactory.setXIncludeAware(false);
+        SecurityManager securityManager = new SecurityManager();
+        securityManager.setEntityExpansionLimit(0);
+        documentBuilderFactory.setAttribute(Constants.XERCES_PROPERTY_PREFIX +
+                    Constants.SECURITY_MANAGER_PROPERTY, securityManager);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         documentBuilder.setEntityResolver(new EntityResolver() {
             @Override

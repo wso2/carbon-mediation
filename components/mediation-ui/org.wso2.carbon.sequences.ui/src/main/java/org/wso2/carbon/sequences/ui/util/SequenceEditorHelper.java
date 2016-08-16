@@ -18,6 +18,9 @@ package org.wso2.carbon.sequences.ui.util;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.util.XMLUtils;
+import org.apache.xerces.impl.Constants;
+import org.apache.xerces.util.*;
+import org.apache.xerces.util.SecurityManager;
 import org.wso2.carbon.mediator.service.MediatorService;
 import org.wso2.carbon.mediator.service.MediatorStore;
 import org.wso2.carbon.mediator.service.builtin.CommentMediator;
@@ -543,6 +546,11 @@ public class SequenceEditorHelper {
         documentBuilderFactory.setNamespaceAware(true);
         documentBuilderFactory.setExpandEntityReferences(false);
         documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        documentBuilderFactory.setXIncludeAware(false);
+        org.apache.xerces.util.SecurityManager securityManager = new SecurityManager();
+        securityManager.setEntityExpansionLimit(0);
+        documentBuilderFactory.setAttribute(Constants.XERCES_PROPERTY_PREFIX +
+                Constants.SECURITY_MANAGER_PROPERTY, securityManager);
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         documentBuilder.setEntityResolver(new EntityResolver() {
             @Override
