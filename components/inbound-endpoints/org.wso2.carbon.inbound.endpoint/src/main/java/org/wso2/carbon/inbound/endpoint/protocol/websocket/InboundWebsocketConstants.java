@@ -52,5 +52,6 @@ public class InboundWebsocketConstants {
 
     public static final String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse";
     public static final String WEBSOCKET_SUBSCRIBER_PATH = "websocket.subscriber.path";
+    public static final String INBOUND_HANDSHAKE_HANDLER_CLASS = "ws.handshake.handler.class";
 
 }

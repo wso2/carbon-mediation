@@ -26,6 +26,7 @@ public class InboundWebsocketConfiguration {
     private String outFlowDispatchSequence;
     private String outFlowErrorSequence;
     private String subprotocolHandler;
+    private String handshakeHandler;
 
     private InboundWebsocketConfiguration(InboundWebsocketConfigurationBuilder builder) {
         this.port = builder.port;
@@ -36,6 +37,7 @@ public class InboundWebsocketConfiguration {
         this.outFlowDispatchSequence = builder.outFlowDispatchSequence;
         this.outFlowErrorSequence = builder.outFlowErrorSequence;
         this.subprotocolHandler = builder.subprotocolHandler;
+        this.handshakeHandler = builder.handshakeHandler;
     }
 
     public int getPort() {
@@ -70,6 +72,10 @@ public class InboundWebsocketConfiguration {
         return subprotocolHandler;
     }
 
+    public String getHandshakeHandler() {
+        return handshakeHandler;
+    }
+
     public static class InboundWebsocketConfigurationBuilder {
         private final int port;
         private final String name;
@@ -79,6 +85,7 @@ public class InboundWebsocketConfiguration {
         private String outFlowDispatchSequence;
         private String outFlowErrorSequence;
         private String subprotocolHandler;
+        private String handshakeHandler;
 
         public InboundWebsocketConfigurationBuilder(int port, String name) {
             this.port = port;
@@ -119,6 +126,10 @@ public class InboundWebsocketConfiguration {
             return this;
         }
 
+        public InboundWebsocketConfigurationBuilder handshakeHandler(String handshakeHandler) {
+            this.handshakeHandler = handshakeHandler;
+            return this;
+        }
     }
 
 }

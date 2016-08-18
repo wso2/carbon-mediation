@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.websocket;
 
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -37,6 +38,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
     private int clientBroadcastLevel;
     private String outflowDispatchSequence;
     private String outflowErrorSequence;
+    private ChannelInboundHandlerAdapter handshakeHandler;
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
 
     public InboundWebsocketChannelInitializer() {
@@ -44,6 +46,10 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
 
     public void setSslConfiguration(InboundWebsocketSSLConfiguration sslConfiguration) {
         this.sslConfiguration = sslConfiguration;
+    }
+
+    public void sethandshakeHandler(ChannelInboundHandlerAdapter name){
+        this.handshakeHandler = name;
     }
 
     public void setClientBroadcastLevel(int clientBroadcastLevel) {
@@ -82,6 +88,8 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
             sourceHandler.setOutflowErrorSequence(outflowErrorSequence);
         if (subprotocolHandlers != null)
             sourceHandler.setSubprotocolHandlers(subprotocolHandlers);
+        if(handshakeHandler!=null)
+            p.addLast("handshakeHandler", handshakeHandler.getClass().getConstructor().newInstance());
         p.addLast("handler", sourceHandler);
     }
 
