@@ -44,6 +44,7 @@
         if (argType == null) {
             continue;
         }
+        arg.setDeepCheck(request.getParameter("payloadFactory.argDeepCheck" + i).trim().equalsIgnoreCase("false") ? false : true);
         if ("value".equals(argType)) {
             arg.setValue(request.getParameter("payloadFactory.argValue" + i).trim());
         } else if ("expression".equals(argType)) {
