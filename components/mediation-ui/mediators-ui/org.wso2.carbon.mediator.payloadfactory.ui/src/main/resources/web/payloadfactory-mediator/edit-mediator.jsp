@@ -261,7 +261,7 @@
                             </td>
                             <td>
                                 <select class="esb-edit small_textbox" name="payloadFactory.argDeepCheck<%=i%>"
-                                        id="payloadFactory.argDeepCheck<%=i%>" style="<%=isValue? "display:none;" : ""%>">
+                                        id="payloadFactory.argDeepCheck<%=i%>" style="">
                                     <option value="true"
                                             <%=isDeepCheck ? " selected=\"true\"" : "" %>>
                                         <fmt:message key="mediator.payloadFactory.true"/>
