@@ -447,7 +447,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             } catch (JMSException e1) {
                 logger.error("Could not find nor create '" + destinationName
                         + "' on connection factory for '" + this.connectionFactoryString + "'. "
-                        + e.getMessage());
+                        + e1.getMessage(), e1);
             }
 
         } catch (NamingException e) {
