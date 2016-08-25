@@ -47,11 +47,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
+import org.apache.synapse.mediators.MediatorFaultHandler;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
@@ -185,25 +188,39 @@ public class JMSInjectHandler {
             }
             OMElement documentElement = null;
             // set the message payload to the message context
-            if (msg instanceof TextMessage) {
-                String message = ((TextMessage) msg).getText();
-                InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(
-                        message.getBytes()));
-                documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
-            } else if (msg instanceof BytesMessage) {
-                if (builder instanceof DataSourceMessageBuilder) {
-                    documentElement = ((DataSourceMessageBuilder) builder).processDocument(
-                            new BytesMessageDataSource((BytesMessage) msg), contentType,
-                            axis2MsgCtx);
-                } else {
-                    documentElement = builder.processDocument(new BytesMessageInputStream(
-                            (BytesMessage) msg), contentType, axis2MsgCtx);
+            try {
+                if (msg instanceof TextMessage) {
+                    String message = ((TextMessage) msg).getText();
+                    InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(
+                            message.getBytes()));
+                    documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
+                } else if (msg instanceof BytesMessage) {
+                    if (builder instanceof DataSourceMessageBuilder) {
+                        documentElement = ((DataSourceMessageBuilder) builder).processDocument(
+                                new BytesMessageDataSource((BytesMessage) msg), contentType,
+                                axis2MsgCtx);
+                    } else {
+                        documentElement = builder.processDocument(new BytesMessageInputStream(
+                                (BytesMessage) msg), contentType, axis2MsgCtx);
+                    }
+                } else if (msg instanceof MapMessage) {
+                    documentElement = convertJMSMapToXML((MapMessage) msg);
                 }
-            } else if (msg instanceof MapMessage) {
-                documentElement = convertJMSMapToXML((MapMessage) msg);
-            }
+            } catch (Exception ex) {
+                    // Handle message building error
+                    log.error("Error while building the message", ex);
+                    msgCtx.setProperty(SynapseConstants.ERROR_CODE, GenericConstants.INBOUND_BUILD_ERROR);
+                    msgCtx.setProperty(SynapseConstants.ERROR_MESSAGE, ex.getMessage());
+                    SequenceMediator faultSequence = getFaultSequence(msgCtx, inboundEndpoint);
+                    faultSequence.mediate(msgCtx);
 
-            // Setting JMSXDeliveryCount header on the message context
+                    if (isRollback(msgCtx)) {
+                        return false;
+                    }
+                    return true;
+                }
+
+                // Setting JMSXDeliveryCount header on the message context
             try {
                 int deliveryCount = msg.getIntProperty("JMSXDeliveryCount");
                 msgCtx.setProperty(JMSConstants.DELIVERY_COUNT, deliveryCount);
@@ -227,8 +244,11 @@ public class JMSInjectHandler {
                 }
                 if (!seq.isInitialized()) {
                     seq.init(synapseEnvironment);
-                }                
-                seq.setErrorHandler(onErrorSeq);
+                }
+                SequenceMediator faultSequence = getFaultSequence(msgCtx, inboundEndpoint);
+                MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
+                msgCtx.pushFaultHandler(mediatorFaultHandler);
+
                 if (!synapseEnvironment.injectInbound(msgCtx, seq, sequential)) {
                     return false;
                 }
@@ -236,12 +256,8 @@ public class JMSInjectHandler {
                 log.error("Sequence: " + injectingSeq + " not found");
             }
 
-            Object o = msgCtx.getProperty(JMSConstants.SET_ROLLBACK_ONLY);
-            if (o != null) {
-                if ((o instanceof Boolean && ((Boolean) o))
-                        || (o instanceof String && Boolean.valueOf((String) o))) {
-                    return false;
-                }
+            if (isRollback(msgCtx)) {
+                return false;
             }
         } catch (SynapseException se) {
             throw se;            
@@ -250,6 +266,26 @@ public class JMSInjectHandler {
             throw new SynapseException("Error while processing the JMS Message", e);            
         }
         return true;
+    }
+
+    private boolean isRollback(org.apache.synapse.MessageContext msgCtx) {
+        // First check for rollback property from synapse context
+        Object rollbackProp = msgCtx.getProperty(JMSConstants.SET_ROLLBACK_ONLY);
+        if (rollbackProp != null) {
+            if ((rollbackProp instanceof Boolean && ((Boolean) rollbackProp))
+                || (rollbackProp instanceof String && Boolean.valueOf((String) rollbackProp))) {
+                return true;
+            }
+            return false;
+        }
+        // Then from axis2 context - This is for make it consistent with JMS Transport config parameters
+        rollbackProp =
+                (((Axis2MessageContext) msgCtx).getAxis2MessageContext()).getProperty(JMSConstants.SET_ROLLBACK_ONLY);
+        if ((rollbackProp instanceof Boolean && ((Boolean) rollbackProp))
+            || (rollbackProp instanceof String && Boolean.valueOf((String) rollbackProp))) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -304,6 +340,19 @@ public class JMSInjectHandler {
         // send a message is this is TRUE - and I want it to be the other way
         msgCtx.setProperty(MessageContext.CLIENT_API_NON_BLOCKING, true);
         return msgCtx;
+    }
+
+    private SequenceMediator getFaultSequence(org.apache.synapse.MessageContext synCtx, InboundEndpoint endpoint) {
+        SequenceMediator faultSequence = null;
+        if (endpoint.getOnErrorSeq() != null) {
+            faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
+        }
+
+        if (faultSequence == null) {
+            faultSequence = (SequenceMediator) synCtx.getFaultSequence();
+        }
+
+        return faultSequence;
     }
 
 }

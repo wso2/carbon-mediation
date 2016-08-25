@@ -159,14 +159,14 @@ public class JMSPollingConsumer {
                 jmsConnectionFactory.closeConnection();
                 return null;
             }
-            destination = jmsConnectionFactory.getDestination(connection);
+            destination = jmsConnectionFactory.getDestination(session);
             if (replyDestinationName != null && !replyDestinationName.trim().equals("")) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Using the reply destination as " + replyDestinationName +
                                  " in inbound endpoint.");
                 }
                 replyDestination =
-                                   jmsConnectionFactory.createDestination(connection,
+                                   jmsConnectionFactory.createDestination(session,
                                                                           replyDestinationName);
             }
             messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);            
