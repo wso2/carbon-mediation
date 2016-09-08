@@ -109,8 +109,8 @@
                 throw new RuntimeException("Invalid number format");
             }
         }
-    } else if (action.equals("testServer") && publishEventMediatorConfigAdminClient.isNotNullOrEmpty(serverIp)
-            && publishEventMediatorConfigAdminClient.isNotNullOrEmpty(serverPort)) {
+    } else if (action.equals("testServer") && publishEventMediatorConfigAdminClient.isNotNullAndNotEmpty(serverIp)
+            && publishEventMediatorConfigAdminClient.isNotNullAndNotEmpty(serverPort)) {
         responseText = publishEventMediatorConfigAdminClient.backendServerExists(serverIp, serverPort);
         out.write(responseText);
     }

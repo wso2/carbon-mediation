@@ -122,29 +122,29 @@ public class PublishEventMediatorConfigAdminClient {
 		return false;
 	}
 
-	/**
-	 * Invokes services' updateEventSink method to get All Event Sinks
-	 *
-	 * @return status of the update as boolean value
-	 */
-	public boolean updateEventSink(String name, String username, String password, String receiverUrl,
-	                               String authenticatorUrl) throws PublishEventMediatorConfigAdminEventSinkException {
-		try {
-			return stub.updateEventSink(name, username, password, receiverUrl, authenticatorUrl);
-		} catch (RemoteException e) {
-			log.error("Error occurred while updating Event Sink, Error: " +
-			          e.getLocalizedMessage());
-		}
-		return false;
-	}
+    /**
+     * Invokes services' updateEventSink method to get All Event Sinks
+     *
+     * @return status of the update as boolean value
+     */
+    public boolean updateEventSink(String name, String username, String password, String receiverUrl,
+                                   String authenticatorUrl) throws PublishEventMediatorConfigAdminEventSinkException {
+        try {
+            return stub.updateEventSink(name, username, password, receiverUrl, authenticatorUrl);
+        } catch (RemoteException e) {
+            log.error("Error occurred while updating Event Sink, Error: " +
+                    e.getLocalizedMessage());
+        }
+        return false;
+    }
 
-	/**
-	 * Checks the provided string empty or null
-	 *
-	 * @param string property which needs check empty or null
-	 * @return true if provided property is null or empty else false
-	 */
-    public boolean isNotNullOrEmpty(String string) {
+    /**
+     * Checks the provided string empty or null
+     *
+     * @param string property which needs check empty or null
+     * @return true if provided property is null and not empty else false
+     */
+    public boolean isNotNullAndNotEmpty(String string) {
         return string != null && !string.equals("");
     }
 
