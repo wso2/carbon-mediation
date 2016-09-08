@@ -115,10 +115,10 @@
         if (url == '') {
             CARBON.showErrorDialog("server url cannot be empty");
         } else if (receiverUrlCheck == null && protocol == "tcp") {
-            CARBON.showErrorDialog("Incomplete url, Please provide complete url");
+            CARBON.showErrorDialog("Incomplete url or invalid protocol, Please provide correct url");
             return false;
         } else if (authenticationUrlCheck == null && protocol == "ssl") {
-            CARBON.showErrorDialog("Incomplete url, Please provide complete url");
+            CARBON.showErrorDialog("Incomplete url or invalid protocol, Please provide correct url");
             return false;
         } else {
             var receivedUrl = /^(.*:)\/\/([A-Za-z0-9\-\.]+)(:([0-9]+))?(.*)$/i;
