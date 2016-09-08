@@ -144,36 +144,36 @@ public class PublishEventMediatorConfigAdminClient {
 	 * @param string property which needs check empty or null
 	 * @return true if provided property is null or empty else false
 	 */
-	public boolean isNotNullOrEmpty(String string) {
-		return string != null && !string.equals("");
-	}
+    public boolean isNotNullOrEmpty(String string) {
+        return string != null && !string.equals("");
+    }
 
-	/**
-	 * Method checks whether a socket can be created for the given ip and port
-	 *
-	 * @param ip   ip of analytics server
-	 * @param port port of the analytics server
-	 * @return true if socket can be created else false
-	 */
-	public String backendServerExists(String ip, String port) {
-		Socket socket = null;
-		try {
-			socket = new Socket(ip, Integer.parseInt(port));
-			return "true";
-		} catch (UnknownHostException e) {
-			return "false";
-		} catch (IOException e) {
-			return "false";
-		} catch (Exception e) {
-			return "false";
-		} finally {
-			if (socket != null) {
-				try {
-					socket.close();
-				} catch (IOException e) {
-					log.warn("Error occurred while closing the server socket when trying to test the connectivity");
-				}
-			}
-		}
-	}
+    /**
+     * Method checks whether a socket can be created for the given ip and port
+     *
+     * @param ip   ip of analytics server
+     * @param port port of the analytics server
+     * @return true if socket can be created else false
+     */
+    public String backendServerExists(String ip, String port) {
+        Socket socket = null;
+        try {
+            socket = new Socket(ip, Integer.parseInt(port));
+            return "true";
+        } catch (UnknownHostException e) {
+            return "false";
+        } catch (IOException e) {
+            return "false";
+        } catch (Exception e) {
+            return "false";
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    log.warn("Error occurred while closing the server socket when trying to test the connectivity");
+                }
+            }
+        }
+    }
 }
