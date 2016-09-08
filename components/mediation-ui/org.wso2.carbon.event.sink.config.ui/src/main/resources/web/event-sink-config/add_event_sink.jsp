@@ -55,7 +55,7 @@
         }
 
         var receiverUrlCheck
-                = (receiverUrl.value.trim()).match(/(({(((http|https|tcp|ssl):\/\/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|localhost|[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}):[0-9]+) ?,+ ?)* *((http|https|tcp|ssl):\/\/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|localhost|[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}):[0-9]+)} *,+ *)* *{(((http|https|tcp|ssl):\/\/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|localhost|[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}):[0-9]+) *,+ *)* *((http|https|tcp|ssl):\/\/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|localhost|[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}):[0-9]+)})|((((http|https|tcp|ssl):\/\/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|localhost|[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}):[0-9]+) *,+ *)* *((http|https|tcp|ssl):\/\/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|localhost|[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}):[0-9]+))/g);
+                = (receiverUrl.value.trim()).match(/^tcp?:\/\/\w+(\.\w+)*(:[0-9]{1,5})/g);
         if (!(receiverUrlCheck == (receiverUrl.value.trim()))) {
             CARBON.showErrorDialog("Invalid url format in Receiver url");
             return false;
@@ -109,6 +109,51 @@
         }
     }
 
+    function testURL(url, protocol) {
+        var receiverUrlCheck = (url.trim()).match(/^tcp?:\/\/\w+(\.\w+)*(:[0-9]{1,5})/g);
+        var authenticationUrlCheck = (url.trim()).match(/^ssl?:\/\/\w+(\.\w+)*(:[0-9]{1,5})/g);
+        if (url == '') {
+            CARBON.showErrorDialog("server url cannot be empty");
+        } else if (receiverUrlCheck == null && protocol == "tcp") {
+            CARBON.showErrorDialog("Incomplete url or invalid protocol, Please provide correct url");
+            return false;
+        } else if (authenticationUrlCheck == null && protocol == "ssl") {
+            CARBON.showErrorDialog("Incomplete url or invalid protocol, Please provide correct url");
+            return false;
+        } else {
+            var receivedUrl = /^(.*:)\/\/([A-Za-z0-9\-\.]+)(:([0-9]+))?(.*)$/i;
+            var commProtocol = receivedUrl.exec(url)[1];
+            var serverHost = receivedUrl.exec(url)[2];
+            var serverPort = receivedUrl.exec(url)[3];
+            var serverPort = receivedUrl.exec(url)[4];
+            if (protocol == "tcp") {
+                if (!(receiverUrlCheck == (url.trim())) && !(commProtocol == "tcp:")) {
+                    CARBON.showErrorDialog("Invalid url format in Receiver url");
+                    return false;
+                }
+            } else {
+                if (!(authenticationUrlCheck == (url.trim())) && !(commProtocol == "ssl:")) {
+                    CARBON.showErrorDialog("Invalid url format in authentication url");
+                    return false;
+                }
+            }
+            jQuery.ajax({
+                type: "GET",
+                url: "../event-sink-config/update_event_sink_ajaxprocessor.jsp",
+                data: {action: "testServer", ip: serverHost, port: serverPort},
+                success: function (data) {
+                    if (data != null && data != "") {
+                        var result = data.replace(/\n+/g, '');
+                        if (result == "true") {
+                            CARBON.showInfoDialog("Successfully connected to Analytics Server.");
+                        } else if (result == "false") {
+                            CARBON.showErrorDialog("Analytics Server cannot be connected!")
+                        }
+                    }
+                }
+            });
+        }
+    }
 </script>
 
 <%
@@ -228,6 +273,7 @@
                                                id="propertyReceiverUrl0"
 
                                                value="<%=eventSink.getReceiverUrlSet()%>"/>
+                                        <input id="testReceiverAddress" name="testReceiverAddress" type="button" class="button" onclick="testURL(document.getElementById('propertyReceiverUrl0').value, 'tcp')" value="Test Server">
                                     </td>
                                 </tr>
                                 <tr>
@@ -237,6 +283,7 @@
                                                id="propertyAuthenticatorUrl0"
 
                                                value="<%=eventSink.getAuthenticationUrlSet()%>"/>
+                                        <input id="testAuthenticatorAddress" name="testAuthenticatorAddress" type="button" class="button" onclick="testURL(document.getElementById('propertyAuthenticatorUrl0').value, 'ssl')" value="Test Server">
                                     </td>
                                 </tr>
                                 <%

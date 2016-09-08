@@ -37,6 +37,8 @@
     String action = request.getParameter("action");
     String responseText="";
     String propertyCountParameter = request.getParameter("propertyCount");
+    String serverIp = request.getParameter("ip");
+    String serverPort = request.getParameter("port");
     if (action.equals("add")) {
 
         if (propertyCountParameter != null && !"".equals(propertyCountParameter)) {
@@ -107,5 +109,9 @@
                 throw new RuntimeException("Invalid number format");
             }
         }
+    } else if (action.equals("testServer") && publishEventMediatorConfigAdminClient.isNotNullAndNotEmpty(serverIp)
+            && publishEventMediatorConfigAdminClient.isNotNullAndNotEmpty(serverPort)) {
+        responseText = publishEventMediatorConfigAdminClient.backendServerExists(serverIp, serverPort);
+        out.write(responseText);
     }
 %>
