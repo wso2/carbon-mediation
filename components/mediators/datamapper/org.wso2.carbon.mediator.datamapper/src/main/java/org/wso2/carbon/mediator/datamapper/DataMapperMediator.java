@@ -17,6 +17,7 @@
 package org.wso2.carbon.mediator.datamapper;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -380,7 +381,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 inputStream = new ByteArrayInputStream(
                         context.getEnvelope().toString().getBytes(StandardCharsets.UTF_8));
             }
-        } catch (Exception e) {
+        } catch (OMException e) {
             handleException("Unable to read input message in Data Mapper mediator reason : " + e.getMessage(), e,
                     context);
         }
