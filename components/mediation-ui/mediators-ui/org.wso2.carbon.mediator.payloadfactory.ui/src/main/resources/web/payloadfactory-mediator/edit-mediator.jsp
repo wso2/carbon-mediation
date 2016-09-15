@@ -207,6 +207,7 @@
                         <th width="10%"><fmt:message key="mediator.payloadFactory.arg.type"/></th>
                         <th width="10%"><fmt:message key="mediator.payloadFactory.arg.eval"/></th>
                         <th width="10%"><fmt:message key="mediator.payloadFactory.arg.deep.check"/></th>
+                        <th width="10%"><fmt:message key="mediator.payloadFactory.arg.literal"/></th>
                         <th width="15%"><fmt:message key="mediator.payloadFactory.arg.value"/></th>
                         <th id="ns-edior-th" style="display:none;" width="15%"><fmt:message
                                 key="mediator.payloadFactory.ns.editor"/></th>
@@ -220,6 +221,7 @@
                         if (arg != null) {
                             boolean isXPath = arg.getExpression() != null;
                             boolean isDeepCheck = arg.isDeepCheck();
+                            boolean isLiteral = arg.isLiteral();
                             boolean isJson  = arg.getJsonPath() != null;
                             boolean isValue = arg.getValue() != null;
                             if (isXPath) {
@@ -268,6 +270,20 @@
                                     </option>
                                     <option value="false"
                                             <%=!isDeepCheck ? " selected=\"true\"" : "" %>>
+                                        <fmt:message key="mediator.payloadFactory.false"/>
+                                    </option>
+
+                                </select>
+                            </td>
+                            <td>
+                                <select class="esb-edit small_textbox" name="payloadFactory.argLiteral<%=i%>"
+                                        id="payloadFactory.argLiteral<%=i%>" style="">
+                                    <option value="true"
+                                            <%=isLiteral ? " selected=\"true\"" : "" %>>
+                                        <fmt:message key="mediator.payloadFactory.true"/>
+                                    </option>
+                                    <option value="false"
+                                            <%=!isLiteral ? " selected=\"true\"" : "" %>>
                                         <fmt:message key="mediator.payloadFactory.false"/>
                                     </option>
 
