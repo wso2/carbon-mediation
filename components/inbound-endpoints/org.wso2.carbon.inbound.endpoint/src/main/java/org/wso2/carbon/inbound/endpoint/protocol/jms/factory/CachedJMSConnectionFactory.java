@@ -74,6 +74,7 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
         } catch (JMSException e) {
             logger.error("JMS Exception while starting connection for factory '" + this.connectionFactoryString + "' " + e.getMessage());
             resetCache();
+            return null;
         }        
         return connection;
     }
