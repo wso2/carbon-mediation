@@ -78,6 +78,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private URI subscriberPath;
     private String tenantDomain;
     private int port;
+    private boolean dispatchToCustomSequence;
     private InboundWebsocketResponseSender responseSender;
     private static ArrayList<String> contentTypes = new ArrayList<>();
     private static ArrayList<String> otherSubprotocols = new ArrayList<>();
@@ -452,6 +453,13 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
             log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
         }
         synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
+        if(dispatchToCustomSequence){
+            String context = (subscriberPath.getPath()).substring(1);
+            context = context.replace('/','-');
+            if( synCtx.getConfiguration().getDefinedSequences().containsKey(context))
+                injectingSequence = (SequenceMediator) synCtx.getSequence(context);
+
+        }
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
 
@@ -474,5 +482,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         }
         ctx.close();
     }
+    public void setDispatchToCustomSequence(boolean dispatchToCustomSequence) {
+        this.dispatchToCustomSequence = dispatchToCustomSequence;
+    }
+
 
 }

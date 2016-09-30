@@ -131,6 +131,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
         handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
         handler.sethandshakeHandler(HandshakeHandlerBuilderUtil.stringToHandshakeHandlers(config.getHandshakeHandler()));
+        handler.setDispatchToCustomSequence(config.getDispatchToCustomSequence());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -164,6 +165,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
         handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
         handler.sethandshakeHandler(HandshakeHandlerBuilderUtil.stringToHandshakeHandlers(config.getHandshakeHandler()));
+        handler.setDispatchToCustomSequence(config.getDispatchToCustomSequence());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -205,6 +207,8 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                         InboundWebsocketConstants.INBOUND_SUBPROTOCOL_HANDLER_CLASS))
                 .handshakeHandler(params.getProperties().getProperty(
                         InboundWebsocketConstants.INBOUND_HANDSHAKE_HANDLER_CLASS))
+                .dispatchToCustomSequence(params.getProperties().getProperty(
+                        InboundWebsocketConstants.CUSTOM_SEQUENCE))
                 .build();
     }
 

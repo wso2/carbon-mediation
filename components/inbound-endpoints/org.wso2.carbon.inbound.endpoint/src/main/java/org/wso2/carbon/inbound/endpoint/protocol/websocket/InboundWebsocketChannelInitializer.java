@@ -39,6 +39,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
     private String outflowDispatchSequence;
     private String outflowErrorSequence;
     private ChannelInboundHandlerAdapter handshakeHandler;
+    private boolean dispatchToCustomSequence;
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
 
     public InboundWebsocketChannelInitializer() {
@@ -50,6 +51,10 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
 
     public void sethandshakeHandler(ChannelInboundHandlerAdapter name){
         this.handshakeHandler = name;
+    }
+
+    public void setDispatchToCustomSequence(String dispatchToCustomSequence) {
+        this.dispatchToCustomSequence = Boolean.parseBoolean(dispatchToCustomSequence);
     }
 
     public void setClientBroadcastLevel(int clientBroadcastLevel) {
@@ -82,6 +87,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         p.addLast("frameAggregator", new WebSocketFrameAggregator(Integer.MAX_VALUE));
         InboundWebsocketSourceHandler sourceHandler = new InboundWebsocketSourceHandler();
         sourceHandler.setClientBroadcastLevel(clientBroadcastLevel);
+        sourceHandler.setDispatchToCustomSequence(dispatchToCustomSequence);
         if (outflowDispatchSequence != null)
             sourceHandler.setOutflowDispatchSequence(outflowDispatchSequence);
         if (outflowErrorSequence != null)
