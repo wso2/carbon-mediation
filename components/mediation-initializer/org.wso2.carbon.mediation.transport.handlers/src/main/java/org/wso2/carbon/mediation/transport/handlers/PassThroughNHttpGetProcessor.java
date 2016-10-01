@@ -45,10 +45,10 @@ import org.apache.synapse.transport.passthru.SourceHandler;
 import org.jaxen.SimpleNamespaceContext;
 import org.jaxen.XPath;
 import org.wso2.carbon.base.ServerConfiguration;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
+import org.wso2.carbon.mediation.transport.handlers.utils.RequestProcessorDispatcherUtil;
 import org.wso2.carbon.utils.ServerConstants;
 
 import javax.servlet.ServletException;
@@ -323,7 +323,10 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
                                         queryString.indexOf("&") == item.length() ||
                                         queryString.indexOf("=") == item.length())) {
                             if (axisService == null) {
-                                continue;
+                                //check for APIs since no axis2 service found
+                                if (!RequestProcessorDispatcherUtil.isDispatchToApiGetProcessor(requestUri, cfgCtx)) {
+                                    continue;
+                                }
                             }
 
                             try {
