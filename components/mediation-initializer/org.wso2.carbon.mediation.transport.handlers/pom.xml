@@ -45,7 +45,7 @@
                         <Private-Package>
                         </Private-Package>
                         <Export-Package>
-                            org.wso2.carbon.mediation.transport.handlers
+                            org.wso2.carbon.mediation.transport.handlers.*
                         </Export-Package>
                         <Import-Package>
                             !javax.xml.namespace,
@@ -77,6 +77,9 @@
             <groupId>org.wso2.carbon</groupId>
             <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.synapse</groupId>
+            <artifactId>synapse-core</artifactId>
+        </dependency>
     </dependencies>
-
 </project>
