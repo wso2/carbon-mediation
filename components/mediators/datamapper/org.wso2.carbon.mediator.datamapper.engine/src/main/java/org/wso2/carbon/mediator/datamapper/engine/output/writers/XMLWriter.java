@@ -21,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.SchemaException;
 import org.wso2.carbon.mediator.datamapper.engine.core.exceptions.WriterException;
 import org.wso2.carbon.mediator.datamapper.engine.core.schemas.Schema;
+import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -190,16 +191,20 @@ public class XMLWriter implements Writer {
     private void writeStartElement(String name, XMLStreamWriter xMLStreamWriter) throws XMLStreamException {
         String prefix = name.split(NAMESPACE_SEPARATOR)[0];
         if (namespaceMap.values().contains(prefix)) {
-            String nameWithoutPrefix = name.split(NAMESPACE_SEPARATOR)[1];
+            if (name.contains(DataMapperEngineConstants.NAME_SEPERATOR)) {
+                name = name.split(DataMapperEngineConstants.NAME_SEPERATOR)[0];
+            }
+            name = name.replaceFirst(prefix + NAMESPACE_SEPARATOR, "");
             Iterator<Map.Entry<String, String>> entryIterator = namespaceMap.entrySet().iterator();
             while (entryIterator.hasNext()) {
                 Map.Entry<String, String> entry = entryIterator.next();
                 if (prefix.equals(entry.getValue())) {
-                    xMLStreamWriter.writeStartElement(prefix, nameWithoutPrefix, entry.getKey());
+                    xMLStreamWriter.writeStartElement(prefix, name, entry.getKey());
                 }
             }
-        } else if (name.contains(XSI_TYPE_IDENTIFIER)) {
-            xMLStreamWriter.writeStartElement(prefix);
+        } else if (name.contains(DataMapperEngineConstants.NAME_SEPERATOR)) {
+            name = name.split(DataMapperEngineConstants.NAME_SEPERATOR)[0];
+            xMLStreamWriter.writeStartElement(name);
         } else {
             xMLStreamWriter.writeStartElement(name);
         }

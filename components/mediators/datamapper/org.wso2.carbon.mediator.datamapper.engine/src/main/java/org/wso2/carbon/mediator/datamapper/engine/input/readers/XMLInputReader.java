@@ -34,13 +34,13 @@ import org.wso2.carbon.mediator.datamapper.engine.input.InputBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.input.builders.JSONBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 
+import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.xml.namespace.QName;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ATTRIBUTES_KEY;
@@ -578,7 +578,8 @@ public class XMLInputReader implements InputReader {
     }
 
     private String getModifiedFieldName(String fieldName) {
-        return fieldName.replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_").replace(",", "_").replace("=", "_");
+        return fieldName.replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_")
+                .replace(",", DataMapperEngineConstants.NAME_SEPERATOR).replace("=", "_");
     }
 
 }
