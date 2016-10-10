@@ -198,7 +198,7 @@ public class WebsocketConnectionFactory {
             handlerMap.put(clientIdentifier, clientHandler);
             channelHandlerPool.put(sourceIdentifier, handlerMap);
         } else {
-            channelHandlerPool.put(sourceIdentifier, handlerMap);
+            handlerMap.put(clientIdentifier, clientHandler);
         }
     }
 
