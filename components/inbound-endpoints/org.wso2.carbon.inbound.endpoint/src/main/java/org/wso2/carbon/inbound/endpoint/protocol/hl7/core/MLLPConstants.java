@@ -65,6 +65,8 @@ public class MLLPConstants {
 
     public final static String HL7_INBOUND_TENANT_DOMAIN = "HL7_INBOUND_TENANT_DOMAIN";
 
+    public final static String PARAM_HL7_VERSION = "inbound.hl7.Version";
+
     public static class TCPConstants {
 
         public final static String IO_THREAD_COUNT = "io_thread_count";

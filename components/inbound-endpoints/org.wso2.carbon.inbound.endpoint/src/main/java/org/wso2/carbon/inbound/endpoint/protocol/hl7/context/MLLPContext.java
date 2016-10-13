@@ -54,12 +54,15 @@ public class MLLPContext {
     private Parser preProcessorParser = null;
     private BufferFactory bufferFactory;
 
+    private int hl7Version = 2;
+
     public MLLPContext(IOSession session,
                        CharsetDecoder decoder,
                        boolean autoAck,
                        boolean validateMessage,
                        Parser preProcessorParser,
-                       BufferFactory bufferFactory) {
+                       BufferFactory bufferFactory,
+                       int hl7Version) {
         this.session = session;
         this.codec = new HL7Codec(decoder);
         this.autoAck = autoAck;
@@ -69,6 +72,7 @@ public class MLLPContext {
         this.expiry = MLLPConstants.DEFAULT_HL7_TIMEOUT;
         this.requestBuffer = new StringBuffer();
         this.responseBuffer = new StringBuffer();
+        this.hl7Version = hl7Version;
 
         if (preProcessorParser == null) {
             preProcess = false;
@@ -188,6 +192,14 @@ public class MLLPContext {
 
     public void setMessageId(String messageId) {
         this.messageId = messageId;
+    }
+
+    public int getHl7Version() {
+        return hl7Version;
+    }
+
+    public void setHl7Version(int hl7Version) {
+        this.hl7Version = hl7Version;
     }
 
     public void reset() {
