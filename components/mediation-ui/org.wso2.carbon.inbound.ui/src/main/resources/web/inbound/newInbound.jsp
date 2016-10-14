@@ -91,6 +91,8 @@ var existingInbounds = null;
                                 <option value="<%=InboundClientConstants.TYPE_RABBITMQ%>">RabbitMQ</option>
                                 <option value="<%=InboundClientConstants.TYPE_WS%>">WS</option>
                                 <option value="<%=InboundClientConstants.TYPE_WSS%>">WSS</option>
+                                <option value="<%=InboundClientConstants.TYPE_HTTP2%>">HTTP2</option>
+                                <option value="<%=InboundClientConstants.TYPE_HTTPS2%>">HTTPS2</option>
                             </select>
                         </td>
                     </tr>

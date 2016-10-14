@@ -21,6 +21,8 @@ public class InboundClientConstants {
 
     public static final String TYPE_HTTP = "http";
     public static final String TYPE_HTTPS = "https";
+    public static final String TYPE_HTTP2 = "http2";
+    public static final String TYPE_HTTPS2 = "https2";
     public static final String TYPE_WS = "ws";
     public static final String TYPE_WSS = "wss";
     public static final String TYPE_FILE = "file";
@@ -34,7 +36,7 @@ public class InboundClientConstants {
     public static final String EXCEPTION = "INBOUND_EXCEPTION";
     public static final String STRING_SPLITTER = " ~:~ ";
 
-    public static final String[] LISTENER_TYPES = {TYPE_HTTP, TYPE_HTTPS, TYPE_HL7, TYPE_WS, TYPE_WSS};
+    public static final String[] LISTENER_TYPES = {TYPE_HTTP, TYPE_HTTPS, TYPE_HL7, TYPE_WS, TYPE_WSS, TYPE_HTTPS2, TYPE_HTTP2};
 
-    public static final String[] LISTENER_PORT_PARAMS = {"inbound.http.port", "inbound.hl7.Port", "inbound.ws.port"};
+    public static final String[] LISTENER_PORT_PARAMS = {"inbound.http.port", "inbound.hl7.Port", "inbound.ws.port", "inbound.http2.port"};
 }

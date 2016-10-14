@@ -114,6 +114,16 @@
                     if(strVal != null && !strVal.equals("")){
                         sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
                     }
+                } else if(strKey.startsWith("http2.")){
+                    String strVal = request.getParameter(strKey);
+                    if(strVal != null && !strVal.equals("")){
+                        sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                    }
+                } else if(strKey.startsWith("https2.")){
+                    String strVal = request.getParameter(strKey);
+                    if(strVal != null && !strVal.equals("")){
+                        sParams.add(new ParamDTO(strKey, request.getParameter(strKey)));
+                    }
                 } else if(strKey.startsWith("wso2mb.")) {
                     String strVal = request.getParameter(strKey);
                     if(strVal == null || strVal.equals("")){
