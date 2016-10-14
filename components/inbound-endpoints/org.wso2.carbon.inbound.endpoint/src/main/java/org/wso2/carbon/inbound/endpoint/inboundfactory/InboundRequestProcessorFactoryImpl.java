@@ -28,7 +28,9 @@ import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericEventBasedConsumer;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.core.InboundHL7Listener;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpListener;
+import org.wso2.carbon.inbound.endpoint.protocol.http2.InboundHttp2Listener;
 import org.wso2.carbon.inbound.endpoint.protocol.https.InboundHttpsListener;
+import org.wso2.carbon.inbound.endpoint.protocol.https2.InboundHttps2Listener;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.kafka.KAFKAProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.mqtt.MqttListener;
@@ -41,7 +43,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketListe
  */
 public class InboundRequestProcessorFactoryImpl implements InboundRequestProcessorFactory {
 
-    public static enum Protocols {jms, file, http , https, hl7, kafka, mqtt, rabbitmq, ws, wss}
+    public static enum Protocols {jms, file, http , https, hl7, kafka, mqtt, rabbitmq, ws, wss,http2,https2}
 
     /**
      * return underlying Request Processor Implementation according to protocol
@@ -62,6 +64,10 @@ public class InboundRequestProcessorFactoryImpl implements InboundRequestProcess
                 inboundRequestProcessor = new InboundHttpListener(params);
             } else if (Protocols.https.toString().equals(protocol)){
                 inboundRequestProcessor = new InboundHttpsListener(params);
+            } else if (Protocols.http2.toString().equals(protocol)) {
+                inboundRequestProcessor = new InboundHttp2Listener(params);
+            } else if (Protocols.https2.toString().equals(protocol)) {
+                inboundRequestProcessor = new InboundHttps2Listener(params);
             } else if (Protocols.ws.toString().equals(protocol)) {
                 inboundRequestProcessor = new InboundWebsocketListener(params);
             } else if (Protocols.wss.toString().equals(protocol)) {

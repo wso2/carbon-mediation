@@ -26,6 +26,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
+import org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
@@ -71,6 +72,14 @@ public class EndpointListenerLoader {
                 HTTPEndpointManager.getInstance().
                         startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(),
                                 inboundEndpointInfoDTO.getSslConfiguration(), inboundEndpointInfoDTO.getInboundParams());
+            } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.Protocols.http2.toString())) {
+                Http2EndpointManager.getInstance().
+                        startListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                inboundEndpointInfoDTO.getInboundParams());
+            } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.Protocols.https2.toString())) {
+                Http2EndpointManager.getInstance().
+                        startSSLListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                inboundEndpointInfoDTO.getInboundParams());
             } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.Protocols.ws.toString())) {
                 WebsocketEndpointManager.getInstance().
                         startListener(port, inboundEndpointInfoDTO.getEndpointName(),
