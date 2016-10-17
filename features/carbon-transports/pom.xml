@@ -31,6 +31,7 @@
     <url>http://wso2.org</url>
     <modules>
         <module>org.wso2.carbon.websocket.feature</module>
+        <module>org.wso2.carbon.http2.feature</module>
     </modules>
 </project>
 
