@@ -30,28 +30,27 @@ public class HandshakeHandlerBuilderUtil {
         ChannelInboundHandlerAdapter hand = null;
         if (handlerClass != null) {
 
-
-                try {
-                    Class c = Class.forName(handlerClass);
-                    Constructor cons = c.getConstructor();
-                    ChannelInboundHandlerAdapter handlerInstance = (ChannelInboundHandlerAdapter) cons.newInstance();
-                    return handlerInstance;
-                } catch (ClassNotFoundException e) {
-                    String msg = "Class " + handlerClass +
-                            " not found. Please check the required class is added to the classpath.";
-                    log.error(msg, e);
-                    throw new SynapseException(e);
-                } catch (NoSuchMethodException e) {
-                    String msg = "Required constructor is not implemented.";
-                    log.error(msg, e);
-                    throw new SynapseException(e);
-                } catch (InstantiationException |
-                        IllegalAccessException |
-                        java.lang.reflect.InvocationTargetException e) {
-                    String msg = "Couldn't create the class instance.";
-                    log.error(msg, e);
-                    throw new SynapseException(e);
-                }
+            try {
+                Class c = Class.forName(handlerClass);
+                Constructor cons = c.getConstructor();
+                ChannelInboundHandlerAdapter handlerInstance = (ChannelInboundHandlerAdapter) cons.newInstance();
+                return handlerInstance;
+            } catch (ClassNotFoundException e) {
+                String msg = "Class " + handlerClass +
+                        " not found. Please check the required class is added to the classpath.";
+                log.error(msg, e);
+                throw new SynapseException(e);
+            } catch (NoSuchMethodException e) {
+                String msg = "Required constructor is not implemented.";
+                log.error(msg, e);
+                throw new SynapseException(e);
+            } catch (InstantiationException |
+                    IllegalAccessException |
+                    java.lang.reflect.InvocationTargetException e) {
+                String msg = "Couldn't create the class instance.";
+                log.error(msg, e);
+                throw new SynapseException(e);
+            }
 
         }
         return hand;

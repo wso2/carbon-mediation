@@ -49,7 +49,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         this.sslConfiguration = sslConfiguration;
     }
 
-    public void sethandshakeHandler(ChannelInboundHandlerAdapter name){
+    public void sethandshakeHandler(ChannelInboundHandlerAdapter name) {
         this.handshakeHandler = name;
     }
 
@@ -61,15 +61,15 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         this.clientBroadcastLevel = clientBroadcastLevel;
     }
 
-    public void setOutflowDispatchSequence(String outflowDispatchSequence){
+    public void setOutflowDispatchSequence(String outflowDispatchSequence) {
         this.outflowDispatchSequence = outflowDispatchSequence;
     }
 
-    public void setOutflowErrorSequence(String outflowErrorSequence){
+    public void setOutflowErrorSequence(String outflowErrorSequence) {
         this.outflowErrorSequence = outflowErrorSequence;
     }
 
-    public void setSubprotocolHandlers(ArrayList<AbstractSubprotocolHandler> subprotocolHandlers){
+    public void setSubprotocolHandlers(ArrayList<AbstractSubprotocolHandler> subprotocolHandlers) {
         this.subprotocolHandlers = subprotocolHandlers;
     }
 
@@ -94,7 +94,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
             sourceHandler.setOutflowErrorSequence(outflowErrorSequence);
         if (subprotocolHandlers != null)
             sourceHandler.setSubprotocolHandlers(subprotocolHandlers);
-        if(handshakeHandler!=null)
+        if (handshakeHandler != null)
             p.addLast("handshakeHandler", handshakeHandler.getClass().getConstructor().newInstance());
         p.addLast("handler", sourceHandler);
     }
