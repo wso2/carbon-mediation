@@ -65,7 +65,7 @@ public class Http2ClientHandler extends SimpleChannelInboundHandler<Object> {
                 HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text());
 
         if (streamId == null) {
-            log.error("Http2ClientHandler unexpected message received: " + msg);
+            log.error("unexpected message received: " + msg);
             return;
         }
             MessageContext request=requests.get(streamId);
