@@ -1,9 +1,24 @@
+/*
+ *   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package org.wso2.carbon.http2.transport.util;
 
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.soap.SOAPEnvelope;
-import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -19,17 +34,13 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
-import org.apache.http.nio.NHttpServerConnection;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
-import org.apache.synapse.transport.http.conn.SynapseDebugInfoHolder;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.ClientWorker;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
-import org.apache.synapse.transport.passthru.TargetResponse;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.apache.axis2.builder.Builder;
-import org.apache.axis2.builder.BuilderUtil;
 import org.apache.axis2.builder.SOAPBuilder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
@@ -42,28 +53,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-/**
- * Created by chanakabalasooriya on 9/21/16.
- */
+
 public class Http2ClientWorker {
     private Log log = LogFactory.getLog(ClientWorker.class);
-    /** the Http connectors configuration context */
     private TargetConfiguration targetConfiguration = null;
-    /** the response message context that would be created */
     private org.apache.axis2.context.MessageContext responseMsgCtx = null;
-    /** the HttpResponse received */
     private Http2Response response = null;
-    /** weather a body is expected or not */
     private boolean expectEntityBody = true;
 
     public Http2ClientWorker(TargetConfiguration targetConfiguration,
-                        MessageContext outMsgCtx,
-                        Http2Response response) {
+                             MessageContext outMsgCtx,
+                             Http2Response response) {
         this.targetConfiguration = targetConfiguration;
         this.response = response;
         this.expectEntityBody = response.isExpectResponseBody();
 
-        Map<String,String> headers = response.getHeaders();
+        Map<String, String> headers = response.getHeaders();
         Map excessHeaders = response.getExcessHeaders();
 
         String oriURL = headers.get(PassThroughConstants.LOCATION);
@@ -80,8 +85,7 @@ public class Http2ClientWorker {
                 url = new URL(oriURL);
                 urlContext = url.getFile();
             } catch (MalformedURLException e) {
-                //Fix ESBJAVA-3461 - In the case when relative path is sent should be handled
-                if(log.isDebugEnabled()){
+                if (log.isDebugEnabled()) {
                     log.debug("Relative URL received for Location : " + oriURL, e);
                 }
                 urlContext = oriURL;
@@ -90,7 +94,7 @@ public class Http2ClientWorker {
             headers.remove(PassThroughConstants.LOCATION);
             String prfix = (String) outMsgCtx.getProperty(PassThroughConstants.SERVICE_PREFIX);
             if (prfix != null) {
-                if(urlContext != null && urlContext.startsWith("/")){
+                if (urlContext != null && urlContext.startsWith("/")) {
                     //Remove the preceding '/' character
                     urlContext = urlContext.substring(1);
                 }
@@ -101,7 +105,6 @@ public class Http2ClientWorker {
         try {
             responseMsgCtx = outMsgCtx.getOperationContext().
                     getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
-            // fix for RM to work because of a soapAction and wsaAction conflict
             if (responseMsgCtx != null) {
                 responseMsgCtx.setSoapAction("");
             }
@@ -122,12 +125,12 @@ public class Http2ClientWorker {
             responseMsgCtx = new MessageContext();
             responseMsgCtx.setOperationContext(outMsgCtx.getOperationContext());
         }
-        String tenantDomain=outMsgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN).toString();
-        tenantDomain=(tenantDomain!=null)?tenantDomain:MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
-        responseMsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN,tenantDomain);
+        String tenantDomain = outMsgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN).toString();
+        tenantDomain = (tenantDomain != null) ? tenantDomain : MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
+        responseMsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
 
 
-        responseMsgCtx.setProperty("PRE_LOCATION_HEADER",oriURL);
+        responseMsgCtx.setProperty("PRE_LOCATION_HEADER", oriURL);
 
         responseMsgCtx.setServerSide(true);
         responseMsgCtx.setDoingREST(outMsgCtx.isDoingREST());
@@ -136,7 +139,6 @@ public class Http2ClientWorker {
         responseMsgCtx.setTransportIn(outMsgCtx.getTransportIn());
         responseMsgCtx.setTransportOut(outMsgCtx.getTransportOut());
 
-        //setting the responseMsgCtx PassThroughConstants.INVOKED_REST property to the one set inside PassThroughTransportUtils
         responseMsgCtx.setProperty(PassThroughConstants.INVOKED_REST, outMsgCtx.isDoingREST());
 
         // set any transport headers received
@@ -177,15 +179,13 @@ public class Http2ClientWorker {
         try {
             if (expectEntityBody) {
                 String cType = response.getHeader(HTTP.CONTENT_TYPE);
-                if(cType == null){
-                    cType =  response.getHeader(HTTP.CONTENT_TYPE.toLowerCase());
+                if (cType == null) {
+                    cType = response.getHeader(HTTP.CONTENT_TYPE.toLowerCase());
                 }
                 String contentType;
                 if (cType != null) {
-                    // This is the most common case - Most of the time servers send the Content-Type
                     contentType = cType;
                 } else {
-                    // Server hasn't sent the header - Try to infer the content type
                     contentType = inferContentType();
                 }
 
@@ -213,7 +213,7 @@ public class Http2ClientWorker {
                     String type = index > 0 ? contentType.substring(0, index)
                             : contentType;
                     try {
-                        builder = BuilderUtil.getBuilderFromSelector(type,responseMsgCtx);
+                        builder = BuilderUtil.getBuilderFromSelector(type, responseMsgCtx);
                     } catch (AxisFault axisFault) {
                         log.error("Error in creating message builder :: "
                                 + axisFault.getMessage());
@@ -233,7 +233,7 @@ public class Http2ClientWorker {
                     responseMsgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                 } catch (AxisFault axisFault) {
                     log.error("Error setting SOAP envelope", axisFault);
-                }catch (Exception e){
+                } catch (Exception e) {
                     log.error(e.getStackTrace());
                 }
 
@@ -245,8 +245,6 @@ public class Http2ClientWorker {
                 responseMsgCtx.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
             }
 
-            // copy the HTTP status code as a message context property with the key HTTP_SC to be
-            // used at the sender to set the proper status code when passing the message
             int statusCode = this.response.getStatus();
             responseMsgCtx.setProperty(PassThroughConstants.HTTP_SC, statusCode);
             responseMsgCtx.setProperty(PassThroughConstants.HTTP_SC_DESC, response.getStatusLine());
@@ -273,9 +271,9 @@ public class Http2ClientWorker {
 
     private String inferContentType() {
         //Check whether server sent Content-Type in different case
-        Map<String,String> headers = response.getHeaders();
-        for(String header : headers.keySet()){
-            if(HTTP.CONTENT_TYPE.equalsIgnoreCase(header)){
+        Map<String, String> headers = response.getHeaders();
+        for (String header : headers.keySet()) {
+            if (HTTP.CONTENT_TYPE.equalsIgnoreCase(header)) {
                 return headers.get(header);
             }
         }

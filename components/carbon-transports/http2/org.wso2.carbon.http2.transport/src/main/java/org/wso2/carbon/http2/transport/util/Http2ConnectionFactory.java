@@ -1,52 +1,60 @@
+/*
+ *   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package org.wso2.carbon.http2.transport.util;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.HttpScheme;
 import io.netty.handler.codec.http2.Http2SecurityUtil;
 import io.netty.handler.ssl.*;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import io.netty.util.AsciiString;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.http.protocol.HTTP;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.websocket.transport.WebsocketConstants;
-import org.wso2.carbon.websocket.transport.utils.SSLUtil;
 
 import javax.net.ssl.SSLException;
 import javax.xml.namespace.QName;
 import java.net.URI;
-import java.util.AbstractMap;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by chanakabalasooriya on 9/13/16.
- */
+
 public class Http2ConnectionFactory {
 
     private static Http2ConnectionFactory factory;
-    private static volatile TreeMap<String ,Http2ClientHandler> connections;
-    private Log log=LogFactory.getLog(Http2ConnectionFactory.class);
+    private static volatile TreeMap<String, Http2ClientHandler> connections;
+    private Log log = LogFactory.getLog(Http2ConnectionFactory.class);
     private TransportOutDescription trasportOut;
 
-    private Http2ConnectionFactory(TransportOutDescription transportOut){
-        this.trasportOut=transportOut;
-        connections=new TreeMap<>();
+    private Http2ConnectionFactory(TransportOutDescription transportOut) {
+        this.trasportOut = transportOut;
+        connections = new TreeMap<>();
     }
-    public static Http2ConnectionFactory getInstance(TransportOutDescription transportOut){
-       // Http2ConnectionFactory.trasportOut=transportOut;
-        if(factory==null){
-            factory=new Http2ConnectionFactory(transportOut);
+
+    public static Http2ConnectionFactory getInstance(TransportOutDescription transportOut) {
+        if (factory == null) {
+            factory = new Http2ConnectionFactory(transportOut);
         }
         return factory;
     }
@@ -54,27 +62,26 @@ public class Http2ConnectionFactory {
     public Http2ClientHandler getChannelHandler(URI uri) {
         Http2ClientHandler handler;
 
-        handler=getClientHandlerFromPool(uri);
-        if(handler==null){
-            handler=cacheNewConnection(uri);
-            log.info("New connection created for "+uri);
-        }else {
+        handler = getClientHandlerFromPool(uri);
+        if (handler == null) {
+            handler = cacheNewConnection(uri);
+            log.info("New connection created for " + uri);
+        } else {
             log.info("Get connection from pool");
         }
         return handler;
     }
 
-    public Http2ClientHandler cacheNewConnection(URI uri){
+    public Http2ClientHandler cacheNewConnection(URI uri) {
 
         final SslContext sslCtx;
         final boolean SSL;
-        if(uri.getScheme().equalsIgnoreCase(Http2Constants.HTTPS2) || uri.getScheme().equalsIgnoreCase("https")){
-            SSL=true;
-        }else
-            SSL=false;
+        if (uri.getScheme().equalsIgnoreCase(Http2Constants.HTTPS2) || uri.getScheme().equalsIgnoreCase("https")) {
+            SSL = true;
+        } else
+            SSL = false;
         try {
-            /**
-             *Handling SSL*/
+//            Handling SSL
             if (SSL) {
                 Parameter trustParam = trasportOut.getParameter(Http2Constants.TRUST_STORE_CONFIG_ELEMENT);
                 OMElement tsEle = null;
@@ -89,21 +96,16 @@ public class Http2ConnectionFactory {
                                 .getText();
 
 
-
                 SslProvider provider = OpenSsl.isAlpnSupported() ? SslProvider.OPENSSL : SslProvider.JDK;
                 sslCtx = SslContextBuilder.forClient()
                         .trustManager(SSLUtil.createTrustmanager(location,
                                 storePassword))
                         .sslProvider(provider)
-                /* NOTE: the cipher filter may not include all ciphers required by the HTTP/2 specification.
-                 * Please refer to the HTTP/2 specification for cipher requirements. */
                         .ciphers(Http2SecurityUtil.CIPHERS, SupportedCipherSuiteFilter.INSTANCE)
                         .trustManager(InsecureTrustManagerFactory.INSTANCE)
                         .applicationProtocolConfig(new ApplicationProtocolConfig(
                                 ApplicationProtocolConfig.Protocol.ALPN,
-                                // NO_ADVERTISE is currently the only mode supported by both OpenSsl and JDK providers.
                                 ApplicationProtocolConfig.SelectorFailureBehavior.NO_ADVERTISE,
-                                // ACCEPT is currently the only mode supported by both OpenSsl and JDK providers.
                                 ApplicationProtocolConfig.SelectedListenerFailureBehavior.ACCEPT,
                                 ApplicationProtocolNames.HTTP_2,
                                 ApplicationProtocolNames.HTTP_1_1))
@@ -136,46 +138,44 @@ public class Http2ConnectionFactory {
             handler.setChannel(channel);
             connections.put(key, handler);
             return initializer.responseHandler();
-        }catch (SSLException e){
-            log.error("Error while connection establishment:"+e.fillInStackTrace());
+        } catch (SSLException e) {
+            log.error("Error while connection establishment:" + e.fillInStackTrace());
             return null;
-        }
-        catch (Exception e){
-            log.error("Error while connection establishment:"+e.fillInStackTrace());
+        } catch (Exception e) {
+            log.error("Error while connection establishment:" + e.fillInStackTrace());
             return null;
         }
     }
 
-    public Http2ClientHandler getClientHandlerFromPool(URI uri){
-        String key=generateKey(uri);
-        Http2ClientHandler handler= connections.get(key);
-        if(handler!=null){
-            Channel c=handler.getChannel();
-            if(!c.isActive()){
+    public Http2ClientHandler getClientHandlerFromPool(URI uri) {
+        String key = generateKey(uri);
+        Http2ClientHandler handler = connections.get(key);
+        if (handler != null) {
+            Channel c = handler.getChannel();
+            if (!c.isActive()) {
                 connections.remove(key);
-                handler= cacheNewConnection(uri);
-            }else if(handler.isStreamIdOverflow()){
+                handler = cacheNewConnection(uri);
+            } else if (handler.isStreamIdOverflow()) {
                 c.close().syncUninterruptibly();
                 connections.remove(key);
-                handler= cacheNewConnection(uri);
+                handler = cacheNewConnection(uri);
             }
         }
         return handler;
     }
 
     /**
-     *
      * @param uri
      * @return key to merge connection (scheme+host+port)
      */
-    public String generateKey(URI uri){
-        String host=uri.getHost();
-        int port=uri.getPort();
+    public String generateKey(URI uri) {
+        String host = uri.getHost();
+        int port = uri.getPort();
         String ssl;
-        if(uri.getScheme().equalsIgnoreCase(Http2Constants.HTTPS2) || uri.getScheme().equalsIgnoreCase("https")){
-            ssl="https://";
-        }else
-            ssl="http://";
-        return ssl+host+":"+port;
+        if (uri.getScheme().equalsIgnoreCase(Http2Constants.HTTPS2) || uri.getScheme().equalsIgnoreCase("https")) {
+            ssl = "https://";
+        } else
+            ssl = "http://";
+        return ssl + host + ":" + port;
     }
 }

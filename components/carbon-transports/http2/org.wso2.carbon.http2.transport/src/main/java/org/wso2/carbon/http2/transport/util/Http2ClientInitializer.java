@@ -1,3 +1,21 @@
+/*
+ *   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package org.wso2.carbon.http2.transport.util;
 
 import io.netty.channel.ChannelHandlerContext;
@@ -12,11 +30,6 @@ import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
 import io.netty.handler.ssl.SslContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-
-/**
- * Configures the client pipeline to support HTTP/2 frames.
- */
 
 public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
     protected static final Log log = LogFactory.getLog(Http2ClientInitializer.class);
@@ -42,7 +55,6 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
                                 .maxContentLength(maxContentLength)
                                 .propagateSettings(true)
                                 .build()))
-                //.frameLogger(logger)
                 .connection(connection)
                 .build();
         responseHandler = new Http2ClientHandler();
@@ -66,14 +78,10 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(settingsHandler, responseHandler);
     }
 
-    /**
-     * Configure the pipeline for TLS NPN negotiation to HTTP/2.
-     */
+
     private void configureSsl(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(sslCtx.newHandler(ch.alloc()));
-        // We must wait for the handshake to finish and the protocol to be negotiated before configuring
-        // the HTTP/2 components of the pipeline.
         pipeline.addLast(new ApplicationProtocolNegotiationHandler("") {
             @Override
             protected void configurePipeline(ChannelHandlerContext ctx, String protocol) {
@@ -89,9 +97,7 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
         });
     }
 
-    /**
-     * Configure the pipeline for a cleartext upgrade from HTTP to HTTP/2.
-     */
+
     private void configureClearText(SocketChannel ch) {
         HttpClientCodec sourceCodec = new HttpClientCodec();
         Http2ClientUpgradeCodec upgradeCodec = new Http2ClientUpgradeCodec(connectionHandler);
@@ -103,32 +109,23 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
                 new UserEventLogger());
     }
 
-    /**
-     * A handler that triggers the cleartext upgrade to HTTP/2 by sending an initial HTTP request.
-     */
+
     private final class UpgradeRequestHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             DefaultFullHttpRequest upgradeRequest =
                     new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
             ctx.writeAndFlush(upgradeRequest);
-
             ctx.fireChannelActive();
-
-            // Done with this handler, remove it from the pipeline.
             ctx.pipeline().remove(this);
-
             configureEndOfPipeline(ctx.pipeline());
         }
     }
 
-    /**
-     * Class that logs any User Events triggered on this channel.
-     */
     private static class UserEventLogger extends ChannelInboundHandlerAdapter {
         @Override
         public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-            if(log.isDebugEnabled()){
+            if (log.isDebugEnabled()) {
                 log.debug("User Event Triggered for Http2 Server: " + evt);
             }
             ctx.fireUserEventTriggered(evt);
