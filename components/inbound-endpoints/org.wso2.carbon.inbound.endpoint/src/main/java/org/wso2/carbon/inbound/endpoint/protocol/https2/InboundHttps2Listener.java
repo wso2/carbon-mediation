@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
  */
 
 package org.wso2.carbon.inbound.endpoint.protocol.https2;
@@ -28,17 +30,14 @@ import org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EndpointM
 public class InboundHttps2Listener implements InboundRequestProcessor {
 
     private static final Logger log = Logger.getLogger(InboundHttps2Listener.class);
-
-    private SSLConfiguration sslConfiguration;
     private int port;
     private String name;
     private InboundProcessorParams processorParams;
 
     public InboundHttps2Listener(InboundProcessorParams params) {
-        //super(params);
         processorParams = params;
         String portParam = params.getProperties().getProperty(
-                   InboundHttp2Constants.INBOUND_PORT);
+                InboundHttp2Constants.INBOUND_PORT);
         try {
             port = Integer.parseInt(portParam);
         } catch (NumberFormatException e) {
@@ -49,10 +48,10 @@ public class InboundHttps2Listener implements InboundRequestProcessor {
 
     @Override
     public void init() {
-        Http2EndpointManager.getInstance().startSSLEndpoint(port,name,processorParams);
+        Http2EndpointManager.getInstance().startSSLEndpoint(port, name, processorParams);
     }
 
-    public void destroy(){
+    public void destroy() {
         Http2EndpointManager.getInstance().closeEndpoint(port);
     }
 

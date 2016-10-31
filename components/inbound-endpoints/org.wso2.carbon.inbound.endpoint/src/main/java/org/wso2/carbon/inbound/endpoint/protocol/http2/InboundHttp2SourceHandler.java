@@ -1,3 +1,21 @@
+/*
+ *   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
 package org.wso2.carbon.inbound.endpoint.protocol.http2;
 
 import io.netty.buffer.ByteBuf;
@@ -25,15 +43,16 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
     private InboundMessageHandler messageHandler;
     private InboundHttp2ResponseSender responseSender;
     private final InboundHttp2Configuration config;
-    private HashMap<Integer,HTTP2SourceRequest> streams=new HashMap<Integer,HTTP2SourceRequest>();
+    private HashMap<Integer, HTTP2SourceRequest> streams = new HashMap<Integer, HTTP2SourceRequest>();
     private Map<String, String> headerMap
             = new TreeMap<String, String>(new Comparator<String>() {
         public int compare(String o1, String o2) {
             return o1.compareToIgnoreCase(o2);
         }
     });
+
     public InboundHttp2SourceHandler(InboundHttp2Configuration config) {
-        this.config=config;
+        this.config = config;
 
     }
 
@@ -58,18 +77,18 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         this.responseSender = new InboundHttp2ResponseSender(this);
-        this.messageHandler=new InboundMessageHandler(this.responseSender,this.config);
+        this.messageHandler = new InboundMessageHandler(this.responseSender, this.config);
     }
 
     public void onDataRead(ChannelHandlerContext ctx, Http2DataFrame data) throws Exception {
 
         if (data.isEndStream()) {
-            int streamId=data.streamId();
-            HTTP2SourceRequest request=null;
-            request=streams.get(streamId);
+            int streamId = data.streamId();
+            HTTP2SourceRequest request = null;
+            request = streams.get(streamId);
             request.setChannel(ctx);
 
-            request.addFrame(Http2FrameTypes.DATA,data);
+            request.addFrame(Http2FrameTypes.DATA, data);
             messageHandler.processRequest(request);
             streams.remove(request.getStreamID());
         }
@@ -81,40 +100,42 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
     public void onHeadersRead(ChannelHandlerContext ctx, Http2HeadersFrame headers)
             throws Exception {
 
-        int streamId=headers.streamId();
-        HTTP2SourceRequest request=null;
-        if(streams.containsKey(streamId)){
-            request=streams.get(streamId);
-        }else{
-            request=new HTTP2SourceRequest(streamId,ctx);
-            streams.put(streamId,request);
+        int streamId = headers.streamId();
+        HTTP2SourceRequest request = null;
+        if (streams.containsKey(streamId)) {
+            request = streams.get(streamId);
+        } else {
+            request = new HTTP2SourceRequest(streamId, ctx);
+            streams.put(streamId, request);
         }
-        Map r_headers=request.getHeaders();
+        Map r_headers = request.getHeaders();
         Set<CharSequence> headerSet = headers.headers().names();
         for (CharSequence header : headerSet) {
-            log.debug("headers for stream id:"+streamId+":-"+header.toString());
+            if (log.isDebugEnabled()) {
+                log.debug("headers for stream id:" + streamId + ":-" + header.toString());
+            }
             request.setHeader(header.toString(), headers.headers().get(header).toString());
         }
-        if (headers.isEndStream() && !r_headers.containsKey("http2-settings")){
+        if (headers.isEndStream() && !r_headers.containsKey("http2-settings")) {
             messageHandler.processRequest(request);
             streams.remove(request.getStreamID());
         }
     }
 
     public synchronized void sendResponse(MessageContext msgCtx) throws AxisFault {
-        ChannelHandlerContext channel=(ChannelHandlerContext) msgCtx.getProperty("stream-channel");
+        ChannelHandlerContext channel = (ChannelHandlerContext) msgCtx.getProperty("stream-channel");
 
         ByteBuf content = channel.alloc().buffer();
 
-        String response=messageHandler.messageFormatter(((Axis2MessageContext)msgCtx).getAxis2MessageContext());
+        String response = messageHandler.messageFormatter(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
 
         content.writeBytes(response.getBytes());
 
         // Send a frame for the response status
         Http2Headers headers = new DefaultHttp2Headers().status(OK.codeAsText());
-        String contentType=messageHandler.getContentType(((Axis2MessageContext)msgCtx).getAxis2MessageContext());
-        if(contentType!=null){
-            headers.add(HttpHeaderNames.CONTENT_TYPE,contentType);
+        String contentType = messageHandler.getContentType(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
+        if (contentType != null) {
+            headers.add(HttpHeaderNames.CONTENT_TYPE, contentType);
         }
 
         channel.write(new DefaultHttp2HeadersFrame(headers));

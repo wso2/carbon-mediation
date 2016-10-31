@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
  */
 
 package org.wso2.carbon.inbound.endpoint.protocol.http2.management;
@@ -118,7 +120,7 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
             return true;
         }
 
-        InboundHttp2Configuration config = buildConfiguration(port,name,params);
+        InboundHttp2Configuration config = buildConfiguration(port, name, params);
         NettyThreadPoolConfiguration threadPoolConfig =
                 new NettyThreadPoolConfiguration(config.getBossThreadPoolSize(),
                         config.getWorkerThreadPoolSize());
@@ -130,15 +132,14 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
         b.group(eventExecutor.getBossGroupThreadPool(), eventExecutor.getWorkerGroupThreadPool())
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(new InboundHttp2ServerInitializer((SslContext) null,config));
-        try{
+                .childHandler(new InboundHttp2ServerInitializer((SslContext) null, config));
+        try {
 
             b.bind(config.getPort()).sync().channel();
             log.info("Http2 Inbound started on Port : " + config.getPort());
             return true;
-        }
-        catch (InterruptedException e){
-            log.error(e.getMessage(),e);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
             return false;
         }
     }
@@ -149,8 +150,8 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
             return true;
         }
 
-        InboundHttp2Configuration config = buildConfiguration(port,name,params);
-        InboundWebsocketSSLConfiguration SslConfig=buildSSLConfiguration(params);
+        InboundHttp2Configuration config = buildConfiguration(port, name, params);
+        InboundWebsocketSSLConfiguration SslConfig = buildSSLConfiguration(params);
         NettyThreadPoolConfiguration threadPoolConfig =
                 new NettyThreadPoolConfiguration(config.getBossThreadPoolSize(),
                         config.getWorkerThreadPoolSize());
@@ -162,14 +163,14 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
             b.group(eventExecutor.getBossGroupThreadPool(), eventExecutor.getWorkerGroupThreadPool())
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new InboundHttp2ServerInitializer(getSSLContext(SslConfig),config));
+                    .childHandler(new InboundHttp2ServerInitializer(getSSLContext(SslConfig), config));
 
             b.bind(config.getPort()).sync().channel();
 
             log.info("Http2-secure Inbound started on Port : " + config.getPort());
 
         } catch (InterruptedException e) {
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }
         return true;
     }
@@ -190,7 +191,7 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
     }
 
     public InboundHttp2Configuration buildConfiguration(int port, String name, InboundProcessorParams params) {
-        return new InboundHttp2Configuration.InboundHttp2ConfigurationBuilder(port,name,params).build();
+        return new InboundHttp2Configuration.InboundHttp2ConfigurationBuilder(port, name, params).build();
 
     }
 
@@ -199,7 +200,7 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
         SslProvider provider = OpenSsl.isAlpnSupported() ? SslProvider.OPENSSL : SslProvider.JDK;
         try {
             SelfSignedCertificate ssc = new SelfSignedCertificate();
-            SSLHandlerFactory handlerFactory=new SSLHandlerFactory(sslconfig);
+            SSLHandlerFactory handlerFactory = new SSLHandlerFactory(sslconfig);
             sslContext = SslContextBuilder.forServer(handlerFactory.getKeyStoreFactory())
                     .trustManager(handlerFactory.getTrustStoreFactory())
                     .sslProvider(provider)
