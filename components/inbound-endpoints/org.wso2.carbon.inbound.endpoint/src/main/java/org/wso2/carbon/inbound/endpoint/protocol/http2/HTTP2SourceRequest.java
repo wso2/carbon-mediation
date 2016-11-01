@@ -118,7 +118,10 @@ public class HTTP2SourceRequest {
             return uri;
         }
         else if(headers.containsKey("path")){
-            return "/"+headers.get("path");
+            uri=headers.get("path");
+            if(uri.charAt(0)!='/')
+                uri='/'+uri;
+            return uri;
         }else{
             return null;
         }
