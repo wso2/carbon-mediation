@@ -49,6 +49,7 @@ public class PersistenceUtils {
     private static final String SSLPROTOCOL_ATT = "SSLProtocol";
     private static final String HTTPSPROTOCOLS_ATT = "HttpsProtocols";
     private static final String REVOCATIONVERIFIER_ATT = "CertificateRevocationVerifier";
+    private static final String PREFERRED_CIPHERS_ATT = "PreferredCiphers";
 
     // QNames
     private static final QName INBOUND_ENDPOINTS_QN = new QName("inboundEndpoints");
@@ -75,6 +76,7 @@ public class PersistenceUtils {
     private static final QName SSLPROTOCOL_QN = new QName(SSLPROTOCOL_ATT);
     private static final QName HTTPSPROTOCOL_QN = new QName(HTTPSPROTOCOLS_ATT);
     private static final QName REVOCATIONVERIFIER_QN = new QName(REVOCATIONVERIFIER_ATT);
+    private static final QName PREFERRED_CIPHERS_QN = new QName(PREFERRED_CIPHERS_ATT);
 
     private static OMFactory fac = OMAbstractFactory.getOMFactory();
     private static final OMNamespace nullNS =
@@ -209,13 +211,14 @@ public class PersistenceUtils {
                                           endpointElement.getAttributeValue(PROTOCOL_QN),
                                           endpointElement.getAttributeValue(NAME_QN), params);
                 if (endpointElement.getAttributeValue(PROTOCOL_QN).equals("https")) {
-                    SSLConfiguration sslConfiguration =
-                               new SSLConfiguration(endpointElement.getAttributeValue(KEYSTORE_QN),
-                                                    endpointElement.getAttributeValue(TRUSTORE_QN),
-                                                    endpointElement.getAttributeValue(CLIENTAUTH_QN),
-                                                    endpointElement.getAttributeValue(HTTPSPROTOCOL_QN),
-                                                    endpointElement.getAttributeValue(REVOCATIONVERIFIER_QN),
-                                                    endpointElement.getAttributeValue(SSLPROTOCOL_QN));
+                    SSLConfiguration sslConfiguration = new SSLConfiguration(
+                            endpointElement.getAttributeValue(KEYSTORE_QN),
+                            endpointElement.getAttributeValue(TRUSTORE_QN),
+                            endpointElement.getAttributeValue(CLIENTAUTH_QN),
+                            endpointElement.getAttributeValue(HTTPSPROTOCOL_QN),
+                            endpointElement.getAttributeValue(REVOCATIONVERIFIER_QN),
+                            endpointElement.getAttributeValue(SSLPROTOCOL_QN),
+                            endpointElement.getAttributeValue(PREFERRED_CIPHERS_QN));
 
                     inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
                 }

@@ -64,4 +64,7 @@ public class InboundHttpConstants {
 
     public static final String INBOUND_THREAD_ID = "inbound.thread.id";
 
+    /** Parameter name for preferred ciphers in inbound endpoint configs **/
+    public static final String PREFERRED_CIPHERS = "PreferredCiphers";
+
 }
