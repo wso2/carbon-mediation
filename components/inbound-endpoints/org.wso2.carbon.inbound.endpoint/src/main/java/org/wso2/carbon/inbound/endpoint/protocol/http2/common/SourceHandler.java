@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.http2.common;
 
-
 import org.apache.axis2.AxisFault;
 import org.apache.synapse.MessageContext;
 

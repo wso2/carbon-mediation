@@ -24,11 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Http2EventExecutorManager {
 
-    private ConcurrentHashMap<Integer, InboundHttp2EventExecutor> executorPoolMap =
-            new ConcurrentHashMap<Integer, InboundHttp2EventExecutor>();
+    private ConcurrentHashMap<Integer, InboundHttp2EventExecutor> executorPoolMap = new ConcurrentHashMap<Integer, InboundHttp2EventExecutor>();
 
     private static org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager instance = null;
-
 
     public static org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager getInstance() {
         if (instance == null) {

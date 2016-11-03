@@ -92,21 +92,18 @@ public class InboundMessageHandler {
     public final Pattern dispatchPattern;
     private Matcher patternMatcher;
 
-    public InboundMessageHandler(InboundResponseSender responseSender, InboundHttp2Configuration config) {
-        this.config=config;
-        if(config.getDispatchPattern()==null){
-            dispatchPattern=null;
-        }else {
+    public InboundMessageHandler(InboundResponseSender responseSender,
+            InboundHttp2Configuration config) {
+        this.config = config;
+        if (config.getDispatchPattern() == null) {
+            dispatchPattern = null;
+        } else {
             dispatchPattern = Pattern.compile(config.getDispatchPattern());
         }
-        this.responseSender=responseSender;
+        this.responseSender = responseSender;
     }
 
-    public void injectToSequence(MessageContext synCtx,
-                                  InboundEndpoint endpoint) {
-
-        /*((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(org.apache.axis2.context.MessageContext
-                .TRANSPORT_HEADERS, headerMap);*/
+    public void injectToSequence(MessageContext synCtx, InboundEndpoint endpoint) {
 
         SequenceMediator injectingSequence = null;
         if (endpoint.getInjectingSeq() != null) {
@@ -123,8 +120,8 @@ public class InboundMessageHandler {
         synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
-    private SequenceMediator getFaultSequence(MessageContext synCtx,
-                                              InboundEndpoint endpoint) {
+
+    private SequenceMediator getFaultSequence(MessageContext synCtx, InboundEndpoint endpoint) {
         SequenceMediator faultSequence = null;
         if (endpoint.getOnErrorSeq() != null) {
             faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
@@ -138,10 +135,13 @@ public class InboundMessageHandler {
     public MessageContext getSynapseMessageContext(String tenantDomain) throws AxisFault {
         MessageContext synCtx = createSynapseMessageContext(tenantDomain);
         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
-        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(SynapseConstants.IS_INBOUND, true);
-        synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, responseSender);
         ((Axis2MessageContext) synCtx).getAxis2MessageContext()
-                .setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, responseSender);
+                .setProperty(SynapseConstants.IS_INBOUND, true);
+        synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
+                responseSender);
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext()
+                .setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
+                        responseSender);
         return synCtx;
     }
 
@@ -153,8 +153,8 @@ public class InboundMessageHandler {
         axis2MsgCtx.setOperationContext(opCtx);
 
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            ConfigurationContext tenantConfigCtx =
-                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
+            ConfigurationContext tenantConfigCtx = TenantAxisUtils
+                    .getTenantConfigurationContext(tenantDomain,
                             axis2MsgCtx.getConfigurationContext());
             axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
             axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
@@ -171,22 +171,23 @@ public class InboundMessageHandler {
     private static org.apache.axis2.context.MessageContext createAxis2MessageContext() {
         org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
         axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
-        axis2MsgCtx.setConfigurationContext(ServiceReferenceHolder.getInstance().getConfigurationContextService()
-                .getServerConfigContext());
+        axis2MsgCtx.setConfigurationContext(
+                ServiceReferenceHolder.getInstance().getConfigurationContextService()
+                        .getServerConfigContext());
         return axis2MsgCtx;
     }
 
-    public Builder getMessageBuilder(String contentType,org.apache.axis2.context.MessageContext axis2MsgCtx){
-        Builder builder=null;
+    public Builder getMessageBuilder(String contentType,
+            org.apache.axis2.context.MessageContext axis2MsgCtx) {
+        Builder builder = null;
         if (contentType == null) {
             log.info("No content type specified. Using SOAP builder.");
-            builder= new SOAPBuilder();
+            builder = new SOAPBuilder();
         } else {
             try {
                 builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
             } catch (AxisFault axisFault) {
-                log.error("Error while creating message builder :: "
-                        + axisFault.getMessage());
+                log.error("Error while creating message builder :: " + axisFault.getMessage());
             }
             if (builder == null) {
                 log.info("No message builder found for type '" + contentType
@@ -196,8 +197,8 @@ public class InboundMessageHandler {
         }
         return builder;
     }
-    public void injectToMainSequence(MessageContext synCtx,
-                                      InboundEndpoint endpoint) {
+
+    public void injectToMainSequence(MessageContext synCtx, InboundEndpoint endpoint) {
 
         SequenceMediator injectingSequence = (SequenceMediator) synCtx.getMainSequence();
 
@@ -213,53 +214,55 @@ public class InboundMessageHandler {
         }
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
+
     /**
      * processing the request at the end of the stream
+     *
      * @param request
      * @throws AxisFault
      */
-    public void processRequest(HTTP2SourceRequest request) throws AxisFault{
+    public void processRequest(HTTP2SourceRequest request) throws AxisFault {
 
-        //HTTP2SourceRequest request=streams.get(streamID);
-        String tenantDomain=getTenantDomain(request);
+        String tenantDomain = getTenantDomain(request);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain);
 
-        InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(this.config.getName());
+        InboundEndpoint endpoint = synCtx.getConfiguration()
+                .getInboundEndpoint(this.config.getName());
         if (endpoint == null) {
-            log.error("Cannot find deployed inbound endpoint " + this.config.getName() + "for process request");
+            log.error("Cannot find deployed inbound endpoint " + this.config.getName()
+                    + "for process request");
             return;
         }
 
-        org.apache.axis2.context.MessageContext axis2MsgCtx =
-                ((Axis2MessageContext) synCtx)
-                        .getAxis2MessageContext();
-        updateMessageContext(axis2MsgCtx,request);
-        // axis2MsgCtx.setProperty("stream-id",streamID);
-        synCtx.setProperty("stream-id",request.getStreamID());
-        synCtx.setProperty("stream-channel",request.getChannel());
+        org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx)
+                .getAxis2MessageContext();
+        updateMessageContext(axis2MsgCtx, request);
+        synCtx.setProperty("stream-id", request.getStreamID());
+        synCtx.setProperty("stream-channel", request.getChannel());
         axis2MsgCtx.setProperty("OutTransportInfo", this);
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setProperty("TransportInURL", request.getUri());
-        String method=request.getMethod();
+        String method = request.getMethod();
         axis2MsgCtx.setIncomingTransportName(request.getScheme());
-        processHttpRequestUri(axis2MsgCtx,method,request);
+        processHttpRequestUri(axis2MsgCtx, method, request);
         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
         synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
                 responseSender);
         synCtx.setWSAAction(request.getHeader(InboundHttpConstants.SOAP_ACTION));
 
         if (!isRESTRequest(axis2MsgCtx, method)) {
-            if (request.getFrame(Http2FrameTypes.DATA)!=null) {
-                processEntityEnclosingRequest(axis2MsgCtx, false,request);
+            if (request.getFrame(Http2FrameTypes.DATA) != null) {
+                processEntityEnclosingRequest(axis2MsgCtx, false, request);
             } else {
-                processNonEntityEnclosingRESTHandler(null, axis2MsgCtx, false,request);
+                processNonEntityEnclosingRESTHandler(null, axis2MsgCtx, false, request);
             }
         } else {
-            AxisOperation axisOperation = ((Axis2MessageContext) synCtx).getAxis2MessageContext().getAxisOperation();
+            AxisOperation axisOperation = ((Axis2MessageContext) synCtx).getAxis2MessageContext()
+                    .getAxisOperation();
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(null);
             String contentTypeHeader = request.getHeader(HTTP.CONTENT_TYPE);
-            SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader,axis2MsgCtx,request);
-            processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgCtx, false,request);
+            SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader, axis2MsgCtx, request);
+            processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgCtx, false, request);
             ((Axis2MessageContext) synCtx).getAxis2MessageContext().setAxisOperation(axisOperation);
 
         }
@@ -277,32 +280,34 @@ public class InboundMessageHandler {
         if (continueDispatch && dispatchPattern != null) {
 
             boolean processedByAPI = false;
-            RESTRequestHandler restHandler=new RESTRequestHandler();
+            RESTRequestHandler restHandler = new RESTRequestHandler();
             // Trying to dispatch to an API
             processedByAPI = restHandler.process(synCtx);
             if (log.isDebugEnabled()) {
-                log.debug("Dispatch to API state : enabled, Message is "
-                        + (!processedByAPI ? "NOT" : "") + "processed by an API");
+                log.debug("Dispatch to API state : enabled, Message is " + (!processedByAPI ?
+                        "NOT" :
+                        "") + "processed by an API");
             }
 
             if (!processedByAPI) {
                 //check the validity of message routing to axis2 path
-                boolean isAxis2Path = isAllowedAxis2Path(synCtx,request,axis2MsgCtx);
+                boolean isAxis2Path = isAllowedAxis2Path(synCtx, request, axis2MsgCtx);
 
                 if (isAxis2Path) {
                     //create axis2 message context again to avoid settings updated above
-                   // axis2MsgCtx = createMessageContext(null, request);
-                        if (!isRESTRequest(axis2MsgCtx, method)) {
-                            if (request.getFrame(Http2FrameTypes.DATA)!=null) {
-                                processEntityEnclosingRequest(axis2MsgCtx,false, request);
-                            } else {
-                                processNonEntityEnclosingRESTHandler(null, axis2MsgCtx,false, request);
-                            }
+                    if (!isRESTRequest(axis2MsgCtx, method)) {
+                        if (request.getFrame(Http2FrameTypes.DATA) != null) {
+                            processEntityEnclosingRequest(axis2MsgCtx, false, request);
                         } else {
-                            String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
-                            SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader,axis2MsgCtx,request);
-                            processNonEntityEnclosingRESTHandler(soapEnvelope,axis2MsgCtx,true,request);
+                            processNonEntityEnclosingRESTHandler(null, axis2MsgCtx, false, request);
                         }
+                    } else {
+                        String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+                        SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader,
+                                axis2MsgCtx, request);
+                        processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgCtx, true,
+                                request);
+                    }
                 } else {
                     //this case can only happen regex exists and it DOES match
                     //BUT there is no api or proxy found message to be injected
@@ -318,14 +323,13 @@ public class InboundMessageHandler {
             //should be routed to the main sequence instead inbound defined sequence
             injectToMainSequence(synCtx, endpoint);
         }
-
-        // messageHandler.injectToSequence(synCtx, endpoint);
     }
 
-    public void processNonEntityEnclosingRESTHandler(SOAPEnvelope soapEnvelope, org.apache.axis2.context.MessageContext msgContext,
-                                                     boolean injectToAxis2Engine, HTTP2SourceRequest request) {
+    public void processNonEntityEnclosingRESTHandler(SOAPEnvelope soapEnvelope,
+            org.apache.axis2.context.MessageContext msgContext, boolean injectToAxis2Engine,
+            HTTP2SourceRequest request) {
         String soapAction = request.getHeader("soapaction");
-        if(soapAction != null && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
+        if (soapAction != null && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
             soapAction = soapAction.substring(1, soapAction.length() - 1);
         }
 
@@ -333,32 +337,30 @@ public class InboundMessageHandler {
         msgContext.setTo(new EndpointReference(request.getUri()));
         msgContext.setServerSide(true);
         msgContext.setDoingREST(true);
-        if(request.getFrame(Http2FrameTypes.DATA)==null) {
+        if (request.getFrame(Http2FrameTypes.DATA) == null) {
             msgContext.setProperty("NO_ENTITY_BODY", Boolean.TRUE);
         }
 
         try {
-            if(soapEnvelope == null) {
+            if (soapEnvelope == null) {
                 msgContext.setEnvelope((new SOAP11Factory()).getDefaultEnvelope());
             } else {
                 msgContext.setEnvelope(soapEnvelope);
             }
 
-            if(injectToAxis2Engine) {
+            if (injectToAxis2Engine) {
                 AxisEngine.receive(msgContext);
             }
         } catch (AxisFault var6) {
-            log.error("AxisFault:"+var6);
-            //handleException("Error processing " + this.request.getMethod() + " request for : " + this.request.getUri(), var6);
+            log.error("AxisFault:" + var6);
         } catch (Exception var7) {
-            log.error("Exception:"+var7);
-            // this.handleException("Error processing " + this.request.getMethod() + " reguest for : " + this.request.getUri() + ". Error detail: " + var7.getMessage() + ". ", var7);
+            log.error("Exception:" + var7);
         }
 
     }
 
-    private boolean isAllowedAxis2Path(MessageContext synapseMsgContext
-            , HTTP2SourceRequest request, org.apache.axis2.context.MessageContext messageContext) {
+    private boolean isAllowedAxis2Path(MessageContext synapseMsgContext, HTTP2SourceRequest request,
+            org.apache.axis2.context.MessageContext messageContext) {
         boolean isProxy = false;
 
         String reqUri = request.getUri();
@@ -372,8 +374,7 @@ public class InboundMessageHandler {
 
         //Get the operation part from the request URL
         // e.g. '/services/TestProxy/' > TestProxy when service path is '/service/' > result 'TestProxy/'
-        String serviceOpPart = Utils.getServiceAndOperationPart(reqUri,
-                servicePath);
+        String serviceOpPart = Utils.getServiceAndOperationPart(reqUri, servicePath);
         //if proxy, then check whether it is deployed in the environment
         if (serviceOpPart != null) {
             isProxy = isProxyDeployed(synapseMsgContext, serviceOpPart);
@@ -385,8 +386,7 @@ public class InboundMessageHandler {
         return isProxy;
     }
 
-    private boolean isProxyDeployed(MessageContext synapseContext,
-                                    String serviceOpPart) {
+    private boolean isProxyDeployed(MessageContext synapseContext, String serviceOpPart) {
         boolean isDeployed = false;
 
         //extract proxy name from serviceOperation, get the first portion split by '/'
@@ -400,66 +400,73 @@ public class InboundMessageHandler {
     }
 
     public void processEntityEnclosingRequest(org.apache.axis2.context.MessageContext msgContext,
-                                              boolean injectToAxis2Engine,HTTP2SourceRequest request) {
+            boolean injectToAxis2Engine, HTTP2SourceRequest request) {
         try {
             String e = request.getHeaders().get("content-type");
-            //e = e != null?e:this.inferContentType();
             String charSetEncoding = null;
             String contentType = null;
-            if(e != null) {
+            if (e != null) {
                 charSetEncoding = BuilderUtil.getCharSetEncoding(e);
                 contentType = TransportUtils.getContentType(e, msgContext);
             }
 
-            if(charSetEncoding == null) {
+            if (charSetEncoding == null) {
                 charSetEncoding = "UTF-8";
             }
 
-            String method =request!= null?request.getMethod().toUpperCase():"";
+            String method = request != null ? request.getMethod().toUpperCase() : "";
             msgContext.setTo(new EndpointReference(request.getUri()));
             msgContext.setProperty("HTTP_METHOD_OBJECT", method);
             msgContext.setProperty("CHARACTER_SET_ENCODING", charSetEncoding);
             msgContext.setServerSide(true);
             msgContext.setProperty("ContentType", e);
             msgContext.setProperty("messageType", contentType);
-            if(e == null || HTTPTransportUtils.isRESTRequest(e) || this.isRest(e)) {
+            if (e == null || HTTPTransportUtils.isRESTRequest(e) || this.isRest(e)) {
                 msgContext.setProperty("synapse.internal.rest.contentType", contentType);
                 msgContext.setDoingREST(true);
-                SOAPEnvelope soapAction1 = this.handleRESTUrlPost(e,msgContext,request);
+                SOAPEnvelope soapAction1 = this.handleRESTUrlPost(e, msgContext, request);
                 // msgContext.setProperty("pass-through.pipe", this.request.getPipe());
-                this.processNonEntityEnclosingRESTHandler(soapAction1, msgContext, injectToAxis2Engine,request);
+                this.processNonEntityEnclosingRESTHandler(soapAction1, msgContext,
+                        injectToAxis2Engine, request);
                 return;
             }
 
             String soapAction = request.getHeader("soapaction");
-            int soapVersion = HTTPTransportUtils.initializeMessageContext(msgContext, soapAction, request.getUri(), e);
+            int soapVersion = HTTPTransportUtils
+                    .initializeMessageContext(msgContext, soapAction, request.getUri(), e);
             SOAPEnvelope envelope;
-            Builder builder=getMessageBuilder(contentType,msgContext);
+            Builder builder = getMessageBuilder(contentType, msgContext);
 
             //Inject to the sequence
             InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(ByteBufUtil.getBytes(
-                    ((Http2DataFrame)request.getFrame(Http2FrameTypes.DATA)).content())));
+                    ((Http2DataFrame) request.getFrame(Http2FrameTypes.DATA)).content())));
             OMElement documentElement = builder.processDocument(in, contentType, msgContext);
-            envelope=TransportUtils.createSOAPEnvelope(documentElement);
+            envelope = TransportUtils.createSOAPEnvelope(documentElement);
 
             msgContext.setEnvelope(envelope);
-            if(injectToAxis2Engine) {
+            if (injectToAxis2Engine) {
                 AxisEngine.receive(msgContext);
             }
         } catch (AxisFault var11) {
-            log.error("Error processing " + request.getMethod() + " request for : " + request.getUri(), var11);
+            log.error("Error processing " + request.getMethod() + " request for : " + request
+                    .getUri(), var11);
         } catch (Exception var12) {
-            log.error("Error processing " + request.getMethod() + " reguest for : " + request.getUri() + ". Error detail: " + var12.getMessage() + ". ", var12);
+            log.error(
+                    "Error processing " + request.getMethod() + " reguest for : " + request.getUri()
+                            + ". Error detail: " + var12.getMessage() + ". ", var12);
         }
 
     }
 
     private boolean isRest(String contentType) {
-        return contentType != null && contentType.indexOf("text/xml") == -1 && contentType.indexOf("application/soap+xml") == -1;
+        return contentType != null && contentType.indexOf("text/xml") == -1
+                && contentType.indexOf("application/soap+xml") == -1;
     }
 
-    public boolean isRESTRequest(org.apache.axis2.context.MessageContext msgContext, String method) {
-        if(msgContext.getProperty("rest_get_delete_invoke") != null && ((Boolean)msgContext.getProperty("rest_get_delete_invoke")).booleanValue()) {
+    public boolean isRESTRequest(org.apache.axis2.context.MessageContext msgContext,
+            String method) {
+        if (msgContext.getProperty("rest_get_delete_invoke") != null && ((Boolean) msgContext
+                .getProperty("rest_get_delete_invoke")).booleanValue()) {
             msgContext.setProperty("HTTP_METHOD_OBJECT", method);
             msgContext.setServerSide(true);
             msgContext.setDoingREST(true);
@@ -469,40 +476,46 @@ public class InboundMessageHandler {
         }
     }
 
-    public void processHttpRequestUri(org.apache.axis2.context.MessageContext msgContext, String method,HTTP2SourceRequest request) {
+    public void processHttpRequestUri(org.apache.axis2.context.MessageContext msgContext,
+            String method, HTTP2SourceRequest request) {
         String servicePrefixIndex = "://";
-        //ConfigurationContext cfgCtx = this.sourceConfiguration.getConfigurationContext();
-        ConfigurationContext cfgCtx=msgContext.getConfigurationContext();
+        ConfigurationContext cfgCtx = msgContext.getConfigurationContext();
         msgContext.setProperty("HTTP_METHOD", method);
         String oriUri = request.getUri();
-        oriUri="/"+oriUri;
+        oriUri = "/" + oriUri;
         String restUrlPostfix = NhttpUtil.getRestUrlPostfix(oriUri, cfgCtx.getServicePath());
         String servicePrefix = oriUri.substring(0, oriUri.indexOf(restUrlPostfix));
-        if(servicePrefix.indexOf(servicePrefixIndex) == -1) {
-            /*HttpInetConnection response = (HttpInetConnection)this.request.getConnection();
-            InetAddress entity = response.getLocalAddress();*/
-            String schema=request.getScheme();
-            SocketAddress entity=request.getChannel().channel().localAddress();
-            if(entity != null) {
-                servicePrefix = schema + servicePrefixIndex.substring(0,servicePrefixIndex.length()-1) + entity+ servicePrefix;
+        if (servicePrefix.indexOf(servicePrefixIndex) == -1) {
+            String schema = request.getScheme();
+            SocketAddress entity = request.getChannel().channel().localAddress();
+            if (entity != null) {
+                servicePrefix =
+                        schema + servicePrefixIndex.substring(0, servicePrefixIndex.length() - 1)
+                                + entity + servicePrefix;
             }
         }
 
         msgContext.setProperty("SERVICE_PREFIX", servicePrefix);
         msgContext.setTo(new EndpointReference(restUrlPostfix));
         msgContext.setProperty("REST_URL_POSTFIX", restUrlPostfix);
-        if("GET".equals(method) || "DELETE".equals(method) || "HEAD".equals(method) || "OPTIONS".equals(method)) {
+        if ("GET".equals(method) || "DELETE".equals(method) || "HEAD".equals(method) || "OPTIONS"
+                .equals(method)) {
             msgContext.setProperty(PassThroughConstants.REST_GET_DELETE_INVOKE, true);
         }
 
     }
 
-    public SOAPEnvelope handleRESTUrlPost(String contentTypeHdr, org.apache.axis2.context.MessageContext msgContext,
-                                          HTTP2SourceRequest request) throws FactoryConfigurationError {
+    public SOAPEnvelope handleRESTUrlPost(String contentTypeHdr,
+            org.apache.axis2.context.MessageContext msgContext, HTTP2SourceRequest request)
+            throws FactoryConfigurationError {
         SOAPEnvelope soapEnvelope = null;
-        String contentType = contentTypeHdr != null?TransportUtils.getContentType(contentTypeHdr, msgContext):null;
-        if(contentType == null || "".equals(contentType) || "application/x-www-form-urlencoded".equals(contentType)) {
-            contentType = contentTypeHdr != null?contentTypeHdr:"application/x-www-form-urlencoded";
+        String contentType = contentTypeHdr != null ?
+                TransportUtils.getContentType(contentTypeHdr, msgContext) :
+                null;
+        if (contentType == null || "".equals(contentType) || "application/x-www-form-urlencoded"
+                .equals(contentType)) {
+            contentType =
+                    contentTypeHdr != null ? contentTypeHdr : "application/x-www-form-urlencoded";
             msgContext.setTo(new EndpointReference(request.getUri()));
             msgContext.setProperty("ContentType", contentType);
             String charSetEncoding = BuilderUtil.getCharSetEncoding(contentType);
@@ -517,35 +530,43 @@ public class InboundMessageHandler {
             try {
                 boolean e = NHttpConfiguration.getInstance().isReverseProxyMode();
                 AxisService axisService = null;
-                if(!e) {
+                if (!e) {
                     RequestURIBasedDispatcher isCustomRESTDispatcher = new RequestURIBasedDispatcher();
                     axisService = isCustomRESTDispatcher.findService(msgContext);
                 }
 
                 boolean isCustomRESTDispatcher1 = false;
                 String requestURI = request.getUri();
-                if(requestURI.matches(NHttpConfiguration.getInstance().getRestUriApiRegex()) || requestURI.matches(NHttpConfiguration.getInstance().getRestUriProxyRegex())) {
+                if (requestURI.matches(NHttpConfiguration.getInstance().getRestUriApiRegex())
+                        || requestURI
+                        .matches(NHttpConfiguration.getInstance().getRestUriProxyRegex())) {
                     isCustomRESTDispatcher1 = true;
                 }
 
                 String multiTenantDispatchService;
-                if(!isCustomRESTDispatcher1) {
-                    if(axisService == null) {
-                        multiTenantDispatchService = NHttpConfiguration.getInstance().getNhttpDefaultServiceName();
-                        axisService = msgContext.getConfigurationContext().getAxisConfiguration().getService(multiTenantDispatchService);
+                if (!isCustomRESTDispatcher1) {
+                    if (axisService == null) {
+                        multiTenantDispatchService = NHttpConfiguration.getInstance()
+                                .getNhttpDefaultServiceName();
+                        axisService = msgContext.getConfigurationContext().getAxisConfiguration()
+                                .getService(multiTenantDispatchService);
                         msgContext.setAxisService(axisService);
                     }
                 } else {
-                    multiTenantDispatchService = PassThroughConfiguration.getInstance().getRESTDispatchService();
-                    axisService = msgContext.getConfigurationContext().getAxisConfiguration().getService(multiTenantDispatchService);
+                    multiTenantDispatchService = PassThroughConfiguration.getInstance()
+                            .getRESTDispatchService();
+                    axisService = msgContext.getConfigurationContext().getAxisConfiguration()
+                            .getService(multiTenantDispatchService);
                     msgContext.setAxisService(axisService);
                 }
             } catch (AxisFault var12) {
-                log.error("Error processing " + request.getMethod() + " request for : " + request.getUri(), var12);
+                log.error("Error processing " + request.getMethod() + " request for : " + request
+                        .getUri(), var12);
             }
 
             try {
-                soapEnvelope = TransportUtils.createSOAPMessage(msgContext, (InputStream)null, contentType);
+                soapEnvelope = TransportUtils
+                        .createSOAPMessage(msgContext, (InputStream) null, contentType);
             } catch (Exception var10) {
                 log.error("Error while building message for REST_URL request");
             }
@@ -564,28 +585,30 @@ public class InboundMessageHandler {
         return tenant;
     }
 
-    private org.apache.axis2.context.MessageContext updateMessageContext(org.apache.axis2.context.MessageContext msgContext,
-                                                                         HTTP2SourceRequest request) {
+    private org.apache.axis2.context.MessageContext updateMessageContext(
+            org.apache.axis2.context.MessageContext msgContext, HTTP2SourceRequest request) {
         Map excessHeaders = request.getExcessHeaders();
-        Map headers=request.getHeaders();
-        //ConfigurationContext cfgCtx = this.sourceConfiguration.getConfigurationContext();
-        if(msgContext == null) {
+        if (msgContext == null) {
             msgContext = new org.apache.axis2.context.MessageContext();
         }
 
-        if(request.getScheme()!=null && request.getScheme().equalsIgnoreCase("https")) {
-            msgContext.setTransportOut(msgContext.getConfigurationContext().getAxisConfiguration().getTransportOut("https"));
-            msgContext.setTransportIn(msgContext.getConfigurationContext().getAxisConfiguration().getTransportIn("https"));
+        if (request.getScheme() != null && request.getScheme().equalsIgnoreCase("https")) {
+            msgContext.setTransportOut(msgContext.getConfigurationContext().getAxisConfiguration()
+                    .getTransportOut("https"));
+            msgContext.setTransportIn(msgContext.getConfigurationContext().getAxisConfiguration()
+                    .getTransportIn("https"));
         } else {
-            msgContext.setTransportOut(msgContext.getConfigurationContext().getAxisConfiguration().getTransportOut("http"));
-            msgContext.setTransportIn(msgContext.getConfigurationContext().getAxisConfiguration().getTransportIn("http"));
+            msgContext.setTransportOut(msgContext.getConfigurationContext().getAxisConfiguration()
+                    .getTransportOut("http"));
+            msgContext.setTransportIn(msgContext.getConfigurationContext().getAxisConfiguration()
+                    .getTransportIn("http"));
 
         }
 
         msgContext.setProperty("OutTransportInfo", this);
         msgContext.setServerSide(true);
         msgContext.setProperty("TransportInURL", request.getUri());
-        TreeMap<String,String> headers1 = new TreeMap<String,String>(new Comparator<String>() {
+        TreeMap<String, String> headers1 = new TreeMap<String, String>(new Comparator<String>() {
             public int compare(String o1, String o2) {
                 return o1.compareToIgnoreCase(o2);
             }
@@ -593,21 +616,22 @@ public class InboundMessageHandler {
         Set entries = request.getHeaders().entrySet();
         Iterator netConn = entries.iterator();
 
-        while(netConn.hasNext()) {
-            Map.Entry remoteAddress = (Map.Entry)netConn.next();
+        while (netConn.hasNext()) {
+            Map.Entry remoteAddress = (Map.Entry) netConn.next();
             headers1.put(remoteAddress.getKey().toString(), remoteAddress.getValue().toString());
         }
 
         msgContext.setProperty("TRANSPORT_HEADERS", headers1);
         msgContext.setProperty("EXCESS_TRANSPORT_HEADERS", excessHeaders);
-        msgContext.setProperty("RequestResponseTransportControl", new HttpCoreRequestResponseTransport(msgContext));
+        msgContext.setProperty("RequestResponseTransportControl",
+                new HttpCoreRequestResponseTransport(msgContext));
         return msgContext;
     }
 
-    public String messageFormatter(org.apache.axis2.context.MessageContext msgCtx) throws AxisFault{
+    public String messageFormatter(org.apache.axis2.context.MessageContext msgCtx)
+            throws AxisFault {
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
-        MessageFormatter messageFormatter =
-                MessageProcessorSelector.getMessageFormatter(msgCtx);
+        MessageFormatter messageFormatter = MessageProcessorSelector.getMessageFormatter(msgCtx);
         StringWriter sw = new StringWriter();
         OutputStream out = new WriterOutputStream(sw, format.getCharSetEncoding());
         messageFormatter.writeTo(msgCtx, format, out, true);
@@ -619,16 +643,17 @@ public class InboundMessageHandler {
         return sw.toString();
     }
 
-    public String getContentType(org.apache.axis2.context.MessageContext msgCtx) throws AxisFault{
-        Boolean noEntityBody = (Boolean)msgCtx.getProperty("NO_ENTITY_BODY");
+    public String getContentType(org.apache.axis2.context.MessageContext msgCtx) throws AxisFault {
+        Boolean noEntityBody = (Boolean) msgCtx.getProperty("NO_ENTITY_BODY");
 
         boolean noEntityBodyResponse = false;
-        if(noEntityBody != null && Boolean.TRUE == noEntityBody) {
+        if (noEntityBody != null && Boolean.TRUE == noEntityBody) {
             noEntityBodyResponse = true;
         }
-        MessageFormatter formatter = MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgCtx);
+        MessageFormatter formatter = MessageFormatterDecoratorFactory
+                .createMessageFormatterDecorator(msgCtx);
         OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
-        if(!noEntityBodyResponse) {
+        if (!noEntityBodyResponse) {
             if ("true".equals(msgCtx.getProperty("enableMTOM"))) {
                 msgCtx.setProperty("ContentType", "multipart/related");
                 msgCtx.setProperty("messageType", "multipart/related");

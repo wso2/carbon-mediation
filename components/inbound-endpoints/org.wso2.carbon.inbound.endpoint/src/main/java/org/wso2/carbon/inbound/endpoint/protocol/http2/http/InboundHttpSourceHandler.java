@@ -44,7 +44,8 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
-public class InboundHttpSourceHandler extends SimpleChannelInboundHandler<FullHttpRequest> implements SourceHandler {
+public class InboundHttpSourceHandler extends SimpleChannelInboundHandler<FullHttpRequest>
+        implements SourceHandler {
     private static final Log log = LogFactory.getLog(InboundHttpSourceHandler.class);
     private ChannelHandlerContext channelCtx;
     private boolean keepAlive;
@@ -69,17 +70,20 @@ public class InboundHttpSourceHandler extends SimpleChannelInboundHandler<FullHt
     public void sendResponse(MessageContext msgCtx) throws AxisFault {
 
         ByteBuf content = channelCtx.alloc().buffer();
-        String res = messageHandler.messageFormatter(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
+        String res = messageHandler
+                .messageFormatter(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
         content.writeBytes(res.getBytes());
 
         FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, OK, content);
-        String contentType = messageHandler.getContentType(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
+        String contentType = messageHandler
+                .getContentType(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
         if (contentType != null) {
             response.headers().add(CONTENT_TYPE, contentType);
             response.headers().add(CONTENT_LENGTH, response.content().readableBytes());
         }
         keepAlive = (msgCtx.getProperty(HttpHeaderValues.KEEP_ALIVE.toString()) != null) ?
-                (boolean) msgCtx.getProperty(HttpHeaderValues.KEEP_ALIVE.toString()) : false;
+                (boolean) msgCtx.getProperty(HttpHeaderValues.KEEP_ALIVE.toString()) :
+                false;
 
         if (!keepAlive) {
             channelCtx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
@@ -104,7 +108,8 @@ public class InboundHttpSourceHandler extends SimpleChannelInboundHandler<FullHt
         http2Req.setUri(req.uri());
         http2Req.setMethod(req.method().toString());
         http2Req.setScheme(req.protocolVersion().protocolName());
-        if ((req.method() != HttpMethod.GET) && (req.method() != HttpMethod.DELETE) && (req.method() != HttpMethod.HEAD)) {
+        if ((req.method() != HttpMethod.GET) && (req.method() != HttpMethod.DELETE) && (req.method()
+                != HttpMethod.HEAD)) {
             http2Req.addFrame(Http2FrameTypes.DATA, new DefaultHttp2DataFrame(req.content()));
         }
         return http2Req;

@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.http2;
 
-
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundHttp2Constants;
 
@@ -37,8 +36,8 @@ public class InboundHttp2Configuration {
         return properties;
     }
 
-
-    private InboundHttp2Configuration(InboundHttp2Configuration.InboundHttp2ConfigurationBuilder builder) {
+    private InboundHttp2Configuration(
+            InboundHttp2Configuration.InboundHttp2ConfigurationBuilder builder) {
         this.port = builder.port;
         this.name = builder.name;
         this.properties = builder.properties;
@@ -81,33 +80,41 @@ public class InboundHttp2Configuration {
         private String workerThreadPoolSize;
         private int so_blcklog;
 
-        public InboundHttp2ConfigurationBuilder(int port, String name, InboundProcessorParams params) {
+        public InboundHttp2ConfigurationBuilder(int port, String name,
+                InboundProcessorParams params) {
             properties = params.getProperties();
 
             this.name = ((name != null) || (name != "")) ? name : params.getName();
-            this.port = (port > 0) ? port : Integer.parseInt(properties.getProperty(InboundHttp2Constants.INBOUND_PORT));
+            this.port = (port > 0) ?
+                    port :
+                    Integer.parseInt(properties.getProperty(InboundHttp2Constants.INBOUND_PORT));
 
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN) != null) {
+            if (properties.getProperty(
+                    InboundHttp2Constants.INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN)
+                    != null) {
                 this.dispatchPattern = properties.getProperty(
                         InboundHttp2Constants.INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN);
             } else {
                 this.dispatchPattern = null;
             }
 
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_BOSS_THREAD_POOL_SIZE) != null) {
-                this.bossThreadPoolSize = properties.getProperty(
-                        InboundHttp2Constants.INBOUND_BOSS_THREAD_POOL_SIZE);
+            if (properties.getProperty(InboundHttp2Constants.INBOUND_BOSS_THREAD_POOL_SIZE)
+                    != null) {
+                this.bossThreadPoolSize = properties
+                        .getProperty(InboundHttp2Constants.INBOUND_BOSS_THREAD_POOL_SIZE);
             } else {
                 this.bossThreadPoolSize = "1";
             }
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_WORKER_THREAD_POOL_SIZE) != null) {
-                this.workerThreadPoolSize = properties.getProperty(
-                        InboundHttp2Constants.INBOUND_WORKER_THREAD_POOL_SIZE);
+            if (properties.getProperty(InboundHttp2Constants.INBOUND_WORKER_THREAD_POOL_SIZE)
+                    != null) {
+                this.workerThreadPoolSize = properties
+                        .getProperty(InboundHttp2Constants.INBOUND_WORKER_THREAD_POOL_SIZE);
             } else {
                 this.workerThreadPoolSize = "1";
             }
             if (properties.getProperty(InboundHttp2Constants.INBOUND_SO_BACKLOG) != null) {
-                this.so_blcklog = Integer.parseInt(properties.getProperty(InboundHttp2Constants.INBOUND_SO_BACKLOG));
+                this.so_blcklog = Integer
+                        .parseInt(properties.getProperty(InboundHttp2Constants.INBOUND_SO_BACKLOG));
             } else {
                 this.so_blcklog = 1024;
             }

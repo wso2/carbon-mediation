@@ -39,14 +39,15 @@ public class InboundHttp2HttpHandler extends ApplicationProtocolNegotiationHandl
     @Override
     protected void configurePipeline(ChannelHandlerContext ctx, String protocol) throws Exception {
         if (ApplicationProtocolNames.HTTP_2.equals(protocol)) {
-            ctx.pipeline().addLast(new Http2Codec(true, new InboundHttp2SourceHandler(this.config)));
+            ctx.pipeline()
+                    .addLast(new Http2Codec(true, new InboundHttp2SourceHandler(this.config)));
             return;
         }
 
         if (ApplicationProtocolNames.HTTP_1_1.equals(protocol)) {
-            ctx.pipeline().addLast(new HttpServerCodec(),
-                    new HttpObjectAggregator(MAX_CONTENT_LENGTH),
-                    new InboundHttpSourceHandler(this.config));
+            ctx.pipeline()
+                    .addLast(new HttpServerCodec(), new HttpObjectAggregator(MAX_CONTENT_LENGTH),
+                            new InboundHttpSourceHandler(this.config));
             return;
         }
 

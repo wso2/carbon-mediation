@@ -35,8 +35,7 @@ public class InboundHttp2Listener implements InboundRequestProcessor {
 
     public InboundHttp2Listener(InboundProcessorParams params) {
         processorParams = params;
-        String portParam = params.getProperties().getProperty(
-                InboundHttp2Constants.INBOUND_PORT);
+        String portParam = params.getProperties().getProperty(InboundHttp2Constants.INBOUND_PORT);
         try {
             port = Integer.parseInt(portParam);
         } catch (NumberFormatException e) {

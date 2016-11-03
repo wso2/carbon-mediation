@@ -18,8 +18,8 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.http2.ssl;
 
-
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
@@ -40,18 +40,21 @@ public class SSLHandlerFactory {
             algorithm = "SunX509";
         }
         try {
-            KeyStore keyStore = getKeyStore(sslConfiguration.getKeyStore(), sslConfiguration.getKeyStorePass());
+            KeyStore keyStore = getKeyStore(sslConfiguration.getKeyStore(),
+                    sslConfiguration.getKeyStorePass());
             keyStoreFactory = KeyManagerFactory.getInstance(algorithm);
-            keyStoreFactory.init(keyStore, sslConfiguration.getCertPass() != null ? sslConfiguration.getCertPass().toCharArray()
-                    : sslConfiguration.getKeyStorePass().toCharArray());
+            keyStoreFactory.init(keyStore, sslConfiguration.getCertPass() != null ?
+                    sslConfiguration.getCertPass().toCharArray() :
+                    sslConfiguration.getKeyStorePass().toCharArray());
             if (sslConfiguration.getTrustStore() != null) {
-                KeyStore trustStore = getKeyStore(sslConfiguration.getTrustStore(), sslConfiguration.getTrustStorePass());
+                KeyStore trustStore = getKeyStore(sslConfiguration.getTrustStore(),
+                        sslConfiguration.getTrustStorePass());
                 trustStoreFactory = TrustManagerFactory.getInstance(algorithm);
                 trustStoreFactory.init(trustStore);
             }
-        } catch (UnrecoverableKeyException |
-                NoSuchAlgorithmException | KeyStoreException | IOException ex) {
-            throw new IllegalArgumentException("Failed to initialize the server side SSLContext", ex);
+        } catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException | IOException ex) {
+            throw new IllegalArgumentException("Failed to initialize the server side SSLContext",
+                    ex);
         }
     }
 

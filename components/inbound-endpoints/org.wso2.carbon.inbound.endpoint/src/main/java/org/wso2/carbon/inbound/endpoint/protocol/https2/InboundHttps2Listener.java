@@ -18,7 +18,6 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.https2;
 
-
 import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
@@ -36,12 +35,12 @@ public class InboundHttps2Listener implements InboundRequestProcessor {
 
     public InboundHttps2Listener(InboundProcessorParams params) {
         processorParams = params;
-        String portParam = params.getProperties().getProperty(
-                InboundHttp2Constants.INBOUND_PORT);
+        String portParam = params.getProperties().getProperty(InboundHttp2Constants.INBOUND_PORT);
         try {
             port = Integer.parseInt(portParam);
         } catch (NumberFormatException e) {
-            handleException("Please provide port number as integer  instead of  port  " + portParam, e);
+            handleException("Please provide port number as integer  instead of  port  " + portParam,
+                    e);
         }
         name = params.getName();
     }

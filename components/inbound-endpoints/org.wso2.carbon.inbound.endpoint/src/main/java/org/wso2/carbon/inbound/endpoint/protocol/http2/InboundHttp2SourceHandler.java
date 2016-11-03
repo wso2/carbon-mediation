@@ -36,7 +36,6 @@ import java.util.*;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
-
 @Sharable
 public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements SourceHandler {
     private static final Log log = LogFactory.getLog(InboundHttp2SourceHandler.class);
@@ -44,8 +43,7 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
     private InboundHttp2ResponseSender responseSender;
     private final InboundHttp2Configuration config;
     private HashMap<Integer, HTTP2SourceRequest> streams = new HashMap<Integer, HTTP2SourceRequest>();
-    private Map<String, String> headerMap
-            = new TreeMap<String, String>(new Comparator<String>() {
+    private Map<String, String> headerMap = new TreeMap<String, String>(new Comparator<String>() {
         public int compare(String o1, String o2) {
             return o1.compareToIgnoreCase(o2);
         }
@@ -123,17 +121,20 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
     }
 
     public synchronized void sendResponse(MessageContext msgCtx) throws AxisFault {
-        ChannelHandlerContext channel = (ChannelHandlerContext) msgCtx.getProperty("stream-channel");
+        ChannelHandlerContext channel = (ChannelHandlerContext) msgCtx
+                .getProperty("stream-channel");
 
         ByteBuf content = channel.alloc().buffer();
 
-        String response = messageHandler.messageFormatter(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
+        String response = messageHandler
+                .messageFormatter(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
 
         content.writeBytes(response.getBytes());
 
         // Send a frame for the response status
         Http2Headers headers = new DefaultHttp2Headers().status(OK.codeAsText());
-        String contentType = messageHandler.getContentType(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
+        String contentType = messageHandler
+                .getContentType(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
         if (contentType != null) {
             headers.add(HttpHeaderNames.CONTENT_TYPE, contentType);
         }
@@ -141,6 +142,5 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
         channel.write(new DefaultHttp2HeadersFrame(headers));
         channel.writeAndFlush(new DefaultHttp2DataFrame(content, true));
     }
-
 
 }

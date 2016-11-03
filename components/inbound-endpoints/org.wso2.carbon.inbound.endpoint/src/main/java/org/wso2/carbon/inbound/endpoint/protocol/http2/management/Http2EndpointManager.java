@@ -46,7 +46,8 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
 
     private static org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EndpointManager instance = null;
 
-    private static final Logger log = Logger.getLogger(org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EndpointManager.class);
+    private static final Logger log = Logger.getLogger(
+            org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EndpointManager.class);
 
     protected Http2EndpointManager() {
         super();
@@ -60,7 +61,8 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
     }
 
     public boolean startEndpoint(int port, String name, InboundProcessorParams params) {
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext
+                .getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
 
         String epName = dataStore.getListeningEndpointName(port, tenantDomain);
@@ -68,12 +70,15 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
             if (epName.equalsIgnoreCase(name)) {
                 log.info(epName + " Endpoint is already started in port : " + port);
             } else {
-                String msg = "Another endpoint named : " + epName + " is currently using this port: " + port;
+                String msg =
+                        "Another endpoint named : " + epName + " is currently using this port: "
+                                + port;
                 log.warn(msg);
                 throw new SynapseException(msg);
             }
         } else {
-            dataStore.registerListeningEndpoint(port, tenantDomain, InboundHttp2Constants.HTTP2, name, params);
+            dataStore.registerListeningEndpoint(port, tenantDomain, InboundHttp2Constants.HTTP2,
+                    name, params);
             boolean start = startListener(port, name, params);
 
             if (start) {
@@ -88,7 +93,8 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
     }
 
     public boolean startSSLEndpoint(int port, String name, InboundProcessorParams params) {
-        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+        PrivilegedCarbonContext carbonContext = PrivilegedCarbonContext
+                .getThreadLocalCarbonContext();
         String tenantDomain = carbonContext.getTenantDomain();
         String epName = dataStore.getListeningEndpointName(port, tenantDomain);
 
@@ -96,13 +102,15 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
             if (epName.equalsIgnoreCase(name)) {
                 log.info(epName + " Endpoint is already started in port : " + port);
             } else {
-                String msg = "Another endpoint named : " + epName + " is currently using this port: " + port;
+                String msg =
+                        "Another endpoint named : " + epName + " is currently using this port: "
+                                + port;
                 log.warn(msg);
                 throw new SynapseException(msg);
             }
         } else {
-            dataStore.registerListeningEndpoint(port, tenantDomain, InboundHttp2Constants.HTTPS2, name,
-                    params);
+            dataStore.registerListeningEndpoint(port, tenantDomain, InboundHttp2Constants.HTTPS2,
+                    name, params);
             boolean start = startSSLListener(port, name, params);
             if (start) {
                 //do nothing
@@ -115,23 +123,23 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
     }
 
     public boolean startListener(int port, String name, InboundProcessorParams params) {
-        if (org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager.getInstance().isRegisteredExecutor(port)) {
+        if (org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager
+                .getInstance().isRegisteredExecutor(port)) {
             log.info("Netty Listener already started on port " + port);
             return true;
         }
 
         InboundHttp2Configuration config = buildConfiguration(port, name, params);
-        NettyThreadPoolConfiguration threadPoolConfig =
-                new NettyThreadPoolConfiguration(config.getBossThreadPoolSize(),
-                        config.getWorkerThreadPoolSize());
+        NettyThreadPoolConfiguration threadPoolConfig = new NettyThreadPoolConfiguration(
+                config.getBossThreadPoolSize(), config.getWorkerThreadPoolSize());
         InboundHttp2EventExecutor eventExecutor = new InboundHttp2EventExecutor(threadPoolConfig);
         //EventLoopGroup group = new NioEventLoopGroup();
-        org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager.getInstance().registerEventExecutor(port, eventExecutor);
+        org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager
+                .getInstance().registerEventExecutor(port, eventExecutor);
         ServerBootstrap b = new ServerBootstrap();
         b.option(ChannelOption.SO_BACKLOG, config.getSoBacklog());
         b.group(eventExecutor.getBossGroupThreadPool(), eventExecutor.getWorkerGroupThreadPool())
-                .channel(NioServerSocketChannel.class)
-                .handler(new LoggingHandler(LogLevel.INFO))
+                .channel(NioServerSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new InboundHttp2ServerInitializer((SslContext) null, config));
         try {
 
@@ -145,25 +153,26 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
     }
 
     public boolean startSSLListener(int port, String name, InboundProcessorParams params) {
-        if (org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEventExecutorManager.getInstance().isRegisteredExecutor(port)) {
+        if (org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEventExecutorManager
+                .getInstance().isRegisteredExecutor(port)) {
             log.info("Netty Listener already started on port " + port);
             return true;
         }
 
         InboundHttp2Configuration config = buildConfiguration(port, name, params);
         InboundWebsocketSSLConfiguration SslConfig = buildSSLConfiguration(params);
-        NettyThreadPoolConfiguration threadPoolConfig =
-                new NettyThreadPoolConfiguration(config.getBossThreadPoolSize(),
-                        config.getWorkerThreadPoolSize());
+        NettyThreadPoolConfiguration threadPoolConfig = new NettyThreadPoolConfiguration(
+                config.getBossThreadPoolSize(), config.getWorkerThreadPoolSize());
         InboundHttp2EventExecutor eventExecutor = new InboundHttp2EventExecutor(threadPoolConfig);
-        org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager.getInstance().registerEventExecutor(port, eventExecutor);
+        org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager
+                .getInstance().registerEventExecutor(port, eventExecutor);
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.option(ChannelOption.SO_BACKLOG, 1024);
-            b.group(eventExecutor.getBossGroupThreadPool(), eventExecutor.getWorkerGroupThreadPool())
-                    .channel(NioServerSocketChannel.class)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new InboundHttp2ServerInitializer(getSSLContext(SslConfig), config));
+            b.group(eventExecutor.getBossGroupThreadPool(),
+                    eventExecutor.getWorkerGroupThreadPool()).channel(NioServerSocketChannel.class)
+                    .handler(new LoggingHandler(LogLevel.INFO)).childHandler(
+                    new InboundHttp2ServerInitializer(getSSLContext(SslConfig), config));
 
             b.bind(config.getPort()).sync().channel();
 
@@ -181,7 +190,8 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
         String tenantDomain = cc.getTenantDomain();
         dataStore.unregisterListeningEndpoint(port, tenantDomain);
 
-        if (!org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager.getInstance().isRegisteredExecutor(port)) {
+        if (!org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager
+                .getInstance().isRegisteredExecutor(port)) {
             log.info("Listener Endpoint is not started");
             return;
         } else if (dataStore.isEndpointRegistryEmpty(port)) {
@@ -190,8 +200,10 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
 
     }
 
-    public InboundHttp2Configuration buildConfiguration(int port, String name, InboundProcessorParams params) {
-        return new InboundHttp2Configuration.InboundHttp2ConfigurationBuilder(port, name, params).build();
+    public InboundHttp2Configuration buildConfiguration(int port, String name,
+            InboundProcessorParams params) {
+        return new InboundHttp2Configuration.InboundHttp2ConfigurationBuilder(port, name, params)
+                .build();
 
     }
 
@@ -202,20 +214,18 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
             SelfSignedCertificate ssc = new SelfSignedCertificate();
             SSLHandlerFactory handlerFactory = new SSLHandlerFactory(sslconfig);
             sslContext = SslContextBuilder.forServer(handlerFactory.getKeyStoreFactory())
-                    .trustManager(handlerFactory.getTrustStoreFactory())
-                    .sslProvider(provider)
+                    .trustManager(handlerFactory.getTrustStoreFactory()).sslProvider(provider)
                 /* NOTE: the cipher filter may not include all ciphers required by the HTTP/2 specification.
                  * Please refer to the HTTP/2 specification for cipher requirements. */
                     .ciphers(Http2SecurityUtil.CIPHERS, SupportedCipherSuiteFilter.INSTANCE)
-                    .applicationProtocolConfig(new ApplicationProtocolConfig(
-                            ApplicationProtocolConfig.Protocol.ALPN,
-                            // NO_ADVERTISE is currently the only mode supported by both OpenSsl and JDK providers.
-                            ApplicationProtocolConfig.SelectorFailureBehavior.NO_ADVERTISE,
-                            // ACCEPT is currently the only mode supported by both OpenSsl and JDK providers.
-                            ApplicationProtocolConfig.SelectedListenerFailureBehavior.ACCEPT,
-                            ApplicationProtocolNames.HTTP_2,
-                            ApplicationProtocolNames.HTTP_1_1))
-                    .build();
+                    .applicationProtocolConfig(
+                            new ApplicationProtocolConfig(ApplicationProtocolConfig.Protocol.ALPN,
+                                    // NO_ADVERTISE is currently the only mode supported by both OpenSsl and JDK providers.
+                                    ApplicationProtocolConfig.SelectorFailureBehavior.NO_ADVERTISE,
+                                    // ACCEPT is currently the only mode supported by both OpenSsl and JDK providers.
+                                    ApplicationProtocolConfig.SelectedListenerFailureBehavior.ACCEPT,
+                                    ApplicationProtocolNames.HTTP_2,
+                                    ApplicationProtocolNames.HTTP_1_1)).build();
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (SSLException e) {
@@ -225,18 +235,16 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
     }
 
     public InboundWebsocketSSLConfiguration buildSSLConfiguration(InboundProcessorParams params) {
-        return new InboundWebsocketSSLConfiguration.SSLConfigurationBuilder(
-                params.getProperties().getProperty(
-                        InboundHttp2Constants.INBOUND_SSL_KEY_STORE_FILE),
-                params.getProperties().getProperty(
-                        InboundHttp2Constants.INBOUND_SSL_KEY_STORE_PASS),
-                params.getProperties().getProperty(
-                        InboundHttp2Constants.INBOUND_SSL_TRUST_STORE_FILE),
-                params.getProperties().getProperty(
-                        InboundHttp2Constants.INBOUND_SSL_TRUST_STORE_PASS),
-                params.getProperties().getProperty(
-                        InboundHttp2Constants.INBOUND_SSL_CERT_PASS)).build();
+        return new InboundWebsocketSSLConfiguration.SSLConfigurationBuilder(params.getProperties()
+                .getProperty(InboundHttp2Constants.INBOUND_SSL_KEY_STORE_FILE),
+                params.getProperties()
+                        .getProperty(InboundHttp2Constants.INBOUND_SSL_KEY_STORE_PASS),
+                params.getProperties()
+                        .getProperty(InboundHttp2Constants.INBOUND_SSL_TRUST_STORE_FILE),
+                params.getProperties()
+                        .getProperty(InboundHttp2Constants.INBOUND_SSL_TRUST_STORE_PASS),
+                params.getProperties().getProperty(InboundHttp2Constants.INBOUND_SSL_CERT_PASS))
+                .build();
     }
-
 
 }

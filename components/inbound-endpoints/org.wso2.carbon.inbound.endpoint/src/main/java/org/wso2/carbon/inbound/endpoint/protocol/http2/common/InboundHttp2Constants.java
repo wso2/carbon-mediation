@@ -20,10 +20,8 @@ package org.wso2.carbon.inbound.endpoint.protocol.http2.common;
 
 public class InboundHttp2Constants {
 
-
     public static final String HTTP2 = "http2";
     public static final String HTTPS2 = "https2";
-
 
     public static final String INBOUND_PORT = "inbound.http2.port";
     public static final String INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN = "dispatch.filter.pattern";

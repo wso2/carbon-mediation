@@ -22,7 +22,8 @@ import org.apache.log4j.Logger;
 
 public class NettyThreadPoolConfiguration {
 
-    private static final Logger log = Logger.getLogger(org.wso2.carbon.inbound.endpoint.protocol.http2.configuration.NettyThreadPoolConfiguration.class);
+    private static final Logger log = Logger.getLogger(
+            org.wso2.carbon.inbound.endpoint.protocol.http2.configuration.NettyThreadPoolConfiguration.class);
 
     private int bossThreadPoolSize;
     private int workerThreadPoolSize;

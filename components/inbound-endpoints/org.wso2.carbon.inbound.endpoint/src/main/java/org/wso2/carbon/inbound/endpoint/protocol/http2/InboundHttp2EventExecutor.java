@@ -27,7 +27,6 @@ public class InboundHttp2EventExecutor {
     private EventLoopGroup workerGroup;
     private EventLoopGroup bossGroup;
 
-
     public InboundHttp2EventExecutor(NettyThreadPoolConfiguration configuration) {
         workerGroup = new NioEventLoopGroup(configuration.getBossThreadPoolSize());
         bossGroup = new NioEventLoopGroup(configuration.getBossThreadPoolSize());
