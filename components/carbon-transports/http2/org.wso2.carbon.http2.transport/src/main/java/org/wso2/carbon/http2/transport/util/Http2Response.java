@@ -22,7 +22,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http2.Http2DataFrame;
-import io.netty.handler.codec.http2.Http2HeadersFrame;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 import io.netty.util.CharsetUtil;
 import org.apache.commons.collections.map.MultiValueMap;
@@ -30,14 +31,13 @@ import org.apache.commons.collections.map.MultiValueMap;
 import java.util.*;
 
 public class Http2Response {
-
+    private final Log log=LogFactory.getLog(Http2Response.class);
     private Map<String, String> headers = new HashMap();
     private Map excessHeaders = new MultiValueMap();
     private boolean endOfStream = false;
     private boolean expectResponseBody = false;
     private int status = 200;
     private String statusLine = "OK";
-    private boolean responseFromHttp2Server = true;
     private byte[] data;
 
     public boolean isEndOfStream() {
@@ -69,7 +69,6 @@ public class Http2Response {
     }
 
     public Http2Response(FullHttpResponse response) {
-        responseFromHttp2Server = false;
         endOfStream = true;
         List<Map.Entry<String, String>> headerList = response.headers().entries();
         for (Map.Entry header : headerList) {
@@ -88,44 +87,17 @@ public class Http2Response {
         this.statusLine = response.status().reasonPhrase();
         if (response.headers().contains(HttpHeaderNames.CONTENT_TYPE)) {
             expectResponseBody = true;
+
+        }
+        try{
             setData(response);
+        }catch (Exception e){
+            log.error(e.getStackTrace());
         }
 
 
     }
 
-    public Http2Response(Http2HeadersFrame frame) {
-        responseFromHttp2Server = true;
-        if (frame.isEndStream()) {
-            endOfStream = true;
-        }
-        Iterator<Map.Entry<CharSequence, CharSequence>> iterator = frame.headers().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<CharSequence, CharSequence> header = iterator.next();
-            String key = header.getKey().toString();
-            key = (key.charAt(0) == ':') ? key.substring(1) : key;
-
-            if (this.headers.containsKey(key)) {
-                this.excessHeaders.put(key, header.getValue().toString());
-            } else {
-                this.headers.put(key, header.getValue().toString());
-            }
-        }
-        if (headers.containsKey("status")) {
-            status = Integer.parseInt(headers.get("status").toString());
-        }
-        if (headers.containsKey(HttpHeaderNames.CONTENT_TYPE)) {
-            expectResponseBody = true;
-        }
-    }
-
-    public void setDataFrame(Http2DataFrame data) {
-        setData(data);
-        expectResponseBody = true;
-        if (data.isEndStream()) {
-            endOfStream = true;
-        }
-    }
 
     public byte[] getBytes() {
         return data;
@@ -144,7 +116,9 @@ public class Http2Response {
             byte[] arr = new byte[contentLength];
             content.readBytes(arr);
             response = new String(arr, 0, contentLength, CharsetUtil.UTF_8);
+            expectResponseBody=true;
+            data = response.getBytes();
         }
-        data = response.getBytes();
+
     }
 }

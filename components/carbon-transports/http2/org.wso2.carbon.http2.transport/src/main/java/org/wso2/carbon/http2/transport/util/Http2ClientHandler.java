@@ -90,17 +90,9 @@ public class Http2ClientHandler extends SimpleChannelInboundHandler<Object> {
         if (responseMap.containsKey(streamId)) {
             response = responseMap.get(streamId);
         } else {
-            if (msg instanceof Http2HeadersFrame) {
-                Http2HeadersFrame res = (Http2HeadersFrame) msg;
-                response = new Http2Response(res);
-            } else {
                 FullHttpResponse res = (FullHttpResponse) msg;
                 response = new Http2Response(res);
-            }
             responseMap.put(streamId, response);
-        }
-        if (msg instanceof Http2DataFrame) {
-            response.setDataFrame((Http2DataFrame) msg);
         }
         if (response.isEndOfStream()) {
             Http2ClientWorker clientWorker = new Http2ClientWorker(targetConfig, request, response);
