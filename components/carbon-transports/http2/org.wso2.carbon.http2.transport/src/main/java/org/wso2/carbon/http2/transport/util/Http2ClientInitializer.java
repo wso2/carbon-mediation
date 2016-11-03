@@ -48,15 +48,11 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         final Http2Connection connection = new DefaultHttp2Connection(false);
-        connectionHandler = new HttpToHttp2ConnectionHandlerBuilder()
-                .frameListener(new DelegatingDecompressorFrameListener(
-                        connection,
+        connectionHandler = new HttpToHttp2ConnectionHandlerBuilder().frameListener(
+                new DelegatingDecompressorFrameListener(connection,
                         new InboundHttp2ToHttpAdapterBuilder(connection)
-                                .maxContentLength(maxContentLength)
-                                .propagateSettings(true)
-                                .build()))
-                .connection(connection)
-                .build();
+                                .maxContentLength(maxContentLength).propagateSettings(true)
+                                .build())).connection(connection).build();
         responseHandler = new Http2ClientHandler();
         settingsHandler = new Http2SettingsHandler(ch.newPromise());
         if (sslCtx != null) {
@@ -78,7 +74,6 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(settingsHandler, responseHandler);
     }
 
-
     private void configureSsl(SocketChannel ch) {
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(sslCtx.newHandler(ch.alloc()));
@@ -97,24 +92,21 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
         });
     }
 
-
     private void configureClearText(SocketChannel ch) {
         HttpClientCodec sourceCodec = new HttpClientCodec();
         Http2ClientUpgradeCodec upgradeCodec = new Http2ClientUpgradeCodec(connectionHandler);
-        HttpClientUpgradeHandler upgradeHandler = new HttpClientUpgradeHandler(sourceCodec, upgradeCodec, 65536);
+        HttpClientUpgradeHandler upgradeHandler = new HttpClientUpgradeHandler(sourceCodec,
+                upgradeCodec, 65536);
 
-        ch.pipeline().addLast(sourceCodec,
-                upgradeHandler,
-                new UpgradeRequestHandler(),
+        ch.pipeline().addLast(sourceCodec, upgradeHandler, new UpgradeRequestHandler(),
                 new UserEventLogger());
     }
-
 
     private final class UpgradeRequestHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
-            DefaultFullHttpRequest upgradeRequest =
-                    new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
+            DefaultFullHttpRequest upgradeRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
+                    HttpMethod.GET, "/");
             ctx.writeAndFlush(upgradeRequest);
             ctx.fireChannelActive();
             ctx.pipeline().remove(this);

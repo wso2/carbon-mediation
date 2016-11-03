@@ -38,7 +38,6 @@ import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-
 public class Http2ClientHandler extends SimpleChannelInboundHandler<Object> {
 
     private volatile SortedMap<Integer, Map.Entry<ChannelFuture, ChannelPromise>> streamidPromiseMap;
@@ -58,23 +57,21 @@ public class Http2ClientHandler extends SimpleChannelInboundHandler<Object> {
         this.channel = channel;
     }
 
-
     public Http2ClientHandler() {
         streamidPromiseMap = new TreeMap<Integer, Map.Entry<ChannelFuture, ChannelPromise>>();
         requests = new TreeMap<Integer, MessageContext>();
         responseMap = new TreeMap<>();
     }
 
-
     public void put(int streamId, Object request) {
-        streamidPromiseMap.put(streamId,
-                new AbstractMap.SimpleEntry<ChannelFuture, ChannelPromise>(channel.writeAndFlush(request), channel.newPromise()));
+        streamidPromiseMap.put(streamId, new AbstractMap.SimpleEntry<ChannelFuture, ChannelPromise>(
+                channel.writeAndFlush(request), channel.newPromise()));
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        Integer streamId = ((FullHttpResponse) msg).headers().getInt(
-                HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text());
+        Integer streamId = ((FullHttpResponse) msg).headers()
+                .getInt(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text());
 
         if (streamId == null) {
             log.error("unexpected message received: " + msg);
@@ -90,8 +87,8 @@ public class Http2ClientHandler extends SimpleChannelInboundHandler<Object> {
         if (responseMap.containsKey(streamId)) {
             response = responseMap.get(streamId);
         } else {
-                FullHttpResponse res = (FullHttpResponse) msg;
-                response = new Http2Response(res);
+            FullHttpResponse res = (FullHttpResponse) msg;
+            response = new Http2Response(res);
             responseMap.put(streamId, response);
         }
         if (response.isEndOfStream()) {

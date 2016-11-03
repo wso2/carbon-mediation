@@ -55,8 +55,7 @@ public class Http2TransportSender extends AbstractTransportSender {
         connectionFactory = Http2ConnectionFactory.getInstance(transportOut);
         proxyConfig = new ProxyConfigBuilder().build(transportOut);
         log.info(proxyConfig.logProxyConfig());
-        targetConfiguration = new TargetConfiguration(cfgCtx,
-                transportOut, null, null,
+        targetConfiguration = new TargetConfiguration(cfgCtx, transportOut, null, null,
                 proxyConfig.createProxyAuthenticator());
         targetConfiguration.build();
 
@@ -85,7 +84,8 @@ public class Http2TransportSender extends AbstractTransportSender {
             HttpHost target = new HttpHost(hostname, port, scheme);
             boolean secure = "https".equalsIgnoreCase(target.getSchemeName());
 
-            msgCtx.setProperty(PassThroughConstants.PROXY_PROFILE_TARGET_HOST, target.getHostName());
+            msgCtx.setProperty(PassThroughConstants.PROXY_PROFILE_TARGET_HOST,
+                    target.getHostName());
 
             if (log.isDebugEnabled()) {
                 log.debug("Fetching a Connection from the Http2(Https2) Connection Factory.");
@@ -95,9 +95,10 @@ public class Http2TransportSender extends AbstractTransportSender {
             clientHandler.setTargetConfig(targetConfiguration);
             //For steaming data
             int streamId;
-            if (msgCtx.getProperty(Http2Constants.HTTP2_DATA_FRAME_PRESENT) != null
-                    && msgCtx.getProperty(Http2Constants.HTTP2_DATA_FRAME_PRESENT).equals(true)) {
-                Http2DataFrame frame = (Http2DataFrame) msgCtx.getProperty(Http2Constants.HTTP2_DATA_FRAME);
+            if (msgCtx.getProperty(Http2Constants.HTTP2_DATA_FRAME_PRESENT) != null && msgCtx
+                    .getProperty(Http2Constants.HTTP2_DATA_FRAME_PRESENT).equals(true)) {
+                Http2DataFrame frame = (Http2DataFrame) msgCtx
+                        .getProperty(Http2Constants.HTTP2_DATA_FRAME);
                 if (log.isDebugEnabled()) {
                     log.debug("Sending the data frame to the Http2 server on channel id : "
                             + clientHandler.getChannel().toString());
@@ -111,12 +112,13 @@ public class Http2TransportSender extends AbstractTransportSender {
             } else {
                 RelayUtils.buildMessage(msgCtx, false);
                 OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
-                MessageFormatter messageFormatter =
-                        MessageProcessorSelector.getMessageFormatter(msgCtx);
+                MessageFormatter messageFormatter = MessageProcessorSelector
+                        .getMessageFormatter(msgCtx);
                 StringWriter sw = new StringWriter();
                 OutputStream out = new WriterOutputStream(sw, format.getCharSetEncoding());
                 messageFormatter.writeTo(msgCtx, format, out, true);
-                String contentType = messageFormatter.getContentType(msgCtx, format, msgCtx.getSoapAction());
+                String contentType = messageFormatter
+                        .getContentType(msgCtx, format, msgCtx.getSoapAction());
                 out.close();
                 String msg = sw.toString();
 
@@ -130,16 +132,22 @@ public class Http2TransportSender extends AbstractTransportSender {
                 if (channel.isActive()) {
                     clientHandler.setRequest(streamId, msgCtx);
                     log.debug("Sending message to backend: " + msg);
-                    String method = (msgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null ? msgCtx.getProperty(Constants.Configuration.HTTP_METHOD).toString() : POST.toString());
+                    String method = (
+                            msgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null ?
+                                    msgCtx.getProperty(Constants.Configuration.HTTP_METHOD)
+                                            .toString() :
+                                    POST.toString());
                     //Set content type and required frames
                     HttpMethod m = new HttpMethod(method);
                     FullHttpRequest request = new DefaultFullHttpRequest(HTTP_1_1, m, uri.getPath(),
                             Unpooled.copiedBuffer(msg.getBytes(CharsetUtil.UTF_8)));
                     request.headers().add(HttpHeaderNames.HOST, new URI(targetEPR).getHost());
-                    request.headers().add(HttpConversionUtil.ExtensionHeaderNames.SCHEME.text(), secure ? HttpScheme.HTTPS : HttpScheme.HTTP);
+                    request.headers().add(HttpConversionUtil.ExtensionHeaderNames.SCHEME.text(),
+                            secure ? HttpScheme.HTTPS : HttpScheme.HTTP);
                     request.headers().add(HttpHeaderNames.CONTENT_TYPE, contentType);
                     request.headers().add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP);
-                    request.headers().add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.DEFLATE);
+                    request.headers()
+                            .add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.DEFLATE);
                     clientHandler.put(streamId, request);
                     log.info("Request sent to backend with stream id:" + streamId);
                 }

@@ -39,7 +39,6 @@ import java.net.URI;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-
 public class Http2ConnectionFactory {
 
     private static Http2ConnectionFactory factory;
@@ -76,30 +75,32 @@ public class Http2ConnectionFactory {
 
         final SslContext sslCtx;
         final boolean SSL;
-        if (uri.getScheme().equalsIgnoreCase(Http2Constants.HTTPS2) || uri.getScheme().equalsIgnoreCase("https")) {
+        if (uri.getScheme().equalsIgnoreCase(Http2Constants.HTTPS2) || uri.getScheme()
+                .equalsIgnoreCase("https")) {
             SSL = true;
         } else
             SSL = false;
         try {
-//            Handling SSL
+            //            Handling SSL
             if (SSL) {
-                Parameter trustParam = trasportOut.getParameter(Http2Constants.TRUST_STORE_CONFIG_ELEMENT);
+                Parameter trustParam = trasportOut
+                        .getParameter(Http2Constants.TRUST_STORE_CONFIG_ELEMENT);
                 OMElement tsEle = null;
                 if (trustParam != null) {
                     tsEle = trustParam.getParameterElement();
                 }
-                final String location =
-                        tsEle.getFirstChildWithName(new QName(Http2Constants.TRUST_STORE_LOCATION))
-                                .getText();
-                final String storePassword =
-                        tsEle.getFirstChildWithName(new QName(Http2Constants.TRUST_STORE_PASSWORD))
-                                .getText();
+                final String location = tsEle
+                        .getFirstChildWithName(new QName(Http2Constants.TRUST_STORE_LOCATION))
+                        .getText();
+                final String storePassword = tsEle
+                        .getFirstChildWithName(new QName(Http2Constants.TRUST_STORE_PASSWORD))
+                        .getText();
 
-
-                SslProvider provider = OpenSsl.isAlpnSupported() ? SslProvider.OPENSSL : SslProvider.JDK;
+                SslProvider provider = OpenSsl.isAlpnSupported() ?
+                        SslProvider.OPENSSL :
+                        SslProvider.JDK;
                 sslCtx = SslContextBuilder.forClient()
-                        .trustManager(SSLUtil.createTrustmanager(location,
-                                storePassword))
+                        .trustManager(SSLUtil.createTrustmanager(location, storePassword))
                         .sslProvider(provider)
                         .ciphers(Http2SecurityUtil.CIPHERS, SupportedCipherSuiteFilter.INSTANCE)
                         .trustManager(InsecureTrustManagerFactory.INSTANCE)
@@ -107,15 +108,15 @@ public class Http2ConnectionFactory {
                                 ApplicationProtocolConfig.Protocol.ALPN,
                                 ApplicationProtocolConfig.SelectorFailureBehavior.NO_ADVERTISE,
                                 ApplicationProtocolConfig.SelectedListenerFailureBehavior.ACCEPT,
-                                ApplicationProtocolNames.HTTP_2,
-                                ApplicationProtocolNames.HTTP_1_1))
+                                ApplicationProtocolNames.HTTP_2, ApplicationProtocolNames.HTTP_1_1))
                         .build();
             } else {
                 sslCtx = null;
             }
 
             EventLoopGroup workerGroup = new NioEventLoopGroup();
-            Http2ClientInitializer initializer = new Http2ClientInitializer(sslCtx, Integer.MAX_VALUE);
+            Http2ClientInitializer initializer = new Http2ClientInitializer(sslCtx,
+                    Integer.MAX_VALUE);
 
             String HOST = uri.getHost();
             Integer PORT = uri.getPort();
@@ -172,7 +173,8 @@ public class Http2ConnectionFactory {
         String host = uri.getHost();
         int port = uri.getPort();
         String ssl;
-        if (uri.getScheme().equalsIgnoreCase(Http2Constants.HTTPS2) || uri.getScheme().equalsIgnoreCase("https")) {
+        if (uri.getScheme().equalsIgnoreCase(Http2Constants.HTTPS2) || uri.getScheme()
+                .equalsIgnoreCase("https")) {
             ssl = "https://";
         } else
             ssl = "http://";

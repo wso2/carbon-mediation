@@ -40,7 +40,8 @@ public class ServiceReferenceHolder {
         return null;
     }
 
-    public void setConfigurationContextService(ConfigurationContextService configurationContextService) {
+    public void setConfigurationContextService(
+            ConfigurationContextService configurationContextService) {
         this.configurationContextService = configurationContextService;
     }
 

@@ -42,13 +42,13 @@ public class SSLUtil {
     private static final Logger LOGGER = Logger.getLogger(SSLUtil.class);
 
     public static SSLContext createServerSSLContext(final String keyStoreLocation,
-                                                    final String keyStorePwd) {
+            final String keyStorePwd) {
         try {
             if (serverSSLCtx == null) {
                 KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
                 keyStore.load(new FileInputStream(keyStoreLocation), keyStorePwd.toCharArray());
-                KeyManagerFactory keyManagerFactory =
-                        KeyManagerFactory.getInstance(KEY_MANAGER_TYPE);
+                KeyManagerFactory keyManagerFactory = KeyManagerFactory
+                        .getInstance(KEY_MANAGER_TYPE);
                 keyManagerFactory.init(keyStore, keyStorePwd.toCharArray());
                 serverSSLCtx = SSLContext.getInstance(PROTOCOL);
                 serverSSLCtx.init(keyManagerFactory.getKeyManagers(), null, null);
@@ -73,14 +73,14 @@ public class SSLUtil {
     }
 
     public static SSLContext createClientSSLContext(final String trustStoreLocation,
-                                                    final String trustStorePwd) {
+            final String trustStorePwd) {
         try {
             if (clientSSLCtx == null) {
                 KeyStore trustStore = KeyStore.getInstance(TRUST_STORE_TYPE);
-                trustStore.load(new FileInputStream(trustStoreLocation),
-                        trustStorePwd.toCharArray());
-                TrustManagerFactory trustManagerFactory =
-                        TrustManagerFactory.getInstance(TRUST_MANAGER_TYPE);
+                trustStore
+                        .load(new FileInputStream(trustStoreLocation), trustStorePwd.toCharArray());
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory
+                        .getInstance(TRUST_MANAGER_TYPE);
                 trustManagerFactory.init(trustStore);
                 clientSSLCtx = SSLContext.getInstance(PROTOCOL);
                 clientSSLCtx.init(null, trustManagerFactory.getTrustManagers(), null);
@@ -104,18 +104,15 @@ public class SSLUtil {
     }
 
     public static TrustManagerFactory createTrustmanager(final String trustStoreLocation,
-                                                         final String trustStorePwd) {
+            final String trustStorePwd) {
         TrustManagerFactory trustManagerFactory = null;
         try {
             if (clientSSLCtx == null) {
                 KeyStore trustStore = KeyStore.getInstance(TRUST_STORE_TYPE);
-                trustStore.load(new FileInputStream(trustStoreLocation),
-                        trustStorePwd.toCharArray());
+                trustStore
+                        .load(new FileInputStream(trustStoreLocation), trustStorePwd.toCharArray());
                 trustManagerFactory = TrustManagerFactory.getInstance(TRUST_MANAGER_TYPE);
                 trustManagerFactory.init(trustStore);
-                // clientSSLCtx = SSLContext.getInstance(PROTOCOL);
-                // clientSSLCtx.init(null,
-                // trustManagerFactory.getTrustManagers(), null);
             }
         } catch (KeyStoreException e) {
             LOGGER.error("Exception was thrown while building the client SSL Context", e);

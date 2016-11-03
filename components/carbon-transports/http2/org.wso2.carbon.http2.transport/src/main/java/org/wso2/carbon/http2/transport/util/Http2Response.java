@@ -31,7 +31,7 @@ import org.apache.commons.collections.map.MultiValueMap;
 import java.util.*;
 
 public class Http2Response {
-    private final Log log=LogFactory.getLog(Http2Response.class);
+    private final Log log = LogFactory.getLog(Http2Response.class);
     private Map<String, String> headers = new HashMap();
     private Map excessHeaders = new MultiValueMap();
     private boolean endOfStream = false;
@@ -72,7 +72,8 @@ public class Http2Response {
         endOfStream = true;
         List<Map.Entry<String, String>> headerList = response.headers().entries();
         for (Map.Entry header : headerList) {
-            if (header.getKey().toString().equalsIgnoreCase(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.toString())) {
+            if (header.getKey().toString().equalsIgnoreCase(
+                    HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.toString())) {
                 continue;
             }
             String key = header.getKey().toString();
@@ -89,15 +90,13 @@ public class Http2Response {
             expectResponseBody = true;
 
         }
-        try{
+        try {
             setData(response);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getStackTrace());
         }
 
-
     }
-
 
     public byte[] getBytes() {
         return data;
@@ -116,7 +115,7 @@ public class Http2Response {
             byte[] arr = new byte[contentLength];
             content.readBytes(arr);
             response = new String(arr, 0, contentLength, CharsetUtil.UTF_8);
-            expectResponseBody=true;
+            expectResponseBody = true;
             data = response.getBytes();
         }
 

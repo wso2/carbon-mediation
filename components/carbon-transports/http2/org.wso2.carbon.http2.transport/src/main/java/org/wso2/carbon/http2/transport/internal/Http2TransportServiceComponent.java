@@ -29,7 +29,6 @@ import org.wso2.carbon.http2.transport.service.Https2TransportService;
 import org.wso2.carbon.http2.transport.service.ServiceReferenceHolder;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
-
 public class Http2TransportServiceComponent {
     private static Log log = LogFactory.getLog(Http2TransportServiceComponent.class);
 
@@ -50,14 +49,18 @@ public class Http2TransportServiceComponent {
             if (contextService != null) {
                 configContext = contextService.getServerConfigContext();
             } else {
-                throw new Exception(
-                        "ConfigurationContext is not found while loading org.wso2.carbon.http2.transport bundle");
+                throw new Exception("ConfigurationContext is not found while loading "
+                        + "org.wso2.carbon.http2.transport bundle");
             }
 
-            new TransportPersistenceManager(configContext.getAxisConfiguration()).saveTransportConfiguration(Http2TransportService.TRANSPORT_NAME,
-                    ctxt.getBundleContext().getBundle().getResource(Http2TransportService.TRANSPORT_CONF));
-            new TransportPersistenceManager(configContext.getAxisConfiguration()).saveTransportConfiguration(Https2TransportService.TRANSPORT_NAME,
-                    ctxt.getBundleContext().getBundle().getResource(Https2TransportService.TRANSPORT_CONF));
+            new TransportPersistenceManager(configContext.getAxisConfiguration())
+                    .saveTransportConfiguration(Http2TransportService.TRANSPORT_NAME,
+                            ctxt.getBundleContext().getBundle()
+                                    .getResource(Http2TransportService.TRANSPORT_CONF));
+            new TransportPersistenceManager(configContext.getAxisConfiguration())
+                    .saveTransportConfiguration(Https2TransportService.TRANSPORT_NAME,
+                            ctxt.getBundleContext().getBundle()
+                                    .getResource(Https2TransportService.TRANSPORT_CONF));
 
             Http2Transport = new Http2TransportService();
             Https2Transport = new Https2TransportService();
