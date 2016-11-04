@@ -54,6 +54,7 @@
                             javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
                             org.apache.commons.logging,
                             org.apache.axis2.*; version="${axis2.osgi.version.range}",
+                            org.yaml.snakeyaml.*; version="${orbit.snakeyaml.import.version.range}",
                             *;resolution:=optional
                         </Import-Package>
                         <Fragment-Host>synapse-nhttp-transport</Fragment-Host>
@@ -80,6 +81,10 @@
         <dependency>
             <groupId>org.apache.synapse</groupId>
             <artifactId>synapse-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
         </dependency>
     </dependencies>
 </project>

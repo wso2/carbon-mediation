@@ -2288,6 +2288,11 @@
                 <artifactId>guava</artifactId>
                 <version>${google.guava.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.wso2.orbit.org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${orbit.version.snakeyaml}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -2480,6 +2485,8 @@
         <esotericsoftware.kryo.version>3.0.3</esotericsoftware.kryo.version>
         <org.objenesis.version>2.1</org.objenesis.version>
         <esotericsoftware.minlog.version>1.3.0</esotericsoftware.minlog.version>
+        <orbit.version.snakeyaml>1.16.0.wso2v1</orbit.version.snakeyaml>
+        <orbit.snakeyaml.import.version.range>[1.16.0.wso2v1, 2.0.0)</orbit.snakeyaml.import.version.range>
     </properties>
     <pluginRepositories>
         <pluginRepository>
