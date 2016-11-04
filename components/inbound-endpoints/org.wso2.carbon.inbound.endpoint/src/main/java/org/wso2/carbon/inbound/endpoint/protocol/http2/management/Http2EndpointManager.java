@@ -133,7 +133,7 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
         NettyThreadPoolConfiguration threadPoolConfig = new NettyThreadPoolConfiguration(
                 config.getBossThreadPoolSize(), config.getWorkerThreadPoolSize());
         InboundHttp2EventExecutor eventExecutor = new InboundHttp2EventExecutor(threadPoolConfig);
-        //EventLoopGroup group = new NioEventLoopGroup();
+
         org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager
                 .getInstance().registerEventExecutor(port, eventExecutor);
         ServerBootstrap b = new ServerBootstrap();
