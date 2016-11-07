@@ -21,6 +21,9 @@ package org.wso2.carbon.inbound.endpoint.protocol.websocket.pipelinehandlers;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+/**
+ * This class is an example of a Pipeline Handler
+ */
 public class SamplePipelineHandler extends ChannelInboundHandlerAdapter {
 
     @Override

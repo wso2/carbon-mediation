@@ -26,9 +26,19 @@ import org.apache.synapse.SynapseException;
 
 import java.lang.reflect.Constructor;
 
+/**
+ * This class builds a ChannelHandler instance from the pipeline handler String
+ * given in the configuration file
+ */
 public class PipelineHandlerBuilderUtil {
     private static final Log log = LogFactory.getLog(PipelineHandlerBuilderUtil.class);
 
+    /**
+     * build a ChannelHandler instance from a String
+     *
+     * @param handlerClass the pipeline handler class given in the configuration
+     * @return ChannelHandler instance of the pipeline handler
+     */
     public static ChannelHandler stringToPipelineHandlers(String handlerClass) {
         ChannelInboundHandlerAdapter hand = null;
         if (handlerClass != null) {
