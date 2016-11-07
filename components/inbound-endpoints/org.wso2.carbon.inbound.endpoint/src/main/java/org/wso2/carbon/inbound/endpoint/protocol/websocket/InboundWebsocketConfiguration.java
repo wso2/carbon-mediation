@@ -26,6 +26,8 @@ public class InboundWebsocketConfiguration {
     private String outFlowDispatchSequence;
     private String outFlowErrorSequence;
     private String subprotocolHandler;
+    private String pipelineHandler;
+    private String dispatchToCustomSequence;
 
     private InboundWebsocketConfiguration(InboundWebsocketConfigurationBuilder builder) {
         this.port = builder.port;
@@ -36,6 +38,8 @@ public class InboundWebsocketConfiguration {
         this.outFlowDispatchSequence = builder.outFlowDispatchSequence;
         this.outFlowErrorSequence = builder.outFlowErrorSequence;
         this.subprotocolHandler = builder.subprotocolHandler;
+        this.pipelineHandler = builder.pipelineHandler;
+        this.dispatchToCustomSequence = builder.dispatchToCustomSequence;
     }
 
     public int getPort() {
@@ -70,6 +74,14 @@ public class InboundWebsocketConfiguration {
         return subprotocolHandler;
     }
 
+    public String getPipelineHandler() {
+        return pipelineHandler;
+    }
+
+    public String getDispatchToCustomSequence() {
+        return dispatchToCustomSequence;
+    }
+
     public static class InboundWebsocketConfigurationBuilder {
         private final int port;
         private final String name;
@@ -79,6 +91,8 @@ public class InboundWebsocketConfiguration {
         private String outFlowDispatchSequence;
         private String outFlowErrorSequence;
         private String subprotocolHandler;
+        private String pipelineHandler;
+        private String dispatchToCustomSequence;
 
         public InboundWebsocketConfigurationBuilder(int port, String name) {
             this.port = port;
@@ -119,6 +133,15 @@ public class InboundWebsocketConfiguration {
             return this;
         }
 
+        public InboundWebsocketConfigurationBuilder pipelineHandler(String pipelineHandler) {
+            this.pipelineHandler = pipelineHandler;
+            return this;
+        }
+
+        public InboundWebsocketConfigurationBuilder dispatchToCustomSequence(String dispatchToCustomSequence) {
+            this.dispatchToCustomSequence = dispatchToCustomSequence;
+            return this;
+        }
     }
 
 }

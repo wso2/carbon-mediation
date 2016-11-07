@@ -85,6 +85,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private URI subscriberPath;
     private String tenantDomain;
     private int port;
+    private boolean dispatchToCustomSequence;
     private InboundWebsocketResponseSender responseSender;
     private static ArrayList<String> contentTypes = new ArrayList<>();
     private static ArrayList<String> otherSubprotocols = new ArrayList<>();
@@ -140,12 +141,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private void handleHandshake(ChannelHandlerContext ctx, FullHttpRequest req) throws URISyntaxException, AxisFault {
 
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
-                getWebSocketLocation(req), SubprotocolBuilderUtil.buildSubprotocolString(contentTypes,otherSubprotocols), true);
+                getWebSocketLocation(req), SubprotocolBuilderUtil.buildSubprotocolString(contentTypes, otherSubprotocols), true);
         handshaker = wsFactory.newHandshaker(req);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
         } else {
-            ChannelFuture future=handshaker.handshake(ctx.channel(), req);
+            ChannelFuture future = handshaker.handshake(ctx.channel(), req);
             future.addListener(new ChannelFutureListener() {
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
@@ -177,7 +178,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         }
 
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
         injectToSequence(synCtx, endpoint);
 
     }
@@ -231,7 +232,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 if (frame instanceof CloseWebSocketFrame) {
                     handleClientWebsocketChannelTermination(frame);
                     return;
-                } else if ((frame instanceof BinaryWebSocketFrame)&& ((handshaker.selectedSubprotocol() == null) ||
+                } else if ((frame instanceof BinaryWebSocketFrame) && ((handshaker.selectedSubprotocol() == null) ||
                         (handshaker.selectedSubprotocol() != null
                                 && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     handleWebsocketBinaryFrame(frame);
@@ -291,8 +292,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
             } else {
                 log.error("Handshake incomplete at source handler. Failed to inject websocket frames to Synapse engine");
             }
-        } catch (Exception e){
-            log.error("Exception occured while injecting websocket frames to the Synapse engine",e);
+        } catch (Exception e) {
+            log.error("Exception occured while injecting websocket frames to the Synapse engine", e);
         }
 
     }
@@ -320,9 +321,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         }
 
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, new Boolean(true));
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, new Boolean(true));
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME, frame);
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME, frame);
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME, frame);
         injectToSequence(synCtx, endpoint);
 
     }
@@ -340,9 +341,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         }
 
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, new Boolean(true));
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, new Boolean(true));
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME, frame);
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME, frame);
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME, frame);
         injectToSequence(synCtx, endpoint);
 
     }
@@ -363,7 +364,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         this.outflowDispatchSequence = outflowDispatchSequence;
     }
 
-    public void setOutflowErrorSequence(String outflowErrorSequence){
+    public void setOutflowErrorSequence(String outflowErrorSequence) {
         this.outflowErrorSequence = outflowErrorSequence;
     }
 
@@ -387,12 +388,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private org.apache.synapse.MessageContext getSynapseMessageContext(String tenantDomain) throws AxisFault {
         MessageContext synCtx = createSynapseMessageContext(tenantDomain);
         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(SynapseConstants.IS_INBOUND, true);
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(SynapseConstants.IS_INBOUND, true);
         synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, responseSender);
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext()
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext()
                 .setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, responseSender);
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT, wrappedContext.getChannelHandlerContext());
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext()
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext()
                 .setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDLER_CONTEXT, wrappedContext.getChannelHandlerContext());
         if (outflowDispatchSequence != null) {
             synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE, outflowDispatchSequence);
@@ -458,6 +459,13 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
             log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
         }
         synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
+        if (dispatchToCustomSequence) {
+            String context = (subscriberPath.getPath()).substring(1);
+            context = context.replace('/', '-');
+            if (synCtx.getConfiguration().getDefinedSequences().containsKey(context))
+                injectingSequence = (SequenceMediator) synCtx.getSequence(context);
+
+        }
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
 
@@ -480,5 +488,10 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         }
         ctx.close();
     }
+
+    public void setDispatchToCustomSequence(boolean dispatchToCustomSequence) {
+        this.dispatchToCustomSequence = dispatchToCustomSequence;
+    }
+
 
 }

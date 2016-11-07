@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.websocket;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -37,6 +38,8 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
     private int clientBroadcastLevel;
     private String outflowDispatchSequence;
     private String outflowErrorSequence;
+    private ChannelHandler pipelineHandler;
+    private boolean dispatchToCustomSequence;
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
 
     public InboundWebsocketChannelInitializer() {
@@ -46,19 +49,27 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         this.sslConfiguration = sslConfiguration;
     }
 
+    public void setPipelineHandler(ChannelHandler name) {
+        this.pipelineHandler = name;
+    }
+
+    public void setDispatchToCustomSequence(String dispatchToCustomSequence) {
+        this.dispatchToCustomSequence = Boolean.parseBoolean(dispatchToCustomSequence);
+    }
+
     public void setClientBroadcastLevel(int clientBroadcastLevel) {
         this.clientBroadcastLevel = clientBroadcastLevel;
     }
 
-    public void setOutflowDispatchSequence(String outflowDispatchSequence){
+    public void setOutflowDispatchSequence(String outflowDispatchSequence) {
         this.outflowDispatchSequence = outflowDispatchSequence;
     }
 
-    public void setOutflowErrorSequence(String outflowErrorSequence){
+    public void setOutflowErrorSequence(String outflowErrorSequence) {
         this.outflowErrorSequence = outflowErrorSequence;
     }
 
-    public void setSubprotocolHandlers(ArrayList<AbstractSubprotocolHandler> subprotocolHandlers){
+    public void setSubprotocolHandlers(ArrayList<AbstractSubprotocolHandler> subprotocolHandlers) {
         this.subprotocolHandlers = subprotocolHandlers;
     }
 
@@ -76,12 +87,15 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         p.addLast("frameAggregator", new WebSocketFrameAggregator(Integer.MAX_VALUE));
         InboundWebsocketSourceHandler sourceHandler = new InboundWebsocketSourceHandler();
         sourceHandler.setClientBroadcastLevel(clientBroadcastLevel);
+        sourceHandler.setDispatchToCustomSequence(dispatchToCustomSequence);
         if (outflowDispatchSequence != null)
             sourceHandler.setOutflowDispatchSequence(outflowDispatchSequence);
         if (outflowErrorSequence != null)
             sourceHandler.setOutflowErrorSequence(outflowErrorSequence);
         if (subprotocolHandlers != null)
             sourceHandler.setSubprotocolHandlers(subprotocolHandlers);
+        if (pipelineHandler != null)
+            p.addLast("pipelineHandler", pipelineHandler.getClass().getConstructor().newInstance());
         p.addLast("handler", sourceHandler);
     }
 
