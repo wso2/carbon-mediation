@@ -30,6 +30,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
+import org.apache.http.HttpHost;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -58,25 +59,24 @@ public class Http2ConnectionFactory {
         return factory;
     }
 
-    public Http2ClientHandler getChannelHandler(URI uri) {
+    public Http2ClientHandler getChannelHandler(HttpHost uri) {
         Http2ClientHandler handler;
 
         handler = getClientHandlerFromPool(uri);
         if (handler == null) {
             handler = cacheNewConnection(uri);
-            log.info("New connection created for " + uri);
+            log.info("New connection created for " + uri.toString());
         } else {
             log.info("Get connection from pool");
         }
         return handler;
     }
 
-    public Http2ClientHandler cacheNewConnection(URI uri) {
+    public Http2ClientHandler cacheNewConnection(HttpHost uri) {
 
         final SslContext sslCtx;
         final boolean SSL;
-        if (uri.getScheme().equalsIgnoreCase(Http2Constants.HTTPS2) || uri.getScheme()
-                .equalsIgnoreCase("https")) {
+        if (uri.getSchemeName().equalsIgnoreCase("https")) {
             SSL = true;
         } else
             SSL = false;
@@ -117,8 +117,7 @@ public class Http2ConnectionFactory {
             EventLoopGroup workerGroup = new NioEventLoopGroup();
             Http2ClientInitializer initializer = new Http2ClientInitializer(sslCtx,
                     Integer.MAX_VALUE);
-
-            String HOST = uri.getHost();
+            String HOST = uri.getHostName();
             Integer PORT = uri.getPort();
             // Configure the client.
             Bootstrap b = new Bootstrap();
@@ -134,7 +133,7 @@ public class Http2ConnectionFactory {
             Http2SettingsHandler http2SettingsHandler = initializer.settingsHandler();
             http2SettingsHandler.awaitSettings(5, TimeUnit.SECONDS);
 
-            String key = generateKey(uri);
+            String key = generateKey(URI.create(uri.toURI()));
             Http2ClientHandler handler = initializer.responseHandler();
             handler.setChannel(channel);
             connections.put(key, handler);
@@ -148,8 +147,8 @@ public class Http2ConnectionFactory {
         }
     }
 
-    public Http2ClientHandler getClientHandlerFromPool(URI uri) {
-        String key = generateKey(uri);
+    public Http2ClientHandler getClientHandlerFromPool(HttpHost uri) {
+        String key = generateKey(URI.create(uri.toURI()));
         Http2ClientHandler handler = connections.get(key);
         if (handler != null) {
             Channel c = handler.getChannel();

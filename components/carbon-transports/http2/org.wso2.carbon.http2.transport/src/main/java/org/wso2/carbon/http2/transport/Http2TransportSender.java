@@ -81,10 +81,10 @@ public class Http2TransportSender extends AbstractTransportSender {
     public void sendMessage(MessageContext msgCtx, String targetEPR, OutTransportInfo trpOut)
             throws AxisFault {
         try {
-            if (targetEPR.toLowerCase().contains("http2")) {
-                targetEPR = targetEPR.replaceFirst("http2", "http");
-            } else if (targetEPR.toLowerCase().contains("https2")) {
-                targetEPR = targetEPR.replaceFirst("https2", "https");
+            if (targetEPR.toLowerCase().contains("http2://")) {
+                targetEPR = targetEPR.replaceFirst("http2://", "http://");
+            } else if (targetEPR.toLowerCase().contains("https2://")) {
+                targetEPR = targetEPR.replaceFirst("https2://", "https://");
             }
             URI uri = new URI(targetEPR);
             String scheme = uri.getScheme() != null ? uri.getScheme() : "http";
@@ -93,9 +93,9 @@ public class Http2TransportSender extends AbstractTransportSender {
             if (port == -1) {
                 // use default
                 if ("http".equals(scheme)) {
-                    port = 8080;
+                    port = 80;
                 } else if ("https".equals(scheme)) {
-                    port = 8083;
+                    port = 443;
                 }
             }
             HttpHost target = new HttpHost(hostname, port, scheme);
@@ -107,8 +107,7 @@ public class Http2TransportSender extends AbstractTransportSender {
             if (log.isDebugEnabled()) {
                 log.debug("Fetching a Connection from the Http2(Https2) Connection Factory.");
             }
-            Http2ClientHandler clientHandler = connectionFactory.getChannelHandler(uri);
-
+            Http2ClientHandler clientHandler = connectionFactory.getChannelHandler(target);
             clientHandler.setTargetConfig(targetConfiguration);
 
             RelayUtils.buildMessage(msgCtx, false);
@@ -140,14 +139,16 @@ public class Http2TransportSender extends AbstractTransportSender {
                         POST.toString());
                 //Set content type and required frames
                 HttpMethod m = new HttpMethod(method);
-                FullHttpRequest request = new DefaultFullHttpRequest(HTTP_1_1, m, uri.getPath(),
-                        Unpooled.copiedBuffer(msg.getBytes(CharsetUtil.UTF_8)));
+                FullHttpRequest request;
+                request = new DefaultFullHttpRequest(HTTP_1_1, m, uri.getPath(), Unpooled.copiedBuffer(msg.getBytes(CharsetUtil.UTF_8)));
+                if(!(m.equals(HttpMethod.GET) || m.equals(HttpMethod.DELETE))){
+                    request.headers().add(HttpHeaderNames.CONTENT_TYPE, contentType);
+                    request.headers().add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP);
+                    request.headers().add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.DEFLATE);
+                }
                 request.headers().add(HttpHeaderNames.HOST, new URI(targetEPR).getHost());
                 request.headers().add(HttpConversionUtil.ExtensionHeaderNames.SCHEME.text(),
                         secure ? HttpScheme.HTTPS : HttpScheme.HTTP);
-                request.headers().add(HttpHeaderNames.CONTENT_TYPE, contentType);
-                request.headers().add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP);
-                request.headers().add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.DEFLATE);
                 clientHandler.put(streamId, request);
                 if (log.isDebugEnabled()) {
                     log.debug("Request sent to backend with stream id:" + streamId);

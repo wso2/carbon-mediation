@@ -231,7 +231,7 @@ public class Http2ClientWorker {
                 } catch (AxisFault axisFault) {
                     log.error("Error setting SOAP envelope", axisFault);
                 } catch (Exception e) {
-                    log.error(e.getStackTrace());
+                    log.error(e);
                 }
 
                 responseMsgCtx.setServerSide(true);
