@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.websocket;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,17 +26,17 @@ import org.apache.synapse.SynapseException;
 
 import java.lang.reflect.Constructor;
 
-public class HandshakeHandlerBuilderUtil {
-    private static final Log log = LogFactory.getLog(HandshakeHandlerBuilderUtil.class);
+public class PipelineHandlerBuilderUtil {
+    private static final Log log = LogFactory.getLog(PipelineHandlerBuilderUtil.class);
 
-    public static ChannelInboundHandlerAdapter stringToHandshakeHandlers(String handlerClass) {
+    public static ChannelHandler stringToPipelineHandlers(String handlerClass) {
         ChannelInboundHandlerAdapter hand = null;
         if (handlerClass != null) {
 
             try {
                 Class c = Class.forName(handlerClass);
                 Constructor cons = c.getConstructor();
-                ChannelInboundHandlerAdapter handlerInstance = (ChannelInboundHandlerAdapter) cons.newInstance();
+                ChannelHandler handlerInstance = (ChannelHandler) cons.newInstance();
                 return handlerInstance;
             } catch (ClassNotFoundException e) {
                 String msg = "Class " + handlerClass +

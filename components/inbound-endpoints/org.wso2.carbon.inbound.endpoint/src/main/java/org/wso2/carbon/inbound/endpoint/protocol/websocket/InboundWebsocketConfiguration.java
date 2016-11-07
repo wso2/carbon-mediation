@@ -26,7 +26,7 @@ public class InboundWebsocketConfiguration {
     private String outFlowDispatchSequence;
     private String outFlowErrorSequence;
     private String subprotocolHandler;
-    private String handshakeHandler;
+    private String pipelineHandler;
     private String dispatchToCustomSequence;
 
     private InboundWebsocketConfiguration(InboundWebsocketConfigurationBuilder builder) {
@@ -38,7 +38,7 @@ public class InboundWebsocketConfiguration {
         this.outFlowDispatchSequence = builder.outFlowDispatchSequence;
         this.outFlowErrorSequence = builder.outFlowErrorSequence;
         this.subprotocolHandler = builder.subprotocolHandler;
-        this.handshakeHandler = builder.handshakeHandler;
+        this.pipelineHandler = builder.pipelineHandler;
         this.dispatchToCustomSequence = builder.dispatchToCustomSequence;
     }
 
@@ -74,8 +74,8 @@ public class InboundWebsocketConfiguration {
         return subprotocolHandler;
     }
 
-    public String getHandshakeHandler() {
-        return handshakeHandler;
+    public String getPipelineHandler() {
+        return pipelineHandler;
     }
 
     public String getDispatchToCustomSequence() {
@@ -91,7 +91,7 @@ public class InboundWebsocketConfiguration {
         private String outFlowDispatchSequence;
         private String outFlowErrorSequence;
         private String subprotocolHandler;
-        private String handshakeHandler;
+        private String pipelineHandler;
         private String dispatchToCustomSequence;
 
         public InboundWebsocketConfigurationBuilder(int port, String name) {
@@ -133,8 +133,8 @@ public class InboundWebsocketConfiguration {
             return this;
         }
 
-        public InboundWebsocketConfigurationBuilder handshakeHandler(String handshakeHandler) {
-            this.handshakeHandler = handshakeHandler;
+        public InboundWebsocketConfigurationBuilder pipelineHandler(String pipelineHandler) {
+            this.pipelineHandler = pipelineHandler;
             return this;
         }
 

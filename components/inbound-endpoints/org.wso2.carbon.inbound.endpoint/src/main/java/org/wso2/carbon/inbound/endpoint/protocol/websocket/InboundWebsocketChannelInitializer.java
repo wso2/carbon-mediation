@@ -16,7 +16,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.websocket;
 
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -38,7 +38,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
     private int clientBroadcastLevel;
     private String outflowDispatchSequence;
     private String outflowErrorSequence;
-    private ChannelInboundHandlerAdapter handshakeHandler;
+    private ChannelHandler pipelineHandler;
     private boolean dispatchToCustomSequence;
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
 
@@ -49,8 +49,8 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         this.sslConfiguration = sslConfiguration;
     }
 
-    public void sethandshakeHandler(ChannelInboundHandlerAdapter name) {
-        this.handshakeHandler = name;
+    public void setPipelineHandler(ChannelHandler name) {
+        this.pipelineHandler = name;
     }
 
     public void setDispatchToCustomSequence(String dispatchToCustomSequence) {
@@ -94,8 +94,8 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
             sourceHandler.setOutflowErrorSequence(outflowErrorSequence);
         if (subprotocolHandlers != null)
             sourceHandler.setSubprotocolHandlers(subprotocolHandlers);
-        if (handshakeHandler != null)
-            p.addLast("handshakeHandler", handshakeHandler.getClass().getConstructor().newInstance());
+        if (pipelineHandler != null)
+            p.addLast("pipelineHandler", pipelineHandler.getClass().getConstructor().newInstance());
         p.addLast("handler", sourceHandler);
     }
 
