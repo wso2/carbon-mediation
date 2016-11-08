@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.websocket;
 
+import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -236,6 +237,22 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                                 && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     handleWebsocketBinaryFrame(frame);
                     return;
+                } else if ((frame instanceof BinaryWebSocketFrame)&& ((handshaker.selectedSubprotocol() == null) ||
+                                                                      (handshaker.selectedSubprotocol() != null
+                          && handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
+                    org.apache.axis2.context.MessageContext axis2MsgCtx =
+                            ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)
+                                    .getAxis2MessageContext();
+                    String contentType = SubprotocolBuilderUtil
+                            .syanapeSubprotocolToContentType(SubprotocolBuilderUtil
+                                                                     .extractSynapseSubprotocol(handshaker.selectedSubprotocol()));
+
+                    Builder builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
+                    InputStream in = new AutoCloseInputStream(new ByteBufInputStream(frame.content()));
+                    OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
+                    synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
+                    injectToSequence(synCtx, endpoint);
+                    return;
                 } else if ((frame instanceof TextWebSocketFrame) && ((handshaker.selectedSubprotocol() == null) ||
                         (handshaker.selectedSubprotocol() != null
                                 && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
@@ -284,7 +301,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
                 } else if (frame instanceof PingWebSocketFrame) {
-                    ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
+                    ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
                     return;
                 }
 
@@ -437,7 +454,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         axis2MsgCtx.setConfigurationContext(ServiceReferenceHolder.getInstance().getConfigurationContextService()
                 .getServerConfigContext());
         axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING,
-                Boolean.FALSE);
+                Boolean.TRUE);
         axis2MsgCtx.setServerSide(true);
         return axis2MsgCtx;
     }
