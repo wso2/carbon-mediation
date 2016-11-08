@@ -65,9 +65,17 @@ public class Http2ConnectionFactory {
         handler = getClientHandlerFromPool(uri);
         if (handler == null) {
             handler = cacheNewConnection(uri);
-            log.info("New connection created for " + uri.toString());
+            if (log.isDebugEnabled()) {
+                if (handler != null) {
+                    log.debug("New connection created for " + uri.toString());
+                } else
+                    log.debug("New connection establishment failed for " + uri.toString());
+            }
+
         } else {
-            log.info("Get connection from pool");
+            if (log.isDebugEnabled()) {
+                log.info("Get connection from pool");
+            }
         }
         return handler;
     }
@@ -81,7 +89,7 @@ public class Http2ConnectionFactory {
         } else
             SSL = false;
         try {
-            //            Handling SSL
+            // Handling SSL
             if (SSL) {
                 Parameter trustParam = trasportOut
                         .getParameter(Http2Constants.TRUST_STORE_CONFIG_ELEMENT);

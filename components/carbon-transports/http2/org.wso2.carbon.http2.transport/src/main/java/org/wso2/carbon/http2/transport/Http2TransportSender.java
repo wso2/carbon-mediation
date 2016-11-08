@@ -140,11 +140,13 @@ public class Http2TransportSender extends AbstractTransportSender {
                 //Set content type and required frames
                 HttpMethod m = new HttpMethod(method);
                 FullHttpRequest request;
-                request = new DefaultFullHttpRequest(HTTP_1_1, m, uri.getPath(), Unpooled.copiedBuffer(msg.getBytes(CharsetUtil.UTF_8)));
-                if(!(m.equals(HttpMethod.GET) || m.equals(HttpMethod.DELETE))){
+                request = new DefaultFullHttpRequest(HTTP_1_1, m, uri.getPath(),
+                        Unpooled.copiedBuffer(msg.getBytes(CharsetUtil.UTF_8)));
+                if (!(m.equals(HttpMethod.GET) || m.equals(HttpMethod.DELETE))) {
                     request.headers().add(HttpHeaderNames.CONTENT_TYPE, contentType);
                     request.headers().add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP);
-                    request.headers().add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.DEFLATE);
+                    request.headers()
+                            .add(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.DEFLATE);
                 }
                 request.headers().add(HttpHeaderNames.HOST, new URI(targetEPR).getHost());
                 request.headers().add(HttpConversionUtil.ExtensionHeaderNames.SCHEME.text(),
