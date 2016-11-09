@@ -236,27 +236,35 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                         (handshaker.selectedSubprotocol() != null
                                 && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     handleWebsocketBinaryFrame(frame);
-                    return;
-                } else if ((frame instanceof BinaryWebSocketFrame)&& ((handshaker.selectedSubprotocol() == null) ||
-                                                                      (handshaker.selectedSubprotocol() != null
-                          && handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
+
+                    String contentType = handshaker.selectedSubprotocol();
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
                             ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)
                                     .getAxis2MessageContext();
-                    String contentType = SubprotocolBuilderUtil
-                            .syanapeSubprotocolToContentType(SubprotocolBuilderUtil
-                                                                     .extractSynapseSubprotocol(handshaker.selectedSubprotocol()));
 
                     Builder builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
                     InputStream in = new AutoCloseInputStream(new ByteBufInputStream(frame.content()));
                     OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
+
                     return;
                 } else if ((frame instanceof TextWebSocketFrame) && ((handshaker.selectedSubprotocol() == null) ||
                         (handshaker.selectedSubprotocol() != null
                                 && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     handleWebsocketPassthroughTextFrame(frame);
+
+                    String contentType = handshaker.selectedSubprotocol();
+                    org.apache.axis2.context.MessageContext axis2MsgCtx =
+                            ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)
+                                    .getAxis2MessageContext();
+
+                    Builder builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
+                    InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(((TextWebSocketFrame) frame).text().getBytes()));
+                    OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
+                    synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
+                    injectToSequence(synCtx, endpoint);
+
                     return;
                 } else if ((frame instanceof TextWebSocketFrame) && handshaker.selectedSubprotocol() != null
                         && handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)) {
@@ -340,7 +348,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, new Boolean(true));
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME, frame);
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME, frame);
-        injectToSequence(synCtx, endpoint);
 
     }
 
@@ -360,7 +367,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, new Boolean(true));
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME, frame);
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME, frame);
-        injectToSequence(synCtx, endpoint);
 
     }
 

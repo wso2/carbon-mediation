@@ -8,7 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 public class BinarySubprotocolHandler extends AbstractSubprotocolHandler {
 
     public BinarySubprotocolHandler(){
-        super.setSubprotocolIdentifier("synapse(contentType='binary/octet-stream')");
+        super.setSubprotocolIdentifier("binary/octet-stream");
     }
 
     @Override

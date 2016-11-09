@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.websocket;
 
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -34,6 +35,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketE
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketSubscriberPathManager;
 
 import javax.xml.stream.XMLStreamException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -87,13 +89,36 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
             } else {
                 try {
                     RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
-                    TextWebSocketFrame frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext) msgContext)
-                            .getAxis2MessageContext()));
-                    InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
-                    int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
-                    String subscriberPath = sourceHandler.getSubscriberPath();
-                    WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
-                    handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+                    String tcpEndpoint = msgContext.getProperty("ENDPOINT_PREFIX").toString();
+                    if (tcpEndpoint.substring(tcpEndpoint.lastIndexOf("contentType")+14).startsWith("text")) {
+                        TextWebSocketFrame frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext) msgContext)
+                                                                                                       .getAxis2MessageContext()));
+                        InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+                        int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
+                        String subscriberPath = sourceHandler.getSubscriberPath();
+                        WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
+                        handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+                    } else {
+                        org.apache.axis2.context.MessageContext msgCtx = ((Axis2MessageContext) msgContext).getAxis2MessageContext();
+                                            MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgCtx);
+                                            OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
+                                            byte[] message = messageFormatter.getBytes(msgCtx, format);
+                        FileOutputStream
+                                stream = new FileOutputStream("/Users/Lakshman/Documents/tmp/tree.jpeg");
+                        try {
+                            stream.write(message);
+                        } finally {
+                            stream.close();
+                        }
+
+                                            BinaryWebSocketFrame frame = new BinaryWebSocketFrame(Unpooled.copiedBuffer(message));
+                        InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+                        int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
+                        String subscriberPath = sourceHandler.getSubscriberPath();
+                        WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
+                        handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+                    }
+
                 } catch (XMLStreamException e) {
                     log.error("Error while building message", e);
                 } catch (IOException ex) {
