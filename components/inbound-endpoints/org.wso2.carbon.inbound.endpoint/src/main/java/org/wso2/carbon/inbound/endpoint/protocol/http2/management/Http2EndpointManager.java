@@ -81,9 +81,7 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
                     name, params);
             boolean start = startListener(port, name, params);
 
-            if (start) {
-                //do nothing
-            } else {
+            if (!start) {
                 dataStore.unregisterListeningEndpoint(port, tenantDomain);
                 return false;
             }
@@ -140,7 +138,7 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
         b.option(ChannelOption.SO_BACKLOG, config.getSoBacklog());
         b.group(eventExecutor.getBossGroupThreadPool(), eventExecutor.getWorkerGroupThreadPool())
                 .channel(NioServerSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO))
-                .childHandler(new InboundHttp2ServerInitializer((SslContext) null, config));
+                .childHandler(new InboundHttp2ServerInitializer(null, config));
         try {
 
             b.bind(config.getPort()).sync().channel();

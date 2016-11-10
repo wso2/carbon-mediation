@@ -51,7 +51,6 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
 
     public InboundHttp2SourceHandler(InboundHttp2Configuration config) {
         this.config = config;
-
     }
 
     @Override
@@ -92,9 +91,6 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
         }
     }
 
-    /**
-     * Headers frames sends to start a new stream
-     */
     public void onHeadersRead(ChannelHandlerContext ctx, Http2HeadersFrame headers)
             throws Exception {
 
@@ -106,7 +102,6 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
             request = new HTTP2SourceRequest(streamId, ctx);
             streams.put(streamId, request);
         }
-        Map r_headers = request.getHeaders();
         Set<CharSequence> headerSet = headers.headers().names();
         for (CharSequence header : headerSet) {
             if (log.isDebugEnabled()) {
@@ -114,7 +109,7 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
             }
             request.setHeader(header.toString(), headers.headers().get(header).toString());
         }
-        if (headers.isEndStream() && !r_headers.containsKey("http2-settings")) {
+        if (headers.isEndStream() && !request.getHeaders().containsKey("http2-settings")) {
             messageHandler.processRequest(request);
             streams.remove(request.getStreamID());
         }
