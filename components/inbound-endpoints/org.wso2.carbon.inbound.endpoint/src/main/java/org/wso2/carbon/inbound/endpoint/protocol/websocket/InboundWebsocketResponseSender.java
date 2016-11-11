@@ -103,14 +103,6 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                                             MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgCtx);
                                             OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
                                             byte[] message = messageFormatter.getBytes(msgCtx, format);
-                        FileOutputStream
-                                stream = new FileOutputStream("/Users/Lakshman/Documents/tmp/tree.jpeg");
-                        try {
-                            stream.write(message);
-                        } finally {
-                            stream.close();
-                        }
-
                                             BinaryWebSocketFrame frame = new BinaryWebSocketFrame(Unpooled.copiedBuffer(message));
                         InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
                         int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
