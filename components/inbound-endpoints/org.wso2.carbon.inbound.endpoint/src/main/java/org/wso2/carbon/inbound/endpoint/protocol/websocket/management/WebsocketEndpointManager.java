@@ -18,18 +18,16 @@ package org.wso2.carbon.inbound.endpoint.protocol.websocket.management;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import org.apache.axis2.AxisFault;
 import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.SubprotocolBuilderUtil;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.*;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketChannelInitializer;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConfiguration;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketEventExecutor;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.configuration.NettyThreadPoolConfiguration;
 
 import java.net.InetSocketAddress;
@@ -40,6 +38,8 @@ import java.util.Map;
 public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
 
     private static WebsocketEndpointManager instance = null;
+
+    private InboundWebsocketSourceHandler sourceHandler;
 
     private static final Logger log = Logger.getLogger(WebsocketEndpointManager.class);
 
@@ -172,7 +172,11 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
     }
 
     public void closeEndpoint(int port) {
-
+        try {
+            sourceHandler.handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "shutdown"));
+        } catch (AxisFault fault) {
+            log.error(fault.getMessage());
+        }
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = cc.getTenantDomain();
         dataStore.unregisterListeningEndpoint(port, tenantDomain);
@@ -252,4 +256,11 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         }
     }
 
+    public InboundWebsocketSourceHandler getSourceHandler() {
+        return sourceHandler;
+    }
+
+    public void setSourceHandler(InboundWebsocketSourceHandler sourceHandler) {
+        this.sourceHandler = sourceHandler;
+    }
 }
