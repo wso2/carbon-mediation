@@ -117,6 +117,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         this.wrappedContext = new InboundWebsocketChannelContext(ctx);
         this.port = ((InetSocketAddress) ctx.channel().localAddress()).getPort();
         this.responseSender = new InboundWebsocketResponseSender(this);
+        WebsocketEndpointManager.getInstance().setSourceHandler(this);
     }
 
     @Override
@@ -235,9 +236,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 } else if ((frame instanceof BinaryWebSocketFrame)&& ((handshaker.selectedSubprotocol() == null) ||
                         (handshaker.selectedSubprotocol() != null
                                 && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
+                    String contentType = handshaker.selectedSubprotocol();
+                    if(contentType != null && contentType.startsWith("text")) {
+                        handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "unexpected frame type"));
+                    }
                     handleWebsocketBinaryFrame(frame);
 
-                    String contentType = handshaker.selectedSubprotocol();
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
                             ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)
                                     .getAxis2MessageContext();
@@ -252,9 +256,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 } else if ((frame instanceof TextWebSocketFrame) && ((handshaker.selectedSubprotocol() == null) ||
                         (handshaker.selectedSubprotocol() != null
                                 && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
+                    String contentType = handshaker.selectedSubprotocol();
+                    if(contentType != null && contentType.startsWith("binary")) {
+                        handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "unexpected frame type"));
+                    }
                     handleWebsocketPassthroughTextFrame(frame);
 
-                    String contentType = handshaker.selectedSubprotocol();
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
                             ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)
                                     .getAxis2MessageContext();
