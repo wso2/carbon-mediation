@@ -26,6 +26,7 @@ public class InboundWebsocketConfiguration {
     private String outFlowDispatchSequence;
     private String outFlowErrorSequence;
     private String subprotocolHandler;
+    private String defaultContentType;
 
     private InboundWebsocketConfiguration(InboundWebsocketConfigurationBuilder builder) {
         this.port = builder.port;
@@ -36,6 +37,7 @@ public class InboundWebsocketConfiguration {
         this.outFlowDispatchSequence = builder.outFlowDispatchSequence;
         this.outFlowErrorSequence = builder.outFlowErrorSequence;
         this.subprotocolHandler = builder.subprotocolHandler;
+        this.defaultContentType = builder.defaultContentType;
     }
 
     public int getPort() {
@@ -70,6 +72,10 @@ public class InboundWebsocketConfiguration {
         return subprotocolHandler;
     }
 
+    public String getDefaultContentType() {
+        return defaultContentType;
+    }
+
     public static class InboundWebsocketConfigurationBuilder {
         private final int port;
         private final String name;
@@ -79,6 +85,7 @@ public class InboundWebsocketConfiguration {
         private String outFlowDispatchSequence;
         private String outFlowErrorSequence;
         private String subprotocolHandler;
+        private String defaultContentType;
 
         public InboundWebsocketConfigurationBuilder(int port, String name) {
             this.port = port;
@@ -116,6 +123,11 @@ public class InboundWebsocketConfiguration {
 
         public InboundWebsocketConfigurationBuilder subprotocolHandler(String subprotocolHandler) {
             this.subprotocolHandler = subprotocolHandler;
+            return this;
+        }
+
+        public InboundWebsocketConfigurationBuilder defaultContentType(String defaultContentType) {
+            this.defaultContentType = defaultContentType;
             return this;
         }
 
