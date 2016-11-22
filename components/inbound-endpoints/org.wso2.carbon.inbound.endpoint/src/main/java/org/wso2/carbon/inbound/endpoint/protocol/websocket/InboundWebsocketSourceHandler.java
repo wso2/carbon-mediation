@@ -94,6 +94,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private String outflowErrorSequence;
     private ChannelPromise handshakeFuture;
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
+    private String defaultContentType;
 
     static {
         contentTypes.add("application/xml");
@@ -173,6 +174,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
+        defaultContentType = endpoint.getParametersMap().get("ws.default.content.type");
         if (endpoint == null) {
             log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
             return;
@@ -237,6 +239,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                         (handshaker.selectedSubprotocol() != null
                                 && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     String contentType = handshaker.selectedSubprotocol();
+                    if(contentType == null && defaultContentType != null) {
+                        contentType = defaultContentType;
+                    }
                     if(contentType != null && contentType.startsWith("text")) {
                         handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "unexpected frame type"));
                     }
@@ -257,6 +262,10 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                         (handshaker.selectedSubprotocol() != null
                                 && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     String contentType = handshaker.selectedSubprotocol();
+                    String defaultContentType = endpoint.getParametersMap().get("ws.default.content.type");
+                    if(contentType == null && defaultContentType != null) {
+                        contentType = defaultContentType;
+                    }
                     if(contentType != null && contentType.startsWith("binary")) {
                         handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "unexpected frame type"));
                     }
@@ -387,6 +396,10 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
     public int getClientBroadcastLevel() {
         return clientBroadcastLevel;
+    }
+
+    public String getDefaultContentType() {
+        return defaultContentType;
     }
 
     public void setOutflowDispatchSequence(String outflowDispatchSequence){

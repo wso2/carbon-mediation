@@ -129,6 +129,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setOutflowDispatchSequence(config.getOutFlowDispatchSequence());
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
         handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
+        handler.setDefaultContentType(config.getDefaultContentType());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -161,6 +162,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setOutflowDispatchSequence(config.getOutFlowDispatchSequence());
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
         handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
+        handler.setDefaultContentType(config.getDefaultContentType());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -203,7 +205,9 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                 .outFlowErrorSequence(params.getProperties().getProperty(
                         InboundWebsocketConstants.WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE))
                 .subprotocolHandler(params.getProperties().getProperty(
-                        InboundWebsocketConstants.INBOUND_SUBPROTOCOL_HANDLER_CLASS)).build();
+                        InboundWebsocketConstants.INBOUND_SUBPROTOCOL_HANDLER_CLASS))
+                .defaultContentType(params.getProperties().getProperty(
+                        InboundWebsocketConstants.INBOUND_DEFAULT_CONTENT_TYPE)).build();
     }
 
     protected int validateBroadcastLevelParam(String broadcastLevelParam) {

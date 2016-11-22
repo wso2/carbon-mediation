@@ -89,8 +89,8 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
             } else {
                 try {
                     RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
-                    String tcpEndpoint = msgContext.getProperty("ENDPOINT_PREFIX").toString();
-                    if (tcpEndpoint.substring(tcpEndpoint.lastIndexOf("contentType")+14).startsWith("text")) {
+                    String defaultContentType = sourceHandler.getDefaultContentType();
+                    if (defaultContentType != null && defaultContentType.startsWith("text")) {
                         TextWebSocketFrame frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext) msgContext)
                                                                                                        .getAxis2MessageContext()));
                         InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
@@ -98,7 +98,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                         String subscriberPath = sourceHandler.getSubscriberPath();
                         WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
                         handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
-                    } else {
+                    } else if (defaultContentType != null && defaultContentType.startsWith("binary")){
                         org.apache.axis2.context.MessageContext msgCtx = ((Axis2MessageContext) msgContext).getAxis2MessageContext();
                                             MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgCtx);
                                             OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
