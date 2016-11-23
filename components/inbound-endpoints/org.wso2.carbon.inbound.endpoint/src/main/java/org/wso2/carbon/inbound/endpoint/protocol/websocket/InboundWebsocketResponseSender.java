@@ -91,6 +91,8 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
                     String defaultContentType = sourceHandler.getDefaultContentType();
                     if (defaultContentType != null && defaultContentType.startsWith("text")) {
+                        String backendMessageType = (String)(((Axis2MessageContext) msgContext).getAxis2MessageContext()).getProperty("backendMessageType");
+                        ((Axis2MessageContext) msgContext).getAxis2MessageContext().setProperty("messageType", backendMessageType);
                         TextWebSocketFrame frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext) msgContext)
                                                                                                        .getAxis2MessageContext()));
                         InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
