@@ -21,6 +21,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.base.BaseUtils;
@@ -56,7 +58,16 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
     @Override
     public void sendBack(MessageContext msgContext) {
         if (msgContext != null) {
-
+            Object isConnectionAlive = ((Axis2MessageContext)msgContext).getAxis2MessageContext().getProperty("isConnectionAlive");
+            if (isConnectionAlive != null && !(boolean)isConnectionAlive) {
+                InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+                ctx.writeToChannel(new CloseWebSocketFrame(1001, "shutdown"));
+                return;
+            } else if (isConnectionAlive != null && (boolean)isConnectionAlive) {
+                InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+                ctx.writeToChannel(new PongWebSocketFrame());
+                return;
+            }
             if (msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT) != null &&
                     msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT).equals(true)) {
                 return;

@@ -262,6 +262,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     if (contentType != null && contentType.startsWith(WSConstants.TEXT)) {
                         handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001,
                                 "unexpected frame type"));
+                        return;
                     }
                     handleWebsocketBinaryFrame(frame);
 
@@ -285,6 +286,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     if(contentType != null && contentType.startsWith(WSConstants.BINARY)) {
                         handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001,
                                 "unexpected frame type"));
+                        return;
                     }
                     handleWebsocketPassthroughTextFrame(frame);
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
@@ -340,7 +342,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
                 } else if (frame instanceof PingWebSocketFrame) {
-                    ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
+                    ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty("isPing", new Boolean(true));
+                    injectToSequence(synCtx, endpoint);
                     return;
                 }
 

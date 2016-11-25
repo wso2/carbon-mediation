@@ -175,7 +175,9 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
 
     public void closeEndpoint(int port) {
         try {
-            sourceHandler.handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "shutdown"));
+            if (sourceHandler != null) {
+                sourceHandler.handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "shutdown"));
+            }
         } catch (AxisFault fault) {
             log.error(fault.getMessage());
         }
