@@ -7,13 +7,12 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class BinarySubprotocolHandler extends AbstractSubprotocolHandler {
 
-    public BinarySubprotocolHandler(){
+    public BinarySubprotocolHandler() {
         super.setSubprotocolIdentifier("binary/octet-stream");
     }
 
     @Override
-    public boolean handle(ChannelHandlerContext context, WebSocketFrame frame,
-                                    String subscriberPath) {
+    public boolean handle(ChannelHandlerContext context, WebSocketFrame frame, String subscriberPath) {
         return true;
     }
 }

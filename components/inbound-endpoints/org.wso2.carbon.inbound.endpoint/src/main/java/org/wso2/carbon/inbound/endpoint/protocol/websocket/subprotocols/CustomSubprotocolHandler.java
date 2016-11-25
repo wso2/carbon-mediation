@@ -7,13 +7,12 @@ import org.wso2.carbon.inbound.endpoint.protocol.websocket.AbstractSubprotocolHa
 
 public class CustomSubprotocolHandler extends AbstractSubprotocolHandler {
 
-    public CustomSubprotocolHandler(){
+    public CustomSubprotocolHandler() {
         super.setSubprotocolIdentifier("text/plain");
     }
 
     @Override
-    public boolean handle(ChannelHandlerContext context, WebSocketFrame frame,
-                                    String subscriberPath) {
+    public boolean handle(ChannelHandlerContext context, WebSocketFrame frame, String subscriberPath) {
         return true;
     }
 }

@@ -137,19 +137,19 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception{
-        String endpointName =
-                WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        String endpointName = WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
         if (endpointName == null) {
-            handleException("Endpoint not found for port : " + port + "" +
-                    " tenant domain : " + tenantDomain);
+            handleException("Endpoint not found for port : " + port + "" + " tenant domain : " + tenantDomain);
         }
         WebsocketSubscriberPathManager.getInstance()
                 .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty("websocket.terminate", new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty("clientId", ctx.channel().hashCode());
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.WS_TERMINATE,
+                new Boolean(true));
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.CLIENT_ID,
+                ctx.channel().hashCode());
         injectToSequence(synCtx, endpoint);
     }
 
@@ -195,7 +195,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty("clientId", ctx.channel().hashCode());
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.CLIENT_ID,
+                ctx.channel().hashCode());
         injectToSequence(synCtx, endpoint);
 
     }
@@ -236,7 +237,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                         WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
                 MessageContext synCtx = getSynapseMessageContext(tenantDomain);
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-                ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty("clientId", ctx.channel().hashCode());
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(WSConstants.CLIENT_ID,
+                        ctx.channel().hashCode());
 
                 if (endpoint == null) {
                     log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
@@ -250,21 +252,21 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 if (frame instanceof CloseWebSocketFrame) {
                     handleClientWebsocketChannelTermination(frame);
                     return;
-                } else if ((frame instanceof BinaryWebSocketFrame)&& ((handshaker.selectedSubprotocol() == null) ||
-                        (handshaker.selectedSubprotocol() != null
-                                && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
+                } else if ((frame instanceof BinaryWebSocketFrame) && ((handshaker.selectedSubprotocol() == null) ||
+                        (handshaker.selectedSubprotocol() != null && !handshaker.selectedSubprotocol().contains(
+                                InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     String contentType = handshaker.selectedSubprotocol();
-                    if(contentType == null && defaultContentType != null) {
+                    if (contentType == null && defaultContentType != null) {
                         contentType = defaultContentType;
                     }
-                    if(contentType != null && contentType.startsWith("text")) {
-                        handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "unexpected frame type"));
+                    if (contentType != null && contentType.startsWith(WSConstants.TEXT)) {
+                        handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001,
+                                "unexpected frame type"));
                     }
                     handleWebsocketBinaryFrame(frame);
 
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
-                            ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)
-                                    .getAxis2MessageContext();
+                            ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx).getAxis2MessageContext();
 
                     Builder builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
                     InputStream in = new AutoCloseInputStream(new ByteBufInputStream(frame.content()));
@@ -280,17 +282,16 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     if(contentType == null && defaultContentType != null) {
                         contentType = defaultContentType;
                     }
-                    if(contentType != null && contentType.startsWith("binary")) {
-                        handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "unexpected frame type"));
+                    if(contentType != null && contentType.startsWith(WSConstants.BINARY)) {
+                        handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001,
+                                "unexpected frame type"));
                     }
                     handleWebsocketPassthroughTextFrame(frame);
-
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
-                            ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx)
-                                    .getAxis2MessageContext();
-
+                            ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx).getAxis2MessageContext();
                     Builder builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
-                    InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(((TextWebSocketFrame) frame).text().getBytes()));
+                    InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(
+                            ((TextWebSocketFrame) frame).text().getBytes()));
                     OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
