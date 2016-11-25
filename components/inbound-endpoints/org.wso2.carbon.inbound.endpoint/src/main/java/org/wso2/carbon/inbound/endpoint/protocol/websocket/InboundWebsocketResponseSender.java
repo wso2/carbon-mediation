@@ -58,7 +58,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
     @Override
     public void sendBack(MessageContext msgContext) {
         if (msgContext != null) {
-            Object isConnectionAlive = ((Axis2MessageContext)msgContext).getAxis2MessageContext().getProperty("isConnectionAlive");
+            Object isConnectionAlive = ((Axis2MessageContext) msgContext).getAxis2MessageContext().getProperty(WSConstants.IS_CONNECTION_ALIVE);
             if (isConnectionAlive != null && !(boolean)isConnectionAlive) {
                 InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
                 ctx.writeToChannel(new CloseWebSocketFrame(1001, "shutdown"));

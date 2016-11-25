@@ -187,7 +187,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-        defaultContentType = endpoint.getParametersMap().get("ws.default.content.type");
+        defaultContentType = endpoint.getParametersMap().get(WSConstants.DEFAULT_CONTENT_TYPE);
         if (endpoint == null) {
             log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
             return;
@@ -342,7 +342,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
                 } else if (frame instanceof PingWebSocketFrame) {
-                    ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty("isPing", new Boolean(true));
+                    ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.IS_PING, new Boolean(true));
                     injectToSequence(synCtx, endpoint);
                     return;
                 }
