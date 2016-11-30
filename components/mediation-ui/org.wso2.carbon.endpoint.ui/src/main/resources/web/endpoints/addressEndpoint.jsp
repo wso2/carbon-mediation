@@ -14,7 +14,7 @@
 ~  limitations under the License.
 --%>
 
-
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -67,16 +67,16 @@
     String templateAdd = request.getParameter("templateAdd");
 
     if (endpointName != null) {
-        session.setAttribute("endpointName", endpointName);
+        session.setAttribute("endpointName", Encode.forHtml(endpointName));
     }
     if (endpointAction != null) {
-        session.setAttribute("endpointAction", endpointAction);
+        session.setAttribute("endpointAction", Encode.forHtml(endpointAction));
     }
     if (origin != null) {
-        session.setAttribute("origin", origin);
+        session.setAttribute("origin", Encode.forHtml(origin));
     }
     if (templateAdd != null) {
-        session.setAttribute("templateAdd", templateAdd);
+        session.setAttribute("templateAdd", Encode.forHtml(templateAdd));
     }
 
     boolean isFromTemplateEditor = session.getAttribute("endpointTemplate") != null ? true : false;
@@ -102,7 +102,7 @@
 <div id="middle">
 <h2>
     <% if (request.getParameter("serviceName") != null) {
-    %><%=request.getParameter("serviceName")%>:&nbsp;<%
+    %><%=Encode.forHtmlContent(request.getParameter("serviceName"))%>:&nbsp;<%
     }
     if ("edit".equals(endpointAction) && isFromTemplateEditor) {
 %><fmt:message key="edit.endpoint.template"/><%

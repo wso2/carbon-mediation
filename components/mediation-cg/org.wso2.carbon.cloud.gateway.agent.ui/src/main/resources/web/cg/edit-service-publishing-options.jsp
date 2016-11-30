@@ -27,6 +27,7 @@
 <%@ page import="org.wso2.carbon.cloud.gateway.agent.stub.types.carbon.CGServerBean" %>
 <%@ page import="org.wso2.carbon.cloud.gateway.agent.ui.CGAgentAdminClient" %>
 <%@ page import="org.wso2.carbon.cloud.gateway.common.CGConstant" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
 <%
@@ -83,7 +84,7 @@
             request="<%=request%>"/>
 
     <div id="middle">
-        <h2><fmt:message key="csg.publish.options"/>(<%=serviceName%>)</h2>
+        <h2><fmt:message key="csg.publish.options"/>(<%=Encode.forHtmlContent(serviceName)%>)</h2>
 
         <div id="workArea">
             <table class="styledLeft" cellpadding="0" id="service-publishing-option-table-id"
@@ -156,7 +157,7 @@
                                 %>
                                 <td><input type="button" name="publish"
                                            value="<fmt:message key="csg.service.publish"/>"
-                                           onclick="publishService('<%=serviceName%>', '<%=action%>');return false;"/>
+                                           onclick="publishService('<%=Encode.forJavaScriptAttribute(serviceName)%>', '<%=Encode.forJavaScriptAttribute(action)%>');return false;"/>
                                 </td>
                                 <%
                                 } else {

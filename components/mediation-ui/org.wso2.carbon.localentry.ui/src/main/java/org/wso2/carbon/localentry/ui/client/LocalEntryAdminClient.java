@@ -27,9 +27,19 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.localentry.stub.types.LocalEntryAdminServiceStub;
 import org.wso2.carbon.localentry.stub.types.EntryData;
 import org.wso2.carbon.localentry.stub.types.ConfigurationObject;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.rmi.RemoteException;
 
@@ -176,6 +186,42 @@ public class LocalEntryAdminClient {
         StAXOMBuilder builder = new StAXOMBuilder(parser);
 
         return builder.getDocumentElement();
+    }
+
+    /**
+     * Method which will check the given xml string for XXE attacks.
+     * This will throw SAXException if there is a possibility of XXE attack.
+     *
+     * @param xmlStr
+     * @throws Exception
+     */
+    public static void checkForXXE(String xmlStr) throws Exception {
+        DocumentBuilder documentBuilder = getSecuredDocumentBuilder(false);
+        documentBuilder.parse(new ByteArrayInputStream(xmlStr.getBytes()));
+    }
+
+    /**
+     * This method provides a secured document builder which will secure XXE attacks.
+     *
+     * @param setIgnoreComments whether to set setIgnoringComments in DocumentBuilderFactory.
+     * @return DocumentBuilder
+     * @throws javax.xml.parsers.ParserConfigurationException
+     */
+    private static DocumentBuilder getSecuredDocumentBuilder(boolean setIgnoreComments) throws
+                                                                                        ParserConfigurationException {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setIgnoringComments(setIgnoreComments);
+        documentBuilderFactory.setNamespaceAware(true);
+        documentBuilderFactory.setExpandEntityReferences(false);
+        documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        documentBuilder.setEntityResolver(new EntityResolver() {
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                throw new SAXException("Possible XML External Entity (XXE) attack. Skip resolving entity");
+            }
+        });
+        return documentBuilder;
     }
 
 }

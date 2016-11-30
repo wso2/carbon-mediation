@@ -56,7 +56,7 @@ public class LibraryUploader extends AbstractAdmin {
                 if (fileName == null || fileName.equals(""))
                     throw new AxisFault("Invalid file name");
 
-                if (libraryFile.getFileType().equals("zip")) {
+                if (fileName.endsWith(".zip")) {
                     writeResource(libraryFile.getDataHandler(), carbonAppDirTemp, carbonAppDir,
                             fileName);
                 } else {
