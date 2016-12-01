@@ -72,6 +72,8 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.HOST;
 
@@ -171,6 +173,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
             });
         }
 
+        List<Map.Entry<String, String>> httpHeaders = req.headers().entries();
+
         tenantDomain = MultitenantUtils.getTenantDomainFromUrl(req.getUri());
         if (tenantDomain.equals(req.getUri())) {
             tenantDomain = MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
@@ -191,6 +195,11 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         if (endpoint == null) {
             log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
             return;
+        }
+
+        for (Map.Entry<String, String> entry : httpHeaders) {
+            synCtx.setProperty(entry.getKey(), entry.getValue());
+            ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(entry.getKey(), entry.getValue());
         }
 
         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
@@ -445,7 +454,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         return tenantDomain;
     }
 
-    private org.apache.synapse.MessageContext getSynapseMessageContext(String tenantDomain) throws AxisFault {
+    public org.apache.synapse.MessageContext getSynapseMessageContext(String tenantDomain) throws AxisFault {
         MessageContext synCtx = createSynapseMessageContext(tenantDomain);
         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(SynapseConstants.IS_INBOUND, true);
