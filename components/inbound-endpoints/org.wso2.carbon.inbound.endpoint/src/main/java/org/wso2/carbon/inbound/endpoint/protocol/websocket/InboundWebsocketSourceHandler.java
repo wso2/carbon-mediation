@@ -352,6 +352,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
                 } else if (frame instanceof PingWebSocketFrame) {
+                    synCtx.setProperty(WSConstants.IS_PING, new Boolean(true));
                     ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.IS_PING, new Boolean(true));
                     injectToSequence(synCtx, endpoint);
                     return;
