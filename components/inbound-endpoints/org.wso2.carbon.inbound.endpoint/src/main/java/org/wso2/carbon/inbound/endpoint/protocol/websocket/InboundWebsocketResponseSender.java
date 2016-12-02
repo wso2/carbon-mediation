@@ -115,6 +115,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     if (wsCloseFrameStatusCode != null && wsCloseFrameReasonText != null) {
                         sourceHandler.handleClientWebsocketChannelTermination(new CloseWebSocketFrame(statusCode,
                                 wsCloseFrameReasonText));
+                        return;
                     }
 
                     RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
