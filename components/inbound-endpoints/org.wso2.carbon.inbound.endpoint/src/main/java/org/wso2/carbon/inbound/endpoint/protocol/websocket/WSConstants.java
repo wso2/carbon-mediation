@@ -30,5 +30,7 @@ public class WSConstants {
     public static final String IS_PING = "isPing";
     public static final String IS_CONNECTION_ALIVE = "isConnectionAlive";
     public static final String DEFAULT_CONTENT_TYPE = "ws.default.content.type";
+    public static final String WS_CLOSE_FRAME_STATUS_CODE = "websocket.close.frame.status.code";
+    public static final String WS_CLOSE_FRAME_REASON_TEXT = "websocket.close.frame.reason.text";
 
 }

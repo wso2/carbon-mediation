@@ -58,12 +58,13 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
     @Override
     public void sendBack(MessageContext msgContext) {
         if (msgContext != null) {
-            Object isConnectionAlive = ((Axis2MessageContext) msgContext).getAxis2MessageContext().getProperty(WSConstants.IS_CONNECTION_ALIVE);
-            if (isConnectionAlive != null && !(boolean)isConnectionAlive) {
+            Object isConnectionAlive = ((Axis2MessageContext) msgContext).getAxis2MessageContext().getProperty
+                    (WSConstants.IS_CONNECTION_ALIVE);
+            if (isConnectionAlive != null && !(boolean) isConnectionAlive) {
                 InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
                 ctx.writeToChannel(new CloseWebSocketFrame(1001, "shutdown"));
                 return;
-            } else if (isConnectionAlive != null && (boolean)isConnectionAlive) {
+            } else if (isConnectionAlive != null && (boolean) isConnectionAlive) {
                 InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
                 ctx.writeToChannel(new PongWebSocketFrame());
                 return;
@@ -99,6 +100,23 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
             } else {
                 try {
+                    Object wsCloseFrameStatusCode = msgContext.getProperty(
+                            WSConstants.WS_CLOSE_FRAME_STATUS_CODE);
+                    String wsCloseFrameReasonText = (String) (msgContext.getProperty(
+                            WSConstants.WS_CLOSE_FRAME_REASON_TEXT));
+                    int statusCode = 1001;
+                    if (wsCloseFrameStatusCode != null) {
+                        statusCode = (int) wsCloseFrameStatusCode;
+                    }
+                    if (wsCloseFrameStatusCode == null) {
+                        wsCloseFrameReasonText = "Unexpected frame type";
+                    }
+
+                    if (wsCloseFrameStatusCode != null && wsCloseFrameReasonText != null) {
+                        sourceHandler.handleClientWebsocketChannelTermination(new CloseWebSocketFrame(statusCode,
+                                wsCloseFrameReasonText));
+                    }
+
                     RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
                     String defaultContentType = sourceHandler.getDefaultContentType();
                     if (defaultContentType != null && defaultContentType.startsWith(WSConstants.TEXT)) {
