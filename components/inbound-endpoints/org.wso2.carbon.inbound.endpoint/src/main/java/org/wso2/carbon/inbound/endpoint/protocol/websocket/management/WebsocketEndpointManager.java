@@ -21,7 +21,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import org.apache.axis2.AxisFault;
 import org.apache.log4j.Logger;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.*;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
@@ -174,12 +176,30 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
     }
 
     public void closeEndpoint(int port) {
-        try {
-            if (sourceHandler != null) {
-                sourceHandler.handleClientWebsocketChannelTermination(new CloseWebSocketFrame(1001, "shutdown"));
+        if (sourceHandler != null) {
+            WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
+            String endpointName =
+                    WebsocketEndpointManager.getInstance().getEndpointName(sourceHandler.getPort(),
+                            sourceHandler.getTenantDomain());
+            Integer shutdownStatusCode;
+            String shutdownStatusMessage;
+            try {
+                MessageContext synCtx = sourceHandler.getSynapseMessageContext(sourceHandler.getTenantDomain());
+                InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
+                shutdownStatusCode = Integer.parseInt(endpoint.getParametersMap().get("ws.shutdown.status.code"));
+                shutdownStatusMessage = endpoint.getParametersMap().get("ws.shutdown.status.message");
+
+                if (shutdownStatusCode == null) {
+                    shutdownStatusCode = 1001;
+                }
+                if (shutdownStatusMessage == null) {
+                    shutdownStatusMessage = "shutdown";
+                }
+            } catch (AxisFault fault) {
+                log.error("Error while getting synapse message context. "+ fault);
+                throw new SynapseException(fault);
             }
-        } catch (AxisFault fault) {
-            log.error(fault.getMessage());
+            pathManager.broadcastOnSubscriberPath(new CloseWebSocketFrame(shutdownStatusCode, shutdownStatusMessage), endpointName, sourceHandler.getSubscriberPath());
         }
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = cc.getTenantDomain();
