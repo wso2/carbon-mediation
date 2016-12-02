@@ -21,6 +21,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.http2;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http2.Http2Frame;
 import org.apache.log4j.Logger;
+import org.apache.synapse.transport.passthru.Pipe;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class HTTP2SourceRequest {
+    private Pipe pipe=null;
     private Logger log = Logger.getLogger(HTTP2SourceRequest.class);
     private int streamID;
     private ChannelHandlerContext channel;
@@ -40,6 +42,7 @@ public class HTTP2SourceRequest {
     private String method = null;
     private String uri = null;
     private String scheme = null;
+    private boolean processedReq=false;
 
     public void setUri(String uri) {
         this.uri = uri;
@@ -90,11 +93,13 @@ public class HTTP2SourceRequest {
         this.channel = channel;
     }
 
+    @Deprecated
     public Map<String, String> getHeaders() {
 
         return headers;
     }
 
+    @Deprecated
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
@@ -178,4 +183,21 @@ public class HTTP2SourceRequest {
             headers.put(key, value);
         }
     }
+
+    public boolean isProcessedReq() {
+        return processedReq;
+    }
+
+    public void setProcessedReq(boolean processedReq) {
+        this.processedReq = processedReq;
+    }
+
+    public Pipe getPipe() {
+        return pipe;
+    }
+
+    public void setPipe(Pipe pipe) {
+        this.pipe = pipe;
+    }
 }
+

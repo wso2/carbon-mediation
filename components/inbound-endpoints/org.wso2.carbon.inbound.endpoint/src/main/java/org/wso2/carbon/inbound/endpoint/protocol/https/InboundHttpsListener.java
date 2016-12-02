@@ -53,7 +53,7 @@ public class InboundHttpsListener extends InboundHttpListener {
         String httpsProtocols = params.getProperties().getProperty(InboundHttpConstants.HTTPS_PROTOCOL);
         String certificateRevocation = params.getProperties().getProperty(InboundHttpConstants.CLIENT_REVOCATION);
         sslConfiguration = new SSLConfiguration(keyStoreParam, trustStoreParam, clientAuthParam,
-                                                httpsProtocols, certificateRevocation, sslProtocol);
+                                                httpsProtocols, certificateRevocation, sslProtocol,null);
 
     }
 

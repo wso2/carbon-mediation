@@ -240,6 +240,7 @@ public class InboundMessageHandler {
         synCtx.setProperty("stream-id", request.getStreamID());
         synCtx.setProperty("stream-channel", request.getChannel());
         axis2MsgCtx.setProperty("OutTransportInfo", this);
+        axis2MsgCtx.setProperty("stream-channel", request.getChannel());
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setProperty("TransportInURL", request.getUri());
         String method = request.getMethod();
@@ -251,7 +252,7 @@ public class InboundMessageHandler {
         synCtx.setWSAAction(request.getHeader(InboundHttpConstants.SOAP_ACTION));
 
         if (!isRESTRequest(axis2MsgCtx, method)) {
-            if (request.getFrame(Http2FrameTypes.DATA) != null) {
+            if (request.getPipe() != null) {
                 processEntityEnclosingRequest(axis2MsgCtx, false, request);
             } else {
                 processNonEntityEnclosingRESTHandler(null, axis2MsgCtx, false, request);
@@ -296,13 +297,13 @@ public class InboundMessageHandler {
                 if (isAxis2Path) {
                     //create axis2 message context again to avoid settings updated above
                     if (!isRESTRequest(axis2MsgCtx, method)) {
-                        if (request.getFrame(Http2FrameTypes.DATA) != null) {
-                            processEntityEnclosingRequest(axis2MsgCtx, false, request);
+                        if (request.getPipe() != null) {
+                            processEntityEnclosingRequest(axis2MsgCtx, isAxis2Path, request);
                         } else {
-                            processNonEntityEnclosingRESTHandler(null, axis2MsgCtx, false, request);
+                            processNonEntityEnclosingRESTHandler(null, axis2MsgCtx, isAxis2Path, request);
                         }
                     } else {
-                        String contentTypeHeader = request.getHeaders().get(HTTP.CONTENT_TYPE);
+                        String contentTypeHeader = request.getHeader(HTTP.CONTENT_TYPE);
                         SOAPEnvelope soapEnvelope = handleRESTUrlPost(contentTypeHeader,
                                 axis2MsgCtx, request);
                         processNonEntityEnclosingRESTHandler(soapEnvelope, axis2MsgCtx, true,
@@ -337,7 +338,7 @@ public class InboundMessageHandler {
         msgContext.setTo(new EndpointReference(request.getUri()));
         msgContext.setServerSide(true);
         msgContext.setDoingREST(true);
-        if (request.getFrame(Http2FrameTypes.DATA) == null) {
+        if (request.getPipe() == null) {
             msgContext.setProperty("NO_ENTITY_BODY", Boolean.TRUE);
         }
 
@@ -402,7 +403,7 @@ public class InboundMessageHandler {
     public void processEntityEnclosingRequest(org.apache.axis2.context.MessageContext msgContext,
             boolean injectToAxis2Engine, HTTP2SourceRequest request) {
         try {
-            String e = request.getHeaders().get("content-type");
+            String e = request.getHeader("content-type");
             String charSetEncoding = null;
             String contentType = null;
             if (e != null) {
@@ -425,26 +426,35 @@ public class InboundMessageHandler {
                 msgContext.setProperty("synapse.internal.rest.contentType", contentType);
                 msgContext.setDoingREST(true);
                 SOAPEnvelope soapAction1 = this.handleRESTUrlPost(e, msgContext, request);
-                // msgContext.setProperty("pass-through.pipe", this.request.getPipe());
+                msgContext.setProperty("pass-through.pipe", request.getPipe());
                 this.processNonEntityEnclosingRESTHandler(soapAction1, msgContext,
                         injectToAxis2Engine, request);
                 return;
             }
 
-            String soapAction = request.getHeader("soapaction");
-            int soapVersion = HTTPTransportUtils
-                    .initializeMessageContext(msgContext, soapAction, request.getUri(), e);
+            String soapAction = (String)request.getHeader("soapaction");
+            int soapVersion = HTTPTransportUtils.initializeMessageContext(msgContext, soapAction, request.getUri(), e);
             SOAPEnvelope envelope;
-            Builder builder = getMessageBuilder(contentType, msgContext);
+            SOAPFactory fac;
+            if(soapVersion == 1) {
+                fac = OMAbstractFactory.getSOAP11Factory();
+                envelope = fac.getDefaultEnvelope();
+            } else if(soapVersion == 2) {
+                fac = OMAbstractFactory.getSOAP12Factory();
+                envelope = fac.getDefaultEnvelope();
+            } else {
+                fac = OMAbstractFactory.getSOAP12Factory();
+                envelope = fac.getDefaultEnvelope();
+            }
 
-            //Inject to the sequence
-            InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(ByteBufUtil.getBytes(
-                    ((Http2DataFrame) request.getFrame(Http2FrameTypes.DATA)).content())));
-            OMElement documentElement = builder.processDocument(in, contentType, msgContext);
-            envelope = TransportUtils.createSOAPEnvelope(documentElement);
+            if(soapAction != null && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
+                soapAction = soapAction.substring(1, soapAction.length() - 1);
+                msgContext.setSoapAction(soapAction);
+            }
 
             msgContext.setEnvelope(envelope);
-            if (injectToAxis2Engine) {
+            msgContext.setProperty("pass-through.pipe", request.getPipe());
+            if(injectToAxis2Engine) {
                 AxisEngine.receive(msgContext);
             }
         } catch (AxisFault var11) {

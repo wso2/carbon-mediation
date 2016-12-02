@@ -21,6 +21,7 @@ package org.wso2.carbon.http2.transport.util;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http2.Http2DataFrame;
+import io.netty.handler.codec.http2.Http2Frame;
 import io.netty.handler.codec.http2.Http2HeadersFrame;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 import org.apache.commons.logging.Log;
@@ -63,6 +64,7 @@ public class Http2ClientHandler extends SimpleChannelInboundHandler<Object> {
         responseMap = new TreeMap<>();
     }
 
+    @Deprecated
     public void put(int streamId, Object request) {
         streamidPromiseMap.put(streamId, new AbstractMap.SimpleEntry<ChannelFuture, ChannelPromise>(
                 channel.writeAndFlush(request), channel.newPromise()));
@@ -70,7 +72,22 @@ public class Http2ClientHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        Integer streamId = ((FullHttpResponse) msg).headers()
+       if(msg instanceof Http2DataFrame){
+           handleHttp2Response((Http2Frame)msg);
+       }else if(msg instanceof Http2DataFrame){
+            handleHttp2Response((Http2Frame)msg);
+        }else{
+           handleHttpResponse((FullHttpResponse)msg);
+       }
+    }
+
+    private void handleHttp2Response(Http2Frame msg) {
+
+        log.info("Message received as a http2 frame");
+    }
+
+    private void handleHttpResponse(FullHttpResponse msg) {
+        Integer streamId = (msg).headers()
                 .getInt(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text());
 
         if (streamId == null) {

@@ -20,6 +20,7 @@ package org.wso2.carbon.http2.transport.util;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -37,19 +38,21 @@ import org.apache.commons.logging.LogFactory;
 import javax.net.ssl.SSLException;
 import javax.xml.namespace.QName;
 import java.net.URI;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 public class Http2ConnectionFactory {
 
     private static Http2ConnectionFactory factory;
-    private static volatile TreeMap<String, Http2ClientHandler> connections;
+    private static TreeMap<ChannelId,Map<String, Http2ClientHandler>> clientConnections;
+   // private static TreeMap<String, Http2ClientHandler> connections;
     private Log log = LogFactory.getLog(Http2ConnectionFactory.class);
     private TransportOutDescription trasportOut;
 
     private Http2ConnectionFactory(TransportOutDescription transportOut) {
         this.trasportOut = transportOut;
-        connections = new TreeMap<>();
+        clientConnections = new TreeMap<>();
     }
 
     public static Http2ConnectionFactory getInstance(TransportOutDescription transportOut) {
@@ -59,12 +62,18 @@ public class Http2ConnectionFactory {
         return factory;
     }
 
-    public Http2ClientHandler getChannelHandler(HttpHost uri) {
-        Http2ClientHandler handler;
+    public Http2ClientHandler getChannelHandler(HttpHost uri,ChannelId channelId) {
 
-        handler = getClientHandlerFromPool(uri);
+        Http2ClientHandler handler;
+        Map conns=null;
+        conns=clientConnections.get(channelId);
+        if(conns==null){
+            conns= new TreeMap<String, Http2ClientHandler>();
+            clientConnections.put(channelId,conns);
+        }
+        handler = getClientHandlerFromPool(uri,conns);
         if (handler == null) {
-            handler = cacheNewConnection(uri);
+            handler = cacheNewConnection(uri,conns);
             if (log.isDebugEnabled()) {
                 if (handler != null) {
                     log.debug("New connection created for " + uri.toString());
@@ -80,7 +89,7 @@ public class Http2ConnectionFactory {
         return handler;
     }
 
-    public Http2ClientHandler cacheNewConnection(HttpHost uri) {
+    public Http2ClientHandler cacheNewConnection(HttpHost uri,Map<String, Http2ClientHandler> map) {
 
         final SslContext sslCtx;
         final boolean SSL;
@@ -125,6 +134,7 @@ public class Http2ConnectionFactory {
             EventLoopGroup workerGroup = new NioEventLoopGroup();
             Http2ClientInitializer initializer = new Http2ClientInitializer(sslCtx,
                     Integer.MAX_VALUE);
+
             String HOST = uri.getHostName();
             Integer PORT = uri.getPort();
             // Configure the client.
@@ -144,7 +154,9 @@ public class Http2ConnectionFactory {
             String key = generateKey(URI.create(uri.toURI()));
             Http2ClientHandler handler = initializer.responseHandler();
             handler.setChannel(channel);
-            connections.put(key, handler);
+            map.put(key, handler);
+            
+
             return initializer.responseHandler();
         } catch (SSLException e) {
             log.error("Error while connection establishment:" + e.fillInStackTrace());
@@ -155,18 +167,18 @@ public class Http2ConnectionFactory {
         }
     }
 
-    public Http2ClientHandler getClientHandlerFromPool(HttpHost uri) {
+    public Http2ClientHandler getClientHandlerFromPool(HttpHost uri,Map<String, Http2ClientHandler> map) {
         String key = generateKey(URI.create(uri.toURI()));
-        Http2ClientHandler handler = connections.get(key);
+        Http2ClientHandler handler = map.get(key);
         if (handler != null) {
             Channel c = handler.getChannel();
             if (!c.isActive()) {
-                connections.remove(key);
-                handler = cacheNewConnection(uri);
+                map.remove(key);
+                handler = cacheNewConnection(uri,map);
             } else if (handler.isStreamIdOverflow()) {
                 c.close().syncUninterruptibly();
-                connections.remove(key);
-                handler = cacheNewConnection(uri);
+                map.remove(key);
+                handler = cacheNewConnection(uri,map);
             }
         }
         return handler;

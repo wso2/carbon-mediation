@@ -97,7 +97,6 @@ public class Http2ClientWorker {
                 }
                 headers.put(PassThroughConstants.LOCATION, prfix + urlContext);
             }
-
         }
         try {
             responseMsgCtx = outMsgCtx.getOperationContext().

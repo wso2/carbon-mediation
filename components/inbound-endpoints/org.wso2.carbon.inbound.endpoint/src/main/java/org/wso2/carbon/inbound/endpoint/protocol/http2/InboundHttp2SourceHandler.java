@@ -29,6 +29,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.transport.passthru.Pipe;
+import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
+import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundMessageHandler;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.SourceHandler;
 
@@ -48,9 +51,14 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
             return o1.compareToIgnoreCase(o2);
         }
     });
-
+    private SourceConfiguration sourceConfiguration;
     public InboundHttp2SourceHandler(InboundHttp2Configuration config) {
         this.config = config;
+        try {
+            sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
+        } catch (Exception e) {
+            log.warn("Cannot get PassThroughSourceConfiguration ", e);
+        }
     }
 
     @Override
@@ -79,16 +87,29 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
 
     public void onDataRead(ChannelHandlerContext ctx, Http2DataFrame data) throws Exception {
 
-        if (data.isEndStream()) {
             int streamId = data.streamId();
             HTTP2SourceRequest request = null;
             request = streams.get(streamId);
+
+            if(request==null){
+                return;
+            }
             request.setChannel(ctx);
 
-            request.addFrame(Http2FrameTypes.DATA, data);
+            Pipe pipe=request.getPipe();
+            if(pipe==null){
+                pipe=new Pipe(new HTTP2Producer(),sourceConfiguration.getBufferFactory().getBuffer(), "source", sourceConfiguration);
+                request.setPipe(pipe);
+            }
+            pipe.produce(new HTTP2Decoder(data));
+            //request.addFrame(Http2FrameTypes.DATA, data);
+
+        if(!request.isProcessedReq()){
             messageHandler.processRequest(request);
-            streams.remove(request.getStreamID());
+            request.setProcessedReq(true);
         }
+        if (data.isEndStream())
+            streams.remove(request.getStreamID());
     }
 
     public void onHeadersRead(ChannelHandlerContext ctx, Http2HeadersFrame headers)
