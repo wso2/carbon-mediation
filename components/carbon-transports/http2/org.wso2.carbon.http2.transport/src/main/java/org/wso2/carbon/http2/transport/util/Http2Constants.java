@@ -26,4 +26,18 @@ public class Http2Constants {
     public static final String TRUST_STORE_PASSWORD = "h2.trust.store.Password";
     public static final String TRUST_STORE_CONFIG_ELEMENT = "h2.trust.store";
 
+
+
+    public static final String HTTP2_REQUEST_TYPE="http2.reqeust.type";
+    public static final String HTTP2_CLIENT_SENT_REQEUST="http2.client.sent.reqeust";
+    public static final String HTTP2_PUSH_PROMISE_REQEUST="http2.push.promise.reqeust";
+    public static final String HTTP2_RESET_REQEUST="http2.reset.reqeust";
+    public static final String HTTP2_GO_AWAY_REQUEST="http2.go.away.reqeust";
+    public static final String HTTP2_PING_REQUEST="http2.ping.request";
+
+
+    public static final String HTTP2_PUSH_PROMISE_ID="http2.push.promise.id";
+    public static final String HTTP2_SERVER_STREAM_ID="http2.server.stream.id";
+    public static final String HTTP2_ERROR_CODE="http2.error.code";
+
 }

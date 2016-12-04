@@ -19,31 +19,29 @@
 package org.wso2.carbon.http2.transport.util;
 
 import io.netty.channel.*;
-import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http2.Http2Connection;
 import io.netty.handler.codec.http2.Http2ConnectionEncoder;
 import io.netty.handler.codec.http2.Http2DataFrame;
-import io.netty.handler.codec.http2.Http2Frame;
+import io.netty.handler.codec.http2.Http2Error;
+import io.netty.handler.codec.http2.Http2GoAwayFrame;
 import io.netty.handler.codec.http2.Http2HeadersFrame;
-import io.netty.handler.codec.http2.Http2StreamFrame;
-import io.netty.handler.codec.http2.HttpConversionUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import io.netty.handler.codec.http2.Http2ResetFrame;
+import io.netty.handler.codec.http2.Http2Settings;
+
+import org.apache.axiom.util.UIDGenerator;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.MessageContext;
 
 import java.util.*;
-
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.synapse.transport.passthru.config.TargetConfiguration;
-
-import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class Http2ClientHandler extends ChannelDuplexHandler{
+import org.wso2.carbon.http2.transport.service.ServiceReferenceHolder;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
+public class Http2ClientHandler extends ChannelDuplexHandler{
 
     private Http2RequestWriter writer;
     private Http2ResponseReceiver receiver;
@@ -51,43 +49,148 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
     private Http2ConnectionEncoder encoder;
     private ChannelHandlerContext chContext;
     private Map<Integer,MessageContext> sentRequests;
-    private Map<Integer,Http2StreamFrame> pendingResponses;
 
     public Http2ClientHandler(Http2Connection connection) {
         this.connection=connection;
         sentRequests=new TreeMap<>();
-        pendingResponses=new TreeMap<>();
+        writer=new Http2RequestWriter(connection);
+        receiver=new Http2ResponseReceiver();
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx,Object msg){
-        if(msg)
+        if(msg instanceof Http2HeadersFrame){
+            Http2HeadersFrame frame=(Http2HeadersFrame)msg;
+            if(!sentRequests.containsKey(frame.streamId())){
+                return;
+            }
+            receiver.onHeadersFrameRead(frame,sentRequests.get(frame.streamId()));
+            if(frame.isEndStream()){
+                sentRequests.remove(frame.streamId());
+            }
+        }else if(msg instanceof Http2DataFrame){
+            Http2DataFrame frame=(Http2DataFrame) msg;
+            if(!sentRequests.containsKey(frame.streamId())){
+                return;
+            }
+            receiver.onDataFrameRead(frame,sentRequests.get(frame.streamId()));
+            if(frame.isEndStream()){
+                sentRequests.remove(frame.streamId());
+            }
+
+        }else if(msg instanceof Http2PushPromiseFrame){
+            Http2PushPromiseFrame frame=(Http2PushPromiseFrame) msg;
+            if(!sentRequests.containsKey(frame.streamId())){
+                return;
+            }
+            MessageContext prevRequest=sentRequests.get(frame.streamId());
+            //prevRequest.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
+            sentRequests.put(frame.getPushPromiseId(),prevRequest);
+            receiver.onPushPromiseFrameRead(frame,prevRequest);
+
+        }else if(msg instanceof Http2Settings){
+            receiver.onUnknownFrameRead(msg);
+
+        }else if(msg instanceof Http2GoAwayFrame){
+            receiver.onUnknownFrameRead(msg);
+
+        }else if(msg instanceof Http2ResetFrame){
+            receiver.onUnknownFrameRead(msg);
+
+        }else{
+            receiver.onUnknownFrameRead(msg);
+
+        }
     }
 
 
+    public int channelWrite(MessageContext request){
+        String requestType=(String)request.getProperty(Http2Constants.HTTP2_REQUEST_TYPE);
+        if(requestType==null || requestType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)){
+            return writer.writeSimpleReqeust(request);
+
+        }else if(requestType.equals(Http2Constants.HTTP2_RESET_REQEUST)){
+            int id=(int)request.getProperty(Http2Constants.HTTP2_SERVER_STREAM_ID);
+            Http2Error code=(Http2Error)request.getProperty(Http2Constants.HTTP2_ERROR_CODE);
+            writer.writeRestSreamRequest(id,code);
+
+        }else if(requestType.equals(Http2Constants.HTTP2_GO_AWAY_REQUEST)) {  //Basically GoAway caused to dispose handler
+            int id = (int) request.getProperty(Http2Constants.HTTP2_SERVER_STREAM_ID);
+            Http2Error code = (Http2Error) request.getProperty(Http2Constants.HTTP2_ERROR_CODE);
+            writer.writeGoAwayReqeust(id, code);
+        }
+        return 0;
+    }
 
 
+    public Http2RequestWriter getWriter() {
+        return writer;
+    }
+
+    public void setWriter(Http2RequestWriter writer) {
+        this.writer = writer;
+    }
+
+    public Http2ResponseReceiver getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(Http2ResponseReceiver receiver) {
+        this.receiver = receiver;
+    }
+
+    public Http2Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Http2Connection connection) {
+        this.connection = connection;
+    }
+
+    public Http2ConnectionEncoder getEncoder() {
+        return encoder;
+    }
+
+    public void setEncoder(Http2ConnectionEncoder encoder) {
+        this.encoder = encoder;
+        writer.setEncoder(encoder);
+
+    }
+
+    public ChannelHandlerContext getChContext() {
+        return chContext;
+    }
+
+    public void setChContext(ChannelHandlerContext chContext) {
+        this.chContext = chContext;
+        writer.setChannelHandlerContext(chContext);
+    }
+
+    private static org.apache.axis2.context.MessageContext createNewMessageContext(MessageContext reqeustMsg) throws
+            AxisFault {
+        org.apache.axis2.context.MessageContext axis2MsgCtx = createAxis2MessageContext();
+        ServiceContext svcCtx = reqeustMsg.getServiceContext();
+        OperationContext opCtx = reqeustMsg.getOperationContext();
+        axis2MsgCtx.setServiceContext(svcCtx);
+        axis2MsgCtx.setOperationContext(opCtx);
+        String tenantDomain=reqeustMsg.getProperty(MultitenantConstants.TENANT_DOMAIN).toString();
+        axis2MsgCtx.setConfigurationContext(axis2MsgCtx.getConfigurationContext());
+        axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
 
 
+        return axis2MsgCtx;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    private static org.apache.axis2.context.MessageContext createAxis2MessageContext() {
+        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
+        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
+        axis2MsgCtx.setConfigurationContext(ServiceReferenceHolder.getInstance().getConfigurationContextService()
+                .getServerConfigContext());
+        axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING,
+                Boolean.FALSE);
+        axis2MsgCtx.setServerSide(false);
+        return axis2MsgCtx;
+    }
 
     /*@Deprecated
     public void put(int streamId, Object request) {
