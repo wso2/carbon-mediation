@@ -184,10 +184,6 @@ public class Http2ConnectionFactory {
         return handler;
     }
 
-    /**
-     * @param uri
-     * @return key to merge connection (scheme+host+port)
-     */
     public String generateKey(URI uri) {
         String host = uri.getHost();
         int port = uri.getPort();

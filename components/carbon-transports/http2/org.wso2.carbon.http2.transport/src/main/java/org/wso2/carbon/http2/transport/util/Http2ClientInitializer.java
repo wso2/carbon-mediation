@@ -53,7 +53,7 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
                         new InboundHttp2ToHttpAdapterBuilder(connection)
                                 .maxContentLength(maxContentLength).propagateSettings(true)
                                 .build())).connection(connection).build();
-        responseHandler = new Http2ClientHandler();
+        responseHandler = new Http2ClientHandler(connection);
         settingsHandler = new Http2SettingsHandler(ch.newPromise());
         if (sslCtx != null) {
             configureSsl(ch);

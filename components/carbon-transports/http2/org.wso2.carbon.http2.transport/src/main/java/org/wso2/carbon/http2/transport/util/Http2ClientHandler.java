@@ -20,9 +20,12 @@ package org.wso2.carbon.http2.transport.util;
 
 import io.netty.channel.*;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http2.Http2Connection;
+import io.netty.handler.codec.http2.Http2ConnectionEncoder;
 import io.netty.handler.codec.http2.Http2DataFrame;
 import io.netty.handler.codec.http2.Http2Frame;
 import io.netty.handler.codec.http2.Http2HeadersFrame;
+import io.netty.handler.codec.http2.Http2StreamFrame;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,35 +42,56 @@ import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class Http2ClientHandler extends SimpleChannelInboundHandler<Object> {
+public class Http2ClientHandler extends ChannelDuplexHandler{
 
-    private volatile SortedMap<Integer, Map.Entry<ChannelFuture, ChannelPromise>> streamidPromiseMap;
-    private volatile TreeMap<Integer, MessageContext> requests;
-    private Log log = LogFactory.getLog(Http2ClientHandler.class);
-    private int currentStreamId = 3;
-    private Channel channel;
-    private TargetConfiguration targetConfig;
-    private volatile TreeMap<Integer, Http2Response> responseMap;
-    private boolean streamIdOverflow = false;
 
-    public Channel getChannel() {
-        return channel;
+    private Http2RequestWriter writer;
+    private Http2ResponseReceiver receiver;
+    private Http2Connection connection;
+    private Http2ConnectionEncoder encoder;
+    private ChannelHandlerContext chContext;
+    private Map<Integer,MessageContext> sentRequests;
+    private Map<Integer,Http2StreamFrame> pendingResponses;
+
+    public Http2ClientHandler(Http2Connection connection) {
+        this.connection=connection;
+        sentRequests=new TreeMap<>();
+        pendingResponses=new TreeMap<>();
     }
 
-    public void setChannel(Channel channel) {
-        this.channel = channel;
+    @Override
+    public void channelRead(ChannelHandlerContext ctx,Object msg){
+        if(msg)
     }
 
-    public Http2ClientHandler() {
-        streamidPromiseMap = new TreeMap<Integer, Map.Entry<ChannelFuture, ChannelPromise>>();
-        requests = new TreeMap<Integer, MessageContext>();
-        responseMap = new TreeMap<>();
-    }
 
-    @Deprecated
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*@Deprecated
     public void put(int streamId, Object request) {
-        streamidPromiseMap.put(streamId, new AbstractMap.SimpleEntry<ChannelFuture, ChannelPromise>(
-                channel.writeAndFlush(request), channel.newPromise()));
+
     }
 
     @Override
@@ -137,5 +161,5 @@ public class Http2ClientHandler extends SimpleChannelInboundHandler<Object> {
 
     public void setTargetConfig(TargetConfiguration targetConfiguration) {
         this.targetConfig = targetConfiguration;
-    }
+    }*/
 }
