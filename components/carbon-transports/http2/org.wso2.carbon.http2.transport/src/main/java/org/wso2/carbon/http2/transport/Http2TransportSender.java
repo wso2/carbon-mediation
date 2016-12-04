@@ -95,7 +95,7 @@ public class Http2TransportSender extends AbstractTransportSender {
         try {
             if (targetEPR.toLowerCase().contains("http2://")) {
                 targetEPR = targetEPR.replaceFirst("http2://", "http://");
-            } else if (targetEPR.toLowerCase().contains("https2://")) {
+            }else if (targetEPR.toLowerCase().contains("https2://")) {
                 targetEPR = targetEPR.replaceFirst("https2://", "https://");
             }
             URI uri = new URI(targetEPR);
@@ -124,7 +124,7 @@ public class Http2TransportSender extends AbstractTransportSender {
 
             Http2ClientHandler clientHandler = connectionFactory
                     .getChannelHandler(target, channelCtx.channel().id());
-            clientHandler.setTargetConfig(targetConfiguration);
+      //      clientHandler.setTargetConfig(targetConfiguration);
 
             /*RelayUtils.buildMessage(msgCtx, false);
             OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
@@ -138,15 +138,15 @@ public class Http2TransportSender extends AbstractTransportSender {
             out.close();
             String msg = sw.toString();
 */
-            int streamId = clientHandler.getStreamId();
-            Channel channel = clientHandler.getChannel();
+     ///       int streamId = clientHandler.getStreamId();
+        //    Channel channel = clientHandler.getChannel();
 
             if (log.isDebugEnabled()) {
                 log.debug("Channel created to send message");
             }
 
-            if (channel.isActive()) {
-                clientHandler.setRequest(streamId, msgCtx);
+         //   if (channel.isActive()) {
+         //       clientHandler.setRequest(streamId, msgCtx);
                 if (log.isDebugEnabled()) {
                     log.debug("Sending message to backend... ");
                 }
@@ -206,18 +206,18 @@ public class Http2TransportSender extends AbstractTransportSender {
                 Pipe pipe = (Pipe)msgCtx.getProperty("pass-through.pipe");
                 if(pipe!=null){
                     pipe.attachConsumer(new Http2CosumerIoControl());
-                    int t=pipe.consume(new http2Encoder(channel,request));
+               //     int t=pipe.consume(new http2Encoder(channel,request));
                 }
 
                 //clientHandler.put(streamId, request);
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Request sent to backend with stream id:" + streamId);
+             //       log.debug("Request sent to backend with stream id:" + streamId);
                 }
-            }
+        //    }
         } catch (URISyntaxException e) {
             log.error("Error parsing the http2 endpoint url", e);
-        } catch (IOException e) {
+       // } catch (IOException e) {
             log.error("Error writting to the http2 channel", e);
         }
     }

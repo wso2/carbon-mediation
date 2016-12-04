@@ -29,17 +29,11 @@ import io.netty.handler.codec.http2.Http2HeadersFrame;
 import io.netty.handler.codec.http2.Http2ResetFrame;
 import io.netty.handler.codec.http2.Http2Settings;
 
-import org.apache.axiom.util.UIDGenerator;
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.context.OperationContext;
-import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.context.MessageContext;
 
 import java.util.*;
 import java.util.TreeMap;
 
-import org.wso2.carbon.http2.transport.service.ServiceReferenceHolder;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 public class Http2ClientHandler extends ChannelDuplexHandler{
 
@@ -103,7 +97,6 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
         }
     }
 
-
     public int channelWrite(MessageContext request){
         String requestType=(String)request.getProperty(Http2Constants.HTTP2_REQUEST_TYPE);
         if(requestType==null || requestType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)){
@@ -121,7 +114,6 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
         }
         return 0;
     }
-
 
     public Http2RequestWriter getWriter() {
         return writer;
@@ -164,32 +156,6 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
     public void setChContext(ChannelHandlerContext chContext) {
         this.chContext = chContext;
         writer.setChannelHandlerContext(chContext);
-    }
-
-    private static org.apache.axis2.context.MessageContext createNewMessageContext(MessageContext reqeustMsg) throws
-            AxisFault {
-        org.apache.axis2.context.MessageContext axis2MsgCtx = createAxis2MessageContext();
-        ServiceContext svcCtx = reqeustMsg.getServiceContext();
-        OperationContext opCtx = reqeustMsg.getOperationContext();
-        axis2MsgCtx.setServiceContext(svcCtx);
-        axis2MsgCtx.setOperationContext(opCtx);
-        String tenantDomain=reqeustMsg.getProperty(MultitenantConstants.TENANT_DOMAIN).toString();
-        axis2MsgCtx.setConfigurationContext(axis2MsgCtx.getConfigurationContext());
-        axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
-
-
-        return axis2MsgCtx;
-    }
-
-    private static org.apache.axis2.context.MessageContext createAxis2MessageContext() {
-        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
-        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
-        axis2MsgCtx.setConfigurationContext(ServiceReferenceHolder.getInstance().getConfigurationContextService()
-                .getServerConfigContext());
-        axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING,
-                Boolean.FALSE);
-        axis2MsgCtx.setServerSide(false);
-        return axis2MsgCtx;
     }
 
     /*@Deprecated
