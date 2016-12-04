@@ -20,6 +20,7 @@ public class Http2ResponseReceiver {
     private static final Log log = LogFactory.getLog(Http2ResponseReceiver.class);
     Map<Integer,MessageContext> incompleteResponses;
 
+
     public Http2ResponseReceiver() {
         this.incompleteResponses = new TreeMap<>();
     }
@@ -29,10 +30,13 @@ public class Http2ResponseReceiver {
     }
 
     public void onHeadersFrameRead(Http2HeadersFrame frame,MessageContext msgContext){
-
+            //every response MsgCtx should have a requestType (normal,push-promise)
     }
 
     public void onPushPromiseFrameRead(Http2PushPromiseFrame frame,MessageContext msgContext){
+        //create new axis2Response message for push-promise data and add it to a incompleteResponses
+        //add reqeust_type as push promise
+        //add push_promise headers  (path,method,authority)
 
     }
 

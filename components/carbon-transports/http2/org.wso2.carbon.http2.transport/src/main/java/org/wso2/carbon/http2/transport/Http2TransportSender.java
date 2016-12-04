@@ -124,7 +124,15 @@ public class Http2TransportSender extends AbstractTransportSender {
 
             Http2ClientHandler clientHandler = connectionFactory
                     .getChannelHandler(target, channelCtx.channel().id());
-      //      clientHandler.setTargetConfig(targetConfiguration);
+
+            /**
+             * Here we should think about goaway frames
+             * if a goaway request sent, that connection should be removed from connection pool
+             *
+             */
+
+
+            //      clientHandler.setTargetConfig(targetConfiguration);
 
             /*RelayUtils.buildMessage(msgCtx, false);
             OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);

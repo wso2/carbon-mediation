@@ -12,10 +12,8 @@ public class Http2RequestWriter {
     Http2Connection connection;
     ChannelHandlerContext chContext;
 
-    public int writeSimpleReqeust(MessageContext msgContext){   //sending a normal request
+    public void writeSimpleReqeust(int streamId,MessageContext msgContext){   //sending a normal request
 
-
-        return 0;
 
     }
 
@@ -43,5 +41,9 @@ public class Http2RequestWriter {
 
     public void setChannelHandlerContext(ChannelHandlerContext channelHandlerContext) {
         this.chContext = channelHandlerContext;
+    }
+
+    public int getNextStreamId() {
+        return connection.local().incrementAndGetNextStreamId();
     }
 }

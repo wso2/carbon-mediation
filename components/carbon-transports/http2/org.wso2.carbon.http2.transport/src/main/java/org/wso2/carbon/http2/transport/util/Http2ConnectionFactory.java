@@ -38,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.net.ssl.SSLException;
 import javax.xml.namespace.QName;
 import java.net.URI;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -153,9 +154,9 @@ public class Http2ConnectionFactory {
 
             String key = generateKey(URI.create(uri.toURI()));
             Http2ClientHandler handler = initializer.responseHandler();
-            handler.setChannel(channel);
+          //  handler.setChannel(channel);
             map.put(key, handler);
-            
+
 
             return initializer.responseHandler();
         } catch (SSLException e) {
@@ -171,12 +172,8 @@ public class Http2ConnectionFactory {
         String key = generateKey(URI.create(uri.toURI()));
         Http2ClientHandler handler = map.get(key);
         if (handler != null) {
-            Channel c = handler.getChannel();
+            Channel c = handler.getChContext().channel();
             if (!c.isActive()) {
-                map.remove(key);
-                handler = cacheNewConnection(uri,map);
-            } else if (handler.isStreamIdOverflow()) {
-                c.close().syncUninterruptibly();
                 map.remove(key);
                 handler = cacheNewConnection(uri,map);
             }
@@ -184,6 +181,10 @@ public class Http2ConnectionFactory {
         return handler;
     }
 
+    /**
+     * @param uri
+     * @return key to merge connection (scheme+host+port)
+     */
     public String generateKey(URI uri) {
         String host = uri.getHost();
         int port = uri.getPort();
@@ -194,5 +195,17 @@ public class Http2ConnectionFactory {
         } else
             ssl = "http://";
         return ssl + host + ":" + port;
+    }
+
+
+    public void removeHanlder(ChannelId channelId){
+        if(clientConnections.containsKey(channelId)){
+            Map<String,Http2ClientHandler> conns=clientConnections.remove(channelId);
+            Iterator<Http2ClientHandler> itr=conns.values().iterator();
+            while (itr.hasNext()){
+                Http2ClientHandler handler=itr.next();
+                handler.removeHandler();
+            }
+        }
     }
 }

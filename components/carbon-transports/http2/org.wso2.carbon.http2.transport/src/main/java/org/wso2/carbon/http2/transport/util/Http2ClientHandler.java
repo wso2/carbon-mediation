@@ -43,6 +43,7 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
     private Http2ConnectionEncoder encoder;
     private ChannelHandlerContext chContext;
     private Map<Integer,MessageContext> sentRequests;
+    private EventLoopGroup eventListner;
 
     public Http2ClientHandler(Http2Connection connection) {
         this.connection=connection;
@@ -78,7 +79,7 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
                 return;
             }
             MessageContext prevRequest=sentRequests.get(frame.streamId());
-            //prevRequest.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
+           // prevRequest.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
             sentRequests.put(frame.getPushPromiseId(),prevRequest);
             receiver.onPushPromiseFrameRead(frame,prevRequest);
 
@@ -97,10 +98,12 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
         }
     }
 
-    public int channelWrite(MessageContext request){
+    public void channelWrite(MessageContext request){
         String requestType=(String)request.getProperty(Http2Constants.HTTP2_REQUEST_TYPE);
         if(requestType==null || requestType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)){
-            return writer.writeSimpleReqeust(request);
+            int streamId= writer.getNextStreamId();
+            sentRequests.put(streamId,request);
+            writer.writeSimpleReqeust(streamId,request);
 
         }else if(requestType.equals(Http2Constants.HTTP2_RESET_REQEUST)){
             int id=(int)request.getProperty(Http2Constants.HTTP2_SERVER_STREAM_ID);
@@ -112,7 +115,6 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             Http2Error code = (Http2Error) request.getProperty(Http2Constants.HTTP2_ERROR_CODE);
             writer.writeGoAwayReqeust(id, code);
         }
-        return 0;
     }
 
     public Http2RequestWriter getWriter() {
@@ -158,6 +160,16 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
         writer.setChannelHandlerContext(chContext);
     }
 
+    public void removeHandler() {
+        if(chContext.channel().isActive()||chContext.channel().isOpen()){
+            chContext.channel().close();
+            chContext.executor().shutdownGracefully();
+        }
+    }
+
+    public void setEventListner(EventLoopGroup eventListner) {
+        this.eventListner = eventListner;
+    }
     /*@Deprecated
     public void put(int streamId, Object request) {
 
