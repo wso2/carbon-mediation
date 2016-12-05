@@ -1,0 +1,370 @@
+/*
+ *   Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *   WSO2 Inc. licenses this file to you under the Apache License,
+ *   Version 2.0 (the "License"); you may not use this file except
+ *   in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+
+package org.wso2.carbon.http2.transport.util;
+
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http2.DefaultHttp2Headers;
+import io.netty.handler.codec.http2.Http2Headers;
+import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.Constants;
+import org.apache.axis2.addressing.EndpointReference;
+import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.transport.http.SOAPMessageFormatter;
+import org.apache.axis2.util.MessageProcessorSelector;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpVersion;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.protocol.HTTP;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
+import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
+import org.apache.synapse.transport.passthru.PassThroughConstants;
+import org.apache.synapse.transport.passthru.Pipe;
+import org.apache.synapse.transport.passthru.TargetContext;
+import org.apache.synapse.transport.passthru.TargetRequest;
+import org.apache.synapse.transport.passthru.config.TargetConfiguration;
+import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
+public class Http2TargetRequestUtil {
+    TargetConfiguration configuration;
+    HttpRoute route;
+    private URL url;
+    /** HTTP Method */
+    private String method;
+    /** HTTP request created for sending the message */
+    private HttpRequest request = null;
+    /** Weather chunk encoding should be used */
+    private boolean chunk = true;
+    /** HTTP version that should be used */
+    private ProtocolVersion version = null;
+    /** Weather full url is used for the request */
+    private boolean fullUrl = false;
+    /** Port to be used for the request */
+    private int port = 80;
+    /** Weather this request has a body */
+    private boolean hasEntityBody = true;
+    /** Keep alive request */
+    private boolean keepAlive = true;
+    private boolean disableChunk=false;
+
+    public Http2TargetRequestUtil(TargetConfiguration configuration,HttpRoute route) {
+        this.configuration=configuration;
+        this.route=route;
+
+    }
+
+    public Http2Headers getHeaders(MessageContext msgContext){
+        Http2Headers http2Headers=new DefaultHttp2Headers();
+      //  Map<String,String> reqeustHeaders=new TreeMap<>();
+
+        String httpMethod = (String) msgContext.getProperty(
+                Constants.Configuration.HTTP_METHOD);
+        if (httpMethod == null) {
+            httpMethod = "POST";
+        }
+        http2Headers.method(httpMethod);
+
+        // basic request
+        Boolean noEntityBody = (Boolean) msgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY);
+
+        if(msgContext.getEnvelope().getBody().getFirstElement() != null){
+            noEntityBody  =false;
+        }
+
+        EndpointReference epr = PassThroughTransportUtils.getDestinationEPR(msgContext);
+        URL url = null;
+        try {
+            url = new URL(epr.getAddress());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        //this code block is needed to replace the host header in service chaining with REQUEST_HOST_HEADER
+        //adding host header since it is not available in response message.
+        //otherwise Host header will not replaced after first call
+        if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
+            Object headers = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+            if(headers != null) {
+                Map headersMap = (Map) headers;
+                if (!headersMap.containsKey(HTTPConstants.HEADER_HOST)) {
+                    headersMap.put(HTTPConstants.HEADER_HOST
+                            , msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
+                }
+            }
+        }
+
+        // headers
+        PassThroughTransportUtils.removeUnwantedHeaders(msgContext, configuration);
+
+
+        Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
+
+        if (o != null && o instanceof Map) {
+            Map headers = (Map) o;
+            for (Object entryObj : headers.entrySet()) {
+                Map.Entry entry = (Map.Entry) entryObj;
+                if (entry.getValue() != null && entry.getKey() instanceof String &&
+                        entry.getValue() instanceof String) {
+                    if (HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())
+                            && !configuration.isPreserveHttpHeader(HTTPConstants.HEADER_HOST)) {
+                        if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
+                            http2Headers.add((String) entry.getKey(),
+                                    (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
+                        }
+
+                    } else {
+                        http2Headers.add((String) entry.getKey(), (String) entry.getValue());
+                    }
+                }
+            }
+        }
+
+        String cType = null;
+        try {
+            cType = getContentType(msgContext, configuration.isPreserveHttpHeader(HTTP.CONTENT_TYPE));
+        } catch (AxisFault axisFault) {
+            axisFault.printStackTrace();
+        }
+        if (cType != null && (!httpMethod.equals("GET") && !httpMethod.equals("DELETE"))) {
+            String messageType = (String) msgContext.getProperty("messageType");
+            if (messageType != null) {
+                boolean builderInvoked = false;
+                final Pipe pipe = (Pipe) msgContext
+                        .getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+                if (pipe != null) {
+                    builderInvoked = Boolean.TRUE.equals(msgContext
+                            .getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED));
+                }
+
+                // if multipart related message type and unless if message
+                // not get build we should
+                // skip of setting formatter specific content Type
+                if (messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED) == -1
+                        && messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA) == -1) {
+                    Map msgCtxheaders = (Map) o;
+                    if (msgCtxheaders != null && !cType.isEmpty()) {
+                        msgCtxheaders.put(HTTP.CONTENT_TYPE, cType);
+                    }
+                    http2Headers.add(HTTP.CONTENT_TYPE, cType);
+                }
+
+                // if messageType is related to multipart and if message
+                // already built we need to set new
+                // boundary related content type at Content-Type header
+                if (builderInvoked
+                        && (((messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED) != -1)
+                        || (messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA) != -1)))) {
+                    http2Headers.add(HTTP.CONTENT_TYPE, cType);
+                }
+
+            } else {
+                http2Headers.add(HTTP.CONTENT_TYPE, cType);
+            }
+
+        }
+
+        // version
+        String forceHttp10 = (String) msgContext.getProperty(PassThroughConstants.FORCE_HTTP_1_0);
+        if ("true".equals(forceHttp10)) {
+            //request.setVersion(HttpVersion.HTTP_1_0);
+        }
+
+        // keep alive
+        String noKeepAlie = (String) msgContext.getProperty(PassThroughConstants.NO_KEEPALIVE);
+        if ("true".equals(noKeepAlie)) {
+            keepAlive=false;
+        }
+
+        // port
+        port = url.getPort();
+
+
+
+        // chunk
+        String disableChunking = (String) msgContext.getProperty(
+                PassThroughConstants.DISABLE_CHUNKING);
+        if ("true".equals(disableChunking)) {
+            disableChunk=true;
+        }
+
+        // full url
+        String fullUr = (String) msgContext.getProperty(PassThroughConstants.FULL_URI);
+        if ("true".equals(fullUr)) {
+            fullUrl=true;
+        }
+
+        // Add excess respsonse header.
+        String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
+        Map excessHeaders = (Map) msgContext.getProperty(excessProp);
+        if (excessHeaders != null) {
+            for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
+                String key = (String) iterator.next();
+                for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
+                    http2Headers.add(key, (String) excessVal);
+                }
+            }
+        }
+        String path = fullUrl || (route.getProxyHost() != null && !route.isTunnelled()) ?
+                url.toString() : url.getPath() +
+                (url.getQuery() != null ? "?" + url.getQuery() : "");
+
+        if ((("GET").equals(msgContext.getProperty(Constants.Configuration.HTTP_METHOD)))
+                || (("DELETE").equals(msgContext.getProperty(Constants.Configuration.HTTP_METHOD)))) {
+            try{
+                hasEntityBody = false;
+                MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgContext);
+                OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
+                if (formatter != null && format != null) {
+                    URL _url = formatter.getTargetAddress(msgContext, format, url);
+                    if (_url != null && !_url.toString().isEmpty()) {
+                        if (msgContext.getProperty(NhttpConstants.POST_TO_URI) != null
+                                && Boolean.TRUE.toString().equals(msgContext.getProperty(NhttpConstants.POST_TO_URI))) {
+                            path = _url.toString();
+                        } else {
+                            path = _url.getPath()
+                                    + ((_url.getQuery() != null && !_url.getQuery().isEmpty())
+                                    ? ("?" + _url.getQuery())
+                                    : "");
+                        }
+
+                    }
+                    http2Headers.remove(HTTP.CONTENT_TYPE);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+
+        //fix for  POST_TO_URI
+        if(msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI)){
+            path = url.toString();
+        }
+
+        if(path!=null || !path.isEmpty()){
+           http2Headers.path(path);
+        }
+
+        if(hasEntityBody){
+                long contentLength = -1;
+                String contentLengthHeader = null;
+                if(http2Headers.get(HTTP.CONTENT_LEN) != null && Integer.parseInt(http2Headers.get(HTTP.CONTENT_LEN).toString()) > 0) {
+                    contentLengthHeader = http2Headers.get(HTTP.CONTENT_LEN).toString();
+                }
+
+                if (contentLengthHeader != null) {
+                    contentLength = Integer.parseInt(contentLengthHeader);
+                    http2Headers.remove(HTTP.CONTENT_LEN);
+                }
+
+                //MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
+
+
+                if(msgContext.getProperty(PassThroughConstants.PASSTROUGH_MESSAGE_LENGTH) != null){
+                    contentLength = (Long)msgContext.getProperty(PassThroughConstants.PASSTROUGH_MESSAGE_LENGTH);
+                }
+            boolean forceContentLength = msgContext.isPropertyTrue(
+                    NhttpConstants.FORCE_HTTP_CONTENT_LENGTH);
+            boolean forceContentLengthCopy = msgContext.isPropertyTrue(
+                    PassThroughConstants.COPY_CONTENT_LENGTH_FROM_INCOMING);
+
+            if (forceContentLength) {
+                if (forceContentLengthCopy && contentLength > 0) {
+                    http2Headers.add(HttpHeaderNames.CONTENT_LENGTH,Long.toString(contentLength));
+                }
+            }else{
+                if (contentLength != -1) {
+                    http2Headers.add(HttpHeaderNames.CONTENT_LENGTH,Long.toString(contentLength));
+                }
+            }
+        }
+
+        String soapAction = msgContext.getSoapAction();
+        if (soapAction == null) {
+            soapAction = msgContext.getWSAAction();
+            msgContext.getAxisOperation().getInputAction();
+        }
+
+        if (msgContext.isSOAP11() && soapAction != null &&
+                soapAction.length() > 0) {
+            String existingHeader =
+                    http2Headers.get(HTTPConstants.HEADER_SOAP_ACTION).toString();
+            if (existingHeader != null) {
+                http2Headers.remove(existingHeader);
+            }
+            MessageFormatter messageFormatter =
+                    MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
+            http2Headers.add(HTTPConstants.HEADER_SOAP_ACTION,
+                    messageFormatter.formatSOAPAction(msgContext, null, soapAction));
+            //request.setHeader(HTTPConstants.USER_AGENT,"Synapse-PT-HttpComponents-NIO");
+        }
+
+        if(http2Headers.contains(HttpHeaderNames.HOST)){
+            http2Headers.remove(HttpHeaderNames.HOST);
+        }
+
+        http2Headers.scheme(route.getTargetHost().getSchemeName());
+        http2Headers.authority(route.getTargetHost().toString());
+        return http2Headers;
+    }
+
+    private static String getContentType(MessageContext msgCtx, boolean isContentTypePreservedHeader) throws
+            AxisFault {
+
+        if (isContentTypePreservedHeader) {
+            if (msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE) != null) {
+                return (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
+            } else if (msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE) != null) {
+                return (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
+            }
+        }
+
+        MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgCtx);
+        OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgCtx);
+
+        if (formatter != null) {
+            String contentType= formatter.getContentType(msgCtx, format, msgCtx.getSoapAction());
+            //keep the formatter information to prevent multipart boundary override (this will be the content writing to header)
+            msgCtx.setProperty(PassThroughConstants.MESSAGE_OUTPUT_FORMAT, format);
+            return contentType;
+
+        } else {
+            String contentType = (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
+            if (contentType != null) {
+                return contentType;
+            } else {
+                return new SOAPMessageFormatter().getContentType(
+                        msgCtx, format,  msgCtx.getSoapAction());
+            }
+        }
+    }
+
+    public boolean isHasEntityBody() {
+        return hasEntityBody;
+    }
+}

@@ -28,17 +28,18 @@ import io.netty.handler.codec.http2.*;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
 import io.netty.handler.ssl.SslContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import static io.netty.handler.logging.LogLevel.*;
 
 public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
-    protected static final Log log = LogFactory.getLog(Http2ClientInitializer.class);
+    private static final Http2FrameLogger logger = new Http2FrameLogger(INFO, Http2ClientInitializer.class);
 
     private final SslContext sslCtx;
     private final int maxContentLength;
-    private HttpToHttp2ConnectionHandler connectionHandler;
     private Http2ClientHandler responseHandler;
+    private Http2ConnectionHandler connectionHandler;
     private Http2SettingsHandler settingsHandler;
+    private Http2FrameListener listener;
 
     public Http2ClientInitializer(SslContext sslCtx, int maxContentLength) {
         this.sslCtx = sslCtx;
@@ -48,12 +49,18 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         final Http2Connection connection = new DefaultHttp2Connection(false);
-        connectionHandler = new HttpToHttp2ConnectionHandlerBuilder().frameListener(
-                new DelegatingDecompressorFrameListener(connection,
-                        new InboundHttp2ToHttpAdapterBuilder(connection)
-                                .maxContentLength(maxContentLength).propagateSettings(true)
-                                .build())).connection(connection).build();
+        Http2FrameListenAdapter clientFrameListener=new Http2FrameListenAdapter();
+
+        listener=new DelegatingDecompressorFrameListener(
+                connection,
+                clientFrameListener);
+        connectionHandler=new Http2ConnectionHandlerBuilder()
+                .connection(connection)
+                .frameLogger(logger)
+                .frameListener(listener)
+                .build();
         responseHandler = new Http2ClientHandler(connection);
+        responseHandler.setEncoder(connectionHandler.encoder());
         settingsHandler = new Http2SettingsHandler(ch.newPromise());
         if (sslCtx != null) {
             configureSsl(ch);
@@ -71,7 +78,7 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
     }
 
     protected void configureEndOfPipeline(ChannelPipeline pipeline) {
-        pipeline.addLast(settingsHandler, responseHandler);
+        pipeline.addLast(responseHandler,settingsHandler);
     }
 
     private void configureSsl(SocketChannel ch) {
@@ -117,9 +124,6 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
     private static class UserEventLogger extends ChannelInboundHandlerAdapter {
         @Override
         public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-            if (log.isDebugEnabled()) {
-                log.debug("User Event Triggered for Http2 Server: " + evt);
-            }
             ctx.fireUserEventTriggered(evt);
         }
     }

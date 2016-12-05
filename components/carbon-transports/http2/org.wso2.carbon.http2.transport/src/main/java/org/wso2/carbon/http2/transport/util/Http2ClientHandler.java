@@ -43,7 +43,6 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
     private Http2ConnectionEncoder encoder;
     private ChannelHandlerContext chContext;
     private Map<Integer,MessageContext> sentRequests;
-    private EventLoopGroup eventListner;
 
     public Http2ClientHandler(Http2Connection connection) {
         this.connection=connection;
@@ -79,11 +78,18 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
                 return;
             }
             MessageContext prevRequest=sentRequests.get(frame.streamId());
-           // prevRequest.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
+
+            //if the inbound is not push reqeusts reject them
+            if(!(boolean)prevRequest.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED)){
+                writer.writeRestSreamRequest(frame.pushPromiseId,Http2Error.REFUSED_STREAM);
+                return;
+            }
+
             sentRequests.put(frame.getPushPromiseId(),prevRequest);
             receiver.onPushPromiseFrameRead(frame,prevRequest);
 
         }else if(msg instanceof Http2Settings){
+            setChContext(ctx);
             receiver.onUnknownFrameRead(msg);
 
         }else if(msg instanceof Http2GoAwayFrame){
@@ -167,9 +173,6 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
         }
     }
 
-    public void setEventListner(EventLoopGroup eventListner) {
-        this.eventListner = eventListner;
-    }
     /*@Deprecated
     public void put(int streamId, Object request) {
 

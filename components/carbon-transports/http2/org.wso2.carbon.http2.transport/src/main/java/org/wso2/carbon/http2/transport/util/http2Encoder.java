@@ -23,6 +23,8 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import io.netty.buffer.UnpooledDirectByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http2.DecoratingHttp2FrameWriter;
 import io.netty.handler.codec.http2.DefaultHttp2ConnectionEncoder;
@@ -31,6 +33,7 @@ import io.netty.handler.codec.http2.DefaultHttp2FrameReader;
 import io.netty.handler.codec.http2.DefaultHttp2FrameWriter;
 import io.netty.handler.codec.http2.DefaultHttp2HeadersEncoder;
 import io.netty.handler.codec.http2.Http2Connection;
+import io.netty.handler.codec.http2.Http2ConnectionEncoder;
 import io.netty.handler.codec.http2.Http2DataWriter;
 import org.apache.http.nio.ContentEncoder;
 
@@ -42,11 +45,17 @@ import java.nio.ByteBuffer;
  * Created by chanakabalasooriya on 11/25/16.
  */
 public class http2Encoder implements ContentEncoder {
-    Channel channel;
-    FullHttpRequest request;
-    public http2Encoder(Channel channel, FullHttpRequest request) {
-        this.channel=channel;
-        this.request=request;
+    ChannelHandlerContext chContext;
+    int streamId;
+    Http2ConnectionEncoder encoder;
+    ChannelPromise promise;
+    boolean isComplete=false;
+    public http2Encoder(ChannelHandlerContext chContext,int streamId,Http2ConnectionEncoder encoder,ChannelPromise promise) {
+        this.chContext=chContext;
+        this.streamId=streamId;
+        this.encoder=encoder;
+        this.promise=promise;
+
     }
 
     @Override
@@ -56,17 +65,22 @@ public class http2Encoder implements ContentEncoder {
 
 
         while (src.hasRemaining()){
-            byte [] b= new byte[channel.alloc().buffer().capacity()];
-            if(src.remaining()<b.length){
+            byte [] b;//= new byte[chContext.channel().alloc().buffer().capacity()];
+          //  if(src.remaining()<b.length){
                 b=new byte[src.remaining()];
                 src.get(b);
                // request.replace(Unpooled.wrappedBuffer(b));
-                channel.writeAndFlush(request.replace(Unpooled.wrappedBuffer(b)));
-                break;
-            }else{
+                if(src.hasRemaining())
+                    encoder.writeData(chContext,streamId,Unpooled.wrappedBuffer(b),0,false,promise);
+                else {
+                    encoder.writeData(chContext,streamId, Unpooled.wrappedBuffer(b),0,true,promise);
+                    isComplete = true;
+                }
+
+            /*}else{
                 src.get(b,0,b.length);
-                channel.write(request.replace(Unpooled.wrappedBuffer(b)));
-            }
+                encoder.writeData(chContext,streamId,Unpooled.wrappedBuffer(b),0,false,promise);
+            }*/
         }
 
         return src.position();
@@ -78,6 +92,6 @@ public class http2Encoder implements ContentEncoder {
 
     @Override
     public boolean isCompleted() {
-        return false;
+        return isComplete;
     }
 }

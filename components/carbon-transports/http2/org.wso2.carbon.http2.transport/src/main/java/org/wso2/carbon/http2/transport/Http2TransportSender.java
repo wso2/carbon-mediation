@@ -26,6 +26,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http2.*;
 import io.netty.util.CharsetUtil;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axiom.util.blob.OverflowBlob;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.context.ConfigurationContext;
@@ -41,17 +42,23 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
+import org.apache.http.conn.routing.HttpRoute;
 import org.apache.synapse.transport.http.conn.ProxyConfig;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.config.ProxyConfigBuilder;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
+import org.apache.synapse.transport.passthru.TargetRequest;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
+import org.apache.synapse.transport.passthru.util.TargetRequestFactory;
 import org.wso2.carbon.http2.transport.util.Http2ClientHandler;
 import org.wso2.carbon.http2.transport.util.Http2ConnectionFactory;
+import org.wso2.carbon.http2.transport.util.Http2Constants;
 import org.wso2.carbon.http2.transport.util.Http2CosumerIoControl;
+import org.wso2.carbon.http2.transport.util.Http2TargetRequestUtil;
 import org.wso2.carbon.http2.transport.util.http2Encoder;
 
 import javax.xml.stream.XMLStreamException;
@@ -83,7 +90,7 @@ public class Http2TransportSender extends AbstractTransportSender {
         super.init(cfgCtx, transportOut);
         connectionFactory = Http2ConnectionFactory.getInstance(transportOut);
         proxyConfig = new ProxyConfigBuilder().build(transportOut);
-        log.info(proxyConfig.logProxyConfig());
+        //log.info(proxyConfig.logProxyConfig());
         targetConfiguration = new TargetConfiguration(cfgCtx, transportOut, null, null,
                 proxyConfig.createProxyAuthenticator());
         targetConfiguration.build();
@@ -113,17 +120,37 @@ public class Http2TransportSender extends AbstractTransportSender {
             HttpHost target = new HttpHost(hostname, port, scheme);
             boolean secure = "https".equals(target.getSchemeName());
 
+            HttpHost proxy = proxyConfig.selectProxy(target);
+
             msgCtx.setProperty(PassThroughConstants.PROXY_PROFILE_TARGET_HOST,
                     target.getHostName());
 
-            if (log.isDebugEnabled()) {
-                log.debug("Fetching a Connection from the Http2(Https2) Connection Factory.");
+            HttpRoute route;
+            if (proxy != null) {
+                route = new HttpRoute(target, null, proxy, secure);
+            } else {
+                route = new HttpRoute(target, null, secure);
             }
+            Http2TargetRequestUtil util=new Http2TargetRequestUtil(targetConfiguration,route);
+            msgCtx.setProperty(Http2Constants.PASSTHROUGH_TARGET,util);
+            /*msgCtx.setProperty(Http2Constants.TARGET_URI,uri);
+            msgCtx.setProperty(Http2Constants.TARGET_HOST,target);
+            */
+
             ChannelHandlerContext channelCtx = (ChannelHandlerContext) msgCtx
                     .getProperty("stream-channel");
 
             Http2ClientHandler clientHandler = connectionFactory
                     .getChannelHandler(target, channelCtx.channel().id());
+
+            clientHandler.channelWrite(msgCtx);
+
+            //Termination of a connection
+            if(msgCtx.getProperty(Http2Constants.HTTP2_REQUEST_TYPE)!=null
+                    && Http2Constants.HTTP2_GO_AWAY_REQUEST.equals((String)msgCtx.getProperty(
+                            Http2Constants.HTTP2_REQUEST_TYPE))){
+                connectionFactory.removeHanlder(channelCtx.channel().id());
+            }
 
             /**
              * Here we should think about goaway frames
@@ -149,21 +176,19 @@ public class Http2TransportSender extends AbstractTransportSender {
      ///       int streamId = clientHandler.getStreamId();
         //    Channel channel = clientHandler.getChannel();
 
-            if (log.isDebugEnabled()) {
-                log.debug("Channel created to send message");
-            }
 
          //   if (channel.isActive()) {
          //       clientHandler.setRequest(streamId, msgCtx);
-                if (log.isDebugEnabled()) {
+               /* if (log.isDebugEnabled()) {
                     log.debug("Sending message to backend... ");
-                }
+              /*  }*//*
                 String method = (msgCtx.getProperty(Constants.Configuration.HTTP_METHOD) != null ?
                         msgCtx.getProperty(Constants.Configuration.HTTP_METHOD).toString() :
                         POST.toString());
                 //Set content type and required frames
                 HttpMethod m = new HttpMethod(method);
-
+*/
+/*
 
                 String msg="<Hi> this is wso2</Hi>";
                 FullHttpRequest request;
@@ -182,6 +207,7 @@ public class Http2TransportSender extends AbstractTransportSender {
                         secure ? HttpScheme.HTTPS : HttpScheme.HTTP);
                 //channel.writeAndFlush(request);
 
+*/
 
 
 /*
@@ -218,15 +244,119 @@ public class Http2TransportSender extends AbstractTransportSender {
                 }
 
                 //clientHandler.put(streamId, request);
-
+/*
                 if (log.isDebugEnabled()) {
              //       log.debug("Request sent to backend with stream id:" + streamId);
                 }
-        //    }
+        //    }*/
         } catch (URISyntaxException e) {
             log.error("Error parsing the http2 endpoint url", e);
        // } catch (IOException e) {
             log.error("Error writting to the http2 channel", e);
         }
+    }
+
+
+    public void sendRequestContent(final MessageContext msgContext) throws AxisFault {
+
+        //NOTE:this a special case where, when the backend service expects content-length but,there is no desire that the message
+        //should be build, if FORCE_HTTP_CONTENT_LENGTH and COPY_CONTENT_LENGTH_FROM_INCOMING, we assume that the content
+        //comming from the client side has not been changed
+        boolean forceContentLength = msgContext.isPropertyTrue(NhttpConstants.FORCE_HTTP_CONTENT_LENGTH);
+        boolean forceContentLengthCopy = msgContext.isPropertyTrue(PassThroughConstants.COPY_CONTENT_LENGTH_FROM_INCOMING);
+
+        if (forceContentLength && forceContentLengthCopy && msgContext.getProperty(PassThroughConstants.ORGINAL_CONTEN_LENGTH) != null) {
+            msgContext.setProperty(PassThroughConstants.PASSTROUGH_MESSAGE_LENGTH, Long.parseLong((String)msgContext.getProperty(PassThroughConstants.ORGINAL_CONTEN_LENGTH) ));
+        }
+
+        if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+            synchronized (msgContext) {
+                while (!Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.WAIT_BUILDER_IN_STREAM_COMPLETE)) &&
+                        !Boolean.TRUE.equals(msgContext.getProperty("PASSTHRU_CONNECT_ERROR"))) {
+                    try {
+                        msgContext.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            if (Boolean.TRUE.equals(msgContext.getProperty("PASSTHRU_CONNECT_ERROR"))) {
+                return;
+            }
+
+
+            OutputStream out = (OutputStream) msgContext.getProperty(PassThroughConstants.BUILDER_OUTPUT_STREAM);
+            if (out != null) {
+                String disableChunking = (String) msgContext.getProperty(PassThroughConstants.DISABLE_CHUNKING);
+                String forceHttp10 = (String) msgContext.getProperty(PassThroughConstants.FORCE_HTTP_1_0);
+                Pipe pipe = (Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+
+                if("true".equals(disableChunking) || "true".equals(forceHttp10) ){
+
+                    MessageFormatter formatter =  MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
+                    OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
+                    long messageSize=0;
+
+                    try {
+                        OverflowBlob overflowBlob =setStreamAsTempData(formatter,msgContext,format);
+                        messageSize = overflowBlob.getLength();
+                        msgContext.setProperty(PassThroughConstants.PASSTROUGH_MESSAGE_LENGTH,messageSize);
+                        overflowBlob.writeTo(out);
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        handleException("IO while building message", e);
+                    }
+                    //if HTTP MEHOD = GET we need to write down the HEADER information to the wire and need
+                    //to ignore any entity enclosed methods available.
+                    if (("GET").equals(msgContext.getProperty(Constants.Configuration.HTTP_METHOD)) || ("DELETE").equals(msgContext.getProperty(Constants.Configuration.HTTP_METHOD))) {
+                        pipe.setSerializationCompleteWithoutData(true);
+                    } else if (messageSize == 0 &&
+                            (msgContext.getProperty(PassThroughConstants.FORCE_POST_PUT_NOBODY) != null &&
+                                    (Boolean) msgContext.getProperty(PassThroughConstants.FORCE_POST_PUT_NOBODY))) {
+                        pipe.setSerializationCompleteWithoutData(true);
+                    } else {
+                        pipe.setSerializationComplete(true);
+                    }
+
+                }else {
+                    //if HTTP MEHOD = GET we need to write down the HEADER information to the wire and need
+                    //to ignore any entity enclosed methods available.
+                    if (("GET").equals(msgContext.getProperty(Constants.Configuration.HTTP_METHOD)) || ("DELETE").equals(msgContext.getProperty(Constants.Configuration.HTTP_METHOD))) {
+                        pipe.setSerializationCompleteWithoutData(true);
+                        return;
+                    }
+
+                    if ((disableChunking == null || !"true".equals(disableChunking)) ||
+                            (forceHttp10 == null || !"true".equals(forceHttp10))) {
+                        MessageFormatter formatter = MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
+                        OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
+                        formatter.writeTo(msgContext, format, out, false);
+                    }
+
+                    if ((msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE) != null &&
+                            (Boolean) msgContext.getProperty(PassThroughConstants.REST_GET_DELETE_INVOKE))) {
+                        pipe.setSerializationCompleteWithoutData(true);
+                    } else if ((msgContext.getProperty(PassThroughConstants.FORCE_POST_PUT_NOBODY) != null &&
+                            (Boolean) msgContext.getProperty(PassThroughConstants.FORCE_POST_PUT_NOBODY))) {
+                        pipe.setSerializationCompleteWithoutData(true);
+                    } else {
+                        pipe.setSerializationComplete(true);
+                    }
+
+                }
+            }
+        }
+
+    }
+    private OverflowBlob setStreamAsTempData(MessageFormatter messageFormatter,MessageContext msgContext,OMOutputFormat format) throws IOException {
+        OverflowBlob serialized = new OverflowBlob(256, 4096, "http-nio_", ".dat");
+        OutputStream out = serialized.getOutputStream();
+        try {
+            messageFormatter.writeTo(msgContext, format, out, false);
+        } finally {
+            out.close();
+        }
+        return serialized;
     }
 }
