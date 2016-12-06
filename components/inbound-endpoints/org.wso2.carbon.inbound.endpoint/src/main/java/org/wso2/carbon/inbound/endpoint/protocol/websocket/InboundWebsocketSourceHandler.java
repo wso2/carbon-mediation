@@ -269,9 +269,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                         contentType = defaultContentType;
                     }
                     if (contentType != null && contentType.startsWith(WSConstants.TEXT)) {
-                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_DEFAULT_CONTENT_TYPE_PRESENT, false);
+                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, false);
                     } else {
-                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_DEFAULT_CONTENT_TYPE_PRESENT, true);
+                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, true);
                     }
 
                     handleWebsocketBinaryFrame(frame);
@@ -294,9 +294,9 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                         contentType = defaultContentType;
                     }
                     if (contentType != null && contentType.startsWith(WSConstants.BINARY)) {
-                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_DEFAULT_CONTENT_TYPE_PRESENT, false);
+                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, false);
                     } else {
-                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_DEFAULT_CONTENT_TYPE_PRESENT, true);
+                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, true);
                     }
                     handleWebsocketPassthroughTextFrame(frame);
                     org.apache.axis2.context.MessageContext axis2MsgCtx =

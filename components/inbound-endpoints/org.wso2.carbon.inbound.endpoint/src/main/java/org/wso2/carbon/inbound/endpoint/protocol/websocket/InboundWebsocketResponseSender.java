@@ -24,6 +24,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.util.MessageProcessorSelector;
@@ -57,7 +58,23 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
 
     @Override
     public void sendBack(MessageContext msgContext) {
+        String defaultContentType = sourceHandler.getDefaultContentType();
         if (msgContext != null) {
+            Integer errorCode = null;
+            String errorMessage = null;
+            if (msgContext.getProperty("errorCode") != null ) {
+                errorCode = Integer.parseInt(msgContext.getProperty("errorCode").toString());
+            }
+            if(msgContext.getProperty("ERROR_MESSAGE") != null ) {
+                errorMessage = msgContext.getProperty("ERROR_MESSAGE").toString();
+            }
+            try {
+                if (errorCode != null && errorMessage != null) {
+                    sourceHandler.handleClientWebsocketChannelTermination(new CloseWebSocketFrame(errorCode, errorMessage));
+                }
+            } catch (AxisFault fault) {
+                log.error("Error occurred while sending close frames", fault);
+            }
             Object isConnectionAlive = ((Axis2MessageContext) msgContext).getAxis2MessageContext().getProperty
                     (WSConstants.IS_CONNECTION_ALIVE);
             if (isConnectionAlive != null && !(boolean) isConnectionAlive) {
@@ -84,6 +101,29 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT).equals(true)) {
                 BinaryWebSocketFrame frame = (BinaryWebSocketFrame)
                         msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME);
+                if (frame == null) {
+                    try {
+                        RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
+                        if (defaultContentType != null && defaultContentType.startsWith(WSConstants.BINARY)) {
+                            org.apache.axis2.context.MessageContext msgCtx =
+                                    ((Axis2MessageContext) msgContext).getAxis2MessageContext();
+                            MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgCtx);
+                            OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
+                            byte[] message = messageFormatter.getBytes(msgCtx, format);
+                            frame = new BinaryWebSocketFrame(Unpooled.copiedBuffer(message));
+                            InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+                            int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
+                            String subscriberPath = sourceHandler.getSubscriberPath();
+                            WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
+                            handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+                            return;
+                        }
+                    } catch (XMLStreamException ex) {
+                        log.error("Error while building message", ex);
+                    } catch (IOException ex) {
+                        log.error("Failed for format message to specified output format", ex);
+                    }
+                }
                 InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
                 int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
                 String subscriberPath = sourceHandler.getSubscriberPath();
@@ -93,6 +133,29 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT).equals(true)) {
                 TextWebSocketFrame frame = (TextWebSocketFrame)
                         msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME);
+                if (frame == null) {
+                    try {
+                        RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
+                        if (defaultContentType != null && defaultContentType.startsWith(WSConstants.TEXT)) {
+                            String backendMessageType = (String) (((Axis2MessageContext) msgContext)
+                                    .getAxis2MessageContext()).getProperty(WSConstants.BACKEND_MESSAGE_TYPE);
+                            ((Axis2MessageContext) msgContext).getAxis2MessageContext().setProperty(
+                                    WSConstants.MESSAGE_TYPE, backendMessageType);
+                            frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext)
+                                    msgContext).getAxis2MessageContext()));
+                            InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+                            int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
+                            String subscriberPath = sourceHandler.getSubscriberPath();
+                            WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
+                            handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
+                            return;
+                        }
+                    } catch (XMLStreamException ex) {
+                        log.error("Error while building message", ex);
+                    } catch (IOException ex) {
+                        log.error("Failed for format message to specified output format", ex);
+                    }
+                }
                 InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
                 int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
                 String subscriberPath = sourceHandler.getSubscriberPath();
@@ -118,35 +181,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                         return;
                     }
 
-                    RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
-                    String defaultContentType = sourceHandler.getDefaultContentType();
-                    if (defaultContentType != null && defaultContentType.startsWith(WSConstants.TEXT)) {
-                        String backendMessageType = (String) (((Axis2MessageContext) msgContext)
-                                .getAxis2MessageContext()).getProperty(WSConstants.BACKEND_MESSAGE_TYPE);
-                        ((Axis2MessageContext) msgContext).getAxis2MessageContext().setProperty(
-                                WSConstants.MESSAGE_TYPE, backendMessageType);
-                        TextWebSocketFrame frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext)
-                                msgContext).getAxis2MessageContext()));
-                        InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
-                        int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
-                        String subscriberPath = sourceHandler.getSubscriberPath();
-                        WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
-                        handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
-                    } else if (defaultContentType != null && defaultContentType.startsWith(WSConstants.BINARY)) {
-                        org.apache.axis2.context.MessageContext msgCtx =
-                                ((Axis2MessageContext) msgContext).getAxis2MessageContext();
-                        MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgCtx);
-                        OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
-                        byte[] message = messageFormatter.getBytes(msgCtx, format);
-                        BinaryWebSocketFrame frame = new BinaryWebSocketFrame(Unpooled.copiedBuffer(message));
-                        InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
-                        int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
-                        String subscriberPath = sourceHandler.getSubscriberPath();
-                        WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
-                        handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
-                    }
-                } catch (XMLStreamException e) {
-                    log.error("Error while building message", e);
+
                 } catch (IOException ex) {
                     log.error("Failed for format message to specified output format", ex);
                 }
