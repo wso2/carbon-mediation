@@ -79,9 +79,9 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             }
             MessageContext prevRequest=sentRequests.get(frame.streamId());
 
-            //if the inbound is not push reqeusts reject them
+            //if the inbound is not accept push requests reject them
             if(!(boolean)prevRequest.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED)){
-                writer.writeRestSreamRequest(frame.pushPromiseId,Http2Error.REFUSED_STREAM);
+                writer.writeRestSreamRequest(frame.getPushPromiseId(),Http2Error.REFUSED_STREAM);
                 return;
             }
 

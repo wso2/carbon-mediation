@@ -18,11 +18,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.http2.common;
 
-import io.netty.buffer.ByteBufUtil;
-import io.netty.handler.codec.http2.Http2DataFrame;
-import io.netty.handler.codec.http2.Http2FrameTypes;
 import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
@@ -47,7 +43,6 @@ import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
 import org.apache.axis2.util.MessageProcessorSelector;
 import org.apache.axis2.util.Utils;
-import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,7 +67,8 @@ import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
-import org.wso2.carbon.inbound.endpoint.protocol.http2.HTTP2SourceRequest;
+import org.wso2.carbon.inbound.endpoint.protocol.http2.Http2Constants;
+import org.wso2.carbon.inbound.endpoint.protocol.http2.Http2SourceRequest;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.InboundHttp2Configuration;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
@@ -221,7 +217,7 @@ public class InboundMessageHandler {
      * @param request
      * @throws AxisFault
      */
-    public void processRequest(HTTP2SourceRequest request) throws AxisFault {
+    public void processRequest(Http2SourceRequest request) throws AxisFault {
 
         String tenantDomain = getTenantDomain(request);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain);
@@ -241,6 +237,10 @@ public class InboundMessageHandler {
         synCtx.setProperty("stream-channel", request.getChannel());
         axis2MsgCtx.setProperty("OutTransportInfo", this);
         axis2MsgCtx.setProperty("stream-channel", request.getChannel());
+        if(request.getRequestType()!=null){
+            axis2MsgCtx.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,request.getRequestType());
+        }
+
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setProperty("TransportInURL", request.getUri());
         String method = request.getMethod();
@@ -328,7 +328,7 @@ public class InboundMessageHandler {
 
     public void processNonEntityEnclosingRESTHandler(SOAPEnvelope soapEnvelope,
             org.apache.axis2.context.MessageContext msgContext, boolean injectToAxis2Engine,
-            HTTP2SourceRequest request) {
+            Http2SourceRequest request) {
         String soapAction = request.getHeader("soapaction");
         if (soapAction != null && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
             soapAction = soapAction.substring(1, soapAction.length() - 1);
@@ -360,7 +360,7 @@ public class InboundMessageHandler {
 
     }
 
-    private boolean isAllowedAxis2Path(MessageContext synapseMsgContext, HTTP2SourceRequest request,
+    private boolean isAllowedAxis2Path(MessageContext synapseMsgContext, Http2SourceRequest request,
             org.apache.axis2.context.MessageContext messageContext) {
         boolean isProxy = false;
 
@@ -401,7 +401,7 @@ public class InboundMessageHandler {
     }
 
     public void processEntityEnclosingRequest(org.apache.axis2.context.MessageContext msgContext,
-            boolean injectToAxis2Engine, HTTP2SourceRequest request) {
+            boolean injectToAxis2Engine, Http2SourceRequest request) {
         try {
             String e = request.getHeader("content-type");
             String charSetEncoding = null;
@@ -487,7 +487,7 @@ public class InboundMessageHandler {
     }
 
     public void processHttpRequestUri(org.apache.axis2.context.MessageContext msgContext,
-            String method, HTTP2SourceRequest request) {
+            String method, Http2SourceRequest request) {
         String servicePrefixIndex = "://";
         ConfigurationContext cfgCtx = msgContext.getConfigurationContext();
         msgContext.setProperty("HTTP_METHOD", method);
@@ -516,7 +516,7 @@ public class InboundMessageHandler {
     }
 
     public SOAPEnvelope handleRESTUrlPost(String contentTypeHdr,
-            org.apache.axis2.context.MessageContext msgContext, HTTP2SourceRequest request)
+            org.apache.axis2.context.MessageContext msgContext, Http2SourceRequest request)
             throws FactoryConfigurationError {
         SOAPEnvelope soapEnvelope = null;
         String contentType = contentTypeHdr != null ?
@@ -587,7 +587,7 @@ public class InboundMessageHandler {
         return soapEnvelope;
     }
 
-    protected String getTenantDomain(HTTP2SourceRequest request) {
+    protected String getTenantDomain(Http2SourceRequest request) {
         String tenant = MultitenantUtils.getTenantDomainFromUrl(request.getUri());
         if (tenant.equals(request.getUri())) {
             return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
@@ -596,7 +596,7 @@ public class InboundMessageHandler {
     }
 
     private org.apache.axis2.context.MessageContext updateMessageContext(
-            org.apache.axis2.context.MessageContext msgContext, HTTP2SourceRequest request) {
+            org.apache.axis2.context.MessageContext msgContext, Http2SourceRequest request) {
         Map excessHeaders = request.getExcessHeaders();
         if (msgContext == null) {
             msgContext = new org.apache.axis2.context.MessageContext();

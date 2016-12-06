@@ -28,9 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class HTTP2SourceRequest {
+public class Http2SourceRequest {
     private Pipe pipe=null;
-    private Logger log = Logger.getLogger(HTTP2SourceRequest.class);
+    private Logger log = Logger.getLogger(Http2SourceRequest.class);
     private int streamID;
     private ChannelHandlerContext channel;
     private HashMap<Byte, Http2Frame> frames = new HashMap<Byte, Http2Frame>();
@@ -43,6 +43,16 @@ public class HTTP2SourceRequest {
     private String uri = null;
     private String scheme = null;
     private boolean processedReq=false;
+
+    private String requestType=null;
+
+    public String getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(String requestType) {
+        this.requestType = requestType;
+    }
 
     public void setUri(String uri) {
         this.uri = uri;
@@ -80,7 +90,7 @@ public class HTTP2SourceRequest {
 
     private Map<String, String> excessHeaders = new TreeMap<String, String>();
 
-    public HTTP2SourceRequest(int streamID, ChannelHandlerContext channel) {
+    public Http2SourceRequest(int streamID, ChannelHandlerContext channel) {
         this.streamID = streamID;
         this.channel = channel;
     }

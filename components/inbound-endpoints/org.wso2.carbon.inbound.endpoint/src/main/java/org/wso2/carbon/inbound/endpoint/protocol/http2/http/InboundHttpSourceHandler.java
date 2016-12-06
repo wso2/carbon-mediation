@@ -30,7 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
-import org.wso2.carbon.inbound.endpoint.protocol.http2.HTTP2SourceRequest;
+import org.wso2.carbon.inbound.endpoint.protocol.http2.Http2SourceRequest;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.InboundHttp2Configuration;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.InboundHttp2ResponseSender;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundMessageHandler;
@@ -63,7 +63,7 @@ public class InboundHttpSourceHandler extends SimpleChannelInboundHandler<FullHt
         if (HttpUtil.is100ContinueExpected(req)) {
             channelCtx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
         }
-        HTTP2SourceRequest h2Request = wrapToHttp2SourceRequest(req);
+        Http2SourceRequest h2Request = wrapToHttp2SourceRequest(req);
         messageHandler.processRequest(h2Request);
     }
 
@@ -99,8 +99,8 @@ public class InboundHttpSourceHandler extends SimpleChannelInboundHandler<FullHt
         ctx.close();
     }
 
-    public HTTP2SourceRequest wrapToHttp2SourceRequest(FullHttpRequest req) {
-        HTTP2SourceRequest http2Req = new HTTP2SourceRequest(1, channelCtx);
+    public Http2SourceRequest wrapToHttp2SourceRequest(FullHttpRequest req) {
+        Http2SourceRequest http2Req = new Http2SourceRequest(1, channelCtx);
         List<Map.Entry<String, String>> headers = req.headers().entries();
         for (Map.Entry header : headers) {
             http2Req.setHeader(header.getKey().toString(), header.getValue().toString());

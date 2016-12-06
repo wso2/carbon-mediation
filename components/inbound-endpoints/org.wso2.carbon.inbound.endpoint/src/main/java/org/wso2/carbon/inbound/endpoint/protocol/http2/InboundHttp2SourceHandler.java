@@ -37,28 +37,37 @@ import org.wso2.carbon.inbound.endpoint.protocol.http2.common.SourceHandler;
 
 import java.util.*;
 
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-
 @Sharable
 public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements SourceHandler {
     private static final Log log = LogFactory.getLog(InboundHttp2SourceHandler.class);
-    private InboundMessageHandler messageHandler;
+    /*private InboundMessageHandler messageHandler;
     private InboundHttp2ResponseSender responseSender;
-    private final InboundHttp2Configuration config;
-    private HashMap<Integer, HTTP2SourceRequest> streams = new HashMap<Integer, HTTP2SourceRequest>();
+
+    private HashMap<Integer, Http2SourceRequest> streams = new HashMap<Integer, Http2SourceRequest>();
     private Map<String, String> headerMap = new TreeMap<String, String>(new Comparator<String>() {
         public int compare(String o1, String o2) {
             return o1.compareToIgnoreCase(o2);
         }
-    });
+    });*/
+
+    private final InboundHttp2Configuration config;
     private SourceConfiguration sourceConfiguration;
-    public InboundHttp2SourceHandler(InboundHttp2Configuration config) {
+    private Http2Connection connection;
+    private Http2ConnectionEncoder encoder;
+    private ChannelHandlerContext chContext;
+    private Http2RequestReader reader;
+    private Http2ResponseWriter writer;
+
+
+    public InboundHttp2SourceHandler(InboundHttp2Configuration config, Http2Connection connection,
+            Http2ConnectionEncoder encoder) {
         this.config = config;
-        try {
-            sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
-        } catch (Exception e) {
-            log.warn("Cannot get PassThroughSourceConfiguration ", e);
-        }
+        this.connection = connection;
+        this.encoder = encoder;
+        this.reader=new Http2RequestReader();
+        this.writer=new Http2ResponseWriter();
+        writer.setEncoder(encoder);
+        writer.setConnection(connection);
     }
 
     @Override
@@ -70,25 +79,36 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        reader.setChContext(ctx);
+        if(chContext==null)
+            writer.setChContext(ctx);
         if (msg instanceof Http2HeadersFrame) {
-            onHeadersRead(ctx, (Http2HeadersFrame) msg);
-        } else if (msg instanceof Http2DataFrame) {
-            onDataRead(ctx, (Http2DataFrame) msg);
-        } else {
+            Http2HeadersFrame frame=(Http2HeadersFrame)msg;
+            reader.onHeaderRead(frame);
+
+        }else if (msg instanceof Http2DataFrame) {
+            reader.onDataRead((Http2DataFrame)msg);
+
+        }else if(msg instanceof Http2GoAwayFrame){
+            reader.onGoAwayRead((Http2GoAwayFrame)msg);
+
+        }else {
             super.channelRead(ctx, msg);
         }
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        this.responseSender = new InboundHttp2ResponseSender(this);
-        this.messageHandler = new InboundMessageHandler(this.responseSender, this.config);
+        this.chContext=ctx;
+        reader.setChContext(ctx);
+        writer.setChContext(ctx);
+        reader.setMessageHandler(new InboundMessageHandler(new InboundHttp2ResponseSender(this),config));
     }
 
     public void onDataRead(ChannelHandlerContext ctx, Http2DataFrame data) throws Exception {
 
-            int streamId = data.streamId();
-            HTTP2SourceRequest request = null;
+           /* int streamId = data.streamId();
+            Http2SourceRequest request = null;
             request = streams.get(streamId);
 
             if(request==null){
@@ -109,18 +129,18 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
             request.setProcessedReq(true);
         }
         if (data.isEndStream())
-            streams.remove(request.getStreamID());
+            streams.remove(request.getStreamID());*/
     }
 
     public void onHeadersRead(ChannelHandlerContext ctx, Http2HeadersFrame headers)
             throws Exception {
 
-        int streamId = headers.streamId();
-        HTTP2SourceRequest request = null;
+       /* int streamId = headers.streamId();
+        Http2SourceRequest request = null;
         if (streams.containsKey(streamId)) {
             request = streams.get(streamId);
         } else {
-            request = new HTTP2SourceRequest(streamId, ctx);
+            request = new Http2SourceRequest(streamId, ctx);
             streams.put(streamId, request);
         }
         Set<CharSequence> headerSet = headers.headers().names();
@@ -133,11 +153,39 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
         if (headers.isEndStream() && !request.getHeaders().containsKey("http2-settings")) {
             messageHandler.processRequest(request);
             streams.remove(request.getStreamID());
-        }
+        }*/
     }
 
+    @Override
     public synchronized void sendResponse(MessageContext msgCtx) throws AxisFault {
-        ChannelHandlerContext channel = (ChannelHandlerContext) msgCtx
+        /**
+         * get RequestType; if is null or client-request process as same
+         * if push promise first write push promise and then process as same
+         * if goaway send goaway and stop connection
+         * we are not handling rest-stream requests
+         */
+        org.apache.axis2.context.MessageContext axisMessage=((Axis2MessageContext) msgCtx).getAxis2MessageContext();
+
+        String requestType=null;
+
+        if(axisMessage.getProperty(Http2Constants.HTTP2_REQUEST_TYPE)!=null){
+            requestType=axisMessage.getProperty(Http2Constants.HTTP2_REQUEST_TYPE).toString();
+        }
+        if(requestType==null || requestType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)){
+            writer.writeNormalResponse(msgCtx);
+
+        }else if(requestType.equals(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST)){
+            writer.writePushPromiseResponse(msgCtx);
+
+        }else if(requestType.equals(Http2Constants.HTTP2_GO_AWAY_REQUEST)){
+            writer.writeGoAwayResponse(msgCtx);
+        }else{
+            log.error("Uncaught request type : "+requestType);
+        }
+
+
+
+       /* ChannelHandlerContext channel = (ChannelHandlerContext) msgCtx
                 .getProperty("stream-channel");
 
         ByteBuf content = channel.alloc().buffer();
@@ -156,7 +204,7 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
         }
 
         channel.write(new DefaultHttp2HeadersFrame(headers));
-        channel.writeAndFlush(new DefaultHttp2DataFrame(content, true));
+        channel.writeAndFlush(new DefaultHttp2DataFrame(content, true));*/
     }
 
 }

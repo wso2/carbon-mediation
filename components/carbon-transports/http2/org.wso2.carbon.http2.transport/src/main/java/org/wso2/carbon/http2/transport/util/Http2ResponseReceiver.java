@@ -92,6 +92,7 @@ public class Http2ResponseReceiver {
         }
         if(frame.isEndStream()){
             incompleteResponses.remove(frame.streamId());
+
         }
     }
 

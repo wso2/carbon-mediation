@@ -26,8 +26,13 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler.UpgradeCodec;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler.UpgradeCodecFactory;
+import io.netty.handler.codec.http2.DefaultHttp2Connection;
 import io.netty.handler.codec.http2.Http2Codec;
 import io.netty.handler.codec.http2.Http2CodecUtil;
+import io.netty.handler.codec.http2.Http2Connection;
+import io.netty.handler.codec.http2.Http2ConnectionHandler;
+import io.netty.handler.codec.http2.Http2ConnectionHandlerBuilder;
+import io.netty.handler.codec.http2.Http2FrameLogger;
 import io.netty.handler.codec.http2.Http2ServerUpgradeCodec;
 import io.netty.handler.ssl.SslContext;
 import io.netty.util.AsciiString;
@@ -35,10 +40,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.http.InboundHttpSourceHandler;
 
+import static io.netty.handler.logging.LogLevel.INFO;
+
 public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final Log log = LogFactory.getLog(InboundHttp2ServerInitializer.class);
-    private final UpgradeCodecFactory upgradeCodecFactory;
+    private static final Http2FrameLogger logger = new Http2FrameLogger(INFO, InboundHttp2ServerInitializer.class);
+    private UpgradeCodecFactory upgradeCodecFactory;
     private final SslContext sslCtx;
     private final int maxHttpContentLength;
     private final InboundHttp2Configuration config;
@@ -54,25 +62,33 @@ public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChan
         this.config = config;
         this.sslCtx = sslCtx;
         this.maxHttpContentLength = maxHttpContentLength;
-        upgradeCodecFactory = new UpgradeCodecFactory() {
-
-            public UpgradeCodec newUpgradeCodec(CharSequence protocol) {
-                if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
-                    return new Http2ServerUpgradeCodec(new Http2Codec(true,
-                            new InboundHttp2SourceHandler(config)));
-                } else {
-                    return null;
-                }
-            }
-        };
+/*
+        this.connection=new DefaultHttp2Connection(true);
+        this.listener=new Http2FrameListenAdapter();
+        //listener.setConnection(connection);
+        this.handler=new Http2ConnectionHandlerBuilder()
+                .connection(connection)
+                .frameLogger(logger)
+                .frameListener(listener)
+                .build();
+        listener.setEncoder(handler.encoder());
+        */
     }
 
     @Override
     public void initChannel(SocketChannel ch) {
+        Http2Connection conn=new DefaultHttp2Connection(true);
+        Http2FrameListenAdapter listenAdapter=new Http2FrameListenAdapter();
+        Http2ConnectionHandler connectionHandler=new Http2ConnectionHandlerBuilder()
+                .connection(conn)
+                .frameLogger(logger)
+                .frameListener(listenAdapter)
+                .build();
+        InboundHttp2SourceHandler sourceHandler=new InboundHttp2SourceHandler(this.config,conn,connectionHandler.encoder());
         if (sslCtx != null) {
-            configureSsl(ch);
+            configureSsl(ch,connectionHandler,sourceHandler);
         } else {
-            configureClearText(ch);
+            configureClearText(ch,connectionHandler,sourceHandler);
         }
     }
 
@@ -80,19 +96,31 @@ public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChan
     /**
      * Configure the pipeline for TLS NPN negotiation to HTTP/2.
      */
-    private void configureSsl(SocketChannel ch) {
-        ch.pipeline().addLast(sslCtx.newHandler(ch.alloc()), new InboundHttp2HttpHandler(config));
+    private void configureSsl(SocketChannel ch,Http2ConnectionHandler connectionHandler,InboundHttp2SourceHandler channelHanlder) {
+        ch.pipeline().addLast(sslCtx.newHandler(ch.alloc()), connectionHandler,channelHanlder);  //This can be changed later
     }
 
     /**
      * Configure the pipeline for a clear text upgrade from HTTP to HTTP/2.0
      */
-    private void configureClearText(SocketChannel ch) {
+    private void configureClearText(SocketChannel ch, final Http2ConnectionHandler connectionHandler,
+            final InboundHttp2SourceHandler channelHandler) {
         final ChannelPipeline p = ch.pipeline();
         final HttpServerCodec sourceCodec = new HttpServerCodec();
+        upgradeCodecFactory = new UpgradeCodecFactory() {
+
+            public UpgradeCodec newUpgradeCodec(CharSequence protocol) {
+                if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
+                    return new Http2ServerUpgradeCodec(null,connectionHandler);
+                } else {
+                    return null;
+                }
+            }
+        };
 
         p.addLast(sourceCodec);
         p.addLast(new HttpServerUpgradeHandler(sourceCodec, upgradeCodecFactory));
+        p.addLast(channelHandler);
         p.addLast(new SimpleChannelInboundHandler<HttpMessage>() {
             @Override
             protected void channelRead0(ChannelHandlerContext ctx, HttpMessage msg) throws Exception {

@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.http2;
 
+import io.netty.handler.codec.http2.Http2ConnectionEncoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
@@ -31,6 +32,7 @@ import java.io.IOException;
 
 public class InboundHttp2ResponseSender implements InboundResponseSender {
 
+    private Http2ConnectionEncoder encoder;
     private static final Log log = LogFactory.getLog(InboundHttp2ResponseSender.class);
     private SourceHandler sourceHandler;
 
@@ -38,19 +40,22 @@ public class InboundHttp2ResponseSender implements InboundResponseSender {
         this.sourceHandler = sourceHandler;
     }
 
+    @Override
     public void sendBack(MessageContext synCtx) {
         if (synCtx != null) {
             try {
-                RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext());
+              //  RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext());
                 sourceHandler.sendResponse(synCtx);
-            } catch (IOException iEx) {
+            } catch (Exception iEx) {
                 log.error("Error while building the message", iEx);
-            } catch (XMLStreamException ex) {
-                log.error("Failed to convert message to specified output format", ex);
             }
         } else {
             log.debug("send back message is null");
         }
+    }
+
+    public void setEncoder(Http2ConnectionEncoder encoder){
+        this.encoder=encoder;
     }
 
 }
