@@ -30,11 +30,12 @@ public class Http2Constants {
 
     public static final String HTTP2_REQUEST_TYPE="http2.reqeust.type";
     public static final String HTTP2_CLIENT_SENT_REQEUST="http2.client.sent.reqeust";
+    public static final String HTTP2_PUSH_PROMISE_REQEUST="http2.push.promise.reqeust";
     public static final String HTTP2_PUSH_PROMISE_REQEUST_ENABLED="http2.push.promise.reqeust.enable";
     public static final String HTTP2_RESET_REQEUST="http2.reset.reqeust";
     public static final String HTTP2_GO_AWAY_REQUEST="http2.go.away.reqeust";
     public static final String HTTP2_PING_REQUEST="http2.ping.request";
-
+    public static final String HTTP2_RESPONSE_SENT="http2.response.sent";
 
     public static final String HTTP2_PUSH_PROMISE_ID="http2.push.promise.id";
     public static final String HTTP2_PUSH_PROMISE_HEADERS="http2.push.promise.headers";
@@ -43,11 +44,8 @@ public class Http2Constants {
     public static final String HTTP2_SERVER_STREAM_ID="http2.server.stream.id";
     public static final String HTTP2_ERROR_CODE="http2.error.code";
 
-    public static final String TARGET_URI="target.uri";
-    public static final String TARGET_HOST="target.host";
+
     public static final String PASSTHROUGH_TARGET="passthru.target";
-
-
     public static final String PASS_THROUGH_SOURCE_CONFIGURATION = "PASS_THROUGH_SOURCE_CONFIGURATION";
     public static final String PASS_THROUGH_SOURCE_CONNECTION = "pass-through.Source-Connection";
     public static final String PASS_THROUGH_SOURCE_REQUEST = "pass-through.Source-Request";

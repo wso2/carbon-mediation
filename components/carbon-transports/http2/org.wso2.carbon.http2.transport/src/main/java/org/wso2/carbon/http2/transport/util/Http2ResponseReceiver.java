@@ -19,6 +19,7 @@ import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
 import org.apache.axis2.description.InOutAxisOperation;
 import org.apache.axis2.description.WSDL2Constants;
+import org.apache.axis2.engine.AxisEngine;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +27,7 @@ import org.apache.http.HttpStatus;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
+import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.omg.PortableInterceptor.INACTIVE;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
@@ -63,7 +65,34 @@ public class Http2ResponseReceiver {
          * add a property to identify whether sent to axis2engine or not
          */
 
-
+        if(!incompleteResponses.containsKey(frame.streamId())){
+            log.error("No response headers found for received dataframe of streamID : "+frame.streamId());
+            return;
+        }
+        MessageContext response=incompleteResponses.get(frame.streamId());
+        Pipe pipe;
+        if(response.getProperty(PassThroughConstants.PASS_THROUGH_PIPE)==null) {
+            pipe = new Pipe(new HTTP2Producer(), targetConfiguration.getBufferFactory().getBuffer(),
+                    "target", targetConfiguration);
+            response.setProperty(PassThroughConstants.PASS_THROUGH_PIPE,pipe);
+        }else
+            pipe=(Pipe)response.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+        try {
+            pipe.produce(new HTTP2Decoder(frame));
+        }catch (Exception e){
+            log.error("Error occured during pipe producing "+e);
+        }
+        if(response.getProperty(Http2Constants.HTTP2_RESPONSE_SENT)==null){
+            try {
+                AxisEngine.receive(response);
+                response.setProperty(Http2Constants.HTTP2_RESPONSE_SENT,true);
+            } catch (AxisFault af) {
+                log.error("Fault processing response message through Axis2", af);
+            }
+        }
+        if(frame.isEndStream()){
+            incompleteResponses.remove(frame.streamId());
+        }
     }
 
     public void onHeadersFrameRead(Http2HeadersFrame frame,MessageContext msgContext){
@@ -88,6 +117,7 @@ public class Http2ResponseReceiver {
                 if (response != null) {
                     response.setSoapAction("");
                 }
+                incompleteResponses.put(frame.streamId(),response);
             } catch (AxisFault af) {
                 log.error("Error getting IN message context from the operation context", af);
                 return;
@@ -182,10 +212,19 @@ public class Http2ResponseReceiver {
             response.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.FALSE);
             response.setProperty(NhttpConstants.SC_ACCEPTED, Boolean.TRUE);
         }
+        if(response.getProperty(Http2Constants.HTTP2_REQUEST_TYPE)==null)
+            response.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,Http2Constants.HTTP2_CLIENT_SENT_REQEUST);
 
 
-
-
+        if(frame.isEndStream()){
+            incompleteResponses.remove(frame.streamId());
+            try {
+                AxisEngine.receive(response);
+                response.setProperty(Http2Constants.HTTP2_RESPONSE_SENT,true);
+            } catch (AxisFault af) {
+                log.error("Fault processing response message through Axis2", af);
+            }
+        }
 
     }
 
@@ -198,6 +237,7 @@ public class Http2ResponseReceiver {
         fillMessageContext(pushPromiseResponse,msgContext.getProperty(MultitenantConstants.TENANT_DOMAIN).toString());
         pushPromiseResponse.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_ID,frame.getPushPromiseId());
         pushPromiseResponse.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_HEADERS,frame.getHeaders());
+        pushPromiseResponse.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
         incompleteResponses.put(frame.getPushPromiseId(),pushPromiseResponse);
     }
 
