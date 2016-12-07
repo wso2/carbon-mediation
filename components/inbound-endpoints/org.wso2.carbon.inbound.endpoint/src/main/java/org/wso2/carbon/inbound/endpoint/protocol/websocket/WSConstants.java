@@ -25,7 +25,7 @@ public class WSConstants {
     public static final String BINARY = "binary";
     public static final String BACKEND_MESSAGE_TYPE = "backendMessageType";
     public static final String MESSAGE_TYPE = "messageType";
-    public static final String WS_TERMINATE = "websocket.terminate";
+    public static final String CONNECTION_TERMINATE = "connection.terminate";
     public static final String CLIENT_ID = "clientId";
     public static final String IS_PING = "isPing";
     public static final String IS_CONNECTION_ALIVE = "isConnectionAlive";

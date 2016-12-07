@@ -25,7 +25,6 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
@@ -148,7 +147,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.WS_TERMINATE,
+        synCtx.setProperty(WSConstants.CONNECTION_TERMINATE, new Boolean(true));
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.CONNECTION_TERMINATE,
                 new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.CLIENT_ID,
                 ctx.channel().hashCode());
