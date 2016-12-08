@@ -240,7 +240,7 @@ public class InboundMessageHandler {
         if(request.getRequestType()!=null){
             axis2MsgCtx.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,request.getRequestType());
         }
-
+        axis2MsgCtx.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED,true);
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setProperty("TransportInURL", request.getUri());
         String method = request.getMethod();

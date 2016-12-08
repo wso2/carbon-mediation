@@ -77,6 +77,7 @@ public class Http2FrameListenAdapter extends Http2EventAdapter {
         if(log.isDebugEnabled())
             log.debug("Http2FrameListenAdapter.onSettingRead()");
         ctx.fireChannelRead(settings);
+        super.onSettingsRead(ctx,settings);
     }
 
     @Override

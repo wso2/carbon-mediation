@@ -140,6 +140,7 @@ public class Http2ClientWorker {
 
         // set any transport headers received
         Set<Map.Entry<String, String>> headerEntries = response.getHeaders().entrySet();
+
         Map<String, String> headerMap = new TreeMap<String, String>(new Comparator<String>() {
             public int compare(String o1, String o2) {
                 return o1.compareToIgnoreCase(o2);

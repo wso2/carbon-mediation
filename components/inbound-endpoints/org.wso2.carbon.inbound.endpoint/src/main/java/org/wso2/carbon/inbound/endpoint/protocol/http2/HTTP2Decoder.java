@@ -19,6 +19,7 @@
 package org.wso2.carbon.inbound.endpoint.protocol.http2;
 
 import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.DefaultByteBufHolder;
 import io.netty.handler.codec.http2.Http2DataFrame;
 import org.apache.http.nio.ContentDecoder;
 import java.io.IOException;
@@ -34,7 +35,6 @@ public class HTTP2Decoder implements ContentDecoder {
     @Override
     public int read(ByteBuffer dst) throws IOException {
         complete=false;
-
        /* ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(ByteBufUtil.getBytes(
                 dataFrame.content()));*/
         byte [] data=ByteBufUtil.getBytes(dataFrame.content());

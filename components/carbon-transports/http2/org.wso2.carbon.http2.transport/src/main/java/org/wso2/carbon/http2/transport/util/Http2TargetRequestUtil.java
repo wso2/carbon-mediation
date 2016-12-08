@@ -98,6 +98,13 @@ public class Http2TargetRequestUtil {
         }
 
         EndpointReference epr = PassThroughTransportUtils.getDestinationEPR(msgContext);
+        String targetEPR=epr.getAddress();
+        if (targetEPR.toLowerCase().contains("http2://")) {
+            targetEPR = targetEPR.replaceFirst("http2://", "http://");
+        }else if (targetEPR.toLowerCase().contains("https2://")) {
+            targetEPR = targetEPR.replaceFirst("https2://", "https://");
+        }
+        epr.setAddress(targetEPR);
         URL url = null;
         try {
             url = new URL(epr.getAddress());

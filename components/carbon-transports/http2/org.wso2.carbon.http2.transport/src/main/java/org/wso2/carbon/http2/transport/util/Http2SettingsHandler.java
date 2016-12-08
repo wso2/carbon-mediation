@@ -12,14 +12,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class Http2SettingsHandler extends SimpleChannelInboundHandler<Http2Settings> {
     private ChannelPromise promise;
+    private Http2ClientHandler handler;
 
     /**
      * Create new instance
      *
      * @param promise Promise object used to notify when first settings are received
      */
-    public Http2SettingsHandler(ChannelPromise promise) {
+    public Http2SettingsHandler(ChannelPromise promise,Http2ClientHandler clientHandler) {
         this.promise = promise;
+        this.handler=clientHandler;
     }
 
     /**
@@ -42,7 +44,7 @@ public class Http2SettingsHandler extends SimpleChannelInboundHandler<Http2Setti
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Http2Settings msg) throws Exception {
         promise.setSuccess();
-
+        handler.setChContext(ctx);
         // Only care about the first settings message
         ctx.pipeline().remove(this);
     }

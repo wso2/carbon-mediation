@@ -30,6 +30,7 @@ import io.netty.handler.codec.http2.Http2ResetFrame;
 import io.netty.handler.codec.http2.Http2Settings;
 
 import org.apache.axis2.context.MessageContext;
+import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 
 import java.util.*;
 import java.util.TreeMap;
@@ -43,12 +44,14 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
     private Http2ConnectionEncoder encoder;
     private ChannelHandlerContext chContext;
     private Map<Integer,MessageContext> sentRequests;
+    private LinkedList<MessageContext> pollReqeusts;
+    private TargetConfiguration targetConfiguration;
 
     public Http2ClientHandler(Http2Connection connection) {
         this.connection=connection;
         sentRequests=new TreeMap<>();
         writer=new Http2RequestWriter(connection);
-        receiver=new Http2ResponseReceiver();
+        pollReqeusts=new LinkedList<>();
     }
 
     @Override
@@ -71,7 +74,6 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             if(frame.isEndStream()){
                 sentRequests.remove(frame.streamId());
             }
-
         }else if(msg instanceof Http2PushPromiseFrame){
             Http2PushPromiseFrame frame=(Http2PushPromiseFrame) msg;
             if(!sentRequests.containsKey(frame.streamId())){
@@ -80,7 +82,7 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             MessageContext prevRequest=sentRequests.get(frame.streamId());
 
             //if the inbound is not accept push requests reject them
-            if(!(boolean)prevRequest.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED)){
+            if(prevRequest.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED)==null || !(boolean)prevRequest.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED)){
                 writer.writeRestSreamRequest(frame.getPushPromiseId(),Http2Error.REFUSED_STREAM);
                 return;
             }
@@ -105,6 +107,10 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
     }
 
     public void channelWrite(MessageContext request){
+        if(chContext==null){
+            pollReqeusts.add(request);
+            return;
+        }
         String requestType=(String)request.getProperty(Http2Constants.HTTP2_REQUEST_TYPE);
         if(requestType==null || requestType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)){
             int streamId= writer.getNextStreamId();
@@ -164,6 +170,13 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
     public void setChContext(ChannelHandlerContext chContext) {
         this.chContext = chContext;
         writer.setChannelHandlerContext(chContext);
+
+        if(!pollReqeusts.isEmpty()){
+            Iterator<MessageContext> requests=pollReqeusts.iterator();
+            while (requests.hasNext()){
+                channelWrite(requests.next());
+            }
+        }
     }
 
     public void removeHandler() {
@@ -171,6 +184,11 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             chContext.channel().close();
             chContext.executor().shutdownGracefully();
         }
+    }
+
+    public void setTargetConfiguration(TargetConfiguration targetConfiguration) {
+        this.targetConfiguration = targetConfiguration;
+        receiver=new Http2ResponseReceiver(targetConfiguration);
     }
 
     /*@Deprecated

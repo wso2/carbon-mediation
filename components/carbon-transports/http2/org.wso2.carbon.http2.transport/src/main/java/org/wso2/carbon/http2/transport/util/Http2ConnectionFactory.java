@@ -46,14 +46,17 @@ import java.util.concurrent.TimeUnit;
 public class Http2ConnectionFactory {
 
     private static Http2ConnectionFactory factory;
-    private static TreeMap<ChannelId,Map<String, Http2ClientHandler>> clientConnections;
+    private static TreeMap<String,Map<String, Http2ClientHandler>> clientConnections;
    // private static TreeMap<String, Http2ClientHandler> connections;
     private Log log = LogFactory.getLog(Http2ConnectionFactory.class);
     private TransportOutDescription trasportOut;
+    private EventLoopGroup workerGroup;
 
     private Http2ConnectionFactory(TransportOutDescription transportOut) {
         this.trasportOut = transportOut;
         clientConnections = new TreeMap<>();
+        this.workerGroup = new NioEventLoopGroup();
+
     }
 
     public static Http2ConnectionFactory getInstance(TransportOutDescription transportOut) {
@@ -67,10 +70,11 @@ public class Http2ConnectionFactory {
 
         Http2ClientHandler handler;
         Map conns=null;
-        conns=clientConnections.get(channelId);
+        if (clientConnections.containsKey(channelId.asShortText()))
+            conns=clientConnections.get(channelId.asShortText());
         if(conns==null){
             conns= new TreeMap<String, Http2ClientHandler>();
-            clientConnections.put(channelId,conns);
+            clientConnections.put(channelId.asShortText(),conns);
         }
         handler = getClientHandlerFromPool(uri,conns);
         if (handler == null) {
@@ -132,7 +136,6 @@ public class Http2ConnectionFactory {
                 sslCtx = null;
             }
 
-            EventLoopGroup workerGroup = new NioEventLoopGroup();
             Http2ClientInitializer initializer = new Http2ClientInitializer(sslCtx,
                     Integer.MAX_VALUE);
 
@@ -170,10 +173,15 @@ public class Http2ConnectionFactory {
 
     public Http2ClientHandler getClientHandlerFromPool(HttpHost uri,Map<String, Http2ClientHandler> map) {
         String key = generateKey(URI.create(uri.toURI()));
-        Http2ClientHandler handler = map.get(key);
+        Http2ClientHandler handler;
+        if(map.containsKey(key))
+            handler= map.get(key);
+        else
+            handler=null;
         if (handler != null) {
             Channel c = handler.getChContext().channel();
-            if (!c.isActive()) {
+            boolean canMakeNewStreams=handler.getConnection().local().canOpenStream();
+            if (!c.isActive() || !canMakeNewStreams) {
                 map.remove(key);
                 handler = cacheNewConnection(uri,map);
             }
@@ -199,8 +207,8 @@ public class Http2ConnectionFactory {
 
 
     public void removeHanlder(ChannelId channelId){
-        if(clientConnections.containsKey(channelId)){
-            Map<String,Http2ClientHandler> conns=clientConnections.remove(channelId);
+        if(clientConnections.containsKey(channelId.asShortText())){
+            Map<String,Http2ClientHandler> conns=clientConnections.remove(channelId.asShortText());
             Iterator<Http2ClientHandler> itr=conns.values().iterator();
             while (itr.hasNext()){
                 Http2ClientHandler handler=itr.next();

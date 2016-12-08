@@ -108,6 +108,7 @@ public class Http2TransportSender extends AbstractTransportSender {
             Http2ClientHandler clientHandler = connectionFactory
                     .getChannelHandler(target, channelCtx.channel().id());
 
+            clientHandler.setTargetConfiguration(targetConfiguration);
             clientHandler.channelWrite(msgCtx);
 
             //Termination of a connection

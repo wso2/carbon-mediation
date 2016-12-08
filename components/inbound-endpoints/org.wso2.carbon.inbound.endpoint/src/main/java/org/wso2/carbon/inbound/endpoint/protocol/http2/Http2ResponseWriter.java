@@ -96,9 +96,11 @@ public class Http2ResponseWriter {
         }
         try {
             int statusCode = PassThroughTransportUtils.determineHttpStatusCode(msgContext);
-            String status = PassThroughTransportUtils.determineHttpStatusLine(msgContext);
-            HttpResponseStatus status1 = new HttpResponseStatus(statusCode, status);
-            transportHeaders.status(status1.codeAsText());
+            //String status = PassThroughTransportUtils.determineHttpStatusLine(msgContext);
+            if(statusCode>0){
+                HttpResponseStatus status1 = HttpResponseStatus.valueOf(statusCode);
+                transportHeaders.status(status1.codeAsText());
+            }
         }catch (Exception e){
             log.error(e);
         }
@@ -110,11 +112,12 @@ public class Http2ResponseWriter {
             } else {
                 Pipe pipe = (Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
                 if (pipe != null && !Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
-                    transportHeaders.add(HTTP.CONTENT_TYPE, msgContext.getProperty(org.apache.axis2.Constants.Configuration.CONTENT_TYPE).toString());
+                    transportHeaders.add(HttpHeaderNames.CONTENT_TYPE, msgContext.getProperty(org.apache.axis2.Constants.Configuration.CONTENT_TYPE).toString());
                 }
             }
         }
-        Boolean noEntityBody = (Boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY);
+        Boolean noEntityBody = msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY)!=null?
+                (boolean)msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY):null;
         if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
             OMOutputFormat format = NhttpUtil.getOMOutputFormat(msgContext);
             //transportHeaders = new HashMap();
@@ -125,7 +128,7 @@ public class Http2ResponseWriter {
             }
         }
         String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
-        Map excessHeaders = (Map) msgContext.getProperty(excessProp);
+        Map excessHeaders = msgContext.getProperty(excessProp)==null?null:(Map) msgContext.getProperty(excessProp);
         if (excessHeaders != null) {
             for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
                 String key = (String) iterator.next();
@@ -159,7 +162,8 @@ public class Http2ResponseWriter {
         ChannelPromise promise=c.newPromise();
         if(hasBody){
             http2Encoder pipeEncoder=new http2Encoder(c,streamId,encoder,promise);
-            Pipe pipe = (Pipe) msgContext.getProperty("pass-through.pipe");
+
+            Pipe pipe = msgContext.getProperty("pass-through.pipe")==null?null:(Pipe) msgContext.getProperty("pass-through.pipe");
             encoder.writeHeaders(c,streamId,transportHeaders,0,false,promise);
             if (pipe != null) {
                 pipe.attachConsumer(new Http2CosumerIoControl());
@@ -169,20 +173,24 @@ public class Http2ResponseWriter {
                     log.error(e);
                 }
             }
+            c.flush();
         }else{
             encoder.writeHeaders(c,streamId,transportHeaders,0,true,promise);
+            c.flush();
         }
     }
 
     public void writePushPromiseResponse(MessageContext synCtx){
         int promiseId=connection.local().incrementAndGetNextStreamId();
         int streamId=(int)synCtx.getProperty("stream-id");
+        synCtx.setProperty("stream-id",promiseId);
         ChannelHandlerContext c=(ChannelHandlerContext)synCtx.getProperty("stream-channel");
         if(c==null){
             c=chContext;
         }
         ChannelPromise promise=c.newPromise();
         encoder.writePushPromise(c,streamId,promiseId,null,0,promise);
+        writeNormalResponse(synCtx);
     }
 
     public void writeGoAwayResponse(MessageContext synCtx){

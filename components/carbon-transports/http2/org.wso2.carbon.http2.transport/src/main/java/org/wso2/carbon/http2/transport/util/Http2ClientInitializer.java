@@ -61,7 +61,7 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
                 .build();
         responseHandler = new Http2ClientHandler(connection);
         responseHandler.setEncoder(connectionHandler.encoder());
-        settingsHandler = new Http2SettingsHandler(ch.newPromise());
+        settingsHandler = new Http2SettingsHandler(ch.newPromise(),responseHandler);
         if (sslCtx != null) {
             configureSsl(ch);
         } else {
@@ -78,7 +78,7 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
     }
 
     protected void configureEndOfPipeline(ChannelPipeline pipeline) {
-        pipeline.addLast(responseHandler,settingsHandler);
+        pipeline.addLast(settingsHandler,responseHandler);
     }
 
     private void configureSsl(SocketChannel ch) {
