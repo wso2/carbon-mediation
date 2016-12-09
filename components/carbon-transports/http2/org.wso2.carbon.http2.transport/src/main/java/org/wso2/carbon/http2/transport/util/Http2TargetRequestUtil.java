@@ -140,12 +140,14 @@ public class Http2TargetRequestUtil {
                     if (HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())
                             && !configuration.isPreserveHttpHeader(HTTPConstants.HEADER_HOST)) {
                         if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
-                            http2Headers.add((String) entry.getKey(),
+                            if(!http2Headers.contains((String)entry.getKey()))
+                                http2Headers.add((String) entry.getKey(),
                                     (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
                         }
 
                     } else {
-                        http2Headers.add((String) entry.getKey(), (String) entry.getValue());
+                        if(!http2Headers.contains((String)entry.getKey()))
+                            http2Headers.add((String) entry.getKey(), (String) entry.getValue());
                     }
                 }
             }
@@ -232,7 +234,8 @@ public class Http2TargetRequestUtil {
             for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
                 String key = (String) iterator.next();
                 for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
-                    http2Headers.add(key, (String) excessVal);
+                    if(!http2Headers.contains(key))
+                        http2Headers.add(key, (String) excessVal);
                 }
             }
         }
@@ -274,7 +277,8 @@ public class Http2TargetRequestUtil {
         }
 
         if(path!=null || !path.isEmpty()){
-           http2Headers.path(path);
+            if(!http2Headers.contains(Http2Headers.PseudoHeaderName.PATH.value()))
+                http2Headers.path(path);
         }
 
         if(hasEntityBody){
@@ -334,9 +338,10 @@ public class Http2TargetRequestUtil {
         if(http2Headers.contains(HttpHeaderNames.HOST)){
             http2Headers.remove(HttpHeaderNames.HOST);
         }
-
-        http2Headers.scheme(route.getTargetHost().getSchemeName());
-        http2Headers.authority(route.getTargetHost().toString());
+        if(!http2Headers.contains(Http2Headers.PseudoHeaderName.SCHEME.value()))
+            http2Headers.scheme(route.getTargetHost().getSchemeName());
+        if(!http2Headers.contains(Http2Headers.PseudoHeaderName.AUTHORITY.value()))
+            http2Headers.authority(route.getTargetHost().toString());
         return http2Headers;
     }
 

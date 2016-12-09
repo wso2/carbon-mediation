@@ -60,7 +60,7 @@ public class Http2ClientWorker {
     private Http2Response response = null;
     private boolean expectEntityBody = true;
 
-    public Http2ClientWorker(TargetConfiguration targetConfiguration, MessageContext outMsgCtx,
+   /* public Http2ClientWorker(TargetConfiguration targetConfiguration, MessageContext outMsgCtx,
             Http2Response response) {
         this.targetConfiguration = targetConfiguration;
         this.response = response;
@@ -266,7 +266,7 @@ public class Http2ClientWorker {
             log.error("Fault creating response SOAP envelope", af);
         }
     }
-
+*/
     private String inferContentType() {
         //Check whether server sent Content-Type in different case
         Map<String, String> headers = response.getHeaders();

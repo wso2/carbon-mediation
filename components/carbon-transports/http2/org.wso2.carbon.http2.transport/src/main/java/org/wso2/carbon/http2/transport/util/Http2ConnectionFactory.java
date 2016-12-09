@@ -28,6 +28,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http2.Http2SecurityUtil;
 import io.netty.handler.ssl.*;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
@@ -38,16 +40,18 @@ import org.apache.commons.logging.LogFactory;
 import javax.net.ssl.SSLException;
 import javax.xml.namespace.QName;
 import java.net.URI;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Http2ConnectionFactory {
 
     private static Http2ConnectionFactory factory;
     private static TreeMap<String,Map<String, Http2ClientHandler>> clientConnections;
-   // private static TreeMap<String, Http2ClientHandler> connections;
     private Log log = LogFactory.getLog(Http2ConnectionFactory.class);
     private TransportOutDescription trasportOut;
     private EventLoopGroup workerGroup;
@@ -56,7 +60,6 @@ public class Http2ConnectionFactory {
         this.trasportOut = transportOut;
         clientConnections = new TreeMap<>();
         this.workerGroup = new NioEventLoopGroup();
-
     }
 
     public static Http2ConnectionFactory getInstance(TransportOutDescription transportOut) {
@@ -67,7 +70,6 @@ public class Http2ConnectionFactory {
     }
 
     public Http2ClientHandler getChannelHandler(HttpHost uri,ChannelId channelId) {
-
         Http2ClientHandler handler;
         Map conns=null;
         if (clientConnections.containsKey(channelId.asShortText()))
@@ -94,7 +96,7 @@ public class Http2ConnectionFactory {
         return handler;
     }
 
-    public Http2ClientHandler cacheNewConnection(HttpHost uri,Map<String, Http2ClientHandler> map) {
+    public Http2ClientHandler cacheNewConnection(HttpHost uri, final Map<String, Http2ClientHandler> map) {
 
         final SslContext sslCtx;
         final boolean SSL;
@@ -135,7 +137,6 @@ public class Http2ConnectionFactory {
             } else {
                 sslCtx = null;
             }
-
             Http2ClientInitializer initializer = new Http2ClientInitializer(sslCtx,
                     Integer.MAX_VALUE);
 
@@ -151,16 +152,21 @@ public class Http2ConnectionFactory {
             // Start the client.
             Channel channel = b.connect().syncUninterruptibly().channel();
             log.debug("Connected to [" + HOST + ':' + PORT + ']');
-            // Wait for the HTTP/2 upgrade to occur.
+
             Http2SettingsHandler http2SettingsHandler = initializer.settingsHandler();
             http2SettingsHandler.awaitSettings(5, TimeUnit.SECONDS);
 
-            String key = generateKey(URI.create(uri.toURI()));
+            final String key = generateKey(URI.create(uri.toURI()));
             Http2ClientHandler handler = initializer.responseHandler();
-          //  handler.setChannel(channel);
+
             map.put(key, handler);
 
-
+            channel.closeFuture().addListener(new GenericFutureListener<Future<? super Void>>() {
+                @Override
+                public void operationComplete(Future<? super Void> future) throws Exception {
+                    map.remove(key);
+                }
+            });
             return initializer.responseHandler();
         } catch (SSLException e) {
             log.error("Error while connection establishment:" + e.fillInStackTrace());
@@ -189,10 +195,6 @@ public class Http2ConnectionFactory {
         return handler;
     }
 
-    /**
-     * @param uri
-     * @return key to merge connection (scheme+host+port)
-     */
     public String generateKey(URI uri) {
         String host = uri.getHost();
         int port = uri.getPort();
@@ -205,10 +207,9 @@ public class Http2ConnectionFactory {
         return ssl + host + ":" + port;
     }
 
-
-    public void removeHanlder(ChannelId channelId){
-        if(clientConnections.containsKey(channelId.asShortText())){
-            Map<String,Http2ClientHandler> conns=clientConnections.remove(channelId.asShortText());
+    public void removeAllClientConnections(String channelId){
+        if(clientConnections.containsKey(channelId)){
+            Map<String,Http2ClientHandler> conns=clientConnections.remove(channelId);
             Iterator<Http2ClientHandler> itr=conns.values().iterator();
             while (itr.hasNext()){
                 Http2ClientHandler handler=itr.next();
@@ -216,4 +217,5 @@ public class Http2ConnectionFactory {
             }
         }
     }
+
 }

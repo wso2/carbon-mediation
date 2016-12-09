@@ -34,7 +34,7 @@ import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 
 import java.util.*;
 import java.util.TreeMap;
-
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Http2ClientHandler extends ChannelDuplexHandler{
 
@@ -46,12 +46,16 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
     private Map<Integer,MessageContext> sentRequests;
     private LinkedList<MessageContext> pollReqeusts;
     private TargetConfiguration targetConfiguration;
+    private ChannelHandlerContext clientChannel;
+    private Map<Integer,Integer> requestResponseStreamIdMap;   //Map<streamId-server, stream_id-client>
+
 
     public Http2ClientHandler(Http2Connection connection) {
         this.connection=connection;
         sentRequests=new TreeMap<>();
         writer=new Http2RequestWriter(connection);
         pollReqeusts=new LinkedList<>();
+        requestResponseStreamIdMap=new ConcurrentHashMap<>();
     }
 
     @Override
@@ -106,6 +110,7 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
         }
     }
 
+
     public void channelWrite(MessageContext request){
         if(chContext==null){
             pollReqeusts.add(request);
@@ -128,6 +133,7 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             writer.writeGoAwayReqeust(id, code);
         }
     }
+
 
     public Http2RequestWriter getWriter() {
         return writer;
