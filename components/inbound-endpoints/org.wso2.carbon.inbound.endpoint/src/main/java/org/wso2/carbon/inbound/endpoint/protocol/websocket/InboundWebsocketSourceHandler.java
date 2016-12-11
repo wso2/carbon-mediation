@@ -202,8 +202,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
             ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(entry.getKey(), entry.getValue());
         }
 
-        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.WEBSOCKET_SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
+        synCtx.setProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.CLIENT_ID,
                 ctx.channel().hashCode());
         injectToSequence(synCtx, endpoint);

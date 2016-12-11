@@ -31,7 +31,7 @@ public class InboundWebsocketConstants {
     public static final String INBOUND_SSL_TRUST_STORE_PASS = "wss.ssl.trust.store.pass";
     public static final String INBOUND_SSL_CERT_PASS = "wss.ssl.cert.pass";
 
-    public static final String WEBSOCKET_SOURCE_HANDSHAKE_PRESENT = "websocket.source.handshake.present";
+    public static final String SOURCE_HANDSHAKE_PRESENT = "source.handshake.present";
     public static final String WEBSOCKET_TARGET_HANDSHAKE_PRESENT = "websocket.target.handshake.present";
 
     public static final String WEBSOCKET_TARGET_HANDLER_CONTEXT = "websocket.target.handler.context";
