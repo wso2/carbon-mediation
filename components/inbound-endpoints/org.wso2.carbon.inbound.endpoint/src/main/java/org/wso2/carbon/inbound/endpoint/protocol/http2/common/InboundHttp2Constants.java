@@ -36,4 +36,10 @@ public class InboundHttp2Constants {
     public static final String INBOUND_SSL_TRUST_STORE_PASS = "https2.ssl.trust.store.pass";
     public static final String INBOUND_SSL_CERT_PASS = "https2.ssl.cert.pass";
 
+    public static final String INBOUND_DISPATCH_SEQUENCE="http2.dispatch.sequence";
+    public static final String INBOUND_ERROR_SEQUENCE="http2.error.sequence";
+    public static final String INBOUND_SERVER_PUSH_ENABLED="http2.server.push.enabled";
+
+
+
 }

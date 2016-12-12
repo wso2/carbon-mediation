@@ -30,7 +30,9 @@ public class InboundHttp2Configuration {
     private final Properties properties;
     private String bossThreadPoolSize;
     private String workerThreadPoolSize;
-    private int so_blcklog;
+    private String dispatchSequence;
+    private String errorSequence;
+    private boolean enableServerPush;
 
     public Properties getProperties() {
         return properties;
@@ -44,7 +46,10 @@ public class InboundHttp2Configuration {
         this.dispatchPattern = builder.dispatchPattern;
         this.workerThreadPoolSize = builder.workerThreadPoolSize;
         this.bossThreadPoolSize = builder.bossThreadPoolSize;
-        this.so_blcklog = builder.so_blcklog;
+        this.dispatchSequence=builder.dispatchSequence;
+        this.errorSequence=builder.errorSequence;
+        this.enableServerPush=builder.enableServerPush;
+
     }
 
     public String getBossThreadPoolSize() {
@@ -55,12 +60,20 @@ public class InboundHttp2Configuration {
         return workerThreadPoolSize;
     }
 
-    public int getSoBacklog() {
-        return so_blcklog;
+    public String getDispatchSequence() {
+        return dispatchSequence;
+    }
+
+    public String getErrorSequence() {
+        return errorSequence;
     }
 
     public int getPort() {
         return port;
+    }
+
+    public boolean isEnableServerPush() {
+        return enableServerPush;
     }
 
     public String getName() {
@@ -78,7 +91,9 @@ public class InboundHttp2Configuration {
         private Properties properties;
         private String bossThreadPoolSize;
         private String workerThreadPoolSize;
-        private int so_blcklog;
+        private String dispatchSequence;
+        private String errorSequence;
+        private boolean enableServerPush;
 
         public InboundHttp2ConfigurationBuilder(int port, String name,
                 InboundProcessorParams params) {
@@ -112,12 +127,28 @@ public class InboundHttp2Configuration {
             } else {
                 this.workerThreadPoolSize = "1";
             }
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_SO_BACKLOG) != null) {
-                this.so_blcklog = Integer
-                        .parseInt(properties.getProperty(InboundHttp2Constants.INBOUND_SO_BACKLOG));
+            if (properties.getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE)
+                    != null) {
+                this.dispatchSequence = properties
+                        .getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE);
             } else {
-                this.so_blcklog = 1024;
+                this.dispatchSequence = "main";
             }
+            if (properties.getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE)
+                    != null) {
+                this.errorSequence = properties
+                        .getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE);
+            } else {
+                this.errorSequence = "fault";
+            }
+            if (properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED)
+                    != null) {
+                this.enableServerPush = Boolean.parseBoolean(properties
+                        .getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED));
+            } else {
+                this.enableServerPush = Boolean.parseBoolean("true");
+            }
+
         }
 
         public InboundHttp2Configuration build() {

@@ -52,5 +52,8 @@ public class Http2Constants {
     public static final String PASS_THROUGH_TARGET_CONNECTION = "pass-through.Target-Connection";
     public static final String PASS_THROUGH_TARGET_RESPONSE = "pass-through.Target-Response";
 
+    public static final String HTTP2_DISPATCH_SEQUENCE="http2.dispatch.sequence";
+    public static final String HTTP2_ERROR_SEQUENCE="http2.error.sequence";
+
 
 }

@@ -240,7 +240,7 @@ public class InboundMessageHandler {
         if(request.getRequestType()!=null){
             axis2MsgCtx.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,request.getRequestType());
         }
-        axis2MsgCtx.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED,true);
+        axis2MsgCtx.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED,config.isEnableServerPush());
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setProperty("TransportInURL", request.getUri());
         String method = request.getMethod();
@@ -249,7 +249,12 @@ public class InboundMessageHandler {
         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
         synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
                 responseSender);
+        axis2MsgCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,responseSender);
         synCtx.setWSAAction(request.getHeader(InboundHttpConstants.SOAP_ACTION));
+        //axis2MsgCtx.setProperty();
+        //add error sequence and dispatch sequence
+        axis2MsgCtx.setProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE,config.getDispatchSequence());
+        axis2MsgCtx.setProperty(Http2Constants.HTTP2_ERROR_SEQUENCE,config.getErrorSequence());
 
         if (!isRESTRequest(axis2MsgCtx, method)) {
             if (request.getPipe() != null) {
