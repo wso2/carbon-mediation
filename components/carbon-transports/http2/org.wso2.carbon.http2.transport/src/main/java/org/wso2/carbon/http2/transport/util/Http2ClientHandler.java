@@ -29,7 +29,9 @@ import io.netty.handler.codec.http2.Http2HeadersFrame;
 import io.netty.handler.codec.http2.Http2ResetFrame;
 import io.netty.handler.codec.http2.Http2Settings;
 
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 
 import java.util.*;
@@ -65,7 +67,11 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             if(!sentRequests.containsKey(frame.streamId())){
                 return;
             }
-            receiver.onHeadersFrameRead(frame,sentRequests.get(frame.streamId()));
+            try {
+                receiver.onHeadersFrameRead(frame,sentRequests.get(frame.streamId()));
+            } catch (AxisFault axisFault) {
+                axisFault.printStackTrace();
+            }
             if(frame.isEndStream()){
                 sentRequests.remove(frame.streamId());
             }
@@ -86,7 +92,7 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             MessageContext prevRequest=sentRequests.get(frame.streamId());
 
             //if the inbound is not accept push requests reject them
-            if(prevRequest.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED)==null || !(boolean)prevRequest.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED)){
+            if(receiver.isServerPushAccepted()){
                 writer.writeRestSreamRequest(frame.getPushPromiseId(),Http2Error.REFUSED_STREAM);
                 return;
             }
@@ -192,9 +198,9 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
         }
     }
 
-    public void setTargetConfiguration(TargetConfiguration targetConfiguration) {
+    public void setResponseReceiver(String tenantDomain,String dispatchSequence,String errorSequence,InboundResponseSender responseSender,TargetConfiguration targetConfiguration,boolean serverPushAccept) {
         this.targetConfiguration = targetConfiguration;
-        receiver=new Http2ResponseReceiver(targetConfiguration);
+        receiver=new Http2ResponseReceiver(tenantDomain,responseSender,serverPushAccept,dispatchSequence,errorSequence,targetConfiguration);
     }
 
     /*@Deprecated

@@ -30,6 +30,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.routing.HttpRoute;
+import org.apache.synapse.inbound.InboundEndpointConstants;
+import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.http.conn.ProxyConfig;
 import org.apache.synapse.transport.nhttp.config.ProxyConfigBuilder;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
@@ -38,6 +40,7 @@ import org.wso2.carbon.http2.transport.util.Http2ClientHandler;
 import org.wso2.carbon.http2.transport.util.Http2ConnectionFactory;
 import org.wso2.carbon.http2.transport.util.Http2Constants;
 import org.wso2.carbon.http2.transport.util.Http2TargetRequestUtil;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -108,7 +111,14 @@ public class Http2TransportSender extends AbstractTransportSender {
             Http2ClientHandler clientHandler = connectionFactory
                     .getChannelHandler(target, channelCtx.channel().id());
 
-            clientHandler.setTargetConfiguration(targetConfiguration);
+
+            String tenantDomain=(msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN)==null)?null:(String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
+            String dispatchSequence=(msgCtx.getProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE)==null)?null:(String) msgCtx.getProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE);
+            String errorSequence=(msgCtx.getProperty(Http2Constants.HTTP2_ERROR_SEQUENCE)==null)?null:(String) msgCtx.getProperty(Http2Constants.HTTP2_ERROR_SEQUENCE);
+            InboundResponseSender responseSender=(msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER)==null)?null:(InboundResponseSender) msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER);
+            boolean serverPushEnabled=(msgCtx.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED)==null)?false:(boolean)msgCtx.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED);
+
+            clientHandler.setResponseReceiver(tenantDomain,dispatchSequence,errorSequence,responseSender,targetConfiguration,serverPushEnabled);
             clientHandler.channelWrite(msgCtx);
 
             //Termination of a connection
