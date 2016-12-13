@@ -203,6 +203,7 @@ public class Http2ResponseWriter {
             Http2StreamFrame frame=iterator.next();
             int promise_id=0;
             int id=frame.streamId();
+
             if(promise_ids.containsKey(id)){
                 promise_id=promise_ids.get(id);
             }
@@ -212,7 +213,8 @@ public class Http2ResponseWriter {
 
             }else if(frame instanceof Http2DataFrame){
                 if(promise_id==0)return;
-                encoder.writeData(c,promise_id,((Http2DataFrame)frame).content().duplicate(),0,((Http2DataFrame) frame).isEndStream(),promise);
+                ByteBuf buf=((Http2DataFrame)frame).content().duplicate();
+                encoder.writeData(c,promise_id,buf.copy(),0,((Http2DataFrame) frame).isEndStream(),promise);
             }else{
                 if(!promise_ids.containsKey(id)){
                     promise_id=connection.local().incrementAndGetNextStreamId();

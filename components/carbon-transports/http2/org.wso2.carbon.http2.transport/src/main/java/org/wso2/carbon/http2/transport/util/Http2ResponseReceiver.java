@@ -203,8 +203,10 @@ public class Http2ResponseReceiver {
     public void onPushPromiseFrameRead(Http2PushPromiseFrame frame,MessageContext msgContext){
         serverPushes.put(frame.getPushPromiseId(),frame.streamId());
         LinkedList<Http2StreamFrame> pushframes=new LinkedList<>();
+        int id=frame.streamId();
+        frame.setStreamId(frame.getPushPromiseId());
         pushframes.add(frame);
-        this.pushedData.put(frame.streamId(),pushframes);
+        this.pushedData.put(id,pushframes);
     }
 
     public void onUnknownFrameRead(Object frame){
