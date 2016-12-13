@@ -140,13 +140,12 @@ public class Http2TargetRequestUtil {
                     if (HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())
                             && !configuration.isPreserveHttpHeader(HTTPConstants.HEADER_HOST)) {
                         if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
-                            if(!http2Headers.contains((String)entry.getKey()))
-                                http2Headers.add((String) entry.getKey(),
-                                    (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
+                            if (!http2Headers.contains((String) entry.getKey()))
+                                http2Headers.add((String) entry.getKey(), (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
                         }
 
                     } else {
-                        if(!http2Headers.contains((String)entry.getKey()))
+                        if (!http2Headers.contains((String) entry.getKey()))
                             http2Headers.add((String) entry.getKey(), (String) entry.getValue());
                     }
                 }
@@ -277,7 +276,7 @@ public class Http2TargetRequestUtil {
         }
 
         if(path!=null || !path.isEmpty()){
-            if(!http2Headers.contains(Http2Headers.PseudoHeaderName.PATH.value()))
+            if(http2Headers.path()==null)
                 http2Headers.path(path);
         }
 
@@ -338,9 +337,9 @@ public class Http2TargetRequestUtil {
         if(http2Headers.contains(HttpHeaderNames.HOST)){
             http2Headers.remove(HttpHeaderNames.HOST);
         }
-        if(!http2Headers.contains(Http2Headers.PseudoHeaderName.SCHEME.value()))
+        if(http2Headers.scheme()==null)
             http2Headers.scheme(route.getTargetHost().getSchemeName());
-        if(!http2Headers.contains(Http2Headers.PseudoHeaderName.AUTHORITY.value()))
+        if(http2Headers.authority()==null)
             http2Headers.authority(route.getTargetHost().toString());
         return http2Headers;
     }
