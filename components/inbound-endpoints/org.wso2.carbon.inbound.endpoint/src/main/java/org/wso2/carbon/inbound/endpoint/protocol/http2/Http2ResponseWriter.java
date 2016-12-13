@@ -31,8 +31,11 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http2.DefaultHttp2Headers;
 import io.netty.handler.codec.http2.Http2Connection;
 import io.netty.handler.codec.http2.Http2ConnectionEncoder;
+import io.netty.handler.codec.http2.Http2DataFrame;
 import io.netty.handler.codec.http2.Http2Error;
 import io.netty.handler.codec.http2.Http2Headers;
+import io.netty.handler.codec.http2.Http2HeadersFrame;
+import io.netty.handler.codec.http2.Http2StreamFrame;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.commons.logging.Log;
@@ -41,6 +44,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.protocol.HTTP;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
@@ -50,12 +54,14 @@ import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.caching.CachingConstants;
 import org.wso2.caching.digest.DigestGenerator;
+import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundHttp2Constants;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundMessageHandler;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 
@@ -181,15 +187,41 @@ public class Http2ResponseWriter {
     }
 
     public void writePushPromiseResponse(MessageContext synCtx){
-        int promiseId=connection.local().incrementAndGetNextStreamId();
+       // int promiseId=connection.local().incrementAndGetNextStreamId();
         int streamId=(int)synCtx.getProperty("stream-id");
-        synCtx.setProperty("stream-id",promiseId);
+       // synCtx.setProperty("stream-id",promiseId);
         ChannelHandlerContext c=(ChannelHandlerContext)synCtx.getProperty("stream-channel");
         if(c==null){
             c=chContext;
         }
         ChannelPromise promise=c.newPromise();
-        encoder.writePushPromise(c,streamId,promiseId,null,0,promise);
+        LinkedList<Http2StreamFrame> pushFrames=(LinkedList<Http2StreamFrame>) ((Axis2MessageContext) synCtx).getAxis2MessageContext().getProperty(
+                InboundHttp2Constants.HTTP2_PUSH_PROMISE_DATA);
+        Map<Integer,Integer> promise_ids=new HashMap<>();
+        Iterator<Http2StreamFrame> iterator=pushFrames.iterator();
+        while (iterator.hasNext()){
+            Http2StreamFrame frame=iterator.next();
+            int promise_id=0;
+            int id=frame.streamId();
+            if(promise_ids.containsKey(id)){
+                promise_id=promise_ids.get(id);
+            }
+            if(frame instanceof Http2HeadersFrame){
+                if(promise_id==0)return;
+                encoder.writeHeaders(c,promise_id,((Http2HeadersFrame)frame).headers(),0,((Http2HeadersFrame) frame).isEndStream(),promise);
+
+            }else if(frame instanceof Http2DataFrame){
+                if(promise_id==0)return;
+                encoder.writeData(c,promise_id,((Http2DataFrame)frame).content().duplicate(),0,((Http2DataFrame) frame).isEndStream(),promise);
+            }else{
+                if(!promise_ids.containsKey(id)){
+                    promise_id=connection.local().incrementAndGetNextStreamId();
+                    promise_ids.put(id,promise_id);
+                    encoder.writePushPromise(c,streamId,promise_id,null,0,promise);
+                }
+            }
+        }
+        c.flush();
         writeNormalResponse(synCtx);
     }
 

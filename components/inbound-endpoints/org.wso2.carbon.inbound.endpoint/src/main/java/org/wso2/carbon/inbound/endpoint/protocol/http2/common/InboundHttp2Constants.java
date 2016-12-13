@@ -39,7 +39,7 @@ public class InboundHttp2Constants {
     public static final String INBOUND_DISPATCH_SEQUENCE="http2.dispatch.sequence";
     public static final String INBOUND_ERROR_SEQUENCE="http2.error.sequence";
     public static final String INBOUND_SERVER_PUSH_ENABLED="http2.server.push.enabled";
-
+    public static final String HTTP2_PUSH_PROMISE_DATA="http2.push.promise.data";
 
 
 }

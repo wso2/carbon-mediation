@@ -105,65 +105,9 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
         reader.setMessageHandler(new InboundMessageHandler(new InboundHttp2ResponseSender(this),config));
     }
 
-    public void onDataRead(ChannelHandlerContext ctx, Http2DataFrame data) throws Exception {
-
-           /* int streamId = data.streamId();
-            Http2SourceRequest request = null;
-            request = streams.get(streamId);
-
-            if(request==null){
-                return;
-            }
-            request.setChannel(ctx);
-
-            Pipe pipe=request.getPipe();
-            if(pipe==null){
-                pipe=new Pipe(new HTTP2Producer(),sourceConfiguration.getBufferFactory().getBuffer(), "source", sourceConfiguration);
-                request.setPipe(pipe);
-            }
-            pipe.produce(new HTTP2Decoder(data));
-            //request.addFrame(Http2FrameTypes.DATA, data);
-
-        if(!request.isProcessedReq()){
-            messageHandler.processRequest(request);
-            request.setProcessedReq(true);
-        }
-        if (data.isEndStream())
-            streams.remove(request.getStreamID());*/
-    }
-
-    public void onHeadersRead(ChannelHandlerContext ctx, Http2HeadersFrame headers)
-            throws Exception {
-
-       /* int streamId = headers.streamId();
-        Http2SourceRequest request = null;
-        if (streams.containsKey(streamId)) {
-            request = streams.get(streamId);
-        } else {
-            request = new Http2SourceRequest(streamId, ctx);
-            streams.put(streamId, request);
-        }
-        Set<CharSequence> headerSet = headers.headers().names();
-        for (CharSequence header : headerSet) {
-            if (log.isDebugEnabled()) {
-                log.debug("headers for stream id:" + streamId + ":-" + header.toString());
-            }
-            request.setHeader(header.toString(), headers.headers().get(header).toString());
-        }
-        if (headers.isEndStream() && !request.getHeaders().containsKey("http2-settings")) {
-            messageHandler.processRequest(request);
-            streams.remove(request.getStreamID());
-        }*/
-    }
 
     @Override
     public synchronized void sendResponse(MessageContext msgCtx) throws AxisFault {
-        /**
-         * get RequestType; if is null or client-request process as same
-         * if push promise first write push promise and then process as same
-         * if goaway send goaway and stop connection
-         * we are not handling rest-stream requests
-         */
         org.apache.axis2.context.MessageContext axisMessage=((Axis2MessageContext) msgCtx).getAxis2MessageContext();
 
         String requestType=null;
@@ -182,29 +126,6 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
         }else{
             log.error("Uncaught request type : "+requestType);
         }
-
-
-
-       /* ChannelHandlerContext channel = (ChannelHandlerContext) msgCtx
-                .getProperty("stream-channel");
-
-        ByteBuf content = channel.alloc().buffer();
-
-        String response = messageHandler
-                .messageFormatter(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
-
-        content.writeBytes(response.getBytes());
-
-        // Send a frame for the response status
-        Http2Headers headers = new DefaultHttp2Headers().status(OK.codeAsText());
-        String contentType = messageHandler
-                .getContentType(((Axis2MessageContext) msgCtx).getAxis2MessageContext());
-        if (contentType != null) {
-            headers.add(HttpHeaderNames.CONTENT_TYPE, contentType);
-        }
-
-        channel.write(new DefaultHttp2HeadersFrame(headers));
-        channel.writeAndFlush(new DefaultHttp2DataFrame(content, true));*/
     }
 
 }
