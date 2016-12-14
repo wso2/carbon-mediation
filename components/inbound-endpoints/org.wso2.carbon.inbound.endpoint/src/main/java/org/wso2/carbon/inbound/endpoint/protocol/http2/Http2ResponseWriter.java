@@ -124,7 +124,7 @@ public class Http2ResponseWriter {
             MessageFormatter messageFormatter =
                     MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
             if(msgContext.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE) == null){
-                transportHeaders.add(HTTP.CONTENT_TYPE, messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
+                transportHeaders.add(HttpHeaderNames.CONTENT_TYPE, messageFormatter.getContentType(msgContext, format, msgContext.getSoapAction()));
             }
         }
         String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
