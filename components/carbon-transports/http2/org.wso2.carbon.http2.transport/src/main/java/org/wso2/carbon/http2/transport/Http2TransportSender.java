@@ -113,12 +113,12 @@ public class Http2TransportSender extends AbstractTransportSender {
 
 
             String tenantDomain=(msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN)==null)?null:(String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
-           // String dispatchSequence=(msgCtx.getProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE)==null)?null:(String) msgCtx.getProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE);
-           // String errorSequence=(msgCtx.getProperty(Http2Constants.HTTP2_ERROR_SEQUENCE)==null)?null:(String) msgCtx.getProperty(Http2Constants.HTTP2_ERROR_SEQUENCE);
+            String dispatchSequence=(msgCtx.getProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE)==null)?null:(String) msgCtx.getProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE);
+            String errorSequence=(msgCtx.getProperty(Http2Constants.HTTP2_ERROR_SEQUENCE)==null)?null:(String) msgCtx.getProperty(Http2Constants.HTTP2_ERROR_SEQUENCE);
             InboundResponseSender responseSender=(msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER)==null)?null:(InboundResponseSender) msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER);
             boolean serverPushEnabled=(msgCtx.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED)==null)?false:(boolean)msgCtx.getProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED);
 
-            clientHandler.setResponseReceiver(tenantDomain,responseSender,targetConfiguration,serverPushEnabled);
+            clientHandler.setResponseReceiver(tenantDomain,dispatchSequence,errorSequence,responseSender,targetConfiguration,serverPushEnabled);
             clientHandler.channelWrite(msgCtx);
 
             //Termination of a connection

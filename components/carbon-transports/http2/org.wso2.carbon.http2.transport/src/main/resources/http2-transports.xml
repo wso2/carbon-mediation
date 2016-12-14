@@ -17,7 +17,7 @@
   -->
 <transportConfig>
 
-    <transportSender name="http2" class="org.wso2.carbon.http2.transport.Http2TransportSender">
-    </transportSender>
+    <transportReceiver name="http2" class="org.wso2.carbon.http2.transport.Http2TransportListener">
+    </transportReceiver>
 
 </transportConfig>

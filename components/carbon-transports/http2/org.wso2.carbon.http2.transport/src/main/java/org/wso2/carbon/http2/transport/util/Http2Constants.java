@@ -38,7 +38,7 @@ public class Http2Constants {
     public static final String HTTP2_RESPONSE_SENT="http2.response.sent";
 
     public static final String HTTP2_PUSH_PROMISE_ID="http2.push.promise.id";
-    public static final String HTTP2_PUSH_PROMISE_DATA="http2.push.promise.data";
+    public static final String HTTP2_PUSH_PROMISE_HEADERS="http2.push.promise.headers";
 
 
     public static final String HTTP2_SERVER_STREAM_ID="http2.server.stream.id";
