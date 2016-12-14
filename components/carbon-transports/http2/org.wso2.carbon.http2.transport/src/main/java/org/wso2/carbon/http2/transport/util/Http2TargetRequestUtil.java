@@ -46,9 +46,12 @@ import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class Http2TargetRequestUtil {
@@ -72,6 +75,8 @@ public class Http2TargetRequestUtil {
     /** Keep alive request */
     private boolean keepAlive = true;
     private boolean disableChunk=false;
+    private String [] http2headerNames={"method","authority","path","scheme","status"};
+    private Set<String> defaultHttp2Headers=new HashSet(Arrays.asList(http2headerNames));
 
     public Http2TargetRequestUtil(TargetConfiguration configuration,HttpRoute route) {
         this.configuration=configuration;
@@ -141,13 +146,13 @@ public class Http2TargetRequestUtil {
                             && !configuration.isPreserveHttpHeader(HTTPConstants.HEADER_HOST)) {
                         if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
                             if(!http2Headers.contains((String)entry.getKey()))
-                                http2Headers.add((String) entry.getKey(),
+                                http2Headers.add(((String) entry.getKey()).toLowerCase(),
                                     (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
                         }
 
                     } else {
-                        if(!http2Headers.contains((String)entry.getKey()))
-                            http2Headers.add((String) entry.getKey(), (String) entry.getValue());
+                        if(!http2Headers.contains((String)entry.getKey()) && !defaultHttp2Headers.contains((String)entry.getKey()))
+                            http2Headers.add(((String) entry.getKey()).toLowerCase(), (String) entry.getValue());
                     }
                 }
             }
