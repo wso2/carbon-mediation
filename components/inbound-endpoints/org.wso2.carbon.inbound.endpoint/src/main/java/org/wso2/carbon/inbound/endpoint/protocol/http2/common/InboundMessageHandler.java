@@ -235,7 +235,10 @@ public class InboundMessageHandler {
         updateMessageContext(axis2MsgCtx, request);
         synCtx.setProperty("stream-id", request.getStreamID());
         synCtx.setProperty("stream-channel", request.getChannel());
+
         axis2MsgCtx.setProperty("OutTransportInfo", this);
+
+        axis2MsgCtx.setProperty("stream-id", request.getStreamID());
         axis2MsgCtx.setProperty("stream-channel", request.getChannel());
         if(request.getRequestType()!=null){
             axis2MsgCtx.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,request.getRequestType());
