@@ -26,6 +26,7 @@
 <%@ page import="org.wso2.carbon.event.sink.xsd.EventSink" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 
 <%
     response.setHeader("Cache-Control", "no-cache");
@@ -253,22 +254,22 @@
                                 <tr id="propertyRaw<%=i%>">
                                     <td>
                                         <div name="propertyName<%=i%>" id="propertyName<%=i%>">
-                                            <%=eventSink.getName()%>
+                                            <%=Encode.forHtml(eventSink.getName())%>
                                         </div>
                                     </td>
                                     <td>
                                         <div name="propertyUsername<%=i%>" id="propertyUsername<%=i%>">
-                                            <%=eventSink.getUsername()%>
+                                            <%=Encode.forHtml(eventSink.getUsername())%>
                                         </div>
                                     </td>
                                     <td>
                                         <div name="propertyReceiverUrl<%=i%>" id="propertyReceiverUrl<%=i%>">
-                                            <%=eventSink.getReceiverUrlSet()%>
+                                            <%=Encode.forHtml(eventSink.getReceiverUrlSet())%>
                                         </div>
                                     </td>
                                     <td>
                                         <div name="propertyAuthenticatorUrl<%=i%>" id="propertyAuthenticatorUrl<%=i%>">
-                                            <%=eventSink.getAuthenticationUrlSet()%>
+                                            <%=Encode.forHtml(eventSink.getAuthenticationUrlSet())%>
                                         </div>
                                     </td>
                                     <td><a href="#" class="edit-icon-link"

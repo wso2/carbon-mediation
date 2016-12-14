@@ -20,6 +20,7 @@
 <%@ page import="org.wso2.carbon.task.ui.internal.TaskClientConstants" %>
 <%@ page import="org.wso2.carbon.task.ui.internal.TaskManagementClient" %>
 <%@ page import="org.wso2.carbon.task.ui.internal.TaskManagementHelper" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="javax.xml.namespace.QName" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Set" %>
@@ -84,7 +85,7 @@
                    topPage="false" request="<%=request%>"/>
 
 <form method="post" name="taskcreationform" id="taskcreationform"
-      action="savetask.jsp">
+      action="savetask-ajaxprocessor.jsp">
 
 <div id="middle">
 <h2><fmt:message key="task.edit.header"/> : <%=name%>
@@ -104,18 +105,18 @@
     <td style="width:150px"><fmt:message key="task.name"/><span class="required">*</span></td>
     <td align="left">
         <input id="taskName" name="taskName" class="longInput" type="text"
-               value="<%=taskDescription.getName()%>" disabled="true"/>
+               value="<%=Encode.forHtmlAttribute(taskDescription.getName())%>" disabled="true"/>
         <input type="hidden" name="taskName_hidden" id="taskName_hidden"
-               value="<%=taskDescription.getName()%>"/>
+               value="<%=Encode.forHtmlAttribute(taskDescription.getName())%>"/>
     </td>
 </tr>
 <tr>
     <td style="width:150px"><fmt:message key="task.group"/><span class="required">*</span></td>
     <td align="left">
         <input id="taskGroup" name="taskGroup" class="longInput" type="text"
-               value="<%=taskDescription.getTaskGroup()%>" disabled="true"/>
+               value="<%=Encode.forHtmlAttribute(taskDescription.getTaskGroup())%>" disabled="true"/>
         <input type="hidden" name="taskGroup_hidden" id="taskGroup_hidden"
-               value="<%=taskDescription.getTaskGroup()%>"/>
+               value="<%=Encode.forHtmlAttribute(taskDescription.getTaskGroup())%>"/>
     </td>
 </tr>
 <%
@@ -129,7 +130,7 @@
                onkeyup="onclassnamefieldchange('loadClassButton');"
                onchange="onclassnamefieldchange('loadClassButton');" id="taskClass" name="taskClass"
                class="longInput" type="text"
-               value="<%=taskDescription.getTaskImplClassName()%>"/>
+               value="<%=Encode.forHtmlAttribute(taskDescription.getTaskImplClassName())%>"/>
         <input id="loadClassButton" name="loadClassButton" class="button" type="button"
                href="#"
                value="<fmt:message key="task.class.reload.button.text"/>"/>
@@ -138,7 +139,7 @@
 <%
 } else { %>
 <input id="taskClass" name="taskClass" type="hidden"
-       value="<%=taskDescription.getTaskImplClassName()%>"/>
+       value="<%=Encode.forHtmlAttribute(taskDescription.getTaskImplClassName())%>"/>
 <% } %>
 <%
     if (!disableTaskProperties) {
@@ -186,10 +187,10 @@
                 <tr id="pr<%=i%>">
                     <td align="left">
                         <input type="text" name="property_name<%=i%>" id="property_name<%=i%>"
-                               value="<%=propName%>" disabled="true"/>
+                               value="<%=Encode.forHtmlAttribute(propName)%>" disabled="true"/>
                         <input type="hidden" name="property_name_hidden<%=i%>"
                                id="property_name_hidden<%=i%>"
-                               value="<%=propName%>"/>
+                               value="<%=Encode.forHtmlAttribute(propName)%>"/>
                     </td>
 
                     <td align="left">
@@ -222,10 +223,10 @@
                     </td>
                     <td>
                         <input id="textField<%=i%>" name="textField<%=i%>" type="text"
-                               value="<%=value%>"
-                               style="<%=textFieldStyle%>" class="longInput" for-label="<%=propName%>"/>
+                               value="<%=Encode.forHtmlAttribute(value)%>"
+                               style="<%=textFieldStyle%>" class="longInput" for-label="<%=Encode.forHtmlAttribute(propName)%>"/>
                         <textarea id="textArea<%=i%>" name="textArea<%=i%>" class="longInput"
-                                  style="<%=textAreaStyle%>" for-label="<%=propName%>"><%=xmlString%>
+                                  style="<%=textAreaStyle%>" for-label="<%=Encode.forHtmlAttribute(propName)%>"><%=Encode.forHtmlContent(xmlString)%>
                         </textarea>
                     </td>
                     <td valign="top"><a href="#" class="delete-icon-link-nofloat"
@@ -269,11 +270,11 @@
 
 %>
 <input type="hidden" name="property_name_hidden<%=i%>"
-       id="property_name_hidden<%=i%>" value="<%=propName%>"/>
+       id="property_name_hidden<%=i%>" value="<%=Encode.forHtmlAttribute(propName)%>"/>
 <input id="textField<%=i%>" name="textField<%=i%>" type="hidden"
-       value="<%=value%>" style="<%=textFieldStyle%>" class="longInput"/>
+       value="<%=Encode.forHtmlAttribute(value)%>" style="<%=textFieldStyle%>" class="longInput"/>
 <input id="textArea<%=i%>" name="textArea<%=i%>" class="longInput"
-       type="hidden" style="<%=textAreaStyle%>" value="<%=xmlString%>"/>
+       type="hidden" style="<%=textAreaStyle%>" value="<%=Encode.forHtmlAttribute(xmlString)%>"/>
 <input name="propertyTypeSelection<%=i%>" id="propertyTypeSelection<%=i%>"
        type="hidden" value="<%if(isLiteral){%>literal<%}else{%>xml<%}%>"/>
 <% i++;
@@ -368,7 +369,7 @@
 <tr id="triggerCronTR">
     <td><fmt:message key="task.trigger.type.cron"/><span class="required">*</span></td>
     <td>
-        <input id="triggerCron" name="triggerCron" class="longInput" type="text" value="<%=cron%>"/>
+        <input id="triggerCron" name="triggerCron" class="longInput" type="text" value="<%=Encode.forHtmlAttribute(cron)%>"/>
     </td>
 </tr>
 <%} %>
@@ -397,11 +398,11 @@
     <td><fmt:message key="task.pinned.servers"/></td>
     <td>
         <input id="pinnedServers" name="pinnedServers" class="longInput" type="text"
-               value="<%=pinnedServerStr%>"/>
+               value="<%=Encode.forHtmlAttribute(pinnedServerStr)%>"/>
     </td>
 </tr>
 <% } else { %>
-    <input id="pinnedServers" name="pinnedServers" type="hidden" value="<%=pinnedServerStr%>"/>
+    <input id="pinnedServers" name="pinnedServers" type="hidden" value="<%=Encode.forHtmlAttribute(pinnedServerStr)%>"/>
 <% } %>
 
 <tr>
@@ -436,7 +437,7 @@
 %>
 <script type="text/javascript">
     jQuery(document).ready(function() {
-        CARBON.showErrorDialog('<%=e.getMessage()%>');
+        CARBON.showErrorDialog('<%=Encode.forHtml(e.getMessage())%>');
     });
 </script>
 <%

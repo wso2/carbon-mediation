@@ -65,6 +65,10 @@
             <artifactId>org.wso2.carbon.service.mgt.stub</artifactId>
             <version>${carbon.deployment.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -84,6 +88,7 @@
                         </Export-Package>
                         <Import-Package>
                             org.wso2.carbon.cloud.gateway.agent.stub.*;version="${carbon.mediation.imp.pkg.version}",
+                            org.owasp.encoder.*;version="${owasp.encoder.wso2.imp.pkg.version}",
                             *;resolution:=optional
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

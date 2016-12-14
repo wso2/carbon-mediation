@@ -23,6 +23,8 @@
 <%@ page import="org.wso2.carbon.localentry.stub.types.EntryData" %>
 <%@ page import="javax.xml.stream.XMLStreamException" %>
 <%@ page import="org.apache.axiom.om.OMElement" %>
+<%@ page import="org.xml.sax.SAXException" %>
+<%@ page import="javax.xml.parsers.ParserConfigurationException" %>
 <%@ taglib prefix="carbon" uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" %>
 <carbon:jsi18n resourceBundle="org.wso2.carbon.localentry.ui.i18n.Resources"
                request="<%=request%>" />
@@ -46,7 +48,7 @@
    
     
 
-    private String getServiceCallXML() {
+    private String getServiceCallXML() throws Exception {
 
     String name = req.getParameter("Name").trim();
     String value = req.getParameter("Value");
@@ -61,6 +63,8 @@
     } else if (entryCheck.equalsIgnoreCase("inlinedXML.jsp")) {
         entry = "type=\"1\"";
         OMElement elem;
+        //Checking against XXE attacks
+        LocalEntryAdminClient.checkForXXE(value);
         try {
             // Omiting XML declarations etc. e.g. : <?xml version="1.0"?>
             elem = LocalEntryAdminClient.nonCoalescingStringToOm(value);
@@ -116,7 +120,24 @@
     LocalEntryAdminClient client = new LocalEntryAdminClient(cookie, url, configContext);
 
     StringBuilder ss = new StringBuilder();
-    ss.append(getServiceCallXML());
+            try {
+                ss.append(getServiceCallXML());
+            } catch (Exception e) {
+                String msg = e.getMessage();
+                String errMsg = msg.replaceAll("\\'", " ");
+
+                %>
+                <script type="text/javascript">
+                    jQuery(document).ready(function () {
+                        function gotoPage() {
+                            history.go(-1);
+                        }
+                        CARBON.showErrorDialog(jsi18n["invalid.value.error.parsing.xml"] + '<%=errMsg%>', gotoPage);
+                    });
+                </script>
+                <%
+                return;
+            }
 
     // OMElement payload = AXIOMUtil.stringToOM(ss.toString());
     //payload.serialize(new PrintWriter(new PrintWriter(new File("/home/dinuka/Desktop/tt.txt"))));
