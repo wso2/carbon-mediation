@@ -38,14 +38,15 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.util.AsciiString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.inbound.endpoint.protocol.http2.http.InboundHttpSourceHandler;
 
+import static io.netty.handler.logging.LogLevel.DEBUG;
 import static io.netty.handler.logging.LogLevel.INFO;
 
 public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final Log log = LogFactory.getLog(InboundHttp2ServerInitializer.class);
-    private static final Http2FrameLogger logger = new Http2FrameLogger(INFO, InboundHttp2ServerInitializer.class);
+    private static final Http2FrameLogger logger = new Http2FrameLogger(INFO,
+            InboundHttp2ServerInitializer.class);
     private UpgradeCodecFactory upgradeCodecFactory;
     private final SslContext sslCtx;
     private final int maxHttpContentLength;
@@ -55,63 +56,48 @@ public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChan
         this(sslCtx, 16 * 1024, config);
     }
 
-    public InboundHttp2ServerInitializer(SslContext sslCtx, int maxHttpContentLength, final InboundHttp2Configuration config) {
+    public InboundHttp2ServerInitializer(SslContext sslCtx, int maxHttpContentLength,
+            final InboundHttp2Configuration config) {
         if (maxHttpContentLength < 0) {
-            throw new IllegalArgumentException("maxHttpContentLength (expected >= 0): " + maxHttpContentLength);
+            throw new IllegalArgumentException(
+                    "maxHttpContentLength (expected >= 0): " + maxHttpContentLength);
         }
         this.config = config;
         this.sslCtx = sslCtx;
         this.maxHttpContentLength = maxHttpContentLength;
-/*
-        this.connection=new DefaultHttp2Connection(true);
-        this.listener=new Http2FrameListenAdapter();
-        //listener.setConnection(connection);
-        this.handler=new Http2ConnectionHandlerBuilder()
-                .connection(connection)
-                .frameLogger(logger)
-                .frameListener(listener)
-                .build();
-        listener.setEncoder(handler.encoder());
-        */
     }
 
     @Override
     public void initChannel(SocketChannel ch) {
-        Http2Connection conn=new DefaultHttp2Connection(true);
-        Http2FrameListenAdapter listenAdapter=new Http2FrameListenAdapter();
-        Http2ConnectionHandler connectionHandler=new Http2ConnectionHandlerBuilder()
-                .connection(conn)
-                .frameLogger(logger)
-                .frameListener(listenAdapter)
-                .build();
-        InboundHttp2SourceHandler sourceHandler=new InboundHttp2SourceHandler(this.config,conn,connectionHandler.encoder());
+        Http2Connection conn = new DefaultHttp2Connection(true);
+        Http2FrameListenAdapter listenAdapter = new Http2FrameListenAdapter();
+        Http2ConnectionHandler connectionHandler = new Http2ConnectionHandlerBuilder()
+                .connection(conn).frameLogger(logger).frameListener(listenAdapter).build();
+        InboundHttp2SourceHandler sourceHandler = new InboundHttp2SourceHandler(this.config, conn,
+                connectionHandler.encoder());
         if (sslCtx != null) {
-            configureSsl(ch,connectionHandler,sourceHandler);
+            configureSsl(ch, connectionHandler, sourceHandler);
         } else {
-            configureClearText(ch,connectionHandler,sourceHandler);
+            configureClearText(ch, connectionHandler, sourceHandler);
         }
     }
 
-
-    /**
-     * Configure the pipeline for TLS NPN negotiation to HTTP/2.
-     */
-    private void configureSsl(SocketChannel ch,Http2ConnectionHandler connectionHandler,InboundHttp2SourceHandler channelHanlder) {
-        ch.pipeline().addLast(sslCtx.newHandler(ch.alloc()), connectionHandler,channelHanlder);  //This can be changed later
+    private void configureSsl(SocketChannel ch, Http2ConnectionHandler connectionHandler,
+            InboundHttp2SourceHandler channelHanlder) {
+        ch.pipeline().addLast(sslCtx.newHandler(ch.alloc()), connectionHandler, channelHanlder);
     }
 
-    /**
-     * Configure the pipeline for a clear text upgrade from HTTP to HTTP/2.0
-     */
-    private void configureClearText(SocketChannel ch, final Http2ConnectionHandler connectionHandler,
+    private void configureClearText(SocketChannel ch,
+            final Http2ConnectionHandler connectionHandler,
             final InboundHttp2SourceHandler channelHandler) {
         final ChannelPipeline p = ch.pipeline();
         final HttpServerCodec sourceCodec = new HttpServerCodec();
         upgradeCodecFactory = new UpgradeCodecFactory() {
 
             public UpgradeCodec newUpgradeCodec(CharSequence protocol) {
-                if (AsciiString.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
-                    return new Http2ServerUpgradeCodec(null,connectionHandler);
+                if (AsciiString
+                        .contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
+                    return new Http2ServerUpgradeCodec(null, connectionHandler);
                 } else {
                     return null;
                 }
@@ -121,30 +107,14 @@ public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChan
         p.addLast(sourceCodec);
         p.addLast(new HttpServerUpgradeHandler(sourceCodec, upgradeCodecFactory));
         p.addLast(channelHandler);
-        p.addLast(new SimpleChannelInboundHandler<HttpMessage>() {
-            @Override
-            protected void channelRead0(ChannelHandlerContext ctx, HttpMessage msg) throws Exception {
-                // If this handler is hit then no upgrade has been attempted and the client is just talking HTTP.
-                log.info("No upgrade done: continue with " + msg.protocolVersion());
-                ChannelPipeline pipeline = ctx.pipeline();
-                ChannelHandlerContext thisCtx = pipeline.context(this);
-                pipeline.addAfter(thisCtx.name(), null, new InboundHttpSourceHandler(config));
-                pipeline.replace(this, null, new HttpObjectAggregator(maxHttpContentLength));
-                ctx.fireChannelRead(msg);
-            }
-        });
         p.addLast(new UserEventLogger());
     }
 
-    /**
-     * Class that logs any User Events triggered on this channel.
-     */
     private static class UserEventLogger extends ChannelInboundHandlerAdapter {
         @Override
         public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
             ctx.fireUserEventTriggered(evt);
         }
     }
-
 
 }

@@ -26,9 +26,7 @@ import org.apache.axiom.soap.impl.llom.soap11.SOAP11Factory;
 import org.apache.axiom.util.UIDGenerator;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.builder.Builder;
 import org.apache.axis2.builder.BuilderUtil;
-import org.apache.axis2.builder.SOAPBuilder;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.OperationContext;
 import org.apache.axis2.context.ServiceContext;
@@ -41,9 +39,7 @@ import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.axis2.transport.base.BaseUtils;
 import org.apache.axis2.transport.http.HTTPTransportUtils;
-import org.apache.axis2.util.MessageProcessorSelector;
 import org.apache.axis2.util.Utils;
-import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.protocol.HTTP;
@@ -73,19 +69,23 @@ import org.wso2.carbon.inbound.endpoint.protocol.http2.InboundHttp2Configuration
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.utils.multitenancy.MultitenantUtils;
 
-import javax.xml.parsers.FactoryConfigurationError;
-import java.io.*;
+import java.io.InputStream;
 import java.net.SocketAddress;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.xml.parsers.FactoryConfigurationError;
 
 public class InboundMessageHandler {
 
     private static final Log log = LogFactory.getLog(InboundMessageHandler.class);
+    public final Pattern dispatchPattern;
     private InboundResponseSender responseSender;
     private InboundHttp2Configuration config;
-    public final Pattern dispatchPattern;
     private Matcher patternMatcher;
 
     public InboundMessageHandler(InboundResponseSender responseSender,
@@ -97,6 +97,15 @@ public class InboundMessageHandler {
             dispatchPattern = Pattern.compile(config.getDispatchPattern());
         }
         this.responseSender = responseSender;
+    }
+
+    private static org.apache.axis2.context.MessageContext createAxis2MessageContext() {
+        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
+        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
+        axis2MsgCtx.setConfigurationContext(
+                ServiceReferenceHolder.getInstance().getConfigurationContextService()
+                        .getServerConfigContext());
+        return axis2MsgCtx;
     }
 
     public void injectToSequence(MessageContext synCtx, InboundEndpoint endpoint) {
@@ -164,36 +173,6 @@ public class InboundMessageHandler {
         return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
     }
 
-    private static org.apache.axis2.context.MessageContext createAxis2MessageContext() {
-        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
-        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
-        axis2MsgCtx.setConfigurationContext(
-                ServiceReferenceHolder.getInstance().getConfigurationContextService()
-                        .getServerConfigContext());
-        return axis2MsgCtx;
-    }
-
-    public Builder getMessageBuilder(String contentType,
-            org.apache.axis2.context.MessageContext axis2MsgCtx) {
-        Builder builder = null;
-        if (contentType == null) {
-            log.info("No content type specified. Using SOAP builder.");
-            builder = new SOAPBuilder();
-        } else {
-            try {
-                builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
-            } catch (AxisFault axisFault) {
-                log.error("Error while creating message builder :: " + axisFault.getMessage());
-            }
-            if (builder == null) {
-                log.info("No message builder found for type '" + contentType
-                        + "'. Falling back to SOAP.");
-                builder = new SOAPBuilder();
-            }
-        }
-        return builder;
-    }
-
     public void injectToMainSequence(MessageContext synCtx, InboundEndpoint endpoint) {
 
         SequenceMediator injectingSequence = (SequenceMediator) synCtx.getMainSequence();
@@ -211,12 +190,6 @@ public class InboundMessageHandler {
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
 
-    /**
-     * processing the request at the end of the stream
-     *
-     * @param request
-     * @throws AxisFault
-     */
     public void processRequest(Http2SourceRequest request) throws AxisFault {
 
         String tenantDomain = getTenantDomain(request);
@@ -240,10 +213,11 @@ public class InboundMessageHandler {
 
         axis2MsgCtx.setProperty("stream-id", request.getStreamID());
         axis2MsgCtx.setProperty("stream-channel", request.getChannel());
-        if(request.getRequestType()!=null){
-            axis2MsgCtx.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,request.getRequestType());
+        if (request.getRequestType() != null) {
+            axis2MsgCtx.setProperty(Http2Constants.HTTP2_REQUEST_TYPE, request.getRequestType());
         }
-        axis2MsgCtx.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED,config.isEnableServerPush());
+        axis2MsgCtx.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED,
+                config.isEnableServerPush());
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setProperty("TransportInURL", request.getUri());
         String method = request.getMethod();
@@ -252,12 +226,12 @@ public class InboundMessageHandler {
         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
         synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
                 responseSender);
-        axis2MsgCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,responseSender);
+        axis2MsgCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
+                responseSender);
         synCtx.setWSAAction(request.getHeader(InboundHttpConstants.SOAP_ACTION));
-        //axis2MsgCtx.setProperty();
-        //add error sequence and dispatch sequence
-        axis2MsgCtx.setProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE,config.getDispatchSequence());
-        axis2MsgCtx.setProperty(Http2Constants.HTTP2_ERROR_SEQUENCE,config.getErrorSequence());
+        axis2MsgCtx
+                .setProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE, config.getDispatchSequence());
+        axis2MsgCtx.setProperty(Http2Constants.HTTP2_ERROR_SEQUENCE, config.getErrorSequence());
 
         if (!isRESTRequest(axis2MsgCtx, method)) {
             if (request.getPipe() != null) {
@@ -290,7 +264,6 @@ public class InboundMessageHandler {
 
             boolean processedByAPI = false;
             RESTRequestHandler restHandler = new RESTRequestHandler();
-            // Trying to dispatch to an API
             processedByAPI = restHandler.process(synCtx);
             if (log.isDebugEnabled()) {
                 log.debug("Dispatch to API state : enabled, Message is " + (!processedByAPI ?
@@ -308,7 +281,8 @@ public class InboundMessageHandler {
                         if (request.getPipe() != null) {
                             processEntityEnclosingRequest(axis2MsgCtx, isAxis2Path, request);
                         } else {
-                            processNonEntityEnclosingRESTHandler(null, axis2MsgCtx, isAxis2Path, request);
+                            processNonEntityEnclosingRESTHandler(null, axis2MsgCtx, isAxis2Path,
+                                    request);
                         }
                     } else {
                         String contentTypeHeader = request.getHeader(HTTP.CONTENT_TYPE);
@@ -440,14 +414,15 @@ public class InboundMessageHandler {
                 return;
             }
 
-            String soapAction = (String)request.getHeader("soapaction");
-            int soapVersion = HTTPTransportUtils.initializeMessageContext(msgContext, soapAction, request.getUri(), e);
+            String soapAction = (String) request.getHeader("soapaction");
+            int soapVersion = HTTPTransportUtils
+                    .initializeMessageContext(msgContext, soapAction, request.getUri(), e);
             SOAPEnvelope envelope;
             SOAPFactory fac;
-            if(soapVersion == 1) {
+            if (soapVersion == 1) {
                 fac = OMAbstractFactory.getSOAP11Factory();
                 envelope = fac.getDefaultEnvelope();
-            } else if(soapVersion == 2) {
+            } else if (soapVersion == 2) {
                 fac = OMAbstractFactory.getSOAP12Factory();
                 envelope = fac.getDefaultEnvelope();
             } else {
@@ -455,14 +430,14 @@ public class InboundMessageHandler {
                 envelope = fac.getDefaultEnvelope();
             }
 
-            if(soapAction != null && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
+            if (soapAction != null && soapAction.startsWith("\"") && soapAction.endsWith("\"")) {
                 soapAction = soapAction.substring(1, soapAction.length() - 1);
                 msgContext.setSoapAction(soapAction);
             }
 
             msgContext.setEnvelope(envelope);
             msgContext.setProperty("pass-through.pipe", request.getPipe());
-            if(injectToAxis2Engine) {
+            if (injectToAxis2Engine) {
                 AxisEngine.receive(msgContext);
             }
         } catch (AxisFault var11) {
@@ -644,21 +619,6 @@ public class InboundMessageHandler {
         msgContext.setProperty("RequestResponseTransportControl",
                 new HttpCoreRequestResponseTransport(msgContext));
         return msgContext;
-    }
-
-    public String messageFormatter(org.apache.axis2.context.MessageContext msgCtx)
-            throws AxisFault {
-        OMOutputFormat format = BaseUtils.getOMOutputFormat(msgCtx);
-        MessageFormatter messageFormatter = MessageProcessorSelector.getMessageFormatter(msgCtx);
-        StringWriter sw = new StringWriter();
-        OutputStream out = new WriterOutputStream(sw, format.getCharSetEncoding());
-        messageFormatter.writeTo(msgCtx, format, out, true);
-        try {
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sw.toString();
     }
 
     public String getContentType(org.apache.axis2.context.MessageContext msgCtx) throws AxisFault {

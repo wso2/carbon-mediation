@@ -19,7 +19,6 @@
 package org.wso2.carbon.inbound.endpoint.protocol.http2;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http2.Http2Connection;
 import io.netty.handler.codec.http2.Http2DataFrame;
 import io.netty.handler.codec.http2.Http2GoAwayFrame;
 import io.netty.handler.codec.http2.Http2HeadersFrame;
@@ -37,21 +36,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-/**
- * Created by chanakabalasooriya on 12/6/16.
- */
 public class Http2RequestReader {
     private static final Log log = LogFactory.getLog(Http2RequestReader.class);
 
     private ChannelHandlerContext chContext;
-    private Http2Connection connection;
-    private Map<Integer,Http2SourceRequest> requestMap;
+    private Map<Integer, Http2SourceRequest> requestMap;
     private InboundMessageHandler messageHandler;
     private SourceConfiguration sourceConfiguration;
+
     public Http2RequestReader() {
-        requestMap=new TreeMap<>();
+        requestMap = new TreeMap<>();
         try {
-            sourceConfiguration = PassThroughInboundEndpointHandler.getPassThroughSourceConfiguration();
+            sourceConfiguration = PassThroughInboundEndpointHandler
+                    .getPassThroughSourceConfiguration();
         } catch (Exception e) {
             log.warn("Cannot get PassThroughSourceConfiguration ", e);
         }
@@ -61,15 +58,14 @@ public class Http2RequestReader {
         this.messageHandler = messageHandler;
     }
 
-    public void onHeaderRead(Http2HeadersFrame frame){
-            //add stream id as a property
+    public void onHeaderRead(Http2HeadersFrame frame) {
         Http2SourceRequest request;
-        if(requestMap.containsKey(frame.streamId())){
-            request=requestMap.get(frame.streamId());
-        }else{
-            request=new Http2SourceRequest(frame.streamId(),chContext);
+        if (requestMap.containsKey(frame.streamId())) {
+            request = requestMap.get(frame.streamId());
+        } else {
+            request = new Http2SourceRequest(frame.streamId(), chContext);
             request.setRequestType(Http2Constants.HTTP2_CLIENT_SENT_REQEUST);
-            requestMap.put(frame.streamId(),request);
+            requestMap.put(frame.streamId(), request);
         }
         Set<CharSequence> headerSet = frame.headers().names();
         for (CharSequence header : headerSet) {
@@ -79,25 +75,26 @@ public class Http2RequestReader {
             try {
                 messageHandler.processRequest(request);
                 requestMap.remove(frame.streamId());
-            }catch (Exception e){
+            } catch (Exception e) {
                 log.error(e);
             }
         }
     }
 
-    public void onDataRead(Http2DataFrame frame){
+    public void onDataRead(Http2DataFrame frame) {
         int streamId = frame.streamId();
         Http2SourceRequest request = null;
         request = requestMap.get(streamId);
 
-        if(request==null){
+        if (request == null) {
             return;
         }
         request.setChannel(chContext);
 
-        Pipe pipe=request.getPipe();
-        if(pipe==null){
-            pipe=new Pipe(new HTTP2Producer(),sourceConfiguration.getBufferFactory().getBuffer(), "source", sourceConfiguration);
+        Pipe pipe = request.getPipe();
+        if (pipe == null) {
+            pipe = new Pipe(new HTTP2Producer(), sourceConfiguration.getBufferFactory().getBuffer(),
+                    "source", sourceConfiguration);
             request.setPipe(pipe);
         }
         try {
@@ -105,9 +102,7 @@ public class Http2RequestReader {
         } catch (IOException e) {
             log.error(e);
         }
-        //request.addFrame(Http2FrameTypes.DATA, data);
-
-        if(!request.isProcessedReq()){
+        if (!request.isProcessedReq()) {
             try {
                 messageHandler.processRequest(request);
                 request.setProcessedReq(true);
@@ -118,28 +113,25 @@ public class Http2RequestReader {
         if (frame.isEndStream())
             requestMap.remove(request.getStreamID());
 
-
     }
-    public void onGoAwayRead(Http2GoAwayFrame frame){
-        //send msg context with goaway frame
-        Http2SourceRequest request=new Http2SourceRequest(frame.lastStreamId(),chContext);
+
+    public void onGoAwayRead(Http2GoAwayFrame frame) {
+        Http2SourceRequest request = new Http2SourceRequest(frame.lastStreamId(), chContext);
         request.setRequestType(Http2Constants.HTTP2_GO_AWAY_REQUEST);
         try {
             messageHandler.processRequest(request);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
         chContext.executor().shutdownGracefully();
 
     }
-    public void onRstSteamRead(Http2ResetFrame frame){
-        //send msg context with rest frame
+
+    public void onRstSteamRead(Http2ResetFrame frame) {
     }
 
     public void setChContext(ChannelHandlerContext chContext) {
         this.chContext = chContext;
     }
-
-
 
 }

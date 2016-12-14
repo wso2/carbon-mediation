@@ -24,7 +24,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http2.Http2SecurityUtil;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.ssl.*;
+import io.netty.handler.ssl.ApplicationProtocolConfig;
+import io.netty.handler.ssl.ApplicationProtocolNames;
+import io.netty.handler.ssl.OpenSsl;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslProvider;
+import io.netty.handler.ssl.SupportedCipherSuiteFilter;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import org.apache.log4j.Logger;
 import org.apache.synapse.SynapseException;
@@ -39,15 +45,14 @@ import org.wso2.carbon.inbound.endpoint.protocol.http2.configuration.NettyThread
 import org.wso2.carbon.inbound.endpoint.protocol.http2.ssl.SSLHandlerFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 
-import javax.net.ssl.SSLException;
 import java.security.cert.CertificateException;
+import javax.net.ssl.SSLException;
 
 public class Http2EndpointManager extends AbstractInboundEndpointManager {
 
-    private static org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EndpointManager instance = null;
-
     private static final Logger log = Logger.getLogger(
             org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EndpointManager.class);
+    private static org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EndpointManager instance = null;
 
     protected Http2EndpointManager() {
         super();

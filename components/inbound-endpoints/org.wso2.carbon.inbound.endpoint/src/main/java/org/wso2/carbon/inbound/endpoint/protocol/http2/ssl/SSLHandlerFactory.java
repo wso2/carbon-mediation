@@ -20,14 +20,18 @@ package org.wso2.carbon.inbound.endpoint.protocol.http2.ssl;
 
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 public class SSLHandlerFactory {
 
@@ -58,14 +62,6 @@ public class SSLHandlerFactory {
         }
     }
 
-    public KeyManagerFactory getKeyStoreFactory() {
-        return keyStoreFactory;
-    }
-
-    public TrustManagerFactory getTrustStoreFactory() {
-        return trustStoreFactory;
-    }
-
     private static KeyStore getKeyStore(File keyStore, String keyStorePassword) throws IOException {
         KeyStore keyStoreInstance;
         try (InputStream is = new FileInputStream(keyStore)) {
@@ -75,5 +71,13 @@ public class SSLHandlerFactory {
             throw new IOException(e);
         }
         return keyStoreInstance;
+    }
+
+    public KeyManagerFactory getKeyStoreFactory() {
+        return keyStoreFactory;
+    }
+
+    public TrustManagerFactory getTrustStoreFactory() {
+        return trustStoreFactory;
     }
 }

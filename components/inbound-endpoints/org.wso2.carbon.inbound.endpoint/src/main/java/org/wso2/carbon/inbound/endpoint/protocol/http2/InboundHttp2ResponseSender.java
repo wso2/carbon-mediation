@@ -32,7 +32,6 @@ import java.io.IOException;
 
 public class InboundHttp2ResponseSender implements InboundResponseSender {
 
-    private Http2ConnectionEncoder encoder;
     private static final Log log = LogFactory.getLog(InboundHttp2ResponseSender.class);
     private SourceHandler sourceHandler;
 
@@ -44,18 +43,13 @@ public class InboundHttp2ResponseSender implements InboundResponseSender {
     public void sendBack(MessageContext synCtx) {
         if (synCtx != null) {
             try {
-              //  RelayUtils.buildMessage(((Axis2MessageContext) synCtx).getAxis2MessageContext());
                 sourceHandler.sendResponse(synCtx);
             } catch (Exception iEx) {
                 log.error("Error while building the message", iEx);
             }
         } else {
-            log.debug("send back message is null");
+            log.error("send back message is null");
         }
-    }
-
-    public void setEncoder(Http2ConnectionEncoder encoder){
-        this.encoder=encoder;
     }
 
 }

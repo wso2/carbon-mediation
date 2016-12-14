@@ -62,10 +62,6 @@ public class Http2SourceRequest {
         this.method = method;
     }
 
-    public void setScheme(String scheme) {
-        this.scheme = scheme.toLowerCase();
-    }
-
     public String getScheme() {
         if (scheme != null) {
             return scheme;
@@ -74,10 +70,6 @@ public class Http2SourceRequest {
         } else {
             return "http";
         }
-    }
-
-    public void setStreamID(int streamID) {
-        this.streamID = streamID;
     }
 
     public int getStreamID() {
@@ -140,22 +132,6 @@ public class Http2SourceRequest {
             if (uri.charAt(0) != '/')
                 uri = '/' + uri;
             return uri;
-        } else {
-            return null;
-        }
-    }
-
-    public boolean addFrame(Byte frameType, Http2Frame frame) {
-        if (!frames.containsKey(frameType)) {
-            frames.put(frameType, frame);
-            return true;
-        } else
-            return false;
-    }
-
-    public Http2Frame getFrame(byte frameType) {
-        if (frames.containsKey(frameType)) {
-            return frames.get(frameType);
         } else {
             return null;
         }
