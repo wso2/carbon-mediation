@@ -27,9 +27,6 @@ import org.apache.http.nio.ContentEncoder;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-/**
- * Created by chanakabalasooriya on 11/25/16.
- */
 public class http2Encoder implements ContentEncoder {
     ChannelHandlerContext chContext;
     int streamId;

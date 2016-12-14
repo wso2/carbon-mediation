@@ -46,9 +46,13 @@ import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class Http2TargetRequestUtil {
@@ -72,6 +76,8 @@ public class Http2TargetRequestUtil {
     /** Keep alive request */
     private boolean keepAlive = true;
     private boolean disableChunk=false;
+    private final String [] headersNames={"path","method","authority","status","scheme"};
+    private final Set<String> defaultHeaders=new HashSet<>(Arrays.asList(headersNames));
 
     public Http2TargetRequestUtil(TargetConfiguration configuration,HttpRoute route) {
         this.configuration=configuration;
@@ -140,12 +146,12 @@ public class Http2TargetRequestUtil {
                     if (HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())
                             && !configuration.isPreserveHttpHeader(HTTPConstants.HEADER_HOST)) {
                         if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
-                            if (!http2Headers.contains((String) entry.getKey()))
+                            if (!http2Headers.contains((String) entry.getKey()) && !defaultHeaders.contains((String) entry.getKey()))
                                 http2Headers.add((String) entry.getKey(), (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
                         }
 
                     } else {
-                        if (!http2Headers.contains((String) entry.getKey()))
+                        if (!http2Headers.contains((String) entry.getKey()) && !defaultHeaders.contains((String) entry.getKey()))
                             http2Headers.add((String) entry.getKey(), (String) entry.getValue());
                     }
                 }
@@ -233,7 +239,7 @@ public class Http2TargetRequestUtil {
             for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
                 String key = (String) iterator.next();
                 for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
-                    if(!http2Headers.contains(key))
+                    if(!http2Headers.contains(key) &&!defaultHeaders.contains(key))
                         http2Headers.add(key, (String) excessVal);
                 }
             }
