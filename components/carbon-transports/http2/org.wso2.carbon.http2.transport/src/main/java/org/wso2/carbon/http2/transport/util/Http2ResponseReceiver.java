@@ -1,5 +1,6 @@
 package org.wso2.carbon.http2.transport.util;
 
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http2.Http2DataFrame;
@@ -58,37 +59,42 @@ import java.util.TreeMap;
 public class Http2ResponseReceiver {
 
     private static final Log log = LogFactory.getLog(Http2ResponseReceiver.class);
-    Map<Integer,MessageContext> incompleteResponses;
-    Map<Integer,Http2Headers> serverPushes;
+    Map<Integer, MessageContext> incompleteResponses;
+    Map<Integer, Http2Headers> serverPushes;
     private TargetConfiguration targetConfiguration;
     private String tenantDomain;
     private InboundResponseSender responseSender;
-    private boolean serverPushAccepted=true;
+    private boolean serverPushAccepted = true;
     private String dispatchSequence;
     private String errorSequence;
+    private ChannelHandlerContext inboundChannel;
 
     public Http2ResponseReceiver(String tenantDomain, InboundResponseSender responseSender,
-            boolean serverPushAccepted, String dispatchSequence, String errorSequence,TargetConfiguration targetConfiguration) {
+            boolean serverPushAccepted, String dispatchSequence, String errorSequence,
+            TargetConfiguration targetConfiguration) {
         this.tenantDomain = tenantDomain;
         this.responseSender = responseSender;
         this.serverPushAccepted = serverPushAccepted;
         this.dispatchSequence = dispatchSequence;
         this.errorSequence = errorSequence;
-        incompleteResponses=new TreeMap<>();
-        serverPushes=new TreeMap<>();
-        this.targetConfiguration=targetConfiguration;
+        incompleteResponses = new TreeMap<>();
+        serverPushes = new TreeMap<>();
+        this.targetConfiguration = targetConfiguration;
     }
 
-    public void onDataFrameRead(Http2DataFrame frame,MessageContext msgContext){
-        if(!incompleteResponses.containsKey(frame.streamId())){
-            log.error("No response headers found for received dataframe of streamID : "+frame.streamId());
+    public void onDataFrameRead(Http2DataFrame frame, MessageContext msgContext) {
+        if (!incompleteResponses.containsKey(frame.streamId())) {
+            log.error("No response headers found for received dataframe of streamID : " + frame
+                    .streamId());
             return;
         }
-        MessageContext response=incompleteResponses.get(frame.streamId());
-        if(response==null)
+        MessageContext response = incompleteResponses.get(frame.streamId());
+        if (response == null)
             return;
-        Map <String,String>headers=(response.getProperty(MessageContext.TRANSPORT_HEADERS)!=null)?
-                (Map)response.getProperty(MessageContext.TRANSPORT_HEADERS):new TreeMap<String,String>();
+        Map<String, String> headers = (response.getProperty(MessageContext.TRANSPORT_HEADERS)
+                != null) ?
+                (Map) response.getProperty(MessageContext.TRANSPORT_HEADERS) :
+                new TreeMap<String, String>();
         String cType = headers.get(HTTP.CONTENT_TYPE.toString());
         if (cType == null && headers.containsKey(HTTP.CONTENT_TYPE.toLowerCase())) {
             cType = headers.get(HTTP.CONTENT_TYPE.toLowerCase());
@@ -97,7 +103,7 @@ public class Http2ResponseReceiver {
         if (cType != null) {
             contentType = cType;
         } else {
-            contentType = inferContentType(headers,response);
+            contentType = inferContentType(headers, response);
         }
         response.setProperty(Constants.Configuration.CONTENT_TYPE, contentType);
 
@@ -114,54 +120,58 @@ public class Http2ResponseReceiver {
 
         //response.setServerSide(false);
 
-
         Pipe pipe;
-        if(response.getProperty(PassThroughConstants.PASS_THROUGH_PIPE)==null) {
+        if (response.getProperty(PassThroughConstants.PASS_THROUGH_PIPE) == null) {
             pipe = new Pipe(new HTTP2Producer(), targetConfiguration.getBufferFactory().getBuffer(),
                     "target", targetConfiguration);
-            response.setProperty(PassThroughConstants.PASS_THROUGH_PIPE,pipe);
-        }else
-            pipe=(Pipe)response.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+            response.setProperty(PassThroughConstants.PASS_THROUGH_PIPE, pipe);
+        } else
+            pipe = (Pipe) response.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
         try {
             pipe.produce(new HTTP2Decoder(frame));
             response.setServerSide(true);
             response.removeProperty(PassThroughConstants.NO_ENTITY_BODY);
-        }catch (Exception e){
-            log.error("Error occured during pipe producing "+e);
+        } catch (Exception e) {
+            log.error("Error occured during pipe producing " + e);
         }
-        if(response.getProperty(Http2Constants.HTTP2_RESPONSE_SENT)==null){
+        if (response.getProperty(Http2Constants.HTTP2_RESPONSE_SENT) == null) {
             try {
                 response.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
-                if(serverPushAccepted){
-                    org.apache.synapse.MessageContext synCtx=MessageContextCreatorForAxis2.getSynapseMessageContext(response);
+                if (serverPushAccepted) {
+                    org.apache.synapse.MessageContext synCtx = MessageContextCreatorForAxis2
+                            .getSynapseMessageContext(response);
                     if (responseSender != null) {
+                        synCtx.setProperty("stream-id", (int) msgContext.getProperty("stream-id"));
                         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
                         synCtx.setResponse(true);
-                        synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, responseSender);
+                        synCtx.setProperty(
+                                InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
+                                responseSender);
                     }
-                    injectToSequence(synCtx,dispatchSequence,errorSequence);
-                }else{
+                    injectToSequence(synCtx, dispatchSequence, errorSequence);
+                } else {
                     AxisEngine.receive(response);
                 }
-                response.setProperty(Http2Constants.HTTP2_RESPONSE_SENT,true);
+                response.setProperty(Http2Constants.HTTP2_RESPONSE_SENT, true);
             } catch (AxisFault af) {
                 log.error("Fault processing response message through Axis2", af);
             }
         }
-        if(frame.isEndStream()){
+        if (frame.isEndStream()) {
             incompleteResponses.remove(frame.streamId());
-            if(serverPushes.containsKey(frame.streamId()))
+            if (serverPushes.containsKey(frame.streamId()))
                 serverPushes.remove(frame.streamId());
         }
     }
 
-    public void onHeadersFrameRead(Http2HeadersFrame frame,MessageContext msgContext) throws AxisFault{
-        MessageContext response=null;
+    public void onHeadersFrameRead(Http2HeadersFrame frame, MessageContext msgContext)
+            throws AxisFault {
+        MessageContext response = null;
         if (incompleteResponses.containsKey(frame.streamId())) {
             response = incompleteResponses.get(frame.streamId());
         }
-        if(!serverPushAccepted) {
-             if(response==null) {
+        if (!serverPushAccepted) {
+            if (response == null) {
                 response = msgContext.getOperationContext().
                         getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
                 if (response != null) {
@@ -188,10 +198,13 @@ public class Http2ResponseReceiver {
 
             if (response.getProperty(Http2Constants.HTTP2_REQUEST_TYPE) == null) {
                 if (serverPushes.containsKey(frame.streamId())) {
-                    response.setProperty(Http2Constants.HTTP2_REQUEST_TYPE, Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
-                    response.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_HEADERS,serverPushes.get(frame.streamId()));
+                    response.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,
+                            Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
+                    response.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_HEADERS,
+                            serverPushes.get(frame.streamId()));
                 } else {
-                    response.setProperty(Http2Constants.HTTP2_REQUEST_TYPE, Http2Constants.HTTP2_CLIENT_SENT_REQEUST);
+                    response.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,
+                            Http2Constants.HTTP2_CLIENT_SENT_REQEUST);
                 }
             }
 
@@ -201,28 +214,32 @@ public class Http2ResponseReceiver {
                 response.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
                 AxisEngine.receive(response);
                 response.setProperty(Http2Constants.HTTP2_RESPONSE_SENT, true);
-                if(serverPushes.containsKey(frame.streamId()))
+                if (serverPushes.containsKey(frame.streamId()))
                     serverPushes.remove(frame.streamId());
             }
-        }else{
-            if(response==null) {
-                response=createAxis2MessageContext(tenantDomain);
-                incompleteResponses.put(frame.streamId(),response);
-               // response = ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx).getAxis2MessageContext();
+        } else {
+            if (response == null) {
+                response = createAxis2MessageContext(tenantDomain);
+                incompleteResponses.put(frame.streamId(), response);
             }
             addHeaders(null, response, frame);
 
             if (response.getProperty(Http2Constants.HTTP2_REQUEST_TYPE) == null) {
                 if (serverPushes.containsKey(frame.streamId())) {
-                    response.setProperty(Http2Constants.HTTP2_REQUEST_TYPE, Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
-                    response.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_HEADERS,serverPushes.get(frame.streamId()));
+                    response.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,
+                            Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
+                    response.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_HEADERS,
+                            serverPushes.get(frame.streamId()));
                 } else {
-                    response.setProperty(Http2Constants.HTTP2_REQUEST_TYPE, Http2Constants.HTTP2_CLIENT_SENT_REQEUST);
+                    response.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,
+                            Http2Constants.HTTP2_CLIENT_SENT_REQEUST);
                 }
             }
-            if(frame.isEndStream()) {
-                org.apache.synapse.MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(response);
+            if (frame.isEndStream()) {
+                org.apache.synapse.MessageContext synCtx = MessageContextCreatorForAxis2
+                        .getSynapseMessageContext(response);
                 if (responseSender != null) {
+                    synCtx.setProperty("stream-id", (int) msgContext.getProperty("stream-id"));
                     synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
                     synCtx.setResponse(true);
                     synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
@@ -231,42 +248,25 @@ public class Http2ResponseReceiver {
                 response.setProperty(PassThroughConstants.NO_ENTITY_BODY, Boolean.TRUE);
                 injectToSequence(synCtx, dispatchSequence, errorSequence);
                 incompleteResponses.remove(frame.streamId());
-                if(serverPushes.containsKey(frame.streamId()))
+                if (serverPushes.containsKey(frame.streamId()))
                     serverPushes.remove(frame.streamId());
             }
         }
     }
 
-    public void onPushPromiseFrameRead(Http2PushPromiseFrame frame,MessageContext msgContext){
-        /**
-         * create new context for push promise data and add to incomplete list
-         * add some property to identify its a push promise response
-         */
-   //     MessageContext pushPromiseResponse=fillMessageContext(msgContext,msgContext.getProperty(MultitenantConstants.TENANT_DOMAIN).toString());
-        /*pushPromiseResponse.setOperationContext(msgContext.getOperationContext());
-                //createAxis2MessageContext(msgContext);
-        copyAndfillMessageContext(pushPromiseResponse,msgContext);
-        //fillMessageContext(pushPromiseResponse,msgContext.getProperty(MultitenantConstants.TENANT_DOMAIN).toString());*/
-    /*    pushPromiseResponse.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_ID,frame.getPushPromiseId());
-        pushPromiseResponse.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_HEADERS,frame.getHeaders());
-        pushPromiseResponse.setProperty(Http2Constants.HTTP2_REQUEST_TYPE,Http2Constants.HTTP2_PUSH_PROMISE_REQEUST);
-        incompleteResponses.put(frame.getPushPromiseId(),pushPromiseResponse);*/
-       serverPushes.put(frame.getPushPromiseId(),frame.getHeaders());
+    public void onPushPromiseFrameRead(Http2PushPromiseFrame frame, MessageContext msgContext) {
+        serverPushes.put(frame.getPushPromiseId(), frame.getHeaders());
     }
 
-    public void  onSettingsRead(Http2Settings settings){
-
-    }
-
-    public void onUnknownFrameRead(Object frame){
-        if(log.isDebugEnabled()){
-            log.debug("unhandled frame received : "+frame.getClass().getName());
+    public void onUnknownFrameRead(Object frame) {
+        if (log.isDebugEnabled()) {
+            log.debug("unhandled frame received : " + frame.getClass().getName());
         }
     }
 
-    private String inferContentType(Map<String,String> headers,MessageContext responseMsgCtx) {
+    private String inferContentType(Map<String, String> headers, MessageContext responseMsgCtx) {
         //Check whether server sent Content-Type in different case
-       // Map<String, String> headers = response.getHeaders();
+        // Map<String, String> headers = response.getHeaders();
         for (String header : headers.keySet()) {
             if (HTTP.CONTENT_TYPE.equalsIgnoreCase(header)) {
                 return headers.get(header);
@@ -304,7 +304,8 @@ public class Http2ResponseReceiver {
         return PassThroughConstants.DEFAULT_CONTENT_TYPE;
     }
 
-    private void addHeaders(MessageContext request,MessageContext response,Http2HeadersFrame frame){
+    private void addHeaders(MessageContext request, MessageContext response,
+            Http2HeadersFrame frame) {
         Map<String, String> headers = new TreeMap<String, String>(new Comparator<String>() {
             public int compare(String o1, String o2) {
                 return o1.compareToIgnoreCase(o2);
@@ -325,16 +326,13 @@ public class Http2ResponseReceiver {
             }
         }
 
-
-
-
         String oriURL = headers.get(PassThroughConstants.LOCATION);
 
-        HttpResponseStatus status=HttpResponseStatus.parseLine(frame.headers().status());
-        if (oriURL != null && ((status.code() != HttpStatus.SC_MOVED_TEMPORARILY) && (
-                status.code() != HttpStatus.SC_MOVED_PERMANENTLY) && (status.code()
-                != HttpStatus.SC_CREATED) && (status.code() != HttpStatus.SC_SEE_OTHER) && (
-                status.code() != HttpStatus.SC_TEMPORARY_REDIRECT) && !targetConfiguration
+        HttpResponseStatus status = HttpResponseStatus.parseLine(frame.headers().status());
+        if (oriURL != null && ((status.code() != HttpStatus.SC_MOVED_TEMPORARILY) && (status.code()
+                != HttpStatus.SC_MOVED_PERMANENTLY) && (status.code() != HttpStatus.SC_CREATED) && (
+                status.code() != HttpStatus.SC_SEE_OTHER) && (status.code()
+                != HttpStatus.SC_TEMPORARY_REDIRECT) && !targetConfiguration
                 .isPreserveHttpHeader(PassThroughConstants.LOCATION))) {
             URL url;
             String urlContext = null;
@@ -349,7 +347,7 @@ public class Http2ResponseReceiver {
             }
 
             headers.remove(PassThroughConstants.LOCATION);
-            if(request!=null){
+            if (request != null) {
                 String prfix = (String) request.getProperty(PassThroughConstants.SERVICE_PREFIX);
                 if (prfix != null) {
                     if (urlContext != null && urlContext.startsWith("/")) {
@@ -367,14 +365,15 @@ public class Http2ResponseReceiver {
                 MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
         response.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
 
-        response.setProperty("PRE_LOCATION_HEADER",oriURL);
+        response.setProperty("PRE_LOCATION_HEADER", oriURL);
         // copy the important properties from the original message context
 
-        if(request!=null) {
+        if (request != null) {
 
             response.setServerSide(true);
             response.setDoingREST(request.isDoingREST());
-            response.setProperty(MessageContext.TRANSPORT_IN, request.getProperty(MessageContext.TRANSPORT_IN));
+            response.setProperty(MessageContext.TRANSPORT_IN,
+                    request.getProperty(MessageContext.TRANSPORT_IN));
             response.setTransportIn(request.getTransportIn());
             response.setTransportOut(request.getTransportOut());
 
@@ -386,25 +385,24 @@ public class Http2ResponseReceiver {
             response.setConfigurationContext(request.getConfigurationContext());
         }
 
-        if(response.getProperty(MessageContext.TRANSPORT_HEADERS)==null){
-            response.setProperty(MessageContext.TRANSPORT_HEADERS,headers);
-        }else{
-            Map existing=(Map)response.getProperty(MessageContext.TRANSPORT_HEADERS);
+        if (response.getProperty(MessageContext.TRANSPORT_HEADERS) == null) {
+            response.setProperty(MessageContext.TRANSPORT_HEADERS, headers);
+        } else {
+            Map existing = (Map) response.getProperty(MessageContext.TRANSPORT_HEADERS);
             response.removeProperty(MessageContext.TRANSPORT_HEADERS);
             existing.putAll(headers);
-            response.setProperty(MessageContext.TRANSPORT_HEADERS,existing);
+            response.setProperty(MessageContext.TRANSPORT_HEADERS, existing);
 
         }
 
-        if(response.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS)==null)
+        if (response.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS) == null)
             response.setProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS, excessHeaders);
-        else{
-            Map existing=(Map)response.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
+        else {
+            Map existing = (Map) response.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
             response.removeProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
             existing.putAll(headers);
-            response.setProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS,existing);
+            response.setProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS, existing);
         }
-
 
         if (status.code() == 202) {
             response.setProperty(AddressingConstants.
@@ -420,11 +418,13 @@ public class Http2ResponseReceiver {
         return serverPushAccepted;
     }
 
-    private static org.apache.axis2.context.MessageContext createAxis2MessageContext(String tenantDomain) throws AxisFault{
+    private static org.apache.axis2.context.MessageContext createAxis2MessageContext(
+            String tenantDomain) throws AxisFault {
         org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
         axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
-        axis2MsgCtx.setConfigurationContext(ServiceReferenceHolder.getInstance().getConfigurationContextService()
-                .getServerConfigContext());
+        axis2MsgCtx.setConfigurationContext(
+                ServiceReferenceHolder.getInstance().getConfigurationContextService()
+                        .getServerConfigContext());
         axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING,
                 Boolean.FALSE);
         axis2MsgCtx.setServerSide(true);
@@ -433,8 +433,8 @@ public class Http2ResponseReceiver {
         axis2MsgCtx.setServiceContext(svcCtx);
         axis2MsgCtx.setOperationContext(opCtx);
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            ConfigurationContext tenantConfigCtx =
-                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
+            ConfigurationContext tenantConfigCtx = TenantAxisUtils
+                    .getTenantConfigurationContext(tenantDomain,
                             axis2MsgCtx.getConfigurationContext());
             axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
             axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
@@ -448,8 +448,10 @@ public class Http2ResponseReceiver {
         return axis2MsgCtx;
     }
 
-    private void injectToSequence(org.apache.synapse.MessageContext synCtx,
-            String dispatchSequence, String dispatchErrorSequence) {
+    private void injectToSequence(org.apache.synapse.MessageContext synCtx, String dispatchSequence,
+            String dispatchErrorSequence) {
+        if (inboundChannel != null)
+            synCtx.setProperty("stream-channel", inboundChannel);
         SequenceMediator injectingSequence = null;
         if (dispatchSequence != null) {
             injectingSequence = (SequenceMediator) synCtx.getSequence(dispatchSequence);
@@ -478,5 +480,11 @@ public class Http2ResponseReceiver {
         return faultSequence;
     }
 
+    public ChannelHandlerContext getInboundChannel() {
+        return inboundChannel;
+    }
 
+    public void setInboundChannel(ChannelHandlerContext inboundChannel) {
+        this.inboundChannel = inboundChannel;
+    }
 }

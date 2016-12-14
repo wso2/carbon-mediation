@@ -92,7 +92,7 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             MessageContext prevRequest=sentRequests.get(frame.streamId());
 
             //if the inbound is not accept push requests reject them
-            if(receiver.isServerPushAccepted()){
+            if(!receiver.isServerPushAccepted()){
                 writer.writeRestSreamRequest(frame.getPushPromiseId(),Http2Error.REFUSED_STREAM);
                 return;
             }
@@ -122,6 +122,9 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
             pollReqeusts.add(request);
             return;
         }
+        if(receiver.getInboundChannel()==null)
+            receiver.setInboundChannel((ChannelHandlerContext)request.getProperty("stream-channel"));
+
         String requestType=(String)request.getProperty(Http2Constants.HTTP2_REQUEST_TYPE);
         if(requestType==null || requestType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)){
             int streamId= writer.getNextStreamId();
@@ -202,78 +205,4 @@ public class Http2ClientHandler extends ChannelDuplexHandler{
         this.targetConfiguration = targetConfiguration;
         receiver=new Http2ResponseReceiver(tenantDomain,responseSender,serverPushAccept,dispatchSequence,errorSequence,targetConfiguration);
     }
-
-    /*@Deprecated
-    public void put(int streamId, Object request) {
-
-    }
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-       if(msg instanceof Http2DataFrame){
-           handleHttp2Response((Http2Frame)msg);
-       }else if(msg instanceof Http2DataFrame){
-            handleHttp2Response((Http2Frame)msg);
-        }else{
-           handleHttpResponse((FullHttpResponse)msg);
-       }
-    }
-
-    private void handleHttp2Response(Http2Frame msg) {
-
-        log.info("Message received as a http2 frame");
-    }
-
-    private void handleHttpResponse(FullHttpResponse msg) {
-        Integer streamId = (msg).headers()
-                .getInt(HttpConversionUtil.ExtensionHeaderNames.STREAM_ID.text());
-
-        if (streamId == null) {
-            log.error("unexpected message received: " + msg);
-            return;
-        }
-        MessageContext request = requests.get(streamId);
-        if (request == null) {
-            log.error("Message received without a request");
-            return;
-        }
-        log.info("Respond received for stream id:" + streamId);
-        Http2Response response;
-        if (responseMap.containsKey(streamId)) {
-            response = responseMap.get(streamId);
-        } else {
-            FullHttpResponse res = (FullHttpResponse) msg;
-            response = new Http2Response(res);
-            responseMap.put(streamId, response);
-        }
-        if (response.isEndOfStream()) {
-            Http2ClientWorker clientWorker = new Http2ClientWorker(targetConfig, request, response);
-            clientWorker.injectToAxis2Engine();
-            requests.remove(streamId);
-            responseMap.remove(streamId);
-            streamidPromiseMap.remove(streamId);
-        }
-
-    }
-
-    public int getStreamId() {
-        int returnId = currentStreamId;
-        if (currentStreamId > Integer.MAX_VALUE - 10) {   //Max stream_id is Integer.Max-10
-            streamIdOverflow = true;
-        }
-        currentStreamId += 2;
-        return returnId;
-    }
-
-    public boolean isStreamIdOverflow() {
-        return streamIdOverflow;
-    }
-
-    public synchronized void setRequest(int streamId, MessageContext msgCtx) {
-        requests.put(streamId, msgCtx);
-    }
-
-    public void setTargetConfig(TargetConfiguration targetConfiguration) {
-        this.targetConfig = targetConfiguration;
-    }*/
 }

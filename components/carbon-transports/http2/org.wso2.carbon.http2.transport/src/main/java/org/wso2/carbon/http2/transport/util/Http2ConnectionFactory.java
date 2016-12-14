@@ -69,14 +69,14 @@ public class Http2ConnectionFactory {
         return factory;
     }
 
-    public Http2ClientHandler getChannelHandler(HttpHost uri,ChannelId channelId) {
+    public Http2ClientHandler getChannelHandler(HttpHost uri,String channelId) {
         Http2ClientHandler handler;
         Map conns=null;
-        if (clientConnections.containsKey(channelId.asShortText()))
-            conns=clientConnections.get(channelId.asShortText());
+        if (clientConnections.containsKey(channelId))
+            conns=clientConnections.get(channelId);
         if(conns==null){
             conns= new TreeMap<String, Http2ClientHandler>();
-            clientConnections.put(channelId.asShortText(),conns);
+            clientConnections.put(channelId,conns);
         }
         handler = getClientHandlerFromPool(uri,conns);
         if (handler == null) {

@@ -105,12 +105,12 @@ public class Http2TransportSender extends AbstractTransportSender {
             msgCtx.setProperty(Http2Constants.PASSTHROUGH_TARGET,util);
 
 
-            ChannelHandlerContext channelCtx = (ChannelHandlerContext) msgCtx
+            ChannelHandlerContext channelCtx =(msgCtx.getProperty("stream-channel")==null)?null: (ChannelHandlerContext) msgCtx
                     .getProperty("stream-channel");
+            String channelId=(channelCtx!=null)?channelCtx.channel().id().asShortText():msgCtx.getMessageID();
 
             Http2ClientHandler clientHandler = connectionFactory
-                    .getChannelHandler(target, channelCtx.channel().id());
-
+                    .getChannelHandler(target, channelId);
 
             String tenantDomain=(msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN)==null)?null:(String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
             String dispatchSequence=(msgCtx.getProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE)==null)?null:(String) msgCtx.getProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE);
