@@ -136,6 +136,7 @@ public class Http2ResponseReceiver {
                     org.apache.synapse.MessageContext synCtx=MessageContextCreatorForAxis2.getSynapseMessageContext(response);
                     if (responseSender != null) {
                         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
+                        synCtx.setResponse(true);
                         synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER, responseSender);
                     }
                     injectToSequence(synCtx,dispatchSequence,errorSequence);
@@ -223,6 +224,7 @@ public class Http2ResponseReceiver {
                 org.apache.synapse.MessageContext synCtx = MessageContextCreatorForAxis2.getSynapseMessageContext(response);
                 if (responseSender != null) {
                     synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
+                    synCtx.setResponse(true);
                     synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
                             responseSender);
                 }

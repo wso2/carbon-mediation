@@ -135,7 +135,7 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
         org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager
                 .getInstance().registerEventExecutor(port, eventExecutor);
         ServerBootstrap b = new ServerBootstrap();
-        b.option(ChannelOption.SO_BACKLOG, config.getSoBacklog());
+        b.option(ChannelOption.SO_BACKLOG, 1024);
         b.group(eventExecutor.getBossGroupThreadPool(), eventExecutor.getWorkerGroupThreadPool())
                 .channel(NioServerSocketChannel.class).handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new InboundHttp2ServerInitializer(null, config));

@@ -29,6 +29,11 @@ import org.wso2.carbon.http2.transport.service.Https2TransportService;
 import org.wso2.carbon.http2.transport.service.ServiceReferenceHolder;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
+/**
+ * @scr.component name="http2.transport.services" immediate="true"
+ * @scr.reference name="config.context.service" interface="org.wso2.carbon.utils.ConfigurationContextService"
+ * cardinality="1..1" policy="dynamic"  bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
+ */
 public class Http2TransportServiceComponent {
     private static Log log = LogFactory.getLog(Http2TransportServiceComponent.class);
 
