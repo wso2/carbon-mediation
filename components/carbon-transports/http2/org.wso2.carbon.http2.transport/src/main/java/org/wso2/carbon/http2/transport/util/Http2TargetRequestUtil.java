@@ -124,7 +124,7 @@ public class Http2TargetRequestUtil {
             if(headers != null) {
                 Map headersMap = (Map) headers;
                 if (!headersMap.containsKey(HTTPConstants.HEADER_HOST)) {
-                    headersMap.put(HTTPConstants.HEADER_HOST
+                    headersMap.put(HttpHeaderNames.HOST
                             , msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
                 }
             }
@@ -184,7 +184,7 @@ public class Http2TargetRequestUtil {
                     if (msgCtxheaders != null && !cType.isEmpty()) {
                         msgCtxheaders.put(HTTP.CONTENT_TYPE, cType);
                     }
-                    http2Headers.add(HTTP.CONTENT_TYPE, cType);
+                    http2Headers.add(HttpHeaderNames.CONTENT_TYPE, cType);
                 }
 
                 // if messageType is related to multipart and if message
@@ -193,11 +193,11 @@ public class Http2TargetRequestUtil {
                 if (builderInvoked
                         && (((messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED) != -1)
                         || (messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA) != -1)))) {
-                    http2Headers.add(HTTP.CONTENT_TYPE, cType);
+                    http2Headers.add(HttpHeaderNames.CONTENT_TYPE, cType);
                 }
 
             } else {
-                http2Headers.add(HTTP.CONTENT_TYPE, cType);
+                http2Headers.add(HttpHeaderNames.CONTENT_TYPE, cType);
             }
 
         }
@@ -240,7 +240,7 @@ public class Http2TargetRequestUtil {
                 String key = (String) iterator.next();
                 for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
                     if(!http2Headers.contains(key))
-                        http2Headers.add(key, (String) excessVal);
+                        http2Headers.add(key.toLowerCase(), (String) excessVal);
                 }
             }
         }
@@ -268,7 +268,7 @@ public class Http2TargetRequestUtil {
                         }
 
                     }
-                    http2Headers.remove(HTTP.CONTENT_TYPE);
+                    http2Headers.remove(HttpHeaderNames.CONTENT_TYPE);
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -289,13 +289,13 @@ public class Http2TargetRequestUtil {
         if(hasEntityBody){
                 long contentLength = -1;
                 String contentLengthHeader = null;
-                if(http2Headers.get(HTTP.CONTENT_LEN) != null && Integer.parseInt(http2Headers.get(HTTP.CONTENT_LEN).toString()) > 0) {
-                    contentLengthHeader = http2Headers.get(HTTP.CONTENT_LEN).toString();
+                if(http2Headers.get(HttpHeaderNames.CONTENT_LENGTH) != null && Integer.parseInt(http2Headers.get(HttpHeaderNames.CONTENT_LENGTH).toString()) > 0) {
+                    contentLengthHeader = http2Headers.get(HttpHeaderNames.CONTENT_LENGTH).toString();
                 }
 
                 if (contentLengthHeader != null) {
                     contentLength = Integer.parseInt(contentLengthHeader);
-                    http2Headers.remove(HTTP.CONTENT_LEN);
+                    http2Headers.remove(HttpHeaderNames.CONTENT_LENGTH);
                 }
 
                 //MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
@@ -335,7 +335,7 @@ public class Http2TargetRequestUtil {
             }
             MessageFormatter messageFormatter =
                     MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
-            http2Headers.add(HTTPConstants.HEADER_SOAP_ACTION,
+            http2Headers.add(HTTPConstants.HEADER_SOAP_ACTION.toLowerCase(),
                     messageFormatter.formatSOAPAction(msgContext, null, soapAction));
             //request.setHeader(HTTPConstants.USER_AGENT,"Synapse-PT-HttpComponents-NIO");
         }
