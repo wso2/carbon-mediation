@@ -86,15 +86,15 @@ public class Http2TargetRequestUtil {
 
     public Http2Headers getHeaders(MessageContext msgContext){
         Http2Headers http2Headers=new DefaultHttp2Headers();
-      //  Map<String,String> reqeustHeaders=new TreeMap<>();
+        Map<String,String> reqeustHeaders=new TreeMap<>();
 
         String httpMethod = (String) msgContext.getProperty(
                 Constants.Configuration.HTTP_METHOD);
         if (httpMethod == null) {
             httpMethod = "POST";
         }
-        http2Headers.method(httpMethod);
-
+        //http2Headers.method(httpMethod);
+        reqeustHeaders.put(Http2Headers.PseudoHeaderName.METHOD.value().toString(),httpMethod);
         // basic request
         Boolean noEntityBody = (Boolean) msgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY);
 
@@ -145,14 +145,17 @@ public class Http2TargetRequestUtil {
                     if (HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())
                             && !configuration.isPreserveHttpHeader(HTTPConstants.HEADER_HOST)) {
                         if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
-                            if(!http2Headers.contains((String)entry.getKey()))
-                                http2Headers.add(((String) entry.getKey()).toLowerCase(),
+                                reqeustHeaders.put(((String) entry.getKey()).toLowerCase(),
                                     (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
                         }
 
                     } else {
-                        if(!http2Headers.contains((String)entry.getKey()) && !defaultHttp2Headers.contains((String)entry.getKey()))
-                            http2Headers.add(((String) entry.getKey()).toLowerCase(), (String) entry.getValue());
+                        if(!defaultHttp2Headers.contains(entry.getKey()))
+                            reqeustHeaders.put(((String) entry.getKey()).toLowerCase(), (String) entry.getValue());
+                        else{
+                            String keyV=":"+entry.getKey().toString().toLowerCase();
+                            reqeustHeaders.put(keyV,(String) entry.getValue());
+                        }
                     }
                 }
             }
@@ -184,7 +187,7 @@ public class Http2TargetRequestUtil {
                     if (msgCtxheaders != null && !cType.isEmpty()) {
                         msgCtxheaders.put(HTTP.CONTENT_TYPE, cType);
                     }
-                    http2Headers.add(HttpHeaderNames.CONTENT_TYPE, cType);
+                    reqeustHeaders.put(HttpHeaderNames.CONTENT_TYPE.toString(), cType);
                 }
 
                 // if messageType is related to multipart and if message
@@ -193,11 +196,11 @@ public class Http2TargetRequestUtil {
                 if (builderInvoked
                         && (((messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED) != -1)
                         || (messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA) != -1)))) {
-                    http2Headers.add(HttpHeaderNames.CONTENT_TYPE, cType);
+                    reqeustHeaders.put(HttpHeaderNames.CONTENT_TYPE.toString(), cType);
                 }
 
             } else {
-                http2Headers.add(HttpHeaderNames.CONTENT_TYPE, cType);
+                reqeustHeaders.put(HttpHeaderNames.CONTENT_TYPE.toString(), cType);
             }
 
         }
@@ -239,8 +242,7 @@ public class Http2TargetRequestUtil {
             for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
                 String key = (String) iterator.next();
                 for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
-                    if(!http2Headers.contains(key))
-                        http2Headers.add(key.toLowerCase(), (String) excessVal);
+                        reqeustHeaders.put(key.toLowerCase(), (String) excessVal);
                 }
             }
         }
@@ -268,7 +270,8 @@ public class Http2TargetRequestUtil {
                         }
 
                     }
-                    http2Headers.remove(HttpHeaderNames.CONTENT_TYPE);
+                    if(reqeustHeaders.containsKey(HttpHeaderNames.CONTENT_TYPE))
+                        reqeustHeaders.remove(HttpHeaderNames.CONTENT_TYPE);
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -282,20 +285,19 @@ public class Http2TargetRequestUtil {
         }
 
         if(path!=null || !path.isEmpty()){
-            if(!http2Headers.contains(Http2Headers.PseudoHeaderName.PATH.value()))
-                http2Headers.path(path);
+                reqeustHeaders.put(Http2Headers.PseudoHeaderName.PATH.value().toString(),path);
         }
 
         if(hasEntityBody){
                 long contentLength = -1;
                 String contentLengthHeader = null;
-                if(http2Headers.get(HttpHeaderNames.CONTENT_LENGTH) != null && Integer.parseInt(http2Headers.get(HttpHeaderNames.CONTENT_LENGTH).toString()) > 0) {
-                    contentLengthHeader = http2Headers.get(HttpHeaderNames.CONTENT_LENGTH).toString();
+                if(reqeustHeaders.containsKey(HttpHeaderNames.CONTENT_LENGTH.toString())&& Integer.parseInt(reqeustHeaders.get(HttpHeaderNames.CONTENT_LENGTH).toString()) > 0) {
+                    contentLengthHeader = reqeustHeaders.get(HttpHeaderNames.CONTENT_LENGTH).toString();
                 }
 
                 if (contentLengthHeader != null) {
                     contentLength = Integer.parseInt(contentLengthHeader);
-                    http2Headers.remove(HttpHeaderNames.CONTENT_LENGTH);
+                    reqeustHeaders.remove(HttpHeaderNames.CONTENT_LENGTH);
                 }
 
                 //MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
@@ -311,11 +313,11 @@ public class Http2TargetRequestUtil {
 
             if (forceContentLength) {
                 if (forceContentLengthCopy && contentLength > 0) {
-                    http2Headers.add(HttpHeaderNames.CONTENT_LENGTH,Long.toString(contentLength));
+                    reqeustHeaders.put(HttpHeaderNames.CONTENT_LENGTH.toString(),Long.toString(contentLength));
                 }
             }else{
                 if (contentLength != -1) {
-                    http2Headers.add(HttpHeaderNames.CONTENT_LENGTH,Long.toString(contentLength));
+                    reqeustHeaders.put(HttpHeaderNames.CONTENT_LENGTH.toString(),Long.toString(contentLength));
                 }
             }
         }
@@ -329,24 +331,29 @@ public class Http2TargetRequestUtil {
         if (msgContext.isSOAP11() && soapAction != null &&
                 soapAction.length() > 0) {
             String existingHeader =
-                    http2Headers.get(HTTPConstants.HEADER_SOAP_ACTION).toString();
+                    reqeustHeaders.get(HTTPConstants.HEADER_SOAP_ACTION).toString();
             if (existingHeader != null) {
-                http2Headers.remove(existingHeader);
+                reqeustHeaders.remove(existingHeader);
             }
             MessageFormatter messageFormatter =
                     MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
-            http2Headers.add(HTTPConstants.HEADER_SOAP_ACTION.toLowerCase(),
+            reqeustHeaders.put(HTTPConstants.HEADER_SOAP_ACTION.toLowerCase(),
                     messageFormatter.formatSOAPAction(msgContext, null, soapAction));
             //request.setHeader(HTTPConstants.USER_AGENT,"Synapse-PT-HttpComponents-NIO");
         }
 
-        if(http2Headers.contains(HttpHeaderNames.HOST)){
-            http2Headers.remove(HttpHeaderNames.HOST);
+        if(reqeustHeaders.containsKey(HttpHeaderNames.HOST)){
+            reqeustHeaders.remove(HttpHeaderNames.HOST);
         }
-        if(!http2Headers.contains(Http2Headers.PseudoHeaderName.SCHEME.value()))
-            http2Headers.scheme(route.getTargetHost().getSchemeName());
-        if(!http2Headers.contains(Http2Headers.PseudoHeaderName.AUTHORITY.value()))
-            http2Headers.authority(route.getTargetHost().toString());
+        if(!reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.SCHEME.value()))
+            reqeustHeaders.put(Http2Headers.PseudoHeaderName.SCHEME.value().toString(),route.getTargetHost().getSchemeName());
+        if(!reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.AUTHORITY.value()))
+            reqeustHeaders.put(Http2Headers.PseudoHeaderName.AUTHORITY.value().toString(),route.getTargetHost().toString());
+        Iterator<Map.Entry<String,String>> iterator=reqeustHeaders.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<String,String> head=iterator.next();
+            http2Headers.add(head.getKey(),head.getValue());
+        }
         return http2Headers;
     }
 

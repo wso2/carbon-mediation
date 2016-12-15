@@ -1,6 +1,7 @@
 package org.wso2.carbon.http2.transport.util;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http2.Http2DataFrame;
@@ -296,7 +297,7 @@ public class Http2ResponseReceiver {
         // When the response from backend does not have the body(Content-Length is 0 )
         // and Content-Type is not set;
         // ESB should not do any modification to the response and pass-through as it is.
-        if (headers.get(HTTP.CONTENT_LEN) == null || "0".equals(headers.get(HTTP.CONTENT_LEN))) {
+        if (headers.get(HttpHeaderNames.CONTENT_LENGTH) == null || "0".equals(headers.get(HttpHeaderNames.CONTENT_LENGTH))) {
             return null;
         }
 

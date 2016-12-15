@@ -35,6 +35,7 @@ import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.http.conn.ProxyConfig;
 import org.apache.synapse.transport.nhttp.config.ProxyConfigBuilder;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
+import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.wso2.carbon.http2.transport.util.Http2ClientHandler;
 import org.wso2.carbon.http2.transport.util.Http2ConnectionFactory;
@@ -103,6 +104,13 @@ public class Http2TransportSender extends AbstractTransportSender {
             }
             Http2TargetRequestUtil util=new Http2TargetRequestUtil(targetConfiguration,route);
             msgCtx.setProperty(Http2Constants.PASSTHROUGH_TARGET,util);
+
+            if (msgCtx.getProperty(PassThroughConstants.PASS_THROUGH_PIPE) == null) {
+                Pipe pipe = new Pipe(targetConfiguration.getBufferFactory().getBuffer(),
+                        "Test", targetConfiguration);
+                msgCtx.setProperty(PassThroughConstants.PASS_THROUGH_PIPE, pipe);
+                msgCtx.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
+            }
 
 
             ChannelHandlerContext channelCtx =(msgCtx.getProperty("stream-channel")==null)?null: (ChannelHandlerContext) msgCtx

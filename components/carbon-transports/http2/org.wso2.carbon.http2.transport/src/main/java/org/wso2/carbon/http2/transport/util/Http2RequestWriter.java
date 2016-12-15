@@ -25,10 +25,19 @@ import io.netty.handler.codec.http2.Http2Connection;
 import io.netty.handler.codec.http2.Http2ConnectionEncoder;
 import io.netty.handler.codec.http2.Http2Error;
 import io.netty.handler.codec.http2.Http2Headers;
+import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.context.MessageContext;
+import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.util.MessageProcessorSelector;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
+import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
 public class Http2RequestWriter {
 
@@ -52,6 +61,14 @@ public class Http2RequestWriter {
             if (pipe != null) {
                 pipe.attachConsumer(new Http2CosumerIoControl());
                 try {
+                    if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(msgContext);
+                        OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
+                        formatter.writeTo(msgContext, format, out, false);
+                        OutputStream _out = pipe.getOutputStream();
+                        IOUtils.write(out.toByteArray(), _out);
+                    }
                     int t = pipe.consume(pipeEncoder);
                 }catch (Exception e){
                     log.error(e);
