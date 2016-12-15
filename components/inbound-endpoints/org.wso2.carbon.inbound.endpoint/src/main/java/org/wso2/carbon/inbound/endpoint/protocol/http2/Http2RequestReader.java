@@ -116,15 +116,7 @@ public class Http2RequestReader {
     }
 
     public void onGoAwayRead(Http2GoAwayFrame frame) {
-        Http2SourceRequest request = new Http2SourceRequest(frame.lastStreamId(), chContext);
-        request.setRequestType(Http2Constants.HTTP2_GO_AWAY_REQUEST);
-        try {
-            messageHandler.processRequest(request);
-        } catch (Exception e) {
-            log.error(e);
-        }
-        chContext.executor().shutdownGracefully();
-
+        chContext.close();
     }
 
     public void onRstSteamRead(Http2ResetFrame frame) {

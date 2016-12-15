@@ -28,6 +28,8 @@ import io.netty.handler.codec.http2.Http2ConnectionEncoder;
 import io.netty.handler.codec.http2.Http2Headers;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.util.MessageProcessorSelector;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHeaders;
@@ -38,13 +40,17 @@ import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
+import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
+import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.caching.CachingConstants;
 import org.wso2.caching.digest.DigestGenerator;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundMessageHandler;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -56,13 +62,20 @@ public class Http2ResponseWriter {
     Http2Connection connection;
     Http2ConnectionEncoder encoder;
     ChannelHandlerContext chContext; //this can be taken from msgcontext
+    private SourceConfiguration sourceConfiguration;
 
     public void writeNormalResponse(MessageContext synCtx) {
         org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) synCtx)
                 .getAxis2MessageContext();
         Http2Headers transportHeaders = new DefaultHttp2Headers();
+        try{
+            sourceConfiguration = PassThroughInboundEndpointHandler
+                    .getPassThroughSourceConfiguration();
+        }catch (Exception e){
+            log.error("Error while building sourceConfiguration "+e);
+        }
 
-        if (msgContext.getProperty(PassThroughConstants.HTTP_ETAG_ENABLED) != null
+        /*if (msgContext.getProperty(PassThroughConstants.HTTP_ETAG_ENABLED) != null
                 && (Boolean) msgContext.getProperty(PassThroughConstants.HTTP_ETAG_ENABLED)) {
 
             try {
@@ -83,7 +96,9 @@ public class Http2ResponseWriter {
                 Map.Entry<String, String> head = iterator.next();
                 transportHeaders.add(head.getKey(), head.getValue());
             }
-        }
+        }*/
+
+        //status
         try {
             int statusCode = PassThroughTransportUtils.determineHttpStatusCode(msgContext);
             if (statusCode > 0) {
@@ -93,6 +108,30 @@ public class Http2ResponseWriter {
         } catch (Exception e) {
             log.error(e);
         }
+        //content_type
+        Boolean noEntityBody = msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY) != null ?
+                (boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY) :
+                null;
+        if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
+            Pipe pipe=(Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+            if (pipe == null) {
+                pipe = new Pipe(sourceConfiguration.getBufferFactory().getBuffer(),
+                        "Test", sourceConfiguration);
+                msgContext.setProperty(PassThroughConstants.PASS_THROUGH_PIPE, pipe);
+                msgContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
+            }
+
+            OMOutputFormat format = NhttpUtil.getOMOutputFormat(msgContext);
+            MessageFormatter messageFormatter = MessageFormatterDecoratorFactory
+                    .createMessageFormatterDecorator(msgContext);
+            if (msgContext.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE)
+                    == null) {
+                transportHeaders.add(HttpHeaderNames.CONTENT_TYPE, messageFormatter
+                        .getContentType(msgContext, format, msgContext.getSoapAction()));
+            }
+        }
+
+
 
         if (transportHeaders != null
                 && msgContext.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE)
@@ -106,26 +145,16 @@ public class Http2ResponseWriter {
             } else {
                 Pipe pipe = (Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
                 if (pipe != null && !Boolean.TRUE.equals(msgContext
-                        .getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+                        .getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED)) && msgContext
+                        .getProperty(org.apache.axis2.Constants.Configuration.CONTENT_TYPE)!=null) {
                     transportHeaders.add(HttpHeaderNames.CONTENT_TYPE, msgContext
                             .getProperty(org.apache.axis2.Constants.Configuration.CONTENT_TYPE)
                             .toString());
                 }
             }
         }
-        Boolean noEntityBody = msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY) != null ?
-                (boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY) :
-                null;
-        if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
-            OMOutputFormat format = NhttpUtil.getOMOutputFormat(msgContext);
-            MessageFormatter messageFormatter = MessageFormatterDecoratorFactory
-                    .createMessageFormatterDecorator(msgContext);
-            if (msgContext.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE)
-                    == null) {
-                transportHeaders.add(HttpHeaderNames.CONTENT_TYPE, messageFormatter
-                        .getContentType(msgContext, format, msgContext.getSoapAction()));
-            }
-        }
+
+        //Excess headers
         String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
         Map excessHeaders = msgContext.getProperty(excessProp) == null ?
                 null :
@@ -134,7 +163,7 @@ public class Http2ResponseWriter {
             for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext(); ) {
                 String key = (String) iterator.next();
                 for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
-                    transportHeaders.add(key, (String) excessVal);
+                    transportHeaders.add(key.toLowerCase(), (String) excessVal);
                 }
             }
         }
@@ -154,6 +183,9 @@ public class Http2ResponseWriter {
         } else
             hasBody = true;
 
+
+
+
         int streamId = (int) synCtx.getProperty("stream-id");
         ChannelHandlerContext c = (ChannelHandlerContext) synCtx.getProperty("stream-channel");
         if (c == null) {
@@ -170,6 +202,14 @@ public class Http2ResponseWriter {
             if (pipe != null) {
                 pipe.attachConsumer(new Http2CosumerIoControl());
                 try {
+                    if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(msgContext);
+                        OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
+                        formatter.writeTo(msgContext, format, out, false);
+                        OutputStream _out = pipe.getOutputStream();
+                        IOUtils.write(out.toByteArray(), _out);
+                    }
                     int t = pipe.consume(pipeEncoder);
                 } catch (Exception e) {
                     log.error(e);
