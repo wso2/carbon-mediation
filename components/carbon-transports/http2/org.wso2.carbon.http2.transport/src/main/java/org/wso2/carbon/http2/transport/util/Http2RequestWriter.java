@@ -61,10 +61,13 @@ public class Http2RequestWriter {
             if (pipe != null) {
                 pipe.attachConsumer(new Http2CosumerIoControl());
                 try {
-                    if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+                    if (Boolean.TRUE.equals(msgContext
+                            .getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(msgContext);
-                        OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
+                        MessageFormatter formatter = MessageProcessorSelector
+                                .getMessageFormatter(msgContext);
+                        OMOutputFormat format = PassThroughTransportUtils
+                                .getOMOutputFormat(msgContext);
                         formatter.writeTo(msgContext, format, out, false);
                         OutputStream _out = pipe.getOutputStream();
                         IOUtils.write(out.toByteArray(), _out);

@@ -31,7 +31,6 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.axis2.transport.http.SOAPMessageFormatter;
 import org.apache.axis2.util.MessageProcessorSelector;
 import org.apache.http.HttpRequest;
-import org.apache.http.HttpVersion;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.protocol.HTTP;
@@ -39,8 +38,6 @@ import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
-import org.apache.synapse.transport.passthru.TargetContext;
-import org.apache.synapse.transport.passthru.TargetRequest;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 
@@ -58,55 +55,94 @@ public class Http2TargetRequestUtil {
     TargetConfiguration configuration;
     HttpRoute route;
     private URL url;
-    /** HTTP Method */
+    /**
+     * HTTP Method
+     */
     private String method;
-    /** HTTP request created for sending the message */
+    /**
+     * HTTP request created for sending the message
+     */
     private HttpRequest request = null;
-    /** Weather chunk encoding should be used */
+    /**
+     * Weather chunk encoding should be used
+     */
     private boolean chunk = true;
-    /** HTTP version that should be used */
+    /**
+     * HTTP version that should be used
+     */
     private ProtocolVersion version = null;
-    /** Weather full url is used for the request */
+    /**
+     * Weather full url is used for the request
+     */
     private boolean fullUrl = false;
-    /** Port to be used for the request */
+    /**
+     * Port to be used for the request
+     */
     private int port = 80;
-    /** Weather this request has a body */
+    /**
+     * Weather this request has a body
+     */
     private boolean hasEntityBody = true;
-    /** Keep alive request */
+    /**
+     * Keep alive request
+     */
     private boolean keepAlive = true;
-    private boolean disableChunk=false;
-    private String [] http2headerNames={"method","authority","path","scheme","status"};
-    private Set<String> defaultHttp2Headers=new HashSet(Arrays.asList(http2headerNames));
+    private boolean disableChunk = false;
+    private String[] http2headerNames = { "method", "authority", "path", "scheme", "status" };
+    private Set<String> defaultHttp2Headers = new HashSet(Arrays.asList(http2headerNames));
 
-    public Http2TargetRequestUtil(TargetConfiguration configuration,HttpRoute route) {
-        this.configuration=configuration;
-        this.route=route;
+    public Http2TargetRequestUtil(TargetConfiguration configuration, HttpRoute route) {
+        this.configuration = configuration;
+        this.route = route;
 
     }
 
-    public Http2Headers getHeaders(MessageContext msgContext){
-        Http2Headers http2Headers=new DefaultHttp2Headers();
-        Map<String,String> reqeustHeaders=new TreeMap<>();
+    private static String getContentType(MessageContext msgCtx,
+            boolean isContentTypePreservedHeader) throws AxisFault {
 
-        String httpMethod = (String) msgContext.getProperty(
-                Constants.Configuration.HTTP_METHOD);
+        if (isContentTypePreservedHeader) {
+            if (msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE) != null) {
+                return (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
+            } else if (msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE) != null) {
+                return (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
+            }
+        }
+
+        MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgCtx);
+        OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgCtx);
+
+        if (formatter != null) {
+            String contentType = formatter.getContentType(msgCtx, format, msgCtx.getSoapAction());
+            //keep the formatter information to prevent multipart boundary override (this will be the content writing to header)
+            msgCtx.setProperty(PassThroughConstants.MESSAGE_OUTPUT_FORMAT, format);
+            return contentType;
+
+        } else {
+            String contentType = (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
+            if (contentType != null) {
+                return contentType;
+            } else {
+                return new SOAPMessageFormatter()
+                        .getContentType(msgCtx, format, msgCtx.getSoapAction());
+            }
+        }
+    }
+
+    public Http2Headers getHeaders(MessageContext msgContext) {
+        Http2Headers http2Headers = new DefaultHttp2Headers();
+        Map<String, String> reqeustHeaders = new TreeMap<>();
+
+        String httpMethod = (String) msgContext.getProperty(Constants.Configuration.HTTP_METHOD);
         if (httpMethod == null) {
             httpMethod = "POST";
         }
-        //http2Headers.method(httpMethod);
-        reqeustHeaders.put(Http2Headers.PseudoHeaderName.METHOD.value().toString(),httpMethod);
-        // basic request
-        Boolean noEntityBody = (Boolean) msgContext.getProperty(PassThroughConstants.NO_ENTITY_BODY);
-
-        if(msgContext.getEnvelope().getBody().getFirstElement() != null){
-            noEntityBody  =false;
-        }
+        reqeustHeaders.put(Http2Headers.PseudoHeaderName.METHOD.value().toString(), httpMethod);
 
         EndpointReference epr = PassThroughTransportUtils.getDestinationEPR(msgContext);
-        String targetEPR=epr.getAddress();
+        String targetEPR = epr.getAddress();
         if (targetEPR.toLowerCase().contains("http2://")) {
             targetEPR = targetEPR.replaceFirst("http2://", "http://");
-        }else if (targetEPR.toLowerCase().contains("https2://")) {
+        } else if (targetEPR.toLowerCase().contains("https2://")) {
             targetEPR = targetEPR.replaceFirst("https2://", "https://");
         }
         epr.setAddress(targetEPR);
@@ -121,11 +157,11 @@ public class Http2TargetRequestUtil {
         //otherwise Host header will not replaced after first call
         if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
             Object headers = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
-            if(headers != null) {
+            if (headers != null) {
                 Map headersMap = (Map) headers;
                 if (!headersMap.containsKey(HTTPConstants.HEADER_HOST)) {
-                    headersMap.put(HttpHeaderNames.HOST
-                            , msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
+                    headersMap.put(HttpHeaderNames.HOST,
+                            msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
                 }
             }
         }
@@ -133,28 +169,29 @@ public class Http2TargetRequestUtil {
         // headers
         PassThroughTransportUtils.removeUnwantedHeaders(msgContext, configuration);
 
-
         Object o = msgContext.getProperty(MessageContext.TRANSPORT_HEADERS);
 
         if (o != null && o instanceof Map) {
             Map headers = (Map) o;
             for (Object entryObj : headers.entrySet()) {
                 Map.Entry entry = (Map.Entry) entryObj;
-                if (entry.getValue() != null && entry.getKey() instanceof String &&
-                        entry.getValue() instanceof String) {
+                if (entry.getValue() != null && entry.getKey() instanceof String && entry
+                        .getValue() instanceof String) {
                     if (HTTPConstants.HEADER_HOST.equalsIgnoreCase((String) entry.getKey())
                             && !configuration.isPreserveHttpHeader(HTTPConstants.HEADER_HOST)) {
                         if (msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER) != null) {
-                                reqeustHeaders.put(((String) entry.getKey()).toLowerCase(),
-                                    (String) msgContext.getProperty(NhttpConstants.REQUEST_HOST_HEADER));
+                            reqeustHeaders.put(((String) entry.getKey()).toLowerCase(),
+                                    (String) msgContext
+                                            .getProperty(NhttpConstants.REQUEST_HOST_HEADER));
                         }
 
                     } else {
-                        if(!defaultHttp2Headers.contains(entry.getKey()))
-                            reqeustHeaders.put(((String) entry.getKey()).toLowerCase(), (String) entry.getValue());
-                        else{
-                            String keyV=":"+entry.getKey().toString().toLowerCase();
-                            reqeustHeaders.put(keyV,(String) entry.getValue());
+                        if (!defaultHttp2Headers.contains(entry.getKey()))
+                            reqeustHeaders.put(((String) entry.getKey()).toLowerCase(),
+                                    (String) entry.getValue());
+                        else {
+                            String keyV = ":" + entry.getKey().toString().toLowerCase();
+                            reqeustHeaders.put(keyV, (String) entry.getValue());
                         }
                     }
                 }
@@ -163,7 +200,8 @@ public class Http2TargetRequestUtil {
 
         String cType = null;
         try {
-            cType = getContentType(msgContext, configuration.isPreserveHttpHeader(HTTP.CONTENT_TYPE));
+            cType = getContentType(msgContext,
+                    configuration.isPreserveHttpHeader(HTTP.CONTENT_TYPE));
         } catch (AxisFault axisFault) {
             axisFault.printStackTrace();
         }
@@ -182,7 +220,8 @@ public class Http2TargetRequestUtil {
                 // not get build we should
                 // skip of setting formatter specific content Type
                 if (messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED) == -1
-                        && messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA) == -1) {
+                        && messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA)
+                        == -1) {
                     Map msgCtxheaders = (Map) o;
                     if (msgCtxheaders != null && !cType.isEmpty()) {
                         msgCtxheaders.put(HTTP.CONTENT_TYPE, cType);
@@ -193,9 +232,10 @@ public class Http2TargetRequestUtil {
                 // if messageType is related to multipart and if message
                 // already built we need to set new
                 // boundary related content type at Content-Type header
-                if (builderInvoked
-                        && (((messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED) != -1)
-                        || (messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA) != -1)))) {
+                if (builderInvoked && ((
+                        (messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_RELATED) != -1) || (
+                                messageType.indexOf(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA)
+                                        != -1)))) {
                     reqeustHeaders.put(HttpHeaderNames.CONTENT_TYPE.toString(), cType);
                 }
 
@@ -214,110 +254,110 @@ public class Http2TargetRequestUtil {
         // keep alive
         String noKeepAlie = (String) msgContext.getProperty(PassThroughConstants.NO_KEEPALIVE);
         if ("true".equals(noKeepAlie)) {
-            keepAlive=false;
+            keepAlive = false;
         }
 
         // port
         port = url.getPort();
 
-
-
         // chunk
-        String disableChunking = (String) msgContext.getProperty(
-                PassThroughConstants.DISABLE_CHUNKING);
+        String disableChunking = (String) msgContext
+                .getProperty(PassThroughConstants.DISABLE_CHUNKING);
         if ("true".equals(disableChunking)) {
-            disableChunk=true;
+            disableChunk = true;
         }
 
         // full url
         String fullUr = (String) msgContext.getProperty(PassThroughConstants.FULL_URI);
         if ("true".equals(fullUr)) {
-            fullUrl=true;
+            fullUrl = true;
         }
 
         // Add excess respsonse header.
         String excessProp = NhttpConstants.EXCESS_TRANSPORT_HEADERS;
         Map excessHeaders = (Map) msgContext.getProperty(excessProp);
         if (excessHeaders != null) {
-            for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext();) {
+            for (Iterator iterator = excessHeaders.keySet().iterator(); iterator.hasNext(); ) {
                 String key = (String) iterator.next();
                 for (String excessVal : (Collection<String>) excessHeaders.get(key)) {
-                        reqeustHeaders.put(key.toLowerCase(), (String) excessVal);
+                    reqeustHeaders.put(key.toLowerCase(), (String) excessVal);
                 }
             }
         }
         String path = fullUrl || (route.getProxyHost() != null && !route.isTunnelled()) ?
-                url.toString() : url.getPath() +
-                (url.getQuery() != null ? "?" + url.getQuery() : "");
+                url.toString() :
+                url.getPath() + (url.getQuery() != null ? "?" + url.getQuery() : "");
 
         if ((("GET").equals(msgContext.getProperty(Constants.Configuration.HTTP_METHOD)))
-                || (("DELETE").equals(msgContext.getProperty(Constants.Configuration.HTTP_METHOD)))) {
-            try{
+                || (("DELETE")
+                .equals(msgContext.getProperty(Constants.Configuration.HTTP_METHOD)))) {
+            try {
                 hasEntityBody = false;
-                MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgContext);
+                MessageFormatter formatter = MessageProcessorSelector
+                        .getMessageFormatter(msgContext);
                 OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
                 if (formatter != null && format != null) {
                     URL _url = formatter.getTargetAddress(msgContext, format, url);
                     if (_url != null && !_url.toString().isEmpty()) {
                         if (msgContext.getProperty(NhttpConstants.POST_TO_URI) != null
-                                && Boolean.TRUE.toString().equals(msgContext.getProperty(NhttpConstants.POST_TO_URI))) {
+                                && Boolean.TRUE.toString()
+                                .equals(msgContext.getProperty(NhttpConstants.POST_TO_URI))) {
                             path = _url.toString();
                         } else {
-                            path = _url.getPath()
-                                    + ((_url.getQuery() != null && !_url.getQuery().isEmpty())
-                                    ? ("?" + _url.getQuery())
-                                    : "");
+                            path = _url.getPath() + ((_url.getQuery() != null && !_url.getQuery()
+                                    .isEmpty()) ? ("?" + _url.getQuery()) : "");
                         }
 
                     }
-                    if(reqeustHeaders.containsKey(HttpHeaderNames.CONTENT_TYPE))
+                    if (reqeustHeaders.containsKey(HttpHeaderNames.CONTENT_TYPE))
                         reqeustHeaders.remove(HttpHeaderNames.CONTENT_TYPE);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-
         //fix for  POST_TO_URI
-        if(msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI)){
+        if (msgContext.isPropertyTrue(NhttpConstants.POST_TO_URI)) {
             path = url.toString();
         }
 
-        if(path!=null || !path.isEmpty()){
-                reqeustHeaders.put(Http2Headers.PseudoHeaderName.PATH.value().toString(),path);
+        if (path != null || !path.isEmpty()) {
+            reqeustHeaders.put(Http2Headers.PseudoHeaderName.PATH.value().toString(), path);
         }
 
-        if(hasEntityBody){
-                long contentLength = -1;
-                String contentLengthHeader = null;
-                if(reqeustHeaders.containsKey(HttpHeaderNames.CONTENT_LENGTH.toString())&& Integer.parseInt(reqeustHeaders.get(HttpHeaderNames.CONTENT_LENGTH).toString()) > 0) {
-                    contentLengthHeader = reqeustHeaders.get(HttpHeaderNames.CONTENT_LENGTH).toString();
-                }
+        if (hasEntityBody) {
+            long contentLength = -1;
+            String contentLengthHeader = null;
+            if (reqeustHeaders.containsKey(HttpHeaderNames.CONTENT_LENGTH.toString()) &&
+                    Integer.parseInt(reqeustHeaders.get(HttpHeaderNames.CONTENT_LENGTH).toString())
+                            > 0) {
+                contentLengthHeader = reqeustHeaders.get(HttpHeaderNames.CONTENT_LENGTH).toString();
+            }
 
-                if (contentLengthHeader != null) {
-                    contentLength = Integer.parseInt(contentLengthHeader);
-                    reqeustHeaders.remove(HttpHeaderNames.CONTENT_LENGTH);
-                }
+            if (contentLengthHeader != null) {
+                contentLength = Integer.parseInt(contentLengthHeader);
+                reqeustHeaders.remove(HttpHeaderNames.CONTENT_LENGTH);
+            }
 
-                //MessageContext requestMsgCtx = TargetContext.get(conn).getRequestMsgCtx();
-
-
-                if(msgContext.getProperty(PassThroughConstants.PASSTROUGH_MESSAGE_LENGTH) != null){
-                    contentLength = (Long)msgContext.getProperty(PassThroughConstants.PASSTROUGH_MESSAGE_LENGTH);
-                }
-            boolean forceContentLength = msgContext.isPropertyTrue(
-                    NhttpConstants.FORCE_HTTP_CONTENT_LENGTH);
-            boolean forceContentLengthCopy = msgContext.isPropertyTrue(
-                    PassThroughConstants.COPY_CONTENT_LENGTH_FROM_INCOMING);
+            if (msgContext.getProperty(PassThroughConstants.PASSTROUGH_MESSAGE_LENGTH) != null) {
+                contentLength = (Long) msgContext
+                        .getProperty(PassThroughConstants.PASSTROUGH_MESSAGE_LENGTH);
+            }
+            boolean forceContentLength = msgContext
+                    .isPropertyTrue(NhttpConstants.FORCE_HTTP_CONTENT_LENGTH);
+            boolean forceContentLengthCopy = msgContext
+                    .isPropertyTrue(PassThroughConstants.COPY_CONTENT_LENGTH_FROM_INCOMING);
 
             if (forceContentLength) {
                 if (forceContentLengthCopy && contentLength > 0) {
-                    reqeustHeaders.put(HttpHeaderNames.CONTENT_LENGTH.toString(),Long.toString(contentLength));
+                    reqeustHeaders.put(HttpHeaderNames.CONTENT_LENGTH.toString(),
+                            Long.toString(contentLength));
                 }
-            }else{
+            } else {
                 if (contentLength != -1) {
-                    reqeustHeaders.put(HttpHeaderNames.CONTENT_LENGTH.toString(),Long.toString(contentLength));
+                    reqeustHeaders.put(HttpHeaderNames.CONTENT_LENGTH.toString(),
+                            Long.toString(contentLength));
                 }
             }
         }
@@ -328,64 +368,34 @@ public class Http2TargetRequestUtil {
             msgContext.getAxisOperation().getInputAction();
         }
 
-        if (msgContext.isSOAP11() && soapAction != null &&
-                soapAction.length() > 0) {
-            String existingHeader =
-                    reqeustHeaders.get(HTTPConstants.HEADER_SOAP_ACTION).toString();
+        if (msgContext.isSOAP11() && soapAction != null && soapAction.length() > 0) {
+            String existingHeader = reqeustHeaders.get(HTTPConstants.HEADER_SOAP_ACTION).toString();
             if (existingHeader != null) {
                 reqeustHeaders.remove(existingHeader);
             }
-            MessageFormatter messageFormatter =
-                    MessageFormatterDecoratorFactory.createMessageFormatterDecorator(msgContext);
+            MessageFormatter messageFormatter = MessageFormatterDecoratorFactory
+                    .createMessageFormatterDecorator(msgContext);
             reqeustHeaders.put(HTTPConstants.HEADER_SOAP_ACTION.toLowerCase(),
                     messageFormatter.formatSOAPAction(msgContext, null, soapAction));
-            //request.setHeader(HTTPConstants.USER_AGENT,"Synapse-PT-HttpComponents-NIO");
+            request.setHeader(HTTPConstants.USER_AGENT.toLowerCase(),
+                    "Synapse-PT-HttpComponents-NIO");
         }
 
-        if(reqeustHeaders.containsKey(HttpHeaderNames.HOST)){
+        if (reqeustHeaders.containsKey(HttpHeaderNames.HOST)) {
             reqeustHeaders.remove(HttpHeaderNames.HOST);
         }
-        if(!reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.SCHEME.value()))
-            reqeustHeaders.put(Http2Headers.PseudoHeaderName.SCHEME.value().toString(),route.getTargetHost().getSchemeName());
-        if(!reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.AUTHORITY.value()))
-            reqeustHeaders.put(Http2Headers.PseudoHeaderName.AUTHORITY.value().toString(),route.getTargetHost().toString());
-        Iterator<Map.Entry<String,String>> iterator=reqeustHeaders.entrySet().iterator();
-        while (iterator.hasNext()){
-            Map.Entry<String,String> head=iterator.next();
-            http2Headers.add(head.getKey(),head.getValue());
+        if (!reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.SCHEME.value()))
+            reqeustHeaders.put(Http2Headers.PseudoHeaderName.SCHEME.value().toString(),
+                    route.getTargetHost().getSchemeName());
+        if (!reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.AUTHORITY.value()))
+            reqeustHeaders.put(Http2Headers.PseudoHeaderName.AUTHORITY.value().toString(),
+                    route.getTargetHost().toString());
+        Iterator<Map.Entry<String, String>> iterator = reqeustHeaders.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> head = iterator.next();
+            http2Headers.add(head.getKey(), head.getValue());
         }
         return http2Headers;
-    }
-
-    private static String getContentType(MessageContext msgCtx, boolean isContentTypePreservedHeader) throws
-            AxisFault {
-
-        if (isContentTypePreservedHeader) {
-            if (msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE) != null) {
-                return (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
-            } else if (msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE) != null) {
-                return (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
-            }
-        }
-
-        MessageFormatter formatter = MessageProcessorSelector.getMessageFormatter(msgCtx);
-        OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgCtx);
-
-        if (formatter != null) {
-            String contentType= formatter.getContentType(msgCtx, format, msgCtx.getSoapAction());
-            //keep the formatter information to prevent multipart boundary override (this will be the content writing to header)
-            msgCtx.setProperty(PassThroughConstants.MESSAGE_OUTPUT_FORMAT, format);
-            return contentType;
-
-        } else {
-            String contentType = (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
-            if (contentType != null) {
-                return contentType;
-            } else {
-                return new SOAPMessageFormatter().getContentType(
-                        msgCtx, format,  msgCtx.getSoapAction());
-            }
-        }
     }
 
     public boolean isHasEntityBody() {

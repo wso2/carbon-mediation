@@ -22,9 +22,8 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 public class ServiceReferenceHolder {
 
-    private ConfigurationContextService configurationContextService;
-
     private static final ServiceReferenceHolder INSTANCE = new ServiceReferenceHolder();
+    private ConfigurationContextService configurationContextService;
 
     private ServiceReferenceHolder() {
     }

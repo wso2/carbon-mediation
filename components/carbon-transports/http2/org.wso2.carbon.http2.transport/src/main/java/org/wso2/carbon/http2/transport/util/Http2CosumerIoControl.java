@@ -22,9 +22,6 @@ import org.apache.http.nio.IOControl;
 
 import java.io.IOException;
 
-/**
- * Created by chanakabalasooriya on 11/25/16.
- */
 public class Http2CosumerIoControl implements IOControl {
 
     @Override

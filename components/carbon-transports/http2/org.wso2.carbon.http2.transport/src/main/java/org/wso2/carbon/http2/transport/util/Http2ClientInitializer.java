@@ -23,16 +23,29 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.*;
-import io.netty.handler.codec.http2.*;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpClientUpgradeHandler;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http2.DefaultHttp2Connection;
+import io.netty.handler.codec.http2.DelegatingDecompressorFrameListener;
+import io.netty.handler.codec.http2.Http2ClientUpgradeCodec;
+import io.netty.handler.codec.http2.Http2Connection;
+import io.netty.handler.codec.http2.Http2ConnectionHandler;
+import io.netty.handler.codec.http2.Http2ConnectionHandlerBuilder;
+import io.netty.handler.codec.http2.Http2FrameListener;
+import io.netty.handler.codec.http2.Http2FrameLogger;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
 import io.netty.handler.ssl.SslContext;
 
-import static io.netty.handler.logging.LogLevel.*;
+import static io.netty.handler.logging.LogLevel.DEBUG;
+import static io.netty.handler.logging.LogLevel.INFO;
 
 public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
-    private static final Http2FrameLogger logger = new Http2FrameLogger(INFO, Http2ClientInitializer.class);
+    private static final Http2FrameLogger logger = new Http2FrameLogger(DEBUG,  //change mode to INFO for logging frames
+            Http2ClientInitializer.class);
 
     private final SslContext sslCtx;
     private final int maxContentLength;
@@ -49,19 +62,14 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         final Http2Connection connection = new DefaultHttp2Connection(false);
-        Http2FrameListenAdapter clientFrameListener=new Http2FrameListenAdapter();
+        Http2FrameListenAdapter clientFrameListener = new Http2FrameListenAdapter();
 
-        listener=new DelegatingDecompressorFrameListener(
-                connection,
-                clientFrameListener);
-        connectionHandler=new Http2ConnectionHandlerBuilder()
-                .connection(connection)
-                .frameLogger(logger)
-                .frameListener(listener)
-                .build();
+        listener = new DelegatingDecompressorFrameListener(connection, clientFrameListener);
+        connectionHandler = new Http2ConnectionHandlerBuilder().connection(connection)
+                .frameLogger(logger).frameListener(listener).build();
         responseHandler = new Http2ClientHandler(connection);
         responseHandler.setEncoder(connectionHandler.encoder());
-        settingsHandler = new Http2SettingsHandler(ch.newPromise(),responseHandler);
+        settingsHandler = new Http2SettingsHandler(ch.newPromise(), responseHandler);
         if (sslCtx != null) {
             configureSsl(ch);
         } else {
@@ -78,7 +86,7 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
     }
 
     protected void configureEndOfPipeline(ChannelPipeline pipeline) {
-        pipeline.addLast(settingsHandler,responseHandler);
+        pipeline.addLast(settingsHandler, responseHandler);
     }
 
     private void configureSsl(SocketChannel ch) {
@@ -109,6 +117,13 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
                 new UserEventLogger());
     }
 
+    private static class UserEventLogger extends ChannelInboundHandlerAdapter {
+        @Override
+        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+            ctx.fireUserEventTriggered(evt);
+        }
+    }
+
     private final class UpgradeRequestHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -118,13 +133,6 @@ public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
             ctx.fireChannelActive();
             ctx.pipeline().remove(this);
             configureEndOfPipeline(ctx.pipeline());
-        }
-    }
-
-    private static class UserEventLogger extends ChannelInboundHandlerAdapter {
-        @Override
-        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-            ctx.fireUserEventTriggered(evt);
         }
     }
 }

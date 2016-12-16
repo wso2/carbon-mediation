@@ -25,10 +25,9 @@ import org.wso2.carbon.core.transports.util.TransportParameter;
 
 public class Http2TransportService extends AbstractTransportService {
 
-    private static final Log log = LogFactory.getLog(Http2TransportService.class);
-
     public static final String TRANSPORT_NAME = "http2";
     public static final String TRANSPORT_CONF = "http2-transports.xml";
+    private static final Log log = LogFactory.getLog(Http2TransportService.class);
 
     public Http2TransportService() {
         super(TRANSPORT_NAME);

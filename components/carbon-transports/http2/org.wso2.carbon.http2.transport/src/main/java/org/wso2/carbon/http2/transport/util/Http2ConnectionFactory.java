@@ -20,38 +20,40 @@ package org.wso2.carbon.http2.transport.util;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelId;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http2.Http2SecurityUtil;
-import io.netty.handler.ssl.*;
+import io.netty.handler.ssl.ApplicationProtocolConfig;
+import io.netty.handler.ssl.ApplicationProtocolNames;
+import io.netty.handler.ssl.OpenSsl;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.SslProvider;
+import io.netty.handler.ssl.SupportedCipherSuiteFilter;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
-import org.apache.http.HttpHost;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpHost;
 
-import javax.net.ssl.SSLException;
-import javax.xml.namespace.QName;
 import java.net.URI;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.net.ssl.SSLException;
+import javax.xml.namespace.QName;
 
 public class Http2ConnectionFactory {
 
     private static Http2ConnectionFactory factory;
-    private static TreeMap<String,Map<String, Http2ClientHandler>> clientConnections;
+    private static TreeMap<String, Map<String, Http2ClientHandler>> clientConnections;
     private Log log = LogFactory.getLog(Http2ConnectionFactory.class);
     private TransportOutDescription trasportOut;
     private EventLoopGroup workerGroup;
@@ -69,18 +71,18 @@ public class Http2ConnectionFactory {
         return factory;
     }
 
-    public Http2ClientHandler getChannelHandler(HttpHost uri,String channelId) {
+    public Http2ClientHandler getChannelHandler(HttpHost uri, String channelId) {
         Http2ClientHandler handler;
-        Map conns=null;
+        Map conns = null;
         if (clientConnections.containsKey(channelId))
-            conns=clientConnections.get(channelId);
-        if(conns==null){
-            conns= new TreeMap<String, Http2ClientHandler>();
-            clientConnections.put(channelId,conns);
+            conns = clientConnections.get(channelId);
+        if (conns == null) {
+            conns = new TreeMap<String, Http2ClientHandler>();
+            clientConnections.put(channelId, conns);
         }
-        handler = getClientHandlerFromPool(uri,conns);
+        handler = getClientHandlerFromPool(uri, conns);
         if (handler == null) {
-            handler = cacheNewConnection(uri,conns);
+            handler = cacheNewConnection(uri, conns);
             if (log.isDebugEnabled()) {
                 if (handler != null) {
                     log.debug("New connection created for " + uri.toString());
@@ -96,7 +98,8 @@ public class Http2ConnectionFactory {
         return handler;
     }
 
-    public Http2ClientHandler cacheNewConnection(HttpHost uri, final Map<String, Http2ClientHandler> map) {
+    public Http2ClientHandler cacheNewConnection(HttpHost uri,
+            final Map<String, Http2ClientHandler> map) {
 
         final SslContext sslCtx;
         final boolean SSL;
@@ -177,19 +180,20 @@ public class Http2ConnectionFactory {
         }
     }
 
-    public Http2ClientHandler getClientHandlerFromPool(HttpHost uri,Map<String, Http2ClientHandler> map) {
+    public Http2ClientHandler getClientHandlerFromPool(HttpHost uri,
+            Map<String, Http2ClientHandler> map) {
         String key = generateKey(URI.create(uri.toURI()));
         Http2ClientHandler handler;
-        if(map.containsKey(key))
-            handler= map.get(key);
+        if (map.containsKey(key))
+            handler = map.get(key);
         else
-            handler=null;
+            handler = null;
         if (handler != null) {
             Channel c = handler.getChContext().channel();
-            boolean canMakeNewStreams=handler.getConnection().local().canOpenStream();
+            boolean canMakeNewStreams = handler.getConnection().local().canOpenStream();
             if (!c.isActive() || !canMakeNewStreams) {
                 map.remove(key);
-                handler = cacheNewConnection(uri,map);
+                handler = cacheNewConnection(uri, map);
             }
         }
         return handler;
@@ -207,12 +211,12 @@ public class Http2ConnectionFactory {
         return ssl + host + ":" + port;
     }
 
-    public void removeAllClientConnections(String channelId){
-        if(clientConnections.containsKey(channelId)){
-            Map<String,Http2ClientHandler> conns=clientConnections.remove(channelId);
-            Iterator<Http2ClientHandler> itr=conns.values().iterator();
-            while (itr.hasNext()){
-                Http2ClientHandler handler=itr.next();
+    public void removeAllClientConnections(String channelId) {
+        if (clientConnections.containsKey(channelId)) {
+            Map<String, Http2ClientHandler> conns = clientConnections.remove(channelId);
+            Iterator<Http2ClientHandler> itr = conns.values().iterator();
+            while (itr.hasNext()) {
+                Http2ClientHandler handler = itr.next();
                 handler.removeHandler();
             }
         }

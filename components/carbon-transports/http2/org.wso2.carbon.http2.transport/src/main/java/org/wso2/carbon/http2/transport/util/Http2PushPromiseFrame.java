@@ -3,17 +3,14 @@ package org.wso2.carbon.http2.transport.util;
 import io.netty.handler.codec.http2.Http2Headers;
 import io.netty.handler.codec.http2.Http2StreamFrame;
 
-/**
- * Created by chanakabalasooriya on 12/3/16.
- */
-public class Http2PushPromiseFrame implements Http2StreamFrame{
+public class Http2PushPromiseFrame implements Http2StreamFrame {
     private int streamId;
     private int pushPromiseId;
     private Http2Headers headers;
 
     @Override
     public Http2StreamFrame setStreamId(int i) {
-        streamId=i;
+        streamId = i;
         return this;
     }
 

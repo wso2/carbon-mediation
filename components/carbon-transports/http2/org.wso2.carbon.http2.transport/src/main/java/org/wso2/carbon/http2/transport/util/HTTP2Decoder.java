@@ -26,21 +26,19 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class HTTP2Decoder implements ContentDecoder {
-    Http2DataFrame dataFrame=null;
-    boolean complete=false;
-    public HTTP2Decoder(Http2DataFrame dataFrame){
-        this.dataFrame=dataFrame;
+    Http2DataFrame dataFrame = null;
+    boolean complete = false;
+
+    public HTTP2Decoder(Http2DataFrame dataFrame) {
+        this.dataFrame = dataFrame;
     }
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
-        complete=false;
-
-       /* ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(ByteBufUtil.getBytes(
-                dataFrame.content()));*/
-        byte [] data=ByteBufUtil.getBytes(dataFrame.content());
+        complete = false;
+        byte[] data = ByteBufUtil.getBytes(dataFrame.content());
         dst.put(data);
-        complete=true;
+        complete = true;
         return data.length;
     }
 

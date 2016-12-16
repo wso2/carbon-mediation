@@ -2,13 +2,10 @@ package org.wso2.carbon.http2.transport.util;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http2.Http2DataFrame;
 import io.netty.handler.codec.http2.Http2Headers;
 import io.netty.handler.codec.http2.Http2HeadersFrame;
-import io.netty.handler.codec.http2.Http2Settings;
-import io.netty.handler.codec.http2.Http2StreamFrame;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -42,7 +39,6 @@ import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
-import org.omg.PortableInterceptor.INACTIVE;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.http2.transport.service.ServiceReferenceHolder;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -83,6 +79,36 @@ public class Http2ResponseReceiver {
         this.targetConfiguration = targetConfiguration;
     }
 
+    private static org.apache.axis2.context.MessageContext createAxis2MessageContext(
+            String tenantDomain) throws AxisFault {
+        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
+        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
+        axis2MsgCtx.setConfigurationContext(
+                ServiceReferenceHolder.getInstance().getConfigurationContextService()
+                        .getServerConfigContext());
+        axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING,
+                Boolean.FALSE);
+        axis2MsgCtx.setServerSide(true);
+        ServiceContext svcCtx = new ServiceContext();
+        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
+        axis2MsgCtx.setServiceContext(svcCtx);
+        axis2MsgCtx.setOperationContext(opCtx);
+        if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            ConfigurationContext tenantConfigCtx = TenantAxisUtils
+                    .getTenantConfigurationContext(tenantDomain,
+                            axis2MsgCtx.getConfigurationContext());
+            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+        } else {
+            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN,
+                    MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+        }
+        SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
+        SOAPEnvelope envelope = fac.getDefaultEnvelope();
+        axis2MsgCtx.setEnvelope(envelope);
+        return axis2MsgCtx;
+    }
+
     public void onDataFrameRead(Http2DataFrame frame, MessageContext msgContext) {
         if (!incompleteResponses.containsKey(frame.streamId())) {
             log.error("No response headers found for received dataframe of streamID : " + frame
@@ -106,7 +132,8 @@ public class Http2ResponseReceiver {
         } else {
             contentType = inferContentType(headers, response);
         }
-        response.setProperty(Constants.Configuration.CONTENT_TYPE, contentType);
+        if (contentType != null)
+            response.setProperty(Constants.Configuration.CONTENT_TYPE, contentType);
 
         String charSetEnc = BuilderUtil.getCharSetEncoding(contentType);
         if (charSetEnc == null) {
@@ -267,7 +294,6 @@ public class Http2ResponseReceiver {
 
     private String inferContentType(Map<String, String> headers, MessageContext responseMsgCtx) {
         //Check whether server sent Content-Type in different case
-        // Map<String, String> headers = response.getHeaders();
         for (String header : headers.keySet()) {
             if (HTTP.CONTENT_TYPE.equalsIgnoreCase(header)) {
                 return headers.get(header);
@@ -297,7 +323,10 @@ public class Http2ResponseReceiver {
         // When the response from backend does not have the body(Content-Length is 0 )
         // and Content-Type is not set;
         // ESB should not do any modification to the response and pass-through as it is.
-        if (headers.get(HttpHeaderNames.CONTENT_LENGTH) == null || "0".equals(headers.get(HttpHeaderNames.CONTENT_LENGTH))) {
+        String contentLength = (headers.containsKey(HttpHeaderNames.CONTENT_LENGTH.toString())) ?
+                headers.get(HttpHeaderNames.CONTENT_LENGTH.toString()) :
+                null;
+        if (contentLength == null || (contentLength != null && "0".equals(contentLength))) {
             return null;
         }
 
@@ -417,36 +446,6 @@ public class Http2ResponseReceiver {
 
     public boolean isServerPushAccepted() {
         return serverPushAccepted;
-    }
-
-    private static org.apache.axis2.context.MessageContext createAxis2MessageContext(
-            String tenantDomain) throws AxisFault {
-        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
-        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
-        axis2MsgCtx.setConfigurationContext(
-                ServiceReferenceHolder.getInstance().getConfigurationContextService()
-                        .getServerConfigContext());
-        axis2MsgCtx.setProperty(org.apache.axis2.context.MessageContext.CLIENT_API_NON_BLOCKING,
-                Boolean.FALSE);
-        axis2MsgCtx.setServerSide(true);
-        ServiceContext svcCtx = new ServiceContext();
-        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
-        axis2MsgCtx.setServiceContext(svcCtx);
-        axis2MsgCtx.setOperationContext(opCtx);
-        if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            ConfigurationContext tenantConfigCtx = TenantAxisUtils
-                    .getTenantConfigurationContext(tenantDomain,
-                            axis2MsgCtx.getConfigurationContext());
-            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
-            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
-        } else {
-            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN,
-                    MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
-        }
-        SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
-        SOAPEnvelope envelope = fac.getDefaultEnvelope();
-        axis2MsgCtx.setEnvelope(envelope);
-        return axis2MsgCtx;
     }
 
     private void injectToSequence(org.apache.synapse.MessageContext synCtx, String dispatchSequence,
