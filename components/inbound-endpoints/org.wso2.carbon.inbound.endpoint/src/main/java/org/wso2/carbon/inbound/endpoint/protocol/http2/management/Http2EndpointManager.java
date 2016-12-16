@@ -135,6 +135,14 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
         InboundHttp2Configuration config = buildConfiguration(port, name, params);
         NettyThreadPoolConfiguration threadPoolConfig = new NettyThreadPoolConfiguration(
                 config.getBossThreadPoolSize(), config.getWorkerThreadPoolSize());
+
+        if (config.isEnableServerPush()) {
+            if (config.getDispatchSequence() == null || config.getErrorSequence() == null) {
+                throw new SynapseException(
+                        "dispatch.outflow.sequence and error.outflow.sequence "
+                                + "cannot be empty if server-push enabled");
+            }
+        }
         InboundHttp2EventExecutor eventExecutor = new InboundHttp2EventExecutor(threadPoolConfig);
 
         org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager
@@ -164,8 +172,17 @@ public class Http2EndpointManager extends AbstractInboundEndpointManager {
 
         InboundHttp2Configuration config = buildConfiguration(port, name, params);
         InboundWebsocketSSLConfiguration SslConfig = buildSSLConfiguration(params);
+        if (config.isEnableServerPush()) {
+            if (config.getDispatchSequence() == null || config.getErrorSequence() == null) {
+                throw new SynapseException(
+                        "dispatch.outflow.sequence and error.outflow.sequence "
+                                + "cannot be empty if server-push enabled");
+            }
+        }
+
         NettyThreadPoolConfiguration threadPoolConfig = new NettyThreadPoolConfiguration(
                 config.getBossThreadPoolSize(), config.getWorkerThreadPoolSize());
+
         InboundHttp2EventExecutor eventExecutor = new InboundHttp2EventExecutor(threadPoolConfig);
         org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager
                 .getInstance().registerEventExecutor(port, eventExecutor);

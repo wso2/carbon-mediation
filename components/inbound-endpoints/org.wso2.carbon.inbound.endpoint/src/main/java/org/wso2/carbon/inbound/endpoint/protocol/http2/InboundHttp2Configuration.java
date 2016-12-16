@@ -131,21 +131,20 @@ public class InboundHttp2Configuration {
                 this.dispatchSequence = properties
                         .getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE);
             } else {
-                this.dispatchSequence = "main";
+                this.dispatchSequence = null;
             }
             if (properties.getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE) != null) {
                 this.errorSequence = properties
                         .getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE);
             } else {
-                this.errorSequence = "fault";
+                this.errorSequence = null;
             }
             if (properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED) != null) {
                 this.enableServerPush = Boolean.parseBoolean(
                         properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED));
             } else {
-                this.enableServerPush = Boolean.parseBoolean("true");
+                this.enableServerPush = Boolean.parseBoolean("false");
             }
-
         }
 
         public InboundHttp2Configuration build() {
