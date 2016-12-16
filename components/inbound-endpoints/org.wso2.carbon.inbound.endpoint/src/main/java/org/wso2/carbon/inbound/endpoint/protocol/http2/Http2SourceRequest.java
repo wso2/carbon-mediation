@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Http2SourceRequest {
-    private Pipe pipe=null;
+    private Pipe pipe = null;
     private Logger log = Logger.getLogger(Http2SourceRequest.class);
     private int streamID;
     private ChannelHandlerContext channel;
@@ -42,9 +42,15 @@ public class Http2SourceRequest {
     private String method = null;
     private String uri = null;
     private String scheme = null;
-    private boolean processedReq=false;
+    private boolean processedReq = false;
 
-    private String requestType=null;
+    private String requestType = null;
+    private Map<String, String> excessHeaders = new TreeMap<String, String>();
+
+    public Http2SourceRequest(int streamID, ChannelHandlerContext channel) {
+        this.streamID = streamID;
+        this.channel = channel;
+    }
 
     public String getRequestType() {
         return requestType;
@@ -52,14 +58,6 @@ public class Http2SourceRequest {
 
     public void setRequestType(String requestType) {
         this.requestType = requestType;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
     }
 
     public String getScheme() {
@@ -78,13 +76,6 @@ public class Http2SourceRequest {
 
     public Map<String, String> getExcessHeaders() {
         return excessHeaders;
-    }
-
-    private Map<String, String> excessHeaders = new TreeMap<String, String>();
-
-    public Http2SourceRequest(int streamID, ChannelHandlerContext channel) {
-        this.streamID = streamID;
-        this.channel = channel;
     }
 
     public ChannelHandlerContext getChannel() {
@@ -116,6 +107,10 @@ public class Http2SourceRequest {
         }
     }
 
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
     public String getHeader(String key) {
         if (headers.containsKey(key)) {
             return headers.get(key);
@@ -135,6 +130,10 @@ public class Http2SourceRequest {
         } else {
             return null;
         }
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     @Override

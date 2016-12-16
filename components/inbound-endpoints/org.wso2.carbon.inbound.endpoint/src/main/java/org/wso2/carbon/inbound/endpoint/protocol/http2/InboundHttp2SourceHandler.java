@@ -21,7 +21,11 @@ package org.wso2.carbon.inbound.endpoint.protocol.http2;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http2.*;
+import io.netty.handler.codec.http2.Http2Connection;
+import io.netty.handler.codec.http2.Http2ConnectionEncoder;
+import io.netty.handler.codec.http2.Http2DataFrame;
+import io.netty.handler.codec.http2.Http2GoAwayFrame;
+import io.netty.handler.codec.http2.Http2HeadersFrame;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -81,6 +85,7 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
         writer.setChContext(ctx);
         reader.setMessageHandler(
                 new InboundMessageHandler(new InboundHttp2ResponseSender(this), config));
+        writer.setConfig(config);
     }
 
     @Override

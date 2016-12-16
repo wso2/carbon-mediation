@@ -18,16 +18,16 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.http2;
 
-import io.netty.channel.*;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.HttpMessage;
-import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler.UpgradeCodec;
 import io.netty.handler.codec.http.HttpServerUpgradeHandler.UpgradeCodecFactory;
 import io.netty.handler.codec.http2.DefaultHttp2Connection;
-import io.netty.handler.codec.http2.Http2Codec;
 import io.netty.handler.codec.http2.Http2CodecUtil;
 import io.netty.handler.codec.http2.Http2Connection;
 import io.netty.handler.codec.http2.Http2ConnectionHandler;
@@ -45,12 +45,12 @@ import static io.netty.handler.logging.LogLevel.INFO;
 public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final Log log = LogFactory.getLog(InboundHttp2ServerInitializer.class);
-    private static final Http2FrameLogger logger = new Http2FrameLogger(INFO,
+    private static final Http2FrameLogger logger = new Http2FrameLogger(DEBUG, //Change mode into INFO to log frames
             InboundHttp2ServerInitializer.class);
-    private UpgradeCodecFactory upgradeCodecFactory;
     private final SslContext sslCtx;
     private final int maxHttpContentLength;
     private final InboundHttp2Configuration config;
+    private UpgradeCodecFactory upgradeCodecFactory;
 
     public InboundHttp2ServerInitializer(SslContext sslCtx, InboundHttp2Configuration config) {
         this(sslCtx, 16 * 1024, config);

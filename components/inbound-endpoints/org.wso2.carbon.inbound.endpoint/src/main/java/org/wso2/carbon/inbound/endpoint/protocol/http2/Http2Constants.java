@@ -34,16 +34,6 @@ public class Http2Constants {
     public static final String HTTP2_PUSH_PROMISE_ID = "http2.push.promise.id";
     public static final String HTTP2_PUSH_PROMISE_HEADERS = "http2.push.promise.headers";
 
-    public static final String HTTP2_SERVER_STREAM_ID = "http2.server.stream.id";
-    public static final String HTTP2_ERROR_CODE = "http2.error.code";
-
-    public static final String PASSTHROUGH_TARGET = "passthru.target";
-    public static final String PASS_THROUGH_SOURCE_CONFIGURATION = "PASS_THROUGH_SOURCE_CONFIGURATION";
-    public static final String PASS_THROUGH_SOURCE_CONNECTION = "pass-through.Source-Connection";
-    public static final String PASS_THROUGH_SOURCE_REQUEST = "pass-through.Source-Request";
-    public static final String PASS_THROUGH_TARGET_CONNECTION = "pass-through.Target-Connection";
-    public static final String PASS_THROUGH_TARGET_RESPONSE = "pass-through.Target-Response";
-
     public static final String HTTP2_DISPATCH_SEQUENCE = "http2.dispatch.sequence";
     public static final String HTTP2_ERROR_SEQUENCE = "http2.error.sequence";
 

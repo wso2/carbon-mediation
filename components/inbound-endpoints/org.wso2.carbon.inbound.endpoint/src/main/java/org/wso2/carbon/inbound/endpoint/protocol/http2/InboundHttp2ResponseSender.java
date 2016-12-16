@@ -18,17 +18,11 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.http2;
 
-import io.netty.handler.codec.http2.Http2ConnectionEncoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
-import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.inbound.InboundResponseSender;
-import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.SourceHandler;
-
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
 
 public class InboundHttp2ResponseSender implements InboundResponseSender {
 

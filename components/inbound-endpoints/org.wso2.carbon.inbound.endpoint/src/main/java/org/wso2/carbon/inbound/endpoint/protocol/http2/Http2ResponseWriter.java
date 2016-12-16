@@ -27,14 +27,16 @@ import io.netty.handler.codec.http2.Http2Connection;
 import io.netty.handler.codec.http2.Http2ConnectionEncoder;
 import io.netty.handler.codec.http2.Http2Headers;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.util.MessageProcessorSelector;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpHeaders;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.inbound.InboundEndpointConstants;
+import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.nhttp.util.MessageFormatterDecoratorFactory;
 import org.apache.synapse.transport.nhttp.util.NhttpUtil;
@@ -43,60 +45,41 @@ import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.api.PassThroughInboundEndpointHandler;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
-import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.wso2.caching.CachingConstants;
 import org.wso2.caching.digest.DigestGenerator;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundMessageHandler;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import javax.xml.stream.XMLStreamException;
 
 public class Http2ResponseWriter {
     private static final Log log = LogFactory.getLog(Http2ResponseWriter.class);
-    private DigestGenerator digestGenerator = CachingConstants.DEFAULT_XML_IDENTIFIER;
     Http2Connection connection;
     Http2ConnectionEncoder encoder;
     ChannelHandlerContext chContext; //this can be taken from msgcontext
+    private DigestGenerator digestGenerator = CachingConstants.DEFAULT_XML_IDENTIFIER;
     private SourceConfiguration sourceConfiguration;
+    private InboundHttp2Configuration config;
 
     public void writeNormalResponse(MessageContext synCtx) {
         org.apache.axis2.context.MessageContext msgContext = ((Axis2MessageContext) synCtx)
                 .getAxis2MessageContext();
         Http2Headers transportHeaders = new DefaultHttp2Headers();
-        try{
+        InboundResponseSender responseSender =
+                synCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER)
+                        == null ?
+                        null :
+                        (InboundHttp2ResponseSender) synCtx.getProperty(
+                                InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER);
+        try {
             sourceConfiguration = PassThroughInboundEndpointHandler
                     .getPassThroughSourceConfiguration();
-        }catch (Exception e){
-            log.error("Error while building sourceConfiguration "+e);
+        } catch (Exception e) {
+            log.error("Error while building sourceConfiguration " + e);
         }
-
-        /*if (msgContext.getProperty(PassThroughConstants.HTTP_ETAG_ENABLED) != null
-                && (Boolean) msgContext.getProperty(PassThroughConstants.HTTP_ETAG_ENABLED)) {
-
-            try {
-                RelayUtils.buildMessage(msgContext);
-            } catch (IOException e) {
-                log.error("IO Error occurred while building the message", e);
-            } catch (XMLStreamException e) {
-                log.error("XML Error occurred while building the message", e);
-            }
-
-            String hash = digestGenerator.getDigest(msgContext);
-            Map headers = (Map) msgContext
-                    .getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-            headers.put(HttpHeaders.ETAG, "\"" + hash + "\"");
-
-            Iterator<Map.Entry<String, String>> iterator = headers.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<String, String> head = iterator.next();
-                transportHeaders.add(head.getKey(), head.getValue());
-            }
-        }*/
 
         //status
         try {
@@ -113,10 +96,10 @@ public class Http2ResponseWriter {
                 (boolean) msgContext.getProperty(NhttpConstants.NO_ENTITY_BODY) :
                 null;
         if (noEntityBody == null || Boolean.FALSE == noEntityBody) {
-            Pipe pipe=(Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+            Pipe pipe = (Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
             if (pipe == null) {
-                pipe = new Pipe(sourceConfiguration.getBufferFactory().getBuffer(),
-                        "Test", sourceConfiguration);
+                pipe = new Pipe(sourceConfiguration.getBufferFactory().getBuffer(), "Test",
+                        sourceConfiguration);
                 msgContext.setProperty(PassThroughConstants.PASS_THROUGH_PIPE, pipe);
                 msgContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
             }
@@ -131,8 +114,6 @@ public class Http2ResponseWriter {
             }
         }
 
-
-
         if (transportHeaders != null
                 && msgContext.getProperty(org.apache.axis2.Constants.Configuration.MESSAGE_TYPE)
                 != null) {
@@ -146,7 +127,8 @@ public class Http2ResponseWriter {
                 Pipe pipe = (Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
                 if (pipe != null && !Boolean.TRUE.equals(msgContext
                         .getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED)) && msgContext
-                        .getProperty(org.apache.axis2.Constants.Configuration.CONTENT_TYPE)!=null) {
+                        .getProperty(org.apache.axis2.Constants.Configuration.CONTENT_TYPE)
+                        != null) {
                     transportHeaders.add(HttpHeaderNames.CONTENT_TYPE, msgContext
                             .getProperty(org.apache.axis2.Constants.Configuration.CONTENT_TYPE)
                             .toString());
@@ -172,7 +154,8 @@ public class Http2ResponseWriter {
         if (!transportHeaders.contains(HttpHeaderNames.CONTENT_TYPE)) {
             String contentType = null;
             try {
-                contentType = new InboundMessageHandler(null, null).getContentType(msgContext);
+                contentType = new InboundMessageHandler(responseSender, config)
+                        .getContentType(msgContext);
             } catch (Exception e) {
                 log.error(e);
             }
@@ -182,9 +165,6 @@ public class Http2ResponseWriter {
             }
         } else
             hasBody = true;
-
-
-
 
         int streamId = (int) synCtx.getProperty("stream-id");
         ChannelHandlerContext c = (ChannelHandlerContext) synCtx.getProperty("stream-channel");
@@ -202,15 +182,20 @@ public class Http2ResponseWriter {
             if (pipe != null) {
                 pipe.attachConsumer(new Http2CosumerIoControl());
                 try {
-                    if (Boolean.TRUE.equals(msgContext.getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+                    if (Boolean.TRUE.equals(msgContext
+                            .getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
                         ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        MessageFormatter formatter =  MessageProcessorSelector.getMessageFormatter(msgContext);
-                        OMOutputFormat format = PassThroughTransportUtils.getOMOutputFormat(msgContext);
+                        MessageFormatter formatter = MessageProcessorSelector
+                                .getMessageFormatter(msgContext);
+                        OMOutputFormat format = PassThroughTransportUtils
+                                .getOMOutputFormat(msgContext);
                         formatter.writeTo(msgContext, format, out, false);
                         OutputStream _out = pipe.getOutputStream();
                         IOUtils.write(out.toByteArray(), _out);
                     }
                     int t = pipe.consume(pipeEncoder);
+                    if (t < 1)
+                        throw new AxisFault("Empty has not been built properly");
                 } catch (Exception e) {
                     log.error(e);
                 }
@@ -255,5 +240,9 @@ public class Http2ResponseWriter {
 
     public void setChContext(ChannelHandlerContext chContext) {
         this.chContext = chContext;
+    }
+
+    public void setConfig(InboundHttp2Configuration config) {
+        this.config = config;
     }
 }

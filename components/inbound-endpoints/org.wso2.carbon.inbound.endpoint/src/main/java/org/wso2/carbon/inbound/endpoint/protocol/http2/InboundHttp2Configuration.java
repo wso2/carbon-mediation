@@ -34,10 +34,6 @@ public class InboundHttp2Configuration {
     private String errorSequence;
     private boolean enableServerPush;
 
-    public Properties getProperties() {
-        return properties;
-    }
-
     private InboundHttp2Configuration(
             InboundHttp2Configuration.InboundHttp2ConfigurationBuilder builder) {
         this.port = builder.port;
@@ -46,10 +42,14 @@ public class InboundHttp2Configuration {
         this.dispatchPattern = builder.dispatchPattern;
         this.workerThreadPoolSize = builder.workerThreadPoolSize;
         this.bossThreadPoolSize = builder.bossThreadPoolSize;
-        this.dispatchSequence=builder.dispatchSequence;
-        this.errorSequence=builder.errorSequence;
-        this.enableServerPush=builder.enableServerPush;
+        this.dispatchSequence = builder.dispatchSequence;
+        this.errorSequence = builder.errorSequence;
+        this.enableServerPush = builder.enableServerPush;
 
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 
     public String getBossThreadPoolSize() {
@@ -127,24 +127,21 @@ public class InboundHttp2Configuration {
             } else {
                 this.workerThreadPoolSize = "1";
             }
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE)
-                    != null) {
+            if (properties.getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE) != null) {
                 this.dispatchSequence = properties
                         .getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE);
             } else {
                 this.dispatchSequence = "main";
             }
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE)
-                    != null) {
+            if (properties.getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE) != null) {
                 this.errorSequence = properties
                         .getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE);
             } else {
                 this.errorSequence = "fault";
             }
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED)
-                    != null) {
-                this.enableServerPush = Boolean.parseBoolean(properties
-                        .getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED));
+            if (properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED) != null) {
+                this.enableServerPush = Boolean.parseBoolean(
+                        properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED));
             } else {
                 this.enableServerPush = Boolean.parseBoolean("true");
             }
