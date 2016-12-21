@@ -134,19 +134,23 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 		if (decryptedCacheMap.containsKey(aliasPasword)) {
 			SecureVaultCacheContext cacheContext =
 			                                       (SecureVaultCacheContext) decryptedCacheMap.get(aliasPasword);
-			String cacheDurable =
-			                      synCtx.getConfiguration().getRegistry()
-			                            .getConfigurationProperties()
-			                            .getProperty("cachableDuration");
-			long cacheTime =
-			                 (cacheDurable != null && !cacheDurable.isEmpty())
-			                                                                  ? Long.parseLong(cacheDurable)
-			                                                                  : 10000;
-			if ((cacheContext.getDateTime().getTime() + cacheTime) >= System.currentTimeMillis()) {
-				// which means the given value between the cachable limit
-				return cacheContext.getDecryptedValue();
+			if (cacheContext != null) {
+				String cacheDurable =
+						synCtx.getConfiguration().getRegistry()
+								.getConfigurationProperties()
+								.getProperty("cachableDuration");
+				long cacheTime =
+						(cacheDurable != null && !cacheDurable.isEmpty())
+								? Long.parseLong(cacheDurable)
+								: 10000;
+				if ((cacheContext.getDateTime().getTime() + cacheTime) >= System.currentTimeMillis()) {
+					// which means the given value between the cachable limit
+					return cacheContext.getDecryptedValue();
+				} else {
+					decryptedCacheMap.remove(aliasPasword);
+					return vaultLookup(aliasPasword, synCtx, decryptedCacheMap);
+				}
 			} else {
-				decryptedCacheMap.remove(aliasPasword);
 				return vaultLookup(aliasPasword, synCtx, decryptedCacheMap);
 			}
 
@@ -157,27 +161,25 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 	}
 
 	private String vaultLookup(String aliasPasword, MessageContext synCtx,
-	                           Map<String, Object> decryptedCacheMap) {
-		synchronized (decryptlockObj) {
-			SecretCipherHander secretManager = new SecretCipherHander(synCtx);
-			String decryptedValue = secretManager.getSecret(aliasPasword);
-			if (decryptedCacheMap == null) {
-				return null;
-			}
-
-			if (decryptedValue.isEmpty()) {
-				SecureVaultCacheContext cacheContext =
-				                                       (SecureVaultCacheContext) decryptedCacheMap.get(aliasPasword);
-				if (cacheContext != null) {
-					return cacheContext.getDecryptedValue();
-				}
-			}
-
-			decryptedCacheMap.put(aliasPasword, new SecureVaultCacheContext(Calendar.getInstance()
-			                                                                        .getTime(),
-			                                                                decryptedValue));
-			return decryptedValue;
+							   Map<String, Object> decryptedCacheMap) {
+		SecretCipherHander secretManager = new SecretCipherHander(synCtx);
+		String decryptedValue = secretManager.getSecret(aliasPasword);
+		if (decryptedCacheMap == null) {
+			return null;
 		}
+
+		if (decryptedValue.isEmpty()) {
+			SecureVaultCacheContext cacheContext =
+					(SecureVaultCacheContext) decryptedCacheMap.get(aliasPasword);
+			if (cacheContext != null) {
+				return cacheContext.getDecryptedValue();
+			}
+		}
+
+		decryptedCacheMap.put(aliasPasword, new SecureVaultCacheContext(Calendar.getInstance()
+				.getTime(),
+				decryptedValue));
+		return decryptedValue;
 	}
 
 }
