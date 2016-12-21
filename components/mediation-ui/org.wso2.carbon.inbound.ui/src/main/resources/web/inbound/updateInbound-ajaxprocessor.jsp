@@ -21,6 +21,7 @@
 <%@page import="java.util.List"%>
 <%@page import="java.lang.Long"%>
 <%@page import="org.wso2.carbon.inbound.ui.internal.InboundManagementClient"%>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -31,11 +32,12 @@
 <script type="text/javascript" src="global-params.js"></script>
 <script type="text/javascript" src="inboundcommon.js"></script>
 <fmt:bundle basename="org.wso2.carbon.inbound.ui.i18n.Resources">
-	<carbon:breadcrumb label="inbound.edit.header"
-		resourceBundle="org.wso2.carbon.inbound.ui.i18n.Resources"
-		topPage="false" request="<%=request%>" />
 	<%
 		try {
+            if (!"POST".equalsIgnoreCase(request.getMethod())) {
+                response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                return;
+            }
 			InboundManagementClient client = InboundManagementClient.getInstance(config, session);
 			String classImpl = null;
 			String protocol = null;
@@ -155,7 +157,7 @@
 	%>
 	<script type="text/javascript">
     jQuery(document).ready(function() {
-        CARBON.showErrorDialog('<%=e.getMessage()%>', function() {
+        CARBON.showErrorDialog('<%=Encode.forHtml(e.getMessage())%>', function() {
 				goBackOnePage();
 			}, function() {
 				goBackOnePage();

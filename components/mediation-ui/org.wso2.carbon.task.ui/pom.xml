@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-ui</artifactId>
-        <version>4.6.9-SNAPSHOT</version>
+        <version>4.6.10-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.6.9-SNAPSHOT</version>
+    <version>4.6.10-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.task.ui</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Task UI</name>
@@ -48,6 +48,7 @@
                             org.apache.synapse.task.*,
                             javax.servlet;version="${imp.pkg.version.javax.servlet}",
                             javax.servlet.http;version="${imp.pkg.version.javax.servlet}",
+                            org.owasp.encoder.*;version="${owasp.encoder.wso2.imp.pkg.version}",
                             !org.wso2.carbon.task.ui.i18n
                             *;resolution:=optional
                         </Import-Package>
@@ -81,6 +82,10 @@
 	<dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.task.stub</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.owasp.encoder</groupId>
+            <artifactId>encoder</artifactId>
         </dependency>
     </dependencies>
 </project>

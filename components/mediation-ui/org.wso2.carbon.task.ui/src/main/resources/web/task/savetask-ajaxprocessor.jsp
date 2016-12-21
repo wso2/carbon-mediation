@@ -25,6 +25,7 @@
 <%@ page import="java.util.List"%>
 <%@ page import="java.util.Set"%>
 <%@ page import="org.wso2.carbon.CarbonConstants"%>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -35,11 +36,12 @@
 <script type="text/javascript" src="global-params.js"></script>
 <script type="text/javascript" src="taskcommon.js"></script>
 <fmt:bundle basename="org.wso2.carbon.task.ui.i18n.Resources">
-	<carbon:breadcrumb label="task.edit.header"
-		resourceBundle="org.wso2.carbon.task.ui.i18n.Resources"
-		topPage="false" request="<%=request%>" />
 	<%
 		try {
+            if (!"POST".equalsIgnoreCase(request.getMethod())) {
+                response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                return;
+            }
 				String saveMode = request.getParameter("saveMode");
 				boolean edit = "edit".equals(saveMode);
 				TaskManagementClient client;
@@ -81,7 +83,7 @@
 	%>
 	<script type="text/javascript">
     jQuery(document).ready(function() {
-        CARBON.showErrorDialog('<%=e.getMessage()%>
+        CARBON.showErrorDialog('<%=Encode.forHtmlAttribute(e.getMessage())%>
 		', function() {
 				goBackOnePage();
 			}, function() {
