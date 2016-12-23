@@ -37,6 +37,7 @@ import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 public class Http2RequestWriter {
@@ -73,8 +74,10 @@ public class Http2RequestWriter {
                         IOUtils.write(out.toByteArray(), _out);
                     }
                     int t = pipe.consume(pipeEncoder);
-                }catch (Exception e){
-                    log.error(e);
+                }catch (IOException e){
+
+                    //throw ex
+                    //log.error(e);
                 }
             }
         }else{

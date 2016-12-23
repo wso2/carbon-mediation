@@ -70,7 +70,8 @@ public class Http2ClientHandler extends ChannelDuplexHandler {
             try {
                 receiver.onHeadersFrameRead(frame, sentRequests.get(frame.streamId()));
             } catch (AxisFault axisFault) {
-                axisFault.printStackTrace();
+                //log error
+                //axisFault.printStackTrace();
             }
             if (frame.isEndStream()) {
                 sentRequests.remove(frame.streamId());

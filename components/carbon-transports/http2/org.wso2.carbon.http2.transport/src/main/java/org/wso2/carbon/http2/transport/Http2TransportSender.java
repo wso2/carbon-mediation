@@ -137,7 +137,10 @@ public class Http2TransportSender extends AbstractTransportSender {
             }
 
         } catch (URISyntaxException e){
-            log.error("Error parsing the http2 endpoint url", e);
+            //Throw an error
+            log.error("Error parsing the http2 endpoint url");
+            throw new AxisFault(e.getMessage());
+
         }
     }
 }

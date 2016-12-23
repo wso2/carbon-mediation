@@ -154,6 +154,7 @@ public class Http2ConnectionFactory {
             b.handler(initializer);
             // Start the client.
             Channel channel = b.connect().syncUninterruptibly().channel();
+
             log.debug("Connected to [" + HOST + ':' + PORT + ']');
 
             Http2SettingsHandler http2SettingsHandler = initializer.settingsHandler();
