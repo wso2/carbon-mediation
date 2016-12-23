@@ -135,14 +135,10 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 			SecureVaultCacheContext cacheContext =
 			                                       (SecureVaultCacheContext) decryptedCacheMap.get(aliasPasword);
 			if (cacheContext != null) {
-				String cacheDurable =
-						synCtx.getConfiguration().getRegistry()
-								.getConfigurationProperties()
-								.getProperty("cachableDuration");
-				long cacheTime =
-						(cacheDurable != null && !cacheDurable.isEmpty())
-								? Long.parseLong(cacheDurable)
-								: 10000;
+				String cacheDurable = synCtx.getConfiguration().getRegistry().getConfigurationProperties().getProperty
+						("cachableDuration");
+				long cacheTime = (cacheDurable != null && !cacheDurable.isEmpty()) ? Long.parseLong(cacheDurable) :
+						10000;
 				if ((cacheContext.getDateTime().getTime() + cacheTime) >= System.currentTimeMillis()) {
 					// which means the given value between the cachable limit
 					return cacheContext.getDecryptedValue();
@@ -153,7 +149,6 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 			} else {
 				return vaultLookup(aliasPasword, synCtx, decryptedCacheMap);
 			}
-
 		} else {
 			String decryptedValue = vaultLookup(aliasPasword, synCtx, decryptedCacheMap);
 			return decryptedValue;
