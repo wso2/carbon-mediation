@@ -37,4 +37,7 @@ public class Http2Constants {
     public static final String HTTP2_DISPATCH_SEQUENCE = "http2.dispatch.sequence";
     public static final String HTTP2_ERROR_SEQUENCE = "http2.error.sequence";
 
+    public static final String STREAM_ID="stream-id";
+    public static final String STREAM_CHANNEL="stream-channel";
+
 }

@@ -207,6 +207,10 @@ public class Http2ResponseWriter {
         }
     }
 
+    /**
+     *
+     * @param synCtx
+     */
     public void writePushPromiseResponse(MessageContext synCtx) {
         int promiseId = connection.local().incrementAndGetNextStreamId();
         int streamId = (int) synCtx.getProperty("stream-id");

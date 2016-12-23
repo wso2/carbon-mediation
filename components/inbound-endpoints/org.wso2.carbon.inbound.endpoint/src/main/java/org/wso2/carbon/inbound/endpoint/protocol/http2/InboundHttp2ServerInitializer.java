@@ -42,13 +42,15 @@ import org.apache.commons.logging.LogFactory;
 import static io.netty.handler.logging.LogLevel.DEBUG;
 import static io.netty.handler.logging.LogLevel.INFO;
 
+/**
+ * Initializing connection with a peer
+ */
 public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private static final Log log = LogFactory.getLog(InboundHttp2ServerInitializer.class);
     private static final Http2FrameLogger logger = new Http2FrameLogger(DEBUG, //Change mode into INFO to log frames
             InboundHttp2ServerInitializer.class);
     private final SslContext sslCtx;
-    private final int maxHttpContentLength;
     private final InboundHttp2Configuration config;
     private UpgradeCodecFactory upgradeCodecFactory;
 
@@ -64,9 +66,12 @@ public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChan
         }
         this.config = config;
         this.sslCtx = sslCtx;
-        this.maxHttpContentLength = maxHttpContentLength;
     }
 
+    /**
+     * Channel initialization
+     * @param ch
+     */
     @Override
     public void initChannel(SocketChannel ch) {
         Http2Connection conn = new DefaultHttp2Connection(true);
@@ -82,11 +87,23 @@ public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChan
         }
     }
 
+    /**
+     * start channel for HTTP/2 over TLS (https)
+     * @param ch
+     * @param connectionHandler
+     * @param channelHanlder
+     */
     private void configureSsl(SocketChannel ch, Http2ConnectionHandler connectionHandler,
             InboundHttp2SourceHandler channelHanlder) {
         ch.pipeline().addLast(sslCtx.newHandler(ch.alloc()), connectionHandler, channelHanlder);
     }
 
+    /**
+     * start channel for HTTP/2 Cleartext
+     * @param ch
+     * @param connectionHandler
+     * @param channelHandler
+     */
     private void configureClearText(SocketChannel ch,
             final Http2ConnectionHandler connectionHandler,
             final InboundHttp2SourceHandler channelHandler) {

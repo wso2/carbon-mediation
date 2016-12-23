@@ -22,14 +22,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.inbound.InboundResponseSender;
-import org.wso2.carbon.inbound.endpoint.protocol.http2.common.SourceHandler;
 
+/**
+ * Send responses back to peer
+ *
+ */
 public class InboundHttp2ResponseSender implements InboundResponseSender {
 
     private static final Log log = LogFactory.getLog(InboundHttp2ResponseSender.class);
-    private SourceHandler sourceHandler;
+    private InboundHttp2SourceHandler sourceHandler;
 
-    public InboundHttp2ResponseSender(SourceHandler sourceHandler) {
+    public InboundHttp2ResponseSender(InboundHttp2SourceHandler sourceHandler) {
         this.sourceHandler = sourceHandler;
     }
 
@@ -39,7 +42,7 @@ public class InboundHttp2ResponseSender implements InboundResponseSender {
             try {
                 sourceHandler.sendResponse(synCtx);
             } catch (Exception iEx) {
-                log.error("Error while building the message", iEx);
+                log.error("Error while while sending the response", iEx);
             }
         } else {
             log.error("send back message is null");

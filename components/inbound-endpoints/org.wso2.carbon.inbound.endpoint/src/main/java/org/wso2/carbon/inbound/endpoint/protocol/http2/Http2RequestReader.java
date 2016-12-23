@@ -84,11 +84,14 @@ public class Http2RequestReader {
     public void onDataRead(Http2DataFrame frame) {
         int streamId = frame.streamId();
         Http2SourceRequest request = null;
-        request = requestMap.get(streamId);
 
-        if (request == null) {
+        if (!requestMap.containsKey(streamId)) {
             return;
         }
+
+        request = requestMap.get(streamId);
+
+
         request.setChannel(chContext);
 
         Pipe pipe = request.getPipe();

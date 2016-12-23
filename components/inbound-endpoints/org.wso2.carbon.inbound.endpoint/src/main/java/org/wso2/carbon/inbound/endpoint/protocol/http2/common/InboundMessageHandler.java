@@ -80,6 +80,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.parsers.FactoryConfigurationError;
 
+/**
+ * This class is responsible for dispatching request message to Axis2 Engine
+ */
+
 public class InboundMessageHandler {
 
     private static final Log log = LogFactory.getLog(InboundMessageHandler.class);
@@ -99,97 +103,11 @@ public class InboundMessageHandler {
         this.responseSender = responseSender;
     }
 
-    private static org.apache.axis2.context.MessageContext createAxis2MessageContext() {
-        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
-        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
-        axis2MsgCtx.setConfigurationContext(
-                ServiceReferenceHolder.getInstance().getConfigurationContextService()
-                        .getServerConfigContext());
-        return axis2MsgCtx;
-    }
-
-    public void injectToSequence(MessageContext synCtx, InboundEndpoint endpoint) {
-
-        SequenceMediator injectingSequence = null;
-        if (endpoint.getInjectingSeq() != null) {
-            injectingSequence = (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
-        }
-        if (injectingSequence == null) {
-            injectingSequence = (SequenceMediator) synCtx.getMainSequence();
-        }
-        SequenceMediator faultSequence = getFaultSequence(synCtx, endpoint);
-        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
-        synCtx.pushFaultHandler(mediatorFaultHandler);
-
-        log.info("Injecting message to sequence : " + endpoint.getInjectingSeq());
-        synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
-        synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
-    }
-
-    private SequenceMediator getFaultSequence(MessageContext synCtx, InboundEndpoint endpoint) {
-        SequenceMediator faultSequence = null;
-        if (endpoint.getOnErrorSeq() != null) {
-            faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
-        }
-        if (faultSequence == null) {
-            faultSequence = (SequenceMediator) synCtx.getFaultSequence();
-        }
-        return faultSequence;
-    }
-
-    public MessageContext getSynapseMessageContext(String tenantDomain) throws AxisFault {
-        MessageContext synCtx = createSynapseMessageContext(tenantDomain);
-        synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
-        ((Axis2MessageContext) synCtx).getAxis2MessageContext()
-                .setProperty(SynapseConstants.IS_INBOUND, true);
-        synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
-                responseSender);
-        ((Axis2MessageContext) synCtx).getAxis2MessageContext()
-                .setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
-                        responseSender);
-        return synCtx;
-    }
-
-    public MessageContext createSynapseMessageContext(String tenantDomain) throws AxisFault {
-        org.apache.axis2.context.MessageContext axis2MsgCtx = createAxis2MessageContext();
-        ServiceContext svcCtx = new ServiceContext();
-        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
-        axis2MsgCtx.setServiceContext(svcCtx);
-        axis2MsgCtx.setOperationContext(opCtx);
-
-        if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            ConfigurationContext tenantConfigCtx = TenantAxisUtils
-                    .getTenantConfigurationContext(tenantDomain,
-                            axis2MsgCtx.getConfigurationContext());
-            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
-            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
-        } else {
-            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN,
-                    MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
-        }
-        SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
-        SOAPEnvelope envelope = fac.getDefaultEnvelope();
-        axis2MsgCtx.setEnvelope(envelope);
-        return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
-    }
-
-    public void injectToMainSequence(MessageContext synCtx, InboundEndpoint endpoint) {
-
-        SequenceMediator injectingSequence = (SequenceMediator) synCtx.getMainSequence();
-
-        SequenceMediator faultSequence = getFaultSequence(synCtx, endpoint);
-
-        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
-        synCtx.pushFaultHandler(mediatorFaultHandler);
-
-        /* handover synapse message context to synapse environment for inject it to given
-        sequence in synchronous manner*/
-        if (log.isDebugEnabled()) {
-            log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
-        }
-        synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
-    }
-
+    /**
+     * Create synapse message context and dispatch the sequence to Axis2 Engine
+     * @param request
+     * @throws AxisFault
+     */
     public void processRequest(Http2SourceRequest request) throws AxisFault {
 
         String tenantDomain = getTenantDomain(request);
@@ -198,26 +116,24 @@ public class InboundMessageHandler {
         InboundEndpoint endpoint = synCtx.getConfiguration()
                 .getInboundEndpoint(this.config.getName());
         if (endpoint == null) {
-            log.error("Cannot find deployed inbound endpoint " + this.config.getName()
+            throw new AxisFault("Cannot find deployed inbound endpoint " + this.config.getName()
                     + "for process request");
-            return;
         }
 
         org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx)
                 .getAxis2MessageContext();
         updateMessageContext(axis2MsgCtx, request);
-        synCtx.setProperty("stream-id", request.getStreamID());
-        synCtx.setProperty("stream-channel", request.getChannel());
+        synCtx.setProperty(Http2Constants.STREAM_ID, request.getStreamID());
+        synCtx.setProperty(Http2Constants.STREAM_CHANNEL, request.getChannel());
 
         axis2MsgCtx.setProperty("OutTransportInfo", this);
 
-        axis2MsgCtx.setProperty("stream-id", request.getStreamID());
-        axis2MsgCtx.setProperty("stream-channel", request.getChannel());
+        axis2MsgCtx.setProperty(Http2Constants.STREAM_ID, request.getStreamID());
+        axis2MsgCtx.setProperty(Http2Constants.STREAM_CHANNEL, request.getChannel());
         if (request.getRequestType() != null) {
             axis2MsgCtx.setProperty(Http2Constants.HTTP2_REQUEST_TYPE, request.getRequestType());
         }
-        axis2MsgCtx.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED,
-                config.isEnableServerPush());
+
         axis2MsgCtx.setServerSide(true);
         axis2MsgCtx.setProperty("TransportInURL", request.getUri());
         String method = request.getMethod();
@@ -229,10 +145,12 @@ public class InboundMessageHandler {
         axis2MsgCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
                 responseSender);
         synCtx.setWSAAction(request.getHeader(InboundHttpConstants.SOAP_ACTION));
-        axis2MsgCtx
-                .setProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE, config.getDispatchSequence());
-        axis2MsgCtx.setProperty(Http2Constants.HTTP2_ERROR_SEQUENCE, config.getErrorSequence());
-
+        axis2MsgCtx.setProperty(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST_ENABLED,
+                config.isEnableServerPush());
+        if(config.isEnableServerPush()) {
+            axis2MsgCtx.setProperty(Http2Constants.HTTP2_DISPATCH_SEQUENCE, config.getDispatchSequence());
+            axis2MsgCtx.setProperty(Http2Constants.HTTP2_ERROR_SEQUENCE, config.getErrorSequence());
+        }
         if (!isRESTRequest(axis2MsgCtx, method)) {
             if (request.getPipe() != null) {
                 processEntityEnclosingRequest(axis2MsgCtx, false, request);
@@ -308,7 +226,104 @@ public class InboundMessageHandler {
         }
     }
 
-    public void processNonEntityEnclosingRESTHandler(SOAPEnvelope soapEnvelope,
+    private static org.apache.axis2.context.MessageContext createAxis2MessageContext() {
+        org.apache.axis2.context.MessageContext axis2MsgCtx = new org.apache.axis2.context.MessageContext();
+        axis2MsgCtx.setMessageID(UIDGenerator.generateURNString());
+        axis2MsgCtx.setConfigurationContext(
+                ServiceReferenceHolder.getInstance().getConfigurationContextService()
+                        .getServerConfigContext());
+        return axis2MsgCtx;
+    }
+
+    private void injectToSequence(MessageContext synCtx, InboundEndpoint endpoint) {
+
+        SequenceMediator injectingSequence = null;
+        if (endpoint.getInjectingSeq() != null) {
+            injectingSequence = (SequenceMediator) synCtx.getSequence(endpoint.getInjectingSeq());
+        }
+        if (injectingSequence == null) {
+            injectingSequence = (SequenceMediator) synCtx.getMainSequence();
+        }
+        SequenceMediator faultSequence = getFaultSequence(synCtx, endpoint);
+        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
+        synCtx.pushFaultHandler(mediatorFaultHandler);
+
+        log.info("Injecting message to sequence : " + endpoint.getInjectingSeq());
+        synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
+        synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
+    }
+
+    private SequenceMediator getFaultSequence(MessageContext synCtx, InboundEndpoint endpoint) {
+        SequenceMediator faultSequence = null;
+        if (endpoint.getOnErrorSeq() != null) {
+            faultSequence = (SequenceMediator) synCtx.getSequence(endpoint.getOnErrorSeq());
+        }
+        if (faultSequence == null) {
+            faultSequence = (SequenceMediator) synCtx.getFaultSequence();
+        }
+        return faultSequence;
+    }
+
+    /**
+     * creating synapse context according to the tenant domain
+     * @param tenantDomain
+     * @return
+     * @throws AxisFault
+     */
+    public MessageContext getSynapseMessageContext(String tenantDomain) throws AxisFault {
+        MessageContext synCtx = createSynapseMessageContext(tenantDomain);
+        synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext()
+                .setProperty(SynapseConstants.IS_INBOUND, true);
+        synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
+                responseSender);
+        ((Axis2MessageContext) synCtx).getAxis2MessageContext()
+                .setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
+                        responseSender);
+        return synCtx;
+    }
+
+    private MessageContext createSynapseMessageContext(String tenantDomain) throws AxisFault {
+        org.apache.axis2.context.MessageContext axis2MsgCtx = createAxis2MessageContext();
+        ServiceContext svcCtx = new ServiceContext();
+        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
+        axis2MsgCtx.setServiceContext(svcCtx);
+        axis2MsgCtx.setOperationContext(opCtx);
+
+        if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
+            ConfigurationContext tenantConfigCtx = TenantAxisUtils
+                    .getTenantConfigurationContext(tenantDomain,
+                            axis2MsgCtx.getConfigurationContext());
+            axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
+            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
+        } else {
+            axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN,
+                    MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+        }
+        SOAPFactory fac = OMAbstractFactory.getSOAP11Factory();
+        SOAPEnvelope envelope = fac.getDefaultEnvelope();
+        axis2MsgCtx.setEnvelope(envelope);
+        return MessageContextCreatorForAxis2.getSynapseMessageContext(axis2MsgCtx);
+    }
+
+    private void injectToMainSequence(MessageContext synCtx, InboundEndpoint endpoint) {
+
+        SequenceMediator injectingSequence = (SequenceMediator) synCtx.getMainSequence();
+
+        SequenceMediator faultSequence = getFaultSequence(synCtx, endpoint);
+
+        MediatorFaultHandler mediatorFaultHandler = new MediatorFaultHandler(faultSequence);
+        synCtx.pushFaultHandler(mediatorFaultHandler);
+
+        /* handover synapse message context to synapse environment for inject it to given
+        sequence in synchronous manner*/
+        if (log.isDebugEnabled()) {
+            log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
+        }
+        synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
+    }
+
+    private void processNonEntityEnclosingRESTHandler(SOAPEnvelope soapEnvelope,
             org.apache.axis2.context.MessageContext msgContext, boolean injectToAxis2Engine,
             Http2SourceRequest request) {
         String soapAction = request.getHeader("soapaction");
@@ -382,7 +397,7 @@ public class InboundMessageHandler {
         return isDeployed;
     }
 
-    public void processEntityEnclosingRequest(org.apache.axis2.context.MessageContext msgContext,
+    private void processEntityEnclosingRequest(org.apache.axis2.context.MessageContext msgContext,
             boolean injectToAxis2Engine, Http2SourceRequest request) {
         try {
             String e = request.getHeader("content-type");
@@ -456,7 +471,7 @@ public class InboundMessageHandler {
                 && contentType.indexOf("application/soap+xml") == -1;
     }
 
-    public boolean isRESTRequest(org.apache.axis2.context.MessageContext msgContext,
+    private boolean isRESTRequest(org.apache.axis2.context.MessageContext msgContext,
             String method) {
         if (msgContext.getProperty("rest_get_delete_invoke") != null && ((Boolean) msgContext
                 .getProperty("rest_get_delete_invoke")).booleanValue()) {
@@ -469,7 +484,7 @@ public class InboundMessageHandler {
         }
     }
 
-    public void processHttpRequestUri(org.apache.axis2.context.MessageContext msgContext,
+    private void processHttpRequestUri(org.apache.axis2.context.MessageContext msgContext,
             String method, Http2SourceRequest request) {
         String servicePrefixIndex = "://";
         ConfigurationContext cfgCtx = msgContext.getConfigurationContext();
@@ -498,7 +513,7 @@ public class InboundMessageHandler {
 
     }
 
-    public SOAPEnvelope handleRESTUrlPost(String contentTypeHdr,
+    private SOAPEnvelope handleRESTUrlPost(String contentTypeHdr,
             org.apache.axis2.context.MessageContext msgContext, Http2SourceRequest request)
             throws FactoryConfigurationError {
         SOAPEnvelope soapEnvelope = null;
@@ -570,7 +585,7 @@ public class InboundMessageHandler {
         return soapEnvelope;
     }
 
-    protected String getTenantDomain(Http2SourceRequest request) {
+    private String getTenantDomain(Http2SourceRequest request) {
         String tenant = MultitenantUtils.getTenantDomainFromUrl(request.getUri());
         if (tenant.equals(request.getUri())) {
             return MultitenantConstants.SUPER_TENANT_DOMAIN_NAME;
@@ -621,7 +636,7 @@ public class InboundMessageHandler {
         return msgContext;
     }
 
-    public String getContentType(org.apache.axis2.context.MessageContext msgCtx) throws AxisFault {
+    private String getContentType(org.apache.axis2.context.MessageContext msgCtx) throws AxisFault {
         Boolean noEntityBody = (Boolean) msgCtx.getProperty("NO_ENTITY_BODY");
 
         boolean noEntityBodyResponse = false;

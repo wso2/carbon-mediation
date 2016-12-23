@@ -22,6 +22,9 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.configuration.NettyThreadPoolConfiguration;
 
+/**
+ * Managing thread groups for inbound
+ */
 public class InboundHttp2EventExecutor {
 
     private EventLoopGroup workerGroup;
@@ -32,14 +35,24 @@ public class InboundHttp2EventExecutor {
         bossGroup = new NioEventLoopGroup(configuration.getBossThreadPoolSize());
     }
 
+    /**
+     * @return Boss Thread Group
+     */
     public EventLoopGroup getBossGroupThreadPool() {
         return bossGroup;
     }
 
+    /**
+     *
+     * @return worker Thread Group
+     */
     public EventLoopGroup getWorkerGroupThreadPool() {
         return workerGroup;
     }
 
+    /**
+     * Shutdown Thread Groups
+     */
     public void shutdownEventExecutor() {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();

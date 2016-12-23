@@ -32,10 +32,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundMessageHandler;
-import org.wso2.carbon.inbound.endpoint.protocol.http2.common.SourceHandler;
 
+/**
+ * Handle Inbound Endpoint Requests and Responses
+ */
 @Sharable
-public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements SourceHandler {
+public class InboundHttp2SourceHandler extends ChannelDuplexHandler{
     private static final Log log = LogFactory.getLog(InboundHttp2SourceHandler.class);
     private final InboundHttp2Configuration config;
     private ChannelHandlerContext chContext;
@@ -58,6 +60,12 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
         ctx.close();
     }
 
+    /**
+     * Read peer's frames
+     * @param ctx
+     * @param msg
+     * @throws Exception
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         reader.setChContext(ctx);
@@ -88,26 +96,30 @@ public class InboundHttp2SourceHandler extends ChannelDuplexHandler implements S
         writer.setConfig(config);
     }
 
-    @Override
+    /**
+     * Send Responses to the peer
+     * @param msgCtx
+     * @throws AxisFault
+     */
     public synchronized void sendResponse(MessageContext msgCtx) throws AxisFault {
         org.apache.axis2.context.MessageContext axisMessage = ((Axis2MessageContext) msgCtx)
                 .getAxis2MessageContext();
 
-        String requestType = null;
+        String responseType = null;
 
         if (axisMessage.getProperty(Http2Constants.HTTP2_REQUEST_TYPE) != null) {
-            requestType = axisMessage.getProperty(Http2Constants.HTTP2_REQUEST_TYPE).toString();
+            responseType = axisMessage.getProperty(Http2Constants.HTTP2_REQUEST_TYPE).toString();
         }
-        if (requestType == null || requestType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)) {
+        if (responseType == null || responseType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)) {
             writer.writeNormalResponse(msgCtx);
 
-        } else if (requestType.equals(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST)) {
+        } else if (responseType.equals(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST)) {
             writer.writePushPromiseResponse(msgCtx);
 
-        } else if (requestType.equals(Http2Constants.HTTP2_GO_AWAY_REQUEST)) {
+        } else if (responseType.equals(Http2Constants.HTTP2_GO_AWAY_REQUEST)) {
             writer.writeGoAwayResponse(msgCtx);
         } else {
-            log.error("Uncaught request type : " + requestType);
+            throw new AxisFault("Uncaught response type : " + responseType);
         }
     }
 
