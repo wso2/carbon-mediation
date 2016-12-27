@@ -11,41 +11,41 @@ import java.util.concurrent.TimeUnit;
  * Reads the first {@link Http2Settings} object and notifies a {@link ChannelPromise}
  */
 public class Http2SettingsHandler extends SimpleChannelInboundHandler<Http2Settings> {
-    private ChannelPromise promise;
-    private Http2ClientHandler handler;
+	private ChannelPromise promise;
+	private Http2ClientHandler handler;
 
-    /**
-     * Create new instance
-     *
-     * @param promise Promise object used to notify when first settings are received
-     */
-    public Http2SettingsHandler(ChannelPromise promise,Http2ClientHandler clientHandler) {
-        this.promise = promise;
-        this.handler=clientHandler;
-    }
+	/**
+	 * Create new instance
+	 *
+	 * @param promise Promise object used to notify when first settings are received
+	 */
+	public Http2SettingsHandler(ChannelPromise promise, Http2ClientHandler clientHandler) {
+		this.promise = promise;
+		this.handler = clientHandler;
+	}
 
-    /**
-     * Wait for this handler to be added after the upgrade to HTTP/2, and for initial preface
-     * handshake to complete.
-     *
-     * @param timeout Time to wait
-     * @param unit    {@link TimeUnit} for {@code timeout}
-     * @throws Exception if timeout or other failure occurs
-     */
-    public void awaitSettings(long timeout, TimeUnit unit) throws Exception {
-        if (!promise.awaitUninterruptibly(timeout, unit)) {
-            throw new IllegalStateException("Timed out waiting for settings");
-        }
-        if (!promise.isSuccess()) {
-            throw new RuntimeException(promise.cause());
-        }
-    }
+	/**
+	 * Wait for this handler to be added after the upgrade to HTTP/2, and for initial preface
+	 * handshake to complete.
+	 *
+	 * @param timeout Time to wait
+	 * @param unit    {@link TimeUnit} for {@code timeout}
+	 * @throws Exception if timeout or other failure occurs
+	 */
+	public void awaitSettings(long timeout, TimeUnit unit) throws Exception {
+		if (!promise.awaitUninterruptibly(timeout, unit)) {
+			throw new IllegalStateException("Timed out waiting for settings");
+		}
+		if (!promise.isSuccess()) {
+			throw new RuntimeException(promise.cause());
+		}
+	}
 
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Http2Settings msg) throws Exception {
-        promise.setSuccess();
-        handler.setChContext(ctx);
-        // Only care about the first settings message
-        ctx.pipeline().remove(this);
-    }
+	@Override
+	protected void channelRead0(ChannelHandlerContext ctx, Http2Settings msg) throws Exception {
+		promise.setSuccess();
+		handler.setChContext(ctx);
+		// Only care about the first settings message
+		ctx.pipeline().remove(this);
+	}
 }

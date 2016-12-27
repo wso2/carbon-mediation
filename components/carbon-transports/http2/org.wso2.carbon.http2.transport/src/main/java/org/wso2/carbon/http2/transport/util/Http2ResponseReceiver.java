@@ -110,6 +110,11 @@ public class Http2ResponseReceiver {
         return axis2MsgCtx;
     }
 
+    /**
+     * Handle Http2 Data frames
+     * @param frame
+     * @param msgContext
+     */
     public void onDataFrameRead(Http2DataFrame frame, MessageContext msgContext) {
         if (!incompleteResponses.containsKey(frame.streamId())) {
             log.error("No response headers found for received dataframe of streamID : " + frame
@@ -170,7 +175,8 @@ public class Http2ResponseReceiver {
                     org.apache.synapse.MessageContext synCtx = MessageContextCreatorForAxis2
                             .getSynapseMessageContext(response);
                     if (responseSender != null) {
-                        synCtx.setProperty("stream-id", (int) msgContext.getProperty("stream-id"));
+                        synCtx.setProperty(Http2Constants.STREAM_ID, (int) msgContext.getProperty
+                                (Http2Constants.STREAM_ID));
                         synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
                         synCtx.setResponse(true);
                         synCtx.setProperty(
@@ -193,16 +199,26 @@ public class Http2ResponseReceiver {
         }
     }
 
+    /**
+     * Handle Http2 Header frames
+     * @param frame
+     * @param msgContext
+     */
     public void onHeadersFrameRead(Http2HeadersFrame frame, MessageContext msgContext)
-            throws AxisFault {
+    {
         MessageContext response = null;
         if (incompleteResponses.containsKey(frame.streamId())) {
             response = incompleteResponses.get(frame.streamId());
         }
         if (!serverPushAccepted) {
             if (response == null) {
-                response = msgContext.getOperationContext().
-                        getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
+                try {
+                    response = msgContext.getOperationContext().
+                            getMessageContext(WSDL2Constants.MESSAGE_LABEL_IN);
+                }catch (AxisFault fault){
+                    log.error("Error while taking operation context from request",fault);
+                }
+
                 if (response != null) {
                     response.setSoapAction("");
                 }
@@ -240,15 +256,23 @@ public class Http2ResponseReceiver {
             if (frame.isEndStream()) {
                 response.setProperty(PassThroughConstants.NO_ENTITY_BODY, Boolean.TRUE);
                 incompleteResponses.remove(frame.streamId());
-                response.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
-                AxisEngine.receive(response);
+                try{
+                    response.setEnvelope(new SOAP11Factory().getDefaultEnvelope());
+                    AxisEngine.receive(response);
+                }catch (AxisFault fault){
+                    log.error("Error occured while receiving response",fault);
+                }
                 response.setProperty(Http2Constants.HTTP2_RESPONSE_SENT, true);
                 if (serverPushes.containsKey(frame.streamId()))
                     serverPushes.remove(frame.streamId());
             }
         } else {
             if (response == null) {
-                response = createAxis2MessageContext(tenantDomain);
+                try {
+                    response = createAxis2MessageContext(tenantDomain);
+                }catch (AxisFault fault){
+                    log.error("Error while creating Axis2MessageContext",fault);
+                }
                 incompleteResponses.put(frame.streamId(), response);
             }
             addHeaders(null, response, frame);
@@ -265,10 +289,16 @@ public class Http2ResponseReceiver {
                 }
             }
             if (frame.isEndStream()) {
-                org.apache.synapse.MessageContext synCtx = MessageContextCreatorForAxis2
-                        .getSynapseMessageContext(response);
+                org.apache.synapse.MessageContext synCtx=null;
+                try {
+                     synCtx= MessageContextCreatorForAxis2
+                            .getSynapseMessageContext(response);
+                }catch (AxisFault fault){
+                    log.error("Error occured while creating synapse message context",fault);
+                }
                 if (responseSender != null) {
-                    synCtx.setProperty("stream-id", (int) msgContext.getProperty("stream-id"));
+                    synCtx.setProperty(Http2Constants.STREAM_ID,msgContext.getProperty
+                            (Http2Constants.STREAM_ID));
                     synCtx.setProperty(SynapseConstants.IS_INBOUND, true);
                     synCtx.setResponse(true);
                     synCtx.setProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER,
@@ -283,6 +313,11 @@ public class Http2ResponseReceiver {
         }
     }
 
+    /**
+     * Handle Http2 Server push responses
+     * @param frame
+     * @param msgContext
+     */
     public void onPushPromiseFrameRead(Http2PushPromiseFrame frame, MessageContext msgContext) {
         serverPushes.put(frame.getPushPromiseId(), frame.getHeaders());
     }
@@ -368,7 +403,8 @@ public class Http2ResponseReceiver {
         if(headers.containsKey(PassThroughConstants.LOCATION))
              oriURL= headers.get(PassThroughConstants.LOCATION);
 
-        HttpResponseStatus status = HttpResponseStatus.parseLine(frame.headers().status());
+        HttpResponseStatus status = (frame.headers().status()!=null)?HttpResponseStatus.parseLine
+                (frame.headers().status()):HttpResponseStatus.OK;
         if (oriURL != null && ((status.code() != HttpStatus.SC_MOVED_TEMPORARILY) && (status.code()
                 != HttpStatus.SC_MOVED_PERMANENTLY) && (status.code() != HttpStatus.SC_CREATED) && (
                 status.code() != HttpStatus.SC_SEE_OTHER) && (status.code()
@@ -461,7 +497,7 @@ public class Http2ResponseReceiver {
     private void injectToSequence(org.apache.synapse.MessageContext synCtx, String dispatchSequence,
             String dispatchErrorSequence) {
         if (inboundChannel != null)
-            synCtx.setProperty("stream-channel", inboundChannel);
+            synCtx.setProperty(Http2Constants.STREAM_CHANNEL, inboundChannel);
         SequenceMediator injectingSequence = null;
         if (dispatchSequence != null) {
             injectingSequence = (SequenceMediator) synCtx.getSequence(dispatchSequence);

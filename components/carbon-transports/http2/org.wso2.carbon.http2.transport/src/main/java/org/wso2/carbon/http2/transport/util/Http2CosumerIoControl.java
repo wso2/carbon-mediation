@@ -22,30 +22,33 @@ import org.apache.http.nio.IOControl;
 
 import java.io.IOException;
 
+/**
+ * Dummy ConsumerIoControl class for Pass-through-pipe
+ */
 public class Http2CosumerIoControl implements IOControl {
 
-    @Override
-    public void requestInput() {
+	@Override
+	public void requestInput() {
 
-    }
+	}
 
-    @Override
-    public void suspendInput() {
+	@Override
+	public void suspendInput() {
 
-    }
+	}
 
-    @Override
-    public void requestOutput() {
+	@Override
+	public void requestOutput() {
 
-    }
+	}
 
-    @Override
-    public void suspendOutput() {
+	@Override
+	public void suspendOutput() {
 
-    }
+	}
 
-    @Override
-    public void shutdown() throws IOException {
+	@Override
+	public void shutdown() throws IOException {
 
-    }
+	}
 }

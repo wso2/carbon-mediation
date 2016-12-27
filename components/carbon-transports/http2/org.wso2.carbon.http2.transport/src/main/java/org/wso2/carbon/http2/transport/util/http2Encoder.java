@@ -27,57 +27,55 @@ import org.apache.http.nio.ContentEncoder;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+/**
+ * Encoder to consume Pass-through-pipe and write data-frames on wire
+ */
 public class http2Encoder implements ContentEncoder {
-    ChannelHandlerContext chContext;
-    int streamId;
-    Http2ConnectionEncoder encoder;
-    ChannelPromise promise;
-    boolean isComplete = false;
+	ChannelHandlerContext chContext;
+	int streamId;
+	Http2ConnectionEncoder encoder;
+	ChannelPromise promise;
+	boolean isComplete = false;
 
-    public http2Encoder(ChannelHandlerContext chContext, int streamId,
-            Http2ConnectionEncoder encoder, ChannelPromise promise) {
-        this.chContext = chContext;
-        this.streamId = streamId;
-        this.encoder = encoder;
-        this.promise = promise;
+	public http2Encoder(ChannelHandlerContext chContext, int streamId,
+	                    Http2ConnectionEncoder encoder, ChannelPromise promise) {
+		this.chContext = chContext;
+		this.streamId = streamId;
+		this.encoder = encoder;
+		this.promise = promise;
 
-    }
+	}
 
-    @Override
-    public int write(ByteBuffer src) throws IOException {
-        int l = 0;
-        //channel.newPromise();
+	@Override
+	public int write(ByteBuffer src) throws IOException {
+		int l = 0;
+		//channel.newPromise();
 
-        while (src.hasRemaining()) {
-            byte[] b;//= new byte[chContext.channel().alloc().buffer().capacity()];
-            //  if(src.remaining()<b.length){
-            b = new byte[src.remaining()];
-            src.get(b);
-            // request.replace(Unpooled.wrappedBuffer(b));
-            if (src.hasRemaining())
-                encoder.writeData(chContext, streamId, Unpooled.wrappedBuffer(b), 0, false,
-                        promise);
-            else {
-                encoder.writeData(chContext, streamId, Unpooled.wrappedBuffer(b), 0, true, promise);
-                isComplete = true;
-            }
+		while (src.hasRemaining()) {
+			byte[] b;//= new byte[chContext.channel().alloc().buffer().capacity()];
+			//  if(src.remaining()<b.length){
+			b = new byte[src.remaining()];
+			src.get(b);
+			// request.replace(Unpooled.wrappedBuffer(b));
+			if (src.hasRemaining())
+				encoder.writeData(chContext, streamId, Unpooled.wrappedBuffer(b), 0, false,
+				                  promise);
+			else {
+				encoder.writeData(chContext, streamId, Unpooled.wrappedBuffer(b), 0, true, promise);
+				isComplete = true;
+			}
+		}
 
-            /*}else{
-                src.get(b,0,b.length);
-                encoder.writeData(chContext,streamId,Unpooled.wrappedBuffer(b),0,false,promise);
-            }*/
-        }
+		return src.position();
+	}
 
-        return src.position();
-    }
+	@Override
+	public void complete() throws IOException {
 
-    @Override
-    public void complete() throws IOException {
+	}
 
-    }
-
-    @Override
-    public boolean isCompleted() {
-        return isComplete;
-    }
+	@Override
+	public boolean isCompleted() {
+		return isComplete;
+	}
 }

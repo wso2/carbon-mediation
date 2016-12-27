@@ -41,81 +41,110 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * Writes requests onto wire
+ */
 public class Http2RequestWriter {
 
-    private static final Log log = LogFactory.getLog(Http2RequestWriter.class);
+	private static final Log log = LogFactory.getLog(Http2RequestWriter.class);
 
-    Http2ConnectionEncoder encoder;
-    Http2Connection connection;
-    ChannelHandlerContext chContext;
+	Http2ConnectionEncoder encoder;
+	Http2Connection connection;
+	ChannelHandlerContext chContext;
 
-    public void writeSimpleReqeust(int streamId,MessageContext msgContext) throws AxisFault{
-        Http2TargetRequestUtil util = (Http2TargetRequestUtil) msgContext.getProperty(Http2Constants.PASSTHROUGH_TARGET);
-        Http2Headers headers=util.getHeaders(msgContext);
-        ChannelPromise promise=chContext.newPromise();
+	/**
+	 * Writes a normal request in wire under given stream-id
+	 *
+	 * @param streamId
+	 * @param msgContext
+	 * @throws AxisFault
+	 */
+	public void writeSimpleReqeust(int streamId, MessageContext msgContext) throws AxisFault {
+		Http2TargetRequestUtil util =
+				(Http2TargetRequestUtil) msgContext.getProperty(Http2Constants.PASSTHROUGH_TARGET);
+		Http2Headers headers = util.getHeaders(msgContext);
+		ChannelPromise promise = chContext.newPromise();
 
-        if(util.isHasEntityBody() && headers.contains(HttpHeaderNames.CONTENT_TYPE)) {
-            http2Encoder pipeEncoder=new http2Encoder(chContext,streamId,encoder,promise);
-            Pipe pipe = (Pipe) msgContext.getProperty("pass-through.pipe");
-            encoder.writeHeaders(chContext,streamId,headers,0,false,promise);
-            if (pipe != null) {
-                pipe.attachConsumer(new Http2CosumerIoControl());
-                try {
-                    if (Boolean.TRUE.equals(msgContext
-                            .getProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
-                        ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        MessageFormatter formatter = MessageProcessorSelector
-                                .getMessageFormatter(msgContext);
-                        OMOutputFormat format = PassThroughTransportUtils
-                                .getOMOutputFormat(msgContext);
-                        formatter.writeTo(msgContext, format, out, false);
-                        OutputStream _out = pipe.getOutputStream();
-                        IOUtils.write(out.toByteArray(), _out);
-                    }
-                    int t = pipe.consume(pipeEncoder);
-                }catch (IOException e){
-                    throw new AxisFault("Error while consuming pipe",e);
-                }
-            }
-        }else{
-            encoder.writeHeaders(chContext,streamId,headers,0,true,promise);
-        }
-        try {
-            encoder.flowController().writePendingBytes();
-        } catch (Exception e) {
-            throw new AxisFault("Error while writing pending bytes of encoder to channel",e);
-        }
-        chContext.flush();
-    }
+		if (util.isHasEntityBody() && headers.contains(HttpHeaderNames.CONTENT_TYPE)) {
+			http2Encoder pipeEncoder = new http2Encoder(chContext, streamId, encoder, promise);
+			Pipe pipe = (Pipe) msgContext.getProperty(PassThroughConstants.PASS_THROUGH_PIPE);
+			encoder.writeHeaders(chContext, streamId, headers, 0, false, promise);
+			if (pipe != null) {
+				pipe.attachConsumer(new Http2CosumerIoControl());
+				try {
+					if (Boolean.TRUE.equals(msgContext.getProperty(
+							PassThroughConstants.MESSAGE_BUILDER_INVOKED))) {
+						ByteArrayOutputStream out = new ByteArrayOutputStream();
+						MessageFormatter formatter =
+								MessageProcessorSelector.getMessageFormatter(msgContext);
+						OMOutputFormat format =
+								PassThroughTransportUtils.getOMOutputFormat(msgContext);
+						formatter.writeTo(msgContext, format, out, false);
+						OutputStream _out = pipe.getOutputStream();
+						IOUtils.write(out.toByteArray(), _out);
+					}
+					int t = pipe.consume(pipeEncoder);
+				} catch (IOException e) {
+					throw new AxisFault("Error while consuming pipe", e);
+				}
+			}
+		} else {
+			encoder.writeHeaders(chContext, streamId, headers, 0, true, promise);
+		}
+		try {
+			encoder.flowController().writePendingBytes();
+		} catch (Exception e) {
+			throw new AxisFault("Error while writing pending bytes of encoder to channel", e);
+		}
+		chContext.flush();
+	}
 
-    public void writeRestSreamRequest(int streamId,Http2Error code){
-        encoder.writeRstStream(chContext,streamId,code.code(),chContext.newPromise());  //sending a restStreamFrame
-        chContext.flush();
-    }
+	/**
+	 * Writes a stream termination request;
+	 *
+	 * @param streamId
+	 * @param code
+	 */
+	public void writeRestSreamRequest(int streamId, Http2Error code) {
+		encoder.writeRstStream(chContext, streamId, code.code(),
+		                       chContext.newPromise());  //sending a restStreamFrame
+		chContext.flush();
+	}
 
-    public void writeGoAwayReqeust(int lastStreamId,Http2Error code){
-        encoder.writeGoAway(chContext,lastStreamId,0,null,chContext.newPromise());  //sending a goAwayFrame
-        chContext.flush();
-    }
+	/**
+	 * Writes a connection termination request
+	 *
+	 * @param lastStreamId
+	 * @param code
+	 */
+	public void writeGoAwayReqeust(int lastStreamId, Http2Error code) {
+		encoder.writeGoAway(chContext, lastStreamId, 0, null,
+		                    chContext.newPromise());  //sending a goAwayFrame
+		chContext.flush();
+	}
 
+	public Http2RequestWriter(Http2Connection connection) {
+		this.connection = connection;
+	}
 
-    public Http2RequestWriter(Http2Connection connection) {
-        this.connection = connection;
-    }
+	public void setEncoder(Http2ConnectionEncoder encoder) {
+		this.encoder = encoder;
+	}
 
-    public void setEncoder(Http2ConnectionEncoder encoder) {
-        this.encoder = encoder;
-    }
+	public void setConnection(Http2Connection connection) {
+		this.connection = connection;
+	}
 
-    public void setConnection(Http2Connection connection) {
-        this.connection = connection;
-    }
+	public void setChannelHandlerContext(ChannelHandlerContext channelHandlerContext) {
+		this.chContext = channelHandlerContext;
+	}
 
-    public void setChannelHandlerContext(ChannelHandlerContext channelHandlerContext) {
-        this.chContext = channelHandlerContext;
-    }
-
-    public int getNextStreamId() {
-        return connection.local().incrementAndGetNextStreamId();
-    }
+	/**
+	 * Get the next available stream id for requests
+	 *
+	 * @return
+	 */
+	public int getNextStreamId() {
+		return connection.local().incrementAndGetNextStreamId();
+	}
 }

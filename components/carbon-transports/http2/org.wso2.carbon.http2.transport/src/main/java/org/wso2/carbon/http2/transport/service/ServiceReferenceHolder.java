@@ -22,26 +22,26 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 
 public class ServiceReferenceHolder {
 
-    private static final ServiceReferenceHolder INSTANCE = new ServiceReferenceHolder();
-    private ConfigurationContextService configurationContextService;
+	private static final ServiceReferenceHolder INSTANCE = new ServiceReferenceHolder();
+	private ConfigurationContextService configurationContextService;
 
-    private ServiceReferenceHolder() {
-    }
+	private ServiceReferenceHolder() {
+	}
 
-    public static ServiceReferenceHolder getInstance() {
-        return INSTANCE;
-    }
+	public static ServiceReferenceHolder getInstance() {
+		return INSTANCE;
+	}
 
-    public ConfigurationContextService getConfigurationContextService() {
-        if (configurationContextService != null) {
-            return configurationContextService;
-        }
-        return null;
-    }
+	public ConfigurationContextService getConfigurationContextService() {
+		if (configurationContextService != null) {
+			return configurationContextService;
+		}
+		return null;
+	}
 
-    public void setConfigurationContextService(
-            ConfigurationContextService configurationContextService) {
-        this.configurationContextService = configurationContextService;
-    }
+	public void setConfigurationContextService(
+			ConfigurationContextService configurationContextService) {
+		this.configurationContextService = configurationContextService;
+	}
 
 }

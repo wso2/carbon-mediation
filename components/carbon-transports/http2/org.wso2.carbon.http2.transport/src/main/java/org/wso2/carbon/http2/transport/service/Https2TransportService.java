@@ -25,23 +25,23 @@ import org.wso2.carbon.core.transports.util.TransportParameter;
 
 public class Https2TransportService extends AbstractTransportService {
 
-    public static final String TRANSPORT_NAME = "https2";
-    public static final String TRANSPORT_CONF = "secure-http2-transports.xml";
-    private static final Log log = LogFactory.getLog(Https2TransportService.class);
+	public static final String TRANSPORT_NAME = "https2";
+	public static final String TRANSPORT_CONF = "secure-http2-transports.xml";
+	private static final Log log = LogFactory.getLog(Https2TransportService.class);
 
-    public Https2TransportService() {
-        super(TRANSPORT_NAME);
-    }
+	public Https2TransportService() {
+		super(TRANSPORT_NAME);
+	}
 
-    public boolean dependenciesAvailable(TransportParameter[] params) {
-        try {
-            Class.forName("io.netty.handler.codec.http2.Http2ConnectionHandler");
-            return true;
-        } catch (ClassNotFoundException e) {
-            log.error("Https2 protocol handlers not found");
-            return false;
-        }
-    }
+	public boolean dependenciesAvailable(TransportParameter[] params) {
+		try {
+			Class.forName("io.netty.handler.codec.http2.Http2ConnectionHandler");
+			return true;
+		} catch (ClassNotFoundException e) {
+			log.error("Https2 protocol handlers not found");
+			return false;
+		}
+	}
 }
 
 

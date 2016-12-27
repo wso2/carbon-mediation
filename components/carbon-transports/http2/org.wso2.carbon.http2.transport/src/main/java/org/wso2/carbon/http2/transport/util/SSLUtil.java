@@ -20,44 +20,47 @@ package org.wso2.carbon.http2.transport.util;
 
 import org.apache.log4j.Logger;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
+/**
+ * Creating Trust-store for Http2 over TLS connections
+ */
 public class SSLUtil {
-    private static String TRUST_STORE_TYPE = "JKS";
-    private static String TRUST_MANAGER_TYPE = "SunX509";
-    private static TrustManagerFactory trustManagerFactory = null;
+	private static String TRUST_STORE_TYPE = "JKS";
+	private static String TRUST_MANAGER_TYPE = "SunX509";
+	private static TrustManagerFactory trustManagerFactory = null;
 
-    private static final Logger LOGGER = Logger.getLogger(SSLUtil.class);
+	private static final Logger LOGGER = Logger.getLogger(SSLUtil.class);
 
-    public static TrustManagerFactory createTrustmanager(final String trustStoreLocation,
-            final String trustStorePwd) {
-        try {
-            if (trustManagerFactory == null) {
-                KeyStore trustStore = KeyStore.getInstance(TRUST_STORE_TYPE);
-                trustStore
-                        .load(new FileInputStream(trustStoreLocation), trustStorePwd.toCharArray());
-                trustManagerFactory = TrustManagerFactory.getInstance(TRUST_MANAGER_TYPE);
-                trustManagerFactory.init(trustStore);
-            }
-        } catch (KeyStoreException e) {
-            LOGGER.error("Exception was thrown while building the client SSL context", e);
-        } catch (NoSuchAlgorithmException e) {
-            LOGGER.error("Exception was thrown while building the client SSL context", e);
-        } catch (CertificateException e) {
-            LOGGER.error("Exception was thrown while building the client SSL context", e);
-        } catch (FileNotFoundException e) {
-            LOGGER.error("Exception was thrown while building the client SSL context", e);
-        } catch (IOException e) {
-            LOGGER.error("Exception was thrown while building the client SSL context", e);
-        }
-        return trustManagerFactory;
-    }
+	public static TrustManagerFactory createTrustmanager(final String trustStoreLocation,
+	                                                     final String trustStorePwd) {
+		try {
+			if (trustManagerFactory == null) {
+				KeyStore trustStore = KeyStore.getInstance(TRUST_STORE_TYPE);
+				trustStore
+						.load(new FileInputStream(trustStoreLocation), trustStorePwd.toCharArray());
+				trustManagerFactory = TrustManagerFactory.getInstance(TRUST_MANAGER_TYPE);
+				trustManagerFactory.init(trustStore);
+			}
+		} catch (KeyStoreException e) {
+			LOGGER.error("Exception was thrown while building the client SSL context", e);
+		} catch (NoSuchAlgorithmException e) {
+			LOGGER.error("Exception was thrown while building the client SSL context", e);
+		} catch (CertificateException e) {
+			LOGGER.error("Exception was thrown while building the client SSL context", e);
+		} catch (FileNotFoundException e) {
+			LOGGER.error("Exception was thrown while building the client SSL context", e);
+		} catch (IOException e) {
+			LOGGER.error("Exception was thrown while building the client SSL context", e);
+		}
+		return trustManagerFactory;
+	}
 
 }

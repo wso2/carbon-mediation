@@ -41,98 +41,108 @@ import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
 import io.netty.handler.ssl.SslContext;
 
 import static io.netty.handler.logging.LogLevel.DEBUG;
-import static io.netty.handler.logging.LogLevel.INFO;
 
+/**
+ * Initializing a connection with the back-end server
+ */
 public class Http2ClientInitializer extends ChannelInitializer<SocketChannel> {
-    private static final Http2FrameLogger logger = new Http2FrameLogger(DEBUG,  //change mode to INFO for logging frames
-            Http2ClientInitializer.class);
+	private static final Http2FrameLogger logger =
+			new Http2FrameLogger(DEBUG,  //change mode to INFO for logging frames
+			                     Http2ClientInitializer.class);
 
-    private final SslContext sslCtx;
-    private final int maxContentLength;
-    private Http2ClientHandler responseHandler;
-    private Http2ConnectionHandler connectionHandler;
-    private Http2SettingsHandler settingsHandler;
-    private Http2FrameListener listener;
+	private final SslContext sslCtx;
+	private final int maxContentLength;
+	private Http2ClientHandler responseHandler;
+	private Http2ConnectionHandler connectionHandler;
+	private Http2SettingsHandler settingsHandler;
+	private Http2FrameListener listener;
 
-    public Http2ClientInitializer(SslContext sslCtx, int maxContentLength) {
-        this.sslCtx = sslCtx;
-        this.maxContentLength = maxContentLength;
-    }
+	public Http2ClientInitializer(SslContext sslCtx, int maxContentLength) {
+		this.sslCtx = sslCtx;
+		this.maxContentLength = maxContentLength;
+	}
 
-    @Override
-    public void initChannel(SocketChannel ch) throws Exception {
-        final Http2Connection connection = new DefaultHttp2Connection(false);
-        Http2FrameListenAdapter clientFrameListener = new Http2FrameListenAdapter();
+	/**
+	 * Initiate Http2 connection as clearText or TCP secured
+	 *
+	 * @param ch
+	 * @throws Exception
+	 */
+	@Override
+	public void initChannel(SocketChannel ch) throws Exception {
+		final Http2Connection connection = new DefaultHttp2Connection(false);
+		Http2FrameListenAdapter clientFrameListener = new Http2FrameListenAdapter();
 
-        listener = new DelegatingDecompressorFrameListener(connection, clientFrameListener);
-        connectionHandler = new Http2ConnectionHandlerBuilder().connection(connection)
-                .frameLogger(logger).frameListener(listener).build();
-        responseHandler = new Http2ClientHandler(connection);
-        responseHandler.setEncoder(connectionHandler.encoder());
-        settingsHandler = new Http2SettingsHandler(ch.newPromise(), responseHandler);
-        if (sslCtx != null) {
-            configureSsl(ch);
-        } else {
-            configureClearText(ch);
-        }
-    }
+		listener = new DelegatingDecompressorFrameListener(connection, clientFrameListener);
+		connectionHandler =
+				new Http2ConnectionHandlerBuilder().connection(connection).frameLogger(logger)
+				                                   .frameListener(listener).build();
+		responseHandler = new Http2ClientHandler(connection);
+		responseHandler.setEncoder(connectionHandler.encoder());
+		settingsHandler = new Http2SettingsHandler(ch.newPromise(), responseHandler);
+		if (sslCtx != null) {
+			configureSsl(ch);
+		} else {
+			configureClearText(ch);
+		}
+	}
 
-    public Http2ClientHandler responseHandler() {
-        return responseHandler;
-    }
+	public Http2ClientHandler responseHandler() {
+		return responseHandler;
+	}
 
-    public Http2SettingsHandler settingsHandler() {
-        return settingsHandler;
-    }
+	public Http2SettingsHandler settingsHandler() {
+		return settingsHandler;
+	}
 
-    protected void configureEndOfPipeline(ChannelPipeline pipeline) {
-        pipeline.addLast(settingsHandler, responseHandler);
-    }
+	private void configureEndOfPipeline(ChannelPipeline pipeline) {
+		pipeline.addLast(settingsHandler, responseHandler);
+	}
 
-    private void configureSsl(SocketChannel ch) {
-        ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(sslCtx.newHandler(ch.alloc()));
-        pipeline.addLast(new ApplicationProtocolNegotiationHandler("") {
-            @Override
-            protected void configurePipeline(ChannelHandlerContext ctx, String protocol) {
-                if (ApplicationProtocolNames.HTTP_2.equals(protocol)) {
-                    ChannelPipeline p = ctx.pipeline();
-                    p.addLast(connectionHandler);
-                    configureEndOfPipeline(p);
-                    return;
-                }
-                ctx.close();
-                throw new IllegalStateException("unknown protocol: " + protocol);
-            }
-        });
-    }
+	private void configureSsl(SocketChannel ch) {
+		ChannelPipeline pipeline = ch.pipeline();
+		pipeline.addLast(sslCtx.newHandler(ch.alloc()));
+		pipeline.addLast(new ApplicationProtocolNegotiationHandler("") {
+			@Override
+			protected void configurePipeline(ChannelHandlerContext ctx, String protocol) {
+				if (ApplicationProtocolNames.HTTP_2.equals(protocol)) {
+					ChannelPipeline p = ctx.pipeline();
+					p.addLast(connectionHandler);
+					configureEndOfPipeline(p);
+					return;
+				}
+				ctx.close();
+				throw new IllegalStateException("unknown protocol: " + protocol);
+			}
+		});
+	}
 
-    private void configureClearText(SocketChannel ch) {
-        HttpClientCodec sourceCodec = new HttpClientCodec();
-        Http2ClientUpgradeCodec upgradeCodec = new Http2ClientUpgradeCodec(connectionHandler);
-        HttpClientUpgradeHandler upgradeHandler = new HttpClientUpgradeHandler(sourceCodec,
-                upgradeCodec, 65536);
+	private void configureClearText(SocketChannel ch) {
+		HttpClientCodec sourceCodec = new HttpClientCodec();
+		Http2ClientUpgradeCodec upgradeCodec = new Http2ClientUpgradeCodec(connectionHandler);
+		HttpClientUpgradeHandler upgradeHandler =
+				new HttpClientUpgradeHandler(sourceCodec, upgradeCodec, 65536);
 
-        ch.pipeline().addLast(sourceCodec, upgradeHandler, new UpgradeRequestHandler(),
-                new UserEventLogger());
-    }
+		ch.pipeline()
+		  .addLast(sourceCodec, upgradeHandler, new UpgradeRequestHandler(), new UserEventLogger());
+	}
 
-    private static class UserEventLogger extends ChannelInboundHandlerAdapter {
-        @Override
-        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-            ctx.fireUserEventTriggered(evt);
-        }
-    }
+	private static class UserEventLogger extends ChannelInboundHandlerAdapter {
+		@Override
+		public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+			ctx.fireUserEventTriggered(evt);
+		}
+	}
 
-    private final class UpgradeRequestHandler extends ChannelInboundHandlerAdapter {
-        @Override
-        public void channelActive(ChannelHandlerContext ctx) throws Exception {
-            DefaultFullHttpRequest upgradeRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1,
-                    HttpMethod.GET, "/");
-            ctx.writeAndFlush(upgradeRequest);
-            ctx.fireChannelActive();
-            ctx.pipeline().remove(this);
-            configureEndOfPipeline(ctx.pipeline());
-        }
-    }
+	private final class UpgradeRequestHandler extends ChannelInboundHandlerAdapter {
+		@Override
+		public void channelActive(ChannelHandlerContext ctx) throws Exception {
+			DefaultFullHttpRequest upgradeRequest =
+					new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
+			ctx.writeAndFlush(upgradeRequest);
+			ctx.fireChannelActive();
+			ctx.pipeline().remove(this);
+			configureEndOfPipeline(ctx.pipeline());
+		}
+	}
 }
