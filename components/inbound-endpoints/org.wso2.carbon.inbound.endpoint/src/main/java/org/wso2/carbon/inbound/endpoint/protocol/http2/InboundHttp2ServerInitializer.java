@@ -40,98 +40,102 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import static io.netty.handler.logging.LogLevel.DEBUG;
-import static io.netty.handler.logging.LogLevel.INFO;
 
 /**
  * Initializing connection with a peer
  */
 public class InboundHttp2ServerInitializer extends ChannelInitializer<SocketChannel> {
 
-    private static final Log log = LogFactory.getLog(InboundHttp2ServerInitializer.class);
-    private static final Http2FrameLogger logger = new Http2FrameLogger(DEBUG, //Change mode into INFO to log frames
-            InboundHttp2ServerInitializer.class);
-    private final SslContext sslCtx;
-    private final InboundHttp2Configuration config;
-    private UpgradeCodecFactory upgradeCodecFactory;
+	private static final Log log = LogFactory.getLog(InboundHttp2ServerInitializer.class);
+	private static final Http2FrameLogger logger =
+			new Http2FrameLogger(DEBUG, //Change mode into INFO to log frames
+			                     InboundHttp2ServerInitializer.class);
+	private final SslContext sslCtx;
+	private final InboundHttp2Configuration config;
+	private UpgradeCodecFactory upgradeCodecFactory;
 
-    public InboundHttp2ServerInitializer(SslContext sslCtx, InboundHttp2Configuration config) {
-        this(sslCtx, 16 * 1024, config);
-    }
+	public InboundHttp2ServerInitializer(SslContext sslCtx, InboundHttp2Configuration config) {
+		this(sslCtx, 16 * 1024, config);
+	}
 
-    public InboundHttp2ServerInitializer(SslContext sslCtx, int maxHttpContentLength,
-            final InboundHttp2Configuration config) {
-        if (maxHttpContentLength < 0) {
-            throw new IllegalArgumentException(
-                    "maxHttpContentLength (expected >= 0): " + maxHttpContentLength);
-        }
-        this.config = config;
-        this.sslCtx = sslCtx;
-    }
+	public InboundHttp2ServerInitializer(SslContext sslCtx, int maxHttpContentLength,
+	                                     final InboundHttp2Configuration config) {
+		if (maxHttpContentLength < 0) {
+			throw new IllegalArgumentException(
+					"maxHttpContentLength (expected >= 0): " + maxHttpContentLength);
+		}
+		this.config = config;
+		this.sslCtx = sslCtx;
+	}
 
-    /**
-     * Channel initialization
-     * @param ch
-     */
-    @Override
-    public void initChannel(SocketChannel ch) {
-        Http2Connection conn = new DefaultHttp2Connection(true);
-        Http2FrameListenAdapter listenAdapter = new Http2FrameListenAdapter();
-        Http2ConnectionHandler connectionHandler = new Http2ConnectionHandlerBuilder()
-                .connection(conn).frameLogger(logger).frameListener(listenAdapter).build();
-        InboundHttp2SourceHandler sourceHandler = new InboundHttp2SourceHandler(this.config, conn,
-                connectionHandler.encoder());
-        if (sslCtx != null) {
-            configureSsl(ch, connectionHandler, sourceHandler);
-        } else {
-            configureClearText(ch, connectionHandler, sourceHandler);
-        }
-    }
+	/**
+	 * Channel initialization
+	 *
+	 * @param ch
+	 */
+	@Override
+	public void initChannel(SocketChannel ch) {
+		Http2Connection conn = new DefaultHttp2Connection(true);
+		Http2FrameListenAdapter listenAdapter = new Http2FrameListenAdapter();
+		Http2ConnectionHandler connectionHandler =
+				new Http2ConnectionHandlerBuilder().connection(conn).frameLogger(logger)
+				                                   .frameListener(listenAdapter).build();
+		InboundHttp2SourceHandler sourceHandler =
+				new InboundHttp2SourceHandler(this.config, conn, connectionHandler.encoder());
+		if (sslCtx != null) {
+			configureSsl(ch, connectionHandler, sourceHandler);
+		} else {
+			configureClearText(ch, connectionHandler, sourceHandler);
+		}
+	}
 
-    /**
-     * start channel for HTTP/2 over TLS (https)
-     * @param ch
-     * @param connectionHandler
-     * @param channelHanlder
-     */
-    private void configureSsl(SocketChannel ch, Http2ConnectionHandler connectionHandler,
-            InboundHttp2SourceHandler channelHanlder) {
-        ch.pipeline().addLast(sslCtx.newHandler(ch.alloc()), connectionHandler, channelHanlder);
-    }
+	/**
+	 * start channel for HTTP/2 over TLS (https)
+	 *
+	 * @param ch
+	 * @param connectionHandler
+	 * @param channelHanlder
+	 */
+	private void configureSsl(SocketChannel ch, Http2ConnectionHandler connectionHandler,
+	                          InboundHttp2SourceHandler channelHanlder) {
+		ch.pipeline().addLast(sslCtx.newHandler(ch.alloc()), connectionHandler, channelHanlder);
+	}
 
-    /**
-     * start channel for HTTP/2 Cleartext
-     * @param ch
-     * @param connectionHandler
-     * @param channelHandler
-     */
-    private void configureClearText(SocketChannel ch,
-            final Http2ConnectionHandler connectionHandler,
-            final InboundHttp2SourceHandler channelHandler) {
-        final ChannelPipeline p = ch.pipeline();
-        final HttpServerCodec sourceCodec = new HttpServerCodec();
-        upgradeCodecFactory = new UpgradeCodecFactory() {
+	/**
+	 * start channel for HTTP/2 Cleartext
+	 *
+	 * @param ch
+	 * @param connectionHandler
+	 * @param channelHandler
+	 */
+	private void configureClearText(SocketChannel ch,
+	                                final Http2ConnectionHandler connectionHandler,
+	                                final InboundHttp2SourceHandler channelHandler) {
+		final ChannelPipeline p = ch.pipeline();
+		final HttpServerCodec sourceCodec = new HttpServerCodec();
+		upgradeCodecFactory = new UpgradeCodecFactory() {
 
-            public UpgradeCodec newUpgradeCodec(CharSequence protocol) {
-                if (AsciiString
-                        .contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
-                    return new Http2ServerUpgradeCodec(null, connectionHandler);
-                } else {
-                    return null;
-                }
-            }
-        };
+			public UpgradeCodec newUpgradeCodec(CharSequence protocol) {
+				if (AsciiString
+						.contentEquals(Http2CodecUtil.HTTP_UPGRADE_PROTOCOL_NAME, protocol)) {
+					return new Http2ServerUpgradeCodec(null, connectionHandler);
+				} else {
+					return null;
+				}
+			}
+		};
 
-        p.addLast(sourceCodec);
-        p.addLast(new HttpServerUpgradeHandler(sourceCodec, upgradeCodecFactory));
-        p.addLast(channelHandler);
-        p.addLast(new UserEventLogger());
-    }
+		p.addLast(sourceCodec);
+		p.addLast(new HttpServerUpgradeHandler(sourceCodec, upgradeCodecFactory));
+		p.addLast(channelHandler);
+		p.addLast(new UserEventLogger());
+	}
 
-    private static class UserEventLogger extends ChannelInboundHandlerAdapter {
-        @Override
-        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
-            ctx.fireUserEventTriggered(evt);
-        }
-    }
+	private static class UserEventLogger extends ChannelInboundHandlerAdapter {
+		@Override
+		public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
+			ctx.fireUserEventTriggered(evt);
+		}
+	}
 
 }

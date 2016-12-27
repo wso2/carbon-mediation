@@ -25,25 +25,28 @@ import org.apache.http.nio.ContentDecoder;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+/**
+ * Write data frames into Pass-through-pipe
+ */
 public class HTTP2Decoder implements ContentDecoder {
-    Http2DataFrame dataFrame = null;
-    boolean complete = false;
+	Http2DataFrame dataFrame = null;
+	boolean complete = false;
 
-    public HTTP2Decoder(Http2DataFrame dataFrame) {
-        this.dataFrame = dataFrame;
-    }
+	public HTTP2Decoder(Http2DataFrame dataFrame) {
+		this.dataFrame = dataFrame;
+	}
 
-    @Override
-    public int read(ByteBuffer dst) throws IOException {
-        complete = false;
-        byte[] data = ByteBufUtil.getBytes(dataFrame.content());
-        dst.put(data);
-        complete = true;
-        return data.length;
-    }
+	@Override
+	public int read(ByteBuffer dst) throws IOException {
+		complete = false;
+		byte[] data = ByteBufUtil.getBytes(dataFrame.content());
+		dst.put(data);
+		complete = true;
+		return data.length;
+	}
 
-    @Override
-    public boolean isCompleted() {
-        return dataFrame.isEndStream() & complete;
-    }
+	@Override
+	public boolean isCompleted() {
+		return dataFrame.isEndStream() & complete;
+	}
 }

@@ -37,90 +37,92 @@ import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundMessageHand
  * Handle Inbound Endpoint Requests and Responses
  */
 @Sharable
-public class InboundHttp2SourceHandler extends ChannelDuplexHandler{
-    private static final Log log = LogFactory.getLog(InboundHttp2SourceHandler.class);
-    private final InboundHttp2Configuration config;
-    private ChannelHandlerContext chContext;
-    private Http2RequestReader reader;
-    private Http2ResponseWriter writer;
+public class InboundHttp2SourceHandler extends ChannelDuplexHandler {
+	private static final Log log = LogFactory.getLog(InboundHttp2SourceHandler.class);
+	private final InboundHttp2Configuration config;
+	private ChannelHandlerContext chContext;
+	private Http2RequestReader reader;
+	private Http2ResponseWriter writer;
 
-    public InboundHttp2SourceHandler(InboundHttp2Configuration config, Http2Connection connection,
-            Http2ConnectionEncoder encoder) {
-        this.config = config;
-        this.reader = new Http2RequestReader();
-        this.writer = new Http2ResponseWriter();
-        writer.setEncoder(encoder);
-        writer.setConnection(connection);
-    }
+	public InboundHttp2SourceHandler(InboundHttp2Configuration config, Http2Connection connection,
+	                                 Http2ConnectionEncoder encoder) {
+		this.config = config;
+		this.reader = new Http2RequestReader();
+		this.writer = new Http2ResponseWriter();
+		writer.setEncoder(encoder);
+		writer.setConnection(connection);
+	}
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
-        cause.printStackTrace();
-        ctx.close();
-    }
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+		super.exceptionCaught(ctx, cause);
+		ctx.close();
+		throw new AxisFault("connection error occurred", cause);
+	}
 
-    /**
-     * Read peer's frames
-     * @param ctx
-     * @param msg
-     * @throws Exception
-     */
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        reader.setChContext(ctx);
-        if (chContext == null)
-            writer.setChContext(ctx);
-        if (msg instanceof Http2HeadersFrame) {
-            Http2HeadersFrame frame = (Http2HeadersFrame) msg;
-            reader.onHeaderRead(frame);
+	/**
+	 * Read peer's frames
+	 *
+	 * @param ctx
+	 * @param msg
+	 * @throws Exception
+	 */
+	@Override
+	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+		reader.setChContext(ctx);
+		if (chContext == null)
+			writer.setChContext(ctx);
+		if (msg instanceof Http2HeadersFrame) {
+			Http2HeadersFrame frame = (Http2HeadersFrame) msg;
+			reader.onHeaderRead(frame);
 
-        } else if (msg instanceof Http2DataFrame) {
-            reader.onDataRead((Http2DataFrame) msg);
+		} else if (msg instanceof Http2DataFrame) {
+			reader.onDataRead((Http2DataFrame) msg);
 
-        } else if (msg instanceof Http2GoAwayFrame) {
-            reader.onGoAwayRead((Http2GoAwayFrame) msg);
+		} else if (msg instanceof Http2GoAwayFrame) {
+			reader.onGoAwayRead((Http2GoAwayFrame) msg);
 
-        } else {
-            super.channelRead(ctx, msg);
-        }
-    }
+		} else {
+			super.channelRead(ctx, msg);
+		}
+	}
 
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        this.chContext = ctx;
-        reader.setChContext(ctx);
-        writer.setChContext(ctx);
-        reader.setMessageHandler(
-                new InboundMessageHandler(new InboundHttp2ResponseSender(this), config));
-        writer.setConfig(config);
-    }
+	@Override
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+		this.chContext = ctx;
+		reader.setChContext(ctx);
+		writer.setChContext(ctx);
+		reader.setMessageHandler(
+				new InboundMessageHandler(new InboundHttp2ResponseSender(this), config));
+		writer.setConfig(config);
+	}
 
-    /**
-     * Send Responses to the peer
-     * @param msgCtx
-     * @throws AxisFault
-     */
-    public synchronized void sendResponse(MessageContext msgCtx) throws AxisFault {
-        org.apache.axis2.context.MessageContext axisMessage = ((Axis2MessageContext) msgCtx)
-                .getAxis2MessageContext();
+	/**
+	 * Send Responses to the peer
+	 *
+	 * @param msgCtx
+	 * @throws AxisFault
+	 */
+	public synchronized void sendResponse(MessageContext msgCtx) throws AxisFault {
+		org.apache.axis2.context.MessageContext axisMessage =
+				((Axis2MessageContext) msgCtx).getAxis2MessageContext();
 
-        String responseType = null;
+		String responseType = null;
 
-        if (axisMessage.getProperty(Http2Constants.HTTP2_REQUEST_TYPE) != null) {
-            responseType = axisMessage.getProperty(Http2Constants.HTTP2_REQUEST_TYPE).toString();
-        }
-        if (responseType == null || responseType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)) {
-            writer.writeNormalResponse(msgCtx);
+		if (axisMessage.getProperty(Http2Constants.HTTP2_REQUEST_TYPE) != null) {
+			responseType = axisMessage.getProperty(Http2Constants.HTTP2_REQUEST_TYPE).toString();
+		}
+		if (responseType == null || responseType.equals(Http2Constants.HTTP2_CLIENT_SENT_REQEUST)) {
+			writer.writeNormalResponse(msgCtx);
 
-        } else if (responseType.equals(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST)) {
-            writer.writePushPromiseResponse(msgCtx);
+		} else if (responseType.equals(Http2Constants.HTTP2_PUSH_PROMISE_REQEUST)) {
+			writer.writePushPromiseResponse(msgCtx);
 
-        } else if (responseType.equals(Http2Constants.HTTP2_GO_AWAY_REQUEST)) {
-            writer.writeGoAwayResponse(msgCtx);
-        } else {
-            throw new AxisFault("Uncaught response type : " + responseType);
-        }
-    }
+		} else if (responseType.equals(Http2Constants.HTTP2_GO_AWAY_REQUEST)) {
+			writer.writeGoAwayResponse(msgCtx);
+		} else {
+			throw new AxisFault("Uncaught response type : " + responseType);
+		}
+	}
 
 }

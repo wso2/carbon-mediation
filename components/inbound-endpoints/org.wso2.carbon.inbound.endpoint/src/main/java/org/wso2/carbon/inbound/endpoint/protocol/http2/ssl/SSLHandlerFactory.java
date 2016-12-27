@@ -33,6 +33,9 @@ import java.security.cert.CertificateException;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+/**
+ * Key store and trust store creation
+ */
 public class SSLHandlerFactory {
 
     private KeyManagerFactory keyStoreFactory;

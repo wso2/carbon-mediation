@@ -22,36 +22,36 @@ import org.apache.log4j.Logger;
 
 public class NettyThreadPoolConfiguration {
 
-    private static final Logger log = Logger.getLogger(
-            org.wso2.carbon.inbound.endpoint.protocol.http2.configuration.NettyThreadPoolConfiguration.class);
+	private static final Logger log = Logger.getLogger(
+			org.wso2.carbon.inbound.endpoint.protocol.http2.configuration.NettyThreadPoolConfiguration.class);
 
-    private int bossThreadPoolSize;
-    private int workerThreadPoolSize;
+	private int bossThreadPoolSize;
+	private int workerThreadPoolSize;
 
-    public NettyThreadPoolConfiguration(String bossThreadPoolSize, String workerThreadPoolSize) {
+	public NettyThreadPoolConfiguration(String bossThreadPoolSize, String workerThreadPoolSize) {
 
-        try {
-            if (bossThreadPoolSize != null && bossThreadPoolSize.trim() != "") {
-                this.bossThreadPoolSize = Integer.parseInt(bossThreadPoolSize);
-            } else {
-                this.bossThreadPoolSize = Runtime.getRuntime().availableProcessors();
-            }
-            if (workerThreadPoolSize != null && workerThreadPoolSize.trim() != "") {
-                this.workerThreadPoolSize = Integer.parseInt(workerThreadPoolSize);
-            } else {
-                this.workerThreadPoolSize = Runtime.getRuntime().availableProcessors() * 2;
-            }
-        } catch (Exception e) {
-            log.error("failed to validate the Netty thread pool configuration", e);
-        }
-    }
+		try {
+			if (bossThreadPoolSize != null && bossThreadPoolSize.trim() != "") {
+				this.bossThreadPoolSize = Integer.parseInt(bossThreadPoolSize);
+			} else {
+				this.bossThreadPoolSize = Runtime.getRuntime().availableProcessors();
+			}
+			if (workerThreadPoolSize != null && workerThreadPoolSize.trim() != "") {
+				this.workerThreadPoolSize = Integer.parseInt(workerThreadPoolSize);
+			} else {
+				this.workerThreadPoolSize = Runtime.getRuntime().availableProcessors() * 2;
+			}
+		} catch (Exception e) {
+			log.error("failed to validate the Netty thread pool configuration", e);
+		}
+	}
 
-    public int getBossThreadPoolSize() {
-        return bossThreadPoolSize;
-    }
+	public int getBossThreadPoolSize() {
+		return bossThreadPoolSize;
+	}
 
-    public int getWorkerThreadPoolSize() {
-        return workerThreadPoolSize;
-    }
+	public int getWorkerThreadPoolSize() {
+		return workerThreadPoolSize;
+	}
 
 }

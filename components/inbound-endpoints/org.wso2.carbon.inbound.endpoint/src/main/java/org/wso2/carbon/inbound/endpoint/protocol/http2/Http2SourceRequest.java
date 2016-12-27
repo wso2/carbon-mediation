@@ -28,161 +28,158 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Wrapping class to carry peer's request to InboundMessageHandler
+ */
 public class Http2SourceRequest {
-    private Pipe pipe = null;
-    private Logger log = Logger.getLogger(Http2SourceRequest.class);
-    private int streamID;
-    private ChannelHandlerContext channel;
-    private HashMap<Byte, Http2Frame> frames = new HashMap<Byte, Http2Frame>();
-    private Map<String, String> headers = new TreeMap<String, String>(new Comparator<String>() {
-        public int compare(String o1, String o2) {
-            return o1.compareToIgnoreCase(o2);
-        }
-    });
-    private String method = null;
-    private String uri = null;
-    private String scheme = null;
-    private boolean processedReq = false;
+	private Pipe pipe = null;
+	private Logger log = Logger.getLogger(Http2SourceRequest.class);
+	private int streamID;
+	private ChannelHandlerContext channel;
+	private HashMap<Byte, Http2Frame> frames = new HashMap<Byte, Http2Frame>();
+	private Map<String, String> headers = new TreeMap<String, String>(new Comparator<String>() {
+		public int compare(String o1, String o2) {
+			return o1.compareToIgnoreCase(o2);
+		}
+	});
+	private String method = null;
+	private String uri = null;
+	private String scheme = null;
+	private boolean processedReq = false;
 
-    private String requestType = null;
-    private Map<String, String> excessHeaders = new TreeMap<String, String>();
+	private String requestType = null;
+	private Map<String, String> excessHeaders = new TreeMap<String, String>();
 
-    public Http2SourceRequest(int streamID, ChannelHandlerContext channel) {
-        this.streamID = streamID;
-        this.channel = channel;
-    }
+	public Http2SourceRequest(int streamID, ChannelHandlerContext channel) {
+		this.streamID = streamID;
+		this.channel = channel;
+	}
 
-    public String getRequestType() {
-        return requestType;
-    }
+	public String getRequestType() {
+		return requestType;
+	}
 
-    public void setRequestType(String requestType) {
-        this.requestType = requestType;
-    }
+	public void setRequestType(String requestType) {
+		this.requestType = requestType;
+	}
 
-    public String getScheme() {
-        if (scheme != null) {
-            return scheme;
-        } else if (headers.containsKey("scheme")) {
-            return headers.get("scheme");
-        } else {
-            return "http";
-        }
-    }
+	public String getScheme() {
+		if (scheme != null) {
+			return scheme;
+		} else if (headers.containsKey("scheme")) {
+			return headers.get("scheme");
+		} else {
+			return "http";
+		}
+	}
 
-    public int getStreamID() {
-        return streamID;
-    }
+	public int getStreamID() {
+		return streamID;
+	}
 
-    public Map<String, String> getExcessHeaders() {
-        return excessHeaders;
-    }
+	public Map<String, String> getExcessHeaders() {
+		return excessHeaders;
+	}
 
-    public ChannelHandlerContext getChannel() {
-        return channel;
-    }
+	public ChannelHandlerContext getChannel() {
+		return channel;
+	}
 
-    public void setChannel(ChannelHandlerContext channel) {
-        this.channel = channel;
-    }
+	public void setChannel(ChannelHandlerContext channel) {
+		this.channel = channel;
+	}
 
-    @Deprecated
-    public Map<String, String> getHeaders() {
+	public Map<String, String> getHeaders() {
 
-        return headers;
-    }
+		return headers;
+	}
 
-    @Deprecated
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
-    }
+	public String getMethod() {
+		if (method != null) {
+			return method;
+		} else if (headers.containsKey("method")) {
+			return headers.get("method");
+		} else {
+			return null;
+		}
+	}
 
-    public String getMethod() {
-        if (method != null) {
-            return method;
-        } else if (headers.containsKey("method")) {
-            return headers.get("method");
-        } else {
-            return null;
-        }
-    }
+	public void setMethod(String method) {
+		this.method = method;
+	}
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
+	public String getHeader(String key) {
+		if (headers.containsKey(key)) {
+			return headers.get(key);
+		} else {
+			return null;
+		}
+	}
 
-    public String getHeader(String key) {
-        if (headers.containsKey(key)) {
-            return headers.get(key);
-        } else {
-            return null;
-        }
-    }
+	public String getUri() {
+		if (uri != null) {
+			return uri;
+		} else if (headers.containsKey("path")) {
+			uri = headers.get("path");
+			if (uri.charAt(0) != '/')
+				uri = '/' + uri;
+			return uri;
+		} else {
+			return null;
+		}
+	}
 
-    public String getUri() {
-        if (uri != null) {
-            return uri;
-        } else if (headers.containsKey("path")) {
-            uri = headers.get("path");
-            if (uri.charAt(0) != '/')
-                uri = '/' + uri;
-            return uri;
-        } else {
-            return null;
-        }
-    }
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
 
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
+	@Override
+	public String toString() {
+		String name = "";
+		name += "Stream Id:" + streamID + "/n";
+		if (headers.size() > 0) {
+			name += "Headers:/n";
+			for (Map.Entry h : headers.entrySet()) {
+				name += h.getKey() + ":" + h.getValue() + "/n";
+			}
+		}
+		if (frames.size() > 0) {
+			name += "Frames : /n";
+			for (Map.Entry h : frames.entrySet()) {
+				name += h.getKey().toString() + ":" + h.getValue() + "/n";
+			}
+		}
+		return name;
+	}
 
-    @Override
-    public String toString() {
-        String name = "";
-        name += "Stream Id:" + streamID + "/n";
-        if (headers.size() > 0) {
-            name += "Headers:/n";
-            for (Map.Entry h : headers.entrySet()) {
-                name += h.getKey() + ":" + h.getValue() + "/n";
-            }
-        }
-        if (frames.size() > 0) {
-            name += "Frames : /n";
-            for (Map.Entry h : frames.entrySet()) {
-                name += h.getKey().toString() + ":" + h.getValue() + "/n";
-            }
-        }
-        return name;
-    }
+	public void setHeader(String key, String value) {
+		if (key.charAt(0) == ':') {
+			key = key.substring(1);
+		}
+		if (key.equalsIgnoreCase("authority")) {
+			key = "host";
+		}
+		if (headers.containsKey(key)) {
+			excessHeaders.put(key, value);
+		} else {
+			headers.put(key, value);
+		}
+	}
 
-    public void setHeader(String key, String value) {
-        if (key.charAt(0) == ':') {
-            key = key.substring(1);
-        }
-        if (key.equalsIgnoreCase("authority")) {
-            key = "host";
-        }
-        if (headers.containsKey(key)) {
-            excessHeaders.put(key, value);
-        } else {
-            headers.put(key, value);
-        }
-    }
+	public boolean isProcessedReq() {
+		return processedReq;
+	}
 
-    public boolean isProcessedReq() {
-        return processedReq;
-    }
+	public void setProcessedReq(boolean processedReq) {
+		this.processedReq = processedReq;
+	}
 
-    public void setProcessedReq(boolean processedReq) {
-        this.processedReq = processedReq;
-    }
+	public Pipe getPipe() {
+		return pipe;
+	}
 
-    public Pipe getPipe() {
-        return pipe;
-    }
-
-    public void setPipe(Pipe pipe) {
-        this.pipe = pipe;
-    }
+	public void setPipe(Pipe pipe) {
+		this.pipe = pipe;
+	}
 }
 

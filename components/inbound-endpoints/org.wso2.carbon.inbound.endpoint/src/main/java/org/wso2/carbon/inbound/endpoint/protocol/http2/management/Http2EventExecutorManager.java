@@ -24,27 +24,30 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Http2EventExecutorManager {
 
-    private static org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager instance = null;
-    private ConcurrentHashMap<Integer, InboundHttp2EventExecutor> executorPoolMap = new ConcurrentHashMap<Integer, InboundHttp2EventExecutor>();
+	private static org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager
+			instance = null;
+	private ConcurrentHashMap<Integer, InboundHttp2EventExecutor> executorPoolMap =
+			new ConcurrentHashMap<Integer, InboundHttp2EventExecutor>();
 
-    public static org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager getInstance() {
-        if (instance == null) {
-            instance = new org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager();
-        }
-        return instance;
-    }
+	public static org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager getInstance() {
+		if (instance == null) {
+			instance =
+					new org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EventExecutorManager();
+		}
+		return instance;
+	}
 
-    public void shutdownExecutor(int port) {
-        executorPoolMap.get(port).shutdownEventExecutor();
-        executorPoolMap.remove(port);
-    }
+	public void shutdownExecutor(int port) {
+		executorPoolMap.get(port).shutdownEventExecutor();
+		executorPoolMap.remove(port);
+	}
 
-    public void registerEventExecutor(int port, InboundHttp2EventExecutor eventExecutor) {
-        executorPoolMap.put(port, eventExecutor);
-    }
+	public void registerEventExecutor(int port, InboundHttp2EventExecutor eventExecutor) {
+		executorPoolMap.put(port, eventExecutor);
+	}
 
-    public boolean isRegisteredExecutor(int port) {
-        return executorPoolMap.containsKey(port);
-    }
+	public boolean isRegisteredExecutor(int port) {
+		return executorPoolMap.containsKey(port);
+	}
 
 }

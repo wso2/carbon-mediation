@@ -19,25 +19,25 @@
 package org.wso2.carbon.inbound.endpoint.protocol.http2;
 
 public class Http2Constants {
-    public static final String HTTP2 = "http2";
-    public static final String HTTPS2 = "https2";
+	public static final String HTTP2 = "http2";
+	public static final String HTTPS2 = "https2";
 
-    public static final String HTTP2_REQUEST_TYPE = "http2.reqeust.type";
-    public static final String HTTP2_CLIENT_SENT_REQEUST = "http2.client.sent.reqeust";
-    public static final String HTTP2_PUSH_PROMISE_REQEUST = "http2.push.promise.reqeust";
-    public static final String HTTP2_PUSH_PROMISE_REQEUST_ENABLED = "http2.push.promise.reqeust.enable";
-    public static final String HTTP2_RESET_REQEUST = "http2.reset.reqeust";
-    public static final String HTTP2_GO_AWAY_REQUEST = "http2.go.away.reqeust";
-    public static final String HTTP2_PING_REQUEST = "http2.ping.request";
-    public static final String HTTP2_RESPONSE_SENT = "http2.response.sent";
+	public static final String HTTP2_REQUEST_TYPE = "http2.reqeust.type";
+	public static final String HTTP2_CLIENT_SENT_REQEUST = "http2.client.sent.reqeust";
+	public static final String HTTP2_PUSH_PROMISE_REQEUST = "http2.push.promise.reqeust";
+	public static final String HTTP2_PUSH_PROMISE_REQEUST_ENABLED =
+			"http2.push.promise.reqeust.enable";
+	public static final String HTTP2_RESET_REQEUST = "http2.reset.reqeust";
+	public static final String HTTP2_GO_AWAY_REQUEST = "http2.go.away.reqeust";
+	public static final String HTTP2_PUSH_PROMISE_ID = "http2.push.promise.id";
+	public static final String HTTP2_PUSH_PROMISE_HEADERS = "http2.push.promise.headers";
 
-    public static final String HTTP2_PUSH_PROMISE_ID = "http2.push.promise.id";
-    public static final String HTTP2_PUSH_PROMISE_HEADERS = "http2.push.promise.headers";
+	public static final String HTTP2_DISPATCH_SEQUENCE = "http2.dispatch.sequence";
+	public static final String HTTP2_ERROR_SEQUENCE = "http2.error.sequence";
 
-    public static final String HTTP2_DISPATCH_SEQUENCE = "http2.dispatch.sequence";
-    public static final String HTTP2_ERROR_SEQUENCE = "http2.error.sequence";
+	public static final String STREAM_ID = "stream-id";
+	public static final String STREAM_CHANNEL = "stream-channel";
 
-    public static final String STREAM_ID="stream-id";
-    public static final String STREAM_CHANNEL="stream-channel";
+	public static final String Http2SoapHeader="soapaction";
 
 }

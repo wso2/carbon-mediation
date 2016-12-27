@@ -23,134 +23,136 @@ import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundHttp2Consta
 
 import java.util.Properties;
 
+/**
+ * Stores Inbound Endpoint Configuration Parameters
+ */
 public class InboundHttp2Configuration {
-    private final int port;
-    private final String name;
-    private final String dispatchPattern;
-    private final Properties properties;
-    private String bossThreadPoolSize;
-    private String workerThreadPoolSize;
-    private String dispatchSequence;
-    private String errorSequence;
-    private boolean enableServerPush;
+	private final int port;
+	private final String name;
+	private final String dispatchPattern;
+	private final Properties properties;
+	private String bossThreadPoolSize;
+	private String workerThreadPoolSize;
+	private String dispatchSequence;
+	private String errorSequence;
+	private boolean enableServerPush;
 
-    private InboundHttp2Configuration(
-            InboundHttp2Configuration.InboundHttp2ConfigurationBuilder builder) {
-        this.port = builder.port;
-        this.name = builder.name;
-        this.properties = builder.properties;
-        this.dispatchPattern = builder.dispatchPattern;
-        this.workerThreadPoolSize = builder.workerThreadPoolSize;
-        this.bossThreadPoolSize = builder.bossThreadPoolSize;
-        this.dispatchSequence = builder.dispatchSequence;
-        this.errorSequence = builder.errorSequence;
-        this.enableServerPush = builder.enableServerPush;
+	private InboundHttp2Configuration(
+			InboundHttp2Configuration.InboundHttp2ConfigurationBuilder builder) {
+		this.port = builder.port;
+		this.name = builder.name;
+		this.properties = builder.properties;
+		this.dispatchPattern = builder.dispatchPattern;
+		this.workerThreadPoolSize = builder.workerThreadPoolSize;
+		this.bossThreadPoolSize = builder.bossThreadPoolSize;
+		this.dispatchSequence = builder.dispatchSequence;
+		this.errorSequence = builder.errorSequence;
+		this.enableServerPush = builder.enableServerPush;
 
-    }
+	}
 
-    public Properties getProperties() {
-        return properties;
-    }
+	public Properties getProperties() {
+		return properties;
+	}
 
-    public String getBossThreadPoolSize() {
-        return bossThreadPoolSize;
-    }
+	public String getBossThreadPoolSize() {
+		return bossThreadPoolSize;
+	}
 
-    public String getWorkerThreadPoolSize() {
-        return workerThreadPoolSize;
-    }
+	public String getWorkerThreadPoolSize() {
+		return workerThreadPoolSize;
+	}
 
-    public String getDispatchSequence() {
-        return dispatchSequence;
-    }
+	public String getDispatchSequence() {
+		return dispatchSequence;
+	}
 
-    public String getErrorSequence() {
-        return errorSequence;
-    }
+	public String getErrorSequence() {
+		return errorSequence;
+	}
 
-    public int getPort() {
-        return port;
-    }
+	public int getPort() {
+		return port;
+	}
 
-    public boolean isEnableServerPush() {
-        return enableServerPush;
-    }
+	public boolean isEnableServerPush() {
+		return enableServerPush;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getDispatchPattern() {
-        return dispatchPattern;
-    }
+	public String getDispatchPattern() {
+		return dispatchPattern;
+	}
 
-    public static class InboundHttp2ConfigurationBuilder {
-        private final int port;
-        private final String name;
-        private String dispatchPattern;
-        private Properties properties;
-        private String bossThreadPoolSize;
-        private String workerThreadPoolSize;
-        private String dispatchSequence;
-        private String errorSequence;
-        private boolean enableServerPush;
+	public static class InboundHttp2ConfigurationBuilder {
+		private final int port;
+		private final String name;
+		private String dispatchPattern;
+		private Properties properties;
+		private String bossThreadPoolSize;
+		private String workerThreadPoolSize;
+		private String dispatchSequence;
+		private String errorSequence;
+		private boolean enableServerPush;
 
-        public InboundHttp2ConfigurationBuilder(int port, String name,
-                InboundProcessorParams params) {
-            properties = params.getProperties();
+		public InboundHttp2ConfigurationBuilder(int port, String name,
+		                                        InboundProcessorParams params) {
+			properties = params.getProperties();
 
-            this.name = ((name != null) || (name != "")) ? name : params.getName();
-            this.port = (port > 0) ?
-                    port :
-                    Integer.parseInt(properties.getProperty(InboundHttp2Constants.INBOUND_PORT));
+			this.name = ((name != null) || (name != "")) ? name : params.getName();
+			this.port = (port > 0) ? port : Integer.parseInt(
+					properties.getProperty(InboundHttp2Constants.INBOUND_PORT));
 
-            if (properties.getProperty(
-                    InboundHttp2Constants.INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN)
-                    != null) {
-                this.dispatchPattern = properties.getProperty(
-                        InboundHttp2Constants.INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN);
-            } else {
-                this.dispatchPattern = null;
-            }
+			if (properties.getProperty(
+					InboundHttp2Constants.INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN) !=
+			    null) {
+				this.dispatchPattern = properties.getProperty(
+						InboundHttp2Constants.INBOUND_ENDPOINT_PARAMETER_DISPATCH_FILTER_PATTERN);
+			} else {
+				this.dispatchPattern = null;
+			}
 
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_BOSS_THREAD_POOL_SIZE)
-                    != null) {
-                this.bossThreadPoolSize = properties
-                        .getProperty(InboundHttp2Constants.INBOUND_BOSS_THREAD_POOL_SIZE);
-            } else {
-                this.bossThreadPoolSize = "1";
-            }
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_WORKER_THREAD_POOL_SIZE)
-                    != null) {
-                this.workerThreadPoolSize = properties
-                        .getProperty(InboundHttp2Constants.INBOUND_WORKER_THREAD_POOL_SIZE);
-            } else {
-                this.workerThreadPoolSize = "1";
-            }
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE) != null) {
-                this.dispatchSequence = properties
-                        .getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE);
-            } else {
-                this.dispatchSequence = null;
-            }
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE) != null) {
-                this.errorSequence = properties
-                        .getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE);
-            } else {
-                this.errorSequence = null;
-            }
-            if (properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED) != null) {
-                this.enableServerPush = Boolean.parseBoolean(
-                        properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED));
-            } else {
-                this.enableServerPush = Boolean.parseBoolean("false");
-            }
-        }
+			if (properties.getProperty(InboundHttp2Constants.INBOUND_BOSS_THREAD_POOL_SIZE) !=
+			    null) {
+				this.bossThreadPoolSize =
+						properties.getProperty(InboundHttp2Constants.INBOUND_BOSS_THREAD_POOL_SIZE);
+			} else {
+				this.bossThreadPoolSize = "1";
+			}
+			if (properties.getProperty(InboundHttp2Constants.INBOUND_WORKER_THREAD_POOL_SIZE) !=
+			    null) {
+				this.workerThreadPoolSize = properties
+						.getProperty(InboundHttp2Constants.INBOUND_WORKER_THREAD_POOL_SIZE);
+			} else {
+				this.workerThreadPoolSize = "1";
+			}
+			if (properties.getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE) != null) {
+				this.dispatchSequence =
+						properties.getProperty(InboundHttp2Constants.INBOUND_DISPATCH_SEQUENCE);
+			} else {
+				this.dispatchSequence = null;
+			}
+			if (properties.getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE) != null) {
+				this.errorSequence =
+						properties.getProperty(InboundHttp2Constants.INBOUND_ERROR_SEQUENCE);
+			} else {
+				this.errorSequence = null;
+			}
+			if (properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED) != null) {
+				this.enableServerPush = Boolean.parseBoolean(
+						properties.getProperty(InboundHttp2Constants.INBOUND_SERVER_PUSH_ENABLED));
+			} else {
+				this.enableServerPush = Boolean.parseBoolean("false");
+			}
+		}
 
-        public InboundHttp2Configuration build() {
-            return new InboundHttp2Configuration(this);
-        }
+		public InboundHttp2Configuration build() {
+			return new InboundHttp2Configuration(this);
+		}
 
-    }
+	}
 
 }

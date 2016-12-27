@@ -25,38 +25,41 @@ import org.apache.synapse.inbound.InboundRequestProcessor;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.common.InboundHttp2Constants;
 import org.wso2.carbon.inbound.endpoint.protocol.http2.management.Http2EndpointManager;
 
+/**
+ * Starts Inbound endpoints
+ */
 public class InboundHttp2Listener implements InboundRequestProcessor {
 
-    private static final Logger log = Logger.getLogger(InboundHttp2Listener.class);
+	private static final Logger log = Logger.getLogger(InboundHttp2Listener.class);
 
-    private String name;
-    private int port;
-    private InboundProcessorParams processorParams;
+	private String name;
+	private int port;
+	private InboundProcessorParams processorParams;
 
-    public InboundHttp2Listener(InboundProcessorParams params) {
-        processorParams = params;
-        String portParam = params.getProperties().getProperty(InboundHttp2Constants.INBOUND_PORT);
-        try {
-            port = Integer.parseInt(portParam);
-        } catch (NumberFormatException e) {
-            handleException("Validation failed for the port parameter " + portParam, e);
-        }
-        name = params.getName();
-    }
+	public InboundHttp2Listener(InboundProcessorParams params) {
+		processorParams = params;
+		String portParam = params.getProperties().getProperty(InboundHttp2Constants.INBOUND_PORT);
+		try {
+			port = Integer.parseInt(portParam);
+		} catch (NumberFormatException e) {
+			handleException("Validation failed for the port parameter " + portParam, e);
+		}
+		name = params.getName();
+	}
 
-    @Override
-    public void init() {
-        Http2EndpointManager.getInstance().startEndpoint(port, name, processorParams);
-    }
+	@Override
+	public void init() {
+		Http2EndpointManager.getInstance().startEndpoint(port, name, processorParams);
+	}
 
-    @Override
-    public void destroy() {
-        Http2EndpointManager.getInstance().closeEndpoint(port);
-    }
+	@Override
+	public void destroy() {
+		Http2EndpointManager.getInstance().closeEndpoint(port);
+	}
 
-    protected void handleException(String msg, Exception e) {
-        log.error(msg, e);
-        throw new SynapseException(msg, e);
-    }
+	protected void handleException(String msg, Exception e) {
+		log.error(msg, e);
+		throw new SynapseException(msg, e);
+	}
 
 }

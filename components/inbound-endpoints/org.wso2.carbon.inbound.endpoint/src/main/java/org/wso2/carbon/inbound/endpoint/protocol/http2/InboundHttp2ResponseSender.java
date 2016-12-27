@@ -25,28 +25,27 @@ import org.apache.synapse.inbound.InboundResponseSender;
 
 /**
  * Send responses back to peer
- *
  */
 public class InboundHttp2ResponseSender implements InboundResponseSender {
 
-    private static final Log log = LogFactory.getLog(InboundHttp2ResponseSender.class);
-    private InboundHttp2SourceHandler sourceHandler;
+	private static final Log log = LogFactory.getLog(InboundHttp2ResponseSender.class);
+	private InboundHttp2SourceHandler sourceHandler;
 
-    public InboundHttp2ResponseSender(InboundHttp2SourceHandler sourceHandler) {
-        this.sourceHandler = sourceHandler;
-    }
+	public InboundHttp2ResponseSender(InboundHttp2SourceHandler sourceHandler) {
+		this.sourceHandler = sourceHandler;
+	}
 
-    @Override
-    public void sendBack(MessageContext synCtx) {
-        if (synCtx != null) {
-            try {
-                sourceHandler.sendResponse(synCtx);
-            } catch (Exception iEx) {
-                log.error("Error while while sending the response", iEx);
-            }
-        } else {
-            log.error("send back message is null");
-        }
-    }
+	@Override
+	public void sendBack(MessageContext synCtx) {
+		if (synCtx != null) {
+			try {
+				sourceHandler.sendResponse(synCtx);
+			} catch (Exception iEx) {
+				log.error("Error while while sending the response", iEx);
+			}
+		} else {
+			log.error("send back message is null");
+		}
+	}
 
 }

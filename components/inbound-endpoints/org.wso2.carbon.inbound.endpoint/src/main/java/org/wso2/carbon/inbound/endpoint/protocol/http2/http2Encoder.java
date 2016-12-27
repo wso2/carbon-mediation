@@ -27,49 +27,52 @@ import org.apache.http.nio.ContentEncoder;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+/**
+ * Read bytes from Pass-through-pipe and write down on wire
+ */
 public class http2Encoder implements ContentEncoder {
-    ChannelHandlerContext chContext;
-    int streamId;
-    Http2ConnectionEncoder encoder;
-    ChannelPromise promise;
-    boolean isComplete = false;
+	ChannelHandlerContext chContext;
+	int streamId;
+	Http2ConnectionEncoder encoder;
+	ChannelPromise promise;
+	boolean isComplete = false;
 
-    public http2Encoder(ChannelHandlerContext chContext, int streamId,
-            Http2ConnectionEncoder encoder, ChannelPromise promise) {
-        this.chContext = chContext;
-        this.streamId = streamId;
-        this.encoder = encoder;
-        this.promise = promise;
+	public http2Encoder(ChannelHandlerContext chContext, int streamId,
+	                    Http2ConnectionEncoder encoder, ChannelPromise promise) {
+		this.chContext = chContext;
+		this.streamId = streamId;
+		this.encoder = encoder;
+		this.promise = promise;
 
-    }
+	}
 
-    @Override
-    public int write(ByteBuffer src) throws IOException {
-        while (src.hasRemaining()) {
-            byte[] b;
-            b = new byte[src.remaining()];
-            src.get(b);
+	@Override
+	public int write(ByteBuffer src) throws IOException {
+		while (src.hasRemaining()) {
+			byte[] b;
+			b = new byte[src.remaining()];
+			src.get(b);
 
-            if (src.hasRemaining())
-                encoder.writeData(chContext, streamId, Unpooled.wrappedBuffer(b), 0, false,
-                        promise);
-            else {
-                encoder.writeData(chContext, streamId, Unpooled.wrappedBuffer(b), 0, true, promise);
-                isComplete = true;
-            }
+			if (src.hasRemaining())
+				encoder.writeData(chContext, streamId, Unpooled.wrappedBuffer(b), 0, false,
+				                  promise);
+			else {
+				encoder.writeData(chContext, streamId, Unpooled.wrappedBuffer(b), 0, true, promise);
+				isComplete = true;
+			}
 
-        }
+		}
 
-        return src.position();
-    }
+		return src.position();
+	}
 
-    @Override
-    public void complete() throws IOException {
+	@Override
+	public void complete() throws IOException {
 
-    }
+	}
 
-    @Override
-    public boolean isCompleted() {
-        return isComplete;
-    }
+	@Override
+	public boolean isCompleted() {
+		return isComplete;
+	}
 }
