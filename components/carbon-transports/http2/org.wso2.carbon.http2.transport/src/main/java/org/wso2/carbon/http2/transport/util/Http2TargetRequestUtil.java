@@ -128,7 +128,7 @@ public class Http2TargetRequestUtil {
         }
     }
 
-    public Http2Headers getHeaders(MessageContext msgContext) {
+    public Http2Headers getHeaders(MessageContext msgContext) throws AxisFault {
         Http2Headers http2Headers = new DefaultHttp2Headers();
         Map<String, String> reqeustHeaders = new TreeMap<>();
 
@@ -150,7 +150,7 @@ public class Http2TargetRequestUtil {
         try {
             url = new URL(epr.getAddress());
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            throw new AxisFault("endpoint url parsing failed : ",e);
         }
         //this code block is needed to replace the host header in service chaining with REQUEST_HOST_HEADER
         //adding host header since it is not available in response message.
@@ -384,11 +384,15 @@ public class Http2TargetRequestUtil {
         if (reqeustHeaders.containsKey(HttpHeaderNames.HOST)) {
             reqeustHeaders.remove(HttpHeaderNames.HOST);
         }
-        if (!reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.SCHEME.value()))
-            reqeustHeaders.put(Http2Headers.PseudoHeaderName.SCHEME.value().toString(),
+        if (reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.SCHEME.value()))
+            reqeustHeaders.remove(Http2Headers.PseudoHeaderName.SCHEME.value());
+
+        reqeustHeaders.put(Http2Headers.PseudoHeaderName.SCHEME.value().toString(),
                     route.getTargetHost().getSchemeName());
-        if (!reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.AUTHORITY.value()))
-            reqeustHeaders.put(Http2Headers.PseudoHeaderName.AUTHORITY.value().toString(),
+
+        if (reqeustHeaders.containsKey(Http2Headers.PseudoHeaderName.AUTHORITY.value()))
+            reqeustHeaders.remove(Http2Headers.PseudoHeaderName.AUTHORITY.value());
+        reqeustHeaders.put(Http2Headers.PseudoHeaderName.AUTHORITY.value().toString(),
                     route.getTargetHost().toString());
         Iterator<Map.Entry<String, String>> iterator = reqeustHeaders.entrySet().iterator();
         while (iterator.hasNext()) {

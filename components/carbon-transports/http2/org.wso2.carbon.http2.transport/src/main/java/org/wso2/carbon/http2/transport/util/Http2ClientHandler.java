@@ -30,6 +30,8 @@ import io.netty.handler.codec.http2.Http2ResetFrame;
 import io.netty.handler.codec.http2.Http2Settings;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.inbound.InboundResponseSender;
 import org.apache.synapse.transport.passthru.config.TargetConfiguration;
 
@@ -40,6 +42,8 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Http2ClientHandler extends ChannelDuplexHandler {
+
+    private static final Log log = LogFactory.getLog(Http2ClientHandler.class);
 
     private Http2RequestWriter writer;
     private Http2ResponseReceiver receiver;
@@ -109,6 +113,9 @@ public class Http2ClientHandler extends ChannelDuplexHandler {
             receiver.onUnknownFrameRead(msg);
 
         } else if (msg instanceof Http2ResetFrame) {
+            if(sentRequests.containsKey(((Http2ResetFrame) msg).streamId())){
+                sentRequests.remove(((Http2ResetFrame) msg).streamId());
+            }
             receiver.onUnknownFrameRead(msg);
 
         } else {
@@ -117,7 +124,7 @@ public class Http2ClientHandler extends ChannelDuplexHandler {
         }
     }
 
-    public void channelWrite(MessageContext request) {
+    public synchronized void channelWrite(MessageContext request) throws AxisFault{
         if (chContext == null) {
             pollReqeusts.add(request);
             return;
@@ -183,14 +190,18 @@ public class Http2ClientHandler extends ChannelDuplexHandler {
         return chContext;
     }
 
-    public void setChContext(ChannelHandlerContext chContext) {
+    public void setChContext(ChannelHandlerContext chContext){
         this.chContext = chContext;
         writer.setChannelHandlerContext(chContext);
 
         if (!pollReqeusts.isEmpty()) {
             Iterator<MessageContext> requests = pollReqeusts.iterator();
             while (requests.hasNext()) {
-                channelWrite(requests.next());
+                try{
+                    channelWrite(requests.next());
+                }catch (Exception e){
+                    log.error("Error while sending polled messages before channel establishment",e);
+                }
             }
         }
     }

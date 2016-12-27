@@ -61,7 +61,6 @@ public class Http2TransportSender extends AbstractTransportSender {
         super.init(cfgCtx, transportOut);
         connectionFactory = Http2ConnectionFactory.getInstance(transportOut);
         proxyConfig = new ProxyConfigBuilder().build(transportOut);
-        //log.info(proxyConfig.logProxyConfig());
         targetConfiguration = new TargetConfiguration(cfgCtx, transportOut, null, null,
                 proxyConfig.createProxyAuthenticator());
         targetConfiguration.build();
@@ -129,18 +128,9 @@ public class Http2TransportSender extends AbstractTransportSender {
             clientHandler.setResponseReceiver(tenantDomain,dispatchSequence,errorSequence,responseSender,targetConfiguration,serverPushEnabled);
             clientHandler.channelWrite(msgCtx);
 
-            //Termination of a connection
-            if(msgCtx.getProperty(Http2Constants.HTTP2_REQUEST_TYPE)!=null
-                    && Http2Constants.HTTP2_GO_AWAY_REQUEST.equals((String)msgCtx.getProperty(
-                            Http2Constants.HTTP2_REQUEST_TYPE))){
-                connectionFactory.removeAllClientConnections(channelCtx.channel().id().asShortText());
-            }
-
         } catch (URISyntaxException e){
-            //Throw an error
             log.error("Error parsing the http2 endpoint url");
             throw new AxisFault(e.getMessage());
-
         }
     }
 }

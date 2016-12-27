@@ -6,6 +6,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http2.Http2DataFrame;
 import io.netty.handler.codec.http2.Http2Headers;
 import io.netty.handler.codec.http2.Http2HeadersFrame;
+import io.netty.handler.codec.http2.Http2ResetFrame;
 import io.netty.handler.codec.http2.HttpConversionUtil;
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.soap.SOAPEnvelope;
@@ -51,7 +52,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Created by chanakabalasooriya on 12/3/16.
+ * Handling responses from backend-server
  */
 public class Http2ResponseReceiver {
 
@@ -287,6 +288,14 @@ public class Http2ResponseReceiver {
     }
 
     public void onUnknownFrameRead(Object frame) {
+        if(frame instanceof Http2ResetFrame){
+            if(incompleteResponses.containsKey(((Http2ResetFrame) frame).streamId())){
+                incompleteResponses.remove(((Http2ResetFrame) frame).streamId());
+            }
+            if(serverPushes.containsKey(((Http2ResetFrame) frame).streamId())){
+                serverPushes.remove(((Http2ResetFrame) frame).streamId());
+            }
+        }
         if (log.isDebugEnabled()) {
             log.debug("unhandled frame received : " + frame.getClass().getName());
         }
@@ -355,8 +364,9 @@ public class Http2ResponseReceiver {
                 headers.put(key, header.getValue().toString());
             }
         }
-
-        String oriURL = headers.get(PassThroughConstants.LOCATION);
+        String oriURL=null;
+        if(headers.containsKey(PassThroughConstants.LOCATION))
+             oriURL= headers.get(PassThroughConstants.LOCATION);
 
         HttpResponseStatus status = HttpResponseStatus.parseLine(frame.headers().status());
         if (oriURL != null && ((status.code() != HttpStatus.SC_MOVED_TEMPORARILY) && (status.code()

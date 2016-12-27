@@ -26,6 +26,7 @@ import io.netty.handler.codec.http2.Http2ConnectionEncoder;
 import io.netty.handler.codec.http2.Http2Error;
 import io.netty.handler.codec.http2.Http2Headers;
 import org.apache.axiom.om.OMOutputFormat;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.MessageFormatter;
 import org.apache.axis2.util.MessageProcessorSelector;
@@ -48,9 +49,7 @@ public class Http2RequestWriter {
     Http2Connection connection;
     ChannelHandlerContext chContext;
 
-    public void writeSimpleReqeust(int streamId,MessageContext msgContext) {   //sending a normal request
-
-
+    public void writeSimpleReqeust(int streamId,MessageContext msgContext) throws AxisFault{
         Http2TargetRequestUtil util = (Http2TargetRequestUtil) msgContext.getProperty(Http2Constants.PASSTHROUGH_TARGET);
         Http2Headers headers=util.getHeaders(msgContext);
         ChannelPromise promise=chContext.newPromise();
@@ -75,9 +74,7 @@ public class Http2RequestWriter {
                     }
                     int t = pipe.consume(pipeEncoder);
                 }catch (IOException e){
-
-                    //throw ex
-                    //log.error(e);
+                    throw new AxisFault("Error while consuming pipe",e);
                 }
             }
         }else{
@@ -86,7 +83,7 @@ public class Http2RequestWriter {
         try {
             encoder.flowController().writePendingBytes();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new AxisFault("Error while writing pending bytes of encoder to channel",e);
         }
         chContext.flush();
     }
