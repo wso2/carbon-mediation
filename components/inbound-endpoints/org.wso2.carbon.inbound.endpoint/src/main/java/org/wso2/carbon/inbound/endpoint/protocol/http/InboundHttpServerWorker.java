@@ -42,6 +42,7 @@ import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.apache.synapse.transport.passthru.ServerWorker;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -356,9 +357,20 @@ public class InboundHttpServerWorker extends ServerWorker {
         // If not super tenant, assign tenant configuration context
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
             try {
-                ConfigurationContext tenantConfigCtx =
-                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
-                                                                  axis2MsgCtx.getConfigurationContext());
+                // We have to start the tenant flow inorder to get the tenant from the tenant cache.
+                ConfigurationContext tenantConfigCtx = null;
+                try {
+                    PrivilegedCarbonContext.startTenantFlow();
+                    PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext
+                            .getThreadLocalCarbonContext();
+                    privilegedCarbonContext.setTenantDomain(tenantDomain, true);
+
+                    tenantConfigCtx = TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
+                            axis2MsgCtx.getConfigurationContext());
+                } finally {
+                    PrivilegedCarbonContext.endTenantFlow();
+                }
+
                 axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
                 axis2MsgCtx.setProperty(MultitenantConstants.TENANT_DOMAIN, tenantDomain);
             } catch (Exception e) {
