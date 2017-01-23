@@ -19,6 +19,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.websocket;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
@@ -56,8 +57,6 @@ import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.osgi.service.ServiceReferenceHolder;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
@@ -94,6 +93,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     private String outflowErrorSequence;
     private ChannelPromise handshakeFuture;
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
+    private int portOffset;
 
     static {
         contentTypes.add("application/xml");
@@ -115,7 +115,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     public void channelActive(final ChannelHandlerContext ctx) throws Exception {
         this.isSSLEnabled = ctx.channel().pipeline().get("ssl") != null ? true : false;
         this.wrappedContext = new InboundWebsocketChannelContext(ctx);
-        this.port = ((InetSocketAddress) ctx.channel().localAddress()).getPort();
+        this.port = ((InetSocketAddress) ctx.channel().localAddress()).getPort() - portOffset;
         this.responseSender = new InboundWebsocketResponseSender(this);
     }
 
@@ -494,4 +494,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
     }
 
 
+    public void setPortOffset(int portOffset) {
+        this.portOffset = portOffset;
+    }
 }

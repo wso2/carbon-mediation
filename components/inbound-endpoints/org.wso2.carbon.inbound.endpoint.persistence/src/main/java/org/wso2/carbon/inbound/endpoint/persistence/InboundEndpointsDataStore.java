@@ -89,6 +89,9 @@ public class InboundEndpointsDataStore {
      */
     private void initRegistryData() {
 
+        /**
+         * Note : ports in this map are not offset by the value of port offset.
+         */
         endpointListeningInfo = new ConcurrentHashMap<Integer, List<InboundEndpointInfoDTO>>();
         endpointPollingInfo = new ConcurrentHashMap<String, Set<String>>();
         try {
@@ -114,6 +117,7 @@ public class InboundEndpointsDataStore {
         if (tenantList == null) {
             // If there is no existing listeners in the port, create a new list
             tenantList = new ArrayList<InboundEndpointInfoDTO>();
+            port = port - PersistenceUtils.getPortOffset(params.getProperties());
             endpointListeningInfo.put(port, tenantList);
         }
         tenantList.add(new InboundEndpointInfoDTO(tenantDomain, protocol, name, params));
