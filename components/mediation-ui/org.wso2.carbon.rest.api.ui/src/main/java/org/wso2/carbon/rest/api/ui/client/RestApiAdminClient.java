@@ -16,16 +16,6 @@
 
 package org.wso2.carbon.rest.api.ui.client;
 
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMXMLBuilderFactory;
@@ -41,18 +31,24 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.rest.api.stub.RestApiAdminStub;
 import org.wso2.carbon.rest.api.stub.types.carbon.APIData;
 import org.wso2.carbon.rest.api.stub.types.carbon.ResourceData;
-import org.apache.synapse.transport.nhttp.ListenerContext;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.axis2.description.Parameter;
-import org.apache.axis2.description.TransportInDescription;
-import org.wso2.carbon.CarbonConstants;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RestApiAdminClient {
 
 	private static final Log log = LogFactory.getLog(RestApiAdminClient.class);
 
 	private static final String BUNDLE = "org.wso2.carbon.rest.api.ui.i18n.Resources";
+	private static String CONF_LOCATION = "conf.location";
 
 	private ResourceBundle bundle;
 
@@ -237,8 +233,12 @@ public class RestApiAdminClient {
 
      private String ReadWSDLPrefix(String svrURL){
          try{
-             InputStream in = new FileInputStream("./repository/conf/axis2/axis2.xml");
-             OMElement results = OMXMLBuilderFactory.createOMBuilder(in).getDocumentElement();
+			 String confPath = System.getProperty(CONF_LOCATION);
+			 if (confPath == null) {
+				 confPath = Paths.get("repository", "conf").toString();
+			 }
+			 InputStream in = new FileInputStream(Paths.get(confPath, "axis2", "axis2.xml").toString());
+			 OMElement results = OMXMLBuilderFactory.createOMBuilder(in).getDocumentElement();
 
              AXIOMXPath xpathExpression = new AXIOMXPath ("/axisconfig/transportReceiver/parameter[@name='WSDLEPRPrefix']");
              List nodeList = (List) xpathExpression.selectNodes(results);

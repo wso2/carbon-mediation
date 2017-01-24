@@ -15,12 +15,16 @@
  */
 package org.wso2.carbon.cloud.gateway.common;
 
+import java.nio.file.Paths;
+
 public class CGConstant {
 
     /**
      * The csg thirft server port
      */
     public static final String THRIFT_SERVER_PORT = "cg-thrift-server-port";
+
+    private static String CONF_LOCATION = "conf.location";
 
     /**
      * Host name in which csg thrift server is running
@@ -172,7 +176,15 @@ public class CGConstant {
     /**
      * Client axis2.xml for admin services when using with ESB
      */
-    public static final String CLIENT_AXIS2_XML = "repository/conf/axis2/axis2_client.xml";
+    public static final String CLIENT_AXIS2_XML;
+
+    static {
+        String confPath = System.getProperty(CONF_LOCATION);
+        if (confPath == null) {
+            confPath = Paths.get("repository", "conf").toString();
+        }
+        CLIENT_AXIS2_XML = Paths.get(confPath, "axis2", "axis2_client.xml").toString();
+    }
 
     /**
      * CSG Transport name
