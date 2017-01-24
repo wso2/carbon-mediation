@@ -41,6 +41,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
     private ChannelHandler pipelineHandler;
     private boolean dispatchToCustomSequence;
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
+    private int portOffset;
 
     public InboundWebsocketChannelInitializer() {
     }
@@ -88,6 +89,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         InboundWebsocketSourceHandler sourceHandler = new InboundWebsocketSourceHandler();
         sourceHandler.setClientBroadcastLevel(clientBroadcastLevel);
         sourceHandler.setDispatchToCustomSequence(dispatchToCustomSequence);
+        sourceHandler.setPortOffset(portOffset);
         if (outflowDispatchSequence != null)
             sourceHandler.setOutflowDispatchSequence(outflowDispatchSequence);
         if (outflowErrorSequence != null)
@@ -99,4 +101,7 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
         p.addLast("handler", sourceHandler);
     }
 
+    public void setPortOffset(int portOffset) {
+        this.portOffset = portOffset;
+    }
 }

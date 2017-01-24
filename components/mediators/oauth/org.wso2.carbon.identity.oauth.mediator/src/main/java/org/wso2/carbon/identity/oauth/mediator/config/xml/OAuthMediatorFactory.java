@@ -18,8 +18,6 @@
 package org.wso2.carbon.identity.oauth.mediator.config.xml;
 
 
-import javax.xml.namespace.QName;
-
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
@@ -28,6 +26,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.wso2.carbon.identity.oauth.mediator.OAuthMediator;
 import org.wso2.carbon.mediator.service.MediatorException;
 
+import javax.xml.namespace.QName;
 import java.util.Properties;
 
 /**
@@ -36,7 +35,7 @@ import java.util.Properties;
  */
 public class OAuthMediatorFactory extends AbstractMediatorFactory {
 
-    private static final QName ELEMENT_OAUTH = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,"oauthService");
+    private static final QName ELEMENT_OAUTH = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "oauthService");
     private static final QName ATTR_NAME_SERVICE_EPR = new QName("remoteServiceUrl");
     private static final QName ATTR_NAME_USERNAME = new QName("username");
     private static final QName ATTR_NAME_PASSWORD = new QName("password");
@@ -60,20 +59,20 @@ public class OAuthMediatorFactory extends AbstractMediatorFactory {
         remoteServiceUrl = element.getAttribute(ATTR_NAME_SERVICE_EPR);
         if (remoteServiceUrl != null && remoteServiceUrl.getAttributeValue() != null) {
             mediator.setRemoteServiceUrl(remoteServiceUrl.getAttributeValue());
-        }else {
+        } else {
             throw new MediatorException(
                     "The 'remoteServiceUrl' attribute is required for the OAuth mediator");
         }
         username = element.getAttribute(ATTR_NAME_USERNAME);
-        if(username != null && username.getAttributeValue() != null){
-        	mediator.setUsername(username.getAttributeValue());
+        if (username != null && username.getAttributeValue() != null) {
+            mediator.setUsername(username.getAttributeValue());
         } else {
-            throw new MediatorException("The 'username' attribute is required for the OAuth mediator ");
+            throw new MediatorException("The 'username' attribute is required for the OAuth mediator");
         }
         password = element.getAttribute(ATTR_NAME_PASSWORD);
-        if(password != null && password.getAttributeValue() != null){
-        	mediator.setPassword(password.getAttributeValue());
-        }else {
+        if (password != null && password.getAttributeValue() != null) {
+            mediator.setPassword(password.getAttributeValue());
+        } else {
             throw new MediatorException("The 'password' attribute is required for the OAuth mediator");
         }
         return mediator;

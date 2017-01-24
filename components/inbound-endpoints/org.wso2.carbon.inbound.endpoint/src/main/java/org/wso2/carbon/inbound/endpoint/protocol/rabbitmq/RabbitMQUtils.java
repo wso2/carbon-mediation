@@ -18,6 +18,7 @@
 
 package org.wso2.carbon.inbound.endpoint.protocol.rabbitmq;
 
+import com.rabbitmq.client.Address;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -27,14 +28,19 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.util.Hashtable;
-
+import java.util.concurrent.TimeoutException;
 
 public class RabbitMQUtils {
 
     private static final Log log = LogFactory.getLog(RabbitMQUtils.class);
 
-    public static Connection createConnection(ConnectionFactory factory) throws IOException {
-        Connection connection = factory.newConnection();
+    public static Connection createConnection(ConnectionFactory factory, Address[] addresses) throws IOException {
+        Connection connection = null;
+        try {
+            connection = factory.newConnection(addresses);
+        } catch (TimeoutException e) {
+            log.error("Error while creating new connection", e);
+        }
         return connection;
     }
 
@@ -164,7 +170,11 @@ public class RabbitMQUtils {
                 handleException("Error occurred while declaring exchange.", e);
             }
         }
-        channel.close();
+        try {
+            channel.close();
+        } catch (TimeoutException e) {
+            log.error("Error occurred while closing connection.", e);
+        }
     }
 
     public static void handleException(String message, Exception e) {
