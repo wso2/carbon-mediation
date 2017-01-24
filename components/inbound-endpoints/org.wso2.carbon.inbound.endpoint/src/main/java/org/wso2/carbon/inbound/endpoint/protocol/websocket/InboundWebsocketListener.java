@@ -21,6 +21,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.inbound.InboundRequestProcessor;
+import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 
 import java.util.Collection;
@@ -47,12 +48,14 @@ public class InboundWebsocketListener implements InboundRequestProcessor {
 
     @Override
     public void init() {
-        WebsocketEndpointManager.getInstance().startEndpoint(port, name, processorParams);
+        int offsetPort = port + PersistenceUtils.getPortOffset(processorParams.getProperties());
+        WebsocketEndpointManager.getInstance().startEndpoint(offsetPort, name, processorParams);
     }
 
     @Override
     public void destroy() {
-        WebsocketEndpointManager.getInstance().closeEndpoint(port);
+        int offsetPort = port + PersistenceUtils.getPortOffset(processorParams.getProperties());
+        WebsocketEndpointManager.getInstance().closeEndpoint(offsetPort);
     }
 
     protected void handleException(String msg, Exception e) {

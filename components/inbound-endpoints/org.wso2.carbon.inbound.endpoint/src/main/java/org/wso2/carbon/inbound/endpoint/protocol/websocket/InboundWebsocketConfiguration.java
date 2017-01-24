@@ -28,6 +28,7 @@ public class InboundWebsocketConfiguration {
     private String subprotocolHandler;
     private String pipelineHandler;
     private String dispatchToCustomSequence;
+    private final boolean usePortOffset;
 
     private InboundWebsocketConfiguration(InboundWebsocketConfigurationBuilder builder) {
         this.port = builder.port;
@@ -40,6 +41,7 @@ public class InboundWebsocketConfiguration {
         this.subprotocolHandler = builder.subprotocolHandler;
         this.pipelineHandler = builder.pipelineHandler;
         this.dispatchToCustomSequence = builder.dispatchToCustomSequence;
+        this.usePortOffset = builder.usePortOffset;
     }
 
     public int getPort() {
@@ -82,6 +84,10 @@ public class InboundWebsocketConfiguration {
         return dispatchToCustomSequence;
     }
 
+    public boolean isUsePortOffset() {
+        return usePortOffset;
+    }
+
     public static class InboundWebsocketConfigurationBuilder {
         private final int port;
         private final String name;
@@ -93,6 +99,7 @@ public class InboundWebsocketConfiguration {
         private String subprotocolHandler;
         private String pipelineHandler;
         private String dispatchToCustomSequence;
+        private boolean usePortOffset = false;
 
         public InboundWebsocketConfigurationBuilder(int port, String name) {
             this.port = port;
@@ -140,6 +147,11 @@ public class InboundWebsocketConfiguration {
 
         public InboundWebsocketConfigurationBuilder dispatchToCustomSequence(String dispatchToCustomSequence) {
             this.dispatchToCustomSequence = dispatchToCustomSequence;
+            return this;
+        }
+
+        public InboundWebsocketConfigurationBuilder usePortOffset(boolean usePortOffset) {
+            this.usePortOffset = usePortOffset;
             return this;
         }
     }
