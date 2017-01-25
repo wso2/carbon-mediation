@@ -50,7 +50,6 @@ import java.util.concurrent.BlockingQueue;
 public class CGUtils {
 
     private static final Log log = LogFactory.getLog(CGUtils.class);
-    private static String CONF_LOCATION = "conf.location";
     private static Properties prop;
 
     static {
@@ -311,7 +310,7 @@ public class CGUtils {
         //if we reach to this assume that the we may have to looking to the customer provided external location for the
         //given properties
 
-        String confPath = System.getProperty(CONF_LOCATION);
+        String confPath = System.getProperty(CGConstant.CONF_LOCATION);
         if (confPath != null) {
             try {
                 in = new FileInputStream(confPath + File.separator + filePath);

@@ -24,7 +24,11 @@ public class CGConstant {
      */
     public static final String THRIFT_SERVER_PORT = "cg-thrift-server-port";
 
-    private static String CONF_LOCATION = "conf.location";
+    /**
+     * Configuration directory path - By default it should be repository/conf
+     * Users can specify the configuration path as a System variable.
+     */
+    public static String CONF_LOCATION = "conf.location";
 
     /**
      * Host name in which csg thrift server is running
