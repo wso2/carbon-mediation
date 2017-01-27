@@ -53,6 +53,7 @@ public class JMSPollingConsumer {
     private String name;
     private Properties jmsProperties;
     private boolean isConnected;
+
     private Long reconnectDuration;
     private long retryDuration;
     private int retryIteration;
@@ -172,7 +173,17 @@ public class JMSPollingConsumer {
                                    jmsConnectionFactory.createDestination(session,
                                                                           replyDestinationName);
             }
-            messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);            
+            messageConsumer = jmsConnectionFactory.getMessageConsumer(session, destination);
+            if (messageConsumer == null) {
+                logger.debug("Inbound JMS Endpoint. No JMS consumer initialized. No JMS message received.");
+                if (session != null) {
+                    jmsConnectionFactory.closeSession(session, true);
+                }
+                if (connection != null) {
+                    jmsConnectionFactory.closeConnection(connection, true);
+                }
+                return null;
+            }
             Message msg = receiveMessage(messageConsumer);
             if (msg == null) {
                 logger.debug("Inbound JMS Endpoint. No JMS message received.");
