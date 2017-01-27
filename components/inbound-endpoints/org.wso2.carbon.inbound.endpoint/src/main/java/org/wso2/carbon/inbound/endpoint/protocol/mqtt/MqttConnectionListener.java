@@ -63,6 +63,7 @@ public class MqttConnectionListener {
 
             }
         }  catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
             log.error("Error while trying to subscribe to the remote", ex);
         }
     }

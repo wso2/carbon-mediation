@@ -82,6 +82,13 @@ public class MappingResource {
         return function;
     }
 
+    /**
+     * propertiesList contains a list of WSO2 ESB Properties used in the Data Mapper Mapping configuration.
+     * These will be extracted by processing the mapping configuration file and will be included as Strings
+     * in the format of : "SCOPE['PROP_NAME']"
+     *
+     * @return propertiesList
+     */
     public List getPropertiesList() {
         return propertiesList;
     }
@@ -128,7 +135,7 @@ public class MappingResource {
         match = pattern.matcher(jsFunctionBody);
 
         while (match.find()) {
-            propertiesList.add(match.group(2) + "['" + match.group(3)+"']");
+            propertiesList.add(match.group(2) + "['" + match.group(3) + "']");
         }
 
         if (fnName != null) {

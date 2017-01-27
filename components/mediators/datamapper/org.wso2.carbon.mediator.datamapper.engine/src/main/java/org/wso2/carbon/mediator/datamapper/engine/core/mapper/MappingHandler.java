@@ -60,6 +60,27 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
         this.mappingResource = mappingResource;
     }
 
+    /**
+     * This method performs the mapping from input message to the specified output schema.
+     * <p>
+     *  Input message should be passed as an InputStream and any runtime properties can be passed as a Map.
+     *  At the top level of the Properties map, it contains scope name (String) and an individual map for each scope.
+     *  In the next level, a map in a single scope should contain name, value pairs for each property name and its
+     *  value.
+     * </p>
+     * <p>
+     *  Map of maps will be converted to a JSON object to be injected to the JavaScript processing engine.
+     * </p>
+     *
+     * @param inputMsg  Input message as an InputStream
+     * @param propertiesMap Map of maps, single map for each scope
+     * @return  Output message created according to the provided OutputSchema using the runtime arguments
+     * @throws ReaderException
+     * @throws InterruptedException
+     * @throws IOException
+     * @throws SchemaException
+     * @throws JSException
+     */
     public String doMap(InputStream inputMsg, Map<String, Map<String, Object>> propertiesMap)
             throws ReaderException, InterruptedException, IOException, SchemaException, JSException {
         this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
@@ -96,7 +117,7 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
     }
 
     /**
-     * Coinvert the properties map to a JSON String
+     * Convert the properties map to a JSON String
      * @param propertiesMap
      * @return JSON String
      * @throws ReaderException
