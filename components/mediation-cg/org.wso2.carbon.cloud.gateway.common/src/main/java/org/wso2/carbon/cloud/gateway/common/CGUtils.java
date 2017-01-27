@@ -15,14 +15,6 @@
  */
 package org.wso2.carbon.cloud.gateway.common;
 
-import java.io.*;
-import java.net.Socket;
-import java.net.SocketException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.BlockingQueue;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.logging.Log;
@@ -40,10 +32,24 @@ import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.core.util.CryptoUtil;
 import org.wso2.carbon.utils.NetworkUtils;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.BlockingQueue;
+
 public class CGUtils {
 
     private static final Log log = LogFactory.getLog(CGUtils.class);
-
     private static Properties prop;
 
     static {
@@ -300,7 +306,22 @@ public class CGUtils {
             log.debug("Loading a file '" + filePath + "' from classpath");
         }
 
-        InputStream in = cl.getResourceAsStream(filePath);
+        InputStream in = null;
+        //if we reach to this assume that the we may have to looking to the customer provided external location for the
+        //given properties
+
+        String confPath = System.getProperty(CGConstant.CONF_LOCATION);
+        if (confPath != null) {
+            try {
+                in = new FileInputStream(confPath + File.separator + filePath);
+            } catch (FileNotFoundException e) {
+                String msg = "Error loading properties from file: " + filePath;
+                log.warn(msg);
+            }
+        }
+        if (in == null) {
+            in = cl.getResourceAsStream(filePath);
+        }
         if (in == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to load file  ' " + filePath + " '");

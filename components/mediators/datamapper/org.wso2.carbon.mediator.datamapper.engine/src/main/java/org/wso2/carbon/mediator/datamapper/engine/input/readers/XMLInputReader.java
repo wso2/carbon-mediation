@@ -471,8 +471,7 @@ public class XMLInputReader implements InputReader {
                     namespaceURI = xsiNamespace.getNamespaceURI();
                     modifiedLocalName = modifiedLocalName + "," + prefixInMap + ":type=" + getInputSchema()
                             .getPrefixForNamespace(namespaceURI) + ":" + xsiNamespacePrefix[1];
-                }
-                else {
+                } else {
                     modifiedLocalName = modifiedLocalName + "," + prefixInMap + ":type=" + xsiType;
                 }
             }

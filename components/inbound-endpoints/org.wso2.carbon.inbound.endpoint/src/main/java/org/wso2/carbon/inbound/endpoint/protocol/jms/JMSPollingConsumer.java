@@ -35,6 +35,13 @@ public class JMSPollingConsumer {
 
     private static final Log logger = LogFactory.getLog(JMSPollingConsumer.class.getName());
 
+    /* Contents used for the process of reconnection */
+    private static final int DEFAULT_RETRY_ITERATION = 0;
+    private static final int DEFAULT_RETRY_DURATION = 1000;
+    private static final double RECONNECTION_PROGRESSION_FACTOR = 2.0;
+    private static final long MAX_RECONNECTION_DURATION = 60000;
+    private static final int SCALE_FACTOR = 1000;
+
     private CachedJMSConnectionFactory jmsConnectionFactory;
     private JMSInjectHandler injectHandler;
     private long scanInterval;
@@ -49,8 +56,6 @@ public class JMSPollingConsumer {
     private Long reconnectDuration;
     private long retryDuration;
     private int retryIteration;
-    private double reconnectionProgressionFactor;
-    private long maxReconnectDuration;
 
     private Connection connection = null;
     private Session session = null;
@@ -63,10 +68,8 @@ public class JMSPollingConsumer {
         strUserName = jmsProperties.getProperty(JMSConstants.PARAM_JMS_USERNAME);
         strPassword = jmsProperties.getProperty(JMSConstants.PARAM_JMS_PASSWORD);
         this.name = name;
-        this.retryIteration = 0;
-        this.reconnectionProgressionFactor = 2.0;
-        this.maxReconnectDuration = 60000;
-        this.retryDuration = 1000;
+        this.retryIteration = DEFAULT_RETRY_ITERATION;
+        this.retryDuration = DEFAULT_RETRY_DURATION;
         
         String strReceiveTimeout = jmsProperties.getProperty(JMSConstants.RECEIVER_TIMEOUT);
         if(strReceiveTimeout != null){
@@ -142,11 +145,11 @@ public class JMSPollingConsumer {
                 isConnected = false;
                 return null;
             }
-            if (retryIteration != 0) {
+            if (retryIteration != DEFAULT_RETRY_ITERATION) {
                 logger.info("Reconnection attempt: " + retryIteration + " for the JMS Inbound: " + name +
                         " was successful!");
-                this.retryIteration = 0;
-                this.retryDuration = 1;
+                this.retryIteration = DEFAULT_RETRY_ITERATION;
+                this.retryDuration = DEFAULT_RETRY_DURATION;
             }
             isConnected = true;
             session = jmsConnectionFactory.getSession(connection);
@@ -259,21 +262,27 @@ public class JMSPollingConsumer {
                 if (reconnectDuration != null) {
                     retryDuration = reconnectDuration;
                     logger.error("Reconnection attempt : " + (retryIteration++) + " for JMS Inbound : " +
-                            name + " failed. Next retry in " + (retryDuration / 1000) +
+                            name + " failed. Next retry in " + (retryDuration / SCALE_FACTOR) +
                             " seconds. (Fixed Interval)");
                 } else {
-                    retryDuration = (long) (retryDuration * reconnectionProgressionFactor);
-                    if (retryDuration > maxReconnectDuration) {
-                        retryDuration = maxReconnectDuration;
+                    retryDuration = (long) (retryDuration * RECONNECTION_PROGRESSION_FACTOR);
+                    if (retryDuration > MAX_RECONNECTION_DURATION) {
+                        retryDuration = MAX_RECONNECTION_DURATION;
                         logger.info("InitialReconnectDuration reached to MaxReconnectDuration.");
                     }
                     logger.error("Reconnection attempt : " + (retryIteration++) + " for JMS Inbound : " +
-                            name + " failed. Next retry in " + (retryDuration / 1000) +
+                            name + " failed. Next retry in " + (retryDuration / SCALE_FACTOR) +
                             " seconds");
                 }
                 try {
                     Thread.sleep(retryDuration);
                 } catch (InterruptedException ignore) {
+                    Thread.currentThread().interrupt();
+                    /* Occurs when the owner of this thread sets the Interrupted flag to TRUE. Inside the sleep method
+                       this flag will be checked occasionally and throw an InterruptedException (and reset the flag)
+                       whenever its set to true. Ideally, after catching this we should wrap up the work and exist.
+                       Since this can only happen during an ESB shutdown it can be ignored here. But as a good
+                       practice the Interrupted flag is set back to TRUE in this thread. */
                 }
             }
             if (messageConsumer != null) {
