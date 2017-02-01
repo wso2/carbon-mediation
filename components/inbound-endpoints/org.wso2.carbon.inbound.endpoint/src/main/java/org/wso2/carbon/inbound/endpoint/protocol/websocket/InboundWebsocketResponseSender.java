@@ -81,10 +81,6 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
                 ctx.writeToChannel(new CloseWebSocketFrame(1001, "shutdown"));
                 return;
-            } else if (isConnectionAlive != null && (boolean) isConnectionAlive) {
-                InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
-                ctx.writeToChannel(new PongWebSocketFrame());
-                return;
             }
             if (msgContext.getProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT) != null &&
                     msgContext.getProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT).equals(true)) {

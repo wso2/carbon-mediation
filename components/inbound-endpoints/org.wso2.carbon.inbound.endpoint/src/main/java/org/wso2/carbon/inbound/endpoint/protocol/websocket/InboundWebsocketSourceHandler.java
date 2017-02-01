@@ -25,6 +25,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
@@ -352,9 +353,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
                 } else if (frame instanceof PingWebSocketFrame) {
-                    synCtx.setProperty(WSConstants.IS_PING, new Boolean(true));
-                    ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.IS_PING, new Boolean(true));
-                    injectToSequence(synCtx, endpoint);
+                    ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
                     return;
                 }
 
