@@ -24,6 +24,7 @@ import com.sap.conn.jco.ext.DestinationDataEventListener;
 import com.sap.conn.jco.ext.ServerDataProvider;
 import com.sap.conn.jco.ext.ServerDataEventListener;
 
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.io.File;
 import java.io.FileInputStream;
@@ -98,8 +99,11 @@ public class CarbonDestinationDataProvider implements DestinationDataProvider, S
 
     private File getConfigurationFile(String destination, boolean server) {
         String fileName = destination + "." + (server ? "server" : "dest");
-        File file1 = new File("repository" + File.separator + "conf" + File.separator + "sap" +
-                File.separator + fileName);
+        String confPath = System.getProperty("conf.location");
+        if (confPath == null) {
+            confPath = Paths.get("repository", "conf").toString();
+        }
+        File file1 = new File(confPath + File.separator + "sap" + File.separator + fileName);
         if (file1.exists()) {
             return file1;
         }

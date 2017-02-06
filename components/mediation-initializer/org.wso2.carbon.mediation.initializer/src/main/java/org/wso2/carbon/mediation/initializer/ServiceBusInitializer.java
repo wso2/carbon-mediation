@@ -159,14 +159,14 @@ public class ServiceBusInitializer {
         // to fix this by making it possible to let the authentication of carbon be done through
         // the non blocking https transport
         setHttpsProtForConsole();
-        
+
       //clean up temp folder created for connector class loader reference
         String javaTempDir = System.getProperty("java.io.tmpdir");
         String APP_UNZIP_DIR = javaTempDir.endsWith(File.separator) ?
                         javaTempDir + "libs" :
                         javaTempDir + File.separator + "libs";
         cleanupTempDirectory(APP_UNZIP_DIR);
-        
+
         try {
             BundleContext bndCtx = ctxt.getBundleContext();
             ConfigurationHolder.getInstance().setBundleContext(bndCtx);
@@ -511,8 +511,8 @@ public class ServiceBusInitializer {
 
         try {
             String carbonHome = System.getProperty(ServerConstants.CARBON_HOME);
-            File synapseProperties = new File(carbonHome + File.separator + "repository" + File.separator + "conf" +
-                    File.separator + "synapse.properties");
+            File synapseProperties = new File(CarbonUtils.getCarbonConfigDirPath() + File.separator + "synapse" +
+                                              ".properties");
             Properties properties = new Properties();
             InputStream inputStream = new FileInputStream(synapseProperties);
             properties.load(inputStream);
@@ -788,10 +788,10 @@ public class ServiceBusInitializer {
             }
         }
     }
-    
+
     /**
 	 * Clean up temp files
-	 * 
+	 *
 	 * @param appUnzipDir
 	 */
 	private static void cleanupTempDirectory(String appUnzipDir) {

@@ -74,6 +74,7 @@ import org.wso2.carbon.mediation.registry.WSO2Registry;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.utils.AbstractAxis2ConfigurationContextObserver;
+import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.ServerConstants;
 
 import java.io.File;
@@ -89,7 +90,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * for the respective tenants.
  */
 public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationContextObserver {
-    private static final Log log = LogFactory.getLog(TenantServiceBusInitializer.class);    
+    private static final Log log = LogFactory.getLog(TenantServiceBusInitializer.class);
 
 //    private Map<Integer, ServiceRegistration> tenantRegistrations =
 //            new HashMap<Integer, ServiceRegistration>();
@@ -98,7 +99,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         ServerContextInformation contextInfo;
         String tenantDomain =
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
-        
+
         log.info("Intializing the ESB Configuration for the tenant domain : " + tenantDomain);
 
         try {
@@ -158,7 +159,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             if (contextInfo == null) {
                 handleFatal("Failed to intilize the ESB for tenent:" + tenantDomain);
             }
-            
+
             initPersistence(manger.getTracker().getCurrentConfigurationName(),
                     configurationContext,
                     contextInfo);
@@ -168,7 +169,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
 
             int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
             // populate the SynapseEnv service and SynapseConfig OSGI Services so that other
-            // components get to know about the availability of the new synapse configuration            
+            // components get to know about the availability of the new synapse configuration
             //Properties props = new Properties();
             SynapseConfigurationService synCfgSvc
                         = new SynapseConfigurationServiceImpl(contextInfo.getSynapseConfiguration(),
@@ -203,9 +204,9 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
     					.newCollection();
     			registry.put(ServiceBusConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY,
     					secureVaultCollection);
-    		
+
     		}
-            
+
 
             ConfigurationTrackingService trackingService = ServiceBusInitializer.
                     getConfigurationTrackingService();
@@ -220,7 +221,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             }
 
             ConfigurationHolder.getInstance().addSynapseRegistration(tenantId, synapseRegistration);
-            registerInboundDeployer(axisConfig, contextInfo.getSynapseEnvironment());            
+            registerInboundDeployer(axisConfig, contextInfo.getSynapseEnvironment());
         } catch (Exception e) {
             handleFatal("Couldn't initialize the ESB for tenant:" + tenantDomain, e);
         } catch (Throwable t) {
@@ -254,8 +255,8 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         }
         deploymentEngine.addDeployer(new InboundEndpointDeployer(), inboundDirPath,
                 ServiceBusConstants.ARTIFACT_EXTENSION);
-    }    
-    
+    }
+
     public void terminatingConfigurationContext(ConfigurationContext configurationContext) {
         String tenantDomain =
                 PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
@@ -370,7 +371,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         }
         contextInfo.addProperty(TaskConstants.TASK_SCHEDULER, scheduler);
 
-        TaskDescriptionRepository repository;                
+        TaskDescriptionRepository repository;
         if (configurationContext.getProperty(ServiceBusConstants.CARBON_TASK_REPOSITORY) == null) {
             repository = new TaskDescriptionRepository();
             configurationContext.setProperty(
@@ -468,9 +469,9 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
         registry.getConfigurationProperties().setProperty("cachableDuration", "1500");
         initialSynCfg.setRegistry(registry);
         //Add the default NTask Manager to config
-        TaskManager taskManager = new NTaskTaskManager();      
+        TaskManager taskManager = new NTaskTaskManager();
         initialSynCfg.setTaskManager(taskManager);
-        
+
         MultiXMLConfigurationSerializer serializer
                 = new MultiXMLConfigurationSerializer(synapseConfigDir.getAbsolutePath());
         try {
@@ -512,8 +513,8 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
 
         try {
             String carbonHome = System.getProperty(ServerConstants.CARBON_HOME);
-            File synapseProperties = new File(carbonHome + File.separator + "repository" + File.separator + "conf" +
-                    File.separator + "synapse.properties");
+            File synapseProperties = new File(CarbonUtils.getCarbonConfigDirPath() + File.separator + "synapse" +
+                                              ".properties");
             Properties properties = new Properties();
             InputStream inputStream = new FileInputStream(synapseProperties);
             properties.load(inputStream);
@@ -533,11 +534,11 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             log.error("Error while creating Synapse debug environment ", ex);
         }
     }
-    
-    
+
+
     /**
 	 * Checks whether the given repository already existing.
-	 * 
+	 *
 	 * @return
 	 */
 	protected boolean isRepoExists(org.wso2.carbon.registry.core.Registry registry) {
@@ -559,7 +560,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
 	public String getProviderClass() {
 		return this.getClass().getName();
 	}
-	
+
 
     public static boolean isRunningSamplesMode() {
         return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null;
