@@ -21,9 +21,7 @@ public class SecureVaultUtil {
 		if (confPath == null) {
 			confPath = Paths.get("repository", "conf").toString();
 		}
-		String filePath =         confPath + File.separator +
-		                          SecureVaultConstants.SECURITY_DIR + File.separator +
-		                          SecureVaultConstants.SECRET_CONF;
+		String filePath = Paths.get(confPath, SecureVaultConstants.SECURITY_DIR, SecureVaultConstants.SECRET_CONF).toString();
 
 		File dataSourceFile = new File(filePath);
 		if (!dataSourceFile.exists()) {

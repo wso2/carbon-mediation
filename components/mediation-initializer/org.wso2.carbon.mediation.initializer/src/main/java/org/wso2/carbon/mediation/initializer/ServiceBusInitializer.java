@@ -80,6 +80,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -511,8 +512,7 @@ public class ServiceBusInitializer {
 
         try {
             String carbonHome = System.getProperty(ServerConstants.CARBON_HOME);
-            File synapseProperties = new File(CarbonUtils.getCarbonConfigDirPath() + File.separator + "synapse" +
-                                              ".properties");
+            File synapseProperties = Paths.get(CarbonUtils.getCarbonConfigDirPath(), "synapse.properties").toFile();
             Properties properties = new Properties();
             InputStream inputStream = new FileInputStream(synapseProperties);
             properties.load(inputStream);

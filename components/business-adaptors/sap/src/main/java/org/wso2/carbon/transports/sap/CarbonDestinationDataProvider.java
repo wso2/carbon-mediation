@@ -103,7 +103,7 @@ public class CarbonDestinationDataProvider implements DestinationDataProvider, S
         if (confPath == null) {
             confPath = Paths.get("repository", "conf").toString();
         }
-        File file1 = new File(confPath + File.separator + "sap" + File.separator + fileName);
+        File file1 = Paths.get(confPath, "sap", fileName).toFile();
         if (file1.exists()) {
             return file1;
         }
