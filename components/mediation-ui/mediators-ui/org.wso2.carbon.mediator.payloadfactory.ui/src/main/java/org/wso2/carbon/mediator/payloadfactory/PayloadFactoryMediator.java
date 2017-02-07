@@ -50,7 +50,6 @@ public class PayloadFactoryMediator extends AbstractMediator {
     private static final String VALUE = "value";
     private static final String EXPRESSION = "expression";
     private static final String EVAL = "evaluator";
-    private static final String DEEP_CHECK = "deepCheck";
     private static final String LITERAL = "literal";
     private static final String TYPE = "media-type";
 
@@ -58,7 +57,6 @@ public class PayloadFactoryMediator extends AbstractMediator {
     private static final QName ARGS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "args");
     protected static final QName ATT_KEY = new QName("key");
     protected static final QName ATT_EVAL   = new QName("evaluator");
-    protected static final QName ATT_DEEP_CHECK   = new QName("deepCheck");
     protected static final QName ATT_LITERAL   = new QName("literal");
     protected static final QName ATT_MEDIA   = new QName("media-type");
 
@@ -116,12 +114,6 @@ public class PayloadFactoryMediator extends AbstractMediator {
             for (Argument arg : argumentList) {
 
                 OMElement argElem = fac.createOMElement(ARG, synNS);
-
-                if (arg.isDeepCheck()) {
-                    argElem.addAttribute(fac.createOMAttribute(DEEP_CHECK, nullNS, "true"));
-                } else {
-                    argElem.addAttribute(fac.createOMAttribute(DEEP_CHECK, nullNS, "false"));
-                }
 
                 if (arg.isLiteral()) {
                     argElem.addAttribute(fac.createOMAttribute(LITERAL, nullNS, "true"));
@@ -187,15 +179,7 @@ public class PayloadFactoryMediator extends AbstractMediator {
                 OMElement argElem = (OMElement) itr.next();
                 Argument arg = new Argument();
                 String attrValue;
-                String deepCheckValue;
                 String isLiteral;
-                if ((deepCheckValue = argElem.getAttributeValue(ATT_DEEP_CHECK)) != null) {
-                    if (deepCheckValue.equalsIgnoreCase("false")) {
-                        arg.setDeepCheck(false);
-                    } else {
-                        arg.setDeepCheck(true);
-                    }
-                }
 
                 if ((isLiteral = argElem.getAttributeValue(ATT_LITERAL)) != null) {
                     if (isLiteral.equalsIgnoreCase("false")) {
@@ -310,7 +294,6 @@ public class PayloadFactoryMediator extends AbstractMediator {
         private SynapseXPath expression;
         private SynapseJsonPath jsonPath;
         private String evaluator;
-        private boolean deepCheck = true;
         private boolean literal = false;
 
         public String getValue() {
@@ -343,14 +326,6 @@ public class PayloadFactoryMediator extends AbstractMediator {
 
         public void setEvaluator(String evaluator) {
             this.evaluator = evaluator;
-        }
-
-        public boolean isDeepCheck() {
-            return deepCheck;
-        }
-
-        public void setDeepCheck(boolean deepCheck) {
-            this.deepCheck = deepCheck;
         }
 
         public boolean isLiteral() {
