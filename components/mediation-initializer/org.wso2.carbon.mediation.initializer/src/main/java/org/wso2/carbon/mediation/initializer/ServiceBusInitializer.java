@@ -272,8 +272,8 @@ public class ServiceBusInitializer {
             bndCtx.registerService(SynapseRegistrationsService.class.getName(),
                     synRegistrationsSvc, null);
 
-            configCtxSvc.getServerConfigContext().setProperty(ConfigurationManager.CONFIGURATION_MANAGER,
-                                                              configurationManager);
+            configCtxSvc.getServerConfigContext().setProperty(
+                    ConfigurationManager.CONFIGURATION_MANAGER, configurationManager);
 
             // Start Inbound Endpoint Listeners
             EndpointListenerLoader.loadListeners();
@@ -325,8 +325,8 @@ public class ServiceBusInitializer {
                     configurationInformation.getSynapseXMLLocation(),
                     synCfgSvc.getSynapseConfiguration(), intervalInMillis, configName);
 
-            configCtxSvc.getServerConfigContext().getAxisConfiguration().addParameter(
-                    new Parameter(ServiceBusConstants.PERSISTENCE_MANAGER, pm));
+            configCtxSvc.getServerConfigContext().getAxisConfiguration().addParameter(new Parameter(
+                    ServiceBusConstants.PERSISTENCE_MANAGER, pm));
         } else {
             log.info("Persistence for mediation configuration is disabled");
         }
@@ -846,8 +846,8 @@ public class ServiceBusInitializer {
 						+ File.separator + inboundEndpoint.getFileName());
 			}
 		}
-		deploymentEngine.addDeployer(new InboundEndpointDeployer(), inboundDirPath,
-                                     ServiceBusConstants.ARTIFACT_EXTENSION);
+		deploymentEngine.addDeployer(new InboundEndpointDeployer(),
+                         inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
 	}
 
     protected void setInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
