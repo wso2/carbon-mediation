@@ -269,11 +269,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     if (contentType == null && defaultContentType != null) {
                         contentType = defaultContentType;
                     }
-                    if (contentType != null && contentType.startsWith(WSConstants.TEXT)) {
-                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, false);
-                    } else {
-                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, true);
-                    }
 
                     handleWebsocketBinaryFrame(frame);
 
@@ -281,6 +276,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                             ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx).getAxis2MessageContext();
 
                     Builder builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
+                    if (builder != null && InboundWebsocketConstants.BINARY_BUILDER_IMPLEMENTATION.equals(
+                            builder.getClass().getName())) {
+                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, true);
+                    } else {
+                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, false);
+                    }
                     InputStream in = new AutoCloseInputStream(new ByteBufInputStream(frame.content()));
                     OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
@@ -289,20 +290,23 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     return;
                 } else if ((frame instanceof TextWebSocketFrame) && ((handshaker.selectedSubprotocol() == null) ||
                         (handshaker.selectedSubprotocol() != null
-                                && !handshaker.selectedSubprotocol().contains(InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
+                                && !handshaker.selectedSubprotocol().contains(
+                                        InboundWebsocketConstants.SYNAPSE_SUBPROTOCOL_PREFIX)))) {
                     String contentType = handshaker.selectedSubprotocol();
                     if(contentType == null && defaultContentType != null) {
                         contentType = defaultContentType;
-                    }
-                    if (contentType != null && contentType.startsWith(WSConstants.BINARY)) {
-                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, false);
-                    } else {
-                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, true);
                     }
                     handleWebsocketPassthroughTextFrame(frame);
                     org.apache.axis2.context.MessageContext axis2MsgCtx =
                             ((org.apache.synapse.core.axis2.Axis2MessageContext) synCtx).getAxis2MessageContext();
                     Builder builder = BuilderUtil.getBuilderFromSelector(contentType, axis2MsgCtx);
+
+                    if (builder != null && InboundWebsocketConstants.TEXT_BUILDER_IMPLEMENTATION.equals(
+                            builder.getClass().getName())) {
+                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, true);
+                    } else {
+                        synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, false);
+                    }
                     InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(
                             ((TextWebSocketFrame) frame).text().getBytes()));
                     OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
