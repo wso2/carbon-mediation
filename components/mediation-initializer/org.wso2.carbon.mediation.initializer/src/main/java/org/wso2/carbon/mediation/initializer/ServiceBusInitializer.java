@@ -272,8 +272,8 @@ public class ServiceBusInitializer {
             bndCtx.registerService(SynapseRegistrationsService.class.getName(),
                     synRegistrationsSvc, null);
 
-            configCtxSvc.getServerConfigContext().setProperty(
-                    ConfigurationManager.CONFIGURATION_MANAGER, configurationManager);
+            configCtxSvc.getServerConfigContext().setProperty(ConfigurationManager.CONFIGURATION_MANAGER,
+                                                              configurationManager);
 
             // Start Inbound Endpoint Listeners
             EndpointListenerLoader.loadListeners();
@@ -325,8 +325,8 @@ public class ServiceBusInitializer {
                     configurationInformation.getSynapseXMLLocation(),
                     synCfgSvc.getSynapseConfiguration(), intervalInMillis, configName);
 
-            configCtxSvc.getServerConfigContext().getAxisConfiguration().addParameter(new Parameter(
-                    ServiceBusConstants.PERSISTENCE_MANAGER, pm));
+            configCtxSvc.getServerConfigContext().getAxisConfiguration().addParameter(
+                    new Parameter(ServiceBusConstants.PERSISTENCE_MANAGER, pm));
         } else {
             log.info("Persistence for mediation configuration is disabled");
         }
@@ -417,14 +417,13 @@ public class ServiceBusInitializer {
             configurationInformation.setServerControllerProvider(
                     CarbonSynapseController.class.getName());
             if (isRunningSamplesMode()) {
-                if (System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) != null) {
-                    configurationInformation.setSynapseXMLLocation(
-                            "samples" + File.separator + "synapse_sample_" +
-                            System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) + ".xml");
-                } else if (System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null) {
+                if (System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null) {
                     configurationInformation.setSynapseXMLLocation(
                             "repository" + File.separator + "samples" + File.separator + "synapse_sample_" +
                             System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                } else {
+                    configurationInformation.setSynapseXMLLocation("samples" + File.separator + "synapse_sample_" +
+                            System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) + ".xml");
                 }
             }
 
@@ -507,7 +506,8 @@ public class ServiceBusInitializer {
     }
 
     public static boolean isRunningSamplesMode() {
-        return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null;
+        return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null ||
+               System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null;
     }
 
     public static boolean isRunningDebugMode() {
@@ -846,8 +846,8 @@ public class ServiceBusInitializer {
 						+ File.separator + inboundEndpoint.getFileName());
 			}
 		}
-		deploymentEngine.addDeployer(new InboundEndpointDeployer(),
-				inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+		deploymentEngine.addDeployer(new InboundEndpointDeployer(), inboundDirPath,
+                                     ServiceBusConstants.ARTIFACT_EXTENSION);
 	}
 
     protected void setInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
