@@ -25,11 +25,15 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.*;
-import org.apache.synapse.debug.SynapseDebugManager;
-import org.apache.synapse.debug.SynapseDebugInterface;
+import org.apache.synapse.ServerConfigurationInformation;
+import org.apache.synapse.ServerConfigurationInformationFactory;
+import org.apache.synapse.ServerContextInformation;
+import org.apache.synapse.ServerManager;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.debug.SynapseDebugInterface;
+import org.apache.synapse.debug.SynapseDebugManager;
 import org.apache.synapse.deployers.InboundEndpointDeployer;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -53,7 +57,12 @@ import org.wso2.carbon.mediation.initializer.handler.ProxyLogHandler;
 import org.wso2.carbon.mediation.initializer.handler.SynapseExternalPropertyConfigurator;
 import org.wso2.carbon.mediation.initializer.multitenancy.TenantServiceBusInitializer;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
-import org.wso2.carbon.mediation.initializer.services.*;
+import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
+import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationServiceImpl;
+import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentServiceImpl;
+import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
+import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServiceImpl;
 import org.wso2.carbon.mediation.initializer.utils.ConfigurationHolder;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.mediation.registry.ESBRegistryConstants;
@@ -408,9 +417,15 @@ public class ServiceBusInitializer {
             configurationInformation.setServerControllerProvider(
                     CarbonSynapseController.class.getName());
             if (isRunningSamplesMode()) {
-                configurationInformation.setSynapseXMLLocation("repository" + File.separator
-                        + "samples" + File.separator + "synapse_sample_" + System.getProperty(
-                        ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                if (System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) != null) {
+                    configurationInformation.setSynapseXMLLocation(
+                            "samples" + File.separator + "synapse_sample_" +
+                            System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                } else if (System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null) {
+                    configurationInformation.setSynapseXMLLocation(
+                            "repository" + File.separator + "samples" + File.separator + "synapse_sample_" +
+                            System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                }
             }
 
             serverManager = new ServerManager();
