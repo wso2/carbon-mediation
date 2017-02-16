@@ -507,7 +507,7 @@ public class ServiceBusInitializer {
 
     public static boolean isRunningSamplesMode() {
         return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null ||
-               System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null;
+               System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) != null;
     }
 
     public static boolean isRunningDebugMode() {
