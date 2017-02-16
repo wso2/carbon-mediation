@@ -422,7 +422,8 @@ public class ServiceBusInitializer {
                             "repository" + File.separator + "samples" + File.separator + "synapse_sample_" +
                             System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) + ".xml");
                 } else {
-                    configurationInformation.setSynapseXMLLocation("samples" + File.separator + "synapse_sample_" +
+                    configurationInformation.setSynapseXMLLocation("samples" + File.separator + "service-bus" +
+                            File.separator + "synapse_sample_" +
                             System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) + ".xml");
                 }
             }
