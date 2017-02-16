@@ -417,14 +417,14 @@ public class ServiceBusInitializer {
             configurationInformation.setServerControllerProvider(
                     CarbonSynapseController.class.getName());
             if (isRunningSamplesMode()) {
-                if (System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) != null) {
-                    configurationInformation.setSynapseXMLLocation(
-                            "samples" + File.separator + "synapse_sample_" +
-                            System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) + ".xml");
-                } else if (System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null) {
+                if (System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null) {
                     configurationInformation.setSynapseXMLLocation(
                             "repository" + File.separator + "samples" + File.separator + "synapse_sample_" +
                             System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                } else {
+                    configurationInformation.setSynapseXMLLocation("samples" + File.separator + "service-bus" +
+                            File.separator + "synapse_sample_" +
+                            System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) + ".xml");
                 }
             }
 
@@ -507,7 +507,8 @@ public class ServiceBusInitializer {
     }
 
     public static boolean isRunningSamplesMode() {
-        return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null;
+        return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null ||
+               System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) != null;
     }
 
     public static boolean isRunningDebugMode() {
@@ -847,7 +848,7 @@ public class ServiceBusInitializer {
 			}
 		}
 		deploymentEngine.addDeployer(new InboundEndpointDeployer(),
-				inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+                         inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
 	}
 
     protected void setInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
