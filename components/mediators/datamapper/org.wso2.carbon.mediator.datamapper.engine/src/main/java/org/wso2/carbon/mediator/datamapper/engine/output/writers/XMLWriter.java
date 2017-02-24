@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
 
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
@@ -49,6 +51,7 @@ public class XMLWriter implements Writer {
     private Stack<String> arrayElementStack;
     private String latestElementName;
     private Map<String, String> namespaceMap;
+    private Map<String, String> nsPrefixToUriMap;
     private static final String NAMESPACE_SEPARATOR = "_";
     private static final String XSI_TYPE_IDENTIFIER = "_xsi_type_";
 
@@ -66,11 +69,12 @@ public class XMLWriter implements Writer {
             xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
             //creating root element of the xml message
             namespaceMap = outputSchema.getNamespaceMap();
+            nsPrefixToUriMap = outputSchema.getPrefixMap();
             writeStartElement(outputSchema.getName(), xmlStreamWriter);
-            Iterator<Map.Entry<String, String>> namespaceEntryIterator = namespaceMap.entrySet().iterator();
+            Iterator<Map.Entry<String, String>> namespaceEntryIterator = nsPrefixToUriMap.entrySet().iterator();
             while (namespaceEntryIterator.hasNext()) {
                 Map.Entry<String, String> entry = namespaceEntryIterator.next();
-                xmlStreamWriter.writeNamespace(entry.getValue(), entry.getKey());
+                xmlStreamWriter.writeNamespace(entry.getKey(), entry.getValue());
             }
         } catch (XMLStreamException e) {
             throw new WriterException("Error while creating xml output factory. " + e.getMessage());
@@ -79,6 +83,7 @@ public class XMLWriter implements Writer {
 
     @Override public void writeStartObject(String name) throws WriterException {
         try {
+            name = decodeSpecialChars(name);
             if (name.endsWith(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX)) {
                 latestElementName = name.substring(0, name.lastIndexOf(SCHEMA_ATTRIBUTE_PARENT_ELEMENT_POSTFIX));
                 writeStartElement(latestElementName, xmlStreamWriter);
@@ -93,6 +98,7 @@ public class XMLWriter implements Writer {
 
     @Override public void writeField(String name, Object fieldValue) throws WriterException {
         try {
+            name = decodeSpecialChars(name);
             //with in a element attributes must come first before any of other field values
             if (fieldValue != null) {
                 String value = getFieldValueAsString(fieldValue);
@@ -100,16 +106,10 @@ public class XMLWriter implements Writer {
                     String attributeNameWithNamespace = name.replaceFirst(SCHEMA_ATTRIBUTE_FIELD_PREFIX, "");
                     if (attributeNameWithNamespace.contains("_")) {
                         String[] attributeNameArray = attributeNameWithNamespace.split("_");
-                        if (namespaceMap.values().contains(attributeNameArray[0])) {
-                            Iterator<Map.Entry<String, String>> entryIterator = namespaceMap.entrySet().iterator();
-                            while (entryIterator.hasNext()) {
-                                Map.Entry<String, String> entry = entryIterator.next();
-                                if (attributeNameArray[0].equals(entry.getValue())) {
-                                    xmlStreamWriter.writeAttribute(entry.getKey(),
-                                                                   attributeNameArray[attributeNameArray.length - 1],
-                                                                   value);
-                                }
-                            }
+                        if (nsPrefixToUriMap.containsKey(attributeNameArray[0])) {
+                            xmlStreamWriter.writeAttribute(attributeNameArray[0],
+                                    nsPrefixToUriMap.get(attributeNameArray[0]),
+                                    attributeNameArray[attributeNameArray.length - 1], value);
                         } else {
                             xmlStreamWriter.writeAttribute(attributeNameWithNamespace, value);
                         }
@@ -189,25 +189,29 @@ public class XMLWriter implements Writer {
     }
 
     private void writeStartElement(String name, XMLStreamWriter xMLStreamWriter) throws XMLStreamException {
+        name = decodeSpecialChars(name);
         String prefix = name.split(NAMESPACE_SEPARATOR)[0];
-        if (namespaceMap.values().contains(prefix)) {
+        if (nsPrefixToUriMap.containsKey(prefix)) {
             if (name.contains(DataMapperEngineConstants.NAME_SEPERATOR)) {
                 name = name.split(DataMapperEngineConstants.NAME_SEPERATOR)[0];
             }
             name = name.replaceFirst(prefix + NAMESPACE_SEPARATOR, "");
-            Iterator<Map.Entry<String, String>> entryIterator = namespaceMap.entrySet().iterator();
-            while (entryIterator.hasNext()) {
-                Map.Entry<String, String> entry = entryIterator.next();
-                if (prefix.equals(entry.getValue())) {
-                    xMLStreamWriter.writeStartElement(prefix, name, entry.getKey());
-                }
-            }
+            xMLStreamWriter.writeStartElement(prefix, name, nsPrefixToUriMap.get(prefix));
         } else if (name.contains(DataMapperEngineConstants.NAME_SEPERATOR)) {
             name = name.split(DataMapperEngineConstants.NAME_SEPERATOR)[0];
             xMLStreamWriter.writeStartElement(name);
         } else {
             xMLStreamWriter.writeStartElement(name);
         }
+    }
+
+    /**
+     * Function to decode special characters used data mapper configuration
+     * @param str
+     * @return
+     */
+    private String decodeSpecialChars(String str) {
+        return str.replace(ENCODE_CHAR_HYPHEN, HYPHEN);
     }
 
 }
