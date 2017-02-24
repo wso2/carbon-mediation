@@ -34,22 +34,25 @@ import org.wso2.carbon.mediator.datamapper.engine.input.InputBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.input.builders.JSONBuilder;
 import org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants;
 
-import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import javax.xml.namespace.QName;
 
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ARRAY_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ATTRIBUTES_KEY;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.INTEGER_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ITEMS_KEY;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NULL_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NUMBER_ELEMENT_TYPE;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.OBJECT_ELEMENT_TYPE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PREFIX_LIST_SEPERATOR;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_KEY;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_ATTRIBUTE_FIELD_PREFIX;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.SCHEMA_NAMESPACE_NAME_SEPARATOR;
@@ -157,7 +160,8 @@ public class XMLInputReader implements InputReader {
         /* Reading parameters of the currently processing OMElement */
         localName = omElement.getLocalName();
         nameSpaceURI = this.getNameSpaceURI(omElement);
-        String nameSpaceLocalName = getNamespacesAndIdentifiersAddedFieldName(nameSpaceURI, localName, omElement);
+        String nameSpaceLocalName = getNamespacesAndIdentifiersAddedFieldName(nameSpaceURI, localName,
+                omElement, jsonSchemaMap);
 
         elementType = getElementType(jsonSchemaMap, nameSpaceLocalName);
         if (NULL_ELEMENT_TYPE.equals(elementType)) {
@@ -300,8 +304,8 @@ public class XMLInputReader implements InputReader {
                 continue;
 
             attributeNSURI = this.getNameSpaceURI(omAttribute);
-            attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI);
-            attributeQName = getAttributeQName(omAttribute.getNamespace(), attributeLocalName);
+            attributeFieldName = getAttributeFieldName(attributeLocalName, attributeNSURI, jsonSchemaMap);
+            attributeQName = getAttributeQName(omAttribute.getNamespace(), attributeLocalName, jsonSchemaMap);
 
             /* get the type of the attribute element */
             attributeType = getElementType(jsonSchemaMap, attributeQName);
@@ -438,9 +442,10 @@ public class XMLInputReader implements InputReader {
      * Elements Local name modifier methods
      */
 
-    private String getAttributeFieldName(String qName, String uri) {
+    private String getAttributeFieldName(String qName, String uri, Map jsonSchemaMap) throws SchemaException {
         String[] qNameOriginalArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
-        qName = getNamespacesAndIdentifiersAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length - 1], null);
+        qName = getNamespacesAndIdentifiersAddedFieldName(uri, qNameOriginalArray[qNameOriginalArray.length - 1],
+                                                                                                null, jsonSchemaMap);
         String[] qNameArray = qName.split(SCHEMA_NAMESPACE_NAME_SEPARATOR);
         if (qNameArray.length > 1) {
             return SCHEMA_ATTRIBUTE_FIELD_PREFIX + qNameArray[0] + SCHEMA_NAMESPACE_NAME_SEPARATOR +
@@ -450,12 +455,13 @@ public class XMLInputReader implements InputReader {
         }
     }
 
-    private String getNamespacesAndIdentifiersAddedFieldName(String uri, String localName, OMElement omElement) {
+    private String getNamespacesAndIdentifiersAddedFieldName(String uri,
+                                String localName, OMElement omElement, Map jsonSchemaMap) throws SchemaException {
         String modifiedLocalName = null;
         String[] xsiNamespacePrefix;
         String namespaceURI;
         OMNamespace xsiNamespace = null;
-        String prefix = getInputSchema().getPrefixForNamespace(uri);
+        String prefix = resolveUriToPrefix(uri, localName, jsonSchemaMap);
         if (StringUtils.isNotEmpty(prefix)) {
             modifiedLocalName = prefix + SCHEMA_NAMESPACE_NAME_SEPARATOR + localName;
         } else {
@@ -463,15 +469,57 @@ public class XMLInputReader implements InputReader {
         }
         String prefixInMap = inputSchema.getNamespaceMap().get(XSI_NAMESPACE_URI);
         if (prefixInMap != null && omElement != null) {
-            String xsiType = omElement.getAttributeValue(new QName(XSI_NAMESPACE_URI, "type", prefixInMap));
+            String xsiType = omElement.getAttributeValue(new QName(XSI_NAMESPACE_URI, "type"));
             if (xsiType != null) {
                 xsiNamespacePrefix = xsiType.split(":", 2);
                 xsiNamespace = omElement.findNamespaceURI(xsiNamespacePrefix[0]);
                 if (xsiNamespace != null) {
                     namespaceURI = xsiNamespace.getNamespaceURI();
-                    modifiedLocalName = modifiedLocalName + "," + prefixInMap + ":type=" + getInputSchema()
-                            .getPrefixForNamespace(namespaceURI) + ":" + xsiNamespacePrefix[1];
-                } else {
+                    if (prefixInMap.contains(PREFIX_LIST_SEPERATOR)) {
+                        String[] prefixArr = prefixInMap.split(PREFIX_LIST_SEPERATOR);
+                        String tempModifiedLocalName;
+
+                        /**
+                         * At this point xsi type may have data-type which it's prefix represent multiple namespace uri
+                           as shown in the below sample xml
+                           <root xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsd2="http://www.w3.org/2001/XMLSchema">
+                                <testNS:element1 xsi:type="xsd2:string">car</testNS:element1>
+                                <testNS:element2 xsi:type="xsd:string">car</testNS:element2>
+                           </root>
+                         
+                        **/
+                        if (!getInputSchema().getPrefixForNamespace(namespaceURI).contains(PREFIX_LIST_SEPERATOR)) {
+                            for (String targetPrefix : prefixArr) {
+                                tempModifiedLocalName =
+                                        modifiedLocalName + "," + targetPrefix + ":type=" +
+                                        getInputSchema().getPrefixForNamespace(namespaceURI) + ":" + xsiNamespacePrefix[1];
+                                if (jsonSchemaMap.containsKey(tempModifiedLocalName)) {
+                                    modifiedLocalName = tempModifiedLocalName;
+                                    break;
+                                }
+                            }
+                        } else {
+                            //there are multiple prefixes for xsi type
+                            String[] xsdTypePrefixArray = getInputSchema().
+                                                    getPrefixForNamespace(namespaceURI).split(PREFIX_LIST_SEPERATOR);
+                            for (String targetPrefix : prefixArr) {
+                                for (String xsdTypePrefix : xsdTypePrefixArray) {
+                                    tempModifiedLocalName =
+                                            modifiedLocalName + "," + targetPrefix + ":type=" +
+                                                    xsdTypePrefix + ":" + xsiNamespacePrefix[1];
+                                    if (jsonSchemaMap.containsKey(tempModifiedLocalName)) {
+                                        modifiedLocalName = tempModifiedLocalName;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        modifiedLocalName = modifiedLocalName + "," + prefixInMap + ":type=" + getInputSchema()
+                                .getPrefixForNamespace(namespaceURI) + ":" + xsiNamespacePrefix[1];
+                    }
+                }
+                else {
                     modifiedLocalName = modifiedLocalName + "," + prefixInMap + ":type=" + xsiType;
                 }
             }
@@ -479,9 +527,74 @@ public class XMLInputReader implements InputReader {
         return modifiedLocalName;
     }
 
+    /**
+     * Function to resolve relevant prefix for the provided namespace URI. If multiple prefixes exists, this will
+     * resolve it for the current XML traversal level
+     * @return resolved namespace prefix
+     */
+    private String resolveUriToPrefix (String uri, String localName, Map jsonSchemaMap) throws
+            SchemaException {
+        String prefix = getInputSchema().getPrefixForNamespace(uri);
+
+        if (StringUtils.isNotEmpty(prefix) && prefix.contains(",")) {
+            //multiple prefixes exists for this namespace URI. hence adding all prefixes that related to same
+            // namespace separating by commas
+            //adding comma separated prefix string is looks UGLY :-/, BUT can't help .... !, trying to do with
+            //minimum impact existing mechanism
+            if (jsonSchemaMap != null) {
+                String[] prefixArray = prefix.split(PREFIX_LIST_SEPERATOR);
+                prefix = null;
+                String tempNamespaceLocalName;
+                for (String tempPrefix : prefixArray) {
+                    tempNamespaceLocalName = tempPrefix + SCHEMA_NAMESPACE_NAME_SEPARATOR + localName;
+                    if (tempNamespaceLocalName.equals(getInputSchema().getName()) ||
+                            jsonSchemaMap.containsKey(tempNamespaceLocalName)) {
+                        //found matching namespace prefix for this level for target URI
+                        prefix = tempPrefix;
+                        break;
+                    }
+                }
+
+                if (prefix == null) {
+                    //Still didn't find the matching namespace prefix. May be due to xsi:type attribute exists in the
+                    //input schema and it appended to the schema map key. eg: test2:name,xsi:type=xsd:string for
+                    // <test2:name test1:nameType="productID" xsi:type="xsd:string"
+                    //              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">car</test2:name>
+                    Iterator<String> iterator = jsonSchemaMap.keySet().iterator();
+                    while (iterator.hasNext() && prefix == null) {
+                        String elementName = iterator.next();
+                        for (String tempPrefix : prefixArray) {
+                            tempNamespaceLocalName = tempPrefix + SCHEMA_NAMESPACE_NAME_SEPARATOR + localName + ",";
+                            if (elementName.startsWith(tempNamespaceLocalName)) {
+                                prefix = tempPrefix;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                prefix = null;
+                log.warn("Multiple prefixes exists for element local name: " + localName + " with URI: " + uri
+                            + ". But jsonSchemaMap not provided");
+            }
+        }
+        return prefix;
+    }
+
     private boolean isXsiNil(OMElement omElement) {
         String prefixInMap = inputSchema.getNamespaceMap().get(XSI_NAMESPACE_URI);
         if (prefixInMap != null && omElement != null) {
+            if (prefixInMap.contains(PREFIX_LIST_SEPERATOR)) {
+                //if multiple prefixes for xsi namespace
+                String[] prefixArray = prefixInMap.split(PREFIX_LIST_SEPERATOR);
+                for (String prefix : prefixArray) {
+                    String xsiNilValue = omElement.getAttributeValue(new QName(XSI_NAMESPACE_URI, "nil", prefix));
+                    if (xsiNilValue != null && "true".equalsIgnoreCase(xsiNilValue)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
             String xsiNilValue = omElement.getAttributeValue(new QName(XSI_NAMESPACE_URI, "nil", prefixInMap));
             if (xsiNilValue != null && "true".equalsIgnoreCase(xsiNilValue)) {
                 return true;
@@ -493,6 +606,24 @@ public class XMLInputReader implements InputReader {
     public String getAttributeQName(OMNamespace omNamespace, String localName) {
         if (omNamespace != null) {
             return omNamespace.getPrefix() + ":" + localName;
+        } else {
+            return localName;
+        }
+    }
+
+    /**
+     * This function will resolve prefix for given URI depending on the provided traversal level given by jsonSchemaMap
+     * @param omNamespace
+     * @param localName
+     * @param jsonSchemaMap
+     * @return
+     * @throws SchemaException
+     */
+    public String getAttributeQName(OMNamespace omNamespace, String localName, Map jsonSchemaMap)
+            throws SchemaException {
+        if (omNamespace != null) {
+            String prefix = resolveUriToPrefix(omNamespace.getNamespaceURI(), localName, jsonSchemaMap);
+            return prefix + ":" + localName;
         } else {
             return localName;
         }
@@ -578,7 +709,7 @@ public class XMLInputReader implements InputReader {
 
     private String getModifiedFieldName(String fieldName) {
         return fieldName.replace(SCHEMA_NAMESPACE_NAME_SEPARATOR, "_")
-                .replace(",", DataMapperEngineConstants.NAME_SEPERATOR).replace("=", "_");
+                .replace(",", DataMapperEngineConstants.NAME_SEPERATOR).replace("=", "_").replace(HYPHEN, ENCODE_CHAR_HYPHEN);
     }
 
 }
