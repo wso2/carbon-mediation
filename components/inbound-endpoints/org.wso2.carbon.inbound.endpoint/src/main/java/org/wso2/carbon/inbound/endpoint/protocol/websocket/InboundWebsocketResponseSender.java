@@ -22,7 +22,6 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import org.apache.axiom.om.OMOutputFormat;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.transport.MessageFormatter;
@@ -74,6 +73,13 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 }
             } catch (AxisFault fault) {
                 log.error("Error occurred while sending close frames", fault);
+            }
+            Object isConnectionAlive = ((Axis2MessageContext) msgContext).getAxis2MessageContext().getProperty
+                    (WSConstants.IS_CONNECTION_ALIVE);
+            if (isConnectionAlive != null && !(boolean) isConnectionAlive) {
+                InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+                ctx.writeToChannel(new CloseWebSocketFrame(1001, "shutdown"));
+                return;
             }
             if (msgContext.getProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT) != null &&
                     msgContext.getProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT).equals(true)) {

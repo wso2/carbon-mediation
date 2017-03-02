@@ -27,7 +27,6 @@ public class WSConstants {
     public static final String MESSAGE_TYPE = "messageType";
     public static final String CONNECTION_TERMINATE = "connection.terminate";
     public static final String CLIENT_ID = "clientId";
-    public static final String IS_PING = "isPing";
     public static final String IS_CONNECTION_ALIVE = "isConnectionAlive";
     public static final String DEFAULT_CONTENT_TYPE = "ws.default.content.type";
     public static final String WS_CLOSE_FRAME_STATUS_CODE = "websocket.close.frame.status.code";
