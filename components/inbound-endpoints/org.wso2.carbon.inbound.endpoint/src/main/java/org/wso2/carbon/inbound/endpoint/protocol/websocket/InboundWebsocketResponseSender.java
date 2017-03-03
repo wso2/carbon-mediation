@@ -75,7 +75,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 log.error("Error occurred while sending close frames", fault);
             }
             Object isConnectionAlive = ((Axis2MessageContext) msgContext).getAxis2MessageContext().getProperty
-                    (WSConstants.IS_CONNECTION_ALIVE);
+                    (InboundWebsocketConstants.IS_CONNECTION_ALIVE);
             if (isConnectionAlive != null && !(boolean) isConnectionAlive) {
                 InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
                 ctx.writeToChannel(new CloseWebSocketFrame(1001, "shutdown"));
@@ -99,7 +99,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 if (frame == null) {
                     try {
                         RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
-                        if (defaultContentType != null && defaultContentType.startsWith(WSConstants.BINARY)) {
+                        if (defaultContentType != null && defaultContentType.startsWith(InboundWebsocketConstants.BINARY)) {
                             org.apache.axis2.context.MessageContext msgCtx =
                                     ((Axis2MessageContext) msgContext).getAxis2MessageContext();
                             MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgCtx);
@@ -131,11 +131,11 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                 if (frame == null) {
                     try {
                         RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
-                        if (defaultContentType != null && defaultContentType.startsWith(WSConstants.TEXT)) {
+                        if (defaultContentType != null && defaultContentType.startsWith(InboundWebsocketConstants.TEXT)) {
                             String backendMessageType = (String) (((Axis2MessageContext) msgContext)
-                                    .getAxis2MessageContext()).getProperty(WSConstants.BACKEND_MESSAGE_TYPE);
+                                    .getAxis2MessageContext()).getProperty(InboundWebsocketConstants.BACKEND_MESSAGE_TYPE);
                             ((Axis2MessageContext) msgContext).getAxis2MessageContext().setProperty(
-                                    WSConstants.MESSAGE_TYPE, backendMessageType);
+                                    InboundWebsocketConstants.MESSAGE_TYPE, backendMessageType);
                             frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext)
                                     msgContext).getAxis2MessageContext()));
                             InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
@@ -159,9 +159,9 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
             } else {
                 try {
                     Object wsCloseFrameStatusCode = msgContext.getProperty(
-                            WSConstants.WS_CLOSE_FRAME_STATUS_CODE);
+                            InboundWebsocketConstants.WS_CLOSE_FRAME_STATUS_CODE);
                     String wsCloseFrameReasonText = (String) (msgContext.getProperty(
-                            WSConstants.WS_CLOSE_FRAME_REASON_TEXT));
+                            InboundWebsocketConstants.WS_CLOSE_FRAME_REASON_TEXT));
                     int statusCode = 1001;
                     if (wsCloseFrameStatusCode != null) {
                         statusCode = (int) wsCloseFrameStatusCode;

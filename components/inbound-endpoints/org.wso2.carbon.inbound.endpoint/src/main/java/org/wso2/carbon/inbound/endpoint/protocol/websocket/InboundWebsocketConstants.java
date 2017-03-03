@@ -57,4 +57,14 @@ public class InboundWebsocketConstants {
     public static final String BINARY_BUILDER_IMPLEMENTATION = "org.wso2.carbon.relay.BinaryRelayBuilder";
     public static final String TEXT_BUILDER_IMPLEMENTATION = "org.apache.axis2.format.PlainTextBuilder";
 
+    public static final String TEXT = "text";
+    public static final String BINARY = "binary";
+    public static final String BACKEND_MESSAGE_TYPE = "backendMessageType";
+    public static final String MESSAGE_TYPE = "messageType";
+    public static final String CONNECTION_TERMINATE = "connection.terminate";
+    public static final String CLIENT_ID = "clientId";
+    public static final String IS_CONNECTION_ALIVE = "isConnectionAlive";
+    public static final String WS_CLOSE_FRAME_STATUS_CODE = "websocket.close.frame.status.code";
+    public static final String WS_CLOSE_FRAME_REASON_TEXT = "websocket.close.frame.reason.text";
+
 }

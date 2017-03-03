@@ -148,10 +148,10 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-        synCtx.setProperty(WSConstants.CONNECTION_TERMINATE, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.CONNECTION_TERMINATE,
+        synCtx.setProperty(InboundWebsocketConstants.CONNECTION_TERMINATE, new Boolean(true));
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CONNECTION_TERMINATE,
                 new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.CLIENT_ID,
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                 ctx.channel().hashCode());
         injectToSequence(synCtx, endpoint);
     }
@@ -192,7 +192,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                 .addChannelContext(endpointName, subscriberPath.getPath(), wrappedContext);
         MessageContext synCtx = getSynapseMessageContext(tenantDomain);
         InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-        defaultContentType = endpoint.getParametersMap().get(WSConstants.DEFAULT_CONTENT_TYPE);
+        defaultContentType = endpoint.getParametersMap().get(InboundWebsocketConstants.INBOUND_DEFAULT_CONTENT_TYPE);
         if (endpoint == null) {
             log.error("Cannot find deployed inbound endpoint " + endpointName + "for process request");
             return;
@@ -205,7 +205,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
 
         synCtx.setProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
         ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT, new Boolean(true));
-        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(WSConstants.CLIENT_ID,
+        ((Axis2MessageContext)synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                 ctx.channel().hashCode());
         injectToSequence(synCtx, endpoint);
 
@@ -247,7 +247,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                         WebsocketEndpointManager.getInstance().getEndpointName(port, tenantDomain);
                 MessageContext synCtx = getSynapseMessageContext(tenantDomain);
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-                ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(WSConstants.CLIENT_ID,
+                ((Axis2MessageContext) synCtx).getAxis2MessageContext().setProperty(InboundWebsocketConstants.CLIENT_ID,
                         ctx.channel().hashCode());
 
                 if (endpoint == null) {
