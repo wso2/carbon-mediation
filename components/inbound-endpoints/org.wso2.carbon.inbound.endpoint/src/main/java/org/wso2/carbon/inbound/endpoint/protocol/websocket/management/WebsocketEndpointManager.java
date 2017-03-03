@@ -202,7 +202,8 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                 log.error("Error while getting synapse message context. "+ fault);
                 throw new SynapseException(fault);
             }
-            pathManager.broadcastOnSubscriberPath(new CloseWebSocketFrame(shutdownStatusCode, shutdownStatusMessage), endpointName, sourceHandler.getSubscriberPath());
+            pathManager.broadcastOnSubscriberPath(new CloseWebSocketFrame(shutdownStatusCode, shutdownStatusMessage),
+                    endpointName, sourceHandler.getSubscriberPath());
         }
         PrivilegedCarbonContext cc = PrivilegedCarbonContext.getThreadLocalCarbonContext();
         String tenantDomain = cc.getTenantDomain();

@@ -69,7 +69,8 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
             }
             try {
                 if (errorCode != null && errorMessage != null) {
-                    sourceHandler.handleClientWebsocketChannelTermination(new CloseWebSocketFrame(errorCode, errorMessage));
+                    sourceHandler.handleClientWebsocketChannelTermination(
+                            new CloseWebSocketFrame(errorCode, errorMessage));
                 }
             } catch (AxisFault fault) {
                 log.error("Error occurred while sending close frames", fault);
@@ -98,8 +99,10 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                         msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME);
                 if (frame == null) {
                     try {
-                        RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
-                        if (defaultContentType != null && defaultContentType.startsWith(InboundWebsocketConstants.BINARY)) {
+                        RelayUtils.buildMessage(((Axis2MessageContext) msgContext)
+                                .getAxis2MessageContext(), false);
+                        if (defaultContentType != null && defaultContentType.startsWith(
+                                InboundWebsocketConstants.BINARY)) {
                             org.apache.axis2.context.MessageContext msgCtx =
                                     ((Axis2MessageContext) msgContext).getAxis2MessageContext();
                             MessageFormatter messageFormatter = BaseUtils.getMessageFormatter(msgCtx);
@@ -130,10 +133,13 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                         msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME);
                 if (frame == null) {
                     try {
-                        RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
-                        if (defaultContentType != null && defaultContentType.startsWith(InboundWebsocketConstants.TEXT)) {
+                        RelayUtils.buildMessage(((Axis2MessageContext) msgContext)
+                                .getAxis2MessageContext(), false);
+                        if (defaultContentType != null && defaultContentType.startsWith(
+                                InboundWebsocketConstants.TEXT)) {
                             String backendMessageType = (String) (((Axis2MessageContext) msgContext)
-                                    .getAxis2MessageContext()).getProperty(InboundWebsocketConstants.BACKEND_MESSAGE_TYPE);
+                                    .getAxis2MessageContext())
+                                    .getProperty(InboundWebsocketConstants.BACKEND_MESSAGE_TYPE);
                             ((Axis2MessageContext) msgContext).getAxis2MessageContext().setProperty(
                                     InboundWebsocketConstants.MESSAGE_TYPE, backendMessageType);
                             frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext)
