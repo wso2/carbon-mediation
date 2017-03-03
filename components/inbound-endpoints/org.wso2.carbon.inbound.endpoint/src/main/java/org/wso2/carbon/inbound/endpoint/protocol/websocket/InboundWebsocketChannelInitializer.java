@@ -38,7 +38,6 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
     private String outflowDispatchSequence;
     private String outflowErrorSequence;
     private ArrayList<AbstractSubprotocolHandler> subprotocolHandlers;
-    private String defaultContentType;
 
     public InboundWebsocketChannelInitializer() {
     }
@@ -61,10 +60,6 @@ public class InboundWebsocketChannelInitializer extends ChannelInitializer<Socke
 
     public void setSubprotocolHandlers(ArrayList<AbstractSubprotocolHandler> subprotocolHandlers){
         this.subprotocolHandlers = subprotocolHandlers;
-    }
-
-    public void setDefaultContentType(String defaultContentType) {
-        this.defaultContentType = defaultContentType;
     }
 
     @Override

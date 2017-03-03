@@ -25,7 +25,12 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundProcessorParams;
-import org.wso2.carbon.inbound.endpoint.protocol.websocket.*;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketSourceHandler;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConfiguration;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketEventExecutor;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketChannelInitializer;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.SubprotocolBuilderUtil;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
@@ -131,7 +136,6 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setOutflowDispatchSequence(config.getOutFlowDispatchSequence());
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
         handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
-        handler.setDefaultContentType(config.getDefaultContentType());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -164,7 +168,6 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setOutflowDispatchSequence(config.getOutFlowDispatchSequence());
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
         handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
-        handler.setDefaultContentType(config.getDefaultContentType());
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
