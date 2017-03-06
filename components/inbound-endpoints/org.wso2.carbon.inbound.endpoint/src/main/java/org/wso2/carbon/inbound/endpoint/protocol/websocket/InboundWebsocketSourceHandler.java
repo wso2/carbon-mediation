@@ -288,7 +288,6 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
-
                     return;
                 } else if ((frame instanceof TextWebSocketFrame) && ((handshaker.selectedSubprotocol() == null) ||
                         (handshaker.selectedSubprotocol() != null
