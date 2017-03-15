@@ -36,6 +36,7 @@ import org.apache.synapse.transport.nhttp.ServerHandler;
 import org.jaxen.SimpleNamespaceContext;
 import org.jaxen.XPath;
 import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
@@ -133,8 +134,15 @@ public class NHttpGetProcessor extends DefaultHttpGetProcessor {
             CarbonHttpResponse carbonHttpResponse = new CarbonHttpResponse(
                     temporaryData.getOutputStream());
 
-            (getRequestProcessors.get(item)).process(carbonHttpRequest,
-                    carbonHttpResponse, cfgCtx);
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(TenantAxisUtils.
+                        getTenantDomain(requestUrl), true);
+                (getRequestProcessors.get(item)).process(carbonHttpRequest,
+                        carbonHttpResponse, cfgCtx);
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
 
             // adding headers
             Map<String, String> responseHeaderMap = carbonHttpResponse.getHeaders();
@@ -267,9 +275,14 @@ public class NHttpGetProcessor extends DefaultHttpGetProcessor {
                     if (axisService == null && !loadBalancer && serviceName != null) {
                         // Try to see whether the service is available in a tenant
                         try {
+                            String tenantDomain = TenantAxisUtils.getTenantDomain(uri);
+                            PrivilegedCarbonContext.startTenantFlow();
+                            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
                             axisService = TenantAxisUtils.getAxisService(serviceName, cfgCtx);
                         } catch (AxisFault axisFault) {
                             axisFault.printStackTrace();
+                        } finally {
+                            PrivilegedCarbonContext.endTenantFlow();
                         }
                     }
                 }
