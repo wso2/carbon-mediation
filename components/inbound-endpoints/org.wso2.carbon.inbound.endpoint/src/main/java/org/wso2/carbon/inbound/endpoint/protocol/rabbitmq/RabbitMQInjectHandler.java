@@ -61,6 +61,7 @@ public class RabbitMQInjectHandler {
      */
     public boolean invoke(RabbitMQMessage message) {
 
+        boolean success = true;
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
         log.debug("Processed RabbitMQ Message ");
         MessageContext axis2MsgCtx = ((org.apache.synapse.core.axis2.Axis2MessageContext) msgCtx)
@@ -122,7 +123,7 @@ public class RabbitMQInjectHandler {
 
         if (injectingSeq == null || injectingSeq.equals("")) {
             log.error("Sequence name not specified. Sequence : " + injectingSeq);
-            return false;
+            success = false;
         }
         SequenceMediator seq = (SequenceMediator) synapseEnvironment
                 .getSynapseConfiguration().getSequence(injectingSeq);        
@@ -139,7 +140,13 @@ public class RabbitMQInjectHandler {
             log.error("Sequence: " + injectingSeq + " not found");
         }
 
-        return true;
+        Object rollbackProperty = msgCtx.getProperty(RabbitMQConstants.SET_ROLLBACK_ONLY);
+        if (rollbackProperty != null && (rollbackProperty instanceof Boolean && ((Boolean) rollbackProperty))
+                || (rollbackProperty instanceof String && Boolean.valueOf((String) rollbackProperty))) {
+            success = false;
+        }
+
+        return success;
     }
 
     /**
