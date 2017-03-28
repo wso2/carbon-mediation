@@ -20,23 +20,20 @@ import org.apache.axiom.om.*;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.context.MessageContext;
-import org.apache.axis2.transport.http.SOAPMessageFormatter;
-import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.description.Parameter;
 import org.apache.axis2.transport.MessageFormatter;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.transport.http.SOAPMessageFormatter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.transport.nhttp.NhttpConstants;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
@@ -189,10 +186,11 @@ public class ExpandingMessageFormatter extends SOAPMessageFormatter {
                             log.warn("Attempting to send an already consumed request [" +
                                      messageContext.getTo().getAddress() + " POST/Empty Message Body]");
                         }
-                    }
-                    //Ask the data source to stream, if it has not already cached the request
-                    if (!preserve && dataSource instanceof StreamingOnRequestDataSource) {
-                        ((StreamingOnRequestDataSource) dataSource).setLastUse(true);
+
+                        //Ask the data source to stream, if it has not already cached the request
+                        if (!preserve) {
+                            ((StreamingOnRequestDataSource) dataSource).setLastUse(true);
+                        }
                     }
                 }
                 dh.writeTo(out);
