@@ -200,6 +200,9 @@ public class XMLInputReader implements InputReader {
                 elementType = getObjectTextElementType(jsonSchemaMap, nameSpaceLocalName);
             }
         }
+        /** If an object/element(String/boolean/integer/number) property contains xis:nil=true
+         * need  to avoid writing those fields*/
+        if (!isXsiNil(omElement)) {
         /* If there is text in the OMElement */
         if (DataMapperEngineConstants.STRING_ELEMENT_TYPE.equals(elementType)
                 || DataMapperEngineConstants.BOOLEAN_ELEMENT_TYPE.equals(elementType)
@@ -223,7 +226,7 @@ public class XMLInputReader implements InputReader {
         it = omElement.getChildElements();
 
         /* Recursively call all the children */
-        if (!isXsiNil(omElement)) {
+
             while (it.hasNext()) {
                 prevElementNameSpaceLocalName = xmlTraverse(it.next(), prevElementNameSpaceLocalName,
                         nextJSONSchemaMap);
