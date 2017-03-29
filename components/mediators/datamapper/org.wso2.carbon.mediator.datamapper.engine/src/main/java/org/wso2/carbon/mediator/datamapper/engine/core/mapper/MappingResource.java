@@ -41,6 +41,7 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 public class MappingResource {
 
     public static final String NAMESPACE_DELIMETER = ":";
+    public static final String NEW_LINE = "\n";
     private Schema inputSchema;
     private Schema outputSchema;
     private String inputRootelement;
@@ -126,6 +127,7 @@ public class MappingResource {
         try {
             while ((configLine = configReader.readLine()) != null) {
                 configScriptBuilder.append(configLine);
+                configScriptBuilder.append(NEW_LINE);
             }
         } catch (IOException e) {
             throw new JSException(e.getMessage());
