@@ -200,8 +200,8 @@ public class XMLInputReader implements InputReader {
                 elementType = getObjectTextElementType(jsonSchemaMap, nameSpaceLocalName);
             }
         }
-        /** If an object/element(String/boolean/integer/number) property contains xis:nil=true
-         * need  to avoid writing those fields*/
+        /* If an object/element(String/boolean/integer/number) property contains xis:nil=true
+          need  to avoid writing those fields*/
         if (!isXsiNil(omElement)) {
         /* If there is text in the OMElement */
             if (DataMapperEngineConstants.STRING_ELEMENT_TYPE.equals(elementType)
