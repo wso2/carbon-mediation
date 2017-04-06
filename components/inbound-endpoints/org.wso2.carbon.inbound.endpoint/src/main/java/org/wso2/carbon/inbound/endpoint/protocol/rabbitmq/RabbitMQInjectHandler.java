@@ -28,6 +28,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
@@ -58,8 +59,9 @@ public class RabbitMQInjectHandler {
     /**
      * Determine the message builder to use, set the message payload to the message context and
      * inject the message.
+     * @param inboundName 
      */
-    public boolean invoke(RabbitMQMessage message) {
+    public boolean invoke(RabbitMQMessage message, String inboundName) {
 
         boolean success = true;
         org.apache.synapse.MessageContext msgCtx = createMessageContext();
@@ -135,6 +137,7 @@ public class RabbitMQInjectHandler {
                 seq.init(synapseEnvironment);
             }
             seq.setErrorHandler(onErrorSeq);
+            msgCtx.setProperty(SynapseConstants.INBOUND_ENDPOINT_NAME, inboundName);
             synapseEnvironment.injectInbound(msgCtx, seq, sequential);
         } else {
             log.error("Sequence: " + injectingSeq + " not found");
