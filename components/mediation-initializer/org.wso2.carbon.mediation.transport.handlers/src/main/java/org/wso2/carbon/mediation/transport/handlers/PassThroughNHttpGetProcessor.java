@@ -336,9 +336,16 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
                                         queryString.indexOf("&") == item.length() ||
                                         queryString.indexOf("=") == item.length())) {
                             if (axisService == null) {
-                                //check for APIs since no axis2 service found
-                                if (!RequestProcessorDispatcherUtil.isDispatchToApiGetProcessor(requestUri, cfgCtx)) {
-                                    continue;
+                                try {
+                                    String tenantDomain = TenantAxisUtils.getTenantDomain(uri);
+                                    PrivilegedCarbonContext.startTenantFlow();
+                                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                                    //check for APIs since no axis2 service found
+                                    if (!RequestProcessorDispatcherUtil.isDispatchToApiGetProcessor(requestUri, cfgCtx)) {
+                                        continue;
+                                    }
+                                } finally {
+                                    PrivilegedCarbonContext.endTenantFlow();
                                 }
                             }
 
