@@ -177,7 +177,7 @@ public class RabbitMQConnectionConsumer {
             if (message != null) {
                 idle = false;
                 try {
-                    successful = injectHandler.invoke(message);
+                    successful = injectHandler.invoke(message, inboundName);
                 } finally {
                     if (successful) {
                         try {
