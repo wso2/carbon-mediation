@@ -21,6 +21,7 @@ import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.inbound.endpoint.inboundfactory.InboundRequestProcessorFactoryImpl;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointsDataStore;
+import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceServiceDSComponent;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
@@ -58,10 +59,11 @@ public class EndpointListenerLoader {
                 InboundEndpointsDataStore.getInstance().getAllListeningEndpointData();
 
         for (Map.Entry tenantInfoEntry : tenantData.entrySet()) {
-            int port = (Integer) tenantInfoEntry.getKey();
 
             InboundEndpointInfoDTO inboundEndpointInfoDTO =
                        (InboundEndpointInfoDTO) ((ArrayList) tenantInfoEntry.getValue()).get(0);
+            int port = (Integer) tenantInfoEntry.getKey() + PersistenceUtils.getPortOffset(inboundEndpointInfoDTO
+                    .getInboundParams().getProperties());
 
             if (inboundEndpointInfoDTO.getProtocol().equals(InboundHttpConstants.HTTP)) {
                 HTTPEndpointManager.getInstance().

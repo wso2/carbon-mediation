@@ -54,6 +54,28 @@ public class JMSConstants {
     public static final String JMS_MAP_ELEMENT_NAME = "JMSMap";
     public static final String SET_ROLLBACK_ONLY = "SET_ROLLBACK_ONLY";
     public static final QName JMS_MAP_QNAME = new QName(JMS_MAP_NS, JMS_MAP_ELEMENT_NAME, "");
+    /**
+     * Constant that holds the name of the environment property
+     * for specifying configuration information for the service provider
+     * to use. The value of the property should contain a URL string
+     * (e.g. "ldap://somehost:389").
+     * This property may be specified in the environment,
+     * an applet parameter, a system property, or a resource file.
+     * If it is not specified in any of these sources,
+     * the default configuration is determined by the service provider.
+     *
+     * <p> The value of this constant is "java.naming.provider.url".
+     */
+    public static final String PROVIDER_URL = "java.naming.provider.url";
+    public static final String DESTINATION_TYPE_GENERIC = "generic";
+    /**
+     * Naming factory initial
+     */
+    public static final String NAMING_FACTORY_INITIAL = "java.naming.factory.initial";
+    /**
+     * Default Connection Factory
+     * */
+    public static final String CONNECTION_STRING = "connectionfactory.QueueConnectionFactory";
 
     public static final String PARAM_CACHE_LEVEL = "transport.jms.CacheLevel";
     /**

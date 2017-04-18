@@ -27,6 +27,9 @@ public class InboundWebsocketConfiguration {
     private String outFlowErrorSequence;
     private String subprotocolHandler;
     private String defaultContentType;
+    private String pipelineHandler;
+    private String dispatchToCustomSequence;
+    private final boolean usePortOffset;
 
     private InboundWebsocketConfiguration(InboundWebsocketConfigurationBuilder builder) {
         this.port = builder.port;
@@ -38,6 +41,9 @@ public class InboundWebsocketConfiguration {
         this.outFlowErrorSequence = builder.outFlowErrorSequence;
         this.subprotocolHandler = builder.subprotocolHandler;
         this.defaultContentType = builder.defaultContentType;
+        this.pipelineHandler = builder.pipelineHandler;
+        this.dispatchToCustomSequence = builder.dispatchToCustomSequence;
+        this.usePortOffset = builder.usePortOffset;
     }
 
     public int getPort() {
@@ -76,6 +82,18 @@ public class InboundWebsocketConfiguration {
         return defaultContentType;
     }
 
+    public String getPipelineHandler() {
+        return pipelineHandler;
+    }
+
+    public String getDispatchToCustomSequence() {
+        return dispatchToCustomSequence;
+    }
+
+    public boolean isUsePortOffset() {
+        return usePortOffset;
+    }
+
     public static class InboundWebsocketConfigurationBuilder {
         private final int port;
         private final String name;
@@ -86,6 +104,9 @@ public class InboundWebsocketConfiguration {
         private String outFlowErrorSequence;
         private String subprotocolHandler;
         private String defaultContentType;
+        private String pipelineHandler;
+        private String dispatchToCustomSequence;
+        private boolean usePortOffset = false;
 
         public InboundWebsocketConfigurationBuilder(int port, String name) {
             this.port = port;
@@ -131,6 +152,20 @@ public class InboundWebsocketConfiguration {
             return this;
         }
 
+        public InboundWebsocketConfigurationBuilder pipelineHandler(String pipelineHandler) {
+            this.pipelineHandler = pipelineHandler;
+            return this;
+        }
+
+        public InboundWebsocketConfigurationBuilder dispatchToCustomSequence(String dispatchToCustomSequence) {
+            this.dispatchToCustomSequence = dispatchToCustomSequence;
+            return this;
+        }
+
+        public InboundWebsocketConfigurationBuilder usePortOffset(boolean usePortOffset) {
+            this.usePortOffset = usePortOffset;
+            return this;
+        }
     }
 
 }

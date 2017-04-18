@@ -17,15 +17,6 @@
 */
 package org.wso2.carbon.message.processor.service;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
@@ -48,13 +39,31 @@ import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.locks.Lock;
+
 @SuppressWarnings({"UnusedDeclaration"})
 public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     private static Log log = LogFactory.getLog(MessageProcessorAdminService.class);
 
     public static final int MSGS_PER_PAGE = 10;
-    
-    public final static String DEFAULT_AXIS2_XML = "./repository/conf/axis2/axis2_blocking_client.xml";
+    private static String CONF_LOCATION = "conf.location";
+    public final static String DEFAULT_AXIS2_XML;
+
+    static {
+        String confPath = System.getProperty(CONF_LOCATION);
+        if (confPath == null) {
+            confPath = Paths.get("repository", "conf").toString();
+        }
+        DEFAULT_AXIS2_XML = Paths.get(confPath, "axis2", "axis2_blocking_client.xml").toString();
+    }
+
 
     /**
      * Get an XML configuration element for a message processor from the FE and creates and add

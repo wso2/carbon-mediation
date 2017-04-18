@@ -33,6 +33,7 @@ public final class ServiceBusConstants {
     public static final String DEFAULT_COLLECTIONS_PROPERTY = "defaultCollections";
     public static final String DEFAULT_ESBREGISTRY_ITEM = "DefaultESBRegistry.Item";
     public static final String ESB_SAMPLE_SYSTEM_PROPERTY = "esb.sample";
+    public static final String EI_SAMPLE_SYSTEM_PROPERTY = "ei.sample";
     public static final String USE_SYNAPE_XML_SYSTEM_PROPERTY = "useSynapseXML";
     public static final String CONFIGURATION_SERIALIZATION = "synapseConfiguration";
     public static final String SERIALIZED_TO_REGISTRY = "serializedToRegistry";
@@ -110,7 +111,7 @@ public final class ServiceBusConstants {
     public static final String DESCRIPTION = "DESCRIPTION";
     public static final String ACTIVE = "ACTIVE";
     public static final String CREATED = "CREATED";
-    
+
     //constant for registry based wsdl dependency
     public static final String DEPENDS = "depends";
 

@@ -44,6 +44,7 @@ public class InboundWebsocketConstants {
     public static final String WEBSOCKET_TEXT_FRAME = "websocket.text.frame";
 
     public static final String WEBSOCKET_CLIENT_SIDE_BROADCAST_LEVEL = "ws.client.side.broadcast.level";
+    public static final String WEBSOCKET_USE_PORT_OFFSET = "ws.use.port.offset";
 
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_SEQUENCE = "ws.outflow.dispatch.sequence";
     public static final String WEBSOCKET_OUTFLOW_DISPATCH_FAULT_SEQUENCE = "ws.outflow.dispatch.fault.sequence";
@@ -67,4 +68,6 @@ public class InboundWebsocketConstants {
     public static final String WS_CLOSE_FRAME_STATUS_CODE = "websocket.close.frame.status.code";
     public static final String WS_CLOSE_FRAME_REASON_TEXT = "websocket.close.frame.reason.text";
 
+    public static final String INBOUND_PIPELINE_HANDLER_CLASS = "ws.pipeline.handler.class";
+    public static final String CUSTOM_SEQUENCE = "dispatch.custom.sequence";
 }

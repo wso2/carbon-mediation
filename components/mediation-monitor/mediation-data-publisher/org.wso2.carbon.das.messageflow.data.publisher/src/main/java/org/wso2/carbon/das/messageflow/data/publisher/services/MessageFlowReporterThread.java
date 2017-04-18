@@ -140,8 +140,6 @@ public class MessageFlowReporterThread extends Thread {
             }
         }
 
-        int entryElementHashCode = messageFlowLogs.get(0).getHashCode();
-
         for (StatisticsReportingEvent event : remainingEvents) {
 
             switch (event.getEventType()) {

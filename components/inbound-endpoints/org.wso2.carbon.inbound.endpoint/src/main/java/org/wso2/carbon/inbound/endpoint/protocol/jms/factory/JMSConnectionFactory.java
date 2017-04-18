@@ -42,6 +42,7 @@ import javax.naming.NamingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.jms.JMSUtils;
 
 /**
  * use of factory server down and up jms spec transport.jms.MessageSelector
@@ -342,12 +343,12 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         return null;
     }
 
-    public Destination getDestination(Connection connection) {
+    public Destination getDestination(Session session) {
         if (this.destination != null) {
             return this.destination;
         }
 
-        return createDestination(connection);
+        return createDestination(session);
     }
 
     public MessageConsumer createMessageConsumer(Session session, Destination destination) {
@@ -412,18 +413,18 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
         }
     }     
     
-    private Destination createDestination(Connection connection) {
-        this.destination = createDestination(connection, this.destinationName);
+    private Destination createDestination(Session session) {
+        this.destination = createDestination(session, this.destinationName);
         return this.destination;
     }
     
-    public Destination createDestination(Connection connection, String destinationName) {
+    public Destination createDestination(Session session, String destinationName) {
         Destination destination = null;
         try {
             if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-                destination = (Queue) ctx.lookup(destinationName);
+                destination = JMSUtils.lookupDestination(ctx, destinationName, JMSConstants.DESTINATION_TYPE_QUEUE);
             } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-                destination = (Topic) ctx.lookup(destinationName);
+                destination = JMSUtils.lookupDestination(ctx, destinationName, JMSConstants.DESTINATION_TYPE_TOPIC);
             }
         } catch (NameNotFoundException e) {
             if (logger.isDebugEnabled()) {
@@ -433,12 +434,11 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
                 logger.debug("Creating destination '" + destinationName
                         + "' on connection factory for '" + this.connectionFactoryString + ".");
             }
-            Session createSession = createSession(connection);
             try {
                 if (this.destinationType.equals(JMSConstants.JMSDestinationType.QUEUE)) {
-                    destination = (Queue) createSession.createQueue(destinationName);
+                    destination = (Queue) session.createQueue(destinationName);
                 } else if (this.destinationType.equals(JMSConstants.JMSDestinationType.TOPIC)) {
-                    destination = (Topic) createSession.createTopic(destinationName);
+                    destination = (Topic) session.createTopic(destinationName);
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("Created '" + destinationName
@@ -447,13 +447,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             } catch (JMSException e1) {
                 logger.error("Could not find nor create '" + destinationName
                         + "' on connection factory for '" + this.connectionFactoryString + "'. "
-                        + e.getMessage(), e);
-            } finally {
-                try {
-                    createSession.close();
-                } catch (JMSException je) {
-                }
-                createSession = null;
+                        + e1.getMessage(), e1);
             }
 
         } catch (NamingException e) {

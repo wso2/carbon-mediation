@@ -21,7 +21,6 @@ import org.wso2.carbon.mediators.router.impl.RouterMediator;
 import org.apache.synapse.mediators.builtin.SendMediator;
 import org.apache.synapse.mediators.builtin.CalloutMediator;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
-import org.apache.synapse.mediators.builtin.CacheMediator;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.xquery.XQueryMediator;
 import org.apache.synapse.mediators.transform.XSLTMediator;
@@ -31,7 +30,7 @@ import org.apache.synapse.mediators.bsf.ScriptMediator;
 import org.apache.synapse.mediators.spring.SpringMediator;
 import org.apache.synapse.mediators.throttle.ThrottleMediator;
 import org.apache.synapse.Mediator;
-
+import org.wso2.carbon.mediator.cache.CacheMediator;
 import java.util.Map;
 import java.util.HashMap;
 

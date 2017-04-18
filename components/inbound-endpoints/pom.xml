@@ -20,12 +20,12 @@
     <parent>
         <artifactId>carbon-mediation</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.6</version>
+        <version>4.6.20-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>inbound-endpoints</artifactId>
-    <version>4.6.6</version>
+    <version>4.6.20-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Inbound Endpoint Module</name>
     <url>http://wso2.org</url>
@@ -88,9 +88,9 @@
         <version>0.4.0</version>
     </dependency>
     <dependency>
-        <groupId>com.rabbitmq.wso2</groupId>
+        <groupId>org.wso2.orbit.com.rabbitmq</groupId>
         <artifactId>amqp-client</artifactId>
-        <version>3.4.4.wso2v1</version>
+        <version>3.6.6.wso2v1</version>
     </dependency>
 </dependencies>
 </project>

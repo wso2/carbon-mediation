@@ -17,6 +17,7 @@
 package org.wso2.carbon.mediator.datamapper;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAP11Constants;
@@ -79,6 +80,8 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     private static final Log log = LogFactory.getLog(DataMapperMediator.class);
     private static final String cSVToXMLOpeningTag = "<text xmlns=\"http://ws.apache.org/commons/ns/payload\">";
     private static final String cSVToXMLClosingTag = "</text>";
+    private static final int INDEX_OF_CONTEXT = 0;
+    private static final int INDEX_OF_NAME = 1;
     private Value mappingConfigurationKey = null;
     private Value inputSchemaKey = null;
     private Value outputSchemaKey = null;
@@ -378,7 +381,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 inputStream = new ByteArrayInputStream(
                         context.getEnvelope().toString().getBytes(StandardCharsets.UTF_8));
             }
-        } catch (Exception e) {
+        } catch (OMException e) {
             handleException("Unable to read input message in Data Mapper mediator reason : " + e.getMessage(), e,
                     context);
         }
@@ -473,28 +476,28 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         }
         for (String propertyName : propertiesNamesList) {
             contextAndName = propertyName.split("\\['|'\\]");
-            switch (contextAndName[0].toUpperCase()) {
+            switch (contextAndName[INDEX_OF_CONTEXT].toUpperCase()) {
             case DEFAULT_CONTEXT:
             case SYNAPSE_CONTEXT:
-                value = synCtx.getProperty(contextAndName[1]);
+                value = synCtx.getProperty(contextAndName[INDEX_OF_NAME]);
                 break;
             case TRANSPORT_CONTEXT:
-                value = ((Map) axis2MsgCtx.getProperty(TRANSPORT_HEADERS)).get(contextAndName[1]);
+                value = ((Map) axis2MsgCtx.getProperty(TRANSPORT_HEADERS)).get(contextAndName[INDEX_OF_NAME]);
                 break;
             case AXIS2_CONTEXT:
-                value = axis2MsgCtx.getProperty(contextAndName[1]);
+                value = axis2MsgCtx.getProperty(contextAndName[INDEX_OF_NAME]);
                 break;
             case AXIS2_CLIENT_CONTEXT:
-                value = axis2MsgCtx.getOptions().getProperty(contextAndName[1]);
+                value = axis2MsgCtx.getOptions().getProperty(contextAndName[INDEX_OF_NAME]);
                 break;
             case OPERATIONS_CONTEXT:
-                value = axis2MsgCtx.getOperationContext().getProperty(contextAndName[1]);
+                value = axis2MsgCtx.getOperationContext().getProperty(contextAndName[INDEX_OF_NAME]);
                 break;
             case FUNCTION_CONTEXT:
-                value = functionProperties.get(contextAndName[1]);
+                value = functionProperties.get(contextAndName[INDEX_OF_NAME]);
                 break;
             default:
-                log.warn(contextAndName[0] + " scope is not found. Setting it to an empty value.");
+                log.warn(contextAndName[INDEX_OF_CONTEXT] + " scope is not found. Setting it to an empty value.");
                 value = EMPTY_STRING;
             }
             if (value == null) {
@@ -515,11 +518,11 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      * @param value          Current value of the property
      */
     private void insertToMap(Map<String, Map<String, Object>> propertiesMap, String[] contextAndName, Object value) {
-        Map<String, Object> insideMap = propertiesMap.get(contextAndName[0]);
+        Map<String, Object> insideMap = propertiesMap.get(contextAndName[INDEX_OF_CONTEXT]);
         if (insideMap == null) {
             insideMap = new HashMap();
-            propertiesMap.put(contextAndName[0], insideMap);
+            propertiesMap.put(contextAndName[INDEX_OF_CONTEXT], insideMap);
         }
-        insideMap.put(contextAndName[1], value);
+        insideMap.put(contextAndName[INDEX_OF_NAME], value);
     }
 }

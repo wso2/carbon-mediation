@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer-features</artifactId>
-        <version>4.6.6</version>
+        <version>4.6.20-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.6.6</version>
+    <version>4.6.20-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.initializer.server.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Initializer Server Feature</name>
@@ -52,6 +52,10 @@
             <groupId>org.wso2.carbon.commons</groupId>
             <artifactId>org.wso2.carbon.event.server.feature</artifactId>
             <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.orbit.org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
         </dependency>
     </dependencies>
 
@@ -83,6 +87,7 @@
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.registry</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.dependency.mgt</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.startup</bundleDef>
+                                <bundleDef>org.wso2.orbit.org.yaml:snakeyaml:${orbit.version.snakeyaml}</bundleDef>
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>

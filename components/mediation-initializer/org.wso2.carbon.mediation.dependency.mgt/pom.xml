@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer</artifactId>
-        <version>4.6.6</version>
+        <version>4.6.20-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.6.6</version>
+    <version>4.6.20-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.mediation.dependency.mgt</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Mediation Dependency Management</name>
@@ -56,7 +56,10 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediator.router.impl</artifactId>
-            
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon.mediation</groupId>
+            <artifactId>org.wso2.carbon.mediator.cache</artifactId>
         </dependency>
     </dependencies>
 

@@ -20,7 +20,7 @@ import org.wso2.carbon.mediation.dependency.mgt.ConfigurationObject;
 import org.wso2.carbon.mediation.dependency.mgt.DependencyResolverFactory;
 import org.wso2.carbon.mediation.dependency.mgt.DependencyResolver;
 import org.apache.synapse.Mediator;
-import org.apache.synapse.mediators.builtin.CacheMediator;
+import org.wso2.carbon.mediator.cache.CacheMediator;
 
 import java.util.List;
 import java.util.ArrayList;

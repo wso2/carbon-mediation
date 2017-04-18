@@ -22,12 +22,20 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
+import org.apache.log4j.Logger;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.transport.passthru.core.ssl.SSLConfiguration;
+import org.wso2.carbon.base.ServerConfiguration;
 
 import javax.xml.namespace.QName;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PersistenceUtils {
@@ -49,6 +57,7 @@ public class PersistenceUtils {
     private static final String SSLPROTOCOL_ATT = "SSLProtocol";
     private static final String HTTPSPROTOCOLS_ATT = "HttpsProtocols";
     private static final String REVOCATIONVERIFIER_ATT = "CertificateRevocationVerifier";
+    private static final String PREFERRED_CIPHERS_ATT = "PreferredCiphers";
 
     // QNames
     private static final QName INBOUND_ENDPOINTS_QN = new QName("inboundEndpoints");
@@ -75,10 +84,14 @@ public class PersistenceUtils {
     private static final QName SSLPROTOCOL_QN = new QName(SSLPROTOCOL_ATT);
     private static final QName HTTPSPROTOCOL_QN = new QName(HTTPSPROTOCOLS_ATT);
     private static final QName REVOCATIONVERIFIER_QN = new QName(REVOCATIONVERIFIER_ATT);
-
+    private static final QName PREFERRED_CIPHERS_QN = new QName(PREFERRED_CIPHERS_ATT);
+    private static final String PORT_OFFSET_SYSTEM_VAR = "portOffset";
+    private static final String PORT_OFFSET_CONFIG = "Ports.Offset";
+    public static final String WEBSOCKET_USE_PORT_OFFSET = "ws.use.port.offset";
     private static OMFactory fac = OMAbstractFactory.getOMFactory();
     private static final OMNamespace nullNS =
             fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
+    private static final Logger log = Logger.getLogger(PersistenceUtils.class);
 
     /**
      * Convert EndpointInfo to a OMElement
@@ -209,13 +222,14 @@ public class PersistenceUtils {
                                           endpointElement.getAttributeValue(PROTOCOL_QN),
                                           endpointElement.getAttributeValue(NAME_QN), params);
                 if (endpointElement.getAttributeValue(PROTOCOL_QN).equals("https")) {
-                    SSLConfiguration sslConfiguration =
-                               new SSLConfiguration(endpointElement.getAttributeValue(KEYSTORE_QN),
-                                                    endpointElement.getAttributeValue(TRUSTORE_QN),
-                                                    endpointElement.getAttributeValue(CLIENTAUTH_QN),
-                                                    endpointElement.getAttributeValue(HTTPSPROTOCOL_QN),
-                                                    endpointElement.getAttributeValue(REVOCATIONVERIFIER_QN),
-                                                    endpointElement.getAttributeValue(SSLPROTOCOL_QN));
+                    SSLConfiguration sslConfiguration = new SSLConfiguration(
+                            endpointElement.getAttributeValue(KEYSTORE_QN),
+                            endpointElement.getAttributeValue(TRUSTORE_QN),
+                            endpointElement.getAttributeValue(CLIENTAUTH_QN),
+                            endpointElement.getAttributeValue(HTTPSPROTOCOL_QN),
+                            endpointElement.getAttributeValue(REVOCATIONVERIFIER_QN),
+                            endpointElement.getAttributeValue(SSLPROTOCOL_QN),
+                            endpointElement.getAttributeValue(PREFERRED_CIPHERS_QN));
 
                     inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
                 }
@@ -292,4 +306,32 @@ public class PersistenceUtils {
         return inboundParams;
     }
 
+    /**
+     * used to get the port offset value of server according to inbound properties
+     *
+     * @param properties inbound properties
+     * @return port offset of server
+     */
+    public static int getPortOffset(Properties properties) {
+        //Read the property of web socket endpoint ws.use.port.offset
+        boolean usePortOffset = Boolean.valueOf(properties.getProperty(WEBSOCKET_USE_PORT_OFFSET));
+        if (usePortOffset) {
+            //if its true return port offset according to the below
+            ServerConfiguration carbonConfig = ServerConfiguration.getInstance();
+            String portOffset = System.getProperty(PORT_OFFSET_SYSTEM_VAR,
+                    carbonConfig.getFirstProperty(PORT_OFFSET_CONFIG));
+            try {
+                if ((portOffset != null)) {
+                    return Integer.parseInt(portOffset.trim());
+                } else {
+                    return 0;
+                }
+            } catch (NumberFormatException e) {
+                log.error("Invalid Port Offset: " + portOffset + ". Default value 0 will be used.", e);
+                return 0;
+            }
+        }
+        // else return the 0 as it not need to have port offset
+        return 0;
+    }
 }

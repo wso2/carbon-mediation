@@ -906,7 +906,11 @@ function resetVars() {
         <tr>
             <td width="155px">
                 <a class="icon-link"
+                        <%if (fullQueryString != null && !fullQueryString.isEmpty()) { %>
                    href="<%=endpointService.getUIPageName()%>Endpoint.jsp?<%=fullQueryString%>"
+                        <% } else { %>
+                   href="<%=endpointService.getUIPageName()%>Endpoint.jsp"
+                        <% } %>
                    style="background-image: url(../admin/images/add.gif);">
                     <%=Encode.forHtmlContent(endpointService.getDisplayName())%> Template
                 </a>
@@ -919,7 +923,11 @@ function resetVars() {
         <tr>
             <td width="155px">
                 <a class="icon-link"
+                        <%if (fullQueryString != null && !fullQueryString.isEmpty()) { %>
                    href="<%=endpointService.getUIPageName()%>Endpoint.jsp?<%=fullQueryString%>"
+                        <% } else { %>
+                   href="<%=endpointService.getUIPageName()%>Endpoint.jsp"
+                        <% } %>
                    style="background-image: url(../admin/images/add.gif);">
                     <%=Encode.forHtmlContent(endpointService.getDisplayName()) %>
                 </a>

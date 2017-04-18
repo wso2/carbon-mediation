@@ -60,7 +60,7 @@
 
     %>
     <form method="post" name="taskcreationform" id="taskcreationform"
-          action="savetask.jsp">
+          action="savetask-ajaxprocessor.jsp">
 
         <div id="middle">
             <h2><fmt:message key="task.header.new"/></h2>

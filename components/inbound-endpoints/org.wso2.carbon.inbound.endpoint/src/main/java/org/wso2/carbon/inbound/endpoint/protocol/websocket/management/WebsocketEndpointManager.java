@@ -35,7 +35,15 @@ import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketS
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.common.AbstractInboundEndpointManager;
 import org.wso2.carbon.inbound.endpoint.persistence.InboundEndpointInfoDTO;
+import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketChannelInitializer;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConfiguration;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketEventExecutor;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.PipelineHandlerBuilderUtil;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.SubprotocolBuilderUtil;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.configuration.NettyThreadPoolConfiguration;
+import org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl.InboundWebsocketSSLConfiguration;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -136,6 +144,9 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setOutflowDispatchSequence(config.getOutFlowDispatchSequence());
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
         handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
+        handler.setPipelineHandler(PipelineHandlerBuilderUtil.stringToPipelineHandlers(config.getPipelineHandler()));
+        handler.setDispatchToCustomSequence(config.getDispatchToCustomSequence());
+        handler.setPortOffset(PersistenceUtils.getPortOffset(params.getProperties()));
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -168,6 +179,9 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
         handler.setOutflowDispatchSequence(config.getOutFlowDispatchSequence());
         handler.setOutflowErrorSequence(config.getOutFlowErrorSequence());
         handler.setSubprotocolHandlers(SubprotocolBuilderUtil.stringToSubprotocolHandlers(config.getSubprotocolHandler()));
+        handler.setPipelineHandler(PipelineHandlerBuilderUtil.stringToPipelineHandlers(config.getPipelineHandler()));
+        handler.setDispatchToCustomSequence(config.getDispatchToCustomSequence());
+        handler.setPortOffset(PersistenceUtils.getPortOffset(params.getProperties()));
         bootstrap.childHandler(handler);
         try {
             bootstrap.bind(new InetSocketAddress(port)).sync();
@@ -233,7 +247,14 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                 .subprotocolHandler(params.getProperties().getProperty(
                         InboundWebsocketConstants.INBOUND_SUBPROTOCOL_HANDLER_CLASS))
                 .defaultContentType(params.getProperties().getProperty(
-                        InboundWebsocketConstants.INBOUND_DEFAULT_CONTENT_TYPE)).build();
+                        InboundWebsocketConstants.INBOUND_DEFAULT_CONTENT_TYPE))
+                .pipelineHandler(params.getProperties().getProperty(
+                        InboundWebsocketConstants.INBOUND_PIPELINE_HANDLER_CLASS))
+                .dispatchToCustomSequence(params.getProperties().getProperty(
+                        InboundWebsocketConstants.CUSTOM_SEQUENCE))
+                .usePortOffset(Boolean.valueOf(params.getProperties().getProperty(
+                        InboundWebsocketConstants.WEBSOCKET_USE_PORT_OFFSET)))
+                .build();
     }
 
     protected int validateBroadcastLevelParam(String broadcastLevelParam) {

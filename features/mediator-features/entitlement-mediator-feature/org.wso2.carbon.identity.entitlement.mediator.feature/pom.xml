@@ -15,11 +15,11 @@
 	<parent>
     	<artifactId>entitlement-mediator-feature</artifactId>
     	<groupId>org.wso2.carbon.mediation</groupId>
-   	<version>4.6.6</version>
+   	<version>4.6.20-SNAPSHOT</version>
 	</parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.identity.xacml.mediator.feature</artifactId>
-    <version>4.6.6</version>
+    <version>4.6.20-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - XACML Mediation Feature</name>
     <url>http://wso2.org</url>
@@ -80,8 +80,8 @@
                                 <bundleDef>slf4j.wso2:slf4j</bundleDef>
                             </bundles>
                             <importFeatures>
-                                <importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
-                                <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
+                                <importFeatureDef>org.wso2.carbon.core.server:compatible:${carbon.kernel.import.feature.version}</importFeatureDef>
+                                <importFeatureDef>org.apache.synapse.wso2:compatible:${carbon.mediation.import.feature.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
                     </execution>

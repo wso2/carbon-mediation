@@ -20,12 +20,12 @@
     <parent>
         <artifactId>inbound-endpoints</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.6</version>
+        <version>4.6.20-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
     <packaging>bundle</packaging>
-    <version>4.6.6</version>
+    <version>4.6.20-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -80,6 +80,10 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.wso2.carbon</groupId>
+            <artifactId>org.wso2.carbon.utils</artifactId>
         </dependency>
     </dependencies>
 
