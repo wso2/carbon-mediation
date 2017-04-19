@@ -30,7 +30,7 @@
    <url>http://wso2.org</url>
   
          <modules>
-            <!--<module>org.wso2.carbon.mediation.connectors</module>-->
-            <module>org.wso2.carbon.mediation.connector.as4</module>
+             <module>org.wso2.carbon.connector.core</module>
+             <module>org.wso2.carbon.mediation.connector.as4</module>
          </modules>
   </project>
