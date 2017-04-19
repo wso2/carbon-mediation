@@ -561,4 +561,13 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
         ctx.close();
     }
 
+    public void setDispatchToCustomSequence(boolean dispatchToCustomSequence) {
+        this.dispatchToCustomSequence = dispatchToCustomSequence;
+    }
+
+
+    public void setPortOffset(int portOffset) {
+        this.portOffset = portOffset;
+    }
+
 }
