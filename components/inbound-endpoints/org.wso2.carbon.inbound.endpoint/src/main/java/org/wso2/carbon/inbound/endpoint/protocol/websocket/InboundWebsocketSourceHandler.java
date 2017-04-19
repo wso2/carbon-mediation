@@ -284,7 +284,7 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     } else {
                         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT, false);
                     }
-                    InputStream in = new AutoCloseInputStream(new ByteBufInputStream(frame.content()));
+                    InputStream in = new AutoCloseInputStream(new ByteBufInputStream((frame.duplicate()).content()));
                     OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);
@@ -308,8 +308,8 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
                     } else {
                         synCtx.setProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT, false);
                     }
-                    InputStream in = new AutoCloseInputStream(new ByteArrayInputStream(
-                            ((TextWebSocketFrame) frame).text().getBytes()));
+                    InputStream in = new AutoCloseInputStream(
+                            new ByteArrayInputStream(((TextWebSocketFrame) frame).duplicate().text().getBytes()));
                     OMElement documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
                     synCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
                     injectToSequence(synCtx, endpoint);

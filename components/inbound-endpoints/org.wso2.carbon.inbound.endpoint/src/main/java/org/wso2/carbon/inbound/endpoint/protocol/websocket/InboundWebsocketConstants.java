@@ -64,9 +64,10 @@ public class InboundWebsocketConstants {
     public static final String MESSAGE_TYPE = "messageType";
     public static final String CONNECTION_TERMINATE = "connection.terminate";
     public static final String CLIENT_ID = "clientId";
-    public static final String IS_CONNECTION_ALIVE = "isConnectionAlive";
+    public static final String IS_TCP_TRANSPORT = "isTCPTransport";
     public static final String WS_CLOSE_FRAME_STATUS_CODE = "websocket.close.frame.status.code";
     public static final String WS_CLOSE_FRAME_REASON_TEXT = "websocket.close.frame.reason.text";
+    public static final int WS_CLOSE_DEFAULT_CODE = 1001;
 
     public static final String INBOUND_PIPELINE_HANDLER_CLASS = "ws.pipeline.handler.class";
     public static final String CUSTOM_SEQUENCE = "dispatch.custom.sequence";

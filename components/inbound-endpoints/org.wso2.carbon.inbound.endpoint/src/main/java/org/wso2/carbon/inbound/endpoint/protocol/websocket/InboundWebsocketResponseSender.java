@@ -75,13 +75,8 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
             } catch (AxisFault fault) {
                 log.error("Error occurred while sending close frames", fault);
             }
-            Object isConnectionAlive = ((Axis2MessageContext) msgContext).getAxis2MessageContext().getProperty
-                    (InboundWebsocketConstants.IS_CONNECTION_ALIVE);
-            if (isConnectionAlive != null && !(boolean) isConnectionAlive) {
-                InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
-                ctx.writeToChannel(new CloseWebSocketFrame(1001, "shutdown"));
-                return;
-            }
+            Object isTCPTransport = ((Axis2MessageContext) msgContext).getAxis2MessageContext()
+                    .getProperty(InboundWebsocketConstants.IS_TCP_TRANSPORT);
             if (msgContext.getProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT) != null &&
                     msgContext.getProperty(InboundWebsocketConstants.SOURCE_HANDSHAKE_PRESENT).equals(true)) {
                 return;
@@ -97,7 +92,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME_PRESENT).equals(true)) {
                 BinaryWebSocketFrame frame = (BinaryWebSocketFrame)
                         msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_BINARY_FRAME);
-                if (frame == null) {
+                if (isTCPTransport != null && (boolean) isTCPTransport) {
                     try {
                         RelayUtils.buildMessage(((Axis2MessageContext) msgContext)
                                 .getAxis2MessageContext(), false);
@@ -131,7 +126,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                     msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME_PRESENT).equals(true)) {
                 TextWebSocketFrame frame = (TextWebSocketFrame)
                         msgContext.getProperty(InboundWebsocketConstants.WEBSOCKET_TEXT_FRAME);
-                if (frame == null) {
+                if (isTCPTransport != null && (boolean) isTCPTransport) {
                     try {
                         RelayUtils.buildMessage(((Axis2MessageContext) msgContext)
                                 .getAxis2MessageContext(), false);
@@ -168,7 +163,7 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                             InboundWebsocketConstants.WS_CLOSE_FRAME_STATUS_CODE);
                     String wsCloseFrameReasonText = (String) (msgContext.getProperty(
                             InboundWebsocketConstants.WS_CLOSE_FRAME_REASON_TEXT));
-                    int statusCode = 1001;
+                    int statusCode = InboundWebsocketConstants.WS_CLOSE_DEFAULT_CODE;
                     if (wsCloseFrameStatusCode != null) {
                         statusCode = (int) wsCloseFrameStatusCode;
                     }
