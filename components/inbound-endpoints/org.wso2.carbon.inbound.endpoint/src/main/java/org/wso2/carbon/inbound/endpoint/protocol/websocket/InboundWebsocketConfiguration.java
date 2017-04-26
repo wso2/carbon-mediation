@@ -26,6 +26,7 @@ public class InboundWebsocketConfiguration {
     private String outFlowDispatchSequence;
     private String outFlowErrorSequence;
     private String subprotocolHandler;
+    private String defaultContentType;
     private String pipelineHandler;
     private String dispatchToCustomSequence;
     private final boolean usePortOffset;
@@ -39,6 +40,7 @@ public class InboundWebsocketConfiguration {
         this.outFlowDispatchSequence = builder.outFlowDispatchSequence;
         this.outFlowErrorSequence = builder.outFlowErrorSequence;
         this.subprotocolHandler = builder.subprotocolHandler;
+        this.defaultContentType = builder.defaultContentType;
         this.pipelineHandler = builder.pipelineHandler;
         this.dispatchToCustomSequence = builder.dispatchToCustomSequence;
         this.usePortOffset = builder.usePortOffset;
@@ -76,6 +78,10 @@ public class InboundWebsocketConfiguration {
         return subprotocolHandler;
     }
 
+    public String getDefaultContentType() {
+        return defaultContentType;
+    }
+
     public String getPipelineHandler() {
         return pipelineHandler;
     }
@@ -97,6 +103,7 @@ public class InboundWebsocketConfiguration {
         private String outFlowDispatchSequence;
         private String outFlowErrorSequence;
         private String subprotocolHandler;
+        private String defaultContentType;
         private String pipelineHandler;
         private String dispatchToCustomSequence;
         private boolean usePortOffset = false;
@@ -137,6 +144,11 @@ public class InboundWebsocketConfiguration {
 
         public InboundWebsocketConfigurationBuilder subprotocolHandler(String subprotocolHandler) {
             this.subprotocolHandler = subprotocolHandler;
+            return this;
+        }
+
+        public InboundWebsocketConfigurationBuilder defaultContentType(String defaultContentType) {
+            this.defaultContentType = defaultContentType;
             return this;
         }
 
