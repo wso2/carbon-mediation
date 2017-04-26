@@ -61,10 +61,10 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
         if (msgContext != null) {
             Integer errorCode = null;
             String errorMessage = null;
-            if (msgContext.getProperty("errorCode") != null ) {
+            if (msgContext.getProperty("errorCode") != null) {
                 errorCode = Integer.parseInt(msgContext.getProperty("errorCode").toString());
             }
-            if(msgContext.getProperty("ERROR_MESSAGE") != null ) {
+            if (msgContext.getProperty("ERROR_MESSAGE") != null) {
                 errorMessage = msgContext.getProperty("ERROR_MESSAGE").toString();
             }
             try {
@@ -176,10 +176,18 @@ public class InboundWebsocketResponseSender implements InboundResponseSender {
                                 wsCloseFrameReasonText));
                         return;
                     }
-
-
+                    RelayUtils.buildMessage(((Axis2MessageContext) msgContext).getAxis2MessageContext(), false);
+                    TextWebSocketFrame frame = new TextWebSocketFrame(messageContextToText(((Axis2MessageContext) msgContext)
+                            .getAxis2MessageContext()));
+                    InboundWebsocketChannelContext ctx = sourceHandler.getChannelHandlerContext();
+                    int clientBroadcastLevel = sourceHandler.getClientBroadcastLevel();
+                    String subscriberPath = sourceHandler.getSubscriberPath();
+                    WebsocketSubscriberPathManager pathManager = WebsocketSubscriberPathManager.getInstance();
+                    handleSendBack(frame, ctx, clientBroadcastLevel, subscriberPath, pathManager);
                 } catch (IOException ex) {
                     log.error("Failed for format message to specified output format", ex);
+                } catch (XMLStreamException e) {
+                    log.error("Error while building message", e);
                 }
             }
         }
