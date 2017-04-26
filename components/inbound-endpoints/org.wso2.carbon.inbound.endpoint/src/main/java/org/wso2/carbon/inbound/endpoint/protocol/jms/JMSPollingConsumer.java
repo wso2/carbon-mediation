@@ -190,10 +190,8 @@ public class JMSPollingConsumer {
                 return null;
             }
             while (msg != null) {
-                if (!JMSUtils.inferJMSMessageType(msg).equals(TextMessage.class.getName())) {
-                    logger.error("JMS " +
-                            "Inbound transport support JMS TextMessage type only. Found message type "
-                            + JMSUtils.inferJMSMessageType(msg));
+                if (JMSUtils.inferJMSMessageType(msg) == null) {
+                    logger.error("Invalid JMS Message type.");
                     return null;
                 }
 
