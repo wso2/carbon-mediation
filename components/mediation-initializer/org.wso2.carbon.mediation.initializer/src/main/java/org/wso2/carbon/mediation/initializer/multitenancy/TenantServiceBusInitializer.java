@@ -276,8 +276,27 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
                 getSynapseRegistration(tenantId);
 
         if (tenantRegistration != null) {
-            ConfigurationHolder.getInstance().getBundleContext().ungetService(
-                    tenantRegistration.getReference());
+            //retrieve SynapseRegistrationsService service
+            SynapseRegistrationsService synapseRegistrationsService = (SynapseRegistrationsService) ConfigurationHolder.
+                    getInstance().getBundleContext().getService(tenantRegistration.getReference());
+
+            //unregister SynapseConfigurationService and SynapseEnvironmentService
+            if (synapseRegistrationsService != null) {
+                if (synapseRegistrationsService.getSynapseConfigurationServiceRegistration() != null) {
+                    ConfigurationHolder.getInstance().getBundleContext().
+                            ungetService(synapseRegistrationsService.getSynapseEnvironmentServiceRegistration().getReference());
+                    synapseRegistrationsService.getSynapseConfigurationServiceRegistration().unregister();
+                }
+
+                if (synapseRegistrationsService.getSynapseEnvironmentServiceRegistration() != null) {
+                    ConfigurationHolder.getInstance().getBundleContext().
+                            ungetService(synapseRegistrationsService.getSynapseEnvironmentServiceRegistration().getReference());
+                    synapseRegistrationsService.getSynapseEnvironmentServiceRegistration().unregister();
+                }
+            }
+            //unregister SynapseRegistrationsService
+            ConfigurationHolder.getInstance().getBundleContext().ungetService(tenantRegistration.getReference());
+            tenantRegistration.unregister();
         }
     }
 
