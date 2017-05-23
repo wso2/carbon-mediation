@@ -284,7 +284,7 @@ public class TenantServiceBusInitializer extends AbstractAxis2ConfigurationConte
             if (synapseRegistrationsService != null) {
                 if (synapseRegistrationsService.getSynapseConfigurationServiceRegistration() != null) {
                     ConfigurationHolder.getInstance().getBundleContext().
-                            ungetService(synapseRegistrationsService.getSynapseEnvironmentServiceRegistration().getReference());
+                            ungetService(synapseRegistrationsService.getSynapseConfigurationServiceRegistration().getReference());
                     synapseRegistrationsService.getSynapseConfigurationServiceRegistration().unregister();
                 }
 
