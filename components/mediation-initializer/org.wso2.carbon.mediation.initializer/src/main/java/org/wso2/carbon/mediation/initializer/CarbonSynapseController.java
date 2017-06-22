@@ -199,7 +199,6 @@ public class CarbonSynapseController extends Axis2SynapseController {
 
         // adding the Keep history parameter to every ProxyService to prevent the service
         // history being deleted on undeploying services at destroy time
-        AxisConfiguration axisConfiguration = synapseConfiguration.getAxisConfiguration();
         for(ProxyService proxy : synapseConfiguration.getProxyServices()) {
             try {
                 proxy.getAxisService().addParameter(CarbonConstants.KEEP_SERVICE_HISTORY_PARAM, PARAMETER_VALUE_TRUE);
