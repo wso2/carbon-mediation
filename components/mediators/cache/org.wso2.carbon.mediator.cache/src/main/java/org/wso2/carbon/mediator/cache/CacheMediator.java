@@ -17,9 +17,16 @@
  */
 package org.wso2.carbon.mediator.cache;
 
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.cache.CacheBuilder;
+
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAPEnvelope;
+import org.apache.axiom.soap.SOAPFactory;
+import org.apache.axiom.soap.SOAPHeader;
+import org.apache.axiom.soap.SOAPHeaderBlock;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.clustering.ClusteringFault;
@@ -133,6 +140,16 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
 	 * Prefix of the cache key
 	 */
 	private static final String CACHE_KEY_PREFIX = "mediation.cache_key_";
+
+	/**
+	 * Variable to represent 'NO_ENTITY_BODY' property of synapse
+	 */
+	private static final String NO_ENTITY_BODY = "NO_ENTITY_BODY";
+
+	/**
+	 * String variable representing SOAP Header element
+	 */
+	private static final String HEADER = "Header";
 
 	/**
 	 * Key to use in cache configuration
@@ -354,38 +371,66 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
 				synCtx.setResponse(true);
 				opCtx.setProperty(CachingConstants.CACHED_OBJECT, cachedResponse);
 
-				SOAPEnvelope omSOAPEnv = null;
+				OMElement response = null;
 
 				try {
 					if (msgCtx.isDoingREST()) {
+
+						String replacementValue = new String(cachedResponse.getResponseEnvelope());
+						try {
+							response = AXIOMUtil.stringToOM(replacementValue);
+						} catch (XMLStreamException e) {
+							handleException("Error creating response OM from cache : " + cacheKey, synCtx);
+						}
 						if ((headerProperties = cachedResponse.getHeaderProperties()) != null) {
 
-							omSOAPEnv = SOAPMessageHelper.buildSOAPEnvelopeFromBytes(responseEnvelop, cachedResponse.isSOAP11());
-							msgCtx.removeProperty("NO_ENTITY_BODY");
+							msgCtx.removeProperty(NO_ENTITY_BODY);
 							msgCtx.removeProperty(Constants.Configuration.CONTENT_TYPE);
-							msgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headerProperties);
+							msgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
+									headerProperties);
 							msgCtx.setProperty(Constants.Configuration.MESSAGE_TYPE,
-							                   headerProperties.get(Constants.Configuration.MESSAGE_TYPE));
+									headerProperties.get(Constants.Configuration.MESSAGE_TYPE));
 						}
 
 					} else {
-						omSOAPEnv = SOAPMessageHelper.buildSOAPEnvelopeFromBytes(responseEnvelop, msgCtx.isSOAP11());
-						//finally set soap envelope by obtaining built response envelope
-						cachedResponse.setResponseEnvelope(omSOAPEnv.toString().getBytes());
+						String replacementValue = new String(cachedResponse.getResponseEnvelope());
+						try {
+							response = AXIOMUtil.stringToOM(replacementValue);
+						} catch (XMLStreamException e) {
+							handleException("Error creating response OM from cache : " + cacheKey, synCtx);
+						}
 					}
 
-					if (omSOAPEnv != null) {
-						synCtx.setEnvelope(omSOAPEnv);
+					if (response != null) {
+						// Set the headers of the message
+						if (response.getFirstElement().getLocalName().contains(HEADER)) {
+							Iterator childElements = msgCtx.getEnvelope().getHeader().getChildElements();
+							while (childElements.hasNext()) {
+								((OMElement) childElements.next()).detach();
+							}
+							SOAPEnvelope env = synCtx.getEnvelope();
+							SOAPHeader header = env.getHeader();
+							SOAPFactory fac = (SOAPFactory) env.getOMFactory();
+
+							Iterator headers = response.getFirstElement().getChildElements();
+							while (headers.hasNext()) {
+								OMElement soapHeader = (OMElement) headers.next();
+								SOAPHeaderBlock hb = header.addHeaderBlock(soapHeader.getLocalName(),
+										fac.createOMNamespace(soapHeader.getNamespace().getNamespaceURI(),
+												soapHeader.getNamespace().getPrefix()));
+								hb.setText(soapHeader.getText());
+							}
+							response.getFirstElement().detach();
+						}
+						// Set the body of the message
+						if (msgCtx.getEnvelope().getBody().getFirstElement() != null) {
+							msgCtx.getEnvelope().getBody().getFirstElement().detach();
+						}
+						msgCtx.getEnvelope().getBody().addChild(response.getFirstElement().getFirstElement());
+
 					}
-				} catch (AxisFault axisFault) {
-					handleException("Error setting response envelope from cache : "
-					                + cacheKey, synCtx);
-				} catch (IOException ioe) {
-					handleException("Error setting response envelope from cache : "
-					                + cacheKey, ioe, synCtx);
-				} catch (SOAPException soape) {
-					handleException("Error setting response envelope from cache : "
-					                + cacheKey, soape, synCtx);
+				}  catch (Exception ex) {
+					handleException("Error setting response envelope from cache : " + cacheKey, synCtx);
 				}
 
 				// take specified action on cache hit
