@@ -20,11 +20,35 @@ package org.wso2.carbon.mediation.initializer.handler;
 
 import org.apache.synapse.commons.util.ext.TenantInfoInitiator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
+import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 public class CarbonTenantInfoInitiator implements TenantInfoInitiator {
 
     @Override
     public void initTenantInfo(){
+        //Nothing to do here,
+    }
+
+    /**
+     * initialize tenant information based on the request URI
+     * @param uri request URI
+     */
+    @Override
+    public void initTenantInfo(String uri) {
+        String tenantDomain = TenantAxisUtils.getTenantDomain(uri);
+        if (tenantDomain == null) {
+            //should be super tenant
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().
+                    setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME, true);
+        } else {
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+        }
+    }
+
+    @Override
+    public void cleanTenantInfo() {
         PrivilegedCarbonContext.destroyCurrentContext();
     }
+
 }
