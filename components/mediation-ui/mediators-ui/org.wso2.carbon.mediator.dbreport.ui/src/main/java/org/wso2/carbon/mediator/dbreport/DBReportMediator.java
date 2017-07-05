@@ -407,9 +407,8 @@ public class DBReportMediator extends AbstractMediator {
         OMElement ele = pool.getFirstChildWithName(qName);
         if (ele != null) {
             return ele.getAttributeValue(new QName(ATT_KEY));
-        } else {
-            return null;
         }
+        return null;
     }
 
     protected String getValue(OMElement elt, QName qName) {
