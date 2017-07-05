@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import java.util.*;
 import java.sql.Types;
+import java.util.regex.Pattern;
 
 public class DBReportMediator extends AbstractMediator {
     public static final QName URL_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "url");
@@ -48,6 +49,9 @@ public class DBReportMediator extends AbstractMediator {
 
     static final QName ATT_COLUMN = new QName("column");
     static final QName ATT_TYPE = new QName("type");
+
+    static final String REGISTRY_KEY_PREFIX = "$registry:";
+    static final String ATT_KEY = "key";
 
     // Does the DBReport mediator participate in a distribute tx?
     // default do not participate in a distribute tx
@@ -113,7 +117,12 @@ public class DBReportMediator extends AbstractMediator {
             if (o instanceof QName) {
                 QName name = (QName) o;
                 OMElement elt = fac.createOMElement(name.getLocalPart(), synNS);
-                elt.setText(value);
+                if (value != null && value.startsWith(REGISTRY_KEY_PREFIX)) {
+                    value = value.replaceFirst(Pattern.quote(REGISTRY_KEY_PREFIX), "");
+                    elt.addAttribute(fac.createOMAttribute(ATT_KEY, nullNS, value));
+                } else {
+                    elt.setText(value);
+                }
                 poolElt.addChild(elt);
 
             } else if (o instanceof String) {
@@ -356,10 +365,27 @@ public class DBReportMediator extends AbstractMediator {
 
     private void createCustomDataSource(OMElement pool) {
         //save loaded properties for later
-        dataSourceProps.put(DRIVER_Q, getValue(pool, DRIVER_Q));
-        dataSourceProps.put(URL_Q, getValue(pool, URL_Q));
-        dataSourceProps.put(USER_Q, getValue(pool, USER_Q));
-        dataSourceProps.put(PASS_Q, getValue(pool, PASS_Q));
+        //save loaded properties for later
+        if (getKey(pool,DRIVER_Q) != null) {
+            dataSourceProps.put(DRIVER_Q, REGISTRY_KEY_PREFIX + getKey(pool,DRIVER_Q));
+        } else {
+            dataSourceProps.put(DRIVER_Q, getValue(pool,DRIVER_Q));
+        }
+        if (getKey(pool,URL_Q) != null) {
+            dataSourceProps.put(URL_Q, REGISTRY_KEY_PREFIX + getKey(pool,URL_Q));
+        } else {
+            dataSourceProps.put(URL_Q, getValue(pool,URL_Q));
+        }
+        if (getKey(pool,USER_Q) != null) {
+            dataSourceProps.put(USER_Q, REGISTRY_KEY_PREFIX + getKey(pool,USER_Q));
+        } else {
+            dataSourceProps.put(USER_Q, getValue(pool,USER_Q));
+        }
+        if (getKey(pool,PASS_Q) != null) {
+            dataSourceProps.put(PASS_Q, REGISTRY_KEY_PREFIX + getKey(pool,PASS_Q));
+        } else {
+            dataSourceProps.put(PASS_Q, getValue(pool,PASS_Q));
+        }
 
         Iterator props = pool.getChildrenWithName(PROP_Q);
         while (props.hasNext()) {
@@ -368,6 +394,21 @@ public class DBReportMediator extends AbstractMediator {
             String name = prop.getAttribute(ATT_NAME).getAttributeValue();
             String value = prop.getAttribute(ATT_VALUE).getAttributeValue();
             dataSourceProps.put(name, value);
+        }
+    }
+
+    /**
+     * Get the value of the key attribute from the element with given QName
+     * @param pool
+     * @param qName
+     * @return key attribute value
+     */
+    private String getKey(OMElement pool, QName qName) {
+        OMElement ele = pool.getFirstChildWithName(qName);
+        if (ele != null) {
+            return ele.getAttributeValue(new QName(ATT_KEY));
+        } else {
+            return null;
         }
     }
 
