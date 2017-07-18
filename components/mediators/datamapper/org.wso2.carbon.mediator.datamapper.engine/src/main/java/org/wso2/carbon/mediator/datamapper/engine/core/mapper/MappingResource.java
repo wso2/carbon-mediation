@@ -37,6 +37,8 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_1;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_2;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.JS_STRINGIFY;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
 
 public class MappingResource {
 
@@ -108,6 +110,8 @@ public class MappingResource {
         // execute in engine
         String[] inputRootElementArray = inputRootelement.split(NAMESPACE_DELIMETER);
         String inputRootElement = inputRootElementArray[inputRootElementArray.length - 1];
+        inputRootElement = inputRootElement.replace(':', '_').replace('=', '_').
+                replace(',', '_').replace(HYPHEN, ENCODE_CHAR_HYPHEN);
         String[] outputRootElementArray = outputRootelement.split(NAMESPACE_DELIMETER);
         String outputRootElement = outputRootElementArray[outputRootElementArray.length - 1];
         String jsFunctionBody;
