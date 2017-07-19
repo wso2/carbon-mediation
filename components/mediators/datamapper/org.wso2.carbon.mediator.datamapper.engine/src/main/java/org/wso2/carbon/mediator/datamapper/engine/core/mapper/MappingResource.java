@@ -110,8 +110,7 @@ public class MappingResource {
         // execute in engine
         String[] inputRootElementArray = inputRootelement.split(NAMESPACE_DELIMETER);
         String inputRootElement = inputRootElementArray[inputRootElementArray.length - 1];
-        inputRootElement = inputRootElement.replace(':', '_').replace('=', '_').
-                replace(',', '_').replace(HYPHEN, ENCODE_CHAR_HYPHEN);
+        inputRootElement = inputRootElement.replaceAll("[:=,]", "_").replace(HYPHEN, ENCODE_CHAR_HYPHEN);
         String[] outputRootElementArray = outputRootelement.split(NAMESPACE_DELIMETER);
         String outputRootElement = outputRootElementArray[outputRootElementArray.length - 1];
         String jsFunctionBody;
