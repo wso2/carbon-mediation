@@ -68,6 +68,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -156,6 +157,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
         List<Artifact.Dependency> artifacts = carbonApplication.getAppConfig()
                 .getApplicationArtifact().getDependencies();
+        // Fixing ESBJAVA-5201, reverses the artifact order
+        Collections.reverse(artifacts);
 
         for (Artifact.Dependency dep : artifacts) {
 
