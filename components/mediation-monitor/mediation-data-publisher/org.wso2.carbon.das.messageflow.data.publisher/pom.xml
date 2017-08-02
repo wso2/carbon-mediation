@@ -30,7 +30,7 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Axis2Module>${project.artifactId}-${project.version}</Axis2Module>
                         <Export-Package>
-                            org.wso2.carbon.das.mediationstats.data.publisher.*
+                            org.wso2.carbon.das.messageflow.data.publisher.*
                         </Export-Package>
                         <Import-Package>
                             javax.servlet;version="${imp.pkg.version.javax.servlet}",
