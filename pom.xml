@@ -50,7 +50,7 @@
                 <module>components/mediation-config-admin</module>
                 <module>components/business-adaptors</module>
                 <module>components/mediation-admin</module>
-                <!--module>components/mediation-connector</module-->
+                <module>components/mediation-connector</module>
                 <module>components/mediators</module>
                 <module>components/event-sink</module>
                 <module>components/mediation-ui</module>
