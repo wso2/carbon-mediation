@@ -28,12 +28,23 @@ public class AS4Constants {
 
     public static final String MIME_TYPE = "MimeType";
 
+    /**
+     * wss-wssecurity-utility namespace
+     */
     public static final  String WSU_NAMESPACE = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
 
+    /**
+     * Attribute name 'Id'. This Id attribute value is being used as the PartInfo href when the SOAP body contains the payload
+     */
     public static final String ATTRIBUTE_ID  = "Id";
 
-    public static final String ATTACHMENT_HREF_PREFIX = "cid:";
-
+    /**
+     * Payload href prefix '#'. This is used as the PartInfo href prefix when the SOAP body contains the payload
+     */
     public static final String SOAP_BODY_HREF_PREFIX = "#";
 
+    /**
+     * Payload href prefix 'cid:'. This is used as the PartInfo href prefix when the payloads are SOAP attachments
+     */
+    public static final String ATTACHMENT_HREF_PREFIX = "cid:";
 }

@@ -21,7 +21,12 @@ package org.wso2.carbon.mediation.connector.pmode;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.FileListener;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.FileChangeEvent;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.impl.DefaultFileMonitor;
 import org.wso2.carbon.mediation.connector.AS4Constants;
 import org.wso2.carbon.mediation.connector.pmode.impl.PMode;
@@ -52,7 +57,6 @@ public class PModeRepository implements FileListener {
     private Map<String, String> possibleNameChangeMap;
     private Unmarshaller pModeUnmarshaller;
     private int basePathLength;
-
 
     /**
      * Constructor for PMode repository implementation.
@@ -111,7 +115,6 @@ public class PModeRepository implements FileListener {
      * @throws AxisFault
      */
     public static synchronized PModeRepository getInstance() throws AxisFault {
-
         if (pmodeRepository == null) {
             pmodeRepository = new PModeRepository(null);
         }

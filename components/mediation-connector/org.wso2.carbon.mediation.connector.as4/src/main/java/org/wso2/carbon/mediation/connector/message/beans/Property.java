@@ -18,7 +18,12 @@
 
 package org.wso2.carbon.mediation.connector.message.beans;
 
-import javax.xml.bind.annotation.*;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 
 /**
  * Jaxb bean class for <Property></Property> element.

@@ -42,13 +42,11 @@ public class AS4Utils {
 
     public static OMNode getOMNode(final Marshaller marshaller, final Messaging messaging)
             throws IOException, XMLStreamException, PropertyException {
+
         final PipedOutputStream out = new PipedOutputStream();
         PipedInputStream in = new PipedInputStream();
-
         in.connect(out);
-
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
         new Thread(new Runnable() {
             public void run() {
                 try {
@@ -62,10 +60,8 @@ public class AS4Utils {
 
         //Create a new builder with the StAX reader
         StAXOMBuilder builder = new StAXOMBuilder(in);
-
         OMNode node = builder.getDocumentElement();
         node.close(true);
-
         return node;
     }
 

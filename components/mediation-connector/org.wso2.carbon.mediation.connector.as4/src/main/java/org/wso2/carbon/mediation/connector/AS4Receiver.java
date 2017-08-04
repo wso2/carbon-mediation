@@ -77,7 +77,6 @@ public class AS4Receiver extends AbstractConnector {
         } catch (Exception e) {
             throw new ConnectException(e);
         }
-
     }
 
     /**
@@ -133,6 +132,7 @@ public class AS4Receiver extends AbstractConnector {
         PMode pmode = PModeRepository.getInstance().findPModeFromAgreement(agreementRef);
         return AS4Utils.isSendErrorAsResponse(pmode);
     }
+
     /**
      * Write the <eb3:Messaging></eb3:Messaging> and payloads to files
      * @param messaging Messaging object
