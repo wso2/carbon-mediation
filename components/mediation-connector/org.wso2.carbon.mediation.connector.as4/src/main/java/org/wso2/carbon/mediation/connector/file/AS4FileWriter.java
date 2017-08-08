@@ -56,7 +56,7 @@ public class AS4FileWriter {
                     try {
                         dataHandler.writeTo(new FileOutputStream(partFile));
                     } catch (IOException e) {
-                        log.error(e);
+                        log.error("Error writing payload to file : " + cid, e);
                         throw new AS4Exception("Error writing payload to file : " + cid,
                                 AS4ErrorMapper.ErrorCode.EBMS0004, messageId);
                     }
@@ -70,7 +70,7 @@ public class AS4FileWriter {
                             FileOutputStream outputStream = new FileOutputStream(partFile);
                             payloadElement.serialize(outputStream);
                         } catch (Exception e) {
-                            log.error(e);
+                            log.error("Error writing payload to file : " + cid, e);
                             throw new AS4Exception("Error writing payload to file : " + cid,
                                     AS4ErrorMapper.ErrorCode.EBMS0004, messageId);
                         }

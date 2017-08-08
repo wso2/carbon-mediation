@@ -48,9 +48,9 @@ public class AS4ErrorHandler {
     /**
      * Generate AS4 error messages and set to {@link MessageContext}
      * @param messageContext {@link MessageContext} object
-     * @param e {@link AS4Exception} object
+     * @param as4Exception {@link AS4Exception} object
      */
-    public static void generateErrorMessage(MessageContext messageContext, AS4Exception e) {
+    public static void generateErrorMessage(MessageContext messageContext, AS4Exception as4Exception) {
 
         SignalMessage signalMessage = new SignalMessage();
 
@@ -61,10 +61,10 @@ public class AS4ErrorHandler {
         signalMessage.setMessageInfo(responseMessageInfo);
 
         Error error = new Error();
-        AS4ErrorMapper.setErrorDetailsAndDesc(e.getAs4ErrorCode(), error, e.getMessage());
-        if (e.getMessageId() != null) {
-            responseMessageInfo.setRefToMessageId(e.getMessageId());
-            error.setRefToMessageInError(e.getMessageId());
+        AS4ErrorMapper.setErrorDetailsAndDesc(as4Exception.getAs4ErrorCode(), error, as4Exception.getMessage());
+        if (as4Exception.getMessageId() != null) {
+            responseMessageInfo.setRefToMessageId(as4Exception.getMessageId());
+            error.setRefToMessageInError(as4Exception.getMessageId());
         }
         signalMessage.setError(error);
 

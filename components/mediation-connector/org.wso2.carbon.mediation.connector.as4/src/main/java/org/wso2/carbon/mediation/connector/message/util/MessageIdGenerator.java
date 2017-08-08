@@ -19,7 +19,6 @@
 package org.wso2.carbon.mediation.connector.message.util;
 
 import org.wso2.carbon.mediation.connector.AS4Constants;
-
 import java.util.UUID;
 
 public class MessageIdGenerator {

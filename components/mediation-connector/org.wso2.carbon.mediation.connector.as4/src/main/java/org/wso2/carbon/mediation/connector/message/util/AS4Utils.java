@@ -40,6 +40,15 @@ public class AS4Utils {
 
     private static final Log log = LogFactory.getLog(AS4Utils.class);
 
+    /**
+     * Create {@link OMNode} object from {@link Messaging} object
+     * @param marshaller {@link Marshaller} instance for {@link Messaging} class
+     * @param messaging {@link Messaging} object to be converted to {@link OMNode}
+     * @return OMNode object created from {@link Messaging} object
+     * @throws IOException
+     * @throws XMLStreamException
+     * @throws PropertyException
+     */
     public static OMNode getOMNode(final Marshaller marshaller, final Messaging messaging)
             throws IOException, XMLStreamException, PropertyException {
 
@@ -114,10 +123,8 @@ public class AS4Utils {
     public static boolean reportErrorToProducer(PMode pmode) {
 
         boolean notifyProducer = false;
-        if(pmode.getErrorHandling() != null) {
-            if(pmode.getErrorHandling().getReport() != null) {
-                notifyProducer = pmode.getErrorHandling().getReport().isProcessErrorNotifyProducer();
-            }
+        if(pmode.getErrorHandling() != null && pmode.getErrorHandling().getReport() != null) {
+            notifyProducer = pmode.getErrorHandling().getReport().isProcessErrorNotifyProducer();
         }
         return notifyProducer;
     }
@@ -130,10 +137,8 @@ public class AS4Utils {
     public static boolean isSendErrorAsResponse(PMode pmode) {
 
         boolean notifyProducer = false;
-        if(pmode.getErrorHandling() != null) {
-            if(pmode.getErrorHandling().getReport() != null) {
-                notifyProducer = pmode.getErrorHandling().getReport().isAsResponse();
-            }
+        if(pmode.getErrorHandling() != null && pmode.getErrorHandling().getReport() != null) {
+            notifyProducer = pmode.getErrorHandling().getReport().isAsResponse();
         }
         return notifyProducer;
     }
