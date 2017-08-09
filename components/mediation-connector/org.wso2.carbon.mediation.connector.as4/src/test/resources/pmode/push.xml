@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PMode xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://wso2.org/schemas/2016/10/pmode" xsi:pmode="http://wso2.org/schemas/2016/10/pmode ../../repository/xsd/pmode.xsd">
+	<ID>push</ID>
+	<MEP>http://www.oasis-open.org/committees/ebxml-msg/one-way</MEP>
+	<MEPbinding>http://www.oasis-open.org/committees/ebxml-msg/push</MEPbinding>
+	<Initiator>
+		<Party>org:wso2:example:company:A</Party>
+		<Role>Sender</Role>
+	</Initiator>
+	<Responder>
+		<Party>org:wso2:example:company:B</Party>
+		<Role>Receiver</Role>
+	</Responder>
+	<Agreement>
+		<Name>http://wso2.org/examples/agreement0</Name>
+	</Agreement>
+	<Protocol>
+		<Address>http://localhost:8281/services/AS4ReceiverProxy</Address>
+		<SOAPVersion>1.2</SOAPVersion>
+	</Protocol>
+	<BusinessInfo>
+		<Service>Examples</Service>
+		<Action>StoreMessage</Action>
+	</BusinessInfo>
+	<ErrorHandling>
+		<Report>
+			<AsResponse>true</AsResponse>
+			<ProcessErrorNotifyProducer>true</ProcessErrorNotifyProducer>
+		</Report>
+	</ErrorHandling>
+</PMode>

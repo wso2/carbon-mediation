@@ -31,7 +31,6 @@ import org.wso2.carbon.connector.core.ConnectException;
 import org.wso2.carbon.mediation.connector.exceptions.AS4ErrorMapper;
 import org.wso2.carbon.mediation.connector.exceptions.AS4Exception;
 import org.wso2.carbon.mediation.connector.file.AS4FileWriter;
-import org.wso2.carbon.mediation.connector.message.beans.*;
 import org.wso2.carbon.mediation.connector.message.util.AS4Utils;
 import org.wso2.carbon.mediation.connector.message.util.MessageIdGenerator;
 import org.wso2.carbon.mediation.connector.pmode.PModeRepository;
