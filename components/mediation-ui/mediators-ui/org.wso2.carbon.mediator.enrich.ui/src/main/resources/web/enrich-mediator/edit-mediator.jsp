@@ -84,6 +84,8 @@
     int targetType = CUSTOM;
     if (enrichMediator.getTargetType().equals("body")) {
         targetType = BODY;
+    } else if (enrichMediator.getTargetType().equals("envelope")) {
+        targetType = ENVELOPE;
     } else if (enrichMediator.getTargetType().equals("property")) {
         targetType = PROPERTY;
         targetValue = enrichMediator.getTargetProperty();
@@ -111,7 +113,7 @@
 
 
 <script type="text/javascript">
-    function changeSourceElements(elm, targetId) {
+    function changeSourceElements(elm) {
         var selectedElmValue = elm.options[elm.selectedIndex].value;
         if (selectedElmValue == "custom") {
             displayElement('sourceXpathExpLabel', true);
@@ -177,7 +179,6 @@
 
 
         }
-        validateCombinations(elm, targetId);
     }
 
     function changeTargetElements(elm) {
@@ -186,6 +187,12 @@
             displayElement('mediator.enrich.target.val_ex', true);
             displayElement('targetXpathExpLabel', true);
             displayElement('mediator.enrich.target.nmsp_button', true);
+            displayElement('targetPropertyLabel', false);
+            displayElement('targetInlineLabel', false);
+        } else if (selectedElmValue == "envelope") {
+            displayElement('mediator.enrich.target.val_ex', false);
+            displayElement('targetXpathExpLabel', false);
+            displayElement('mediator.enrich.target.nmsp_button', false);
             displayElement('targetPropertyLabel', false);
             displayElement('targetInlineLabel', false);
         } else if (selectedElmValue == "body") {
@@ -203,49 +210,36 @@
         }
     }
 
-    function validateCombinations(sourceId, targetId){
-        <fmt:message key="mediator.enrich.type.custom" var="custom"/>
-        <fmt:message key="mediator.enrich.type.body" var="body"/>
-        <fmt:message key="mediator.enrich.type.property" var="property"/>
+    function validateCombinations(currElem){
+        var elm = document.getElementById('mediator.enrich.target.type');
+        var selectedElmValueForType = elm.options[elm.selectedIndex].value;
 
-        var common = ['${custom}', '${body}', '${property}'];
-        var envelope = ['${property}'];
-        var body = ['${custom}', '${property}'];
+        var elemAction = document.getElementById('mediator.enrich.target.action');
+        var selectedElmValueForAction = elemAction.options[elemAction.selectedIndex].value;
 
-        switch (sourceId.value) {
-            case 'custom':
-            case 'property':
-            case 'inline':
-                targetId.options.length = 0;
-                for (i = 0; i < common.length; i++) {
-                    createOption(targetId, common[i], common[i]);
-                }
-                break;
-            case 'envelope':
-                targetId.options.length = 0;
-                for (i = 0; i < envelope.length; i++) {
-                    createOption(targetId, envelope[i], envelope[i]);
-                }
-                break;
-            case 'body':
-                targetId.options.length = 0;
-                for (i = 0; i < body.length; i++) {
-                    createOption(targetId, body[i], body[i]);
-                }
-                break;
-            default:
-                targetId.options.length = 0;
-                break;
+        var thisElemValue = currElem.options[currElem.selectedIndex].value;
+        <%--alert("on validate : type :" + selectedElmValueForType + "  action : " + selectedElmValueForAction--%>
+            <%--+ "  this : " + thisElemValue);--%>
+
+
+        if(selectedElmValueForAction == "sibling" && selectedElmValueForType == "envelope" ){
+            if(thisElemValue == "sibling"){
+                //force option to 'replace'
+                elm.value = 'body';
+            }
+        }
+
+        if (selectedElmValueForType == "envelope") {
+            elemAction.value = 'replace';
+            elemAction.disabled = true;
+        }
+        else {
+            elemAction.disabled = false;
         }
     }
 
-    function createOption(targetId, text, value) {
-        var opt = document.createElement('option');
-        opt.value = value;
-        opt.text = text;
-        targetId.options.add(opt);
-        changeTargetElements(targetId);
-    }
+    // here the past parameter is just not important.
+    window.onload = validateCombinations(document.getElementById('mediator.enrich.target.action'));
 
 </script>
 
@@ -281,7 +275,7 @@
     </td>
     <td>
         <select id="mediator.enrich.source.type" name="mediator.enrich.source.type2"
-                style="width:150px;" onchange="changeSourceElements(this,document.getElementById('mediator.enrich.target.type'))">
+                style="width:150px;" onchange="changeSourceElements(this)">
             <option value="custom" <%=enrichMediator.getSourceType() != null && enrichMediator.getSourceType().equals("custom") ? "selected=\"selected\"" : ""%>>
                 <fmt:message key="mediator.enrich.type.custom"/>
             </option>
@@ -398,7 +392,7 @@
     </td>
     <td>
         <select id="mediator.enrich.target.action" name="mediator.enrich.target.action"
-                style="width:150px;">
+                style="width:150px;" onchange="validateCombinations(this)">
             <option value="replace" <%=enrichMediator.getTargetAction() != null && enrichMediator.getTargetAction().equals("replace") ? "selected=\"selected\"" : ""%>>
                 <fmt:message key="mediator.enrich.target.action.replace"/>
             </option>
@@ -417,9 +411,12 @@
     </td>
     <td>
         <select id="mediator.enrich.target.type" name="mediator.enrich.target.type"
-                style="width:150px;" onchange="changeTargetElements(this);">
+                style="width:150px;" onchange="changeTargetElements(this);validateCombinations(this);">
             <option value="custom" <%=enrichMediator.getTargetType() != null && enrichMediator.getTargetType().equals("custom") ? "selected=\"selected\"" : ""%>>
                 <fmt:message key="mediator.enrich.type.custom"/>
+            </option>
+            <option id="mediator.enrich.type.envelope" value="envelope" <%=enrichMediator.getTargetType() != null && enrichMediator.getTargetType().equals("envelope") ? "selected=\"selected\"" : ""%>>
+                <fmt:message key="mediator.enrich.type.envelope"/>
             </option>
             <option value="body" <%=enrichMediator.getTargetType() != null && enrichMediator.getTargetType().equals("body") ? "selected=\"selected\"" : ""%>>
                 <fmt:message key="mediator.enrich.type.body"/>
@@ -445,7 +442,7 @@
     <td style="width:320px;">
         <input name="mediator.enrich.target.val_ex"
                type="text" id="mediator.enrich.target.val_ex"
-                <%= (targetType == BODY || targetType == INLINE) ? "style=\"display:none\"" : "id=\"mediator.enrich.target.val_ex\"" %>
+                <%= (targetType == ENVELOPE || targetType == BODY || targetType == INLINE) ? "style=\"display:none\"" : "id=\"mediator.enrich.target.val_ex\"" %>
                value="<%=targetValue%>" style="width:300px;"/>
     </td>
     <td>
