@@ -55,7 +55,7 @@
         }
 
         var receiverUrlCheck
-                = (receiverUrl.value.trim()).match(/^tcp?:\/\/\w+(\.\w+)*(:[0-9]{1,5})/g);
+                = (receiverUrl.value.trim()).match(/^tcp?:\/\/\w+(\.\w+)*(:[0-9]{1,5})(,\s*tcp?:\/\/\w+(\.\w+)*(:[0-9]{1,5}))*/g);
         if (!(receiverUrlCheck == (receiverUrl.value.trim()))) {
             CARBON.showErrorDialog("Invalid url format in Receiver url");
             return false;
@@ -110,7 +110,7 @@
     }
 
     function testURL(url, protocol) {
-        var receiverUrlCheck = (url.trim()).match(/^tcp?:\/\/\w+(\.\w+)*(:[0-9]{1,5})/g);
+        var receiverUrlCheck = (url.trim()).match(/^tcp?:\/\/\w+(\.\w+)*(:[0-9]{1,5})(,\s*tcp?:\/\/\w+(\.\w+)*(:[0-9]{1,5}))*/g);
         var authenticationUrlCheck = (url.trim()).match(/^ssl?:\/\/\w+(\.\w+)*(:[0-9]{1,5})/g);
         if (url == '') {
             CARBON.showErrorDialog("server url cannot be empty");
