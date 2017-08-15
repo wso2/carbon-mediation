@@ -46,26 +46,23 @@ function setProperty() {
 			function() {
 
 				var reason = "";
-				reason += validateEmptySV(
-						document.getElementById('propName'),
-						org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.name"]);
+				reason += validateEmptySV(document.getElementById('propName'),
+				    org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.name"]);
 				if (reason === "") {
-					reason += validateForInputSV(
-							document.getElementById('propName'),
-							org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.name"]);
+					reason += validateForInputSV(document.getElementById('propName'),
+					    org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.name"]);
 				}
 				if (reason === "") {
-                	reason +=validateEmptySV(document.getElementById('propValue'),
-                		   org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
+                	reason += validateEmptySV(document.getElementById('propValue'),
+                	    org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
                 }
 				if (reason === "") {
-					reason += validateValueForInputSV(
-							document.getElementById('propValue'),
-							org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
+					reason += validateValueForInputSV(document.getElementById('propValue'),
+					    org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
 				}
 				if(reason === ""){
 					if(document.getElementById('propValue').value != document.getElementById('propValueConfirm').value){
-						reason += org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value.confirmation.invalid"];
+					    reason += org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value.confirmation.invalid"];
 					}
 				}
 				
@@ -301,6 +298,7 @@ function validateEmptySV(fld, fldName) {
 
 function validateForInputSV(fld, fldName) {
   	var error = "";
+  	// This regex includes patterns for characters which should not include in the vault key
 	var illegalChars = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]/;
 	if (illegalChars.test(fld.value)) {
 		error = "The " + fldName + " has illegal characters";

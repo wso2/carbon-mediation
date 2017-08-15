@@ -580,9 +580,7 @@
                     } else if (wsdlUri.value == '') {
                         return proxyi18n["invalid.wsdl.uri"];                        
                     }
-                }
-
-                else if (mode == 'reg') {
+                } else if (mode == 'reg') {
                     var wsdlKey = getElement('wsdlRegText');
                     if (wsdlKey && wsdlKey.value == '') {
                         return proxyi18n['wsdl.not.selected'];
@@ -590,8 +588,10 @@
                 }
             }
             var serviceGroupElm = getElement("serviceGroup");
-            if(serviceGroupElm.value != null && serviceGroupRegex.test(serviceGroupElm.value)) {
-                return 'Service Group contains invalid characters';
+            if(serviceGroupElm != null) {
+                if(serviceGroupElm.value != null && serviceGroupRegex.test(serviceGroupElm.value)) {
+                    return 'Service Group contains invalid characters';
+                }
             }
 
         } else if (num == 1) {
