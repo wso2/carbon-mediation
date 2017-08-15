@@ -588,12 +588,9 @@
                 }
             }
             var serviceGroupElm = getElement("serviceGroup");
-            if(serviceGroupElm != null) {
-                if(serviceGroupElm.value != null && serviceGroupRegex.test(serviceGroupElm.value)) {
-                    return 'Service Group contains invalid characters';
-                }
+            if(serviceGroupElm != null && serviceGroupElm.value != null && serviceGroupRegex.test(serviceGroupElm.value)) {
+                return 'Service Group contains invalid characters';
             }
-
         } else if (num == 1) {
 
             if (getElement('epOpImp').checked && getElement('importEp').value != 'None') {
