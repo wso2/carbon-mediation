@@ -48,7 +48,7 @@
     <% if(pd.getArtifactContainerName() != null) { %>
         <img src="images/applications.gif">
         <% if (loggedIn) { %>
-            <a href="./service_info.jsp?serviceName=<%=serviceName%>"><%=Encode.forHtmlContent(name)%>
+            <a href="./service_info.jsp?serviceName=<%=Encode.forHtmlAttribute(serviceName)%>"><%=Encode.forHtmlContent(name)%>
             <% if(pd.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
             </a>
         <% } else { %>
@@ -56,7 +56,7 @@
         <% } %>
     <% } else { %>
         <% if (loggedIn) { %>
-            <a href="./service_info.jsp?serviceName=<%=serviceName%>"><%=Encode.forHtmlContent(name)%></a>
+            <a href="./service_info.jsp?serviceName=<%=Encode.forHtmlAttribute(serviceName)%>"><%=Encode.forHtmlContent(name)%></a>
         <% } else { %>
             <%=Encode.forHtmlContent(name)%>
         <% } %>

@@ -561,6 +561,7 @@
         var elem;
         var isOneSpecified = false;
         var proxyNameRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+        var serviceGroupRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]/;
 
         if ((elem = getElement('psName')).value == null || proxyNameRegex.test(elem.value)) {
             return 'Proxy service name is empty or contains invalid characters';
@@ -579,13 +580,20 @@
                     } else if (wsdlUri.value == '') {
                         return proxyi18n["invalid.wsdl.uri"];                        
                     }
-                } else if (mode == 'reg') {
+                }
+
+                else if (mode == 'reg') {
                     var wsdlKey = getElement('wsdlRegText');
                     if (wsdlKey && wsdlKey.value == '') {
                         return proxyi18n['wsdl.not.selected'];
                     }
                 }
             }
+            var serviceGroupElm = getElement("serviceGroup");
+            if(serviceGroupElm.value != null && serviceGroupRegex.test(serviceGroupElm.value)) {
+                return 'Service Group contains invalid characters';
+            }
+
         } else if (num == 1) {
 
             if (getElement('epOpImp').checked && getElement('importEp').value != 'None') {
@@ -1140,7 +1148,7 @@
                     <% if (!nameDisabled) { %>
                     <input id="psName" name="psName" type="text" value="<%=name%>" onchange="changePSN()"  onkeypress="return validateProxyNameText(event)"/>
                     <% } else { %>
-                        <strong><%=name%></strong>
+                        <strong><%=Encode.forHtmlContent(name)%></strong>
                     <% } %>
                 </td>
                 </tr>
@@ -1390,7 +1398,7 @@
                                         <tr>
                                             <td width="20%"><fmt:message key="service.group"/></td>
                                             <td><input id="serviceGroup" name="serviceGroup" type="text"
-                                                       value="<%=serviceGroup%>"/>
+                                                       value="<%=Encode.forHtmlAttribute(serviceGroup)%>" onkeypress="return validateProxyNameText(event)"/>
                                             </td>
                                         </tr>
                                     </table>
@@ -1428,7 +1436,7 @@
                                             <td width="20%"><fmt:message
                                                     key="description"/></td>
                                             <td><input id="description" name="description" type="text"
-                                                       value="<%=description%>"/>
+                                                       value="<%=Encode.forHtmlAttribute(description)%>"/>
                                             </td>
                                         </tr>
                                     </table>
