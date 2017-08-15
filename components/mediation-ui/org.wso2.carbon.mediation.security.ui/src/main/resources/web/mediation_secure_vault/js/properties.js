@@ -49,26 +49,21 @@ function setProperty() {
 				reason += validateEmptySV(
 						document.getElementById('propName'),
 						org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.name"]);
-				// if (reason == "") {
-				// reason
-				// +=validateEmptySV(document.getElementById('propValue'),
-				// org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
-				// }
-              
-
-				if (reason == "") {
+				if (reason === "") {
 					reason += validateForInputSV(
 							document.getElementById('propName'),
 							org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.name"]);
 				}
-				if (reason == "") {
-					reason += validateForInputSV(
+				if (reason === "") {
+                	reason +=validateEmptySV(document.getElementById('propValue'),
+                		   org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
+                }
+				if (reason === "") {
+					reason += validateValueForInputSV(
 							document.getElementById('propValue'),
 							org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
 				}
-				
-				if(reason == ""){
-					
+				if(reason === ""){
 					if(document.getElementById('propValue').value != document.getElementById('propValueConfirm').value){
 						reason += org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value.confirmation.invalid"];
 					}
@@ -76,23 +71,6 @@ function setProperty() {
 				
 				var propertyName = document.getElementById('propName').value;
 				var propertyValue = document.getElementById('propValue').value;
-
-                 
-
-				if (reason == "") {
-					propertyName = propertyName.replace(/^\s\s*/, '').replace(
-							/\s\s*$/, '');
-					if (propertyName == "") {
-						reason = org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value.cannot.contain.only.white.spaces"];
-					}
-
-					propertyValue = propertyValue.replace(/^\s\s*/, '')
-							.replace(/\s\s*$/, '');
-					// if (propertyValue == "") {
-					// reason =
-					// org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value.cannot.contain.only.white.spaces"];
-					// }
-				}
 
 				if (propertyName.startsWith("registry.")) {
 					reason = org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.name.cannot.be.hidden"];
@@ -173,9 +151,7 @@ function editProperty(rowid) {
 						+ rowid);
 				var propertyValueConfim = document.getElementById('propValueConfirm_'
 						+ rowid);
-				// reason +=
-				// validateEmptySV(propertyValue,org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
-				reason += validateForInputSV(
+				reason += validateValueForInputSV(
 						propertyValue,
 						org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
 
@@ -198,14 +174,13 @@ function editProperty(rowid) {
 					reason += org_wso2_carbon_mediation_secure_vault_ui_jsi18n["duplicate.entry.please.choose.another.name"];
 				}
 				
-				if(reason == ""){
-					
+				if(reason === ""){
 					if(propertyValue.value != propertyValueConfim.value){
 						reason += org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value.confirmation.invalid"];
 					}
 				}
 
-				if (reason == "") {
+				if (reason === "") {
 					new Ajax.Request(
 							'../mediation_secure_vault/properties-ajaxprocessor.jsp',
 							{
@@ -315,48 +290,29 @@ function showRetention() {
 	}
 }
 
-
-
-
 function validateEmptySV(fld, fldName) {
 	var error = "";
 	fld.value = fld.value.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-	
 	if (fld.value.length == 0) {
-		error = "The required field" + " " + fldName + " " + "Not fild"
-				+ "<br />";
-	} else {
-		// fld.style.background = 'White';
+		error = "The required field " + fldName + " is not filled";
 	}
 	return error;
 }
 
 function validateForInputSV(fld, fldName) {
   	var error = "";
-	var illegalChars = /(\<[a-zA-Z0-9\s\/]*>)/; // match any starting tag
+	var illegalChars = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]/;
 	if (illegalChars.test(fld.value)) {
-		error = "The"
-				+ " "
-				+ fldName
-				+ " "
-				+"has illigal charachters"
-				+ "<br />";
-	} else {
-		// fld.style.background = 'White';
+		error = "The " + fldName + " has illegal characters";
 	}
- 	//alert("validate input done");	
 	return error;
 }
-function validateValueForInputSV(fldValue, fldName) {
+
+function validateValueForInputSV(fld, fldName) {
 	var error = "";
-	var illegalChars = /(\<[a-zA-Z0-9\s\/]*>)/; // match any starting tag
-	if (illegalChars.test(fldValue)) {
-		error = org_wso2_carbon_registry_common_ui_jsi18n["the"]
-				+ " "
-				+ fldName
-				+ " "
-				+ org_wso2_carbon_registry_common_ui_jsi18n["input.contains.illegal.chars"]
-				+ "<br />";
+	var regex = /^[\S]{5,30}$/;
+	if (!regex.test(fld.value)) {
+		error = "The " + fldName + " length should be within 5 to 30 characters";
 	}
 	return error;
 }
