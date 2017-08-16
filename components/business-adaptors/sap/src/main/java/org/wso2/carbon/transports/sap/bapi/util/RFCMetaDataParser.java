@@ -107,6 +107,8 @@ public class RFCMetaDataParser {
                 processStructure(childElement, function, name);
             }else if(qname.equals("field")){
                 processField(childElement, function, name);
+            }else if(qname.equals("tables")){
+                processTablesParameter(childElement, function);
             }else{
                 log.warn("Unknown meta data type tag :" + qname + " detected. " +
                         "This meta data element will be discarded!");
@@ -177,12 +179,48 @@ public class RFCMetaDataParser {
             }
         }
     }
+    
+    private static void processTablesParameter(OMElement element, JCoFunction function) throws AxisFault{
+        Iterator itr = element.getChildElements();
+        while (itr.hasNext()){
+            OMElement childElement = (OMElement) itr.next();
+            String qname = childElement.getQName().toString();
+            String tableName = childElement.getAttributeValue(RFCConstants.NAME_Q);
+            if(qname.equals("table")){
+                processTableParameter(childElement, function, tableName);
+            }else{
+                log.warn("Invalid meta data type element found : " + qname + " .This meta data " +
+                            "type will be ignored");
+            }
+        }
+    }
 
     private static void processTable(OMElement element, JCoFunction function, String tableName)
             throws AxisFault{
         JCoTable inputTable = function.getTableParameterList().getTable(tableName);
         if(inputTable == null){
             throw new AxisFault("Input table :" + tableName + " does not exist");
+        }
+        Iterator itr = element.getChildElements();
+        while (itr.hasNext()){
+            OMElement childElement = (OMElement)itr.next();
+            String qname = childElement.getQName().toString();
+            String id = childElement.getAttributeValue(RFCConstants.ID_Q);
+            if(qname.equals("row")){
+                processRow(childElement, inputTable, id);
+            }else{
+                log.warn("Invalid meta data type element found : " + qname + " .This meta data " +
+                            "type will be ignored");
+            }
+
+        }
+    }
+    
+    private static void processTableParameter(OMElement element, JCoFunction function, String tableName)
+            throws AxisFault{
+        JCoTable inputTable = function.getImportParameterList().getTable(tableName);
+        if(inputTable == null){
+            throw new AxisFault("Input table parameter :" + tableName + " does not exist");
         }
         Iterator itr = element.getChildElements();
         while (itr.hasNext()){
