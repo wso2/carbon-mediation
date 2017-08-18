@@ -25,6 +25,7 @@
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 <script type="text/javascript" src="../resources/js/resource_util.js"></script>
 <%@ page import="org.wso2.carbon.ui.CarbonSecuredHttpContext" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%
     String serviceName = request.getParameter("serviceName");
     String backendServerURL = CarbonUIUtil.getServerURL(config.getServletContext(), session);
@@ -73,18 +74,18 @@
 </script>
 <td>
     <% if (pd.getArtifactContainerName() != null) { %>
-    <a title="Edit '<%=pd.getName()%>' in the design view" href="#" onclick="editCAppPS('<%=pd.getName()%>');return false;">
+    <a title="Edit '<%=Encode.forHtmlAttribute(pd.getName())%>' in the design view" href="#" onclick="editCAppPS('<%=Encode.forHtmlAttribute(pd.getName())%>');return false;">
             <% } else { %>
-        <a title="Edit '<%=pd.getName()%>' in the design view" href="#" onclick="editPS('<%=pd.getName()%>');return false;">
+        <a title="Edit '<%=Encode.forHtmlAttribute(pd.getName())%>' in the design view" href="#" onclick="editPS('<%=Encode.forHtmlAttribute(pd.getName())%>');return false;">
             <% } %>
             <img src="../proxyservices/images/design-view.gif" alt="" border="0"> Design View</a>
 </td>
 <td>
     <% if (pd.getArtifactContainerName() != null) { %>
-    <a title="Edit '<%=pd.getName()%>' in the source view editor" style="background-image: url(../proxyservices/images/source-view.gif);"
-       class="icon-link" onclick="editCAppProxySourceView('<%=pd.getName()%>')" href="#">Source View</a>
+    <a title="Edit '<%=Encode.forHtmlAttribute(pd.getName())%>' in the source view editor" style="background-image: url(../proxyservices/images/source-view.gif);"
+       class="icon-link" onclick="editCAppProxySourceView('<%=Encode.forHtmlAttribute(pd.getName())%>')" href="#">Source View</a>
     <% } else { %>
-    <a title="Edit '<%=pd.getName()%>' in the source view editor" style="background-image: url(../proxyservices/images/source-view.gif);"
-       class="icon-link" onclick="editProxySourceView('<%=pd.getName()%>')" href="#">Source View</a>
+    <a title="Edit '<%=Encode.forHtmlAttribute(pd.getName())%>' in the source view editor" style="background-image: url(../proxyservices/images/source-view.gif);"
+       class="icon-link" onclick="editProxySourceView('<%=Encode.forHtmlAttribute(pd.getName())%>')" href="#">Source View</a>
     <% } %>
 </td>

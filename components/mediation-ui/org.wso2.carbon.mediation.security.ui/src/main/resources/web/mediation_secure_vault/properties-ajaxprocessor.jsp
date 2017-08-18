@@ -27,6 +27,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage"%>
 <%@ page import="java.util.HashMap"%>
 <%@ page import="org.wso2.carbon.registry.core.RegistryConstants"%>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="carbon"
 	uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar"%>
 
@@ -126,8 +127,8 @@
 						<td style="border-right: none !important"><input
 							id="propRPath_<%=i%>" type="hidden"
 							value="<%=propertiesBean_.getPathWithVersion()%>" /><input
-							id="oldPropName_<%=i%>" type="hidden" value="<%=name%>" /><input
-							value="<%=name%>" type="text" id="propName_<%=i%>"
+							id="oldPropName_<%=i%>" type="hidden" value="<%=Encode.forHtmlAttribute(name)%>" /><input
+							value="<%=Encode.forHtmlAttribute(name)%>" type="text" id="propName_<%=i%>"
 							class="propEditNameSelector" />
 						</td>
 						<td style="border-left: none !important"><table
@@ -166,7 +167,7 @@
             	%>
 						<td style="border-right: none !important"><span
 							class="__propName"><%=tmpName%></span><span
-							class="__propNameRef propViewNameSelector" style="display: none;"><%=name%></span>
+							class="__propNameRef propViewNameSelector" style="display: none;"><%=Encode.forHtmlContent(name)%></span>
 						</td>
 						<td style="border-left: none !important"></td>
 
