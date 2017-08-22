@@ -31,7 +31,6 @@ public class FailoverEndpoint extends ListEndpoint {
 
     private String properties = null;
     private String name;
-    private boolean buildMessage;
 
     public String getTagLocalName() {
         return "failover";
@@ -53,14 +52,6 @@ public class FailoverEndpoint extends ListEndpoint {
         this.properties = properties;
     }
 
-    public boolean isBuildMessage() {
-        return buildMessage;
-    }
-
-    public void setBuildMessage(boolean buildMessage) {
-        this.buildMessage = buildMessage;
-    }
-
     public OMElement serialize(OMElement parent) {
 
         // top element
@@ -72,9 +63,6 @@ public class FailoverEndpoint extends ListEndpoint {
 
         // failover element
         OMElement failover = fac.createOMElement("failover", synNS);
-        if (buildMessage) {
-            failover.addAttribute(fac.createOMAttribute("buildMessage", nullNS, Boolean.toString(true)));
-        }
 
         // Properties
         if (properties != null && properties.length() != 0) {
@@ -104,14 +92,7 @@ public class FailoverEndpoint extends ListEndpoint {
         if (isAnonymous) {
             elem.addAttribute("name", "anonymous", elem.getOMFactory().createOMNamespace("", ""));
         }
-        org.apache.synapse.endpoints.Endpoint failoverEndpoint = EndpointFactory
-                .getEndpointFromElement(elem, isAnonymous, new Properties());
-
-        if (failoverEndpoint instanceof org.apache.synapse.endpoints.FailoverEndpoint) {
-            org.apache.synapse.endpoints.FailoverEndpoint failOverEndpoint =
-                    (org.apache.synapse.endpoints.FailoverEndpoint) failoverEndpoint;
-            buildMessage = failOverEndpoint.isBuildMessageAtt();
-        }
+        org.apache.synapse.endpoints.Endpoint failoverEndpoint = EndpointFactory.getEndpointFromElement(elem, isAnonymous, new Properties());
         if (failoverEndpoint.getName() != null) {
             name = failoverEndpoint.getName().equals("anonymous") ? "" : failoverEndpoint.getName();
         }
