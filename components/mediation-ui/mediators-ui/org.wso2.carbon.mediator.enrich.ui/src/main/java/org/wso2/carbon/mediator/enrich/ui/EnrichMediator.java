@@ -46,7 +46,7 @@ public class EnrichMediator extends AbstractMediator {
     private final String DEFAULT_SOURCE_TYPE = "custom";
     private final String DEFAULT_TARGET_TYPE = "custom";
     private final String DEFAULT_TARGET_ACTION_TYPE = "replace";
-    private String sourceClone = "false";
+    private String sourceClone = "true";
     private String sourceType = DEFAULT_SOURCE_TYPE;
     private SynapseXPath sourceExpression = null;
     private String sourceProperty = "";
