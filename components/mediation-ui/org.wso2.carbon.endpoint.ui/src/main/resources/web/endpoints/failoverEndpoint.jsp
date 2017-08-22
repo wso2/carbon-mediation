@@ -142,13 +142,11 @@
 
     String failoverEndpointName = "";
     String properties = "";
-    boolean isBuildMessage = false;
 
     if (endpoint != null) {
         if (endpoint.getName() != null) {
             failoverEndpointName = endpoint.getName();
         }
-        isBuildMessage = endpoint.isBuildMessage();
         if (endpoint.getProperties() != null) {
             properties = endpoint.getProperties();
         }
@@ -217,16 +215,6 @@
                                            value="<%=failoverEndpointName%>"/>
                                     <input type="hidden" name="isAnnonEndpointID"
                                            id="isAnnonEndpointID" value="<%=isAnonymous%>"/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="leftCol-small"><fmt:message key="buildMessage"/>
-                                </td>
-                                <td>
-                                    <select name="buildMessage" id="_buildMessage">
-                                        <option <%=isBuildMessage ? "selected" : ""%> value="true">True</option>
-                                        <option <%=!isBuildMessage ? "selected" : ""%> value="false">False</option>
-                                    </select>
                                 </td>
                             </tr>
                         </table>

@@ -25,12 +25,9 @@
 
         String name = request.getParameter("listEndpointName");
         String properties = request.getParameter("endpointProperties");
-        String buildMessage = request.getParameter("buildMessage");
         if (name != null) {
             endpoint.setName(name);
         }
-        boolean buildMessageBoolean = Boolean.parseBoolean(buildMessage);
-        endpoint.setBuildMessage(buildMessageBoolean);
         if (properties != null) {
             endpoint.setProperties(properties);
         }

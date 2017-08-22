@@ -20,7 +20,6 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.endpoints.DefinitionFactory;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.config.xml.endpoints.SALoadbalanceEndpointFactory;
-import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
@@ -39,7 +38,6 @@ public class LoadBalanceEndpoint extends ListEndpoint {
     private long sessionTimeout = 0;
     private String name;
     private String algorithmClassName = EndpointConfigurationHelper.ROUNDROBIN_ALGO_CLASS_NAME;
-    private boolean buildMessage;
 
     public String getTagLocalName() {
         return "loadbalance";
@@ -85,14 +83,6 @@ public class LoadBalanceEndpoint extends ListEndpoint {
         this.algorithmClassName = algorithmClassName;
     }
 
-    public boolean isBuildMessage() {
-        return buildMessage;
-    }
-
-    public void setBuildMessage(boolean buildMessage) {
-        this.buildMessage = buildMessage;
-    }
-
     public OMElement serialize(OMElement parent) {
         // top element
         OMElement endpoint = fac.createOMElement("endpoint", synNS);
@@ -105,10 +95,6 @@ public class LoadBalanceEndpoint extends ListEndpoint {
         // load balance element
         OMElement loadbalance = fac.createOMElement("loadbalance", synNS);
         loadbalance.addAttribute(fac.createOMAttribute("algorithm", nullNS, algorithmClassName));
-
-        if (buildMessage) {
-            loadbalance.addAttribute(fac.createOMAttribute("buildMessage", nullNS, Boolean.toString(true)));
-        }
 
         // session
         if (sessionType != null) {
@@ -149,8 +135,7 @@ public class LoadBalanceEndpoint extends ListEndpoint {
         if (isAnonymous) {
             elem.addAttribute("name", "anonymous", elem.getOMFactory().createOMNamespace("", ""));
         }
-        org.apache.synapse.endpoints.Endpoint loadbalanceEndpoint = SALoadbalanceEndpointFactory
-                .getEndpointFromElement(elem, isAnonymous, new Properties());
+        org.apache.synapse.endpoints.Endpoint loadbalanceEndpoint = SALoadbalanceEndpointFactory.getEndpointFromElement(elem, isAnonymous, new Properties());
 
         if (loadbalanceEndpoint != null && loadbalanceEndpoint instanceof SALoadbalanceEndpoint) {
             SALoadbalanceEndpoint saLoadBalanceDataElement = (SALoadbalanceEndpoint) loadbalanceEndpoint;
@@ -161,13 +146,11 @@ public class LoadBalanceEndpoint extends ListEndpoint {
                 algorithmClassName = saLoadBalanceDataElement.getAlgorithm().getClass().getName();
             }
             sessionTimeout = saLoadBalanceDataElement.getSessionTimeout();
-            OMElement sessionElement = elem
-                    .getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE, "session"));
+            OMElement sessionElement = elem.getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE, "session"));
             String session = sessionElement.getAttributeValue(new QName(null, "type"));
             if (session != null && !"".equals(session)) {
                 sessionType = session;
             }
-            buildMessage = saLoadBalanceDataElement.isBuildMessageAtt();
         } else {
             loadbalanceEndpoint = EndpointFactory.getEndpointFromElement(elem, isAnonymous, new Properties());
             if (loadbalanceEndpoint != null) {
@@ -178,7 +161,6 @@ public class LoadBalanceEndpoint extends ListEndpoint {
                 if (loadBalanceEndpoint.getAlgorithm() != null) {
                     algorithmClassName = loadBalanceEndpoint.getAlgorithm().getClass().getName();
                 }
-                buildMessage = loadBalanceEndpoint.isBuildMessageAtt();
             }
         }
 
