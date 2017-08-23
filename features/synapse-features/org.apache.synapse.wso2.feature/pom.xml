@@ -65,11 +65,23 @@
        </dependency>
         <dependency>
             <groupId>org.wso2.orbit.com.jayway.jsonpath</groupId>
-            <artifactId>com.jayway.jsonpath</artifactId>
+            <artifactId>json-path</artifactId>
         </dependency>
         <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>accessors-smart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
       	<dependency>
             <groupId>com.damnhandy.wso2</groupId>
@@ -137,7 +149,10 @@
                                 <bundleDef>com.google.code.gson:gson:${gson.version}</bundleDef>
                                 <bundleDef>org.wso2.caching:wso2caching-core</bundleDef>
                                 <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
-                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
+                                <bundleDef>org.wso2.orbit.com.jayway.jsonpath:json-path</bundleDef>
+                                <bundleDef>org.ow2.asm:asm</bundleDef>
+                                <bundleDef>net.minidev:accessors-smart</bundleDef>
+                                <bundleDef>org.slf4j:slf4j-api</bundleDef>
                                 <bundleDef>net.minidev:json-smart</bundleDef>
                                 <!-- Json schema validator dependencies -->
                                 <bundleDef>org.wso2.orbit.com.googlecode.libphonenumber:libphonenumber</bundleDef>
