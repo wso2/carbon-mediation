@@ -54,7 +54,7 @@ public class PublishEventMediatorTest extends XMLTestCase {
 		super(name);
 	}
 
-	public void _testMediatorFactory() {
+	public void testMediatorFactory() {
 		OMElement mediatorElement = SynapseConfigUtils.stringToOM(mediatorXml);
 		System.setProperty(ServerConstants.CARBON_HOME, System.getProperty("user.dir") + File.separator +
 		                                                "src" + File.separator + "test" + File.separator + "resources");
