@@ -2299,7 +2299,7 @@
 
         <!-- Carbon Commons version-->
         <carbon.commons.version>4.6.1</carbon.commons.version>
-        <carbon.commons.imp.pkg.version>[4.6.0, 4.7.0)</carbon.commons.imp.pkg.version>
+        <carbon.commons.imp.pkg.version>[4.5.0, 5.0.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
         <carbon.deployment.version>4.7.0</carbon.deployment.version>
