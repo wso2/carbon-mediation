@@ -110,9 +110,15 @@
 
 
 <script type="text/javascript">
+    var CUSTOM_ENRICH_TYPE = "custom";
+    var ENVELOPE_ENRICH_TYPE = "envelope";
+    var BODY_ENRICH_TYPE = "body";
+    var PROPERTY_ENRICH_TYPE = "property";
+    var INLINE_ENRICH_TYPE = "inline";
+
     function changeSourceElements(elm, targetId) {
         var selectedElmValue = elm.options[elm.selectedIndex].value;
-        if (selectedElmValue == "custom") {
+        if (selectedElmValue == CUSTOM_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', true);
             displayElement('mediator.enrich.source.nmsp_button', true);
             displayElement('mediator.enrich.source.val_ex', true);
@@ -125,7 +131,7 @@
             displayElement('mediator.enrich.reg.key', false);
             displayElement('inlineRegBrowser', true);
             displayElement('inlineRegBrowser', false);
-        } else if (selectedElmValue == "envelope") {
+        } else if (selectedElmValue == ENVELOPE_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', false);
             displayElement('mediator.enrich.source.nmsp_button', false);
             displayElement('mediator.enrich.source.val_ex', false);
@@ -137,7 +143,7 @@
             displayElement('registryInlineLabel', false);
             displayElement('mediator.enrich.reg.key', false);
             displayElement('inlineRegBrowser', false);
-        } else if (selectedElmValue == "body") {
+        } else if (selectedElmValue == BODY_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', false);
             displayElement('mediator.enrich.source.nmsp_button', false);
             displayElement('mediator.enrich.source.val_ex', false);
@@ -149,7 +155,7 @@
             displayElement('registryInlineLabel', false);
             displayElement('mediator.enrich.reg.key', false);
             displayElement('inlineRegBrowser', false);
-        } else if (selectedElmValue == "property") {
+        } else if (selectedElmValue == PROPERTY_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', false);
             displayElement('mediator.enrich.source.nmsp_button', false);
             displayElement('mediator.enrich.source.val_ex', true);
@@ -161,7 +167,7 @@
             displayElement('registryInlineLabel', false);
             displayElement('mediator.enrich.reg.key', false);
             displayElement('inlineRegBrowser', false);
-        } else if (selectedElmValue == "inline") {
+        } else if (selectedElmValue == INLINE_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', false);
             displayElement('mediator.enrich.source.nmsp_button', false);
             displayElement('mediator.enrich.source.val_ex', false);
@@ -181,25 +187,25 @@
 
     function changeTargetElements(elm) {
         var selectedElmValue = elm.options[elm.selectedIndex].value;
-        if (selectedElmValue == "custom") {
+        if (selectedElmValue == CUSTOM_ENRICH_TYPE) {
             displayElement('mediator.enrich.target.val_ex', true);
             displayElement('targetXpathExpLabel', true);
             displayElement('mediator.enrich.target.nmsp_button', true);
             displayElement('targetPropertyLabel', false);
             displayElement('targetInlineLabel', false);
-        } else if (selectedElmValue == "envelope") {
+        } else if (selectedElmValue == ENVELOPE_ENRICH_TYPE) {
             displayElement('mediator.enrich.target.val_ex', false);
             displayElement('targetXpathExpLabel', false);
             displayElement('mediator.enrich.target.nmsp_button', false);
             displayElement('targetPropertyLabel', false);
             displayElement('targetInlineLabel', false);
-        } else if (selectedElmValue == "body") {
+        } else if (selectedElmValue == BODY_ENRICH_TYPE) {
             displayElement('mediator.enrich.target.val_ex', false);
             displayElement('targetXpathExpLabel', false);
             displayElement('mediator.enrich.target.nmsp_button', false);
             displayElement('targetPropertyLabel', false);
             displayElement('targetInlineLabel', false);
-        } else if (selectedElmValue == "property") {
+        } else if (selectedElmValue == PROPERTY_ENRICH_TYPE) {
             displayElement('mediator.enrich.target.val_ex', true);
             displayElement('targetXpathExpLabel', false);
             displayElement('mediator.enrich.target.nmsp_button', false);
@@ -207,6 +213,10 @@
             displayElement('targetInlineLabel', false);
         }
     }
+
+    <%--
+        Validate the target type based on the source type
+    --%>
 
     function validateCombinations(sourceId, targetId){
         <fmt:message key="mediator.enrich.type.custom" var="custom"/>
@@ -220,26 +230,26 @@
         var body = ['${custom}', '${property}'];
 
         switch (sourceId.value) {
-            case 'property':
-            case 'inline':
+            case PROPERTY_ENRICH_TYPE:
+            case INLINE_ENRICH_TYPE:
                 targetId.options.length = 0;
                 for (i = 0; i < common.length; i++) {
                     createOption(targetId, common[i], common[i]);
                 }
                 break;
-            case 'custom':
+            case CUSTOM_ENRICH_TYPE:
                 targetId.options.length = 0;
                 for (i = 0; i < custom.length; i++) {
                     createOption(targetId, custom[i], custom[i]);
                 }
                 break;
-            case 'envelope':
+            case ENVELOPE_ENRICH_TYPE:
                 targetId.options.length = 0;
                 for (i = 0; i < envelope.length; i++) {
                     createOption(targetId, envelope[i], envelope[i]);
                 }
                 break;
-            case 'body':
+            case BODY_ENRICH_TYPE:
                 targetId.options.length = 0;
                 for (i = 0; i < body.length; i++) {
                     createOption(targetId, body[i], body[i]);

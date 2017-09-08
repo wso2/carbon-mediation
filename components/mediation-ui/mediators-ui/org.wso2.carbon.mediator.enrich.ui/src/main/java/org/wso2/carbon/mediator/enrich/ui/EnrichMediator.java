@@ -19,7 +19,6 @@ package org.wso2.carbon.mediator.enrich.ui;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.synapse.config.xml.SynapseXPathFactory;
 import org.apache.synapse.config.xml.SynapseXPathSerializer;
@@ -28,11 +27,13 @@ import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import java.util.Iterator;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
+
+/**
+ * It represent the attributes and functions of enrich mediator
+ */
 
 public class EnrichMediator extends AbstractMediator {
     private final String SOURCE = "source";
@@ -59,6 +60,9 @@ public class EnrichMediator extends AbstractMediator {
     private SynapseXPath targetExpression = null;
     private String targetProperty = "";
 
+    /*
+        return the source type
+     */
     public String getSourceType() {
         return sourceType;
     }
