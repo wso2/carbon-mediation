@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -32,7 +32,9 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
- * It represent the attributes and functions of enrich mediator
+ * It represent the attributes and functions of enrich mediator, process a message based on a given
+ * source configuration and then perform the specified action on the message by using the
+ * target configuration
  */
 
 public class EnrichMediator extends AbstractMediator {
