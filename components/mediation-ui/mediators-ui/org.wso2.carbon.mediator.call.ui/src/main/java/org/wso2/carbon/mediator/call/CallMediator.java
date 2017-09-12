@@ -35,9 +35,21 @@ public class CallMediator extends AbstractMediator {
 
     private static final QName BLOCKING_Q = new QName("blocking");
 
+    private static final QName ATT_AXIS2XML = new QName("axis2xml");
+
+    private static final QName ATT_REPOSITORY = new QName("repository");
+
+    private static final QName  ATT_INIT_AXIS2_CLIENT_OPTIONS = new QName("initAxis2ClientOptions");
+
     private Endpoint endpoint = null;
 
     private boolean blocking = false;
+
+    private boolean initAxis2ClientOptions = true;
+
+    private String clientRepository = null;
+
+    private String axis2xml = null;
 
     public Endpoint getEndpoint() {
         return endpoint;
@@ -55,6 +67,30 @@ public class CallMediator extends AbstractMediator {
         this.blocking = blocking;
     }
 
+    public boolean getInitAxis2ClientOptions() {
+        return initAxis2ClientOptions;
+    }
+
+    public void setInitAxis2ClientOptions(boolean initAxis2ClientOptions) {
+        this.initAxis2ClientOptions = initAxis2ClientOptions;
+    }
+
+    public String getClientRepository() {
+        return clientRepository;
+    }
+
+    public void setClientRepository(String clientRepository) {
+        this.clientRepository = clientRepository;
+    }
+
+    public String getAxis2xml() {
+        return axis2xml;
+    }
+
+    public void setAxis2xml(String axis2xml) {
+        this.axis2xml = axis2xml;
+    }
+
     public String getTagLocalName() {
         return "call";
     }
@@ -69,6 +105,15 @@ public class CallMediator extends AbstractMediator {
         }
         if (blocking) {
             call.addAttribute(fac.createOMAttribute("blocking", nullNS, "true"));
+            if(!initAxis2ClientOptions) {
+                call.addAttribute(fac.createOMAttribute("initAxis2ClientOptions",nullNS,"false"));
+            }
+            if (clientRepository != null){
+                call.addAttribute(fac.createOMAttribute("repository", nullNS, clientRepository));
+            }
+            if (axis2xml != null) {
+                call.addAttribute(fac.createOMAttribute("axis2xml", nullNS, axis2xml));
+            }
         }
 
         if (parent != null) {
@@ -97,6 +142,20 @@ public class CallMediator extends AbstractMediator {
         OMAttribute blocking = elem.getAttribute(BLOCKING_Q);
         if (blocking != null) {
             setBlocking(Boolean.parseBoolean(blocking.getAttributeValue()));
+            OMAttribute attInitAxis2ClientOptions = elem.getAttribute(ATT_INIT_AXIS2_CLIENT_OPTIONS);
+            OMAttribute attAxis2xml = elem.getAttribute(ATT_AXIS2XML);
+            OMAttribute attRepo = elem.getAttribute(ATT_REPOSITORY);
+            if (attInitAxis2ClientOptions != null) {
+                setInitAxis2ClientOptions(Boolean.parseBoolean(attInitAxis2ClientOptions.getAttributeValue()));
+            }else{
+                setInitAxis2ClientOptions(true);
+            }
+            if (attAxis2xml != null && attAxis2xml.getAttributeValue() != null) {
+                setAxis2xml(attAxis2xml.getAttributeValue());
+            }
+            if (attRepo != null && attRepo.getAttributeValue() != null) {
+               setClientRepository(attRepo.getAttributeValue());
+            }
 
         } else {
             setBlocking(false);

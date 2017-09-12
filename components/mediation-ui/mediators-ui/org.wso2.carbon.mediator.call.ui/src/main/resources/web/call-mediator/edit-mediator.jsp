@@ -50,7 +50,7 @@
     String anonEpXML = null;
     String key = "";
     String xpathVal = "";
-
+    String repo = "", axis2XML = "";
     // The endpoint already associated with call mediator
     Endpoint endpoint = callMediator.getEndpoint();
 
@@ -90,6 +90,12 @@
         session.setAttribute("endpointXML", anonEpXML);
     }
 
+    if (callMediator.getClientRepository() != null) {
+        repo = callMediator.getClientRepository();
+    }
+    if (callMediator.getAxis2xml() != null) {
+        axis2XML = callMediator.getAxis2xml();
+    }
 %>
 <script type="text/javascript">
     var whichEP = '<%=whichEP%>';
@@ -107,6 +113,23 @@
         }
     %>
 </script>
+<script type="text/javascript">
+    function showBlockingOptions(elm) {
+        var selectedElmValue = elm.options[elm.selectedIndex].value;
+        if (selectedElmValue == "true") {
+            displayElement('repo_row', true);
+            displayElement('axis2xml_row', true);
+            displayElement('init_row', true);
+        }
+        if (selectedElmValue == "false") {
+            displayElement('repo_row', false);
+            displayElement('axis2xml_row', false);
+            displayElement('init_row', false);
+        }
+    }
+
+</script>
+
 <fmt:bundle basename="org.wso2.carbon.mediator.call.ui.i18n.Resources">
     <script type="text/javascript" src="../call-mediator/js/mediator-util.js"></script>
 
@@ -203,7 +226,8 @@
                          <tr>
                              <td><fmt:message key="blocking"/></td>
                              <td>
-                                <select id="mediator.call.blocking" name="mediator.call.blocking">
+                                <select id="mediator.call.blocking" name="mediator.call.blocking"
+                                onchange="showBlockingOptions(this)">
                                     <option value="false"
                                             <%=!callMediator.getBlocking() ?
                                                "selected=\"selected\"" :
@@ -216,6 +240,42 @@
                                     </option>
                                 </select>
                              </td>
+                         </tr>
+                         <tr id="repo_row" <%= !callMediator.getBlocking() ? "style=\"display:none;\"" : ""%>>
+                              <td>
+                                   <fmt:message key="mediator.call.repo"/>
+                              </td>
+                              <td>
+                                   <input type="text" size="40" id="mediator.call.repo" name="mediator.call.repo"
+                                    value="<%=repo%>" style="width:300px"/>
+                              </td>
+                         </tr>
+                         <tr id="axis2xml_row" <%= !callMediator.getBlocking() ? "style=\"display:none;\"" : ""%>>
+                              <td>
+                                   <fmt:message key="mediator.call.axis2XML"/>
+                              </td>
+                              <td>
+                                   <input type="text" size="40" id="mediator.call.axis2XML"
+                                   name="mediator.call.axis2XML" value="<%=axis2XML%>" style="width:300px"/>
+                              </td>
+                         </tr>
+                         <tr id="init_row" <%= !callMediator.getBlocking() ? "style=\"display:none;\"" : ""%>>
+                              <td><fmt:message key="initAxis2ClientOptions"/></td>
+                              <td>
+                                  <select id="mediator.call.initAxis2ClientOptions"
+                                  name="mediator.call.initAxis2ClientOptions">
+                                      <option value="true"
+                                          <%=callMediator.getInitAxis2ClientOptions() ?
+                                              "selected=\"selected\"" :
+                                               ""%>><fmt:message key="initAxis2ClientOptions.category.true"/>
+                                      </option>
+                                      <option value="false"
+                                          <%=!callMediator.getInitAxis2ClientOptions() ?
+                                              "selected=\"selected\"" :
+                                              ""%>><fmt:message key="initAxis2ClientOptions.category.false"/>
+                                      </option>
+                                  </select>
+                              </td>
                          </tr>
                      </table>
 
