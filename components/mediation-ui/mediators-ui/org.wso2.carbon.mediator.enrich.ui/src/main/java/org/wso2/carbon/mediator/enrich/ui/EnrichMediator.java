@@ -36,7 +36,6 @@ import javax.xml.stream.XMLStreamException;
  * source configuration and then perform the specified action on the message by using the
  * target configuration
  */
-
 public class EnrichMediator extends AbstractMediator {
     private final String SOURCE = "source";
     private final String TARGET = "target";

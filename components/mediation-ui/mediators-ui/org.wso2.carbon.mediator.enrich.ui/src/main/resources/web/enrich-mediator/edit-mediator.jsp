@@ -217,7 +217,6 @@
     <%--
         Validate the target type based on the source type
     --%>
-
     function validateCombinations(sourceId, targetId){
         <fmt:message key="mediator.enrich.type.custom" var="custom"/>
         <fmt:message key="mediator.enrich.type.body" var="body"/>
@@ -270,7 +269,6 @@
     }
 
     // Validate action, that should be replace for target type envelope
-
     function validateAction(currElem){
         var elm = document.getElementById('mediator.enrich.target.type');
         var selectedElmValueForType = elm.options[elm.selectedIndex].value;
