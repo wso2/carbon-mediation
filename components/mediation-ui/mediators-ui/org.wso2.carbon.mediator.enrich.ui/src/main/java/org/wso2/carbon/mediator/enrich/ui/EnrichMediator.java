@@ -1,5 +1,5 @@
 /*
-*  Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*  Copyright (c) 2005-2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 *
 *  WSO2 Inc. licenses this file to you under the Apache License,
 *  Version 2.0 (the "License"); you may not use this file except
@@ -19,7 +19,6 @@ package org.wso2.carbon.mediator.enrich.ui;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.synapse.config.xml.SynapseXPathFactory;
 import org.apache.synapse.config.xml.SynapseXPathSerializer;
@@ -28,13 +27,15 @@ import org.jaxen.JaxenException;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import java.util.Iterator;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
-
+/**
+ * It represent the attributes and functions of enrich mediator, process a message based on a given
+ * source configuration and then perform the specified action on the message by using the
+ * target configuration
+ */
 public class EnrichMediator extends AbstractMediator {
     private final String SOURCE = "source";
     private final String TARGET = "target";
@@ -43,10 +44,10 @@ public class EnrichMediator extends AbstractMediator {
     private final String TYPE = "type";
     private final String XPATH = "xpath";
     private final String PROPERTY = "property";
-    private final String DEFAULT_SOURCE_TYPE = "custom";
+    private final String DEFAULT_SOURCE_TYPE = "property";
     private final String DEFAULT_TARGET_TYPE = "custom";
     private final String DEFAULT_TARGET_ACTION_TYPE = "replace";
-    private String sourceClone = "true";
+    private String sourceClone = "false";
     private String sourceType = DEFAULT_SOURCE_TYPE;
     private SynapseXPath sourceExpression = null;
     private String sourceProperty = "";
@@ -57,25 +58,23 @@ public class EnrichMediator extends AbstractMediator {
     private String sourceInlineXML = "";
     private String inlineSourceRegKey = "";
 
-
     private SynapseXPath targetExpression = null;
     private String targetProperty = "";
 
-
+    /*
+        return the source type
+     */
     public String getSourceType() {
         return sourceType;
     }
-
 
     public void setSourceType(String sourceType) {
         this.sourceType = sourceType;
     }
 
-
     public String getSourceClone() {
         return sourceClone;
     }
-
 
     public void setSourceClone(String sourceClone) {
         this.sourceClone = sourceClone;
@@ -117,11 +116,9 @@ public class EnrichMediator extends AbstractMediator {
         return targetType;
     }
 
-
     public void setTargetType(String targetType) {
         this.targetType = targetType;
     }
-
 
     public SynapseXPath getTargetExpression() {
         return targetExpression;
@@ -138,7 +135,6 @@ public class EnrichMediator extends AbstractMediator {
     public void setTargetProperty(String targetProperty) {
         this.targetProperty = targetProperty;
     }
-
 
     public String getTagLocalName() {
         return "enrich";
@@ -212,10 +208,9 @@ public class EnrichMediator extends AbstractMediator {
         return enrichElem;
     }
 
-
     public void build(OMElement elem) {
 
-        for (Iterator it = elem.getChildElements(); it.hasNext();) {
+        for (Iterator it = elem.getChildElements(); it.hasNext(); ) {
             OMElement childElem = (OMElement) it.next();
             if (childElem.getLocalName().equals(SOURCE)) {
 
@@ -232,13 +227,13 @@ public class EnrichMediator extends AbstractMediator {
                 }
 
                 OMAttribute sourceXpathAttr = childElem.getAttribute(new QName(XPATH));
-                if (sourceXpathAttr != null
-                        && sourceXpathAttr.getAttributeValue() != null
-                        && !sourceXpathAttr.getAttributeValue().equals("")) {
+                if (sourceXpathAttr != null && sourceXpathAttr.getAttributeValue() != null && !sourceXpathAttr
+                        .getAttributeValue().equals("")) {
                     try {
                         sourceExpression = SynapseXPathFactory.getSynapseXPath(childElem, new QName(XPATH));
                     } catch (JaxenException e) {
-                        String msg = "Invalid XPath expression for 'source' attribute 'xpath' : " + sourceXpathAttr.getAttributeValue();
+                        String msg = "Invalid XPath expression for 'source' attribute 'xpath' : " + sourceXpathAttr
+                                .getAttributeValue();
                         throw new MediatorException(msg);
                     }
                 }
@@ -272,13 +267,13 @@ public class EnrichMediator extends AbstractMediator {
                 }
 
                 OMAttribute targetXpathAttr = childElem.getAttribute(new QName(XPATH));
-                if (targetXpathAttr != null
-                        && targetXpathAttr.getAttributeValue() != null
-                        && !targetXpathAttr.getAttributeValue().equals("")) {
+                if (targetXpathAttr != null && targetXpathAttr.getAttributeValue() != null && !targetXpathAttr
+                        .getAttributeValue().equals("")) {
                     try {
                         targetExpression = SynapseXPathFactory.getSynapseXPath(childElem, new QName(XPATH));
                     } catch (JaxenException e) {
-                        String msg = "Invalid XPath expression for 'target' attribute 'xpath' : " + targetXpathAttr.getAttributeValue();
+                        String msg = "Invalid XPath expression for 'target' attribute 'xpath' : " + targetXpathAttr
+                                .getAttributeValue();
                         throw new MediatorException(msg);
                     }
 
