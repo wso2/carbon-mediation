@@ -17,6 +17,10 @@
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.mediator.store.MessageStoreMediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
+<%@ page import="org.apache.axiom.om.OMElement" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePathFactory" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
 
 <%! public boolean nullChecker(String strChecker) {
 
@@ -37,11 +41,25 @@
         throw new RuntimeException("Unable to edit the mediator");
     }
     MessageStoreMediator storeMediator = (MessageStoreMediator) mediator;
-    String msName = request.getParameter("MessageStore");
-    if(nullChecker(msName)) {
-        storeMediator.setMessageStoreName(msName);
-    }
+    String msName = "";
+    String msExp = "";
+    XPathFactory xPathFactory = XPathFactory.getInstance();
+    String specifyAs = request.getParameter("specifyAs");
+    if (specifyAs != null && !specifyAs.equals("")) {
+        if (specifyAs.equals("Expression")) {
+            msExp = request.getParameter("mediator.store.xpath");
+            if (nullChecker(msExp)) {
+                storeMediator.setMessageStoreExp(xPathFactory.createSynapseXPath("mediator.store.xpath", msExp, session));
+            }
 
+        } else if (specifyAs.equals("Value")) {
+            msName = request.getParameter("MessageStore");
+            if (nullChecker(msName)) {
+                storeMediator.setMessageStoreName(msName);
+                storeMediator.setMessageStoreExp(null);
+            }
+        }
+    }
     String seqName = request.getParameter("onStoreSequence");
 
     if(nullChecker(seqName)) {
