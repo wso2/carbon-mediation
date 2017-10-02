@@ -263,9 +263,10 @@ public class JMSPollingConsumer {
             }
 
         } catch (JMSException e) {
-            logger.error("Error while receiving JMS message. " + e.getMessage(), e);
+            logger.error("Error while receiving JMS message for " + name, e);
+            releaseResources(true);
         } catch (Exception e) {
-            logger.error("Error while receiving JMS message. " + e.getMessage(), e);
+            logger.error("Error while receiving JMS message for " + name, e);
         } finally {
             if (!isConnected) {
                 if (reconnectDuration != null) {
@@ -294,19 +295,29 @@ public class JMSPollingConsumer {
                        practice the Interrupted flag is set back to TRUE in this thread. */
                 }
             }
-            if (messageConsumer != null) {
-                jmsConnectionFactory.closeConsumer(messageConsumer);
-            }
-            if (session != null) {
-                jmsConnectionFactory.closeSession(session);
-            }
-            if (connection != null) {
-                jmsConnectionFactory.closeConnection(connection);
-            }
+            releaseResources(false);
         }
         return null;
     }
-    
+
+    /**
+     * Release the JMS connection, session and consumer to the pool or forcefully close the resource.
+     *
+     * @param forcefullyClose false if the resource needs to be released to the pool and true other wise
+     *
+     */
+    private void releaseResources(boolean forcefullyClose) {
+        if (messageConsumer != null) {
+            jmsConnectionFactory.closeConsumer(messageConsumer, forcefullyClose);
+        }
+        if (session != null) {
+            jmsConnectionFactory.closeSession(session, forcefullyClose);
+        }
+        if (connection != null) {
+            jmsConnectionFactory.closeConnection(connection, forcefullyClose);
+        }
+    }
+
     public void destroy(){
         if (messageConsumer != null) {
             jmsConnectionFactory.closeConsumer(messageConsumer, true);

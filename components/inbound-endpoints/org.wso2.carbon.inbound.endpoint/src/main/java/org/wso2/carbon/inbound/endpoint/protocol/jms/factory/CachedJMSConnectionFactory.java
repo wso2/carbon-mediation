@@ -72,7 +72,8 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
         try {
         	connection.start();
         } catch (JMSException e) {
-            logger.error("JMS Exception while starting connection for factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while starting connection for factory '"
+                    + this.connectionFactoryString + "' ", e);
             resetCache();
             return null;
         }        
@@ -151,7 +152,7 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
         	}
             return true;
         } catch (JMSException e) {
-            logger.error("JMS Exception while closing the connection.");
+            logger.error("JMS Exception while closing the connection.", e);
         }
         return false;
     }
@@ -174,7 +175,7 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
             	connection.close();
             }
         } catch (JMSException e) {
-            logger.error("JMS Exception while closing the connection.");
+            logger.error("JMS Exception while closing the connection.", e);
         }
         return false;
     }    
@@ -185,7 +186,7 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
             	messageConsumer.close();
             }
         } catch (JMSException e) {
-            logger.error("JMS Exception while closing the consumer.");
+            logger.error("JMS Exception while closing the consumer.", e);
         }
         return false;
     }     
@@ -196,7 +197,7 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
             	session.close();
             }
         } catch (JMSException e) {
-            logger.error("JMS Exception while closing the consumer.");
+            logger.error("JMS Exception while closing the consumer.", e);
         }
         return false;
     }     
