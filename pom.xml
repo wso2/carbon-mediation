@@ -2298,7 +2298,7 @@
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.6.2</carbon.commons.version>
+        <carbon.commons.version>4.6.3</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.5.0, 5.0.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
