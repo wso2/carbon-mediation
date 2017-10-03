@@ -228,7 +228,7 @@ public class CachableResponse implements Serializable {
     /**
      * @return HTTP response's Reason- Phrase that is sent by the backend.
      */
-    public String getStatusReason() {
+    public Object getStatusReason() {
         return statusReason;
     }
 
