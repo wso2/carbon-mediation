@@ -39,7 +39,7 @@ public class CallMediator extends AbstractMediator {
 
     private static final QName ATT_REPOSITORY = new QName("repository");
 
-    private static final QName  ATT_INIT_AXIS2_CLIENT_OPTIONS = new QName("initAxis2ClientOptions");
+    private static final QName ATT_INIT_AXIS2_CLIENT_OPTIONS = new QName("initAxis2ClientOptions");
 
     private Endpoint endpoint = null;
 
@@ -105,10 +105,10 @@ public class CallMediator extends AbstractMediator {
         }
         if (blocking) {
             call.addAttribute(fac.createOMAttribute("blocking", nullNS, "true"));
-            if(!initAxis2ClientOptions) {
-                call.addAttribute(fac.createOMAttribute("initAxis2ClientOptions",nullNS,"false"));
+            if (!initAxis2ClientOptions) {
+                call.addAttribute(fac.createOMAttribute("initAxis2ClientOptions", nullNS, "false"));
             }
-            if (clientRepository != null){
+            if (clientRepository != null) {
                 call.addAttribute(fac.createOMAttribute("repository", nullNS, clientRepository));
             }
             if (axis2xml != null) {
@@ -147,16 +147,15 @@ public class CallMediator extends AbstractMediator {
             OMAttribute attRepo = elem.getAttribute(ATT_REPOSITORY);
             if (attInitAxis2ClientOptions != null) {
                 setInitAxis2ClientOptions(Boolean.parseBoolean(attInitAxis2ClientOptions.getAttributeValue()));
-            }else{
+            } else {
                 setInitAxis2ClientOptions(true);
             }
             if (attAxis2xml != null && attAxis2xml.getAttributeValue() != null) {
                 setAxis2xml(attAxis2xml.getAttributeValue());
             }
             if (attRepo != null && attRepo.getAttributeValue() != null) {
-               setClientRepository(attRepo.getAttributeValue());
+                setClientRepository(attRepo.getAttributeValue());
             }
-
         } else {
             setBlocking(false);
         }

@@ -80,10 +80,10 @@
     }
 
     //Sets blocking information
-    String param=request.getParameter("mediator.call.blocking");
+    String param = request.getParameter("mediator.call.blocking");
     if (param != null && !param.equals("")) {
         callMediator.setBlocking(Boolean.parseBoolean(param));
-        if("true".equals(param)){
+        if("true".equals(param)) {
             param = request.getParameter("mediator.call.axis2XML");
             if (param != null && !param.equals("")) {
                 callMediator.setAxis2xml(param);

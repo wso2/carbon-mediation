@@ -127,7 +127,6 @@
             displayElement('init_row', false);
         }
     }
-
 </script>
 
 <fmt:bundle basename="org.wso2.carbon.mediator.call.ui.i18n.Resources">
