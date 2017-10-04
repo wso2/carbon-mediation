@@ -117,7 +117,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      * The size of the messages to be cached in memory. If this is 0 then no disk cache, and if there is no size
      * specified in the config  factory will assign a default value to enable disk based caching.
      */
-    private int inMemoryCacheSize = -1;
+    private int inMemoryCacheSize = CachingConstants.DEFAULT_SIZE;
 
     /**
      * Variable to represent 'NO_ENTITY_BODY' property of synapse.
@@ -132,7 +132,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
     /**
      * The maximum size of the messages to be cached. This is specified in bytes.
      */
-    private int maxMessageSize = -1;
+    private int maxMessageSize = CachingConstants.DEFAULT_SIZE;
 
     /**
      * The regex expression of the HTTP response code to be cached.

@@ -78,7 +78,13 @@ public class CachingConstants {
     public static final String CACHE_KEY = "cacheKey";
 
     /**
-     * Following names represent the local names used in QNames in MediatorFactory, Serializer and the UI CacheMediator.
+     * The default size for the maxSize and maxMessageSize
+     */
+    public static final int DEFAULT_SIZE = -1;
+
+    /**
+     * Following names represent the local names used in QNames in MediatorFactory, Serializer and the UI
+     * CacheMediator.
      */
     public static final String TIMEOUT_STRING = "timeout";
     public static final String COLLECTOR_STRING = "collector";
