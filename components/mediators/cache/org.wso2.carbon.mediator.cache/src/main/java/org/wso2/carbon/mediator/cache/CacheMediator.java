@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -114,15 +114,9 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
     private DigestGenerator digestGenerator = CachingConstants.DEFAULT_HASH_GENERATOR;
 
     /**
-     * The size of the messages to be cached in memory. If this is 0 then no disk cache, and if there is no size
-     * specified in the config  factory will assign a default value to enable disk based caching.
+     * The size of the messages to be cached in memory. If this is -1 then cache can contain any number of messages.
      */
     private int inMemoryCacheSize = CachingConstants.DEFAULT_SIZE;
-
-    /**
-     * Variable to represent 'NO_ENTITY_BODY' property of synapse.
-     */
-    private static final String NO_ENTITY_BODY = "NO_ENTITY_BODY";
 
     /**
      * The compiled pattern for the regex of the responseCodes.
@@ -145,18 +139,19 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
     private String protocolType = CachingConstants.HTTP_PROTOCOL_TYPE;
 
     /**
-     * This is used to store the http method of the request.
-     */
-    private String httpMethod = null;
-
-    /**
      * The http method type that needs to be cached.
      */
     private String[] hTTPMethodsToCache = {CachingConstants.ALL};
 
-    public CacheMediator() {
+    /**
+     * The cache manager to be used.
+     */
+    private CacheManager cacheManager;
+
+    public CacheMediator(CacheManager cacheManager) {
         this.id = UUID.randomUUID().toString();
         responseCodePattern = Pattern.compile(responseCodes);
+        this.cacheManager = cacheManager;
     }
 
     /**
@@ -176,7 +171,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
         if (onCacheHitSequence != null) {
             onCacheHitSequence.destroy();
         }
-        CacheManager.remove(id);
+        cacheManager.remove(id);
     }
 
     /**
@@ -258,7 +253,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
         }
         CachableResponse cachedResponse = getMediatorCache().get(requestHash);
         synCtx.setProperty(CachingConstants.CACHED_OBJECT, cachedResponse);
-        httpMethod = (String) msgCtx.getProperty(Constants.Configuration.HTTP_METHOD);
+        //This is used to store the http method of the request.
+        String httpMethod = (String) msgCtx.getProperty(Constants.Configuration.HTTP_METHOD);
         cachedResponse.setHttpMethod(httpMethod);
         cachedResponse.setProtocolType(protocolType);
         cachedResponse.setResponseCodePattern(responseCodePattern);
@@ -300,7 +296,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
             }
             if (msgCtx.isDoingREST()) {
 
-                msgCtx.removeProperty(NO_ENTITY_BODY);
+                msgCtx.removeProperty(PassThroughConstants.NO_ENTITY_BODY);
                 msgCtx.removeProperty(Constants.Configuration.CONTENT_TYPE);
             }
             if ((headerProperties = cachedResponse.getHeaderProperties()) != null) {
@@ -323,8 +319,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
 
             } else if (onCacheHitRef != null) {
                 if (synLog.isTraceOrDebugEnabled()) {
-                    synLog.traceOrDebug("Delegating message to the onCachingHit " +
-                                                "sequence : " + onCacheHitRef);
+                    synLog.traceOrDebug("Delegating message to the onCachingHit "
+                                                + "sequence : " + onCacheHitRef);
                 }
                 ContinuationStackManager.updateSeqContinuationState(synCtx, getMediatorPosition());
                 synCtx.getSequence(onCacheHitRef).mediate(synCtx);
@@ -360,18 +356,17 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
             handleException("Response messages cannot be handled in a non collector cache", synCtx);
         }
         org.apache.axis2.context.MessageContext msgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-        OperationContext operationContext = msgCtx.getOperationContext();
         CachableResponse response = (CachableResponse) synCtx.getProperty(CachingConstants.CACHED_OBJECT);
 
         if (response != null) {
             boolean toCache = true;
             if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(response.getProtocolType())) {
                 Object httpStatus = msgCtx.getProperty(NhttpConstants.HTTP_SC);
-                String statusCode;
+                String statusCode = null;
                 //Need to check the data type of HTTP_SC to avoid classcast exceptions.
                 if (httpStatus instanceof String) {
                     statusCode = ((String) httpStatus).trim();
-                } else {
+                } else if (httpStatus != null) {
                     statusCode = String.valueOf(httpStatus);
                 }
 
@@ -385,6 +380,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                         toCache = false;
                     }
                 }
+
                 if (toCache) {
                     toCache = false;
                     String httpMethod = response.getHttpMethod();
@@ -464,12 +460,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                 response.setHeaderProperties(headerProperties);
                 msgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headerProperties);
 
-                getMediatorCache().put(response.getRequestHash(), response);
-
             } else {
                 response.clean();
-                getMediatorCache().put(response.getRequestHash(), response);
-                operationContext.setProperty(CachingConstants.CACHED_OBJECT, response);
             }
         } else {
             synLog.auditWarn("A response message without a valid mapping to the " +
@@ -484,7 +476,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      * @return global cache
      */
     public LoadingCache<String, CachableResponse> getMediatorCache() {
-        LoadingCache<String, CachableResponse> cache = CacheManager.get(id);
+        LoadingCache<String, CachableResponse> cache = cacheManager.get(id);
         if (cache == null) {
             if (inMemoryCacheSize > -1) {
                 cache = CacheBuilder.newBuilder().expireAfterWrite(timeout,
@@ -505,7 +497,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                             }
                         });
             }
-            CacheManager.put(id, cache);
+            cacheManager.put(id, cache);
         }
         return cache;
     }
@@ -535,9 +527,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
             MBeanServer mserver = getMBeanServer();
             Set<ObjectName> set = mserver.queryNames(cacheMBeanObjName, null);
             if (set.isEmpty()) {
-                MediatorCacheInvalidator cacheMBean = new MediatorCacheInvalidator(
-                        PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(),
-                        PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId(), msgCtx);
+                MediatorCacheInvalidator cacheMBean = new MediatorCacheInvalidator(cacheManager,
+                                                                                   PrivilegedCarbonContext
+                                                                                           .getThreadLocalCarbonContext()
+                                                                                           .getTenantDomain(),
+                                                                                   PrivilegedCarbonContext
+                                                                                           .getThreadLocalCarbonContext()
+                                                                                           .getTenantId(), msgCtx);
 
                 mserver.registerMBean(cacheMBean, cacheMBeanObjName);
             }
@@ -572,7 +568,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      *
      * @return DigestGenerator used evaluate hash values.
      */
-    public DigestGenerator getDigestGenerator() {
+    DigestGenerator getDigestGenerator() {
         return digestGenerator;
     }
 
@@ -581,7 +577,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      *
      * @param digestGenerator DigestGenerator to be set to evaluate hash values.
      */
-    public void setDigestGenerator(DigestGenerator digestGenerator) {
+    void setDigestGenerator(DigestGenerator digestGenerator) {
         this.digestGenerator = digestGenerator;
     }
 
@@ -762,17 +758,4 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
         this.maxMessageSize = maxMessageSize;
     }
 
-    /**
-     * @return the http method of the request
-     */
-    public String getHttpMethod() {
-        return httpMethod;
-    }
-
-    /**
-     * @param httpMethod the http method of the request
-     */
-    public void setHttpMethod(String httpMethod) {
-        this.httpMethod = httpMethod;
-    }
 }
