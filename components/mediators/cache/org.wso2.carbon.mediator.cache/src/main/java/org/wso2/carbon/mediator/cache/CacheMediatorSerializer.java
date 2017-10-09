@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -117,11 +117,9 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
 
             }
 
-            if (cacheMediator.getDigestGenerator() != null) {
-                OMElement hashGeneratorElem = fac.createOMElement(CachingConstants.HASH_GENERATOR_STRING, synNS);
-                hashGeneratorElem.setText(cacheMediator.getDigestGenerator().getClass().getName());
-                protocolElem.addChild(hashGeneratorElem);
-            }
+            OMElement hashGeneratorElem = fac.createOMElement(CachingConstants.HASH_GENERATOR_STRING, synNS);
+            hashGeneratorElem.setText(cacheMediator.getDigestGenerator().getClass().getName());
+            protocolElem.addChild(hashGeneratorElem);
 
             cacheElem.addChild(protocolElem);
 

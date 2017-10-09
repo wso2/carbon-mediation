@@ -59,14 +59,14 @@
         try {
             cacheMediator.setTimeout(Long.parseLong(cacheTimeout));
         } catch (NumberFormatException e) {
-
+            //This is handled in the UI validation in mediator-util.js
         }
     }
     if (notNullChecker(maxMsgSize)) {
         try {
             cacheMediator.setMaxMessageSize(Integer.parseInt(maxMsgSize));
         } catch (NumberFormatException e) {
-
+            //This is handled in the UI validation in mediator-util.js
         }
     }
 

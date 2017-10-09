@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -43,7 +43,7 @@ public class CachingConstants {
     public static final String CACHE_LOCAL_NAME = "cache";
 
     /**
-     * This holds the default timeout of the mediator cache.
+     * This holds the default timeout of the mediator cache in seconds  .
      */
     public static final long DEFAULT_TIMEOUT = 5000;
 

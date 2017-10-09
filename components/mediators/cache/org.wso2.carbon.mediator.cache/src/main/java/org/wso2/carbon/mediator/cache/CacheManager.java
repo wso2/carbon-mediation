@@ -30,13 +30,13 @@ class CacheManager {
     /**
      * Maps the id with the relevant LoadingCache
      */
-    private static Map<String, LoadingCache<String, CachableResponse>> cacheMap = new ConcurrentHashMap<>();
+    private Map<String, LoadingCache<String, CachableResponse>> cacheMap = new ConcurrentHashMap<>();
 
     /**
      * @param id the id of the mediator
      * @return the relevant cache of the mediator
      */
-    static LoadingCache<String, CachableResponse> get(String id) {
+    LoadingCache<String, CachableResponse> get(String id) {
         return cacheMap.get(id);
     }
 
@@ -46,22 +46,23 @@ class CacheManager {
      * @param id    the id of the cache mediator
      * @param cache the Loading cache related to the id
      */
-    static void put(String id, LoadingCache<String, CachableResponse> cache) {
+    void put(String id, LoadingCache<String, CachableResponse> cache) {
         cacheMap.put(id, cache);
     }
 
     /**
      * removes the LoadingCache associated with the id in the CacheManager
+     *
      * @param id the id of the cache mediator
      */
-    static void remove(String id) {
+    void remove(String id) {
         cacheMap.remove(id);
     }
 
     /**
      * Clears the CacheManager
      */
-    static void clean() {
+    void clean() {
         cacheMap.clear();
     }
 

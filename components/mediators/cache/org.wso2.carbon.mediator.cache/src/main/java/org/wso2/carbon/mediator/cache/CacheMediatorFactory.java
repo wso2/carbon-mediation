@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -105,13 +105,15 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
      */
     private static final QName IMPLEMENTATION_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                             CachingConstants.IMPLEMENTATION_STRING);
-
     /**
      * QName of the maximum message size.
      */
     private static final QName ATT_SIZE = new QName(CachingConstants.MAX_SIZE_STRING);
 
-
+    /**
+     * The cache manager to be used in each cache instance.
+     */
+    private final CacheManager cacheManager = new CacheManager();
     /**
      * {@inheritDoc}
      */
@@ -121,7 +123,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
                     "Unable to create the cache mediator. Unexpected element as the cache mediator configuration");
         }
 
-        CacheMediator cache = new CacheMediator();
+        CacheMediator cache = new CacheMediator(cacheManager);
 
         OMAttribute collectorAttr = elem.getAttribute(ATT_COLLECTOR);
         if (collectorAttr != null && collectorAttr.getAttributeValue() != null) {
