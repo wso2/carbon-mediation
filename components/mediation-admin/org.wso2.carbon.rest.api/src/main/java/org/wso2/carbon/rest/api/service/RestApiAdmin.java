@@ -1,14 +1,5 @@
 package org.wso2.carbon.rest.api.service;
 
-import java.net.MalformedURLException;
-import java.net.SocketException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.locks.Lock;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
@@ -37,16 +28,34 @@ import org.apache.synapse.rest.Resource;
 import org.apache.synapse.rest.dispatch.DispatcherHelper;
 import org.apache.synapse.rest.dispatch.URITemplateHelper;
 import org.apache.synapse.rest.dispatch.URLMappingHelper;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.core.CarbonConfigurationContextFactory;
+import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
-import org.wso2.carbon.context.PrivilegedCarbonContext;
-import org.wso2.carbon.core.CarbonConfigurationContextFactory;
-import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
-import org.wso2.carbon.rest.api.*;
+import org.wso2.carbon.rest.api.APIData;
+import org.wso2.carbon.rest.api.APIDataSorter;
+import org.wso2.carbon.rest.api.APIException;
+import org.wso2.carbon.rest.api.ConfigHolder;
+import org.wso2.carbon.rest.api.ResourceData;
+import org.wso2.carbon.rest.api.RestApiAdminUtils;
 import org.wso2.carbon.utils.NetworkUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
+import java.net.MalformedURLException;
+import java.net.SocketException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 public class RestApiAdmin extends AbstractServiceBusAdmin{
 	
@@ -691,6 +700,17 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		apiData.setHost(api.getHost());
 		apiData.setPort(api.getPort());
 		apiData.setFileName(api.getFileName());
+
+        if (api.getAspectConfiguration() != null && api.getAspectConfiguration().isStatisticsEnable()) {
+            apiData.setStatisticsEnable(true);
+        } else {
+            apiData.setStatisticsEnable(false);
+        }
+        if (api.getAspectConfiguration() != null && api.getAspectConfiguration().isTracingEnabled()) {
+            apiData.setTracingEnable(true);
+        } else {
+            apiData.setTracingEnable(false);
+        }
 
 		Resource[] resources = api.getResources();
 		ResourceData[] resourceDatas = new ResourceData[resources.length];
