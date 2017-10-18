@@ -55,5 +55,7 @@ public class DataMapperEngineConstants {
     public static final String FUNCTION_NAME_CONST_1 = "map_S_";
     public static final String FUNCTION_NAME_CONST_2 = "_S_";
     public static final String NAME_SEPERATOR = "_Separat0r_";
-
+    public static final String ENCODE_CHAR_HYPHEN = "_EnC0DeCHaRHyPh3n_";
+    public static final String HYPHEN = "-";
+    public static final String PREFIX_LIST_SEPERATOR = ",";
 }

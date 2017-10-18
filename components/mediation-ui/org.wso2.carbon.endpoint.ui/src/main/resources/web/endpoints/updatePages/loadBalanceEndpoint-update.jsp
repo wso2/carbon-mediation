@@ -44,10 +44,13 @@
         String sessionType = request.getParameter("sessionManagement");
         String sessionTimeout = request.getParameter("sessionTimeOut");
         String properties = request.getParameter("endpointProperties");
+        String buildMessage = request.getParameter("buildMessage");
 
         if (name != null) {
             endpoint.setName(name);
         }
+        boolean buildMessageBoolean = Boolean.parseBoolean(buildMessage);
+        endpoint.setBuildMessage(buildMessageBoolean);
         if (algo != null && algo.equals("other") && algoClassName != null) {
             endpoint.setAlgorithmClassName(algoClassName);
         } else {

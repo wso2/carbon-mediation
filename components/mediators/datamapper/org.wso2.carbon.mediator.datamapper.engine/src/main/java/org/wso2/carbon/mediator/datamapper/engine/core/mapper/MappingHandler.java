@@ -81,13 +81,31 @@ public class MappingHandler implements InputVariableNotifier, OutputVariableNoti
      * @throws SchemaException
      * @throws JSException
      */
-    public String doMap(InputStream inputMsg, Map<String, Map<String, Object>> propertiesMap)
-            throws ReaderException, InterruptedException, IOException, SchemaException, JSException {
-        this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
-        this.propertiesInJSON = propertiesMapToJSON(propertiesMap);
-        inputBuilder.buildInputModel(inputMsg, this);
-        return outputVariable;
-    }
+	public String doMap(InputStream inputMsg, Map<String, Map<String, Object>> propertiesMap)
+			throws ReaderException, InterruptedException, IOException, SchemaException, JSException {
+		ReaderException readerException = null;
+		try {
+			this.scriptExecutor = ScriptExecutorFactory.getScriptExecutor(dmExecutorPoolSize);
+			this.propertiesInJSON = propertiesMapToJSON(propertiesMap);
+			inputBuilder.buildInputModel(inputMsg, this);
+		} catch (ReaderException re) {
+			readerException = re;
+			throw re;
+		} finally {
+			// Fix for https://github.com/wso2/product-ei/issues/650
+			if (scriptExecutor != null) {
+				try {
+					releaseExecutor();
+				} catch (InterruptedException ie) {
+					if (readerException != null) {
+						ie.initCause(readerException);
+					}
+					throw ie;
+				}
+			}
+		}
+		return outputVariable;
+	}
 
     @Override
     public void notifyInputVariable(Object variable) throws SchemaException, JSException, ReaderException {

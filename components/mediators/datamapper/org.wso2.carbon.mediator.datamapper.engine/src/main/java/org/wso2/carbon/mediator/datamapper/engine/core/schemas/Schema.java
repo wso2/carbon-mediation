@@ -58,6 +58,8 @@ public interface Schema {
 
     Map<String, String> getNamespaceMap();
 
+    Map<String, String> getPrefixMap();
+
     boolean isCurrentArrayIsPrimitive();
 
     Map getSchemaMap();

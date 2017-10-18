@@ -3,14 +3,14 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>data-agents</artifactId>
-        <version>4.6.11-SNAPSHOT</version>
+        <version>4.6.27-SNAPSHOT</version>
 	    <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.das.messageflow.data.publisher</artifactId>
     <packaging>bundle</packaging>
-    <version>4.6.11-SNAPSHOT</version>
+    <version>4.6.27-SNAPSHOT</version>
     <name>WSO2 Carbon - DAS - Message Flow Data Publisher</name>
 
     <build>
@@ -30,7 +30,7 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Axis2Module>${project.artifactId}-${project.version}</Axis2Module>
                         <Export-Package>
-                            org.wso2.carbon.das.mediationstats.data.publisher.*
+                            org.wso2.carbon.das.messageflow.data.publisher.*
                         </Export-Package>
                         <Import-Package>
                             javax.servlet;version="${imp.pkg.version.javax.servlet}",

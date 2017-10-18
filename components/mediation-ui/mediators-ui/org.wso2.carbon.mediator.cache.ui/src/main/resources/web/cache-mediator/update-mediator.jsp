@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%--
   ~  Copyright (c) 2008, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
@@ -15,82 +15,88 @@
   ~  limitations under the License.
   --%>
 
-<%@ page import="org.wso2.carbon.mediator.cache.digest.DOMHASHGenerator" %>
 <%@ page import="org.wso2.carbon.mediator.cache.ui.CacheMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 
-<%! public boolean notNullChecker(String strChecker){
+<%! public boolean notNullChecker(String strChecker) {
 
-    if(strChecker==null){
+    if (strChecker == null) {
         return false;
-    }
-    else if(strChecker!=null){
+    } else if (strChecker != null) {
+        return true;
+    } else if ((!(strChecker.equalsIgnoreCase("")))) {
         return true;
     }
-    else if((!(strChecker.equalsIgnoreCase("")))){
-        return true;
-    }
-   return false;
+    return false;
 }%>
 <%
-    final int DEFAUTLINMEMSIZE = 1000;
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
     if (!(mediator instanceof CacheMediator)) {
         // todo : proper error handling
         throw new RuntimeException("Unable to edit the mediator");
     }
     CacheMediator cacheMediator = (CacheMediator) mediator;
-    String cacheid = request.getParameter("cacheId");
-    String cacheScope = request.getParameter("cacheScope");
     String cacheType = request.getParameter("cacheType");
-    String cacheTimeout = request.getParameter("cacheTimeout");
-    String maxMsgSize = request.getParameter("maxMsgSize");
-    String impType = request.getParameter("impType");
-    String maxSize = request.getParameter("maxSize");
+    String protocolType = request.getParameter("protocolType").trim();
+    String cacheTimeout = request.getParameter("cacheTimeout").trim();
+    String maxMsgSize = request.getParameter("maxMsgSize").trim();
+    String methods = request.getParameter("methods");
+    String headersToExclude = request.getParameter("headersToExclude");
+    String responseCodes = request.getParameter("responseCodes");
+    String hashGen = request.getParameter("hashGen");
+    String maxSize = request.getParameter("maxSize").trim();
     String sequenceOption = request.getParameter("sequenceOption");
 
-    if(notNullChecker(cacheid)){
-        cacheMediator.setId(cacheid);
-    }
-    if(notNullChecker(cacheScope)){
-        cacheMediator.setScope(cacheScope.toLowerCase());
-    }
-    if(notNullChecker(cacheType)){
-        if(cacheType.equalsIgnoreCase("Collector")){
+    if (notNullChecker(cacheType)) {
+        if (cacheType.equalsIgnoreCase("Collector")) {
             cacheMediator.setCollector(true);
-        }
-        else{
+        } else {
             cacheMediator.setCollector(false);
         }
     }
-    if(notNullChecker(cacheTimeout)){
-        try{
-        cacheMediator.setTimeout(Long.parseLong(cacheTimeout));
-        }
-        catch(NumberFormatException e){
+    if (notNullChecker(cacheTimeout)) {
+        try {
+            cacheMediator.setTimeout(Long.parseLong(cacheTimeout));
+        } catch (NumberFormatException e) {
 
         }
     }
-    if(notNullChecker(maxMsgSize)){
-        try{
-        cacheMediator.setMaxMessageSize(Integer.parseInt(maxMsgSize));
-        }
-        catch(NumberFormatException e){
+    if (notNullChecker(maxMsgSize)) {
+        try {
+            cacheMediator.setMaxMessageSize(Integer.parseInt(maxMsgSize));
+        } catch (NumberFormatException e) {
 
         }
     }
-    if(notNullChecker(impType)){
+
+    if (notNullChecker(protocolType)) {
+        cacheMediator.setProtocolType(protocolType);
+    }
+
+    if (notNullChecker(methods)) {
+        cacheMediator.setHTTPMethodsToCache(methods);
+    }
+
+    if (notNullChecker(headersToExclude)) {
+        cacheMediator.setHeadersToExcludeInHash(headersToExclude);
+    }
+
+    if (notNullChecker(responseCodes)) {
+        cacheMediator.setResponseCodes(responseCodes);
+    }
+
+    if (notNullChecker(hashGen)) {
+        cacheMediator.setDigestGenerator(hashGen);
+    }
+
+    if (notNullChecker(maxSize)) {
         try {
             cacheMediator.setInMemoryCacheSize(Integer.parseInt(maxSize));
         } catch (NumberFormatException e) {
-            cacheMediator.setInMemoryCacheSize(DEFAUTLINMEMSIZE); //set the default
+            //This is handled in the UI validation in mediator-util.js
         }
     }
-
-
-    DOMHASHGenerator domGen = new DOMHASHGenerator();
-    cacheMediator.setDigestGenerator(domGen.getClass().getName());
 
     if ("selectFromRegistry".equals(sequenceOption)) {
         String selectFromRegistry = request.getParameter("mediator.sequence");

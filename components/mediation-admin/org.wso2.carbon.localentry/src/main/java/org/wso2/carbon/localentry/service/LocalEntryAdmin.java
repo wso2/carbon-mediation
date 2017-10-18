@@ -395,19 +395,24 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
         try {
             lock.lock();
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-            Map gloabalEntriesMap = synapseConfiguration.getLocalRegistry();
+            Map localEntriesMap = synapseConfiguration.getLocalRegistry();
             List<String> propKeys = new ArrayList<String>();
-            for (Object entryValue : gloabalEntriesMap.values()) {
-                if (entryValue instanceof Entry) {
-                    String key = ((Entry) entryValue).getKey();
-                    if (SynapseConstants.SERVER_IP.equals(key)
-                            || SynapseConstants.SERVER_HOST.equals(key)) {
-                        continue;
+            if (localEntriesMap != null) {
+                for (Object entryValue : localEntriesMap.values()) {
+                    if (entryValue instanceof Entry) {
+                        String key = ((Entry) entryValue).getKey();
+                        if (SynapseConstants.SERVER_IP.equals(key)
+                                || SynapseConstants.SERVER_HOST.equals(key)) {
+                            continue;
+                        }
+                        propKeys.add(key);
                     }
-                    propKeys.add(key);
                 }
+                return propKeys.toArray(new String[propKeys.size()]);
+            } else {
+                return new String[0];
             }
-            return propKeys.toArray(new String[propKeys.size()]);
+
         } finally {
             lock.unlock();
         }

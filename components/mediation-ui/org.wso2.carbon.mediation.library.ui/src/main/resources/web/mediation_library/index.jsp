@@ -126,11 +126,11 @@ if(tabs!=null && tabs.equals("0")) {
         // Show confirmation only when disabling the connector
         if (status == "disabled") {
             CARBON.showConfirmationDialog("<fmt:message key="confirm.disable.connector"/>", function () {
-                document.applicationsForm.action = "import_lib.jsp?libQName=" + libQName + "&status=" + status + "&libName=" + libName + "&packageName=" + packageName;
+                document.applicationsForm.action = "import_lib.jsp?libQName=" + encodeURI(libQName) + "&status=" + status + "&libName=" + libName + "&packageName=" + packageName;
                 document.applicationsForm.submit();
             });
         } else {
-            document.applicationsForm.action = "import_lib.jsp?libQName=" + libQName + "&status=" + status + "&libName=" + libName + "&packageName=" + packageName;
+            document.applicationsForm.action = "import_lib.jsp?libQName=" + encodeURI(libQName) + "&status=" + status + "&libName=" + libName + "&packageName=" + packageName;
             document.applicationsForm.submit();
         }
     }

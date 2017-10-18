@@ -48,12 +48,12 @@ public class MediationSecurityAdminService extends AbstractServiceBusAdmin {
 			Cipher cipher = ciperInitializer.getEncryptionProvider();
 			if (cipher == null) {
                 log.error("Either Configuration properties can not be loaded or No secret"
-                          + " repositories have been configured please check PRODUCT_HOME/repository/conf/security "
+                          + " repositories have been configured please check PRODUCT_HOME/conf/security "
                           + " refer links related to configure WSO2 Secure vault");
                 handleException(log,
                                 "Failed to load security key store information ," +
                                 "Configure secret-conf.properties properly by referring to " +
-                                        "http://docs.wso2.org/display/Carbon402/WSO2+Carbon+Secure+Vault",
+                                        "\"Carbon Secure Vault Implementation\" in WSO2 Documentation",
                                 null);
             }
 			byte[] encryptedPassword = cipher.doFinal(plainTextPassByte);

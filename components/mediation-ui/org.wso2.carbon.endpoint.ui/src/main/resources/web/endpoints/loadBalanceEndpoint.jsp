@@ -154,6 +154,7 @@
     boolean isRoundRobin = true;
     long sessionTimeout = 0;
     String properties = "";
+    boolean isBuildMessage = false;
 
     if (endpoint != null) {
         if (endpoint.getName() != null) {
@@ -165,6 +166,7 @@
         if (!algorithmClassName.equals(EndpointConfigurationHelper.ROUNDROBIN_ALGO_CLASS_NAME)) {
             isRoundRobin = false;
         }
+        isBuildMessage = endpoint.isBuildMessage();
         String sessionType = endpoint.getSessionType();
         if (sessionType != null) {
             if (sessionType.equals("http")) {
@@ -302,6 +304,15 @@
                         <input name="algoClassName" type="text" id="_algoClassName"
                                style="width:450px;"
                                value="<%=algorithmClassName%>"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="leftCol-small"><fmt:message key="buildMessage"/></td>
+                    <td>
+                        <select name="buildMessage" id="_buildMessage">
+                            <option <%=isBuildMessage ? "selected" : ""%> value="true">True</option>
+                            <option <%=!isBuildMessage ? "selected" : ""%> value="false">False</option>
+                        </select>
                     </td>
                 </tr>
                 <tr>

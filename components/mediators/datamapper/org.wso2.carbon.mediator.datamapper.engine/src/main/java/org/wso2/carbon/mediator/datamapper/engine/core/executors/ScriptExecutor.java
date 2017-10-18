@@ -34,7 +34,9 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.Map;
 
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.EQUALS_SIGN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTIES_OBJECT_NAME;
 
 /**
@@ -92,7 +94,7 @@ public class ScriptExecutor implements Executor {
     }
 
     private void injectInputVariableToEngine(String inputSchemaName, String inputVariable) throws ScriptException {
-        scriptEngine.eval("var input" + inputSchemaName.replace(':', '_').replace('=', '_').replace(',', '_') + "="
+        scriptEngine.eval("var input" + inputSchemaName.replace(':', '_').replace('=', '_').replace(',', '_').replace(HYPHEN, ENCODE_CHAR_HYPHEN) + "="
                 + inputVariable);
     }
 

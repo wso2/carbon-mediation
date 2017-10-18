@@ -20,11 +20,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>cache-mediator</artifactId>
-        <version>4.6.11-SNAPSHOT</version>
+        <version>4.6.27-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediator.cache</artifactId>
-    <version>4.6.11-SNAPSHOT</version>
+    <version>4.6.27-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Cache mediator</name>
     <url>http://wso2.org</url>
@@ -43,17 +43,7 @@
                         <Export-Package>
                             org.wso2.carbon.mediator.cache.*,
                         </Export-Package>
-                        <Import-Package>
-                            !javax.xml.namespace,
-                            javax.xml.namespace; version=${javax.xml.namespace.version},
-                            org.apache.commons.logging.*;version="${org.apache.commons.logging.version}",
-                            org.osgi.framework,
-                        </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Embed-Dependency>
-                            geronimo-saaj_1.3_spec;scope=compile|runtime;inline=true;
-                            axis2-saaj;scope=compile|runtime;inline=true;
-                        </Embed-Dependency>
                         <Fragment-Host>synapse-core</Fragment-Host>
                     </instructions>
                 </configuration>
@@ -66,36 +56,13 @@
             <artifactId>synapse-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.axis2</groupId>
-            <artifactId>axis2-saaj</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.wso2.carbon.mediation</groupId>
-            <artifactId>org.wso2.carbon.relay</artifactId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wso2.carbon</groupId>
-            <artifactId>javax.cache.wso2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-saaj_1.3_spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.ws.commons.axiom.wso2</groupId>
-            <artifactId>axiom</artifactId>
+            <artifactId>org.wso2.carbon.core</artifactId>
         </dependency>
 
-        <!-- Neethi jar for the policy processor -->
-        <dependency>
-            <groupId>org.apache.neethi.wso2</groupId>
-            <artifactId>neethi</artifactId>
-        </dependency>
-
-        <!-- Third party dependencies -->
-        <dependency>
-            <groupId>xmlunit</groupId>
-            <artifactId>xmlunit</artifactId>
-        </dependency>
     </dependencies>
 </project>

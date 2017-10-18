@@ -72,6 +72,11 @@ public class SAPTransportSender extends AbstractTransportSender {
     public static final int SAP_TRANSPORT_ERROR = 8000;
 
     /**
+     * String constant for the header name of sap transaciton id.
+     */
+    public static final String SAP_TRANSACTION_ID = "SAP-Transaction-Id";
+
+    /**
      * SAP destination error. Possibly something wrong with the remote R/* system
      */
     public static final int SAP_DESTINATION_ERROR = 8001;
@@ -131,8 +136,15 @@ public class SAPTransportSender extends AbstractTransportSender {
                 IDocRepository iDocRepository = JCoIDoc.getIDocRepository(destination);
                 String tid = destination.createTID();
                 IDocDocumentList iDocList = getIDocs(messageContext, iDocRepository);
+
+                //Set the transaction id as a transport header so that it can be used later.
+                Object headers = messageContext.getProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+                Map headersMap = (Map) headers;
+                headersMap.put(SAP_TRANSACTION_ID, tid);
+
                 JCoIDoc.send(iDocList, getIDocVersion(uri), destination, tid);
                 destination.confirmTID(tid);
+
             } else if (uri.getScheme().equals(SAPConstants.SAP_BAPI_PROTOCOL_NAME)) {
                 try {
                     OMElement payLoad,body;

@@ -103,15 +103,15 @@
             return false;
         }
         
-        if (IsEmpty(form.max_delivery_attempts) && form.max_delivery_drop.value.trim() == "Enabled") {
+        if (IsEmpty(form.max_redelivery_attempts) && form.max_delivery_drop.value.trim() == "Enabled") {
             CARBON.showWarningDialog('<fmt:message key="drop.message.Error.empty"/>')
-            form.max_delivery_attempts.focus();
+            form.max_redelivery_attempts.focus();
             return false;
         }
         
-        if (form.max_delivery_attempts.value.trim() < 1 && form.max_delivery_drop.value.trim() == "Enabled") {
+        if (form.max_redelivery_attempts.value.trim() < 1 && form.max_delivery_drop.value.trim() == "Enabled") {
             CARBON.showWarningDialog('<fmt:message key="drop.message.Error.less.than.one"/>')
-            form.max_delivery_attempts.focus();
+            form.max_redelivery_attempts.focus();
             return false;
         }
 
@@ -161,7 +161,7 @@
     	document.getElementById("tableParams").value = "";
         addServiceParameter("interval", document.getElementById('retry_interval').value);
         addServiceParameter("client.retry.interval", document.getElementById('client_retry_interval').value);
-        addServiceParameter("max.delivery.attempts", document.getElementById('max_delivery_attempts').value);
+        addServiceParameter("max.delivery.attempts", document.getElementById('max_redelivery_attempts').value);
         addServiceParameter("axis2.repo", document.getElementById('axis2_repo').value);
         addServiceParameter("axis2.config", document.getElementById('axis2_config').value);
         addServiceParameter("message.processor.reply.sequence", document.getElementById('message_processor_reply_sequence').value);
@@ -454,9 +454,9 @@
                     </tr>
                     <tr>
                         <td><fmt:message key="max.redelivery.attempts"/></td>
-                        <td><input type="text" id="max_delivery_attempts" name="max_delivery_attempts"
+                        <td><input type="text" id="max_redelivery_attempts" name="max_redelivery_attempts"
                                    value="<%=((null!=processorData)&& processorData.getParams() != null
-                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("max.redelivery.attempts")!=null))?processorData.getParams().get("max.redelivery.attempts"):"4"%>"
+                                        && !processorData.getParams().isEmpty()&&(processorData.getParams().get("max.delivery.attempts")!=null))?processorData.getParams().get("max.delivery.attempts"):"4"%>"
                                 />
                         </td>
                     </tr>

@@ -49,16 +49,24 @@ import java.util.Properties;
 public class JMSUtils {
 
     private static final Log log = LogFactory.getLog(JMSUtils.class);
-    
+
+    /**
+     * Method to infer the JMS message type.
+     *
+     * @param msg the message to be inferred
+     * @return the type of the JMS message
+     */
     public static String inferJMSMessageType(Message msg) {
-        if(inferTextMessage(msg)) {
+        if (isTextMessage(msg)) {
             return TextMessage.class.getName();
-        } else if(inferByteMessage(msg)) {
+        } else if (isBytesMessage(msg)) {
             return BytesMessage.class.getName();
-        } else if(inferObjectMessage(msg)) {
+        } else if (isObjectMessage(msg)) {
             return ObjectMessage.class.getName();
-        } else if(inferStreamMessage(msg)) {
+        } else if (isStreamMessage(msg)) {
             return StreamMessage.class.getName();
+        } else if (isMapMessage(msg)) {
+            return MapMessage.class.getName();
         } else {
             return null;
         }
@@ -321,32 +329,55 @@ public class JMSUtils {
 
         return false;
     }
-    private static boolean inferTextMessage(Message msg) {
-        if (msg instanceof TextMessage) {
-            return true;
-        }
-        return false;
+
+    /**
+     * Method to infer if the message is a TextMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is a TextMessage
+     */
+    private static boolean isTextMessage(Message msg) {
+        return (msg instanceof TextMessage);
     }
 
-    private static boolean inferStreamMessage(Message msg) {
-        if (msg instanceof StreamMessage) {
-            return true;
-        }
-        return false;
+    /**
+     * Method to infer if the message is a MapMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is a MapMessage
+     */
+    private static boolean isMapMessage(Message msg) {
+        return (msg instanceof MapMessage);
     }
 
-    private static boolean inferObjectMessage(Message msg) {
-        if (msg instanceof ObjectMessage) {
-            return true;
-        }
-        return false;
+    /**
+     * Method to infer if the message is a StreamMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is a StreamMessage
+     */
+    private static boolean isStreamMessage(Message msg) {
+        return (msg instanceof StreamMessage);
     }
 
-    private static boolean inferByteMessage(Message msg) {
-        if (msg instanceof BytesMessage) {
-            return true;
-        }
-        return false;
+    /**
+     * Method to infer if the message is an ObjectMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is an ObjectMessage
+     */
+    private static boolean isObjectMessage(Message msg) {
+        return  (msg instanceof ObjectMessage);
+    }
+
+    /**
+     * Method to infer if the message is a BytesMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is a BytesMessage
+     */
+    private static boolean isBytesMessage(Message msg) {
+        return (msg instanceof BytesMessage);
     }
     private static String inverseTransformHyphenatedString(String name) {
         return name.replaceAll(JMSConstants.HYPHEN_REPLACEMENT_STR, "-");
