@@ -42,6 +42,7 @@ import javax.xml.namespace.QName;
  * Extracted information is sent as an event.
  */
 public class PublishEventMediator extends AbstractMediator {
+
 	private static final String TASK_EXECUTING_TENANT_ID = "CURRENT_TASK_EXECUTING_TENANT_IDENTIFIER";
 
 	private EventSinkService eventSinkService = null;
@@ -149,7 +150,7 @@ public class PublishEventMediator extends AbstractMediator {
 			}
 
 			if (isAsync) {// use async publishing(default behavior)
-				if(asyncTimeout != 0L) { //asyncTimeout is not set
+				if (asyncTimeout != 0L) { //asyncTimeout is not set
 					eventSink.getDataPublisher()
 							.tryPublish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()),
 									metaData, correlationData, payloadData, arbitraryData, asyncTimeout);
@@ -299,12 +300,11 @@ public class PublishEventMediator extends AbstractMediator {
 		isAsync = async;
 	}
 
-
-	public boolean isAsync() {
+	protected boolean isAsync() {
 		return isAsync;
 	}
 
-	public long getAsyncTimeout() {
+	protected long getAsyncTimeout() {
 		return asyncTimeout;
 	}
 

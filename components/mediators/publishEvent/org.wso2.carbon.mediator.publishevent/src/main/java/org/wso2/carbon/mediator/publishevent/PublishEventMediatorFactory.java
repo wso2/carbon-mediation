@@ -21,6 +21,8 @@ package org.wso2.carbon.mediator.publishevent;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
@@ -39,6 +41,8 @@ import java.util.Properties;
  * Creates the publishEvent mediator with given configuration
  */
 public class PublishEventMediatorFactory extends AbstractMediatorFactory {
+	private static final Log log = LogFactory.getLog(PublishEventMediatorFactory.class);
+
 	public static final QName PUBLISH_EVENT_QNAME = new QName(SynapseConstants.SYNAPSE_NAMESPACE, getTagName());
 	public static final QName EVENT_SINK_QNAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "eventSink");
 	public static final QName STREAM_NAME_QNAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "streamName");
@@ -84,6 +88,7 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 					long timeout = Long.parseLong(asyncTimeout.getAttributeValue());
 					mediator.setAsyncTimeout(timeout);
 				} catch (NumberFormatException e) {
+					log.warn("provided timeout is invalid");
 					//ignore the timeout property if the timeout is not a number
 				}
 			}

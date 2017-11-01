@@ -24,6 +24,9 @@ import org.wso2.carbon.utils.ServerConstants;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * This class is used to test PublishEvent mediator's asynchronous behavior
+ */
 public class publishEventMediatorAsyncTest extends XMLTestCase {
 
     private static final String mediatorXml =
@@ -70,6 +73,9 @@ public class publishEventMediatorAsyncTest extends XMLTestCase {
         super(name);
     }
 
+    /**
+     *  Tests whether the async property is set correctly to true in the mediator
+     */
     public void testMediatorFactoryAsyncTrue() {
         OMElement mediatorElement = SynapseConfigUtils.stringToOM(mediatorXml);
         System.setProperty(ServerConstants.CARBON_HOME,
@@ -82,6 +88,9 @@ public class publishEventMediatorAsyncTest extends XMLTestCase {
         Assert.assertTrue("isAsync property is set to false", mediator.isAsync());
     }
 
+    /**
+     *  Tests whether the timeout property is set correctly being set
+     */
     public void testMediatorFactoryAsyncTrueWithTimeout() {
         OMElement mediatorElement = SynapseConfigUtils.stringToOM(mediatorXml2);
         System.setProperty(ServerConstants.CARBON_HOME,
