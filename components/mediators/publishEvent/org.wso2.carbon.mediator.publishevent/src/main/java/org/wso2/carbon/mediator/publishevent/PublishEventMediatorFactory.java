@@ -76,7 +76,7 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 
 		OMAttribute isAsync = omElement.getAttribute(ATT_ASYNC);
 		if(isAsync != null && !Boolean.valueOf(isAsync.getAttributeValue())) {
-			mediator.setBlocking(false);
+			mediator.setAsync(false);
 		}
 
 		OMElement streamName = omElement.getFirstChildWithName(STREAM_NAME_QNAME);

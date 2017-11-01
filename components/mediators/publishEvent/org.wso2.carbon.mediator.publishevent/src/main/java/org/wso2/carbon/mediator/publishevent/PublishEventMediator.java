@@ -288,7 +288,13 @@ public class PublishEventMediator extends AbstractMediator {
 		this.arbitraryProperties = arbitraryProperties;
 	}
 
-	public void setBlocking(boolean blocking) {
-		isAsync = blocking;
+	public void setAsync(boolean async) {
+		isAsync = async;
 	}
+
+
+	public boolean isAsync() {
+		return isAsync;
+	}
+
 }
