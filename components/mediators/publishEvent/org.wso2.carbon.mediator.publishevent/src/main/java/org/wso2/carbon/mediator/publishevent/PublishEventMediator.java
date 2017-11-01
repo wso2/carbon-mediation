@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.namespace.QName;
 
 /**
  * Mediator that extracts data from current message payload/header according to the given configuration.
@@ -52,6 +53,7 @@ public class PublishEventMediator extends AbstractMediator {
 	private List<Property> arbitraryProperties = new ArrayList<Property>();
 	private EventSink eventSink;
 	private String eventSinkName;
+	private boolean isAsync = true;
 
 	@Override
 	public boolean isContentAware() {
@@ -145,11 +147,16 @@ public class PublishEventMediator extends AbstractMediator {
 				                  arbitraryProperty.extractPropertyValue(messageContext).toString());
 			}
 
-			eventSink.getDataPublisher()
-			         .publish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()), metaData,
-			                  correlationData, payloadData, arbitraryData);
-
-        } catch (SynapseException e) {
+			if (isAsync) {// use async publishing(default behavior)
+				eventSink.getDataPublisher()
+						.tryPublish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()),
+								metaData, correlationData, payloadData, arbitraryData);
+			} else {
+				eventSink.getDataPublisher()
+						.publish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()), metaData,
+								correlationData, payloadData, arbitraryData);
+			}
+		} catch (SynapseException e) {
             String errorMsg = "Error occurred while constructing the event: " + e.getLocalizedMessage();
             handleException(errorMsg, e, messageContext);
         } catch (Exception e) {
@@ -279,5 +286,9 @@ public class PublishEventMediator extends AbstractMediator {
 
 	public void setArbitraryProperties(List<Property> arbitraryProperties) {
 		this.arbitraryProperties = arbitraryProperties;
+	}
+
+	public void setBlocking(boolean blocking) {
+		isAsync = blocking;
 	}
 }

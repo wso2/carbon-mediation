@@ -51,6 +51,8 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 	public static final QName ARBITRARY_QNAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "arbitrary");
 	public static final QName TYPE_QNAME = new QName("type");
 	public static final QName DEFAULT_QNAME = new QName("defaultValue");
+	public static final QName ATT_ASYNC = new QName("async");
+
 
 	public static String getTagName() {
 		return "publishEvent";
@@ -71,6 +73,11 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 	@Override
 	public Mediator createSpecificMediator(OMElement omElement, Properties properties) {
 		PublishEventMediator mediator = new PublishEventMediator();
+
+		OMAttribute isAsync = omElement.getAttribute(ATT_ASYNC);
+		if(isAsync != null && !Boolean.valueOf(isAsync.getAttributeValue())) {
+			mediator.setBlocking(false);
+		}
 
 		OMElement streamName = omElement.getFirstChildWithName(STREAM_NAME_QNAME);
 		if (streamName == null) {
