@@ -54,6 +54,7 @@ public class PublishEventMediator extends AbstractMediator {
 	private EventSink eventSink;
 	private String eventSinkName;
 	private boolean isAsync = true;
+	private long asyncTimeout;
 
 	@Override
 	public boolean isContentAware() {
@@ -148,9 +149,15 @@ public class PublishEventMediator extends AbstractMediator {
 			}
 
 			if (isAsync) {// use async publishing(default behavior)
-				eventSink.getDataPublisher()
-						.tryPublish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()),
-								metaData, correlationData, payloadData, arbitraryData);
+				if(asyncTimeout != 0L) { //asyncTimeout is not set
+					eventSink.getDataPublisher()
+							.tryPublish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()),
+									metaData, correlationData, payloadData, arbitraryData, asyncTimeout);
+				} else {
+					eventSink.getDataPublisher()
+							.tryPublish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()),
+									metaData, correlationData, payloadData, arbitraryData);
+				}
 			} else {
 				eventSink.getDataPublisher()
 						.publish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()), metaData,
@@ -297,4 +304,11 @@ public class PublishEventMediator extends AbstractMediator {
 		return isAsync;
 	}
 
+	public long getAsyncTimeout() {
+		return asyncTimeout;
+	}
+
+	public void setAsyncTimeout(long asyncTimeout) {
+		this.asyncTimeout = asyncTimeout;
+	}
 }

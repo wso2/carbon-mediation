@@ -46,19 +46,51 @@ public class publishEventMediatorAsyncTest extends XMLTestCase {
                     "    </attributes>\n" +
                     "</publishEvent>";
 
+    private static final String mediatorXml2 =
+            "<publishEvent async=\"true\" timeout=\"2000\" xmlns=\"http://ws.apache.org/ns/synapse\">\n" +
+                    "    <eventSink>bam_event_sink</eventSink>\n" +
+                    "    <streamName>stream_3</streamName>\n" +
+                    "    <streamVersion>1.0.0</streamVersion>\n" +
+                    "    <attributes>\n" +
+                    "        <meta>\n" +
+                    "            <attribute name=\"method\" type=\"STRING\" defaultValue=\"rre\" expression=\"get-property('axis2', 'HTTP_METHOD')\"/>\n" +
+                    "            <attribute name=\"to\" type=\"STRING\" defaultValue=\"deffff\" expression=\"get-property('To')\" />\n" +
+                    "        </meta>\n" +
+                    "        <correlation>\n" +
+                    "            <attribute name=\"date\" type=\"STRING\" defaultValue=\"rre\" expression=\"get-property('SYSTEM_DATE')\" />\n" +
+                    "        </correlation>\n" +
+                    "        <payload>\n" +
+                    "            <attribute name=\"symbol\" type=\"STRING\" defaultValue=\"AAPL\" expression=\"$body/m0:getQuote/m0:request/m0:symbol\" xmlns:m0=\"http://services.samples\" />\n" +
+                    "            <attribute name=\"by_value\" type=\"INTEGER\" defaultValue=\"100\" value=\"1001\" />\n" +
+                    "        </payload>\n" +
+                    "    </attributes>\n" +
+                    "</publishEvent>";
+
     public publishEventMediatorAsyncTest(String name) {
         super(name);
     }
 
     public void testMediatorFactoryAsyncTrue() {
         OMElement mediatorElement = SynapseConfigUtils.stringToOM(mediatorXml);
-        System.setProperty(ServerConstants.CARBON_HOME, System.getProperty("user.dir") + File.separator +
-                "src" + File.separator + "test" + File.separator + "resources");
+        System.setProperty(ServerConstants.CARBON_HOME,
+                System.getProperty("user.dir") + File.separator + "src" + File.separator + "test" + File.separator
+                        + "resources");
 
         PublishEventMediatorFactory factory = new PublishEventMediatorFactory();
-        PublishEventMediator mediator =
-                (PublishEventMediator) factory.createSpecificMediator(mediatorElement, new Properties());
-        Assert.assertTrue(mediator.isAsync());
+        PublishEventMediator mediator = (PublishEventMediator) factory
+                .createSpecificMediator(mediatorElement, new Properties());
+        Assert.assertTrue("isAsync property is set to false", mediator.isAsync());
     }
 
+    public void testMediatorFactoryAsyncTrueWithTimeout() {
+        OMElement mediatorElement = SynapseConfigUtils.stringToOM(mediatorXml2);
+        System.setProperty(ServerConstants.CARBON_HOME,
+                System.getProperty("user.dir") + File.separator + "src" + File.separator + "test" + File.separator
+                        + "resources");
+
+        PublishEventMediatorFactory factory = new PublishEventMediatorFactory();
+        PublishEventMediator mediator = (PublishEventMediator) factory
+                .createSpecificMediator(mediatorElement, new Properties());
+        Assert.assertEquals("timeout has not been set for async publishing", 2000, mediator.getAsyncTimeout());
+    }
 }

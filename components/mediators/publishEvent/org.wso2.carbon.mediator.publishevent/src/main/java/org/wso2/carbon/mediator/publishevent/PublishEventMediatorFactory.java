@@ -52,6 +52,7 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 	public static final QName TYPE_QNAME = new QName("type");
 	public static final QName DEFAULT_QNAME = new QName("defaultValue");
 	public static final QName ATT_ASYNC = new QName("async");
+	public static final QName ATT_ASYNC_TIMEOUT = new QName("timeout");
 
 
 	public static String getTagName() {
@@ -73,10 +74,19 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 	@Override
 	public Mediator createSpecificMediator(OMElement omElement, Properties properties) {
 		PublishEventMediator mediator = new PublishEventMediator();
-
 		OMAttribute isAsync = omElement.getAttribute(ATT_ASYNC);
-		if(isAsync != null && !Boolean.valueOf(isAsync.getAttributeValue())) {
+		if ((isAsync != null && !Boolean.parseBoolean(isAsync.getAttributeValue()))) { //async set to false
 			mediator.setAsync(false);
+		} else { // async not set or set to true
+			OMAttribute asyncTimeout = omElement.getAttribute(ATT_ASYNC_TIMEOUT);
+			if (asyncTimeout != null) { //timeout set for async
+				try {
+					long timeout = Long.parseLong(asyncTimeout.getAttributeValue());
+					mediator.setAsyncTimeout(timeout);
+				} catch (NumberFormatException e) {
+					//ignore the timeout property if the timeout is not a number
+				}
+			}
 		}
 
 		OMElement streamName = omElement.getFirstChildWithName(STREAM_NAME_QNAME);
