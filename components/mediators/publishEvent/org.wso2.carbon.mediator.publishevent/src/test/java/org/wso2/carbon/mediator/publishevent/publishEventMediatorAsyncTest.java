@@ -89,7 +89,7 @@ public class publishEventMediatorAsyncTest extends XMLTestCase {
     }
 
     /**
-     *  Tests whether the timeout property is set correctly being set
+     *  Tests whether the timeout property is set correctly
      */
     public void testMediatorFactoryAsyncTrueWithTimeout() {
         OMElement mediatorElement = SynapseConfigUtils.stringToOM(mediatorXml2);
