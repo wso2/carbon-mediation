@@ -150,7 +150,7 @@ public class PublishEventMediator extends AbstractMediator {
 			}
 
 			if (isAsync) {// use async publishing(default behavior)
-				if (asyncTimeout != 0L) { //asyncTimeout is not set
+				if (asyncTimeout != 0L) { //asyncTimeout is not set or set to zero
 					eventSink.getDataPublisher()
 							.tryPublish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()),
 									metaData, correlationData, payloadData, arbitraryData, asyncTimeout);

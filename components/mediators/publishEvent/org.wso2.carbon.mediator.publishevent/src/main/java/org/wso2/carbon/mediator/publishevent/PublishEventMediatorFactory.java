@@ -86,7 +86,12 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 			if (asyncTimeout != null) { //timeout set for async
 				try {
 					long timeout = Long.parseLong(asyncTimeout.getAttributeValue());
-					mediator.setAsyncTimeout(timeout);
+					if (timeout > 0) {
+						mediator.setAsyncTimeout(timeout);
+					} else {
+						log.warn("Provided timeout value - " + asyncTimeout.getAttributeValue()
+								+ " is negative. Expecting a positive whole numerical value. Hence ignoring the provided timeout property.");
+					}
 				} catch (NumberFormatException e) {
 					log.warn("Provided timeout value - " + asyncTimeout.getAttributeValue()
 							+ " is invalid. Expecting a positive whole numerical value. Hence ignoring the provided timeout property.");
