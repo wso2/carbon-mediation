@@ -19,21 +19,6 @@
 
 package org.wso2.carbon.mediation.security.vault;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
-import java.util.Properties;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediation.security.vault.util.SecureVaultUtil;
@@ -51,6 +36,20 @@ import org.wso2.securevault.keystore.KeyStoreWrapper;
 import org.wso2.securevault.keystore.TrustKeyStoreWrapper;
 import org.wso2.securevault.secret.SecretRepository;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.cert.CertificateException;
+import java.util.Properties;
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+
 public class CipherInitializer {
 	private static Log log = LogFactory.getLog(CipherInitializer.class);
 
@@ -60,6 +59,8 @@ public class CipherInitializer {
 	private static final String ALGORITHM = "algorithm";
 	private static final String DEFAULT_ALGORITHM = "RSA";
 	private static final String TRUSTED = "trusted";
+	private static final String CIPHER_TRANSFORMATION_SECRET_CONF_PROPERTY = "keystore.identity.CipherTransformation";
+	private static final String CIPHER_TRANSFORMATION_SYSTEM_PROPERTY = "org.wso2.CipherTransformation";
 	private static CipherInitializer cipherInitializer  = new CipherInitializer();;
 
 	// global password provider implementation class if defined in secret
@@ -243,9 +244,8 @@ public class CipherInitializer {
 		sbTwo.append(DOT);
 		sbTwo.append(ALGORITHM);
 		// Load algorithm
-		String algorithm =
-		                   MiscellaneousUtil.getProperty(properties, sbTwo.toString(),
-		                                                 DEFAULT_ALGORITHM);
+		String algorithm = getCipherTransformation(properties);
+
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(DOT);
 		buffer.append(KEY_STORE);
@@ -309,7 +309,10 @@ public class CipherInitializer {
 		try {
 			KeyStore primaryKeyStore = getKeyStore(keyStoreFile, password, keyType, provider);
 			java.security.cert.Certificate certs = primaryKeyStore.getCertificate(aliasName);
-			cipher = Cipher.getInstance("RSA");
+
+			String algorithm = getCipherTransformation(properties);
+
+			cipher = Cipher.getInstance(algorithm);
 			cipher.init(Cipher.ENCRYPT_MODE, certs);
 		} catch (InvalidKeyException e) {
 			handleException("Error initializing Cipher ", e);
@@ -322,7 +325,26 @@ public class CipherInitializer {
 		}
 		encryptionProvider = cipher;
 	}
-	
+
+	/**
+	 * Get the Cipher Transformation to be used by the Cipher. We have the option of configuring this globally as a
+	 * System Property '-Dorg.wso2.CipherTransformation', which can be overridden at the 'secret-conf.properties' level
+	 * by specifying the property 'keystore.identity.CipherTransformation'. If neither are configured the default 'RSA'
+	 * will be used
+	 *
+	 * @param properties Properties from the 'secret-conf.properties' file
+	 * @return Cipher Transformation String
+	 */
+	private String getCipherTransformation(Properties properties) {
+		String cipherTransformation = System.getProperty(CIPHER_TRANSFORMATION_SYSTEM_PROPERTY);
+
+		if (cipherTransformation == null) {
+			cipherTransformation = DEFAULT_ALGORITHM;
+		}
+
+		return MiscellaneousUtil.getProperty(properties, CIPHER_TRANSFORMATION_SECRET_CONF_PROPERTY,
+				cipherTransformation);
+	}
 	
 	/**
 	 * get the primary key store instant
