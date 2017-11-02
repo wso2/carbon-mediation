@@ -160,7 +160,7 @@ public class PublishEventMediator extends AbstractMediator {
 		String async = elem.getAttributeValue(ASYNC_Q);
 		this.setIsAsync(async);
 
-		if(Boolean.parseBoolean(async)){
+		if (Boolean.parseBoolean(async)) {
 			this.setTimeout(elem.getAttributeValue(ASYNC_TIMEOUT_Q));
 		}
 
