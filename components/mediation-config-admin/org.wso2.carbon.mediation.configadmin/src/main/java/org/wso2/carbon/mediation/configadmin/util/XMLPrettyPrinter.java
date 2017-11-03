@@ -122,7 +122,7 @@ public class XMLPrettyPrinter {
                     "Failed to load XML Processor Feature " +
                             Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE + " or " +
                             Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE + " or " +
-                            Constants.LOAD_EXTERNAL_DTD_FEATURE);
+                            Constants.LOAD_EXTERNAL_DTD_FEATURE, e);
         }
 
         SecurityManager securityManager = new SecurityManager();
