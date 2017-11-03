@@ -40,7 +40,7 @@ public class PublishEventMediator extends AbstractMediator {
 	public static final QName EVENT_SINK_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "eventSink");
 	public static final QName STREAM_NAME_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "streamName");
 	public static final QName STREAM_VERSION_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "streamVersion");
-	public static final QName ASYNC_Q = new QName( "async");
+	public static final QName ASYNC_Q = new QName("async");
 	public static final QName ASYNC_TIMEOUT_Q = new QName("timeout");
 	public static final QName ATTRIBUTES_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attributes");
 	public static final QName ATTRIBUTE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attribute");
