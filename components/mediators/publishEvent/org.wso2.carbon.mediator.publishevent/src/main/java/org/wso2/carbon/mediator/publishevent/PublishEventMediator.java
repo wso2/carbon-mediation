@@ -35,12 +35,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.namespace.QName;
 
 /**
  * Mediator that extracts data from current message payload/header according to the given configuration.
  * Extracted information is sent as an event.
  */
 public class PublishEventMediator extends AbstractMediator {
+
 	private static final String TASK_EXECUTING_TENANT_ID = "CURRENT_TASK_EXECUTING_TENANT_IDENTIFIER";
 
 	private EventSinkService eventSinkService = null;
@@ -52,6 +54,8 @@ public class PublishEventMediator extends AbstractMediator {
 	private List<Property> arbitraryProperties = new ArrayList<Property>();
 	private EventSink eventSink;
 	private String eventSinkName;
+	private boolean isAsync = true;
+	private long asyncTimeout;
 
 	@Override
 	public boolean isContentAware() {
@@ -145,11 +149,22 @@ public class PublishEventMediator extends AbstractMediator {
 				                  arbitraryProperty.extractPropertyValue(messageContext).toString());
 			}
 
-			eventSink.getDataPublisher()
-			         .publish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()), metaData,
-			                  correlationData, payloadData, arbitraryData);
-
-        } catch (SynapseException e) {
+			if (isAsync) {// use async publishing(default behavior)
+				if (asyncTimeout != 0L) { //asyncTimeout is not set or set to zero
+					eventSink.getDataPublisher()
+							.tryPublish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()),
+									metaData, correlationData, payloadData, arbitraryData, asyncTimeout);
+				} else {
+					eventSink.getDataPublisher()
+							.tryPublish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()),
+									metaData, correlationData, payloadData, arbitraryData);
+				}
+			} else {
+				eventSink.getDataPublisher()
+						.publish(DataBridgeCommonsUtils.generateStreamId(getStreamName(), getStreamVersion()), metaData,
+								correlationData, payloadData, arbitraryData);
+			}
+		} catch (SynapseException e) {
             String errorMsg = "Error occurred while constructing the event: " + e.getLocalizedMessage();
             handleException(errorMsg, e, messageContext);
         } catch (Exception e) {
@@ -279,5 +294,21 @@ public class PublishEventMediator extends AbstractMediator {
 
 	public void setArbitraryProperties(List<Property> arbitraryProperties) {
 		this.arbitraryProperties = arbitraryProperties;
+	}
+
+	public void setAsync(boolean async) {
+		isAsync = async;
+	}
+
+	protected boolean isAsync() {
+		return isAsync;
+	}
+
+	protected long getAsyncTimeout() {
+		return asyncTimeout;
+	}
+
+	public void setAsyncTimeout(long asyncTimeout) {
+		this.asyncTimeout = asyncTimeout;
 	}
 }
