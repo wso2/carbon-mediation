@@ -16,63 +16,77 @@
 
 package org.wso2.carbon.mediator.cache.digest;
 
-import org.apache.axiom.om.OMNode;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMDocument;
-import org.apache.axiom.om.OMText;
-import org.apache.axiom.om.OMProcessingInstruction;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMDocument;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMProcessingInstruction;
+import org.apache.axiom.om.OMText;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.mediator.cache.CachingException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
- * This is the default DigestGenerator for the cache and this implements the 
- * <a href="http://www.ietf.org/rfc/rfc2803.txt">DOMHASH algorithm</a> over an XML node
- * to implement retrieving a unique key for the normalized xml node.
- *
+ * This is the default DigestGenerator for the cache and this implements the
+ * <a href="http://www.ietf.org/rfc/rfc2803.txt">DOMHASH
+ * algorithm</a> over an XML node to implement retrieving a unique key for the normalized xml node.
  */
+@Deprecated
 public class DOMHASHGenerator implements DigestGenerator {
 
-    /** String representing the MD5 digest algorithm */
+    /**
+     * String representing the MD5 digest algorithm.
+     */
     public static final String MD5_DIGEST_ALGORITHM = "MD5";
 
-    /** String representing the SHA digest algorithm */
+    /**
+     * String representing the SHA digest algorithm.
+     */
     public static final String SHA_DIGEST_ALGORITHM = "SHA";
 
-    /** String representing the SHA1 digest algorithm */
+    /**
+     * String representing the SHA1 digest algorithm.
+     */
     public static final String SHA1_DIGEST_ALGORITHM = "SHA1";
 
-    /** Holds the log for the logging */
+    /**
+     * Holds the log for the logging.
+     */
     private static final Log log = LogFactory.getLog(DOMHASHGenerator.class);
 
+    @Override
+    public void init(Map<String, Object> properties) {
+
+    }
+
     /**
-     * This is the implementation of the getDigest method and will implement the DOMHASH
-     * algorithm based XML node identifications. This will consider only the SOAP payload
-     * and this does not consider the SOAP headers in generating the digets. So, in effect
-     * this will uniquely identify the SOAP messages with the same payload.
-     * 
+     * This is the implementation of the getDigest method and will implement the DOMHASH algorithm based XML node
+     * identifications. This will consider only the SOAP payload and this does not consider the SOAP headers in
+     * generating the digets. So, in effect this will uniquely identify the SOAP messages with the same payload.
+     *
      * @param msgContext - MessageContext on which the XML node identifier will be generated
      * @return Object representing the DOMHASH value of the normalized XML node
      * @throws CachingException if there is an error in generating the digest key
-     *
-     *          #getDigest(org.apache.axis2.context.MessageContext)
+     *                          <p>
+     *                          #getDigest(org.apache.axis2.context.MessageContext)
      */
     public String getDigest(MessageContext msgContext) throws CachingException {
-        
+
         OMNode request = msgContext.getEnvelope().getBody();
         if (request != null) {
             byte[] digest = getDigest(request, MD5_DIGEST_ALGORITHM);
@@ -83,10 +97,10 @@ public class DOMHASHGenerator implements DigestGenerator {
     }
 
     /**
-     * This is an overloaded method for the digest generation for OMNode
+     * This is an overloaded method for the digest generation for OMNode.
      *
-     * @param node              - OMNode to be subjected to the key generation
-     * @param digestAlgorithm   - digest algorithm as a String
+     * @param node            - OMNode to be subjected to the key generation
+     * @param digestAlgorithm - digest algorithm as a String
      * @return byte[] representing the calculated digest over the provided node
      * @throws CachingException if there is an error in generating the digest
      */
@@ -104,19 +118,19 @@ public class DOMHASHGenerator implements DigestGenerator {
     }
 
     /**
-     * This is an overloaded method for the digest generation for OMDocument
+     * This is an overloaded method for the digest generation for OMDocument.
      *
-     * @param document          - OMDocument to be subjected to the key generation
-     * @param digestAlgorithm   - digest algorithm as a String
+     * @param document        - OMDocument to be subjected to the key generation
+     * @param digestAlgorithm - digest algorithm as a String
      * @return byte[] representing the calculated digest over the provided document
      * @throws CachingException if there is an io error or the specified algorithm is incorrect
      */
     public byte[] getDigest(OMDocument document, String digestAlgorithm) throws CachingException {
-        
+
         byte[] digest = new byte[0];
-        
+
         try {
-            
+
             MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream dos = new DataOutputStream(baos);
@@ -124,44 +138,45 @@ public class DOMHASHGenerator implements DigestGenerator {
             Collection childNodes = getValidElements(document);
             dos.writeInt(childNodes.size());
 
-            for (Iterator itr = childNodes.iterator(); itr.hasNext();) {
+            for (Iterator itr = childNodes.iterator(); itr.hasNext(); ) {
                 OMNode node = (OMNode) itr.next();
-                if (node.getType() == OMNode.PI_NODE)
+                if (node.getType() == OMNode.PI_NODE) {
                     dos.write(getDigest((OMProcessingInstruction) node, digestAlgorithm));
-                else if (
-                        node.getType() == OMNode.ELEMENT_NODE)
+                } else if (
+                        node.getType() == OMNode.ELEMENT_NODE) {
                     dos.write(getDigest((OMElement) node, digestAlgorithm));
+                }
             }
-            
+
             dos.close();
             md.update(baos.toByteArray());
             digest = md.digest();
-            
+
         } catch (NoSuchAlgorithmException e) {
             handleException("Can not locate the algorithm " +
-                "provided for the digest generation : " + digestAlgorithm, e);
+                                    "provided for the digest generation : " + digestAlgorithm, e);
         } catch (IOException e) {
             handleException("Error in calculating the " +
-                "digest value for the OMDocument : " + document, e);
+                                    "digest value for the OMDocument : " + document, e);
         }
-        
+
         return digest;
     }
 
     /**
-     * This is an overloaded method for the digest generation for OMElement
+     * This is an overloaded method for the digest generation for OMElement.
      *
-     * @param element           - OMElement to be subjected to the key generation
-     * @param digestAlgorithm   - digest algorithm as a String
+     * @param element         - OMElement to be subjected to the key generation
+     * @param digestAlgorithm - digest algorithm as a String
      * @return byte[] representing the calculated digest over the provided element
      * @throws CachingException if there is an io error or the specified algorithm is incorrect
      */
     public byte[] getDigest(OMElement element, String digestAlgorithm) throws CachingException {
-        
+
         byte[] digest = new byte[0];
 
         try {
-            
+
             MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream dos = new DataOutputStream(baos);
@@ -172,12 +187,13 @@ public class DOMHASHGenerator implements DigestGenerator {
 
             Collection attrs = getAttributesWithoutNS(element);
             dos.writeInt(attrs.size());
-            
+
             Iterator itr = attrs.iterator();
-            while (itr.hasNext())
+            while (itr.hasNext()) {
                 dos.write(getDigest((OMAttribute) itr.next(), digestAlgorithm));
+            }
             OMNode node = element.getFirstOMChild();
-            
+
             // adjoining Texts are merged,
             // there is  no 0-length Text, and
             // comment nodes are removed.
@@ -188,38 +204,38 @@ public class DOMHASHGenerator implements DigestGenerator {
                 itr.next();
             }
             dos.writeInt(length);
-            
+
             while (node != null) {
                 dos.write(getDigest(node, digestAlgorithm));
                 node = node.getNextOMSibling();
             }
             dos.close();
             md.update(baos.toByteArray());
-            
+
             digest = md.digest();
-            
+
         } catch (NoSuchAlgorithmException e) {
             handleException("Can not locate the algorithm " +
-                "provided for the digest generation : " + digestAlgorithm, e);
+                                    "provided for the digest generation : " + digestAlgorithm, e);
         } catch (IOException e) {
             handleException("Error in calculating the " +
-                "digest value for the OMElement : " + element, e);
+                                    "digest value for the OMElement : " + element, e);
         }
-        
+
         return digest;
     }
 
     /**
-     * This method is an overloaded method for the digest generation for OMProcessingInstruction
+     * This method is an overloaded method for the digest generation for OMProcessingInstruction.
      *
-     * @param pi                - OMProcessingInstruction to be subjected to the key generation
-     * @param digestAlgorithm   - digest algorithm as a String
+     * @param pi              - OMProcessingInstruction to be subjected to the key generation
+     * @param digestAlgorithm - digest algorithm as a String
      * @return byte[] representing the calculated digest over the provided pi
-     * @throws CachingException if the specified algorithm is incorrect or the encoding
-     *                          is not supported by the processor
+     * @throws CachingException if the specified algorithm is incorrect or the encoding is not supported by the
+     *                          processor
      */
     public byte[] getDigest(OMProcessingInstruction pi, String digestAlgorithm)
-        throws CachingException {
+            throws CachingException {
 
         byte[] digest = new byte[0];
 
@@ -240,30 +256,30 @@ public class DOMHASHGenerator implements DigestGenerator {
 
         } catch (NoSuchAlgorithmException e) {
             handleException("Can not locate the algorithm " +
-                "provided for the digest generation : " + digestAlgorithm, e);
+                                    "provided for the digest generation : " + digestAlgorithm, e);
         } catch (UnsupportedEncodingException e) {
             handleException("Error in generating the digest " +
-                "using the provided encoding : UnicodeBigUnmarked", e);
+                                    "using the provided encoding : UnicodeBigUnmarked", e);
         }
-        
+
         return digest;
     }
 
     /**
-     * This is an overloaded method for the digest generation for OMAttribute
+     * This is an overloaded method for the digest generation for OMAttribute.
      *
-     * @param attribute         - OMAttribute to be subjected to the key generation
-     * @param digestAlgorithm   - digest algorithm as a String
+     * @param attribute       - OMAttribute to be subjected to the key generation
+     * @param digestAlgorithm - digest algorithm as a String
      * @return byte[] representing the calculated digest over the provided attribute
-     * @throws CachingException if the specified algorithm is incorrect or the encoding
-     *                          is not supported by the processor
+     * @throws CachingException if the specified algorithm is incorrect or the encoding is not supported by the
+     *                          processor
      */
     public byte[] getDigest(OMAttribute attribute, String digestAlgorithm) throws CachingException {
 
         byte[] digest = new byte[0];
 
         if (!(attribute.getLocalName().equals("xmlns") ||
-            attribute.getLocalName().startsWith("xmlns:"))) {
+                attribute.getLocalName().startsWith("xmlns:"))) {
 
             try {
 
@@ -282,24 +298,24 @@ public class DOMHASHGenerator implements DigestGenerator {
 
             } catch (NoSuchAlgorithmException e) {
                 handleException("Can not locate the algorithm " +
-                    "provided for the digest generation : " + digestAlgorithm, e);
+                                        "provided for the digest generation : " + digestAlgorithm, e);
             } catch (UnsupportedEncodingException e) {
                 handleException("Error in generating the digest " +
-                    "using the provided encoding : UnicodeBigUnmarked", e);
+                                        "using the provided encoding : UnicodeBigUnmarked", e);
             }
         }
-        
+
         return digest;
     }
 
     /**
-     * This method is an overloaded method for the digest generation for OMText
+     * This method is an overloaded method for the digest generation for OMText.
      *
-     * @param text              - OMText to be subjected to the key generation
-     * @param digestAlgorithm   - digest algorithm as a String
+     * @param text            - OMText to be subjected to the key generation
+     * @param digestAlgorithm - digest algorithm as a String
      * @return byte[] representing the calculated digest over the provided text
-     * @throws CachingException if the specified algorithm is incorrect or the encoding
-     *                          is not supported by the processor
+     * @throws CachingException if the specified algorithm is incorrect or the encoding is not supported by the
+     *                          processor
      */
     public byte[] getDigest(OMText text, String digestAlgorithm) throws CachingException {
 
@@ -318,24 +334,24 @@ public class DOMHASHGenerator implements DigestGenerator {
 
         } catch (NoSuchAlgorithmException e) {
             handleException("Can not locate the algorithm " +
-                "provided for the digest generation : " + digestAlgorithm, e);
+                                    "provided for the digest generation : " + digestAlgorithm, e);
         } catch (UnsupportedEncodingException e) {
             handleException("Error in generating the digest " +
-                "using the provided encoding : UnicodeBigUnmarked", e);
+                                    "using the provided encoding : UnicodeBigUnmarked", e);
         }
-        
+
         return digest;
     }
 
     /**
-     * This is an overloaded method for getting the expanded name as namespaceURI followed by
-     * the local name for OMElement
+     * This is an overloaded method for getting the expanded name as namespaceURI followed by the local name for
+     * OMElement.
      *
-     * @param element   - OMElement of which the expanded name is retrieved
+     * @param element - OMElement of which the expanded name is retrieved
      * @return expanded name of OMElement as an String in the form {ns-uri:local-name}
      */
     public String getExpandedName(OMElement element) {
-        
+
         if (element.getNamespace() != null) {
             return element.getNamespace().getNamespaceURI() + ":" + element.getLocalName();
         } else {
@@ -344,14 +360,14 @@ public class DOMHASHGenerator implements DigestGenerator {
     }
 
     /**
-     * This is an overloaded method for getting the expanded name as namespaceURI followed by
-     * the local name for OMAttribute
+     * This is an overloaded method for getting the expanded name as namespaceURI followed by the local name for
+     * OMAttribute.
      *
-     * @param attribute     - OMAttribute of which the expanded name is retrieved
+     * @param attribute - OMAttribute of which the expanded name is retrieved
      * @return expanded name of the OMAttribute as an String in the form {ns-uri:local-name}
      */
     public String getExpandedName(OMAttribute attribute) {
-        
+
         if (attribute.getNamespace() != null) {
             return attribute.getNamespace().getNamespaceURI() + ":" + attribute.getLocalName();
         } else {
@@ -360,54 +376,55 @@ public class DOMHASHGenerator implements DigestGenerator {
     }
 
     /**
-     * Gets the collection of attributes which are none namespace declarations for an OMElement
-     * sorted according to the expanded names of the attributes
+     * Gets the collection of attributes which are none namespace declarations for an OMElement sorted according to the
+     * expanded names of the attributes.
      *
-     * @param element   - OMElement of which the none ns declaration attributes to be retrieved
+     * @param element - OMElement of which the none ns declaration attributes to be retrieved
      * @return the collection of attributes which are none namespace declarations
      */
     public Collection getAttributesWithoutNS(OMElement element) {
-        
+
         SortedMap map = new TreeMap();
-        
+
         Iterator itr = element.getAllAttributes();
         while (itr.hasNext()) {
             OMAttribute attribute = (OMAttribute) itr.next();
 
             if (!(attribute.getLocalName().equals("xmlns") ||
-                attribute.getLocalName().startsWith("xmlns:"))) {
+                    attribute.getLocalName().startsWith("xmlns:"))) {
 
                 map.put(getExpandedName(attribute), attribute);
             }
         }
-        
+
         return map.values();
     }
 
     /**
-     * Gets the valid element collection of an OMDocument. This returns only the OMElement
-     * and OMProcessingInstruction nodes
+     * Gets the valid element collection of an OMDocument. This returns only the OMElement and OMProcessingInstruction
+     * nodes
      *
-     * @param document  - OMDocument of which the valid elements to be retrieved
+     * @param document - OMDocument of which the valid elements to be retrieved
      * @return the collection of OMProcessingInstructions and OMElements in the provided document
      */
     public Collection getValidElements(OMDocument document) {
-        
+
         ArrayList list = new ArrayList();
         Iterator itr = document.getChildren();
         while (itr.hasNext()) {
             OMNode node = (OMNode) itr.next();
-            if (node.getType() == OMNode.ELEMENT_NODE || node.getType() == OMNode.PI_NODE)
+            if (node.getType() == OMNode.ELEMENT_NODE || node.getType() == OMNode.PI_NODE) {
                 list.add(node);
+            }
         }
-        
+
         return list;
     }
 
     /**
-     * Gets the String representation of the byte array
+     * Gets the String representation of the byte array.
      *
-     * @param array     - byte[] of which the String representation is required
+     * @param array - byte[] of which the String representation is required
      * @return the String representation of the byte[]
      */
     public String getStringRepresentation(byte[] array) {
@@ -420,23 +437,23 @@ public class DOMHASHGenerator implements DigestGenerator {
     }
 
     /**
-     * Compares two OMNodes for the XML equality
+     * Compares two OMNodes for the XML equality.
      *
-     * @param node              - OMNode to be compared
-     * @param comparingNode     - OMNode to be compared
-     * @param digestAlgorithm   - digest algorithm as a String to be used in the comparison
+     * @param node            - OMNode to be compared
+     * @param comparingNode   - OMNode to be compared
+     * @param digestAlgorithm - digest algorithm as a String to be used in the comparison
      * @return boolean true if the two OMNodes are XML equal, and false otherwise
      * @throws CachingException if there is an error in generating the digest key
      */
     public boolean compareOMNode(OMNode node, OMNode comparingNode, String digestAlgorithm)
-        throws CachingException {
-        
+            throws CachingException {
+
         return Arrays.equals(getDigest(node, digestAlgorithm),
-            getDigest(comparingNode, digestAlgorithm));
+                             getDigest(comparingNode, digestAlgorithm));
     }
 
     /**
-     * Compares two OMDocuments for the XML equality
+     * Compares two OMDocuments for the XML equality.
      *
      * @param document          - OMDocument to be compared
      * @param comparingDocument - OMDocument to be compared
@@ -445,26 +462,26 @@ public class DOMHASHGenerator implements DigestGenerator {
      * @throws CachingException if there is an error in generating the digest key
      */
     public boolean compareOMDocument(OMDocument document, OMDocument comparingDocument,
-        String digestAlgorithm) throws CachingException {
-        
+                                     String digestAlgorithm) throws CachingException {
+
         return Arrays.equals(getDigest(document, digestAlgorithm),
-            getDigest(comparingDocument, digestAlgorithm));
+                             getDigest(comparingDocument, digestAlgorithm));
     }
 
     /**
-     * Compares two OMAttributes for the XML equality
+     * Compares two OMAttributes for the XML equality.
      *
-     * @param attribute             - OMAttribute to be compared
-     * @param comparingAttribute    - OMAttribute to be compared
-     * @param digestAlgorithm       - digest algorithm as a String to be used in the comparison
+     * @param attribute          - OMAttribute to be compared
+     * @param comparingAttribute - OMAttribute to be compared
+     * @param digestAlgorithm    - digest algorithm as a String to be used in the comparison
      * @return boolean true if the two OMAttributes are XML equal, and false otherwise
      * @throws CachingException if there is an error in generating the digest key
      */
     public boolean compareOMAttribute(OMAttribute attribute, OMAttribute comparingAttribute,
-        String digestAlgorithm) throws CachingException {
-        
+                                      String digestAlgorithm) throws CachingException {
+
         return Arrays.equals(getDigest(attribute, digestAlgorithm),
-            getDigest(comparingAttribute, digestAlgorithm));
+                             getDigest(comparingAttribute, digestAlgorithm));
     }
 
     private void handleException(String message, Throwable cause) throws CachingException {

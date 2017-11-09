@@ -21,6 +21,8 @@ package org.wso2.carbon.mediator.publishevent;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
@@ -39,6 +41,8 @@ import java.util.Properties;
  * Creates the publishEvent mediator with given configuration
  */
 public class PublishEventMediatorFactory extends AbstractMediatorFactory {
+	private static final Log log = LogFactory.getLog(PublishEventMediatorFactory.class);
+
 	public static final QName PUBLISH_EVENT_QNAME = new QName(SynapseConstants.SYNAPSE_NAMESPACE, getTagName());
 	public static final QName EVENT_SINK_QNAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "eventSink");
 	public static final QName STREAM_NAME_QNAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "streamName");
@@ -51,6 +55,9 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 	public static final QName ARBITRARY_QNAME = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "arbitrary");
 	public static final QName TYPE_QNAME = new QName("type");
 	public static final QName DEFAULT_QNAME = new QName("defaultValue");
+	public static final QName ATT_ASYNC = new QName("async");
+	public static final QName ATT_ASYNC_TIMEOUT = new QName("timeout");
+
 
 	public static String getTagName() {
 		return "publishEvent";
@@ -71,6 +78,27 @@ public class PublishEventMediatorFactory extends AbstractMediatorFactory {
 	@Override
 	public Mediator createSpecificMediator(OMElement omElement, Properties properties) {
 		PublishEventMediator mediator = new PublishEventMediator();
+		OMAttribute isAsync = omElement.getAttribute(ATT_ASYNC);
+		if ((isAsync != null && !Boolean.parseBoolean(isAsync.getAttributeValue()))) { //async set to false
+			mediator.setAsync(false);
+		} else { // async not set or set to true
+			OMAttribute asyncTimeout = omElement.getAttribute(ATT_ASYNC_TIMEOUT);
+			if (asyncTimeout != null) { //timeout set for async
+				try {
+					long timeout = Long.parseLong(asyncTimeout.getAttributeValue());
+					if (timeout > 0) {
+						mediator.setAsyncTimeout(timeout);
+					} else {
+						log.warn("Provided timeout value - " + asyncTimeout.getAttributeValue()
+								+ " is negative. Expecting a positive whole numerical value. Hence ignoring the provided timeout property.");
+					}
+				} catch (NumberFormatException e) {
+					log.warn("Provided timeout value - " + asyncTimeout.getAttributeValue()
+							+ " is invalid. Expecting a positive whole numerical value. Hence ignoring the provided timeout property.");
+					//ignore the timeout property if the timeout is not a number
+				}
+			}
+		}
 
 		OMElement streamName = omElement.getFirstChildWithName(STREAM_NAME_QNAME);
 		if (streamName == null) {

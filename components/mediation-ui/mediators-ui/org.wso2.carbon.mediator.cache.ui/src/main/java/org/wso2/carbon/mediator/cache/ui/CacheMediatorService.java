@@ -16,6 +16,7 @@
 
 package org.wso2.carbon.mediator.cache.ui;
 
+import org.wso2.carbon.mediator.cache.CachingConstants;
 import org.wso2.carbon.mediator.service.AbstractMediatorService;
 import org.wso2.carbon.mediator.service.ui.Mediator;
 
@@ -30,7 +31,7 @@ public class CacheMediatorService extends AbstractMediatorService {
 	 * @return tag local name of the mediator tag QName
 	 */
     public String getTagLocalName() {
-        return "cache";
+        return CachingConstants.CACHE_LOCAL_NAME;
     }
 
 	/**

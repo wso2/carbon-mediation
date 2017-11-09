@@ -128,24 +128,35 @@
                         if ("js".equals(scriptMediator.getLanguage())) {
                     %>
                     <option id="javaScript" value="js" selected="true">Javascript</option>
+                    <option id="nashornScript" value="nashornJs">NashornJavascript</option>
                     <option id="ruby" value="rb">Ruby</option>
                     <option id="groovy" value="groovy">Groovy</option>
                     <%
                     } else if ("rb".equals(scriptMediator.getLanguage())) {
                     %>
                     <option id="javaScript" value="js">Javascript</option>
+                    <option id="nashornScript" value="nashornJs">NashornJavascript</option>
                     <option id="ruby" value="rb" selected="true">Ruby</option>
                     <option id="groovy" value="groovy">Groovy</option>
                     <%
                     } else if ("groovy".equals(scriptMediator.getLanguage())) {
                     %>
                     <option id="javaScript" value="js">Javascript</option>
+                    <option id="nashornScript" value="nashornJs">NashornJavascript</option>
                     <option id="ruby" value="rb">Ruby</option>
                     <option id="groovy" value="groovy" selected="true">Groovy</option>
+                    <%
+                    } else if ("nashornJs".equals(scriptMediator.getLanguage())) {
+                    %>
+                    <option id="javaScript" value="js">Javascript</option>
+                    <option id="nashornScript" value="nashornJs" selected="true">NashornJavascript</option>
+                    <option id="ruby" value="rb">Ruby</option>
+                    <option id="groovy" value="groovy">Groovy</option>
                     <%
                     } else {
                     %>
                     <option id="javaScript" value="js" selected="true">Javascript</option>
+                    <option id="nashornScript" value="nashornJs">NashornJavascript</option>
                     <option id="ruby" value="rb">Ruby</option>
                     <option id="groovy" value="groovy">Groovy</option>
                     <%

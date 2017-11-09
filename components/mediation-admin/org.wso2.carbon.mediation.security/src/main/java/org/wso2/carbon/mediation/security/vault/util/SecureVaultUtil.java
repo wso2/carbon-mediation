@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -16,11 +17,11 @@ public class SecureVaultUtil {
 
 	public static Properties loadProperties() {
 		Properties properties = new Properties();
-		String carbonHome = System.getProperty(SecureVaultConstants.CARBON_HOME);
-		String filePath =         carbonHome + File.separator + SecureVaultConstants.REPOSITORY_DIR +
-		                          File.separator + SecureVaultConstants.CONF_DIR + File.separator +
-		                          SecureVaultConstants.SECURITY_DIR + File.separator +
-		                          SecureVaultConstants.SECRET_CONF;
+		String confPath = System.getProperty(SecureVaultConstants.CONF_LOCATION);
+		if (confPath == null) {
+			confPath = Paths.get("repository", "conf").toString();
+		}
+		String filePath = Paths.get(confPath, SecureVaultConstants.SECURITY_DIR, SecureVaultConstants.SECRET_CONF).toString();
 
 		File dataSourceFile = new File(filePath);
 		if (!dataSourceFile.exists()) {

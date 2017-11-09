@@ -145,6 +145,41 @@
                 </td>
                 <td></td>
             </tr>
+            <tr>
+                <td style="width:130px;"><fmt:message key="mediator.publishEvent.isAsync"/>
+                </td>
+                <td>
+                    <select class="esb-edit small_textbox" name="mediator.publishEvent.async.select"
+                            id="mediator.publishEvent.async.select">
+                        <% if (!Boolean.parseBoolean(publishEventMediator.isAsync())) {%>
+                        <option value="false" selected="selected">
+                            <fmt:message key="mediator.publishEvent.async.false"/>
+                        </option>
+                        <option value="true">
+                            <fmt:message key="mediator.publishEvent.async.true"/>
+                        </option>
+                        <%} else { %>
+                        <option value="true" selected="selected">
+                            <fmt:message key="mediator.publishEvent.async.true"/>
+                        </option>
+                        <option value="false">
+                            <fmt:message key="mediator.publishEvent.async.false"/>
+                        </option>
+                        <% }%>
+                    </select>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="width:130px;"><fmt:message key="mediator.publishEvent.async.timeout"/>
+                </td>
+                <td>
+                    <input type="text" id="mediator.publishEvent.async.timeout"
+                           name="mediator.publishEvent.async.timeout"
+                           style="width:300px;"
+                           value='<%=publishEventMediator.getTimeout() != null ? publishEventMediator.getTimeout() : ""%>'/>
+                </td>
+                <td></td>
+            </tr>
         </table>
     </td>
 </tr>

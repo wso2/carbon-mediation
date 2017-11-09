@@ -25,11 +25,15 @@ import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.synapse.*;
-import org.apache.synapse.debug.SynapseDebugManager;
-import org.apache.synapse.debug.SynapseDebugInterface;
+import org.apache.synapse.ServerConfigurationInformation;
+import org.apache.synapse.ServerConfigurationInformationFactory;
+import org.apache.synapse.ServerContextInformation;
+import org.apache.synapse.ServerManager;
+import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.debug.SynapseDebugInterface;
+import org.apache.synapse.debug.SynapseDebugManager;
 import org.apache.synapse.deployers.InboundEndpointDeployer;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentStore;
 import org.apache.synapse.inbound.InboundEndpoint;
@@ -53,7 +57,12 @@ import org.wso2.carbon.mediation.initializer.handler.ProxyLogHandler;
 import org.wso2.carbon.mediation.initializer.handler.SynapseExternalPropertyConfigurator;
 import org.wso2.carbon.mediation.initializer.multitenancy.TenantServiceBusInitializer;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
-import org.wso2.carbon.mediation.initializer.services.*;
+import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationService;
+import org.wso2.carbon.mediation.initializer.services.SynapseConfigurationServiceImpl;
+import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentServiceImpl;
+import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
+import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServiceImpl;
 import org.wso2.carbon.mediation.initializer.utils.ConfigurationHolder;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.mediation.registry.ESBRegistryConstants;
@@ -80,6 +89,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -159,14 +169,14 @@ public class ServiceBusInitializer {
         // to fix this by making it possible to let the authentication of carbon be done through
         // the non blocking https transport
         setHttpsProtForConsole();
-        
+
       //clean up temp folder created for connector class loader reference
         String javaTempDir = System.getProperty("java.io.tmpdir");
         String APP_UNZIP_DIR = javaTempDir.endsWith(File.separator) ?
                         javaTempDir + "libs" :
                         javaTempDir + File.separator + "libs";
         cleanupTempDirectory(APP_UNZIP_DIR);
-        
+
         try {
             BundleContext bndCtx = ctxt.getBundleContext();
             ConfigurationHolder.getInstance().setBundleContext(bndCtx);
@@ -407,9 +417,15 @@ public class ServiceBusInitializer {
             configurationInformation.setServerControllerProvider(
                     CarbonSynapseController.class.getName());
             if (isRunningSamplesMode()) {
-                configurationInformation.setSynapseXMLLocation("repository" + File.separator
-                        + "samples" + File.separator + "synapse_sample_" + System.getProperty(
-                        ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                if (System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null) {
+                    configurationInformation.setSynapseXMLLocation(
+                            "repository" + File.separator + "samples" + File.separator + "synapse_sample_" +
+                            System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                } else {
+                    configurationInformation.setSynapseXMLLocation("samples" + File.separator + "service-bus" +
+                            File.separator + "synapse_sample_" +
+                            System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) + ".xml");
+                }
             }
 
             serverManager = new ServerManager();
@@ -491,7 +507,8 @@ public class ServiceBusInitializer {
     }
 
     public static boolean isRunningSamplesMode() {
-        return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null;
+        return System.getProperty(ServiceBusConstants.ESB_SAMPLE_SYSTEM_PROPERTY) != null ||
+               System.getProperty(ServiceBusConstants.EI_SAMPLE_SYSTEM_PROPERTY) != null;
     }
 
     public static boolean isRunningDebugMode() {
@@ -511,8 +528,7 @@ public class ServiceBusInitializer {
 
         try {
             String carbonHome = System.getProperty(ServerConstants.CARBON_HOME);
-            File synapseProperties = new File(carbonHome + File.separator + "repository" + File.separator + "conf" +
-                    File.separator + "synapse.properties");
+            File synapseProperties = Paths.get(CarbonUtils.getCarbonConfigDirPath(), "synapse.properties").toFile();
             Properties properties = new Properties();
             InputStream inputStream = new FileInputStream(synapseProperties);
             properties.load(inputStream);
@@ -788,10 +804,10 @@ public class ServiceBusInitializer {
             }
         }
     }
-    
+
     /**
 	 * Clean up temp files
-	 * 
+	 *
 	 * @param appUnzipDir
 	 */
 	private static void cleanupTempDirectory(String appUnzipDir) {
@@ -832,7 +848,7 @@ public class ServiceBusInitializer {
 			}
 		}
 		deploymentEngine.addDeployer(new InboundEndpointDeployer(),
-				inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
+                         inboundDirPath, ServiceBusConstants.ARTIFACT_EXTENSION);
 	}
 
     protected void setInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {

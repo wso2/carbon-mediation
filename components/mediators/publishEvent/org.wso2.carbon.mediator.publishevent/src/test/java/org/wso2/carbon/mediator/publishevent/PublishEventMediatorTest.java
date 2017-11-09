@@ -54,7 +54,7 @@ public class PublishEventMediatorTest extends XMLTestCase {
 		super(name);
 	}
 
-	public void _testMediatorFactory() {
+	public void testMediatorFactory() {
 		OMElement mediatorElement = SynapseConfigUtils.stringToOM(mediatorXml);
 		System.setProperty(ServerConstants.CARBON_HOME, System.getProperty("user.dir") + File.separator +
 		                                                "src" + File.separator + "test" + File.separator + "resources");
@@ -65,7 +65,7 @@ public class PublishEventMediatorTest extends XMLTestCase {
 
 		assertEquals(mediator.getStreamName(), "stream_3");
 		assertEquals(mediator.getStreamVersion(), "1.0.0");
-		assertEquals(mediator.getEventSink(), "bam_event_sink");
+		assertEquals(mediator.getEventSinkName(), "bam_event_sink");
 		assertEquals(mediator.getMetaProperties().size(), 2);
 		assertEquals(mediator.getCorrelationProperties().size(), 1);
 		assertEquals(mediator.getPayloadProperties().size(), 2);

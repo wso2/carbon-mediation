@@ -65,7 +65,9 @@ public class RabbitMQConnectionConsumer {
         this.rabbitMQConnectionFactory = rabbitMQConnectionFactory;
         this.rabbitMQProperties = rabbitMQProperties;
         this.injectHandler = injectHandler;
-        this.rabbitMQProperties.putAll(rabbitMQProps);
+        for (final String propertyName : rabbitMQProperties.stringPropertyNames()) {
+            this.rabbitMQProps.put(propertyName, rabbitMQProperties.getProperty(propertyName));
+        }
     }
 
     public void execute() {
@@ -175,7 +177,7 @@ public class RabbitMQConnectionConsumer {
             if (message != null) {
                 idle = false;
                 try {
-                    successful = injectHandler.invoke(message);
+                    successful = injectHandler.invoke(message, inboundName);
                 } finally {
                     if (successful) {
                         try {
@@ -189,6 +191,9 @@ public class RabbitMQConnectionConsumer {
                     } else {
                         try {
                             channel.txRollback();
+                            // According to the spec, rollback doesn't automatically redeliver unacked messages.
+                            // We need to call recover explicitly.
+                            channel.basicRecover();
                         } catch (IOException e) {
                             log.error("Error while trying to roll back transaction", e);
                         }
