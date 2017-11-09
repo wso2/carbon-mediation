@@ -1005,7 +1005,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
             Artifact artifact = dep.getArtifact();
             String artifactDirName = getArtifactDirName(artifact);
 
-            if (!validateArtifact(artifact) && artifactDirName == null) {
+            if (!validateArtifact(artifact) || artifactDirName == null) {
                 continue;
             }
 
