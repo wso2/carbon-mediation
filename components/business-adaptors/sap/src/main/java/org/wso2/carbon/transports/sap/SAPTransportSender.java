@@ -81,6 +81,12 @@ public class SAPTransportSender extends AbstractTransportSender {
      */
     public static final int SAP_DESTINATION_ERROR = 8001;
 
+    /**
+     * This property allows to sent the original SAP error message without handling at SAP implementation and throwing
+     * as an AxisFault
+     */
+    private static final String SAP_ESCAPE_ERROR_HANDLING = "sap.escape.error.handling";
+
     @Override
     public void init(ConfigurationContext cfgCtx, TransportOutDescription trpOut) throws AxisFault {
         super.init(cfgCtx, trpOut);
@@ -157,7 +163,8 @@ public class SAPTransportSender extends AbstractTransportSender {
 
                     JCoFunction function = getRFCfunction(destination, rfcFunctionName);
                     RFCMetaDataParser.processMetaDataDocument(payLoad, function);
-                    String responseXML = evaluateRFCfunction(function, destination);
+                    String escapeErrorHandling = (String) messageContext.getProperty(SAP_ESCAPE_ERROR_HANDLING);
+                    String responseXML = evaluateRFCfunction(function, destination, escapeErrorHandling);
                     processResponse(messageContext, responseXML);
                 } catch (Exception e) {
                     sendFault(messageContext, e , SAP_TRANSPORT_ERROR);
@@ -213,7 +220,7 @@ public class SAPTransportSender extends AbstractTransportSender {
      * @return the result of the function execution
      * @throws AxisFault throws in case of an error
      */
-    private String evaluateRFCfunction(JCoFunction function, JCoDestination destination)
+    private String evaluateRFCfunction(JCoFunction function, JCoDestination destination, String escapeErrorHandling)
             throws AxisFault {
         log.info("Invoking the RFC function :" + function.getName());
         try {
@@ -229,9 +236,12 @@ public class SAPTransportSender extends AbstractTransportSender {
 
         }
         // there seems to be some error that we need to report: TODO ?
-        if (returnStructure != null && (!(returnStructure.getString("TYPE").equals("")
-                                          || returnStructure.getString("TYPE").equals("S")))) {
-            throw new AxisFault(returnStructure.getString("MESSAGE"));
+        //If property "sap.escape.error.handling" is defined and is true, the original SAP exceptions will
+        // be sent without being handled and thrown as an AxisFault
+        if (escapeErrorHandling == null || "".equals(escapeErrorHandling) || "false".equals(escapeErrorHandling)) {
+            if (returnStructure != null && (!(returnStructure.getString("TYPE").equals("") || returnStructure.getString(
+                    "TYPE").equals("S")))) {
+                throw new AxisFault(returnStructure.getString("MESSAGE"));
         }
 
         return function.toXML();
