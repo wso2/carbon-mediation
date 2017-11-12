@@ -186,7 +186,7 @@ public class ExpandingMessageFormatter extends SOAPMessageFormatter {
                             log.warn("Attempting to send an already consumed request [" +
                                      messageContext.getTo().getAddress() + " POST/Empty Message Body]");
                         }
-
+                    } else {
                         //Ask the data source to stream, if it has not already cached the request
                         if (!preserve) {
                             ((StreamingOnRequestDataSource) dataSource).setLastUse(true);
