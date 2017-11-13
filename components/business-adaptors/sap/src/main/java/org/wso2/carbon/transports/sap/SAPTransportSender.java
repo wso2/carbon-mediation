@@ -242,6 +242,7 @@ public class SAPTransportSender extends AbstractTransportSender {
             if (returnStructure != null && (!(returnStructure.getString("TYPE").equals("") || returnStructure.getString(
                     "TYPE").equals("S")))) {
                 throw new AxisFault(returnStructure.getString("MESSAGE"));
+            }
         }
 
         return function.toXML();
