@@ -21,7 +21,9 @@
 <%@ page import="org.wso2.carbon.mediator.store.MessageStoreMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar" %>
 <%@ page import="org.wso2.carbon.mediator.store.MessageStoreAdminServiceClient " %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -35,7 +37,14 @@
     }
     MessageStoreMediator storeMediator = (MessageStoreMediator) mediator;
     String messageStoreName = "";
-    if(storeMediator.getMessageStoreName() != null) {
+    SynapsePath messageStoreExp = null;
+    NameSpacesRegistrar nmspRegistrar = NameSpacesRegistrar.getInstance();
+    boolean isExpression = false;
+    if (storeMediator.getMessageStoreExp() != null) {
+        messageStoreExp = storeMediator.getMessageStoreExp();
+        isExpression = true;
+        nmspRegistrar.registerNameSpaces(storeMediator.getMessageStoreExp(), "mediator.store.xpath", session);
+    } else if (storeMediator.getMessageStoreName() != null) {
         messageStoreName = storeMediator.getMessageStoreName();
     }
 
@@ -70,7 +79,33 @@
         <td>
             <table class="normal">
                 <tr>
-                    <td><fmt:message key="mediator.store.messageStore"/> <span class="required">*</span>
+                    <td>
+                        <h3>
+                            <fmt:message key="mediator.store.messageStore"/>
+                            <span class="required">*</span>
+                        </h3>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="leftCol-small">
+                        <fmt:message key="mediator.store.specifyAs"/> :
+                    </td>
+                    <td>
+                        <input type="radio" id="specify"
+                               onclick="javascript:displayElement('value', true); javascript:displayElement('xpath', false);"
+                               name="specifyAs" <%=!isExpression ? "checked=\"checked\" value=\"Value\"" : "value=\"Value\""%>/>
+                        <fmt:message key="mediator.store.value"/>
+                        <input type="radio"
+                               onclick="javascript:displayElement('value', false); javascript:displayElement('xpath', true);"
+                               name="specifyAs" <%=isExpression ? "checked=\"checked\" value=\"Expression\"" : "value=\"Expression\""%>/>
+                        <fmt:message key="mediator.store.xpath"/>
+                    </td>
+                </tr>
+
+                <tr id="value" <%=isExpression ? "style=\"display:none\";" : ""%>>
+                    <td>
+                        <fmt:message key="mediator.store.value"/>
                     </td>
                     <td>
                         <select name="MessageStore">
@@ -97,10 +132,32 @@
                     </td>
                 </tr>
 
+                <tr id="xpath" <%=!isExpression ? "style=\"display:none\";" : ""%>>
+                    <td>
+                        <fmt:message key="mediator.store.xpath"/>
+                    </td>
+                    <td><input type="text" name="mediator.store.xpath"
+                               style="width:300px"
+                               id="mediator.store.xpath"
+                               value="<%=messageStoreExp!=null ? messageStoreExp.getExpression() : ""%>"/>
+                    </td>
+                    <td><a id="mediator.store.source.xpath_nmsp_button" href="#"
+                           onclick="showNameSpaceEditor('mediator.store.xpath')"
+                           class="nseditor-icon-link"
+                           style="padding-left:40px">
+                        <fmt:message key="mediator.store.namespace"/></a>
+                    </td>
+                </tr>
 
+                <tr>
+                    <td>
+                        <h3><fmt:message key="mediator.store.sequence"/></h3>
+                    </td>
+                </tr>
 
                  <tr>
-                    <td><fmt:message key="mediator.store.onStoreSequence"/>
+                    <td>
+                        <fmt:message key="mediator.store.onStoreSequence"/>
                     </td>
                     <td>
                         <input class="longInput" type="text" value="<%=onStoreSequence%>"
