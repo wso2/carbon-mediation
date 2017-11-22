@@ -221,5 +221,14 @@ function logMediatorValidate() {
     return isValidProperties(logi18n["mediator.store.property.name.empty"], logi18n["mediator.store.property.value.empty"]);
 }
 
-
+function displayElement(elementId, isDisplay) {
+        var toDisplayElement = document.getElementById(elementId);
+        if (toDisplayElement != null) {
+                if (isDisplay) {
+                        toDisplayElement.style.display = '';
+                    } else {
+                        toDisplayElement.style.display = 'none';
+                    }
+            }
+    }
 
