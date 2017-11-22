@@ -183,8 +183,7 @@ public class ExpandingMessageFormatter extends SOAPMessageFormatter {
                     if (((StreamingOnRequestDataSource) dataSource).isConsumed()) {
                         Object httpMethodObj = messageContext.getProperty(Constants.Configuration.HTTP_METHOD);
                         if ((httpMethodObj instanceof String) && "POST".equals(httpMethodObj)) {
-                            log.warn("Attempting to send an already consumed request [" +
-                                     messageContext.getTo().getAddress() + " POST/Empty Message Body]");
+                            log.warn("Attempting to send an already consumed request [POST/Empty Message Body]");
                         }
                     } else {
                         //Ask the data source to stream, if it has not already cached the request
