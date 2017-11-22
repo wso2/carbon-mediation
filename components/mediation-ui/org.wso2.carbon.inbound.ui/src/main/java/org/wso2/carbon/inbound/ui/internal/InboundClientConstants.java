@@ -27,6 +27,7 @@ public class InboundClientConstants {
     public static final String TYPE_JMS = "jms";
     public static final String TYPE_WSO2MB = "wso2mb";
     public static final String TYPE_HL7 = "hl7";
+    public static final String TYPE_TCP = "tcp";
     public static final String TYPE_KAFKA = "kafka";
     public static final String TYPE_MQTT = "mqtt";
     public static final String TYPE_RABBITMQ = "rabbitmq";
@@ -34,7 +35,8 @@ public class InboundClientConstants {
     public static final String EXCEPTION = "INBOUND_EXCEPTION";
     public static final String STRING_SPLITTER = " ~:~ ";
 
-    public static final String[] LISTENER_TYPES = {TYPE_HTTP, TYPE_HTTPS, TYPE_HL7, TYPE_WS, TYPE_WSS};
+    public static final String[] LISTENER_TYPES = {TYPE_HTTP, TYPE_HTTPS, TYPE_HL7, TYPE_TCP, TYPE_WS, TYPE_WSS};
 
-    public static final String[] LISTENER_PORT_PARAMS = {"inbound.http.port", "inbound.hl7.Port", "inbound.ws.port"};
+    public static final String[] LISTENER_PORT_PARAMS = {"inbound.http.port", "inbound.hl7.Port", "inbound.tcp.Port",
+                                                         "inbound.ws.port"};
 }

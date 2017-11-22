@@ -27,6 +27,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericInboundListener;
 import org.wso2.carbon.inbound.endpoint.protocol.hl7.management.HL7EndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.http.InboundHttpConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.http.management.HTTPEndpointManager;
+import org.wso2.carbon.inbound.endpoint.protocol.tcp.management.TCPEndpointManager;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
 import org.wso2.carbon.utils.ConfigurationContextService;
 
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class is responsible for starting Listeners( like HTTP, HTTPS, HL7) on server startup for
+ * This class is responsible for starting Listeners( like HTTP, HTTPS, HL7, tcp) on server startup for
  * Listening Inbound Endpoints.
  */
 public class EndpointListenerLoader {
@@ -85,6 +86,11 @@ public class EndpointListenerLoader {
                 HL7EndpointManager.getInstance().
                         startListener(port, inboundEndpointInfoDTO.getEndpointName(),
                                 inboundEndpointInfoDTO.getInboundParams());
+            } else if (inboundEndpointInfoDTO.getProtocol().equals(InboundRequestProcessorFactoryImpl.
+                    Protocols.tcp.toString())) {
+                TCPEndpointManager.getInstance().
+                        startListener(port, inboundEndpointInfoDTO.getEndpointName(),
+                                      inboundEndpointInfoDTO.getInboundParams());
             } else {
                 // Check for custom-listening-InboundEndpoints
                 InboundProcessorParams inboundParams = inboundEndpointInfoDTO.getInboundParams();

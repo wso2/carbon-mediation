@@ -85,6 +85,7 @@ var existingInbounds = null;
                                 <option value="<%=InboundClientConstants.TYPE_JMS%>">JMS</option>
                                 <option value="<%=InboundClientConstants.TYPE_WSO2MB%>">WSO2 MB</option>
                                 <option value="<%=InboundClientConstants.TYPE_HL7%>">HL7</option>
+                                <option value="<%=InboundClientConstants.TYPE_TCP%>">TCP</option>
                                 <option value="<%=InboundClientConstants.TYPE_KAFKA%>">KAFKA</option>
                                 <option value="<%=InboundClientConstants.TYPE_CLASS%>">Custom</option>
                                 <option value="<%=InboundClientConstants.TYPE_MQTT%>">MQTT</option>
