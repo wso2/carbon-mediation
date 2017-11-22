@@ -78,9 +78,6 @@
         }
     }
 
-
-
-
     int targetType = CUSTOM;
     if (enrichMediator.getTargetType().equals("body")) {
         targetType = BODY;
@@ -113,9 +110,15 @@
 
 
 <script type="text/javascript">
-    function changeSourceElements(elm) {
+    var CUSTOM_ENRICH_TYPE = "custom";
+    var ENVELOPE_ENRICH_TYPE = "envelope";
+    var BODY_ENRICH_TYPE = "body";
+    var PROPERTY_ENRICH_TYPE = "property";
+    var INLINE_ENRICH_TYPE = "inline";
+
+    function changeSourceElements(elm, targetId) {
         var selectedElmValue = elm.options[elm.selectedIndex].value;
-        if (selectedElmValue == "custom") {
+        if (selectedElmValue == CUSTOM_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', true);
             displayElement('mediator.enrich.source.nmsp_button', true);
             displayElement('mediator.enrich.source.val_ex', true);
@@ -128,7 +131,7 @@
             displayElement('mediator.enrich.reg.key', false);
             displayElement('inlineRegBrowser', true);
             displayElement('inlineRegBrowser', false);
-        } else if (selectedElmValue == "envelope") {
+        } else if (selectedElmValue == ENVELOPE_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', false);
             displayElement('mediator.enrich.source.nmsp_button', false);
             displayElement('mediator.enrich.source.val_ex', false);
@@ -140,7 +143,7 @@
             displayElement('registryInlineLabel', false);
             displayElement('mediator.enrich.reg.key', false);
             displayElement('inlineRegBrowser', false);
-        } else if (selectedElmValue == "body") {
+        } else if (selectedElmValue == BODY_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', false);
             displayElement('mediator.enrich.source.nmsp_button', false);
             displayElement('mediator.enrich.source.val_ex', false);
@@ -152,7 +155,7 @@
             displayElement('registryInlineLabel', false);
             displayElement('mediator.enrich.reg.key', false);
             displayElement('inlineRegBrowser', false);
-        } else if (selectedElmValue == "property") {
+        } else if (selectedElmValue == PROPERTY_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', false);
             displayElement('mediator.enrich.source.nmsp_button', false);
             displayElement('mediator.enrich.source.val_ex', true);
@@ -164,7 +167,7 @@
             displayElement('registryInlineLabel', false);
             displayElement('mediator.enrich.reg.key', false);
             displayElement('inlineRegBrowser', false);
-        } else if (selectedElmValue == "inline") {
+        } else if (selectedElmValue == INLINE_ENRICH_TYPE) {
             displayElement('sourceXpathExpLabel', false);
             displayElement('mediator.enrich.source.nmsp_button', false);
             displayElement('mediator.enrich.source.val_ex', false);
@@ -176,32 +179,31 @@
             displayElement('registryInlineLabel', false);
             displayElement('mediator.enrich.reg.key', false);
             displayElement('inlineRegBrowser', false);
-
-
         }
+        validateCombinations(elm, targetId);
     }
 
     function changeTargetElements(elm) {
         var selectedElmValue = elm.options[elm.selectedIndex].value;
-        if (selectedElmValue == "custom") {
+        if (selectedElmValue == CUSTOM_ENRICH_TYPE) {
             displayElement('mediator.enrich.target.val_ex', true);
             displayElement('targetXpathExpLabel', true);
             displayElement('mediator.enrich.target.nmsp_button', true);
             displayElement('targetPropertyLabel', false);
             displayElement('targetInlineLabel', false);
-        } else if (selectedElmValue == "envelope") {
+        } else if (selectedElmValue == ENVELOPE_ENRICH_TYPE) {
             displayElement('mediator.enrich.target.val_ex', false);
             displayElement('targetXpathExpLabel', false);
             displayElement('mediator.enrich.target.nmsp_button', false);
             displayElement('targetPropertyLabel', false);
             displayElement('targetInlineLabel', false);
-        } else if (selectedElmValue == "body") {
+        } else if (selectedElmValue == BODY_ENRICH_TYPE) {
             displayElement('mediator.enrich.target.val_ex', false);
             displayElement('targetXpathExpLabel', false);
             displayElement('mediator.enrich.target.nmsp_button', false);
             displayElement('targetPropertyLabel', false);
             displayElement('targetInlineLabel', false);
-        } else if (selectedElmValue == "property") {
+        } else if (selectedElmValue == PROPERTY_ENRICH_TYPE) {
             displayElement('mediator.enrich.target.val_ex', true);
             displayElement('targetXpathExpLabel', false);
             displayElement('mediator.enrich.target.nmsp_button', false);
@@ -210,7 +212,45 @@
         }
     }
 
-    function validateCombinations(currElem){
+    <%--
+        Validate the target type based on the source type
+    --%>
+    function validateCombinations(sourceId, targetId){
+        <fmt:message key="mediator.enrich.type.custom" var="custom"/>
+        <fmt:message key="mediator.enrich.type.body" var="body"/>
+        <fmt:message key="mediator.enrich.type.property" var="property"/>
+        <fmt:message key="mediator.enrich.type.envelope" var="envelope"/>
+
+        if (sourceId.value == CUSTOM_ENRICH_TYPE) {
+            targetId.children[0].disabled=false;
+            targetId.children[1].disabled=true;
+            targetId.children[2].disabled=false;
+            targetId.children[3].disabled=false;
+            targetId.children[3].selected=false;
+        } else if (sourceId.value == ENVELOPE_ENRICH_TYPE) {
+            targetId.children[0].disabled=true;
+            targetId.children[1].disabled=true;
+            targetId.children[2].disabled=true;
+            targetId.children[3].disabled=false;
+            targetId.children[3].selected=true;
+        } else if (sourceId.value == BODY_ENRICH_TYPE) {
+            targetId.children[0].disabled=false;
+            targetId.children[1].disabled=true;
+            targetId.children[2].disabled=true;
+            targetId.children[3].disabled=false;
+            targetId.children[3].selected=false;
+        } else {
+            targetId.children[0].disabled=false;
+            targetId.children[1].disabled=false;
+            targetId.children[2].disabled=false;
+            targetId.children[3].disabled=false;
+            targetId.children[3].selected=false;
+        }
+        changeTargetElements(targetId);
+    }
+
+    // Validate action, that should be replace for target type envelope
+    function validateAction(currElem){
         var elm = document.getElementById('mediator.enrich.target.type');
         var selectedElmValueForType = elm.options[elm.selectedIndex].value;
 
@@ -218,32 +258,13 @@
         var selectedElmValueForAction = elemAction.options[elemAction.selectedIndex].value;
 
         var thisElemValue = currElem.options[currElem.selectedIndex].value;
-        <%--alert("on validate : type :" + selectedElmValueForType + "  action : " + selectedElmValueForAction--%>
-            <%--+ "  this : " + thisElemValue);--%>
-
-
-        if(selectedElmValueForAction == "sibling" && selectedElmValueForType == "envelope" ){
-            if(thisElemValue == "sibling"){
-                //force option to 'replace'
-                elm.value = 'body';
-            }
-        }
 
         if (selectedElmValueForType == "envelope") {
+            elemAction.style.display = 'block';
             elemAction.value = 'replace';
-            elemAction.disabled = true;
-        }
-        else {
-            elemAction.disabled = false;
         }
     }
-
-    // here the past parameter is just not important.
-    window.onload = validateCombinations(document.getElementById('mediator.enrich.target.action'));
-
 </script>
-
-
 
 <table class="normal" width="100%">
 <tbody>
@@ -275,7 +296,7 @@
     </td>
     <td>
         <select id="mediator.enrich.source.type" name="mediator.enrich.source.type2"
-                style="width:150px;" onchange="changeSourceElements(this)">
+                style="width:150px;" onchange="changeSourceElements(this,document.getElementById('mediator.enrich.target.type'));validateAction(this);">
             <option value="custom" <%=enrichMediator.getSourceType() != null && enrichMediator.getSourceType().equals("custom") ? "selected=\"selected\"" : ""%>>
                 <fmt:message key="mediator.enrich.type.custom"/>
             </option>
@@ -392,7 +413,7 @@
     </td>
     <td>
         <select id="mediator.enrich.target.action" name="mediator.enrich.target.action"
-                style="width:150px;" onchange="validateCombinations(this)">
+                style="width:150px;" onchange="validateAction(this)">
             <option value="replace" <%=enrichMediator.getTargetAction() != null && enrichMediator.getTargetAction().equals("replace") ? "selected=\"selected\"" : ""%>>
                 <fmt:message key="mediator.enrich.target.action.replace"/>
             </option>
@@ -411,11 +432,11 @@
     </td>
     <td>
         <select id="mediator.enrich.target.type" name="mediator.enrich.target.type"
-                style="width:150px;" onchange="changeTargetElements(this);validateCombinations(this);">
+                style="width:150px;" onchange="changeTargetElements(this);validateAction(this);">
             <option value="custom" <%=enrichMediator.getTargetType() != null && enrichMediator.getTargetType().equals("custom") ? "selected=\"selected\"" : ""%>>
                 <fmt:message key="mediator.enrich.type.custom"/>
             </option>
-            <option id="mediator.enrich.type.envelope" value="envelope" <%=enrichMediator.getTargetType() != null && enrichMediator.getTargetType().equals("envelope") ? "selected=\"selected\"" : ""%>>
+            <option id="mediator.enrich.type.envelope" value="envelope" <%=enrichMediator.getTargetType() != null && enrichMediator.getTargetType().equals("envelope") ? "selected=\"selected\"" : ""%> disabled>
                 <fmt:message key="mediator.enrich.type.envelope"/>
             </option>
             <option value="body" <%=enrichMediator.getTargetType() != null && enrichMediator.getTargetType().equals("body") ? "selected=\"selected\"" : ""%>>
