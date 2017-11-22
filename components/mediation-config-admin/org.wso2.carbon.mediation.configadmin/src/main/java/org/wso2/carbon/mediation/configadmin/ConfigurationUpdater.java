@@ -302,14 +302,15 @@ public class ConfigurationUpdater {
         for (ProxyService proxyService : newConfig.getProxyServices()) {
             try {
                 AxisService axisService = proxyService.buildAxisService(newConfig, axisCfg);
-                ProxyServiceParameterObserver paramObserver =
-                        new ProxyServiceParameterObserver(axisService);
-                axisService.addParameterObserver(paramObserver);
-                if (log.isDebugEnabled()) {
-                    log.debug("Deployed Proxy service : " + proxyService.getName());
-                }
-                if (!proxyService.isStartOnLoad()) {
-                    proxyService.stop(newConfig);
+                ProxyServiceParameterObserver paramObserver = new ProxyServiceParameterObserver(axisService);
+                if (axisService != null) {
+                    axisService.addParameterObserver(paramObserver);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Deployed Proxy service : " + proxyService.getName());
+                    }
+                    if (!proxyService.isStartOnLoad()) {
+                        proxyService.stop(newConfig);
+                    }
                 }
             } catch (Exception e) {
                 handleServiceInitializationError(proxyService.getName(),
