@@ -16,6 +16,22 @@
  ~ under the License.
  -->
 <component xmlns="http://products.wso2.org/carbon">
+
+    <ManagementPermissions>
+        <ManagementPermission>
+            <DisplayName>Connectors</DisplayName>
+            <ResourceId>/permission/admin/manage/connectors</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>list</DisplayName>
+            <ResourceId>/permission/admin/manage/connectors/list</ResourceId>
+        </ManagementPermission>
+        <ManagementPermission>
+            <DisplayName>add</DisplayName>
+            <ResourceId>/permission/admin/manage/connectors/add</ResourceId>
+        </ManagementPermission>
+    </ManagementPermissions>
+
 	<menus>
 	    <menu>
             <id>libs_menu</id>
@@ -38,7 +54,7 @@
 			<order>5</order>
 			<style-class>manage</style-class>
             <icon>../mediation_library/images/list.gif</icon>
-            <require-permission>/permission/admin/manage</require-permission>
+            <require-permission>/permission/admin/manage/connectors/list</require-permission>
         </menu>
 		 <menu>
             <id>libs_add_menu</id>
@@ -50,7 +66,7 @@
             <order>10</order>
             <style-class>manage</style-class>
             <icon>../mediation_library/images/add.gif</icon>
-            <require-permission>/permission/admin/manage/add/application</require-permission>
+            <require-permission>/permission/admin/manage/connectors/add</require-permission>
         </menu>
 	</menus>
 
