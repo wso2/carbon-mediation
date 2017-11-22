@@ -375,8 +375,26 @@ public class ConfigurationUpdater {
                 newEndpoint.setArtifactContainerName(oldEndpoint.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.ENDPOINTS_DIR, oldEndpoint.getFileName(), name, newConfig);
             } else {
-                newEndpoint.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.ENDPOINTS_DIR, newEndpoint.getFileName(), name, newConfig);
+                if (currentConfig.getDefinedEndpoints().size() >= newConfig.getDefinedEndpoints().size()) {
+                    newConfig.removeEndpoint(name);
+                    log.error("Updation failed: The endpoint can't be renamed.");
+                    Map<String, Endpoint> oldEndpoints = currentConfig.getDefinedEndpoints();
+                    for (String oldName : oldEndpoints.keySet()) {
+                        if (newConfig.getDefinedEndpoints().get(oldName) == null) {
+                            newConfig.addEndpoint(oldName, oldEndpoints.get(oldName));
+                        }
+                    }
+                } else {
+                    Map<String, Endpoint> oldEndpoints = currentConfig.getDefinedEndpoints();
+                    for (String oldName : oldEndpoints.keySet()) {
+                        if (newConfig.getDefinedEndpoints().get(oldName) == null) {
+                            newConfig.addEndpoint(oldName, oldEndpoints.get(oldName));
+                        }
+                    }
+                    log.info("The endpoint which you are updating is created as a new endpoint: " + name);
+                    newEndpoint.setFileName(name + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.ENDPOINTS_DIR, newEndpoint.getFileName(), name, newConfig);
+                }
             }
         }
 
@@ -388,9 +406,27 @@ public class ConfigurationUpdater {
                 sequences.get(name).setArtifactContainerName(oldSequence.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, oldSequence.getFileName(), name, newConfig);
             } else {
-                SequenceMediator newSequence = sequences.get(name);
-                newSequence.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, newSequence.getFileName(), name, newConfig);
+                if (currentConfig.getDefinedSequences().size() >= newConfig.getDefinedSequences().size()) {
+                    newConfig.removeSequence(name);
+                    log.error("Updation failed: The sequence can't be renamed");
+                    Map<String, SequenceMediator> oldSequences = currentConfig.getDefinedSequences();
+                    for (String oldName : oldSequences.keySet()) {
+                        if (newConfig.getDefinedSequences().get(oldName) == null) {
+                            newConfig.addSequence(oldName, oldSequences.get(oldName));
+                        }
+                    }
+                } else {
+                    Map<String, SequenceMediator> oldSequences = currentConfig.getDefinedSequences();
+                    for (String oldName : oldSequences.keySet()) {
+                        if (newConfig.getDefinedSequences().get(oldName) == null) {
+                            newConfig.addSequence(oldName, oldSequences.get(oldName));
+                        }
+                    }
+                    log.info("The sequence which you are updating is created as a new sequence: " + name);
+                    SequenceMediator newSequence = sequences.get(name);
+                    newSequence.setFileName(name + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, newSequence.getFileName(), name, newConfig);
+                }
             }
         }
 
@@ -402,8 +438,26 @@ public class ConfigurationUpdater {
                 proxy.setArtifactContainerName(oldProxy.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR, oldProxy.getFileName(), proxy.getName(), newConfig);
             } else {
-                proxy.setFileName(proxy.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.SEQUENCES_DIR, proxy.getFileName(), proxy.getName(), newConfig);
+                if (currentConfig.getProxyServices().size() >= newConfig.getProxyServices().size()) {
+                    newConfig.removeProxyService(proxy.getName());
+                    log.error("Updation failed: The proxy service can't be renamed.");
+                    Collection<ProxyService> oldProxies = currentConfig.getProxyServices();
+                    for (ProxyService eachOldProxy : oldProxies) {
+                        if (newConfig.getProxyService(eachOldProxy.getName()) == null) {
+                            newConfig.addProxyService(eachOldProxy.getName(), eachOldProxy);
+                        }
+                    }
+                } else {
+                    Collection<ProxyService> oldProxies = currentConfig.getProxyServices();
+                    for (ProxyService eachOldProxy : oldProxies) {
+                        if (newConfig.getProxyService(eachOldProxy.getName()) == null) {
+                            newConfig.addProxyService(eachOldProxy.getName(), eachOldProxy);
+                        }
+                    }
+                    log.info("The proxy service which you are updating is created as a new proxy service: " + proxy.getName());
+                    proxy.setFileName(proxy.getName() + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.PROXY_SERVICES_DIR, proxy.getFileName(), proxy.getName(), newConfig);
+                }
             }
         }
 
@@ -416,8 +470,26 @@ public class ConfigurationUpdater {
                 newEntry.setArtifactContainerName(oldEntry.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR, oldEntry.getFileName(), name, newConfig);
             } else {
-                newEntry.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR, newEntry.getFileName(), name, newConfig);
+                if (currentConfig.getDefinedEntries().size() >= newConfig.getDefinedEntries().size()) {
+                    newConfig.removeEntry(name);
+                    log.error("Updation failed: The local entry can't be renamed.");
+                    Map<String, Entry> oldEntries = currentConfig.getDefinedEntries();
+                    for (String oldName : oldEntries.keySet()) {
+                        if (newConfig.getDefinedEntries().get(oldName) == null) {
+                            newConfig.addEntry(oldName, oldEntries.get(oldName));
+                        }
+                    }
+                } else {
+                    Map<String, Entry> oldEntries = currentConfig.getDefinedEntries();
+                    for (String oldName : oldEntries.keySet()) {
+                        if (newConfig.getDefinedEntries().get(oldName) == null) {
+                            newConfig.addEntry(oldName, oldEntries.get(oldName));
+                        }
+                    }
+                    log.info("The local entry which you are updating is created as a new local entry: " + name);
+                    newEntry.setFileName(name + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.LOCAL_ENTRY_DIR, newEntry.getFileName(), name, newConfig);
+                }
             }
         }
 
@@ -441,8 +513,26 @@ public class ConfigurationUpdater {
                 eventSource.setFileName(oldEventSource.getFileName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.EVENTS_DIR, oldEventSource.getFileName(), eventSource.getName(), newConfig);
             } else {
-                eventSource.setFileName(eventSource.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.EVENTS_DIR, eventSource.getFileName(), eventSource.getName(), newConfig);
+                if (currentConfig.getEventSources().size() >= newConfig.getEventSources().size()) {
+                    newConfig.removeEventSource(eventSource.getName());
+                    log.error("Updation failed: The event source can't be renamed.");
+                    Collection<SynapseEventSource> oldEventSources = currentConfig.getEventSources();
+                    for (SynapseEventSource eachOldEventSource : oldEventSources) {
+                        if (newConfig.getEventSource(eachOldEventSource.getName()) == null) {
+                            newConfig.addEventSource(eachOldEventSource.getName(), eachOldEventSource);
+                        }
+                    }
+                } else {
+                    Collection<SynapseEventSource> oldEventSources = currentConfig.getEventSources();
+                    for (SynapseEventSource eachOldEventSource : oldEventSources) {
+                        if (newConfig.getEventSource(eachOldEventSource.getName()) == null) {
+                            newConfig.addEventSource(eachOldEventSource.getName(), eachOldEventSource);
+                        }
+                    }
+                    log.info("The event source which you are updating is created as a new event source: " + eventSource.getName());
+                    eventSource.setFileName(eventSource.getName() + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.EVENTS_DIR, eventSource.getFileName(), eventSource.getName(), newConfig);
+                }
             }
         }
 
@@ -467,8 +557,26 @@ public class ConfigurationUpdater {
                 store.setArtifactContainerName(oldStore.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR, oldStore.getFileName(), store.getName(), newConfig);
             } else {
-                store.setFileName(store.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR, store.getFileName(), store.getName(), newConfig);
+                if (currentConfig.getMessageStores().values().size() >= newConfig.getMessageStores().values().size()) {
+                    newConfig.removeMessageStore(store.getName());
+                    log.error("Updation failed: The message store can't be renamed.");
+                    Collection<MessageStore> oldMessageStores = currentConfig.getMessageStores().values();
+                    for (MessageStore eachOldStore : oldMessageStores) {
+                        if (newConfig.getMessageStore(eachOldStore.getName()) == null) {
+                            newConfig.addMessageStore(eachOldStore.getName(), eachOldStore);
+                        }
+                    }
+                } else {
+                    Collection<MessageStore> oldMessageStores = currentConfig.getMessageStores().values();
+                    for (MessageStore eachOldStore : oldMessageStores) {
+                        if (newConfig.getMessageStore(eachOldStore.getName()) == null) {
+                            newConfig.addMessageStore(eachOldStore.getName(), eachOldStore);
+                        }
+                    }
+                    log.info("The message store which you are updating is created as a new message store: " + store.getName());
+                    store.setFileName(store.getName() + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_STORE_DIR, store.getFileName(), store.getName(), newConfig);
+                }
             }
         }
 
@@ -482,8 +590,26 @@ public class ConfigurationUpdater {
                 processor.setArtifactContainerName(oldProcessor.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR, oldProcessor.getFileName(), processor.getName(), newConfig);
             } else {
-                processor.setFileName(processor.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR, processor.getFileName(), processor.getName(), newConfig);
+                if (currentConfig.getMessageProcessors().values().size() >= newConfig.getMessageProcessors().values().size()) {
+                    newConfig.removeMessageProcessor(processor.getName());
+                    log.error("Updation failed: The message processor can't be renamed.");
+                    Collection<MessageProcessor> oldMessageProcessors = currentConfig.getMessageProcessors().values();
+                    for (MessageProcessor eachOldProcessor : oldMessageProcessors) {
+                        if (newConfig.getMessageProcessors().get(eachOldProcessor.getName()) == null) {
+                            newConfig.addMessageProcessor(eachOldProcessor.getName(), eachOldProcessor);
+                        }
+                    }
+                } else {
+                    Collection<MessageProcessor> oldMessageProcessors = currentConfig.getMessageProcessors().values();
+                    for (MessageProcessor eachOldProcessor : oldMessageProcessors) {
+                        if (newConfig.getMessageProcessors().get(eachOldProcessor.getName()) == null) {
+                            newConfig.addMessageProcessor(eachOldProcessor.getName(), eachOldProcessor);
+                        }
+                    }
+                    log.info("The message processor which you are updating is created as a new message processor: " + processor.getName());
+                    processor.setFileName(processor.getName() + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.MESSAGE_PROCESSOR_DIR, processor.getFileName(), processor.getName(), newConfig);
+                }
             }
         }
 
@@ -495,9 +621,27 @@ public class ConfigurationUpdater {
                 sequenceTemplates.get(name).setArtifactContainerName(oldSequenceTempl.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, oldSequenceTempl.getFileName(), name, newConfig);
             } else {
-                TemplateMediator newSeqTemplate = sequenceTemplates.get(name);
-                newSeqTemplate.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newSeqTemplate.getFileName(), name, newConfig);
+                if (currentConfig.getSequenceTemplates().size() >= newConfig.getSequenceTemplates().size()) {
+                    newConfig.removeSequenceTemplate(name);
+                    log.error("Updation failed: The sequence template can't be renamed.");
+                    Map<String, TemplateMediator> oldSequenceTemplates = currentConfig.getSequenceTemplates();
+                    for (String oldName : oldSequenceTemplates.keySet()) {
+                        if (newConfig.getSequenceTemplates().get(oldName) == null) {
+                            newConfig.addSequenceTemplate(oldName, oldSequenceTemplates.get(oldName));
+                        }
+                    }
+                } else {
+                    Map<String, TemplateMediator> oldSequenceTemplates = currentConfig.getSequenceTemplates();
+                    for (String oldName : oldSequenceTemplates.keySet()) {
+                        if (newConfig.getSequenceTemplates().get(oldName) == null) {
+                            newConfig.addSequenceTemplate(oldName, oldSequenceTemplates.get(oldName));
+                        }
+                    }
+                    log.info("The sequence template which you are updating is created as a new sequence template: " + name);
+                    TemplateMediator newSeqTemplate = sequenceTemplates.get(name);
+                    newSeqTemplate.setFileName(name + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newSeqTemplate.getFileName(), name, newConfig);
+                }
             }
         }
 
@@ -509,9 +653,27 @@ public class ConfigurationUpdater {
                 endpointTemplates.get(name).setArtifactContainerName(oldEndpointTempl.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, oldEndpointTempl.getFileName(), name, newConfig);
             } else {
-                Template newTemplate = endpointTemplates.get(name);
-                newTemplate.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newTemplate.getFileName(), name, newConfig);
+                if (currentConfig.getEndpointTemplates().size() >= newConfig.getEndpointTemplates().size()) {
+                    newConfig.removeEndpointTemplate(name);
+                    log.error("Updation failed: The endpoint template can't be renamed.");
+                    Map<String, Template> oldEndpointTemplates = currentConfig.getEndpointTemplates();
+                    for (String oldName : oldEndpointTemplates.keySet()) {
+                        if (newConfig.getEndpointTemplates().get(oldName) == null) {
+                            newConfig.addEndpointTemplate(oldName, oldEndpointTemplates.get(oldName));
+                        }
+                    }
+                } else {
+                    Map<String, Template> oldEndpointTemplates = currentConfig.getEndpointTemplates();
+                    for (String oldName : oldEndpointTemplates.keySet()) {
+                        if (newConfig.getEndpointTemplates().get(oldName) == null) {
+                            newConfig.addEndpointTemplate(oldName, oldEndpointTemplates.get(oldName));
+                        }
+                    }
+                    log.info("The endpoint template which you are updating is created as a new endpoint template: " + name);
+                    Template newTemplate = endpointTemplates.get(name);
+                    newTemplate.setFileName(name + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.TEMPLATES_DIR, newTemplate.getFileName(), name, newConfig);
+                }
             }
         }
 
@@ -523,8 +685,26 @@ public class ConfigurationUpdater {
                 api.setArtifactContainerName(oldAPI.getArtifactContainerName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
             } else {
-                api.setFileName(api.getName() + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
+                if (currentConfig.getAPIs().size() >= newConfig.getAPIs().size()) {
+                    newConfig.removeAPI(api.getName());
+                    log.error("Updation failed: The API can't be renamed.");
+                    Collection<API> oldApiCollection = currentConfig.getAPIs();
+                    for (API eachOldApi : oldApiCollection) {
+                        if (newConfig.getAPI(eachOldApi.getName()) == null) {
+                            newConfig.addAPI(eachOldApi.getName(), eachOldApi);
+                        }
+                    }
+                } else {
+                    Collection<API> oldApiCollection = currentConfig.getAPIs();
+                    for (API eachOldApi : oldApiCollection) {
+                        if (newConfig.getAPI(eachOldApi.getName()) == null) {
+                            newConfig.addAPI(eachOldApi.getName(), eachOldApi);
+                        }
+                    }
+                    log.info("The API which you are updating is created as a new API: " + api.getName());
+                    api.setFileName(api.getName() + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.REST_API_DIR, api.getFileName(), api.getName(), newConfig);
+                }
             }
         }
 
@@ -543,9 +723,27 @@ public class ConfigurationUpdater {
                 imports.get(name).setFileName(oldImport.getFileName());
                 addToDeploymentStore(MultiXMLConfigurationBuilder.SYNAPSE_IMPORTS_DIR, oldImport.getFileName(), name, newConfig);
             } else {
-                SynapseImport newImport = imports.get(name);
-                newImport.setFileName(name + XML);
-                addToDeploymentStore(MultiXMLConfigurationBuilder.SYNAPSE_IMPORTS_DIR, newImport.getFileName(), name, newConfig);
+                if (currentConfig.getSynapseImports().size() >= newConfig.getSynapseImports().size()) {
+                    newConfig.removeSynapseImport(name);
+                    log.error("Updation failed: The synapse import can't be renamed.");
+                    Map<String, SynapseImport> oldImports = currentConfig.getSynapseImports();
+                    for (String oldName : oldImports.keySet()) {
+                        if (newConfig.getSynapseImports().get(oldName) == null) {
+                            newConfig.addSynapseImport(oldName, oldImports.get(oldName));
+                        }
+                    }
+                } else {
+                    Map<String, SynapseImport> oldImports = currentConfig.getSynapseImports();
+                    for (String oldName : oldImports.keySet()) {
+                        if (newConfig.getSynapseImports().get(oldName) == null) {
+                            newConfig.addSynapseImport(oldName, oldImports.get(oldName));
+                        }
+                    }
+                    log.info("The synapse import which you are updating is created as a new synapse import: " + name);
+                    SynapseImport newImport = imports.get(name);
+                    newImport.setFileName(name + XML);
+                    addToDeploymentStore(MultiXMLConfigurationBuilder.SYNAPSE_IMPORTS_DIR, newImport.getFileName(), name, newConfig);
+                }
             }
         }
 
