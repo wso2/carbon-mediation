@@ -85,6 +85,7 @@ public abstract class InboundRequestProcessorImpl implements InboundRequestProce
                 taskDescription.setIntervalInMs(true);
                 taskDescription.addResource(TaskDescription.INSTANCE, task);
                 taskDescription.addResource(TaskDescription.CLASSNAME, task.getClass().getName());
+                taskDescription.addProperty(TaskDescription.COORDINATION, Boolean.toString(coordination));
                 StartUpController startUpController = new StartUpController();
                 startUpController.setTaskDescription(taskDescription);
                 startUpController.init(synapseEnvironment);

@@ -166,6 +166,12 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
             }
         }
         try {
+            //handle inbound endpoint local deletion in clustered scenario
+            TaskInfo taskInfo = taskManager.getTask(name);
+            if (Boolean.valueOf(taskInfo.getProperties().get(TaskDescription.COORDINATION))) {
+                return localDelete(taskName);
+            }
+
             boolean deleted;
             synchronized (lock) {
                 if (taskManager == null) {
@@ -182,6 +188,34 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
             logger.error("Cannot delete task [" + taskName + "::" + group + "]. Error: " + e.getLocalizedMessage(), e);
             return false;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean delete(String taskName, boolean isShuttingDown) {
+        //handle scheduled task and message processor local deletion in clustered scenario
+        if (isShuttingDown && taskManager instanceof ClusteredTaskManager) {
+            return localDelete(taskName);
+        } else {
+            return this.delete(taskName);
+        }
+    }
+
+    /**
+     * Method to remove the task locally, removing from the NTaskAdapter and not deleting the task (Quartz job), in
+     * order to allow another node to pick it up when this node leaves.
+     *
+     * @param taskName name of the task to be deleted
+     * @return successful deletion of the task locally
+     */
+    private boolean localDelete(String taskName) {
+        NTaskAdapter.removeProperty(taskName);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Deleted task [" + taskName + "] locally to allow fail-over");
+        }
+        return true;
     }
 
     @Override
@@ -733,19 +767,18 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 
     @Override
     public void sendClusterMessage(Callable<Void> callable) {
-        if (taskManager instanceof ClusteredTaskManager) {
-            try {
-                IExecutorService executorService =
-                                                   ((ClusteredTaskManager) taskManager).getClusterComm()
-                                                                                       .getHazelcast()
-                                                                                       .getExecutorService(NTASK_P2P_COMM_EXECUTOR);
-                executorService.submitToAllMembers(callable);
-            } catch (TaskException e) {
-                logger.error("Can not submit a cluster message.", e);
-            }
-        }
-
+        /*
+        TODO: With the removal of Hazelcast in ntask, we currently cannot send cluster messages with ntask:
+        An alternative needs to be introduced since we use this method with message processors.
+         */
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isClusteredTaskManager() {
+        return (this.taskManager instanceof ClusteredTaskManager);
+    }
 }
 
