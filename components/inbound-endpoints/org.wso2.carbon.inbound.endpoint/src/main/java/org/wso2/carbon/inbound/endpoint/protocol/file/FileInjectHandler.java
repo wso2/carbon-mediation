@@ -17,7 +17,9 @@
 */
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Properties;
 
@@ -26,6 +28,7 @@ import javax.mail.internet.ParseException;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
 import org.apache.axis2.builder.Builder;
 import org.apache.axis2.builder.BuilderUtil;
@@ -34,6 +37,7 @@ import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.format.DataSourceMessageBuilder;
 import org.apache.axis2.format.ManagedDataSource;
 import org.apache.axis2.format.ManagedDataSourceFactory;
+import org.apache.axis2.format.PlainTextBuilder;
 import org.apache.axis2.transport.TransportUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.logging.Log;
@@ -133,11 +137,27 @@ public class FileInjectHandler {
                 in = new AutoCloseInputStream(file.getContent().getInputStream());
                 dataSource = null;
             }
+
         
             //Inject the message to the sequence.
+            //todo : need to get from the inbound config
+            boolean isReadLine = true;
 
             OMElement documentElement;
-            if (in != null) {
+            if (in != null && isReadLine && builder instanceof PlainTextBuilder) {
+                //create buffered reader
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                String line = br.readLine();
+                while (line != null) {
+                    documentElement = ((PlainTextBuilder) builder).processDocument(line, contentType, axis2MsgCtx);
+                    if (!injectMessage(documentElement, msgCtx)) {
+                        log.error("Error injecting the line : " + documentElement.toString());
+                        return false;
+                    }
+                    line = br.readLine();
+                }
+                return true;
+            } else if (in != null) {
                 documentElement = builder.processDocument(in, contentType, axis2MsgCtx);
             } else {
                 documentElement = ((DataSourceMessageBuilder)builder).processDocument(dataSource, contentType, axis2MsgCtx);
@@ -178,7 +198,36 @@ public class FileInjectHandler {
         }
         return true;
 	}
-	
+
+	//Inject the message
+	private boolean injectMessage(OMElement documentElement, org.apache.synapse.MessageContext msgCtx) throws AxisFault {
+        if("true".equals(vfsProperties.getProperty(VFSConstants.TRANSPORT_BUILD))){
+            documentElement.build();
+        }
+        msgCtx.setEnvelope(TransportUtils.createSOAPEnvelope(documentElement));
+
+        if (injectingSeq == null || injectingSeq.equals("")) {
+            log.error("Sequence name not specified. Sequence : " + injectingSeq);
+        }
+        SequenceMediator seq = (SequenceMediator) synapseEnvironment.getSynapseConfiguration().getSequence(injectingSeq);
+        if (seq != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("injecting message to sequence : " + injectingSeq);
+            }
+            if (!seq.isInitialized()) {
+                seq.init(synapseEnvironment);
+            }
+            seq.setErrorHandler(onErrorSeq);
+            if(!synapseEnvironment.injectInbound(msgCtx, seq, sequential)){
+                return false;
+            }
+        } else {
+            log.error("Sequence: " + injectingSeq + " not found");
+        }
+
+        return true;
+    }
+
     /**
      * @param transportHeaders the transportHeaders to set
      */
