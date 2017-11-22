@@ -60,7 +60,8 @@ public class StreamingOnRequestDataSource implements DataSource {
                 cachedData = new ByteArrayDataSource(data);
                 return cachedData.getInputStream();
             } else {
-                throw new IOException("Input stream has being already consumed");
+		cachedData = new ByteArrayDataSource(new byte[]{});
+                return cachedData.getInputStream();
             }
         }
     }
