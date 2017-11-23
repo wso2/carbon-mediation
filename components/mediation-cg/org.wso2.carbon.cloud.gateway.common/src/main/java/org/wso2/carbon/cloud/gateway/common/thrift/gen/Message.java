@@ -6,26 +6,19 @@
  */
 package org.wso2.carbon.cloud.gateway.common.thrift.gen;
 
+import org.apache.thrift.protocol.TTupleProtocol;
 import org.apache.thrift.scheme.IScheme;
 import org.apache.thrift.scheme.SchemeFactory;
 import org.apache.thrift.scheme.StandardScheme;
-
 import org.apache.thrift.scheme.TupleScheme;
-import org.apache.thrift.protocol.TTupleProtocol;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.EnumMap;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.EnumSet;
-import java.util.Collections;
-import java.util.BitSet;
+
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Message implements org.apache.thrift.TBase<Message, Message._Fields>, java.io.Serializable, Cloneable {
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("Message");
@@ -41,6 +34,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
   private static final org.apache.thrift.protocol.TField HTTP_METHOD_FIELD_DESC = new org.apache.thrift.protocol.TField("httpMethod", org.apache.thrift.protocol.TType.STRING, (short)9);
   private static final org.apache.thrift.protocol.TField IS_DOING_MTOM_FIELD_DESC = new org.apache.thrift.protocol.TField("isDoingMTOM", org.apache.thrift.protocol.TType.BOOL, (short)10);
   private static final org.apache.thrift.protocol.TField IS_DOING_SW_A_FIELD_DESC = new org.apache.thrift.protocol.TField("isDoingSwA", org.apache.thrift.protocol.TType.BOOL, (short)11);
+  private static final org.apache.thrift.protocol.TField INCOMMING_TRANSPORT_FIELD_DESC = new org.apache.thrift.protocol.TField("incommingTransport", org.apache.thrift.protocol.TType.STRING, (short)12);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -59,6 +53,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
   public String httpMethod; // required
   public boolean isDoingMTOM; // required
   public boolean isDoingSwA; // required
+  public String incommingTransport; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -72,7 +67,8 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
     IS_DOING_REST((short)8, "isDoingREST"),
     HTTP_METHOD((short)9, "httpMethod"),
     IS_DOING_MTOM((short)10, "isDoingMTOM"),
-    IS_DOING_SW_A((short)11, "isDoingSwA");
+    IS_DOING_SW_A((short)11, "isDoingSwA"),
+    INCOMMING_TRANSPORT((short)12, "incommingTransport");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -109,6 +105,8 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
           return IS_DOING_MTOM;
         case 11: // IS_DOING_SW_A
           return IS_DOING_SW_A;
+        case 12: // INCOMMING_TRANSPORT
+          return INCOMMING_TRANSPORT;
         default:
           return null;
       }
@@ -181,6 +179,8 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
     tmpMap.put(_Fields.IS_DOING_SW_A, new org.apache.thrift.meta_data.FieldMetaData("isDoingSwA", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+    tmpMap.put(_Fields.INCOMMING_TRANSPORT, new org.apache.thrift.meta_data.FieldMetaData("incommingTransport", org.apache.thrift.TFieldRequirementType.DEFAULT,
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Message.class, metaDataMap);
   }
@@ -199,7 +199,8 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
     boolean isDoingREST,
     String httpMethod,
     boolean isDoingMTOM,
-    boolean isDoingSwA)
+    boolean isDoingSwA,
+    String incommingTransport)
   {
     this();
     this.messageId = messageId;
@@ -217,6 +218,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
     setIsDoingMTOMIsSet(true);
     this.isDoingSwA = isDoingSwA;
     setIsDoingSwAIsSet(true);
+    this.incommingTransport = incommingTransport;
   }
 
   /**
@@ -263,6 +265,9 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
     }
     this.isDoingMTOM = other.isDoingMTOM;
     this.isDoingSwA = other.isDoingSwA;
+    if (other.isSetIncommingTransport()) {
+      this.incommingTransport = other.incommingTransport;
+    }
   }
 
   public Message deepCopy() {
@@ -286,6 +291,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
     this.isDoingMTOM = false;
     setIsDoingSwAIsSet(false);
     this.isDoingSwA = false;
+    this.incommingTransport = null;
   }
 
   public String getMessageId() {
@@ -569,6 +575,32 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
     __isset_bit_vector.set(__ISDOINGSWA_ISSET_ID, value);
   }
 
+  public String getIncommingTransport() {
+    return this.incommingTransport;
+  }
+
+  public Message setIncommingTransport(String incommingTransport) {
+    this.incommingTransport = incommingTransport;
+    return this;
+  }
+
+  public void unsetIncommingTransport() {
+    this.incommingTransport = null;
+  }
+
+  /**
+   * Returns true if field incommingTransport is set (has been assigned a value) and false otherwise
+   */
+  public boolean isSetIncommingTransport() {
+    return this.incommingTransport != null;
+  }
+
+  public void setIncommingTransportIsSet(boolean value) {
+    if (!value) {
+      this.incommingTransport = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case MESSAGE_ID:
@@ -583,7 +615,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetContentType();
       } else {
-        setContentType((String)value);
+        setContentType((String) value);
       }
       break;
 
@@ -591,7 +623,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetMessage();
       } else {
-        setMessage((ByteBuffer)value);
+        setMessage((ByteBuffer) value);
       }
       break;
 
@@ -599,7 +631,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetSoapAction();
       } else {
-        setSoapAction((String)value);
+        setSoapAction((String) value);
       }
       break;
 
@@ -607,7 +639,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetEpoch();
       } else {
-        setEpoch((Long)value);
+        setEpoch((Long) value);
       }
       break;
 
@@ -615,7 +647,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetTransportHeaders();
       } else {
-        setTransportHeaders((Map<String,String>)value);
+        setTransportHeaders((Map<String, String>) value);
       }
       break;
 
@@ -623,7 +655,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetRequestURI();
       } else {
-        setRequestURI((String)value);
+        setRequestURI((String) value);
       }
       break;
 
@@ -631,7 +663,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetIsDoingREST();
       } else {
-        setIsDoingREST((Boolean)value);
+        setIsDoingREST((Boolean) value);
       }
       break;
 
@@ -639,7 +671,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetHttpMethod();
       } else {
-        setHttpMethod((String)value);
+        setHttpMethod((String) value);
       }
       break;
 
@@ -647,7 +679,7 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetIsDoingMTOM();
       } else {
-        setIsDoingMTOM((Boolean)value);
+        setIsDoingMTOM((Boolean) value);
       }
       break;
 
@@ -655,10 +687,18 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (value == null) {
         unsetIsDoingSwA();
       } else {
-        setIsDoingSwA((Boolean)value);
+        setIsDoingSwA((Boolean) value);
       }
       break;
 
+    case INCOMMING_TRANSPORT:
+      if (value == null) {
+        unsetIncommingTransport();
+      } else {
+        setIncommingTransport((String) value);
+      }
+      break;
+      
     }
   }
 
@@ -697,6 +737,9 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
     case IS_DOING_SW_A:
       return Boolean.valueOf(isIsDoingSwA());
 
+    case INCOMMING_TRANSPORT:
+      return getIncommingTransport();
+
     }
     throw new IllegalStateException();
   }
@@ -730,6 +773,8 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       return isSetIsDoingMTOM();
     case IS_DOING_SW_A:
       return isSetIsDoingSwA();
+    case INCOMMING_TRANSPORT:
+      return isSetIncommingTransport();
     }
     throw new IllegalStateException();
   }
@@ -844,6 +889,17 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
         return false;
       if (this.isDoingSwA != that.isDoingSwA)
         return false;
+    }
+
+    boolean this_present_incommingTransport = true && this.isSetIncommingTransport();
+    boolean that_present_incommingTransport = true && that.isSetIncommingTransport();
+    if (this_present_incommingTransport || that_present_incommingTransport) {
+      if (!(this_present_incommingTransport && that_present_incommingTransport)) {
+        return false;
+      }
+      if (!this.incommingTransport.equals(that.incommingTransport)) {
+        return false;
+      }
     }
 
     return true;
@@ -972,6 +1028,16 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetIncommingTransport()).compareTo(typedOther.isSetIncommingTransport());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetIncommingTransport()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.incommingTransport, typedOther.incommingTransport);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -1062,6 +1128,16 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
     if (!first) sb.append(", ");
     sb.append("isDoingSwA:");
     sb.append(this.isDoingSwA);
+    first = false;
+    if (!first) {
+      sb.append(", ");
+    }
+    sb.append("incommingTransport:");
+    if (this.incommingTransport == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.incommingTransport);
+    }
     first = false;
     sb.append(")");
     return sb.toString();
@@ -1207,6 +1283,14 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 12: // INCOMMING_TRANSPORT
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.incommingTransport = iprot.readString();
+              struct.setIncommingTransportIsSet(true);
+            } else {
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -1277,6 +1361,11 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       oprot.writeFieldBegin(IS_DOING_SW_A_FIELD_DESC);
       oprot.writeBool(struct.isDoingSwA);
       oprot.writeFieldEnd();
+      if (struct.incommingTransport != null) {
+        oprot.writeFieldBegin(INCOMMING_TRANSPORT_FIELD_DESC);
+        oprot.writeString(struct.incommingTransport);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -1328,7 +1417,10 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (struct.isSetIsDoingSwA()) {
         optionals.set(10);
       }
-      oprot.writeBitSet(optionals, 11);
+      if (struct.isSetIncommingTransport()) {
+        optionals.set(11);
+      }
+      oprot.writeBitSet(optionals, 12);
       if (struct.isSetMessageId()) {
         oprot.writeString(struct.messageId);
       }
@@ -1368,6 +1460,9 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       }
       if (struct.isSetIsDoingSwA()) {
         oprot.writeBool(struct.isDoingSwA);
+      }
+      if (struct.isSetIncommingTransport()) {
+        oprot.writeString(struct.incommingTransport);
       }
     }
 
@@ -1429,6 +1524,10 @@ public class Message implements org.apache.thrift.TBase<Message, Message._Fields
       if (incoming.get(10)) {
         struct.isDoingSwA = iprot.readBool();
         struct.setIsDoingSwAIsSet(true);
+      }
+      if (incoming.get(11)) {
+        struct.incommingTransport = iprot.readString();
+        struct.setIncommingTransportIsSet(true);
       }
     }
   }

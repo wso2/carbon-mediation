@@ -50,7 +50,7 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
         } else {
             cacheElem.addAttribute(fac.createOMAttribute(CachingConstants.COLLECTOR_STRING, nullNS, "false"));
 
-            if (cacheMediator.getTimeout() != 0) {
+            if (cacheMediator.getTimeout() > -1) {
                 cacheElem.addAttribute(
                         fac.createOMAttribute(CachingConstants.TIMEOUT_STRING, nullNS,
                                               Long.toString(cacheMediator.getTimeout())));

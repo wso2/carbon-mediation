@@ -31,77 +31,77 @@ import javax.xml.namespace.QName;
 public class CacheMediator extends AbstractListMediator {
 
     /**
-     * QName of the collector
+     * QName of the collector.
      */
     private static final QName ATT_COLLECTOR = new QName(CachingConstants.COLLECTOR_STRING);
 
     /**
-     * QName of the maximum message size
+     * QName of the maximum message size.
      */
     private static final QName ATT_MAX_MSG_SIZE = new QName(CachingConstants.MAX_MESSAGE_SIZE_STRING);
 
     /**
-     * QName of the timeout
+     * QName of the timeout.
      */
     private static final QName ATT_TIMEOUT = new QName(CachingConstants.TIMEOUT_STRING);
 
     /**
-     * QName of the mediator sequence
+     * QName of the mediator sequence.
      */
     private static final QName ATT_SEQUENCE = new QName(CachingConstants.SEQUENCE_STRING);
 
     /**
-     * QName of the implementation type
+     * QName of the implementation type.
      */
     private static final QName ATT_TYPE = new QName(CachingConstants.TYPE_STRING);
 
     /**
-     * QName of the maximum message size
+     * QName of the maximum message size.
      */
     private static final QName ATT_SIZE = new QName(CachingConstants.MAX_SIZE_STRING);
 
     /**
-     * QName of the onCacheHit mediator sequence reference
+     * QName of the onCacheHit mediator sequence reference.
      */
     private static final QName ON_CACHE_HIT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                           CachingConstants.ON_CACHE_HIT_STRING);
 
     /**
-     * QName of the cache implementation
+     * QName of the cache implementation.
      */
     private static final QName IMPLEMENTATION_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                             CachingConstants.IMPLEMENTATION_STRING);
 
     /**
-     * This holds the default timeout of the mediator cache
+     * This holds the default timeout of the mediator cache.
      */
     private static final long DEFAULT_TIMEOUT = 5000L;
 
     /**
-     * QName of the onCacheHit mediator sequence reference
+     * QName of the onCacheHit mediator sequence reference.
      */
     private static final QName PROTOCOL_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                       CachingConstants.PROTOCOL_STRING);
 
     /**
-     * QName of the hTTPMethodToCache
+     * QName of the hTTPMethodToCache.
      */
     private static final QName HTTP_METHODS_TO_CACHE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                                    CachingConstants.METHODS_STRING);
 
     /**
-     * QName of the headersToExcludeInHash
+     * QName of the headersToExcludeInHash.
      */
     private static final QName HEADERS_TO_EXCLUDE_IN_HASH_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                                         CachingConstants.HEADERS_TO_EXCLUDE_STRING);
     /**
-     * QName of the response codes to include when hashing
+     * QName of the response codes to include when hashing.
      */
     private static final QName RESPONSE_CODES_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                             CachingConstants.RESPONSE_CODES_STRING);
 
     /**
-     * QName of the digest generator
+     * QName of the digest generator.
      */
     private static final QName HASH_GENERATOR_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                             CachingConstants.HASH_GENERATOR_STRING);
@@ -140,22 +140,22 @@ public class CacheMediator extends AbstractListMediator {
     private int maxMessageSize = -1;
 
     /**
-     * The regex expression of the HTTP response code to be cached
+     * The regex expression of the HTTP response code to be cached.
      */
     private String responseCodes = CachingConstants.ANY_RESPONSE_CODE;
 
     /**
-     * The headers to exclude when caching
+     * The headers to exclude when caching.
      */
     private String headersToExcludeInHash = "";
 
     /**
-     * The protocol type used in caching
+     * The protocol type used in caching.
      */
     private String protocolType = CachingConstants.HTTP_PROTOCOL_TYPE;
 
     /**
-     * The http method type that needs to be cached
+     * The http method type that needs to be cached.
      */
     private String hTTPMethodsToCache = CachingConstants.ALL;
 
@@ -277,7 +277,7 @@ public class CacheMediator extends AbstractListMediator {
     }
 
     /**
-     * This method gives the HTTP method that needs to be cached
+     * This method gives the HTTP method that needs to be cached.
      *
      * @return the HTTP method to be cached
      */
@@ -286,7 +286,7 @@ public class CacheMediator extends AbstractListMediator {
     }
 
     /**
-     * This sets the HTTP method that needs to be cached
+     * This sets the HTTP method that needs to be cached.
      *
      * @param hTTPMethodToCache the HTTP method to be cached
      */
@@ -295,7 +295,8 @@ public class CacheMediator extends AbstractListMediator {
     }
 
     /**
-     * Returns the protocolType of the message
+     * Returns the protocolType of the message.
+     *
      * @return the protocol type of the messages
      */
     public String getProtocolType() {
@@ -312,7 +313,8 @@ public class CacheMediator extends AbstractListMediator {
     }
 
     /**
-     * Returns the response codes (regex expression)
+     * Returns the response codes (regex expression).
+     *
      * @return The regex expression of the HTTP response code of the messages to be cached
      */
     public String getResponseCodes() {
@@ -338,7 +340,7 @@ public class CacheMediator extends AbstractListMediator {
     }
 
     /**
-     * This method sets the array of headers that would be excluded when hashing
+     * This method sets the array of headers that would be excluded when hashing.
      *
      * @param headersToExcludeInHash array of headers to exclude from hashing.
      */
@@ -359,12 +361,12 @@ public class CacheMediator extends AbstractListMediator {
 
             cache.addAttribute(fac.createOMAttribute(CachingConstants.COLLECTOR_STRING, nullNS, "false"));
 
-            if (timeout != 0) {
+            if (timeout > -1) {
                 cache.addAttribute(
                         fac.createOMAttribute(CachingConstants.TIMEOUT_STRING, nullNS, Long.toString(timeout)));
             }
 
-            if (maxMessageSize != 0) {
+            if (maxMessageSize > -1) {
                 cache.addAttribute(fac.createOMAttribute(CachingConstants.MAX_MESSAGE_SIZE_STRING, nullNS,
                                                          Integer.toString(maxMessageSize)));
             }
@@ -425,8 +427,7 @@ public class CacheMediator extends AbstractListMediator {
     }
 
     /**
-     * Creates the cache mediator with given configuration XML as OMElement
-     *
+     * Creates the cache mediator with given configuration XML as OMElement.
      * @param elem OMElement to be converted to cache mediator Object.
      */
     public void build(OMElement elem) {

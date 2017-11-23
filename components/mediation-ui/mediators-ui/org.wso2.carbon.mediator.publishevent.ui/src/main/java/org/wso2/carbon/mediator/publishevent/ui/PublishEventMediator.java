@@ -25,7 +25,9 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.SynapseXPathFactory;
 import org.apache.synapse.config.xml.SynapseXPathSerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.xpath.operations.Bool;
 import org.jaxen.JaxenException;
+import org.omg.CORBA.TIMEOUT;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
 
@@ -38,6 +40,8 @@ public class PublishEventMediator extends AbstractMediator {
 	public static final QName EVENT_SINK_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "eventSink");
 	public static final QName STREAM_NAME_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "streamName");
 	public static final QName STREAM_VERSION_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "streamVersion");
+	public static final QName ASYNC_Q = new QName("async");
+	public static final QName ASYNC_TIMEOUT_Q = new QName("timeout");
 	public static final QName ATTRIBUTES_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attributes");
 	public static final QName ATTRIBUTE_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "attribute");
 	public static final QName META_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "meta");
@@ -46,7 +50,11 @@ public class PublishEventMediator extends AbstractMediator {
 	public static final QName PAYLOAD_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "payload");
 	public static final QName TYPE_Q = new QName("type");
 	public static final QName DEFAULT_Q = new QName("defaultValue");
-	private String streamName, streamVersion, eventSink;
+	private String streamName;
+	private String streamVersion;
+	private String eventSink;
+	private String isAsync = "true";
+	private String timeout;
 	private List<Property> metaProperties = new ArrayList<Property>();
 	private List<Property> correlationProperties = new ArrayList<Property>();
 	private List<Property> payloadProperties = new ArrayList<Property>();
@@ -70,6 +78,18 @@ public class PublishEventMediator extends AbstractMediator {
 
 		OMElement publishEventElement = fac.createOMElement("publishEvent", synNS);
 		saveTracingState(publishEventElement, this);
+
+		if (isAsync() != null) {
+			OMAttribute isAsyncAttribute = fac
+					.createOMAttribute(PublishEventMediator.ASYNC_Q.getLocalPart(), nullNS, this.isAsync());
+			publishEventElement.addAttribute(isAsyncAttribute);
+		}
+
+		if (getTimeout() != null) {
+			OMAttribute asyncTimeout = fac
+					.createOMAttribute(PublishEventMediator.ASYNC_TIMEOUT_Q.getLocalPart(), nullNS, this.getTimeout());
+			publishEventElement.addAttribute(asyncTimeout);
+		}
 
 		if (streamName != null && !streamName.equals("")) {
 			OMElement streamNameElement = fac.createOMElement(PublishEventMediator.STREAM_NAME_Q.getLocalPart(), synNS);
@@ -137,6 +157,13 @@ public class PublishEventMediator extends AbstractMediator {
 	 * @param elem OMElement to be converted to publishEvent Mediator Object.
 	 */
 	public void build(OMElement elem) {
+		String async = elem.getAttributeValue(ASYNC_Q);
+		this.setIsAsync(async);
+
+		if (Boolean.parseBoolean(async)) {
+			this.setTimeout(elem.getAttributeValue(ASYNC_TIMEOUT_Q));
+		}
+
 		OMElement streamName = elem.getFirstChildWithName(STREAM_NAME_Q);
 		if (streamName == null) {
 			throw new SynapseException(STREAM_NAME_Q.getLocalPart() + " element missing");
@@ -310,6 +337,10 @@ public class PublishEventMediator extends AbstractMediator {
 		return streamName;
 	}
 
+	public String isAsync() {
+		return isAsync;
+	}
+
 	public void setStreamName(String streamName) {
 		this.streamName = streamName;
 	}
@@ -330,6 +361,10 @@ public class PublishEventMediator extends AbstractMediator {
 		this.correlationProperties = correlationProperties;
 	}
 
+	public void setIsAsync(String isAsync) {
+		this.isAsync = isAsync;
+	}
+
 	public void setPayloadProperties(List<Property> payloadProperties) {
 		this.payloadProperties = payloadProperties;
 	}
@@ -348,5 +383,13 @@ public class PublishEventMediator extends AbstractMediator {
 
 	public static QName getExpressionAttributeQ() {
 		return ATT_EXPRN;
+	}
+
+	public void setTimeout(String timeout) {
+		this.timeout = timeout;
+	}
+
+	public String getTimeout() {
+		return timeout;
 	}
 }

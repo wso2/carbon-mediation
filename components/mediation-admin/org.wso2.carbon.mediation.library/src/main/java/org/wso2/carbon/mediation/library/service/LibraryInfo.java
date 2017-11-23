@@ -51,20 +51,12 @@ public class LibraryInfo {
 	this.description = description;
     }
 
-    public void setQName(String description) {
-	this.qName = description;
+    public void setQName(String qName) {
+        this.qName = qName;
     }
 
     public String getQName() {
-	return this.qName;
-    }
-
-    public String getqName() {
-	return qName;
-    }
-
-    public void setqName(String qName) {
-	this.qName = qName;
+        return this.qName;
     }
 
     public LibraryArtifiactInfo[] getArtifacts() {

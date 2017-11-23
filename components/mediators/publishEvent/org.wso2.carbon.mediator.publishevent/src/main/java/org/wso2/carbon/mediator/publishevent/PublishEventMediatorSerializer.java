@@ -19,6 +19,7 @@
 
 package org.wso2.carbon.mediator.publishevent;
 
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorSerializer;
@@ -40,6 +41,18 @@ public class PublishEventMediatorSerializer extends AbstractMediatorSerializer {
 		PublishEventMediator publishEventMediator = (PublishEventMediator) mediator;
 		OMElement mediatorElement = fac.createOMElement(PublishEventMediatorFactory.getTagName(), synNS);
 
+		OMAttribute asyncAttribute = fac.createOMAttribute(PublishEventMediatorFactory.ATT_ASYNC.getLocalPart(), nullNS,
+				String.valueOf(publishEventMediator.isAsync()));
+		mediatorElement.addAttribute(asyncAttribute);
+
+		if (!"false".equals(asyncAttribute.getAttributeValue())) {
+			OMAttribute asyncTimeoutAttribute = fac
+					.createOMAttribute(PublishEventMediatorFactory.ATT_ASYNC_TIMEOUT.getLocalPart(), nullNS,
+							String.valueOf(publishEventMediator.getAsyncTimeout()));
+			if (!"0".equals(asyncTimeoutAttribute.getAttributeValue())) {
+				mediatorElement.addAttribute(asyncTimeoutAttribute);
+			}
+		}
 		OMElement eventSinkElement =
 				fac.createOMElement(PublishEventMediatorFactory.EVENT_SINK_QNAME.getLocalPart(), synNS);
 		eventSinkElement.setText(publishEventMediator.getEventSinkName());
