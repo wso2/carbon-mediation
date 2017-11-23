@@ -10,6 +10,7 @@ namespace java org.wso2.carbon.cloud.gateway.common.thrift.gen
  * requestURI - the resource uri
  * isDoingREST - is this a REST request?
  * httpMethod - the http method of this message
+ * incomingTransport - incoming transport type
  */
 struct Message {
     1: string messageId;
@@ -23,6 +24,7 @@ struct Message {
     9: string httpMethod;
     10: bool isDoingMTOM;
     11: bool isDoingSwA;
+    12: string incomingTransport;
 }
 
 /*
