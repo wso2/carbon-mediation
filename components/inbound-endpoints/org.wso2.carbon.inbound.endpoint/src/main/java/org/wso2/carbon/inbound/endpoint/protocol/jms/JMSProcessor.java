@@ -24,13 +24,14 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.inbound.InboundTaskProcessor;
 import org.apache.synapse.inbound.InboundProcessorParams;
 import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
 import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 
-public class JMSProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
+public class JMSProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver, InboundTaskProcessor {
 
     private static final Log log = LogFactory.getLog(JMSProcessor.class.getName());
 
@@ -120,5 +121,17 @@ public class JMSProcessor extends InboundRequestProcessorImpl implements TaskSta
 
     public void update() {
         // This will not be called for inbound endpoints
+    }
+
+    /**
+     * Remove inbound endpoints.
+     *
+     * @param removeTask Whether to remove scheduled task from the registry or not.
+     */
+    @Override
+    public void destroy(boolean removeTask) {
+        if (removeTask) {
+            destroy();
+        }
     }
 }

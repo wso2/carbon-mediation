@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.inbound.InboundProcessorParams;
+import org.apache.synapse.inbound.InboundTaskProcessor;
 import org.apache.synapse.task.TaskStartupObserver;
 import org.wso2.carbon.inbound.endpoint.common.InboundRequestProcessorImpl;
 import org.wso2.carbon.inbound.endpoint.common.InboundTask;
@@ -29,7 +30,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.PollingConstants;
 import java.util.Properties;
 
 
-public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver {
+public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskStartupObserver, InboundTaskProcessor {
     private static final Log log = LogFactory.getLog(KAFKAProcessor.class.getName());
 
     private static final String ENDPOINT_POSTFIX = "KAFKA" + COMMON_ENDPOINT_POSTFIX;
@@ -132,5 +133,17 @@ public class KAFKAProcessor extends InboundRequestProcessorImpl implements TaskS
             log.error("Error while shutdown the consumer connector" + e.getMessage(), e);
         }
         super.destroy();
+    }
+
+    /**
+     * Remove inbound endpoints.
+     *
+     * @param removeTask Whether to remove scheduled task from the registry or not.
+     */
+    @Override
+    public void destroy(boolean removeTask) {
+        if (removeTask) {
+            destroy();
+        }
     }
 }
