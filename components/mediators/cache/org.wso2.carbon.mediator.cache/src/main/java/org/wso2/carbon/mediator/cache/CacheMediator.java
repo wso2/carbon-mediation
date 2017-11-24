@@ -43,8 +43,8 @@ import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.util.FixedByteArrayOutputStream;
 import org.apache.synapse.util.MessageHelper;
-import org.wso2.carbon.mediator.cache.digest.DigestGenerator;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import org.wso2.carbon.mediator.cache.digest.DigestGenerator;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -290,8 +290,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                 handleException("Error creating response OM from cache : " + id, synCtx);
             }
             if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(getProtocolType())) {
-                msgCtx.setProperty(NhttpConstants.HTTP_SC, Integer.parseInt(cachedResponse.getStatusCode()));
-                msgCtx.setProperty(PassThroughConstants.HTTP_SC_DESC, cachedResponse.getStatusReason());
+                if (cachedResponse.getStatusCode() != null) {
+                    msgCtx.setProperty(NhttpConstants.HTTP_SC,
+                                       Integer.parseInt(cachedResponse.getStatusCode().toString()));
+                }
+                if (cachedResponse.getStatusReason() != null) {
+                    msgCtx.setProperty(PassThroughConstants.HTTP_SC_DESC, cachedResponse.getStatusReason());
+                }
             }
             if (msgCtx.isDoingREST()) {
 
@@ -359,17 +364,19 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
         CachableResponse response = (CachableResponse) synCtx.getProperty(CachingConstants.CACHED_OBJECT);
 
         if (response != null) {
-            boolean toCache;
+            boolean toCache = true;
             if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(response.getProtocolType())) {
-                String statusCode = msgCtx.getProperty(NhttpConstants.HTTP_SC).toString();
-                // Now create matcher object.
-                Matcher m = response.getResponseCodePattern().matcher(statusCode);
-                if (m.matches()) {
-                    toCache = true;
-                    response.setStatusCode(statusCode);
-                    response.setStatusReason(msgCtx.getProperty(PassThroughConstants.HTTP_SC_DESC).toString());
-                } else {
-                    toCache = false;
+                String statusCode = (String) msgCtx.getProperty(NhttpConstants.HTTP_SC);
+
+                if (statusCode != null) {
+                    // Now create matcher object.
+                    Matcher m = response.getResponseCodePattern().matcher(statusCode);
+                    if (m.matches()) {
+                        response.setStatusCode(statusCode);
+                        response.setStatusReason((String) msgCtx.getProperty(PassThroughConstants.HTTP_SC_DESC));
+                    } else {
+                        toCache = false;
+                    }
                 }
                 if (toCache) {
                     toCache = false;
@@ -381,8 +388,6 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                         }
                     }
                 }
-            } else {
-                toCache = true;
             }
             if (toCache) {
                 String contentType = ((String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE)).split(";")[0];
