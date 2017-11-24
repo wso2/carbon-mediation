@@ -47,6 +47,8 @@ function poolOnClick() {
     store_displayElement('store.jdbc.url', true);
     store_displayElement('store.jdbc.user', true);
     store_displayElement('store.jdbc.passwd', true);
+    store_displayElement('store.polling.count', true);
+    store_displayElement('store.path', true);
     store_displayElement('sourceGroup', false);
     store_displayElement('dataSourceSelect', false);
     store_displayElement('dsProps', true);
@@ -86,4 +88,14 @@ function existingOnClick() {
     store_displayElement('dataSourceSelect', true);
     store_displayElement('dsProps', false);
     store_displayElement('addProp', false);
+}
+
+function onEvalTypeChange() {
+    var argEval = document.getElementById('resequencer.argEval').value;
+    var nsEditorButtonTD = document.getElementById("nsEditorButtonTD");
+    if ('xml' == argEval) {
+        document.getElementById(nsEditorButtonTD).style.visibility = "visible";
+    }else {
+        document.getElementById(nsEditorButtonTD).style.visibility = "hidden";
+    }
 }
