@@ -19,12 +19,12 @@
     <parent>
         <artifactId>carbon-mediation</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.40</version>
+        <version>4.6.41-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.6.40</version>
+    <version>4.6.41-SNAPSHOT</version>
 	<artifactId>cg-features</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Cloud Gateway Feature Aggregator Module</name>

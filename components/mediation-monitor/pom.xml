@@ -20,13 +20,13 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>carbon-mediation</artifactId>
-        <version>4.6.40</version>
+        <version>4.6.41-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediation-monitor</artifactId>
     <packaging>pom</packaging>
-    <version>4.6.40</version>
+    <version>4.6.41-SNAPSHOT</version>
     <name>WSO2 Carbon - Mediation Monitor - Aggregator Module</name>
     <url>http://wso2.org</url>
     <modules>

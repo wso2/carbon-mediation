@@ -3,12 +3,12 @@
     <parent>
         <artifactId>carbon-mediation</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.40</version>
+        <version>4.6.41-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>inbound-endpoints-feature</artifactId>
-    <version>4.6.40</version>
+    <version>4.6.41-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>org.wso2.carbon.inbound.endpoints.server.feature</module>

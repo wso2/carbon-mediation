@@ -20,12 +20,12 @@
     <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-config-admin-features</artifactId>
-      <version>4.6.40</version>    
+      <version>4.6.41-SNAPSHOT</version>    
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.configadmin.ui.feature</artifactId>
-    <version>4.6.40</version>
+    <version>4.6.41-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Mediation Config Admin UI Feature</name>
     <url>http://wso2.org</url>

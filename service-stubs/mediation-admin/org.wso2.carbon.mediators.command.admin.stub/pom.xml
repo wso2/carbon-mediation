@@ -20,12 +20,12 @@
    <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediation-admin-stub</artifactId>
-      <version>4.6.40</version>
+      <version>4.6.41-SNAPSHOT</version>
    </parent>
    <modelVersion>4.0.0</modelVersion>
    <artifactId>org.wso2.carbon.mediators.command.admin.stub</artifactId>
    <packaging>bundle</packaging>
-   <version>4.6.40</version>
+   <version>4.6.41-SNAPSHOT</version>
    <name>WSO2 Carbon - Command Mediator Admin Stub</name>
    <url>http://wso2.org</url>
    <build>

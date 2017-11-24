@@ -3,14 +3,14 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>data-agents</artifactId>
-        <version>4.6.40</version>
+        <version>4.6.41-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>org.wso2.carbon.das.data.publisher.util</artifactId>
-    <version>4.6.40</version>
+    <version>4.6.41-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - DAS - Data Publisher Util</name>
 

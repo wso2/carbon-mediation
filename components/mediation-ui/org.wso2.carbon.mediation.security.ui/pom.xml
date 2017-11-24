@@ -13,12 +13,12 @@
 	<parent>
 		<groupId>org.wso2.carbon.mediation</groupId>
 		<artifactId>mediation-ui</artifactId>
-		<version>4.6.40</version>
+		<version>4.6.41-SNAPSHOT</version>
 	</parent>
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.wso2.carbon.mediation.security.ui</artifactId>
-	<version>4.6.40</version>
+	<version>4.6.41-SNAPSHOT</version>
 	<packaging>bundle</packaging>
 	<name>WSO2 Carbon - Synapse Security-UI</name>
 	<description>This is a core module of the project.</description>

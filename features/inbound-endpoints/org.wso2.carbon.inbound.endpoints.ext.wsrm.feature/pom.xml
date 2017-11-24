@@ -19,11 +19,11 @@
     <parent>
         <artifactId>inbound-endpoints-feature</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.40</version>
+        <version>4.6.41-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.6.40</version>
+    <version>4.6.41-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.inbound.endpoints.ext.wsrm.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - CXF WS Reliable Messaging Feature</name>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.inbound.endpoint.ext.wsrm</artifactId>
-            <version>4.6.40</version>
+            <version>4.6.41-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.wso2.orbit.org.apache.cxf</groupId>

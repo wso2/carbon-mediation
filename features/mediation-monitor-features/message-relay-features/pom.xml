@@ -19,10 +19,10 @@
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.40</version>
+        <version>4.6.41-SNAPSHOT</version>
     	<artifactId>mediation-monitor-features</artifactId>
     </parent>
-    <version>4.6.40</version>
+    <version>4.6.41-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>message-relay-feature</artifactId>
     <packaging>pom</packaging>
