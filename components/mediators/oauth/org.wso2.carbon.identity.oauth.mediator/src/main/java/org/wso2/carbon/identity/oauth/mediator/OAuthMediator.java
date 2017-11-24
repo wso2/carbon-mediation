@@ -120,7 +120,7 @@ public class OAuthMediator extends AbstractMediator {
 			isOauth2 = true;
             // Don´t need do validate an empty OAuth2 token
             if (authHeader.length() > OAuthConstants.BEARER.length()) {
-                accessToken = authHeader.substring(7).trim();
+                accessToken = authHeader.substring(OAuthConstants.BEARER.length()).trim();
             }
         }
 		
