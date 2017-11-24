@@ -259,5 +259,8 @@ public class RestApiAdminUtils {
         }
     }
 
+    public static boolean isNullOrEmpty(String s) {
+        return (s == null || "".equals(s));
+    }
 
 }
