@@ -79,7 +79,25 @@
         callMediator.setEndpoint(ep);
     }
 
-    callMediator.setBlocking(Boolean.parseBoolean(request.getParameter("mediator.call.blocking")));
+    //Sets blocking information
+    String param = request.getParameter("mediator.call.blocking");
+    if (param != null && !param.equals("")) {
+        callMediator.setBlocking(Boolean.parseBoolean(param));
+        if("true".equals(param)) {
+            param = request.getParameter("mediator.call.axis2XML");
+            if (param != null && !param.equals("")) {
+                callMediator.setAxis2xml(param);
+            }
+            param = request.getParameter("mediator.call.repo");
+            if (param != null && !param.equals("")) {
+                callMediator.setClientRepository(param);
+            }
+            param = request.getParameter("mediator.call.initAxis2ClientOptions");
+            if(param != null && !param.equals("")) {
+                callMediator.setInitAxis2ClientOptions(Boolean.parseBoolean(param));
+            }
+        }
+    }
 
     session.removeAttribute("anonEpXML");
     session.removeAttribute("endpointXML");
