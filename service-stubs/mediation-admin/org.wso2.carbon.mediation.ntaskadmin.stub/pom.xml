@@ -22,13 +22,13 @@
         <parent>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>mediation-admin-stub</artifactId>
-            <version>4.6.40-SNAPSHOT</version>
+            <version>4.6.40</version>
         </parent>
 
         <modelVersion>4.0.0</modelVersion>
         <artifactId>org.wso2.carbon.mediation.ntaskadmin.stub</artifactId>
         <packaging>bundle</packaging>
-        <version>4.6.40-SNAPSHOT</version>
+        <version>4.6.40</version>
         <name>WSO2 Carbon - ESB NTask Stub</name>
         <url>http://wso2.org</url>
         <build>

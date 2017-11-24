@@ -3,7 +3,7 @@
     <parent>
         <artifactId>application-mgt</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.40-SNAPSHOT</version>
+        <version>4.6.40</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.application.mgt.synapse</artifactId>

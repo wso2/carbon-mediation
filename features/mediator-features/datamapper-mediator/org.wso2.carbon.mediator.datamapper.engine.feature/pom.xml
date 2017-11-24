@@ -21,13 +21,13 @@
     <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>datamapper-mediator-feature</artifactId>
-      <version>4.6.40-SNAPSHOT</version>
+      <version>4.6.40</version>
     </parent>
 
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediator.datamapper.engine.feature</artifactId>
-    <version>4.6.40-SNAPSHOT</version>
+    <version>4.6.40</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - DataMapper Mediator Engine Feature</name>
     <url>http://wso2.org</url>

@@ -17,12 +17,12 @@
      <parent>
       <groupId>org.wso2.carbon.mediation</groupId>
       <artifactId>mediator-features</artifactId>
-      <version>4.6.40-SNAPSHOT</version>
+      <version>4.6.40</version>
    </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>oauth-mediator-feature</artifactId>
-   <version>4.6.40-SNAPSHOT</version>
+   <version>4.6.40</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - OAuth Feature Aggregator Module</name>
     <url>http://wso2.org</url>

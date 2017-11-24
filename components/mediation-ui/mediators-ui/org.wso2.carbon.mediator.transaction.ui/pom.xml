@@ -19,10 +19,10 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediators-ui</artifactId>
-        <version>4.6.40-SNAPSHOT</version>
+        <version>4.6.40</version>
     </parent>
 
-    <version>4.6.40-SNAPSHOT</version>
+    <version>4.6.40</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediator.transaction.ui</artifactId>
     <packaging>bundle</packaging>

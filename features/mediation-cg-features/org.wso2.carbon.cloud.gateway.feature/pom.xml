@@ -20,11 +20,11 @@
     <parent>
         <artifactId>cg-features</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.40-SNAPSHOT</version>
+        <version>4.6.40</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <version>4.6.40-SNAPSHOT</version>
+    <version>4.6.40</version>
     <artifactId>org.wso2.carbon.cloud.gateway.feature</artifactId>
     <name>WSO2 Carbon - Cloud Gateway Feature</name>
     <packaging>pom</packaging>

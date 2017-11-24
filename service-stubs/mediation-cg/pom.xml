@@ -21,12 +21,12 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>carbon-mediation</artifactId>
-        <version>4.6.40-SNAPSHOT</version>
+        <version>4.6.40</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-	<version>4.6.40-SNAPSHOT</version>
+	<version>4.6.40</version>
     <artifactId>mediation-cg-stub</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Service Stubs - Aggregator Module</name>

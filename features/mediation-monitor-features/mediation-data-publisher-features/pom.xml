@@ -19,13 +19,13 @@
 
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.40-SNAPSHOT</version>
+        <version>4.6.40</version>
         <artifactId>mediation-monitor-features</artifactId>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.wso2.carbon.mediation</groupId>
-    <version>4.6.40-SNAPSHOT</version>
+    <version>4.6.40</version>
     <artifactId>data-agents-features</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - BAM Data Agents Aggregator Module</name>
