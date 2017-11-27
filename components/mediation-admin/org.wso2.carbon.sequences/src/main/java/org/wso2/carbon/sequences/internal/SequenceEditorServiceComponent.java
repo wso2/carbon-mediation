@@ -169,6 +169,7 @@ public class SequenceEditorServiceComponent extends AbstractAxis2ConfigurationCo
     protected void setConfigurationContextService(ConfigurationContextService cfgCtxService) {
         ConfigHolder.getInstance().setAxisConfiguration(
                 cfgCtxService.getServerConfigContext().getAxisConfiguration());
+        ConfigHolder.getInstance().setConfigurationContextService(cfgCtxService);
     }
 
     protected void unsetConfigurationContextService(ConfigurationContextService cfgCtxService) {

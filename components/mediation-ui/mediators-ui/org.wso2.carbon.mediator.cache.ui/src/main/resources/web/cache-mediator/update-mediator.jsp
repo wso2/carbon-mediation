@@ -18,17 +18,15 @@
 <%@ page import="org.wso2.carbon.mediator.cache.ui.CacheMediator" %>
 <%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
+<%@ page import="org.wso2.carbon.mediator.cache.CachingConstants" %>
 
 <%! public boolean notNullChecker(String strChecker) {
 
     if (strChecker == null) {
         return false;
-    } else if (strChecker != null) {
-        return true;
-    } else if ((!(strChecker.equalsIgnoreCase("")))) {
-        return true;
+    } else {
+        return !strChecker.isEmpty();
     }
-    return false;
 }%>
 <%
     Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
@@ -55,39 +53,55 @@
             cacheMediator.setCollector(false);
         }
     }
+
     if (notNullChecker(cacheTimeout)) {
         try {
             cacheMediator.setTimeout(Long.parseLong(cacheTimeout));
         } catch (NumberFormatException e) {
-
+            //This is handled in the UI validation in mediator-util.js
         }
+    } else {
+        cacheMediator.setTimeout(CachingConstants.DEFAULT_TIMEOUT);
     }
+
     if (notNullChecker(maxMsgSize)) {
         try {
             cacheMediator.setMaxMessageSize(Integer.parseInt(maxMsgSize));
         } catch (NumberFormatException e) {
-
+            //This is handled in the UI validation in mediator-util.js
         }
+    } else {
+        cacheMediator.setMaxMessageSize(CachingConstants.DEFAULT_SIZE);
     }
 
     if (notNullChecker(protocolType)) {
         cacheMediator.setProtocolType(protocolType);
+    } else {
+        cacheMediator.setProtocolType(CachingConstants.HTTP_PROTOCOL_TYPE);
     }
 
     if (notNullChecker(methods)) {
         cacheMediator.setHTTPMethodsToCache(methods);
+    } else {
+        cacheMediator.setHTTPMethodsToCache(CachingConstants.ALL);
     }
 
     if (notNullChecker(headersToExclude)) {
         cacheMediator.setHeadersToExcludeInHash(headersToExclude);
+    } else {
+        cacheMediator.setHeadersToExcludeInHash("");
     }
 
     if (notNullChecker(responseCodes)) {
         cacheMediator.setResponseCodes(responseCodes);
+    } else {
+        cacheMediator.setResponseCodes(CachingConstants.ANY_RESPONSE_CODE);
     }
 
     if (notNullChecker(hashGen)) {
         cacheMediator.setDigestGenerator(hashGen);
+    } else {
+        cacheMediator.setDigestGenerator(CachingConstants.DEFAULT_HASH_GENERATOR.getClass().toString());
     }
 
     if (notNullChecker(maxSize)) {
@@ -96,6 +110,8 @@
         } catch (NumberFormatException e) {
             //This is handled in the UI validation in mediator-util.js
         }
+    } else {
+        cacheMediator.setInMemoryCacheSize(CachingConstants.DEFAULT_SIZE);
     }
 
     if ("selectFromRegistry".equals(sequenceOption)) {
@@ -108,9 +124,5 @@
     } else {
         cacheMediator.setOnCacheHitRef(null);
     }
-
-    //String cacheScope = request.getParameter("")
-
-    // todo : data collection from the edit jsp
 %>
 

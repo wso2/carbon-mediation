@@ -167,6 +167,9 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 						LibraryInfo info = new LibraryInfo();
 						info.setLibName(libName);
 						info.setPackageName(packageName);
+						info.setDescription(synLib.getDescription());
+						info.setQName(synLib.getQName().toString());
+						info.setStatus(synLib.getLibStatus());
 
 						List<LibraryArtifiactInfo> artifactsList =
 						                                           new ArrayList<LibraryArtifiactInfo>();

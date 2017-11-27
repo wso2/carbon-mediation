@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.axis2.description.Parameter;
 import org.apache.commons.logging.Log;
@@ -37,6 +38,7 @@ import org.wso2.carbon.core.ServerStartupHandler;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.ntask.common.TaskException;
 import org.wso2.carbon.ntask.core.TaskInfo;
+import org.wso2.carbon.ntask.core.impl.LocalTaskActionListener;
 import org.wso2.carbon.ntask.core.impl.clustered.ClusteredTaskManager;
 import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.utils.CarbonUtils;
@@ -745,6 +747,29 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
             }
         }
 
+    }
+
+    /**
+     * Registers a listener to the {@link org.wso2.carbon.ntask.core.TaskManager} to be notified when a local task is
+     * deleted.
+     *
+     * @param listener the listener to be notified
+     * @param taskName the task name for which the listener is bound
+     */
+    public void registerListener(final LocalTaskActionListener listener, final String taskName) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (taskManager == null) {
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException e) {
+                        //Continue looping to check if task manager is set.
+                    }
+                }
+                taskManager.registerLocalTaskActionListener(listener, taskName);
+            }
+        }).start();
     }
 
 }

@@ -27,7 +27,7 @@
 
     <groupId>org.wso2.carbon.mediation</groupId>
 	<artifactId>carbon-mediation</artifactId>
- 	<version>4.6.30-SNAPSHOT</version>
+ 	<version>4.6.44-SNAPSHOT</version>
 	<packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -2286,7 +2286,7 @@
     <properties>
 
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.6.30-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.6.44-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.import.feature.version>4.6.0</carbon.mediation.import.feature.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
@@ -2298,7 +2298,7 @@
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.6.5</carbon.commons.version>
+        <carbon.commons.version>4.6.8</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.5.0, 5.0.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
@@ -2322,7 +2322,7 @@
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v25</synapse.version>
+        <synapse.version>2.1.7-wso2v28</synapse.version>
 
         <carbon.identity.entitlement.proxy.version>5.1.1</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>

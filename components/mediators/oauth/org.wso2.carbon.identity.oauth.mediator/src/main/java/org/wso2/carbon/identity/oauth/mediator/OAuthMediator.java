@@ -118,13 +118,17 @@ public class OAuthMediator extends AbstractMediator {
 		// checking for OAuth 2.0 params
 		if (authHeader != null && authHeader.startsWith(OAuthConstants.BEARER)) {
 			isOauth2 = true;
-			accessToken = authHeader.substring(7).trim();
-		}
+            // Do not need do validate an empty OAuth2 token
+            if (authHeader.length() > OAuthConstants.BEARER.length()) {
+                accessToken = authHeader.substring(OAuthConstants.BEARER.length()).trim();
+            }
+        }
 		
 		// not a valid OAuth 2.0 request
 		if (isOauth2 == true && accessToken == null) {
-			throw new SynapseException("OAuth 2.0 access_token could not found in the request");
-		}
+            // Throw a correct descriptive message.
+            throw new SynapseException("Invalid or empty OAuth 2.0 token");
+        }
 
         return isOauth2;
 	}
