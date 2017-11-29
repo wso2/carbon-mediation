@@ -103,6 +103,8 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
         deploySynapseLibrary(artifacts, axisConfig);
         //lists to hold different artifact types considering the deployment order
         Map<String, List<Artifact.Dependency>> artifactTypeMap = new LinkedHashMap<>();
+        artifactTypeMap.put(SynapseAppDeployerConstants.MEDIATOR_TYPE, new ArrayList<Artifact.Dependency>());
+        artifactTypeMap.put(SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE, new ArrayList<Artifact.Dependency>());
         artifactTypeMap.put(SynapseAppDeployerConstants.LOCAL_ENTRY_TYPE, new ArrayList<Artifact.Dependency>());
         artifactTypeMap.put(SynapseAppDeployerConstants.ENDPOINT_TYPE, new ArrayList<Artifact.Dependency>());
         artifactTypeMap.put(SynapseAppDeployerConstants.SEQUENCE_TYPE, new ArrayList<Artifact.Dependency>());
@@ -119,6 +121,12 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
         //Categorize artifacts based on the artifact type
         for (Artifact.Dependency dep : artifacts) {
             switch (dep.getArtifact().getType()) {
+                case SynapseAppDeployerConstants.MEDIATOR_TYPE:
+                    artifactTypeMap.get(SynapseAppDeployerConstants.MEDIATOR_TYPE).add(dep);
+                    break;
+                case SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE:
+                    artifactTypeMap.get(SynapseAppDeployerConstants.SYNAPSE_LIBRARY_TYPE).add(dep);
+                    break;
                 case SynapseAppDeployerConstants.LOCAL_ENTRY_TYPE:
                     artifactTypeMap.get(SynapseAppDeployerConstants.LOCAL_ENTRY_TYPE).add(dep);
                     break;
@@ -127,6 +135,9 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     break;
                 case SynapseAppDeployerConstants.SEQUENCE_TYPE:
                     artifactTypeMap.get(SynapseAppDeployerConstants.SEQUENCE_TYPE).add(dep);
+                    break;
+                case SynapseAppDeployerConstants.MESSAGE_STORE_TYPE:
+                    artifactTypeMap.get(SynapseAppDeployerConstants.MESSAGE_STORE_TYPE).add(dep);
                     break;
                 case SynapseAppDeployerConstants.TEMPLATE_TYPE:
                     artifactTypeMap.get(SynapseAppDeployerConstants.TEMPLATE_TYPE).add(dep);
@@ -139,9 +150,6 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     break;
                 case SynapseAppDeployerConstants.EVENT_SOURCE_TYPE:
                     artifactTypeMap.get(SynapseAppDeployerConstants.EVENT_SOURCE_TYPE).add(dep);
-                    break;
-                case SynapseAppDeployerConstants.MESSAGE_STORE_TYPE:
-                    artifactTypeMap.get(SynapseAppDeployerConstants.MESSAGE_STORE_TYPE).add(dep);
                     break;
                 case SynapseAppDeployerConstants.MESSAGE_PROCESSOR_TYPE:
                     artifactTypeMap.get(SynapseAppDeployerConstants.MESSAGE_PROCESSOR_TYPE).add(dep);
