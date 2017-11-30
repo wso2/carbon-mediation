@@ -366,7 +366,14 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
         if (response != null) {
             boolean toCache = true;
             if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(response.getProtocolType())) {
-                String statusCode = (String) msgCtx.getProperty(NhttpConstants.HTTP_SC);
+                Object httpStatus = msgCtx.getProperty(NhttpConstants.HTTP_SC);
+                String statusCode;
+                //Need to check the data type of HTTP_SC to avoid classcast exceptions.
+                if (httpStatus instanceof String) {
+                    statusCode = ((String) httpStatus).trim();
+                } else {
+                    statusCode = String.valueOf(httpStatus);
+                }
 
                 if (statusCode != null) {
                     // Now create matcher object.
