@@ -77,6 +77,8 @@
 <carbon:jsi18n
                 resourceBundle="org.wso2.carbon.sequences.ui.i18n.JSResources"
                 request="<%=request%>" />
+    <div id="workArea" style="overflow-x:hidden;">
+    <div id="popupContent">
     <div id="nsEditorContent" style="margin-top:10px;">
         <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
            
@@ -180,5 +182,7 @@
                 </tr>
             </tbody>
         </table>
+    </div>
+    </div>
     </div>
 </fmt:bundle>

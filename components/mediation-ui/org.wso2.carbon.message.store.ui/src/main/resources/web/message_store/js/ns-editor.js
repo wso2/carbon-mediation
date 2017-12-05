@@ -15,12 +15,10 @@ function show_ns_editor(dID, id, mode, linkID, name) {
 
     var url = 'ns_editor-ajaxprocessor.jsp?currentID=' + id + '&name=' + name +'&divID=' + dID + sufix;
 
-    var loadingContent = "<div id='workArea' style='overflow-x:hidden;'><div id='popupContent'>" +
-        "<div class='ajax-loading-message'> <img src='../resources/images/ajax-loader.gif' align='top'/> " +
-        "<span>" + messageStorei18n["ns.editor.waiting.text"] + "</span> </div></div></div>";
+     var loadingContent = "<div id='workArea' style='overflow-x:hidden;'><div id='popupContent'><div class='ajax-loading-message'> <img src='../resources/images/ajax-loader.gif' align='top'/> <span>" + messageStorei18n["ns.editor.waiting.text"] + "</span> </div></div></div>"
     CARBON.showPopupDialog(loadingContent, messageStorei18n["ns.editor.title"], 300, false, null, 550);
     var stringData = "null";
-    jQuery("#popupContent").load(url, stringData,
+    jQuery("#dialog").load(url, stringData,
         function(res, status, t) {
             if (status != "success") {
                 CARBON.showWarningDialog(messageStorei18n["ns.editor.load.error"]);
