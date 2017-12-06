@@ -120,6 +120,8 @@
             document.location.href = "inMemoryMessageStore.jsp?" + "messageStoreName=" + name;
         } else if (storeType == "org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore") {
             document.location.href = "jdbcMessageStore.jsp?" + "messageStoreName=" + name;
+        } else if (storeType == "org.apache.synapse.message.store.impl.resequencer.ResequenceMessageStore") {
+            document.location.href = "resequenceMessageStore.jsp?" + "messageStoreName=" + name;
         } else {
             document.location.href = "customMessageStore.jsp?" + "messageStoreName=" + name;
         }
@@ -272,7 +274,9 @@
                     %>
 
                     <tr>
-                        <td> <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore") && !type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
+                        <td> <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jdbc.JDBCMessageStore")
+                         && !type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore")
+                         && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
                             <a href="viewMessageStore.jsp?messageStoreName=<%=name%>">
                                 <% if (msData.getArtifactContainerName() != null) { %>
                                     <img src="images/applications.gif">
@@ -294,6 +298,7 @@
                             </a>
                         <%}%>
                         </td>
+
                         <td><%= type%>
                         </td>
                         <%if (!type.trim().equals("org.apache.synapse.message.store.impl.jms.JmsStore") && !type.trim().equals("org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore")) { %>
@@ -412,6 +417,18 @@
                         <td>
                             <fmt:message key="jdbc.message.store.desc"/>
                         </td>
+                    </tr>
+                    <tr>
+                        <td>
+                           <a class="icon-link"
+                              href="resequenceMessageStore.jsp"
+                              style="background-image: url(../admin/images/add.gif);">
+                              <fmt:message key="resequence.message.store"/>
+                           </a>
+                         </td>
+                         <td>
+                             <fmt:message key="resequence.message.store.desc"/>
+                         </td>
                     </tr>
                     <tr>
                         <td>
