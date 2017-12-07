@@ -78,7 +78,7 @@ function inboundsave1(namemsg, typemsg, form , existingList){
     return false;	
 }
 
-function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
+function inboundsave2(msg1,msg2,msg3,msg4,msg5,msg6,form){
     if (sequenceRequired && document.getElementById('inboundSequence').value == '') {
         CARBON.showWarningDialog(msg1);
         return false;
@@ -97,6 +97,12 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     }    
     if (document.getElementById('interval') != null && isNaN(document.getElementById('interval').value)) {
         CARBON.showWarningDialog(msg3);
+        return false;
+    }
+    var subscriptionDurable = document.getElementById('transport.jms.SubscriptionDurable');
+    if (subscriptionDurable.options[subscriptionDurable.selectedIndex].value == "true" &&
+        document.getElementById('transport.jms.DurableSubscriberName').value == "") {
+        CARBON.showWarningDialog(msg6);
         return false;
     }
 
@@ -124,7 +130,7 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,form){
     return false;	
 }
 
-function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
+function inboundUpdate(msg1,msg2,msg3,msg4,msg5,msg6,form){
     if (sequenceRequired && document.getElementById('inboundSequence').value == '') {
         CARBON.showWarningDialog(msg1);
         return false;
@@ -145,6 +151,12 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,form){
 	    CARBON.showWarningDialog(msg3);
 	    return false;
 	}
+    var subscriptionDurable = document.getElementById('transport.jms.SubscriptionDurable');
+    if (subscriptionDurable.options[subscriptionDurable.selectedIndex].value == "true" &&
+        document.getElementById('transport.jms.DurableSubscriberName').value == "") {
+        CARBON.showWarningDialog(msg6);
+        return false;
+    }
     
     if(requiredParams != null){
     	for(var i = 0;i<requiredParams.length;i++){
