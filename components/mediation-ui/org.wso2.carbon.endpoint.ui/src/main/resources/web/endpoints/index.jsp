@@ -618,7 +618,7 @@ function resetVars() {
                         <% if(endpoint.getIsEdited()) { %> <span style="color:grey"> ( Edited )</span><% } %>
                     </span>
                 <% } else { %>
-                    span href="#"><%= Encode.forHtmlContent(endpoint.getName())%></span>
+                    <span href="#"><%= Encode.forHtmlContent(endpoint.getName())%></span>
                 <% } %>
                 <% } else { %>
                 <% if (endpoint.getArtifactContainerName() != null) { %>

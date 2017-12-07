@@ -98,8 +98,7 @@ public class EndpointConfigurationHelper {
             try {
                 URL conn = new URL(url);
                 conn.openConnection().connect();
-                testWSDLURI(url + "?wsdl");
-                returnValue = "success";
+                returnValue = testWSDLURI(url + "?wsdl");
             } catch (UnknownHostException e) {
                 returnValue = "unknown";
             } catch (MalformedURLException e) {
