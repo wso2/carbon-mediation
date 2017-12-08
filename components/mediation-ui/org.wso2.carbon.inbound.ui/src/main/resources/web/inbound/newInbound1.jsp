@@ -397,7 +397,7 @@ var kafkaSpecialParameters = null;
                         <td class="buttonRow" colspan="3">
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.save.button.text"/>"
-                                   onclick="inboundsave2('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>',document.inboundcreationform); return false;"/>
+                                   onclick="inboundsave2('<fmt:message key="inbound.seq.cannotfound.msg"/>','<fmt:message key="inbound.err.cannotfound.msg"/>','<fmt:message key="inbound.interval.cannotfound.msg"/>','<fmt:message key="inbound.class.cannotfound.msg"/>','<fmt:message key="inbound.required.msg"/>','<fmt:message key="inbound.jms.durableSubscriberName.cannotfound.msg"/>',document.inboundcreationform); return false;"/>
                             <input class="button" type="button"
                                    value="<fmt:message key="inbound.cancel.button.text"/>"
                                    onclick="document.location.href='index.jsp?ordinal=0';"/>                                                                 
