@@ -124,16 +124,46 @@ public class JMSUtils {
                 }
 
             } else if (JMSConstants.JMS_EXPIRATION.equals(name)) {
-                message.setJMSExpiration(
-                    Long.parseLong((String) headerMap.get(JMSConstants.JMS_EXPIRATION)));
+                Object o = headerMap.get(JMSConstants.JMS_EXPIRATION);
+                if (o instanceof Long) {
+                    message.setJMSExpiration((Long) o);
+                } else if (o instanceof String) {
+                    try {
+                        message.setJMSExpiration(Long.parseLong((String) o));
+                    } catch (NumberFormatException nfe) {
+                        log.warn("Invalid jms expiration ignored : " + o, nfe);
+                    }
+                } else {
+                    log.warn("Invalid jms expiration ignored : " + o);
+                }
             } else if (JMSConstants.JMS_MESSAGE_ID.equals(name)) {
                 message.setJMSMessageID((String) headerMap.get(JMSConstants.JMS_MESSAGE_ID));
             } else if (JMSConstants.JMS_PRIORITY.equals(name)) {
-                message.setJMSPriority(
-                    Integer.parseInt((String) headerMap.get(JMSConstants.JMS_PRIORITY)));
+                Object o = headerMap.get(JMSConstants.JMS_PRIORITY);
+                if (o instanceof Integer) {
+                    message.setJMSPriority((Integer) o);
+                } else if (o instanceof String) {
+                    try {
+                        message.setJMSPriority(Integer.parseInt((String) o));
+                    } catch (NumberFormatException nfe) {
+                        log.warn("Invalid jms priority ignored : " + o, nfe);
+                    }
+                } else {
+                    log.warn("Invalid jms priority ignored : " + o);
+                }
             } else if (JMSConstants.JMS_TIMESTAMP.equals(name)) {
-                message.setJMSTimestamp(
-                    Long.parseLong((String) headerMap.get(JMSConstants.JMS_TIMESTAMP)));
+                Object o = headerMap.get(JMSConstants.JMS_TIMESTAMP);
+                if (o instanceof Long) {
+                    message.setJMSTimestamp((Long) o);
+                } else if (o instanceof String) {
+                    try {
+                        message.setJMSTimestamp(Long.parseLong((String) o));
+                    } catch (NumberFormatException nfe) {
+                        log.warn("Invalid timestamp ignored : " + o, nfe);
+                    }
+                } else {
+                    log.warn("Invalid timestamp ignored : " + o);
+                }
             } else if (JMSConstants.JMS_MESSAGE_TYPE.equals(name)) {
                 message.setJMSType((String) headerMap.get(JMSConstants.JMS_MESSAGE_TYPE));
 
