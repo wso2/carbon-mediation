@@ -100,7 +100,7 @@ function inboundsave2(msg1,msg2,msg3,msg4,msg5,msg6,form){
         return false;
     }
     var subscriptionDurable = document.getElementById('transport.jms.SubscriptionDurable');
-    if (subscriptionDurable.options[subscriptionDurable.selectedIndex].value == "true" &&
+    if (subscriptionDurable != null && subscriptionDurable.options[subscriptionDurable.selectedIndex].value == "true" &&
         document.getElementById('transport.jms.DurableSubscriberName').value == "") {
         CARBON.showWarningDialog(msg6);
         return false;
@@ -152,7 +152,7 @@ function inboundUpdate(msg1,msg2,msg3,msg4,msg5,msg6,form){
 	    return false;
 	}
     var subscriptionDurable = document.getElementById('transport.jms.SubscriptionDurable');
-    if (subscriptionDurable.options[subscriptionDurable.selectedIndex].value == "true" &&
+    if (subscriptionDurable != null && subscriptionDurable.options[subscriptionDurable.selectedIndex].value == "true" &&
         document.getElementById('transport.jms.DurableSubscriberName').value == "") {
         CARBON.showWarningDialog(msg6);
         return false;
