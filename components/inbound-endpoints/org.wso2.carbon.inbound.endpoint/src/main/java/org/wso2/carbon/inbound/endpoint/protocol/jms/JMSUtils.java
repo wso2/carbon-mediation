@@ -110,59 +110,30 @@ public class JMSUtils {
                 message.setJMSCorrelationID(
                         (String) headerMap.get(JMSConstants.JMS_COORELATION_ID));
             } else if (JMSConstants.JMS_DELIVERY_MODE.equals(name)) {
-                Object o = headerMap.get(JMSConstants.JMS_DELIVERY_MODE);
-                if (o instanceof Integer) {
-                    message.setJMSDeliveryMode((Integer) o);
-                } else if (o instanceof String) {
-                    try {
-                        message.setJMSDeliveryMode(Integer.parseInt((String) o));
-                    } catch (NumberFormatException nfe) {
-                        log.warn("Invalid delivery mode ignored : " + o, nfe);
-                    }
-                } else {
-                    log.warn("Invalid delivery mode ignored : " + o);
+                Object header = headerMap.get(JMSConstants.JMS_DELIVERY_MODE);
+                Integer value = parseHeaderToInt(header);
+                if (value != null) {
+                    message.setJMSDeliveryMode(value);
                 }
-
             } else if (JMSConstants.JMS_EXPIRATION.equals(name)) {
-                Object o = headerMap.get(JMSConstants.JMS_EXPIRATION);
-                if (o instanceof Long) {
-                    message.setJMSExpiration((Long) o);
-                } else if (o instanceof String) {
-                    try {
-                        message.setJMSExpiration(Long.parseLong((String) o));
-                    } catch (NumberFormatException nfe) {
-                        log.warn("Invalid jms expiration ignored : " + o, nfe);
-                    }
-                } else {
-                    log.warn("Invalid jms expiration ignored : " + o);
+                Object header = headerMap.get(JMSConstants.JMS_EXPIRATION);
+                Long value = parseHeaderToLong(header);
+                if (value != null) {
+                    message.setJMSExpiration(value);
                 }
             } else if (JMSConstants.JMS_MESSAGE_ID.equals(name)) {
                 message.setJMSMessageID((String) headerMap.get(JMSConstants.JMS_MESSAGE_ID));
             } else if (JMSConstants.JMS_PRIORITY.equals(name)) {
-                Object o = headerMap.get(JMSConstants.JMS_PRIORITY);
-                if (o instanceof Integer) {
-                    message.setJMSPriority((Integer) o);
-                } else if (o instanceof String) {
-                    try {
-                        message.setJMSPriority(Integer.parseInt((String) o));
-                    } catch (NumberFormatException nfe) {
-                        log.warn("Invalid jms priority ignored : " + o, nfe);
-                    }
-                } else {
-                    log.warn("Invalid jms priority ignored : " + o);
+                Object header = headerMap.get(JMSConstants.JMS_PRIORITY);
+                Integer value = parseHeaderToInt(header);
+                if (value != null) {
+                    message.setJMSPriority(value);
                 }
             } else if (JMSConstants.JMS_TIMESTAMP.equals(name)) {
-                Object o = headerMap.get(JMSConstants.JMS_TIMESTAMP);
-                if (o instanceof Long) {
-                    message.setJMSTimestamp((Long) o);
-                } else if (o instanceof String) {
-                    try {
-                        message.setJMSTimestamp(Long.parseLong((String) o));
-                    } catch (NumberFormatException nfe) {
-                        log.warn("Invalid timestamp ignored : " + o, nfe);
-                    }
-                } else {
-                    log.warn("Invalid timestamp ignored : " + o);
+                Object header = headerMap.get(JMSConstants.JMS_TIMESTAMP);
+                Long value = parseHeaderToLong(header);
+                if (value != null) {
+                    message.setJMSTimestamp(value);
                 }
             } else if (JMSConstants.JMS_MESSAGE_TYPE.equals(name)) {
                 message.setJMSType((String) headerMap.get(JMSConstants.JMS_MESSAGE_TYPE));
@@ -194,6 +165,36 @@ public class JMSUtils {
                 }
             }
         }
+    }
+
+    private static Long parseHeaderToLong(Object header) {
+        if (header instanceof Long) {
+            return (Long) header;
+        } else if (header instanceof String) {
+            try {
+               return Long.parseLong((String) header);
+            } catch (NumberFormatException nfe) {
+                log.warn("Invalid header ignored : " + header, nfe);
+            }
+        } else {
+            log.warn("Invalid header ignored : " + header);
+        }
+        return null;
+    }
+
+    private static Integer parseHeaderToInt(Object header) {
+        if (header instanceof Integer) {
+            return (Integer) header;
+        } else if (header instanceof String) {
+            try {
+                return Integer.parseInt((String) header);
+            } catch (NumberFormatException nfe) {
+                log.warn("Invalid header ignored : " + header, nfe);
+            }
+        } else {
+            log.warn("Invalid header ignored : " + header);
+        }
+        return null;
     }
 
     /**
