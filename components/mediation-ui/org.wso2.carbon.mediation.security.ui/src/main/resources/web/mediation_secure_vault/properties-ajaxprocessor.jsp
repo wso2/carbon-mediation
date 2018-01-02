@@ -1,4 +1,4 @@
-<!--
+<%--
  ~ Copyright (c) 2005-2010, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ WSO2 Inc. licenses this file to you under the Apache License,
@@ -14,7 +14,7 @@
  ~ KIND, either express or implied.  See the License for the
  ~ specific language governing permissions and limitations
  ~ under the License.
- -->
+ --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
@@ -27,17 +27,9 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage"%>
 <%@ page import="java.util.HashMap"%>
 <%@ page import="org.wso2.carbon.registry.core.RegistryConstants"%>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ taglib prefix="carbon"
 	uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar"%>
-
-<link type="text/css" href="../dialog/js/jqueryui/tabs/ui.all.css"
-	rel="stylesheet" />
-<script type="text/javascript"
-	src="../dialog/js/jqueryui/tabs/jquery-1.2.6.min.js"></script>
-<script type="text/javascript"
-	src="../dialog/js/jqueryui/tabs/jquery-ui-1.6.custom.min.js"></script>
-<script type="text/javascript"
-	src="../dialog/js/jqueryui/tabs/jquery.cookie.js"></script>
 
 <%
 	PropertiesServiceClient client_ = new PropertiesServiceClient(config, session);
@@ -135,8 +127,8 @@
 						<td style="border-right: none !important"><input
 							id="propRPath_<%=i%>" type="hidden"
 							value="<%=propertiesBean_.getPathWithVersion()%>" /><input
-							id="oldPropName_<%=i%>" type="hidden" value="<%=name%>" /><input
-							value="<%=name%>" type="text" id="propName_<%=i%>"
+							id="oldPropName_<%=i%>" type="hidden" value="<%=Encode.forHtmlAttribute(name)%>" /><input
+							value="<%=Encode.forHtmlAttribute(name)%>" type="text" id="propName_<%=i%>"
 							class="propEditNameSelector" />
 						</td>
 						<td style="border-left: none !important"><table
@@ -175,7 +167,7 @@
             	%>
 						<td style="border-right: none !important"><span
 							class="__propName"><%=tmpName%></span><span
-							class="__propNameRef propViewNameSelector" style="display: none;"><%=name%></span>
+							class="__propNameRef propViewNameSelector" style="display: none;"><%=Encode.forHtmlContent(name)%></span>
 						</td>
 						<td style="border-left: none !important"></td>
 
@@ -224,4 +216,12 @@
 			</div>
 		</div>
 	</div>
+	<link type="text/css" href="../dialog/js/jqueryui/tabs/ui.all.css"
+    	rel="stylesheet" />
+    <script type="text/javascript"
+    	src="../dialog/js/jqueryui/tabs/jquery-1.2.6.min.js"></script>
+    <script type="text/javascript"
+    	src="../dialog/js/jqueryui/tabs/jquery-ui-1.6.custom.min.js"></script>
+    <script type="text/javascript"
+    	src="../dialog/js/jqueryui/tabs/jquery.cookie.js"></script>
 </fmt:bundle>

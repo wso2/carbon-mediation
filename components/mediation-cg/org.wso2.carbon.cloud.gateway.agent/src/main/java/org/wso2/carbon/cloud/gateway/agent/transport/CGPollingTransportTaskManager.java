@@ -453,6 +453,7 @@ public class CGPollingTransportTaskManager {
 
                         msgContext.setAxisService(null); // fix the service dispatching
                         msgContext.setProperty(HTTPConstants.HTTP_METHOD, message.getHttpMethod());
+                        msgContext.setIncomingTransportName(message.getIncommingTransport());
                         RESTUtil.processXMLRequest(
                                 msgContext,
                                 new ByteArrayInputStream(message.getMessage()),
@@ -486,8 +487,7 @@ public class CGPollingTransportTaskManager {
                                         gzipInputStream,
                                         contentType));
                         isSOAP11 = msgContext.isSOAP11();
-                        populateIncomingTransporterName(msgContext);
-
+                        msgContext.setIncomingTransportName(message.getIncommingTransport());
                         AxisEngine.receive(msgContext);
                     }
                 } catch (XMLStreamException e) {
@@ -530,24 +530,4 @@ public class CGPollingTransportTaskManager {
         }
     }
 
-    private void populateIncomingTransporterName(MessageContext messageContext) {
-        SOAPHeader header = messageContext.getEnvelope().getHeader();
-        if (header != null) {
-            ArrayList<SOAPHeaderBlock> addressingHeaders = header.getHeaderBlocksWithNSURI(AddressingConstants.Final.WSA_NAMESPACE);
-            if (addressingHeaders != null && addressingHeaders.size() > 0) {
-                for (SOAPHeaderBlock addressingHeader : addressingHeaders) {
-                    if (WSA_TO.equals(addressingHeader.getLocalName())) {
-
-                        String toAddress = addressingHeader.getText();
-                        String[] address = toAddress.split(":");
-                        if (address.length > 0) {
-                            messageContext.setIncomingTransportName(address[0]);
-                        }
-                        break;
-                    }
-                }
-            }
-
-        }
-    }
 }

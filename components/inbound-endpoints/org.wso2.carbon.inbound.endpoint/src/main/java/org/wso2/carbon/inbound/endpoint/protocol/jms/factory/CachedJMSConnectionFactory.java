@@ -72,8 +72,10 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
         try {
         	connection.start();
         } catch (JMSException e) {
-            logger.error("JMS Exception while starting connection for factory '" + this.connectionFactoryString + "' " + e.getMessage());
+            logger.error("JMS Exception while starting connection for factory '"
+                    + this.connectionFactoryString + "' ", e);
             resetCache();
+            return null;
         }        
         return connection;
     }
@@ -145,12 +147,13 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
     
     public boolean closeConnection() {
         try {
-        	if(cachedConnection != null){
-        		cachedConnection.close();
-        	}
+            if (cachedConnection != null) {
+                cachedConnection.close();
+                cachedConnection = null;
+            }
             return true;
         } catch (JMSException e) {
-            logger.error("JMS Exception while closing the connection.");
+            logger.error("JMS Exception while closing the connection.", e);
         }
         return false;
     }
@@ -169,33 +172,36 @@ public class CachedJMSConnectionFactory extends JMSConnectionFactory {
     
     public boolean closeConnection(Connection connection, boolean forcefully) {
         try {
-            if(this.cacheLevel < JMSConstants.CACHE_CONNECTION || forcefully){
-            	connection.close();
+            if (this.cacheLevel < JMSConstants.CACHE_CONNECTION || forcefully) {
+                connection.close();
+                cachedConnection = null;
             }
         } catch (JMSException e) {
-            logger.error("JMS Exception while closing the connection.");
+            logger.error("JMS Exception while closing the connection.", e);
         }
         return false;
     }    
 
     public boolean closeConsumer(MessageConsumer messageConsumer, boolean forcefully) {
         try {
-            if(this.cacheLevel < JMSConstants.CACHE_CONSUMER || forcefully){
-            	messageConsumer.close();
+            if (this.cacheLevel < JMSConstants.CACHE_CONSUMER || forcefully) {
+                messageConsumer.close();
+                cachedMessageConsumer = null;
             }
         } catch (JMSException e) {
-            logger.error("JMS Exception while closing the consumer.");
+            logger.error("JMS Exception while closing the consumer.", e);
         }
         return false;
     }     
 
     public boolean closeSession(Session session, boolean forcefully) {
         try {
-            if(this.cacheLevel < JMSConstants.CACHE_SESSION || forcefully){
-            	session.close();
+            if (this.cacheLevel < JMSConstants.CACHE_SESSION || forcefully) {
+                session.close();
+                cachedSession = null;
             }
         } catch (JMSException e) {
-            logger.error("JMS Exception while closing the consumer.");
+            logger.error("JMS Exception while closing the consumer.", e);
         }
         return false;
     }     

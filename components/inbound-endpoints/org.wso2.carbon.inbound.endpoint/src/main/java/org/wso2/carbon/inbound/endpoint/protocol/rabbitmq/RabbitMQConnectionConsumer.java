@@ -65,7 +65,9 @@ public class RabbitMQConnectionConsumer {
         this.rabbitMQConnectionFactory = rabbitMQConnectionFactory;
         this.rabbitMQProperties = rabbitMQProperties;
         this.injectHandler = injectHandler;
-        this.rabbitMQProperties.putAll(rabbitMQProps);
+        for (final String propertyName : rabbitMQProperties.stringPropertyNames()) {
+            this.rabbitMQProps.put(propertyName, rabbitMQProperties.getProperty(propertyName));
+        }
     }
 
     public void execute() {
@@ -141,7 +143,7 @@ public class RabbitMQConnectionConsumer {
         }
         //set the qos value for the consumer//
         String qos = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_QOS);
-        if (qos != null && !"".equals(qos)) {
+        if (qos != null && !qos.isEmpty()) {
             channel.basicQos(Integer.parseInt(qos));
         }
 
@@ -175,7 +177,7 @@ public class RabbitMQConnectionConsumer {
             if (message != null) {
                 idle = false;
                 try {
-                    successful = injectHandler.invoke(message);
+                    successful = injectHandler.invoke(message, inboundName);
                 } finally {
                     if (successful) {
                         try {
@@ -189,6 +191,9 @@ public class RabbitMQConnectionConsumer {
                     } else {
                         try {
                             channel.txRollback();
+                            // According to the spec, rollback doesn't automatically redeliver unacked messages.
+                            // We need to call recover explicitly.
+                            channel.basicRecover();
                         } catch (IOException e) {
                             log.error("Error while trying to roll back transaction", e);
                         }
@@ -260,6 +265,11 @@ public class RabbitMQConnectionConsumer {
             log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
         }
 
+        //set QoS parameter for the channel before it is assigned to the consumer
+        String qos = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_QOS);
+        if (qos != null && !qos.isEmpty()) {
+            channel.basicQos(Integer.parseInt(qos));
+        }
         queueingConsumer = new QueueingConsumer(channel);
 
         consumerTagString = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_TAG);

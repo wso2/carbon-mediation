@@ -23,6 +23,9 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.HashMap" %>
 <%@ taglib prefix="carbon" uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesInformationRepository" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesInformation" %>
+<%@ page import="java.util.Iterator" %>
 <carbon:jsi18n resourceBundle="org.wso2.carbon.message.store.ui.i18n.JSResources"
                request="<%=request%>"/>
 
@@ -42,9 +45,7 @@
 </script>
 
 <%!
-
-
-    private String getMessageStoreXML() throws Exception {
+    private String getMessageStoreXML(NameSpacesInformation information) throws Exception {
 
         String messageStoreName = req.getParameter("Name").trim();
         String provider = req.getParameter("Provider");
@@ -52,10 +53,8 @@
         String removedParams = req.getParameter("removedParams");
         String params = req.getParameter("tableParams");
 
-
         if (addedParams != null) {
             addedParams = addedParams.trim();
-
         }
 
         if (removedParams != null) {
@@ -82,6 +81,7 @@
         }
 
         HashMap<String, String> paramList = new HashMap<String, String>();
+
         if (params != null) {
             String[] paramParts = params.split("\\|");
             for (int i = 1; i < paramParts.length; i++) {
@@ -89,10 +89,25 @@
                 String[] pair = part.split("#");
                 String pName = pair[0];
                 String value = pair[1];
-                paramList.put(pName.trim(), value.trim());
-                messageStoreXml.append("<ns1:parameter name=\"").append(pName.trim()).append("\" >").
-                        append(value.trim()).append("</ns1:parameter>");
+                if (pName.equals("store.resequence.id.path")) {
+                    messageStoreXml.append("<ns1:parameter name=\"").append(pName.trim()).append("\"").append(" ");
+                    if (information != null && information.getPrefixes() != null) {
+                        for (Iterator<String> it = information.getPrefixes(); it.hasNext(); ) {
+                            String prefix = it.next();
+                            if (!SYNAPSE_NS.equals(information.getNameSpaceURI(prefix))) {
+                                messageStoreXml.append("xmlns:").append(prefix).append("=\"")
+                                        .append(information.getNameSpaceURI(prefix)).append("\" ");
+                            }
+                        }
+                    }
+                    messageStoreXml.append("expression=\"").append(value.trim()).append("\" />");
+                } else {
+                    paramList.put(pName.trim(), value.trim());
 
+                    messageStoreXml.append("<ns1:parameter name=\"").append(pName.trim()).append("\" >").
+                            append(value.trim()).append("</ns1:parameter>");
+
+                }
             }
 
         }
@@ -113,6 +128,7 @@
                 throw new Exception();
             }
         }
+
         messageStoreXml.append("</ns1:messageStore>");
         return messageStoreXml.toString().trim();
     }
@@ -121,6 +137,7 @@
 
 <%
     String name = request.getParameter("Name");
+    String id = "resequencer.argValue";
     req = request;
     ses = session;
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),
@@ -131,8 +148,19 @@
     MessageStoreAdminServiceClient messageStoreClient = new MessageStoreAdminServiceClient(cookie, url, configContext);
     int error = 0;
     StringBuilder messageStore = new StringBuilder();
+
+    NameSpacesInformationRepository repository = (NameSpacesInformationRepository) session.getAttribute(
+            NameSpacesInformationRepository.NAMESPACES_INFORMATION_REPOSITORY);
+    NameSpacesInformation information = null;
+    if (repository == null) {
+        repository = new NameSpacesInformationRepository();
+        session.setAttribute(NameSpacesInformationRepository.NAMESPACES_INFORMATION_REPOSITORY, repository);
+    } else {
+        information = repository.getNameSpacesInformation(name, id);
+    }
+
     try {
-        messageStore.append(getMessageStoreXML());
+        messageStore.append(getMessageStoreXML(information));
     } catch (Exception e) {
         error = 1;
 %>
@@ -189,7 +217,6 @@
 %>
 <%
     try {
-
         messageStoreClient.addMessageStore(messageStore.toString());
     } catch (Exception e) {
         error = 1;

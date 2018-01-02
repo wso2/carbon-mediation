@@ -22,7 +22,7 @@ import org.wso2.carbon.inbound.endpoint.protocol.websocket.AbstractSubprotocolHa
 
 public class EchoSubprotocolHandler extends AbstractSubprotocolHandler {
 
-    public EchoSubprotocolHandler(){
+    public EchoSubprotocolHandler() {
         super.setSubprotocolIdentifier("echo");
     }
 
@@ -30,5 +30,4 @@ public class EchoSubprotocolHandler extends AbstractSubprotocolHandler {
         context.channel().writeAndFlush(frame.retain());
         return false;
     }
-
 }

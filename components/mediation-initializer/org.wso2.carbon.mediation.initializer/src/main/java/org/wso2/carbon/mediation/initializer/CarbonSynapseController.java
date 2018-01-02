@@ -62,6 +62,8 @@ public class CarbonSynapseController extends Axis2SynapseController {
 
     private static final Log log = LogFactory.getLog(CarbonSynapseController.class);
 
+    private static final String PARAMETER_VALUE_TRUE = Boolean.toString(true);
+
     private String currentConfigurationName;
 
     private String synapseXMLLocation;
@@ -197,19 +199,17 @@ public class CarbonSynapseController extends Axis2SynapseController {
 
         // adding the Keep history parameter to every ProxyService to prevent the service
         // history being deleted on undeploying services at destroy time
-        AxisConfiguration axisConfiguration = synapseConfiguration.getAxisConfiguration();
         for(ProxyService proxy : synapseConfiguration.getProxyServices()) {
             try {
-                axisConfiguration.getService(proxy.getName()).addParameter(
-                    CarbonConstants.KEEP_SERVICE_HISTORY_PARAM , "true");
+                proxy.getAxisService().addParameter(CarbonConstants.KEEP_SERVICE_HISTORY_PARAM, PARAMETER_VALUE_TRUE);
             } catch (AxisFault axisFault) {
-                log.error("Error while accesing the Proxy Service " + proxy.getName()
+                log.error("Error while accessing the Proxy Service " + proxy.getName()
                         + ". Service configuration history might get lost", axisFault);
             }
 
         }
 
-        // finally call the super logic to do the destroy tasks afetr persisting
+        // finally call the super logic to do the destroy tasks after persisting
         super.destroySynapseEnvironment();
     }
 

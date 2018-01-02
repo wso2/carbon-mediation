@@ -17,19 +17,6 @@
  */
 package org.wso2.carbon.inbound.endpoint.protocol.jms;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.Properties;
-
-import javax.jms.BytesMessage;
-import javax.jms.Connection;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.MapMessage;
-import javax.jms.Message;
-import javax.jms.TextMessage;
-
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -57,6 +44,18 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.inbound.endpoint.protocol.generic.GenericConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.jms.factory.CachedJMSConnectionFactory;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.Properties;
+import javax.jms.BytesMessage;
+import javax.jms.Connection;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.jms.Message;
+import javax.jms.TextMessage;
 
 /**
  * 
@@ -97,21 +96,26 @@ public class JMSInjectHandler {
             msgCtx.setProperty("inbound.endpoint.name", name);
             InboundEndpoint inboundEndpoint = msgCtx.getConfiguration().getInboundEndpoint(name);
             CustomLogSetter.getInstance().setLogAppender(inboundEndpoint.getArtifactContainerName());
-            String contentType = msg.getJMSType();
-            
-            if (contentType == null || contentType.trim().equals("")) {
-                String contentTypeProperty =
-                                             jmsProperties.getProperty(JMSConstants.CONTENT_TYPE_PROPERTY);
-                if (contentTypeProperty != null) {
-                    contentType = msg.getStringProperty(contentTypeProperty);
-                }
-            }else{
-                msgCtx.setProperty(JMSConstants.JMS_MESSAGE_TYPE, contentType);
+            String contentType = null;
+
+            String contentTypeProperty =
+                    jmsProperties.getProperty(JMSConstants.CONTENT_TYPE_PROPERTY);
+            if (contentTypeProperty != null) {
+                contentType = msg.getStringProperty(contentTypeProperty);
             }
-            
-            if(contentType == null || contentType.trim().equals("")){
+
+            if (contentType == null || contentType.trim().isEmpty()) {
                 contentType = jmsProperties.getProperty(JMSConstants.CONTENT_TYPE);
             }
+
+            if (contentType == null) {
+                String jmsType = msg.getJMSType();
+
+                if (jmsType != null && !(jmsType.trim().isEmpty())) {
+                    contentType = jmsType;
+                }
+            }
+
             if (log.isDebugEnabled()) {
                 log.debug("Processed JMS Message of Content-type : " + contentType);
             }

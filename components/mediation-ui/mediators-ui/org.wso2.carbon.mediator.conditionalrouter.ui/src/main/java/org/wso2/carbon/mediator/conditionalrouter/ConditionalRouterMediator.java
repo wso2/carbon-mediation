@@ -17,16 +17,12 @@
 */
 package org.wso2.carbon.mediator.conditionalrouter;
 
-
-import net.sf.saxon.value.*;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
 import org.wso2.carbon.mediator.service.ui.AbstractListMediator;
 
-import javax.xml.namespace.QName;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import javax.xml.namespace.QName;
 
 public class ConditionalRouterMediator extends AbstractListMediator {
 

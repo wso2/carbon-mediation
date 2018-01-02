@@ -157,9 +157,17 @@ public class HL7MessageUtils {
 
         // If not super tenant, assign tenant configuration context
         if (!tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
-            ConfigurationContext tenantConfigCtx =
-                    TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
-                            axis2MsgCtx.getConfigurationContext());
+            // We have to start the tenant flow in order to get tenant from the tenant cache.
+            ConfigurationContext tenantConfigCtx = null;
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                privilegedCarbonContext.setTenantDomain(tenantDomain, true);
+                tenantConfigCtx = TenantAxisUtils.getTenantConfigurationContext(tenantDomain,
+                                                                                axis2MsgCtx.getConfigurationContext());
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
 
             axis2MsgCtx.setConfigurationContext(tenantConfigCtx);
 

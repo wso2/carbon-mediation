@@ -45,6 +45,7 @@ import org.apache.synapse.transport.passthru.SourceHandler;
 import org.jaxen.SimpleNamespaceContext;
 import org.jaxen.XPath;
 import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.multitenancy.utils.TenantAxisUtils;
 import org.wso2.carbon.core.transports.CarbonHttpRequest;
 import org.wso2.carbon.core.transports.CarbonHttpResponse;
@@ -151,8 +152,15 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
             CarbonHttpResponse carbonHttpResponse = new CarbonHttpResponse(
                     temporaryData.getOutputStream());
 
-            (getRequestProcessors.get(item)).process(carbonHttpRequest,
-                    carbonHttpResponse, cfgCtx);
+            try {
+                PrivilegedCarbonContext.startTenantFlow();
+                PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(TenantAxisUtils.
+                        getTenantDomain(requestUrl), true);
+                (getRequestProcessors.get(item)).process(carbonHttpRequest,
+                        carbonHttpResponse, cfgCtx);
+            } finally {
+                PrivilegedCarbonContext.endTenantFlow();
+            }
             
              // adding headers
             Map<String, String> responseHeaderMap = carbonHttpResponse.getHeaders();
@@ -308,11 +316,16 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
                             //Removing the below code segment due to empty stack exception coming from kernel
                             //Current context does not need to be destroyed at this level.
                             //PrivilegedCarbonContext.destroyCurrentContext();
+                            String tenantDomain = TenantAxisUtils.getTenantDomain(uri);
+                            PrivilegedCarbonContext.startTenantFlow();
+                            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
                     	    axisService = TenantAxisUtils.getAxisService(serviceName, cfgCtx);
                     	} catch (AxisFault axisFault) {
                     	    log.error("Error while retrieving Axis Service for Service name: "+serviceName,
                     	    axisFault);
-                    	}
+                    	} finally {
+                            PrivilegedCarbonContext.endTenantFlow();
+                        }
                     }
                 }
 
@@ -323,9 +336,16 @@ public class PassThroughNHttpGetProcessor implements HttpGetRequestProcessor {
                                         queryString.indexOf("&") == item.length() ||
                                         queryString.indexOf("=") == item.length())) {
                             if (axisService == null) {
-                                //check for APIs since no axis2 service found
-                                if (!RequestProcessorDispatcherUtil.isDispatchToApiGetProcessor(requestUri, cfgCtx)) {
-                                    continue;
+                                try {
+                                    String tenantDomain = TenantAxisUtils.getTenantDomain(uri);
+                                    PrivilegedCarbonContext.startTenantFlow();
+                                    PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+                                    //check for APIs since no axis2 service found
+                                    if (!RequestProcessorDispatcherUtil.isDispatchToApiGetProcessor(requestUri, cfgCtx)) {
+                                        continue;
+                                    }
+                                } finally {
+                                    PrivilegedCarbonContext.endTenantFlow();
                                 }
                             }
 

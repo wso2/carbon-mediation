@@ -33,7 +33,7 @@ final class TaskBuilder {
         if (cron == null && !system && description.getInterval() < 1000) {
             throw new Exception("Task interval cannot be less than 1 second for user tasks");
         }
-        triggerInfo.setIntervalMillis((int) description.getInterval());
+        triggerInfo.setIntervalMillis(description.getInterval());
         triggerInfo.setRepeatCount(description.getCount()
                 > 0 ? description.getCount() - 1 : description.getCount());
         triggerInfo.setDisallowConcurrentExecution(true);

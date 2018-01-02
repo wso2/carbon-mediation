@@ -49,16 +49,24 @@ import java.util.Properties;
 public class JMSUtils {
 
     private static final Log log = LogFactory.getLog(JMSUtils.class);
-    
+
+    /**
+     * Method to infer the JMS message type.
+     *
+     * @param msg the message to be inferred
+     * @return the type of the JMS message
+     */
     public static String inferJMSMessageType(Message msg) {
-        if(inferTextMessage(msg)) {
+        if (isTextMessage(msg)) {
             return TextMessage.class.getName();
-        } else if(inferByteMessage(msg)) {
+        } else if (isBytesMessage(msg)) {
             return BytesMessage.class.getName();
-        } else if(inferObjectMessage(msg)) {
+        } else if (isObjectMessage(msg)) {
             return ObjectMessage.class.getName();
-        } else if(inferStreamMessage(msg)) {
+        } else if (isStreamMessage(msg)) {
             return StreamMessage.class.getName();
+        } else if (isMapMessage(msg)) {
+            return MapMessage.class.getName();
         } else {
             return null;
         }
@@ -102,30 +110,31 @@ public class JMSUtils {
                 message.setJMSCorrelationID(
                         (String) headerMap.get(JMSConstants.JMS_COORELATION_ID));
             } else if (JMSConstants.JMS_DELIVERY_MODE.equals(name)) {
-                Object o = headerMap.get(JMSConstants.JMS_DELIVERY_MODE);
-                if (o instanceof Integer) {
-                    message.setJMSDeliveryMode((Integer) o);
-                } else if (o instanceof String) {
-                    try {
-                        message.setJMSDeliveryMode(Integer.parseInt((String) o));
-                    } catch (NumberFormatException nfe) {
-                        log.warn("Invalid delivery mode ignored : " + o, nfe);
-                    }
-                } else {
-                    log.warn("Invalid delivery mode ignored : " + o);
+                Object header = headerMap.get(JMSConstants.JMS_DELIVERY_MODE);
+                Integer value = parseHeaderToInt(header);
+                if (value != null) {
+                    message.setJMSDeliveryMode(value);
                 }
-
             } else if (JMSConstants.JMS_EXPIRATION.equals(name)) {
-                message.setJMSExpiration(
-                    Long.parseLong((String) headerMap.get(JMSConstants.JMS_EXPIRATION)));
+                Object header = headerMap.get(JMSConstants.JMS_EXPIRATION);
+                Long value = parseHeaderToLong(header);
+                if (value != null) {
+                    message.setJMSExpiration(value);
+                }
             } else if (JMSConstants.JMS_MESSAGE_ID.equals(name)) {
                 message.setJMSMessageID((String) headerMap.get(JMSConstants.JMS_MESSAGE_ID));
             } else if (JMSConstants.JMS_PRIORITY.equals(name)) {
-                message.setJMSPriority(
-                    Integer.parseInt((String) headerMap.get(JMSConstants.JMS_PRIORITY)));
+                Object header = headerMap.get(JMSConstants.JMS_PRIORITY);
+                Integer value = parseHeaderToInt(header);
+                if (value != null) {
+                    message.setJMSPriority(value);
+                }
             } else if (JMSConstants.JMS_TIMESTAMP.equals(name)) {
-                message.setJMSTimestamp(
-                    Long.parseLong((String) headerMap.get(JMSConstants.JMS_TIMESTAMP)));
+                Object header = headerMap.get(JMSConstants.JMS_TIMESTAMP);
+                Long value = parseHeaderToLong(header);
+                if (value != null) {
+                    message.setJMSTimestamp(value);
+                }
             } else if (JMSConstants.JMS_MESSAGE_TYPE.equals(name)) {
                 message.setJMSType((String) headerMap.get(JMSConstants.JMS_MESSAGE_TYPE));
 
@@ -156,6 +165,36 @@ public class JMSUtils {
                 }
             }
         }
+    }
+
+    private static Long parseHeaderToLong(Object header) {
+        if (header instanceof Long) {
+            return (Long) header;
+        } else if (header instanceof String) {
+            try {
+               return Long.parseLong((String) header);
+            } catch (NumberFormatException nfe) {
+                log.warn("Invalid header ignored : " + header, nfe);
+            }
+        } else {
+            log.warn("Invalid header ignored : " + header);
+        }
+        return null;
+    }
+
+    private static Integer parseHeaderToInt(Object header) {
+        if (header instanceof Integer) {
+            return (Integer) header;
+        } else if (header instanceof String) {
+            try {
+                return Integer.parseInt((String) header);
+            } catch (NumberFormatException nfe) {
+                log.warn("Invalid header ignored : " + header, nfe);
+            }
+        } else {
+            log.warn("Invalid header ignored : " + header);
+        }
+        return null;
     }
 
     /**
@@ -321,32 +360,55 @@ public class JMSUtils {
 
         return false;
     }
-    private static boolean inferTextMessage(Message msg) {
-        if (msg instanceof TextMessage) {
-            return true;
-        }
-        return false;
+
+    /**
+     * Method to infer if the message is a TextMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is a TextMessage
+     */
+    private static boolean isTextMessage(Message msg) {
+        return (msg instanceof TextMessage);
     }
 
-    private static boolean inferStreamMessage(Message msg) {
-        if (msg instanceof StreamMessage) {
-            return true;
-        }
-        return false;
+    /**
+     * Method to infer if the message is a MapMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is a MapMessage
+     */
+    private static boolean isMapMessage(Message msg) {
+        return (msg instanceof MapMessage);
     }
 
-    private static boolean inferObjectMessage(Message msg) {
-        if (msg instanceof ObjectMessage) {
-            return true;
-        }
-        return false;
+    /**
+     * Method to infer if the message is a StreamMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is a StreamMessage
+     */
+    private static boolean isStreamMessage(Message msg) {
+        return (msg instanceof StreamMessage);
     }
 
-    private static boolean inferByteMessage(Message msg) {
-        if (msg instanceof BytesMessage) {
-            return true;
-        }
-        return false;
+    /**
+     * Method to infer if the message is an ObjectMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is an ObjectMessage
+     */
+    private static boolean isObjectMessage(Message msg) {
+        return  (msg instanceof ObjectMessage);
+    }
+
+    /**
+     * Method to infer if the message is a BytesMessage.
+     *
+     * @param msg message to be inferred
+     * @return whether or not the message is a BytesMessage
+     */
+    private static boolean isBytesMessage(Message msg) {
+        return (msg instanceof BytesMessage);
     }
     private static String inverseTransformHyphenatedString(String name) {
         return name.replaceAll(JMSConstants.HYPHEN_REPLACEMENT_STR, "-");

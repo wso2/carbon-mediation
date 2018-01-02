@@ -37,10 +37,13 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_1;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FUNCTION_NAME_CONST_2;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.JS_STRINGIFY;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.HYPHEN;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ENCODE_CHAR_HYPHEN;
 
 public class MappingResource {
 
     public static final String NAMESPACE_DELIMETER = ":";
+    public static final String NEW_LINE = "\n";
     private Schema inputSchema;
     private Schema outputSchema;
     private String inputRootelement;
@@ -107,6 +110,7 @@ public class MappingResource {
         // execute in engine
         String[] inputRootElementArray = inputRootelement.split(NAMESPACE_DELIMETER);
         String inputRootElement = inputRootElementArray[inputRootElementArray.length - 1];
+        inputRootElement = inputRootElement.replaceAll("[:=,]", "_").replace(HYPHEN, ENCODE_CHAR_HYPHEN);
         String[] outputRootElementArray = outputRootelement.split(NAMESPACE_DELIMETER);
         String outputRootElement = outputRootElementArray[outputRootElementArray.length - 1];
         String jsFunctionBody;
@@ -126,6 +130,7 @@ public class MappingResource {
         try {
             while ((configLine = configReader.readLine()) != null) {
                 configScriptBuilder.append(configLine);
+                configScriptBuilder.append(NEW_LINE);
             }
         } catch (IOException e) {
             throw new JSException(e.getMessage());

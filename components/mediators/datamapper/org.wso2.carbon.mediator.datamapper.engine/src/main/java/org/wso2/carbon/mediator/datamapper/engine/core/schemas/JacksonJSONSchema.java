@@ -54,6 +54,7 @@ public class JacksonJSONSchema implements Schema {
     private static final String TITLE_KEY = "title";
     private static final String ITEMS_KEY = "items";
     private Map<String, String> namespaceMap;
+    private Map<String, String> prefixMap;
     private boolean currentArrayIsPrimitive;
 
     public JacksonJSONSchema(InputStream inputSchema) throws SchemaException {
@@ -71,12 +72,23 @@ public class JacksonJSONSchema implements Schema {
      */
     private void initNamespaceMap() {
         namespaceMap = new HashMap<>();
+        prefixMap = new HashMap<>();
         ArrayList<Map> namespaceElementArray = (ArrayList<Map>) jsonSchemaMap.get(NAMESPACE_KEY);
         if (namespaceElementArray != null) {
             for (Map namespaceObject : namespaceElementArray) {
                 String urlValue = (String) namespaceObject.get(URL_KEY);
                 if (!namespaceMap.containsKey(urlValue)) {
                     namespaceMap.put(urlValue, (String) namespaceObject.get(PREFIX_KEY));
+                } else {
+                    //multiple prefixes exists for this namespace URI. hence adding all prefixes that related to same
+                    // namespace separating by commas
+                    //adding comma separated prefix string is looks UGLY :-/, BUT can't help .... !, trying to do with
+                    //minimum impact existing mechanism
+                    namespaceMap.put(urlValue, (namespaceMap.get(urlValue) + PREFIX_LIST_SEPERATOR + namespaceObject.get(PREFIX_KEY)));
+                }
+
+                if (!prefixMap.containsKey((String) namespaceObject.get(PREFIX_KEY))) {
+                    prefixMap.put((String) namespaceObject.get(PREFIX_KEY), urlValue);
                 }
             }
         }
@@ -201,6 +213,10 @@ public class JacksonJSONSchema implements Schema {
 
     public Map<String, String> getNamespaceMap() {
         return namespaceMap;
+    }
+
+    public Map<String, String> getPrefixMap() {
+        return prefixMap;
     }
 
     private Map<String, Object> getElementSchemaByName(List<SchemaElement> elementStack, Map<String, Object> schema)

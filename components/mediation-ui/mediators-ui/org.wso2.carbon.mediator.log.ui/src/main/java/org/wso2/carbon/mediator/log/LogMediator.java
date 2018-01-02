@@ -79,7 +79,7 @@ public class LogMediator extends AbstractMediator {
     }
 
     public String getSeparator() {
-        return separator;
+        return separator.replace("\n","\\n").replace("\t","\\t");
     }
 
     public int getLogCategory() {
@@ -99,7 +99,7 @@ public class LogMediator extends AbstractMediator {
     }
 
     public void setSeparator(String separator) {
-        this.separator = separator;
+        this.separator = separator.replace("\\n", "\n").replace("\\t", "\t");
     }
 
     public void addProperty(MediatorProperty p) {

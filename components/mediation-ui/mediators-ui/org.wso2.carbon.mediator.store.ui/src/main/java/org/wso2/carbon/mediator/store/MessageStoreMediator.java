@@ -21,10 +21,14 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.SynapsePath;
+import org.apache.synapse.config.xml.SynapsePathFactory;
+import org.apache.synapse.config.xml.SynapsePathSerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.wso2.carbon.mediator.service.MediatorException;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
 import org.wso2.carbon.mediator.service.util.MediatorProperty;
+import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
@@ -43,6 +47,8 @@ public class MessageStoreMediator extends AbstractMediator {
 
     private String messageStoreName;
 
+    private SynapsePath messageStoreExpression;
+
     private String sequence;
 
     private String name;
@@ -57,6 +63,14 @@ public class MessageStoreMediator extends AbstractMediator {
 
     public void setMessageStoreName(String messageStoreName) {
         this.messageStoreName = messageStoreName;
+    }
+
+    public SynapsePath getMessageStoreExp() {
+        return messageStoreExpression;
+    }
+
+    public void setMessageStoreExp(SynapsePath messageStoreExp) {
+        this.messageStoreExpression = messageStoreExp;
     }
 
     public String getSequence() {
@@ -89,7 +103,9 @@ public class MessageStoreMediator extends AbstractMediator {
 
        //In normal operations messageStoreName can't be null
         //But we do a null check here since in run time there can be manuel modifications
-        if(messageStoreName != null ) {
+        if (messageStoreExpression != null) {
+            SynapsePathSerializer.serializePathWithBraces(messageStoreExpression, storeElem, "messageStore");
+        } else if(messageStoreName != null ) {
             OMAttribute msName = fac.createOMAttribute(ATT_MESSAGE_STORE ,nullNS,messageStoreName);
             storeElem.addAttribute(msName);
         } else {
@@ -120,7 +136,17 @@ public class MessageStoreMediator extends AbstractMediator {
             throw new MediatorException(msg);
         }
 
-        this.messageStoreName = msName.getAttributeValue();
+        if (hasBraces(msName)) {
+            String path = removeBraces(msName);
+            try {
+                this.messageStoreExpression = SynapsePathFactory.getSynapsePath(elem, path);
+            } catch (JaxenException e) {
+                String msg = "Invalid XPath expression for attribute 'messageStore' : " + msName.getAttributeValue();
+                throw new SynapseException(msg, e);
+            }
+        } else {
+            this.messageStoreName = msName.getAttributeValue();
+        }
 
         OMAttribute sqName = elem.getAttribute(ATT_SEQUENCE_Q);
         if(sqName != null) {
@@ -134,5 +160,16 @@ public class MessageStoreMediator extends AbstractMediator {
     private void handleException(String msg) {
         LogFactory.getLog(this.getClass()).error(msg);
         throw new SynapseException(msg);
+    }
+
+    public boolean hasBraces(OMAttribute atr) {
+        String trimmed = atr.getAttributeValue().trim();
+        return ((trimmed.startsWith("{")) && (trimmed.endsWith("}")));
+    }
+
+    public String removeBraces(OMAttribute atr) {
+        String trimmed = atr.getAttributeValue().trim();
+        String path = trimmed.substring(1, trimmed.length() - 1);
+        return path;
     }
 }

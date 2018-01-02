@@ -249,6 +249,10 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
     }
 
     public Connection createConnection(String userName, String password) {
+        if (connectionFactory == null) {
+            logger.error("Connection cannot be establish to the broker. Please check the broker libs provided.");
+            return null;
+        }
         Connection connection = null;
         try {
             if ( JMSConstants.JMS_SPEC_VERSION_1_1.equals(jmsSpec) ) {

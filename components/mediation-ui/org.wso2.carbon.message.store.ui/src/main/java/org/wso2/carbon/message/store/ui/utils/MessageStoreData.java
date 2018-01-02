@@ -21,6 +21,9 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.config.xml.MessageStoreFactory;
+import org.apache.synapse.util.xpath.SynapseJsonPath;
+import org.apache.synapse.util.xpath.SynapseXPath;
+import org.jaxen.JaxenException;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
@@ -42,13 +45,15 @@ public class MessageStoreData {
 
     private Map<String, String> params = new HashMap<String, String>();
 
+    private PathInfo pathInfo;
+
     private String artifactContainerName;
 
     private boolean isEdited;
 
     public MessageStoreData(){}
 
-    public MessageStoreData(String xml) throws XMLStreamException {
+    public MessageStoreData(String xml) throws XMLStreamException, JaxenException {
         populate(xml);
     }
 
@@ -64,6 +69,10 @@ public class MessageStoreData {
         return params;
     }
 
+    public PathInfo getPathInfo() {
+        return pathInfo;
+    }
+
     public String getClazz() {
         return clazz;
     }
@@ -76,7 +85,19 @@ public class MessageStoreData {
         this.clazz=provider;
     }
 
-    private void populate(String xml) throws XMLStreamException {
+    /**
+     * Returns the Xpath expression based on the specified property.
+     *
+     * @param element the element which contains the expression and namespace.
+     * @param expression the expression extracted from the element.
+     * @return the Synapse Xpath expression value.
+     * @throws JaxenException when an error occurs while creating the xPath
+     */
+    private SynapseXPath getXPathExpression(OMElement element,String expression) throws JaxenException {
+        return new SynapseXPath(element,expression);
+    }
+
+    private void populate(String xml) throws XMLStreamException, JaxenException {
         InputStream in = new ByteArrayInputStream(xml.getBytes());
         OMElement elem = new StAXOMBuilder(in).getDocumentElement();
 
@@ -103,11 +124,23 @@ public class MessageStoreData {
         while (it.hasNext()) {
             OMElement paramElem = it.next();
             OMAttribute nameAtt = paramElem.getAttribute(MessageStoreFactory.NAME_Q);
-
+            OMAttribute expressionAttribute = paramElem.getAttribute(MessageStoreFactory.EXPRESSION_Q);
             assert nameAtt != null;
             String name = nameAtt.getAttributeValue();
-            String value = paramElem.getText();
-
+            String value;
+            if (expressionAttribute != null) {
+                value = expressionAttribute.getAttributeValue();
+                this.pathInfo = new PathInfo();
+                if (!value.startsWith("json")) {
+                    SynapseXPath xPathExpression = getXPathExpression(paramElem, value);
+                    this.pathInfo.setxPath(xPathExpression);
+                } else {
+                    SynapseJsonPath jsonPath = new SynapseJsonPath(value);
+                    this.pathInfo.setJsonPath(jsonPath);
+                }
+            } else {
+                value = paramElem.getText();
+            }
             params.put(name, value);
         }
 
