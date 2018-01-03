@@ -141,7 +141,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             transactedSession = false;
         } else if ("true".equals(strTransactedSession)) {
             transactedSession = true;
-            logger.info("Usage of transport.jms.SessionTransacted property is deprecated. Please use SESSION_TRANSACTED " +
+            logger.warn("Usage of transport.jms.SessionTransacted property is deprecated. Please use SESSION_TRANSACTED " +
                     "acknowledge mode to create a transacted session");
         }
 
