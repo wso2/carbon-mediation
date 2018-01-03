@@ -141,6 +141,8 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             transactedSession = false;
         } else if ("true".equals(strTransactedSession)) {
             transactedSession = true;
+            logger.info("Usage of transport.jms.SessionTransacted property is deprecated. Please use SESSION_TRANSACTED " +
+                    "acknowledge mode to create a transacted session");
         }
 
         String strSessionAck = properties.getProperty(JMSConstants.SESSION_ACK);
@@ -154,6 +156,7 @@ public class JMSConnectionFactory implements ConnectionFactory, QueueConnectionF
             sessionAckMode = Session.DUPS_OK_ACKNOWLEDGE;
         } else if (strSessionAck.equals("SESSION_TRANSACTED")) {
             sessionAckMode = Session.SESSION_TRANSACTED;
+            transactedSession = true;
         } else {
             sessionAckMode = 1;
         }
