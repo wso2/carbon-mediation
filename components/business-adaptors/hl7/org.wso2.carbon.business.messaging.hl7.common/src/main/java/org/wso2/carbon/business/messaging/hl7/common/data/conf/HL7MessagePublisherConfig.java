@@ -6,7 +6,7 @@ import ca.uhn.hl7v2.util.Terser;
 import org.apache.axis2.context.MessageContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.bam.data.publisher.util.PublisherUtil;
+import org.wso2.carbon.das.data.publisher.util.PublisherUtil;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.business.messaging.hl7.common.HL7Constants;
 import org.wso2.carbon.business.messaging.hl7.common.data.MessageData;
