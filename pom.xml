@@ -1799,12 +1799,6 @@
                 <artifactId>org.wso2.carbon.caching.core</artifactId>
                 <version>${org.wso2.carbon.caching.core.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.wso2.carbon</groupId>
-                <artifactId>org.wso2.carbon.bam.data.publisher.util</artifactId>
-                <version>${bam.data.publisher.version}</version>
-            </dependency>
-
 
             <!--12 Misc -->
             <dependency>
@@ -2390,7 +2384,6 @@
         <org.wso2.uri.template.version>1.6.4</org.wso2.uri.template.version>
         <org.wso2.caching.version>4.0.3</org.wso2.caching.version>
         <org.wso2.carbon.caching.core.version>4.2.0</org.wso2.carbon.caching.core.version>
-        <bam.data.publisher.version>4.2.0</bam.data.publisher.version>
         <carbon.datastore.version>4.2.0</carbon.datastore.version>
         <wso2.sap.version>1.0</wso2.sap.version>
         <wsdl4j.wso2.version>1.6.2.wso2v4</wsdl4j.wso2.version>
