@@ -31,6 +31,14 @@ public class JMSConstants {
         QUEUE, TOPIC
     };
 
+    // Fix with EI-1622
+    // No. of retries for JMS client polling that occurs before suspending polling.
+    public static final String JMS_CLIENT_POLLING_RETRIES_BEFORE_SUSPENSION = "transport.jms.RetriesBeforeSuspension";
+    // Time in milliseconds for the polling suspension period.
+    public static final String JMS_CLIENT_POLLING_SUSPENSION_PERIOD = "transport.jms.PollingSuspensionPeriod";
+    // Default time in milliseconds for the polling suspension period.
+    public static final int DEFAULT_JMS_CLIENT_POLLING_SUSPENSION_PERIOD = 60000;
+
     public static final String TOPIC_PREFIX = "topic.";
     public static final String QUEUE_PREFIX = "queue.";
 
