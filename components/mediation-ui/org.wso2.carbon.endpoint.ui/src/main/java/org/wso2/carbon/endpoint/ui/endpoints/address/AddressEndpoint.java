@@ -33,6 +33,7 @@ public class AddressEndpoint extends Endpoint {
     private String susProgFactor;
     private String errorCodes;
     private String format;
+    private String encoding;
     private boolean swa = false;
     private boolean mtom = false;
     private boolean soap11 = false;
@@ -321,6 +322,10 @@ public class AddressEndpoint extends Endpoint {
         if (address != null && !"".equals(address)) {
             addressElement.addAttribute(fac.createOMAttribute("uri", nullNS, address));
         }
+        if (encoding != null && !encoding.isEmpty()) {
+            addressElement.addAttribute(fac.createOMAttribute("encoding", nullNS, encoding));
+        }
+
         // format
         if (isSoap11()) {
             addressElement.addAttribute(fac.createOMAttribute("format", nullNS, "soap11"));
@@ -513,6 +518,7 @@ public class AddressEndpoint extends Endpoint {
         if (addressEndpoint.getName() != null) {
             setEndpointName((addressEndpoint.getName().equals("anonymous") ? "" : addressEndpoint.getName()));
         }
+        setEncoding(addressEndpoint.getDefinition().getCharSetEncoding());
         setAddress(addressEndpoint.getDefinition().getAddress());
         setDescription(addressEndpoint.getDescription());
         setSoap11(addressEndpoint.getDefinition().isForceSOAP11());
@@ -565,5 +571,13 @@ public class AddressEndpoint extends Endpoint {
 
     public void setOutboundWsSecPolicyKey(String outboundWsSecPolicyKey) {
         this.outboundWsSecPolicyKey = outboundWsSecPolicyKey;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
     }
 }
