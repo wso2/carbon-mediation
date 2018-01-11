@@ -153,6 +153,12 @@ public class SAPTransportSender extends AbstractTransportSender {
 
             } else if (uri.getScheme().equals(SAPConstants.SAP_BAPI_PROTOCOL_NAME)) {
                 String escapeErrorHandling = (String) messageContext.getProperty(SAP_ESCAPE_ERROR_HANDLING);
+                boolean isLogon = isLogon(messageContext);
+                if (log.isDebugEnabled()) {
+                    log.debug("Transaction property :" + messageContext
+                            .getProperty(SAPConstants.TRANSACTION_COMMIT_PARAM));
+                    log.debug("Logon property :" + messageContext.getProperty(SAPConstants.TRANSACTION_SAP_LOGON));
+                }
                 try {
                     OMElement payLoad,body;
                     body = messageContext.getEnvelope().getBody();
@@ -161,6 +167,13 @@ public class SAPTransportSender extends AbstractTransportSender {
                         log.debug("Received RFC/Meta DATA: " + payLoad);
                     }
                     String rfcFunctionName = RFCMetaDataParser.getBAPIRFCFucntionName(payLoad);
+                    if (isTransaction(messageContext) || isLogon) {
+                        log.info("Begin Transaction");
+                        JCoContext.begin(destination);
+                    }
+                    if (isLogon) {
+                        logon(messageContext, destination, escapeErrorHandling);
+                    }
                     if (log.isDebugEnabled()){
                         log.debug("Looking up the BAPI/RFC function: " + rfcFunctionName + ". In the " +
                                 "meta data repository");
@@ -201,7 +214,7 @@ public class SAPTransportSender extends AbstractTransportSender {
                     }
                     sendFault(messageContext, e , SAP_TRANSPORT_ERROR);
                 } finally {
-                    if (isTransaction(messageContext)) {
+                    if (isTransaction(messageContext) || isLogon) {
                         //end transaction
                         JCoContext.end(destination);
                         if (log.isDebugEnabled()){
@@ -241,6 +254,34 @@ public class SAPTransportSender extends AbstractTransportSender {
             }
         }
         return IDocFactory.IDOC_VERSION_DEFAULT;
+    }
+
+    /**
+     * Check the logon property value
+     *
+     * @param messageContext axis2 Message Context
+     * @return true or false based on the value
+     */
+    private boolean isLogon(MessageContext messageContext) {
+        String logon = (String) messageContext.getProperty(SAPConstants.TRANSACTION_SAP_LOGON);
+        return (null != logon) && ("true".equalsIgnoreCase(logon));
+    }
+
+    private void logon(MessageContext messageContext, JCoDestination destination, String escapeErrorHandling)
+            throws AxisFault {
+        JCoFunction logonFunction = getRFCfunction(destination, SAPConstants.BABI_XMI_LOGON);
+        logonFunction.getImportParameterList().setValue(SAPConstants.EXTCOMPANY,
+                (String) messageContext.getProperty(SAPConstants.TRANSPORT_SAP_EXTCOMPANY));
+        logonFunction.getImportParameterList().setValue(SAPConstants.EXTPRODUCT,
+                (String) messageContext.getProperty(SAPConstants.TRANSPORT_SAP_EXTPRODUCT));
+        logonFunction.getImportParameterList().setValue(SAPConstants.INTERFACE,
+                (String) messageContext.getProperty(SAPConstants.TRANSPORT_SAP_INTERFACE));
+        logonFunction.getImportParameterList().setValue(SAPConstants.VERSION,
+                (String) messageContext.getProperty(SAPConstants.TRANSPORT_SAP_VERSION));
+        String logonResponse = evaluateRFCfunction(logonFunction, destination, escapeErrorHandling);
+        if (log.isDebugEnabled()) {
+            log.debug("BAPI XMI Logon response: " + logonResponse);
+        }
     }
 
     /**
