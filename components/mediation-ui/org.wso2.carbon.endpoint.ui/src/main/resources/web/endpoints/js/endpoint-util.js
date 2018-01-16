@@ -302,7 +302,7 @@ function showHideOnSelect(selectID, element) {
 
 function showErrorCodeEditor(inputID) {
     var url = 'ajaxprocessors/errorCodeEditor-ajaxprocessor.jsp?codes=' + document.getElementById(inputID).value + "&inputID=" + inputID;
-    var loadingContent = "<div id='workArea' style='overflow-x:hidden;'><div id='popupContent'><div class='ajax-loading-message'> <img src='../resources/images/ajax-loader.gif' align='top'/> <span>" + jsi18n["ns.editor.waiting.text"] + "</span> </div></div></div>";
+    var loadingContent = "<div id='workArea' style='overflow-x:hidden;'><div id='popupContent'><div class='ajax-loading-message'> <img src='../resources/images/ajax-loader.gif' align='top'/> <span>" + jsi18n["errorcode.editor.waiting.text"] + "</span> </div></div></div>";
     CARBON.showPopupDialog(loadingContent, jsi18n["errorcode.editor.title"], 470, false, null, 560);
 
     jQuery("#popupContent").load(url, null, function (responseText, status, XMLHttpRequest) {
