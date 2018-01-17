@@ -123,5 +123,7 @@
 		 validateMediator.setResources(resources);
 	}
 
+    validateMediator.setCacheSchema(Boolean.parseBoolean(request.getParameter("mediator.validator.cache")));
+
 %>
 

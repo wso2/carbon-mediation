@@ -57,6 +57,7 @@
     String featureTableStyle = featureList.isEmpty() ? "display:none;" : "";
 	Map<String, String> resources = validateMediator.getResources();
     int nKeys = 1;
+    boolean isSchemaCached = validateMediator.isCacheSchema();
 %>
 
 <fmt:bundle basename="org.wso2.carbon.mediator.validate.ui.i18n.Resources">
@@ -305,6 +306,29 @@
                         </tr>
                         </tbody>
                         </thead>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <br>
+                    <label><fmt:message key="mediator.validator.enable.schema.cache"/></label>
+                    <table id="blockingOptionTable">
+                        <tr>
+                            <td><fmt:message key="mediator.validator.schema.cache"/></td>
+                            <td>
+                                <select id="mediator.validator.cache" name="mediator.validator.cache">
+                                    <option value="false"
+                                            <%=!isSchemaCached ? "selected=\"selected\"" : ""%>>
+                                        <fmt:message key="mediator.validator.cache.false"/>
+                                    </option>
+                                    <option value="true"
+                                            <%=isSchemaCached ? "selected=\"selected\"" : ""%>>
+                                        <fmt:message key="mediator.validator.cache.true"/>
+                                    </option>
+                                </select>
+                            </td>
+                        </tr>
                     </table>
                 </td>
             </tr>
