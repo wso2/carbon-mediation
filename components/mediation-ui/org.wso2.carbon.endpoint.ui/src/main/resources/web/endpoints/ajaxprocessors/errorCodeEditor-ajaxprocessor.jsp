@@ -74,6 +74,8 @@
 
 <fmt:bundle basename="org.wso2.carbon.endpoint.ui.i18n.Resources">
 
+    <div id="workArea" style="overflow-x:hidden;">
+    <div id="popupContent">
     <div id="errorCodesEditorContent" style="margin-top:10px; margin-left: 5px; margin-right: 5px;">
         <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
             <tbody>
@@ -132,6 +134,8 @@
             </tr>
             </tbody>
         </table>
+    </div>
+    </div>
     </div>
 
 </fmt:bundle>
