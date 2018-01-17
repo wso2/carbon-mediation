@@ -456,8 +456,7 @@ public class HL7ProcessingContext {
             	String messageControlID_in = terser.get("/MSH-10");
             	
             	Message response= pollMyResponse(messageControlID_in);
-				
-                return response;
+            	return response;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
