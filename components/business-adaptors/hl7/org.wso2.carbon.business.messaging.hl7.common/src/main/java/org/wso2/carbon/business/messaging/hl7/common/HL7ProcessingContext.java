@@ -473,7 +473,7 @@ public class HL7ProcessingContext {
 	
 	/**
 	 * Try to get ACK response from applicationResponses. If no response match with messageControlID_in
-	 * it retry every 1 second. After timeOutVal 
+	 * it retry every 1 second until the timeOutVal is triggered  
 	 * @param messageControlID_in
 	 * @return
 	 * @throws InterruptedException after Transport Timeout
@@ -491,9 +491,10 @@ public class HL7ProcessingContext {
 			applicationResponses.forEach(consumer);
 			timeEnd=Calendar.getInstance().getTimeInMillis();
 			timeDiff=timeEnd-timeStart;
-			Thread.sleep(1000);
-		}while(responseWrapper.getMsg()==null && timeDiff < timeOutVal);
-		response=responseWrapper.getMsg();
+			response=responseWrapper.getMsg();
+			if(response==null)
+				Thread.sleep(1000);
+		}while(response==null && timeDiff < timeOutVal);
 		if(response== null){
 			log.error("thread["+Thread.currentThread().getId()+"] No response received for messageControlID_in:"+messageControlID_in );
 			throw new InterruptedException("No response received for messageControlID_in:"+messageControlID_in );
