@@ -65,6 +65,9 @@ public class RabbitMQConstants {
     public static final String EXCHANGE_TYPE = "rabbitmq.exchange.type";
     public static final String EXCHANGE_DURABLE = "rabbitmq.exchange.durable";
     public static final String EXCHANGE_AUTODELETE = "rabbitmq.exchange.auto.delete";
+    public static final String EXCHANGE_TYPE_DEFAULT = "direct";
+    public static final String EXCHANGE_DURABLE_DEFAULT = "true";
+    public static final String EXCHANGE_AUTODELETE_DEFAULT = "false";
 
     public static final String QUEUE_NAME = "rabbitmq.queue.name";
     public static final String QUEUE_DURABLE = "rabbitmq.queue.durable";

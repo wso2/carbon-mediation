@@ -134,8 +134,22 @@ public class RabbitMQUtils {
         Boolean exchangeAvailable = false;
         Channel channel = connection.createChannel();
         String exchangeType = properties
-                .get(RabbitMQConstants.EXCHANGE_TYPE);
-        String durable = properties.get(RabbitMQConstants.EXCHANGE_DURABLE);
+                .getOrDefault(RabbitMQConstants.EXCHANGE_TYPE, RabbitMQConstants.EXCHANGE_TYPE_DEFAULT);
+        String durable = properties
+                .getOrDefault(RabbitMQConstants.EXCHANGE_DURABLE, RabbitMQConstants.EXCHANGE_DURABLE_DEFAULT);
+        String autoDelete = properties
+                .getOrDefault(RabbitMQConstants.EXCHANGE_AUTODELETE, RabbitMQConstants.EXCHANGE_AUTODELETE_DEFAULT);
+
+        if (exchangeType.isEmpty()) {
+            exchangeType = RabbitMQConstants.EXCHANGE_TYPE_DEFAULT;
+        }
+        if (durable.isEmpty()) {
+            durable = RabbitMQConstants.EXCHANGE_DURABLE_DEFAULT;
+        }
+        if (autoDelete.isEmpty()) {
+            autoDelete = RabbitMQConstants.EXCHANGE_AUTODELETE_DEFAULT;
+        }
+
         try {
             // check availability of the named exchange.
             // The server will raise an IOException
@@ -153,19 +167,9 @@ public class RabbitMQUtils {
                 log.debug("Channel is not open. Creating a new channel.");
             }
             try {
-                if (exchangeType != null
-                        && !exchangeType.equals("")) {
-                    if (durable != null && !durable.equals("")) {
-                        channel.exchangeDeclare(exchangeName,
-                                exchangeType,
-                                Boolean.parseBoolean(durable));
-                    } else {
-                        channel.exchangeDeclare(exchangeName,
-                                exchangeType, true);
-                    }
-                } else {
-                    channel.exchangeDeclare(exchangeName, "direct", true);
-                }
+                channel.exchangeDeclare(exchangeName, exchangeType, Boolean.parseBoolean(durable),
+                        Boolean.parseBoolean(autoDelete),
+                        null); // null since passing no extra arguments
             } catch (IOException e) {
                 handleException("Error occurred while declaring exchange.", e);
             }
