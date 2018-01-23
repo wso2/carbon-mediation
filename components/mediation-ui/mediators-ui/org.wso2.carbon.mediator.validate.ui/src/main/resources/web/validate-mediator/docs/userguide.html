@@ -29,6 +29,8 @@
 <p>Schema location</p>
 <h3>Source</h3>
 <p>XPath expression to extract the XML that need to be validated. If not specified validation is performed against the first child of the SOAP body</p>
+<h3>Schema Caching</h3>
+<p>Cache the schema to enable better performance. Schema caching will give incorrect result if used inside the template. Schema will cache by default</p>
 <h3>Features</h3>
 <p>Here is the only mandatory feature supported by the validator, "http://javax.xml.XMLConstants/feature/secure-processing". For more information look at
     http://java.sun.com/javase/6/docs/api/constant-values.html#javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING</p>
@@ -36,7 +38,7 @@
 <p>The resources are external schema resources, which can be used to validate the messages </p>
 </body>
 <p> <strong>Note: </strong>If user configure WSO2 ESB with WSO2 Governance Registry and if he uploads all the required files as *.gar file (described in WSO2 GREG documentation),
- uer can  provide only the base schema when he provides schemas.
+ user can  provide only the base schema when he provides schemas.
 There is no need to provide all required imported schemas since ESB is able to resolve the imported resources using only the base schema.
 Please note that for the above function user needs to uncomment the following lines @ synapse.properties file which is avilable in ESB_HOME/lib/core/WEB_INF/classes folder.
 </p>

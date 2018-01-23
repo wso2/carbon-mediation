@@ -37,10 +37,12 @@ import java.util.Set;
 public class ValidateMediator extends AbstractListMediator {
     private static final QName ON_FAIL_Q  = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "on-fail");
     private static final QName SCHEMA_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "schema");
+    private static final QName ATT_CACHE_SCHEMA = new QName("cache-schema");
 
     private List<Value> schemaKeys = new ArrayList<Value>();
     private SynapsePath source = null;
     private final List<MediatorProperty> explicityFeatures = new ArrayList<MediatorProperty>();
+    private boolean cacheSchema = true;
     
 	Map<String, String> resources = new HashMap<String, String>();
 	
@@ -98,6 +100,11 @@ public class ValidateMediator extends AbstractListMediator {
             throw new MediatorException("No 'Fault' mediator found within the on-fail section of the 'Validate' mediator.");
         }
         serializeChildren(onFail, getList());
+
+        if (!isCacheSchema()) {
+            OMAttribute cacheSchemaAtt = fac.createOMAttribute("cache-schema", nullNS, String.valueOf(isCacheSchema()));
+            validate.addAttribute(cacheSchemaAtt);
+        }
 
         if (parent != null) {
             parent.addChild(validate);
@@ -160,6 +167,12 @@ public class ValidateMediator extends AbstractListMediator {
             } catch (JaxenException e) {
                 throw new MediatorException("Invalid XPath expression specified for attribute 'source'");
             }
+        }
+
+        // process schema cacheability.
+        OMAttribute attSchemaCache = elem.getAttribute(ATT_CACHE_SCHEMA);
+        if (attSchemaCache != null) {
+            this.setCacheSchema(Boolean.parseBoolean(attSchemaCache.getAttributeValue()));
         }
 
         // process on-fail
@@ -240,5 +253,13 @@ public class ValidateMediator extends AbstractListMediator {
 
 	public Map<String,String> getResources() {
 	    return resources;
-    } 
+    }
+
+    public boolean isCacheSchema() {
+        return cacheSchema;
+    }
+
+    public void setCacheSchema(boolean cacheSchema) {
+        this.cacheSchema = cacheSchema;
+    }
 }
