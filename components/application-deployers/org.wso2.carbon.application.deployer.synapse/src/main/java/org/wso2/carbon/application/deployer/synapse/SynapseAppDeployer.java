@@ -57,8 +57,6 @@ import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
-import org.wso2.carbon.mediation.library.service.LibraryInfo;
-import org.wso2.carbon.mediation.library.service.MediationLibraryAdminService;
 import org.wso2.carbon.mediation.library.util.LocalEntryUtil;
 
 import javax.xml.namespace.QName;
@@ -101,6 +99,18 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
         deployClassMediators(artifacts, axisConfig);
         deploySynapseLibrary(artifacts, axisConfig);
+        Map<String, List<Artifact.Dependency>> artifactTypeMap = getOrderedArtifactsMap(artifacts);
+
+        //deploy artifacts
+        for (String artifactType : artifactTypeMap.keySet()) {
+            deployArtifactType(artifactTypeMap.get(artifactType), carbonApp, axisConfig);
+        }
+    }
+
+    /**
+     * Add the artifacts in a CAPP to a dependency based orders list
+     */
+    private Map<String, List<Artifact.Dependency>> getOrderedArtifactsMap(List<Artifact.Dependency> artifacts) {
         //lists to hold different artifact types considering the deployment order
         Map<String, List<Artifact.Dependency>> artifactTypeMap = new LinkedHashMap<>();
         artifactTypeMap.put(SynapseAppDeployerConstants.MEDIATOR_TYPE, new ArrayList<Artifact.Dependency>());
@@ -164,11 +174,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     artifactTypeMap.get(SynapseAppDeployerConstants.OTHER_TYPE).add(dep);
             }
         }
-
-        //deploy artifacts
-        for (String artifactType : artifactTypeMap.keySet()) {
-            deployArtifactType(artifactTypeMap.get(artifactType), carbonApp, axisConfig);
-        }
+        return artifactTypeMap;
     }
 
     /**
@@ -183,8 +189,24 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
 
         List<Artifact.Dependency> artifacts = carbonApplication.getAppConfig()
                 .getApplicationArtifact().getDependencies();
-        // Fixing ESBJAVA-5201, reverses the artifact order
-        Collections.reverse(artifacts);
+        // Reverse artifacts dependency order should be used for un deployment, EI-1737
+        Map<String, List<Artifact.Dependency>> artifactTypeMap = getOrderedArtifactsMap(artifacts);
+        List<String> artifactTypesList = new ArrayList<String>(artifactTypeMap.keySet());
+        Collections.reverse(artifactTypesList);
+
+        for (String artifactType : artifactTypesList) {
+            undeployArtifactType(carbonApplication, axisConfig, artifactTypeMap.get(artifactType));
+        }
+    }
+
+    /**
+     * Un deploy a given artifact type
+     * @param carbonApplication
+     * @param axisConfig
+     * @param artifacts
+     */
+    private void undeployArtifactType(CarbonApplication carbonApplication, AxisConfiguration axisConfig,
+            List<Artifact.Dependency> artifacts) {
 
         for (Artifact.Dependency dep : artifacts) {
 
