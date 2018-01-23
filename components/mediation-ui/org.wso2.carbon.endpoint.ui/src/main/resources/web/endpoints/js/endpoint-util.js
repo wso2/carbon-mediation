@@ -305,7 +305,7 @@ function showErrorCodeEditor(inputID) {
     var loadingContent = "<div id='workArea' style='overflow-x:hidden;'><div id='popupContent'><div class='ajax-loading-message'> <img src='../resources/images/ajax-loader.gif' align='top'/> <span>" + jsi18n["errorcode.editor.waiting.text"] + "</span> </div></div></div>";
     CARBON.showPopupDialog(loadingContent, jsi18n["errorcode.editor.title"], 470, false, null, 560);
 
-    jQuery("#popupContent").load(url, null, function (responseText, status, XMLHttpRequest) {
+    jQuery("#dialog").load(url, null, function (responseText, status, XMLHttpRequest) {
         if (status != "success") {
             CARBON.showErrorDialog(jsi18n["errorcode.editor.load.error"]);
         }
