@@ -18,7 +18,7 @@ function show_ns_editor(dID, id, mode, linkID) {
     var loadingContent = "<div id='workArea' style='overflow-x:hidden;'><div id='popupContent'><div class='ajax-loading-message'> <img src='../resources/images/ajax-loader.gif' align='top'/> <span>" + jsi18n["ns.editor.waiting.text"] + "</span> </div></div></div>";
     CARBON.showPopupDialog(loadingContent, jsi18n["ns.editor.title"], 300, false, null, 550);
 
-        jQuery("#popupContent").load(url, null,
+        jQuery("#dialog").load(url, null,
                 function(res, status, t) {
                     if (status != "success") {
                         CARBON.showWarningDialog(jsi18n["ns.editor.load.error"]);

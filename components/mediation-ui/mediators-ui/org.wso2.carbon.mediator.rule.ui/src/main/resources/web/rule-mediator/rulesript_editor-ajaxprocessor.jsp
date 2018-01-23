@@ -50,40 +50,44 @@
     <carbon:jsi18n
             resourceBundle="org.wso2.carbon.mediator.rule.ui.i18n.JSResources"
             request="<%=request%>"/>
-    <div id="ruleScriptEditorContent" style="margin-top:10px;">
-        <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
+    <div id="workArea" style="overflow-x:hidden;">
+        <div id="popupContent">
+            <div id="ruleScriptEditorContent" style="margin-top:10px;">
+                <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
 
-            <tbody>
-            <tr>
-                <td>
-                    <div style="margin-top:10px;">
-                        <table border="0" cellpadding="0" cellspacing="0" width="600" id="nsTable"
-                               class="styledInner">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <div style="margin-top:10px;">
+                                <table border="0" cellpadding="0" cellspacing="0" width="600" id="nsTable"
+                                       class="styledInner">
 
-                            <tbody id="ruleScriptTBody">
-                            <tr>
-                                <td>
-                                    <textarea id="inlined_rule_script_source"
-                                              name="inlined_rule_script_source"
-                                              style="width:100%;height:400px"><%=ruleScript%>
-                                    </textarea>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td class="buttonRow" colspan="3">
+                                    <tbody id="ruleScriptTBody">
+                                        <tr>
+                                            <td>
+                                                <textarea id="inlined_rule_script_source"
+                                                          name="inlined_rule_script_source"
+                                                          style="width:100%;height:400px"><%=ruleScript%>
+                                                </textarea>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="buttonRow" colspan="3">
 
-                    <input id="saveRuleScriptButton" class="button" name="saveRuleScriptButton"
-                           type="button"
-                           onclick="saveRuleScript('<%=ruleScriptID%>'); return false;"
-                           href="#"
-                           value="<fmt:message key="mediator.rule.editor.save"/>"/>
-            </tr>
-            </tbody>
-        </table>
+                            <input id="saveRuleScriptButton" class="button" name="saveRuleScriptButton"
+                                   type="button"
+                                   onclick="saveRuleScript('<%=ruleScriptID%>'); return false;"
+                                   href="#"
+                                   value="<fmt:message key="mediator.rule.editor.save"/>"/>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </fmt:bundle>

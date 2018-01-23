@@ -96,7 +96,7 @@ function showInLinedThrottlePolicyEditor(id) {
     CARBON.showPopupDialog(loadingContent, thottleMediatorJsi18n["throttle.policy.editor"], 500, false, null, 900);
     var random = Math.floor(Math.random() * 2000);
     var url = '../throttling/trottle-policy-editor_ajaxprocessor.jsp?popup=true&policyID=' + id ;
-    jQuery("#popupContent").load(url, null,
+    jQuery("#dialog").load(url, null,
             function(res, status, t) {
                 if (status != "success") {
                     CARBON.showWarningDialog(thottleMediatorJsi18n["throttle.policy.error"]);
