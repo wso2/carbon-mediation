@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -47,6 +47,8 @@ public class MediatorCacheInvalidator implements MediatorCacheInvalidatorMBean {
      */
     private MessageContext msgCtx;
 
+    private CacheManager cacheManager;
+
     /**
      * MediatorCacheInvalidator Constructor which creates MBean to expose operations to invalidate the mediator cache.
      *
@@ -54,10 +56,12 @@ public class MediatorCacheInvalidator implements MediatorCacheInvalidatorMBean {
      * @param tenantId     which the mediator cache should be invalidated.
      * @param msgCtx       which holds the mediator cache.
      */
-    public MediatorCacheInvalidator(String tenantDomain, int tenantId, MessageContext msgCtx) {
+    public MediatorCacheInvalidator(CacheManager cacheManager, String tenantDomain, int tenantId,
+                                    MessageContext msgCtx) {
         this.tenantDomain = tenantDomain;
         this.tenantId = tenantId;
         this.msgCtx = msgCtx;
+        this.cacheManager = cacheManager;
     }
 
     @Override
@@ -70,7 +74,7 @@ public class MediatorCacheInvalidator implements MediatorCacheInvalidatorMBean {
                 MultitenantConstants.INVALID_TENANT_ID) {
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantId(getTenantId());
         }
-        CacheManager.clean();
+        cacheManager.clean();
         log.info("Total mediator cache has been invalidated.");
     }
 

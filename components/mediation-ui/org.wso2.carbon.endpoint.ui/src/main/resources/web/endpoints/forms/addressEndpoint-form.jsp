@@ -207,8 +207,13 @@
     String rmPolicy = "";
     String description = "";
     String properties = "";
+    String encoding = "";
 
     if (endpoint != null) {
+        // Encoding
+        if (endpoint.getEncoding() != null) {
+            encoding = endpoint.getEncoding();
+        }
         // Endpoint Name
         if (endpoint.getEndpointName() != null) {
             addressEpName = endpoint.getEndpointName();
@@ -482,6 +487,7 @@
                    onclick="testURL(document.getElementById('url').value)"
                    value="<fmt:message key="test.url"/>"/>
         </td>
+        <td><input id="encoding" name="encoding" type="hidden" value="<%=encoding%>"/></td>
     </tr>
 
     <%

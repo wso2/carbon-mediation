@@ -75,67 +75,67 @@
 <fmt:bundle basename="org.wso2.carbon.endpoint.ui.i18n.Resources">
 
     <div id="workArea" style="overflow-x:hidden;">
-    <div id="popupContent">
-    <div id="errorCodesEditorContent" style="margin-top:10px; margin-left: 5px; margin-right: 5px;">
-        <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
-            <tbody>
-            <tr>
-                <td>
-                    <div style="margin-top:10px;">
-                        <table border="0" cellpadding="0" cellspacing="0" id="errorCodesTable"
-                               class="styledInner">
-                            <thead>
-                            <tr>
-                                <th width="25%"><fmt:message key="errorcode.editor.code"/></th>
-                                <th width="50%"><fmt:message
-                                        key="errorcode.editor.description"/></th>
-                                <th width="5%"><fmt:message key="errorcode.editor.select"/></th>
-                            </tr>
-                            </thead>
-                            <tbody id="errorCodesTBody">
-                            <%
-                                int i = 0;
-                                for (String key : availableErrorCodes.keySet()) { %>
-                            <tr id="errorCodeEditorRow<%=i%>">
-                                <td align="left">
-                                    <input type="hidden" id="errorCode<%=i%>" name="errorCode<%=i%>"
-                                           value="<%=key%>"/>
-                                    <%=key%>
-                                </td>
-                                <td>
-                                    <%=availableErrorCodes.get(key)%>
-                                </td>
-                                <td><input type="checkbox" id="errorCodeCheckbox<%=i%>"
-                                           name="errorCode<%=i%>"
-                                           value="errorCode<%=i%>"
-                                        <%=previousErrorCodes.contains(key) ? "checked=\"checked\"" : ""%> />
-                                </td>
-                            </tr>
-                            <%
-                                    i++;
-                                }
-                            %>
-                            <input type="hidden" name="errorCodesCount" id="errorCodesCount"
-                                   value="<%=i%>"/>
-                            </tbody>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td align="right" class="buttonRow" colspan="3">
-                    <input id="errorCodesEditorOK" class="button"
-                           name="errorCodesEditorOK"
-                           type="button"
-                           onclick="javascript: errorCodeEditorCallBack('<%=inputID%>'); return false;"
-                           href="#"
-                           value="<fmt:message key="errorcode.editor.ok"/>"/>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    </div>
+        <div id="popupContent">
+            <div id="errorCodesEditorContent" style="margin-top:10px; margin-left: 5px; margin-right: 5px;">
+                <table class="styledLeft noBorders" cellspacing="0" cellpadding="0" border="0">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <div style="margin-top:10px;">
+                                <table border="0" cellpadding="0" cellspacing="0" id="errorCodesTable"
+                                       class="styledInner">
+                                    <thead>
+                                    <tr>
+                                        <th width="25%"><fmt:message key="errorcode.editor.code"/></th>
+                                        <th width="50%"><fmt:message
+                                                key="errorcode.editor.description"/></th>
+                                        <th width="5%"><fmt:message key="errorcode.editor.select"/></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="errorCodesTBody">
+                                    <%
+                                        int i = 0;
+                                        for (String key : availableErrorCodes.keySet()) { %>
+                                    <tr id="errorCodeEditorRow<%=i%>">
+                                        <td align="left">
+                                            <input type="hidden" id="errorCode<%=i%>" name="errorCode<%=i%>"
+                                                   value="<%=key%>"/>
+                                            <%=key%>
+                                        </td>
+                                        <td>
+                                            <%=availableErrorCodes.get(key)%>
+                                        </td>
+                                        <td><input type="checkbox" id="errorCodeCheckbox<%=i%>"
+                                                   name="errorCode<%=i%>"
+                                                   value="errorCode<%=i%>"
+                                                <%=previousErrorCodes.contains(key) ? "checked=\"checked\"" : ""%> />
+                                        </td>
+                                    </tr>
+                                    <%
+                                            i++;
+                                        }
+                                    %>
+                                    <input type="hidden" name="errorCodesCount" id="errorCodesCount"
+                                           value="<%=i%>"/>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" class="buttonRow" colspan="3">
+                            <input id="errorCodesEditorOK" class="button"
+                                   name="errorCodesEditorOK"
+                                   type="button"
+                                   onclick="javascript: errorCodeEditorCallBack('<%=inputID%>'); return false;"
+                                   href="#"
+                                   value="<fmt:message key="errorcode.editor.ok"/>"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 </fmt:bundle>

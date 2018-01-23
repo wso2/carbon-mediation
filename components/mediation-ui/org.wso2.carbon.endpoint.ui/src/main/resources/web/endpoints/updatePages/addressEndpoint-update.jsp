@@ -41,6 +41,7 @@
     String disabledErrorCodes = request.getParameter("disabledErrorCodes");
     String action = request.getParameter("actionSelect");
     String actionDuration = null;
+    String encoding = request.getParameter("encoding");
     if (action != null && !action.equals("neverTimeout")) {
         actionDuration = request.getParameter("actionDuration");
     }
@@ -108,7 +109,9 @@
         addressEndpoint.setSwa(false);
         addressEndpoint.setMtom(false);
     }
-
+    if (encoding != null && !"".equals(encoding)) {
+        addressEndpoint.setEncoding(encoding);
+    }
     if (description != null && !"".equals(description)) {
         addressEndpoint.setDescription(description);
     } else {

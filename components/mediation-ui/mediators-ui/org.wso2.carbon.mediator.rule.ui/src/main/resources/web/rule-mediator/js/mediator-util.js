@@ -239,7 +239,7 @@ function showInLinedRuleScriptPolicyEditor(id) {
     CARBON.showPopupDialog(loadingContent, rulejsi18n["rule.policy.editor"], 500, false, null, 900);
 
     var url = '../rule-mediator/rulesript_editor-ajaxprocessor.jsp?scriptID=' + id;
-    jQuery("#popupContent").load(url, null,
+    jQuery("#dialog").load(url, null,
         function(res, status, t) {
             if (status != "success") {
                 CARBON.showWarningDialog(rulejsi18n["rule.policy.error"]);

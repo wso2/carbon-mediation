@@ -376,58 +376,59 @@ function hideEditor() {
     </h2>
 
     <div id="workArea">
-
-        <div id="formset">
-            <form id="form3" name="dataForm" method="post" action="">
-                <div id="policyConfiguration">
-                    <table class="styledLeft">
-                        <tr>
-                            <td class="formRow">
-                                <table width="100%" border="0" cellpadding="0" cellspacing="0" class="normal">
-                                    <tr>
-                                        <td nowrap="nowrap"><fmt:message key="thottling.maximum.concurrent.accesses"/>&nbsp;<input
-                                                id="maxAccess" name="maxAccess" type="text" size="14"
-                                                value="<%=maxAccesses%>"/></td>
-                                    </tr>
-
-                                </table>
-                                <br/>
-                                <table class="styledLeft" id="dataTable">
-                                    <thead>
+        <div id="popupContent">
+            <div id="formset">
+                <form id="form3" name="dataForm" method="post" action="">
+                    <div id="policyConfiguration">
+                        <table class="styledLeft">
+                            <tr>
+                                <td class="formRow">
+                                    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="normal">
                                         <tr>
-                                            <th><fmt:message key="throttling.range"/></th>
-                                            <th><fmt:message key="throttling.type"/></th>
-                                            <th><fmt:message key="throttling.max.request.count"/></th>
-                                            <th><fmt:message key="throttling.unit.time.ms"/></th>
-                                            <th><fmt:message key="throttling.prohibit.time.period.ms"/></th>
-                                            <th><fmt:message key="throttling.access"/></th>
-                                            <th><fmt:message key="throttling.actions"/></th>
+                                            <td nowrap="nowrap"><fmt:message key="thottling.maximum.concurrent.accesses"/>&nbsp;<input
+                                                    id="maxAccess" name="maxAccess" type="text" size="14"
+                                                    value="<%=maxAccesses%>"/></td>
                                         </tr>
-                                    </thead>
-                                    <%= htmlString%>
-                                </table>
-                                <a href="#" onclick="addRow();" class="add-icon-link"><fmt:message
-                                        key="throttling.add.new.entry"/></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="buttonRow">
-                                <input type="button" value="<fmt:message key="throttling.finish"/>"
-                                       onclick="submitForm();" class="button"/>
-                                <input type="button" value="<fmt:message key="throttling.reset"/>"
-                                       onclick="resetForm();" class="button"/>
-                                <input type="button" value="<fmt:message key="throttling.default"/>"
-                                       onclick="loadDefault();" class="button"/>
-                                <input type="button" value="<fmt:message key="throttling.clear"/>" onclick="clearAll();"
-                                       class="button"/>
-                                <input type="button" id="cancelButton" onclick="hideEditor();return false;"
-                                       value="<fmt:message key="throttling.cancel" />" class="button"/>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </form>
 
+                                    </table>
+                                    <br/>
+                                    <table class="styledLeft" id="dataTable">
+                                        <thead>
+                                            <tr>
+                                                <th><fmt:message key="throttling.range"/></th>
+                                                <th><fmt:message key="throttling.type"/></th>
+                                                <th><fmt:message key="throttling.max.request.count"/></th>
+                                                <th><fmt:message key="throttling.unit.time.ms"/></th>
+                                                <th><fmt:message key="throttling.prohibit.time.period.ms"/></th>
+                                                <th><fmt:message key="throttling.access"/></th>
+                                                <th><fmt:message key="throttling.actions"/></th>
+                                            </tr>
+                                        </thead>
+                                        <%= htmlString%>
+                                    </table>
+                                    <a href="#" onclick="addRow();" class="add-icon-link"><fmt:message
+                                            key="throttling.add.new.entry"/></a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="buttonRow">
+                                    <input type="button" value="<fmt:message key="throttling.finish"/>"
+                                           onclick="submitForm();" class="button"/>
+                                    <input type="button" value="<fmt:message key="throttling.reset"/>"
+                                           onclick="resetForm();" class="button"/>
+                                    <input type="button" value="<fmt:message key="throttling.default"/>"
+                                           onclick="loadDefault();" class="button"/>
+                                    <input type="button" value="<fmt:message key="throttling.clear"/>" onclick="clearAll();"
+                                           class="button"/>
+                                    <input type="button" id="cancelButton" onclick="hideEditor();return false;"
+                                           value="<fmt:message key="throttling.cancel" />" class="button"/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </form>
+
+            </div>
         </div>
     </div>
 </div>
