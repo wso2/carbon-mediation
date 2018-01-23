@@ -74,8 +74,10 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 
     @Override
     public boolean schedule(TaskDescription taskDescription) {
-		logger.debug("#schedule Scheduling task : " + taskId(taskDescription));
-		TaskInfo taskInfo;
+        if (logger.isDebugEnabled()) {
+            logger.debug("#schedule Scheduling task : " + taskId(taskDescription));
+        }
+        TaskInfo taskInfo;
 		try {
 			taskInfo = TaskBuilder.buildTaskInfo(taskDescription, properties);
 		} catch (Exception e) {
@@ -91,7 +93,9 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 		if (!isInitialized()) {
 			// if cannot schedule yet, put in the pending tasks list.
 			synchronized (lock) {
-				logger.debug("#schedule Added pending task : " + taskId(taskDescription));
+                if (logger.isDebugEnabled()) {
+                    logger.debug("#schedule Added pending task : " + taskId(taskDescription));
+                }
                 queueTask(taskDescription);
 			}
 			return false;
@@ -99,13 +103,17 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 		try {
 			synchronized (lock) {
 				if (taskManager == null) {
-					logger.debug("#schedule Could not schedule task " + taskId(taskDescription) +
-					             ". Task manager is not available.");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("#schedule Could not schedule task " + taskId(taskDescription) +
+                                ". Task manager is not available.");
+                    }
                     queueTask(taskDescription);
 					return false;
 				}
                 taskManager.registerTask(taskInfo);
-                taskManager.scheduleTask(taskInfo.getName());
+                if (NtaskService.getTaskService().isServerInit()) {
+                    taskManager.scheduleTask(taskInfo.getName());
+                }
                 removeTask(taskDescription);
 			}
 			logger.info("Scheduled task " + taskId(taskDescription));
@@ -134,8 +142,11 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
 				TaskDescription description = TaskBuilder.buildTaskDescription(taskInfo);
 				taskInfo = TaskBuilder.buildTaskInfo(description, properties);
 				taskManager.registerTask(taskInfo);
-				taskManager.rescheduleTask(taskInfo.getName());
-			}
+                final TaskService taskService = NtaskService.getTaskService();
+                if (taskService != null && taskService.isServerInit()) {
+                    taskManager.rescheduleTask(taskInfo.getName());
+                }
+            }
 		} catch (Exception e) {
 			return false;
 		}
@@ -331,10 +342,14 @@ public class NTaskTaskManager implements TaskManager, TaskServiceObserver, Serve
                     return false;
                 }
                 if ((taskManager = getTaskManager(false)) == null) {
-                    logger.debug("#init Could not initialize task manager. " + managerId());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("#init Could not initialize task manager. " + managerId());
+                    }
                     return false;
                 } else {
-                    logger.debug("#init Obtained Carbon task manager " + managerId());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("#init Obtained Carbon task manager " + managerId());
+                    }
                 }
 
                 initialized = true;
