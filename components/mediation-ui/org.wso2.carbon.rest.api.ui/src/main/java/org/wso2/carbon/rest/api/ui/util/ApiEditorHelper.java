@@ -55,6 +55,16 @@ public class ApiEditorHelper {
 		else{
 			apiData.setPort(-1);
 		}
+
+        OMAttribute version = apiOM.getAttribute(new QName("version"));
+        if(version != null){
+            apiData.setVersion(version.getAttributeValue());
+        }
+
+        OMAttribute versionType = apiOM.getAttribute(new QName("version-type"));
+        if(versionType != null){
+            apiData.setVersionType(versionType.getAttributeValue());
+        }
 		
 		Iterator childIterator = apiOM.getChildElements();
 		if(childIterator == null){

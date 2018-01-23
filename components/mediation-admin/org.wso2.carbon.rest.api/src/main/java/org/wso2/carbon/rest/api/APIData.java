@@ -39,6 +39,10 @@ public class APIData {
 
 	private boolean isTracingEnable;
 
+	private String version;
+
+	private String versionType;
+
 	public String getName() {
 		return name;
 	}
@@ -133,5 +137,21 @@ public class APIData {
 
 	public void setTracingEnable(boolean tracingEnable) {
 		isTracingEnable = tracingEnable;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	public String getVersionType() {
+		return versionType;
+	}
+
+	public void setVersionType(String versionType) {
+		this.versionType = versionType;
 	}
 }

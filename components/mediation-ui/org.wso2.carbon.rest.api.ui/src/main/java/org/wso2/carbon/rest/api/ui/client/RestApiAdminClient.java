@@ -82,7 +82,7 @@ public class RestApiAdminClient {
 		return null;
 	}
 
-	public APIData getApiByNane(String apiName) throws AxisFault{
+	public APIData getApiByName(String apiName) throws AxisFault {
 		try {
 			return stub.getApiByName(apiName);
 		} catch (Exception e) {
@@ -174,7 +174,11 @@ public class RestApiAdminClient {
 
 	public void updateApi(APIData apiData) throws AxisFault{
 		try {
-			stub.updateApi(apiData.getName(), apiData);
+			String apiName = apiData.getName();
+			if (apiData.getVersion() != null && !apiData.getVersion().isEmpty()) {
+				apiName = apiName + ":v" + apiData.getVersion();
+			}
+			stub.updateApi(apiName, apiData);
 		} catch (Exception e) {
 			handleException(bundle.getString("could.not.update.api"), e);
 		}

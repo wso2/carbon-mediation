@@ -44,12 +44,15 @@
     RestApiAdminClient client = new RestApiAdminClient(
             configContext, url, cookie, bundle.getLocale());
 
-    String apiName = "";
-    String apiContext = "";
-    String hostname = "";
-    String port = "";
-    String source = "";
-    String sourceXml = "";
+    String apiName;
+    String apiContext;
+    String hostname;
+    String port;
+    String source;
+    String sourceXml;
+    String version;
+    String versionType;
+    String apiNameWithVersion;
 
     String mode = request.getParameter("mode");
     List<ResourceData> resources = (List<ResourceData>) session.getAttribute("apiResources");
@@ -59,6 +62,8 @@
     apiName = request.getParameter("apiName");
     hostname = request.getParameter("hostname");
     port = request.getParameter("port");
+    version = request.getParameter("version");
+    versionType = request.getParameter("versionType");
 
     if ("edit".equals(mode)) {
 
@@ -67,6 +72,8 @@
         apiData.setContext(apiContext != null && !"/".equals(apiContext.trim()) ? apiContext : "");
         apiData.setHost(hostname == null || "".equals(hostname) ? null : hostname);
         apiData.setPort(Integer.parseInt(port != null && !"".equals(port) ? port : "-1"));
+        apiData.setVersion(version == null || version.isEmpty() ? null : version);
+        apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
         apiData.setResources(resources.toArray(resourceArray));
         source = client.getApiSource(apiData);
         sourceXml = ApiEditorHelper.parseStringToPrettyfiedString(source);
@@ -76,12 +83,19 @@
         apiData.setContext(apiContext != null && !"/".equals(apiContext.trim()) ? apiContext : "");
         apiData.setHost(hostname == null || "".equals(hostname) ? null : hostname);
         apiData.setPort(Integer.parseInt(port != null && !"".equals(port) ? port : "-1"));
+        apiData.setVersion(version == null || version.isEmpty() ? null : version);
+        apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
         apiData.setResources(resources.toArray(resourceArray));
         source = client.getApiSource(apiData);
         sourceXml = ApiEditorHelper.parseStringToPrettyfiedString(source);
     }
     if (sourceXml != null) {
         sourceXml = sourceXml.trim().replace("&", "&amp;");
+    }
+    if (version != null && !version.isEmpty()) {
+        apiNameWithVersion = apiName + ":v" + version;
+    } else {
+        apiNameWithVersion = apiName;
     }
 %>
 
@@ -123,43 +137,43 @@
             return false;
         }
 
-    <%if("edit".equals(mode)){%>
-        jQuery.ajax({
-            type: "POST",
-            url: "savesource-ajaxprocessor.jsp",
-            data: { mode:"<%=mode%>", apiName:"<%=apiName%>", apiString:source },
-            success: function(data) {
-            	var strData = new String(data);
-            	if (strData.indexOf("error:") !=-1) {
-            		strData = strData.substring((strData.indexOf("error::")+7),(strData.indexOf("::error")));
-            		CARBON.showErrorDialog(strData);            		
-            	}else{
-                	CARBON.showInfoDialog("<fmt:message key="api.update.success"/> ", function() {
-                    	document.location.href = "index.jsp";      
-                	});
-            	}
-            }
-        });
-    <%}
-    else{%>
-        jQuery.ajax({
-            type: "POST",
-            url: "savesource-ajaxprocessor.jsp",
-            data: { mode:"<%=mode%>", apiString:source },
-            success: function(data) {
-            	var strData = new String(data);
-            	if (strData.indexOf("error:") !=-1) {
-            		strData = strData.substring((strData.indexOf("error::")+7),(strData.indexOf("::error")));
-            		CARBON.showErrorDialog(strData);            		
-            	}else{            	
-                	CARBON.showInfoDialog("<fmt:message key="api.add.success"/> ", function() {
-                    	document.location.href = "index.jsp";
-                	});
-            	}
-            }
-        });
-    <%}
-    %>
+        <%if("edit".equals(mode)){%>
+            jQuery.ajax({
+                type: "POST",
+                url: "savesource-ajaxprocessor.jsp",
+                data: { mode:"<%=mode%>", apiName:"<%=apiNameWithVersion%>", apiString:source },
+                success: function(data) {
+                    var strData = new String(data);
+                    if (strData.indexOf("error:") !=-1) {
+                        strData = strData.substring((strData.indexOf("error::")+7),(strData.indexOf("::error")));
+                        CARBON.showErrorDialog(strData);
+                    }else{
+                        CARBON.showInfoDialog("<fmt:message key="api.update.success"/> ", function() {
+                            document.location.href = "index.jsp";
+                        });
+                    }
+                }
+            });
+        <%}
+        else{%>
+            jQuery.ajax({
+                type: "POST",
+                url: "savesource-ajaxprocessor.jsp",
+                data: { mode:"<%=mode%>", apiString:source },
+                success: function(data) {
+                    var strData = new String(data);
+                    if (strData.indexOf("error:") !=-1) {
+                        strData = strData.substring((strData.indexOf("error::")+7),(strData.indexOf("::error")));
+                        CARBON.showErrorDialog(strData);
+                    }else{
+                        CARBON.showInfoDialog("<fmt:message key="api.add.success"/> ", function() {
+                            document.location.href = "index.jsp";
+                        });
+                    }
+                }
+            });
+        <%}
+        %>
     }
 
     function cancelSequence() {

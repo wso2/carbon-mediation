@@ -49,11 +49,18 @@
 	String filename = request.getParameter("filename");
 	String hostname = request.getParameter("hostname");
 	String port = request.getParameter("port");
+	String version = request.getParameter("version");
+	String versionType = request.getParameter("versionType");
+
+    if ("none".equals(versionType)) {
+        // in synapse, default version type is picked from empty string
+        versionType = "";
+    }
 	
 	if(port == null || "".equals(port)){
 		port = "-1";
 	}
-	
+
 	List<ResourceData> resourceList = 
 			(ArrayList<ResourceData>)session.getAttribute("apiResources");
 	APIData apiData = new APIData();
@@ -61,8 +68,13 @@
 	apiData.setContext(apiContext);
 	apiData.setHost(hostname);
 	apiData.setPort(Integer.parseInt(port));
+	apiData.setVersion(version);
+	apiData.setVersionType(versionType);
 	apiData.setFileName(filename);
 	ResourceData resources[] = new ResourceData[resourceList.size()];
+
+	// appending api version to the api name
+	apiName = (version != null && !version.isEmpty()) ? apiName + ":v" + version : apiName;
 	
 	if(resourceList != null) {
 
@@ -90,7 +102,7 @@
         String[] names = client.getApiNames();
 
         for (String name : names) {
-            APIData data = client.getApiByNane(name);
+            APIData data = client.getApiByName(name);
             if (data.getContext().equals(apiContext)) {
                 if (!name.equals(apiName)) {
                     response.setStatus(453);

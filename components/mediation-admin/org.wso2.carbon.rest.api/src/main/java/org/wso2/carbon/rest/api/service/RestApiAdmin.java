@@ -169,12 +169,11 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             	apiElement.addAttribute("name", apiName, null);
             }
             
-            API oldAPI = null;
             API api = APIFactory.createAPI(apiElement);
             
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-            
-            oldAPI = synapseConfiguration.getAPI(apiName);
+
+            API oldAPI = synapseConfiguration.getAPI(apiName);
             if (oldAPI != null){
                 oldAPI.destroy();
             	api.setFileName(oldAPI.getFileName());
@@ -187,7 +186,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             if (oldAPI.getArtifactContainerName() != null) {
                 api.setArtifactContainerName(oldAPI.getArtifactContainerName());
                 api.setIsEdited(true);
-                getApiByName(apiName).setIsEdited(true);
+                getApiByName(api.getName()).setIsEdited(true);
             } else {
                 MediationPersistenceManager pm = getMediationPersistenceManager();
                 String fileName = api.getFileName();
@@ -489,7 +488,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         }
 	}
 
-	public APIData	getApiByName(String apiName){
+	public APIData	getApiByName(String apiName) {
 		final Lock lock = getLock();
 		try{
 			lock.lock();
@@ -700,6 +699,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		apiData.setHost(api.getHost());
 		apiData.setPort(api.getPort());
 		apiData.setFileName(api.getFileName());
+		apiData.setVersion(api.getVersion());
+		apiData.setVersionType(api.getVersionStrategy().getVersionType());
 
         if (api.getAspectConfiguration() != null && api.getAspectConfiguration().isStatisticsEnable()) {
             apiData.setStatisticsEnable(true);

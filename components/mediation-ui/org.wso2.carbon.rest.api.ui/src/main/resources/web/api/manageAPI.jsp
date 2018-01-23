@@ -88,6 +88,8 @@
     String filename = "";
     String hostname = "";
     String port = "";
+    String version;
+    String versionType;
 
     APIData apiData = null;
 
@@ -102,7 +104,7 @@
 			if (apiData == null) {
 				apiName = request.getParameter("apiName");
 				try {
-					apiData = client.getApiByNane(apiName);
+					apiData = client.getApiByName(apiName);
 				} catch (Exception e) {
 					String msg = "Unable to get API data: "
 							+ e.getMessage();
@@ -119,7 +121,7 @@
 				session.removeAttribute("apiData");
 
 				try {
-					apiData = client.getApiByNane(apiName);
+					apiData = client.getApiByName(apiName);
 				} catch (Exception e) {
 					String msg = "Unable to get API data: "
 							+ e.getMessage();
@@ -132,7 +134,7 @@
 				//if page loaded from API List view, new APIData should be loaded again.
 				if(!fromSourceView && !fromResourceSourceView){
                                     try {
-                                        apiData = client.getApiByNane(apiName);
+                                        apiData = client.getApiByName(apiName);
                                     } catch (Exception e) {
                                         String msg = "Unable to get API data: "
                                                 + e.getMessage();
@@ -143,15 +145,18 @@
 			}
 
         apiContext = apiData.getContext();
-        //If api context contains a preceeding '/'
+        //If api context contains a preceding '/'
         if (apiContext.startsWith("/")) {
-            //Remove preceeding '/' for displaying
+            //Remove preceding '/' for displaying
             apiContext = apiContext.substring(1);
         }
         filename = apiData.getFileName();
         port = String.valueOf(apiData.getPort() != -1 ? apiData.getPort() : "");
         hostname = apiData.getHost() != null? apiData.getHost() : "";
-        
+
+        version = apiData.getVersion() != null ? apiData.getVersion() : "";
+        versionType = apiData.getVersionType() != null ? apiData.getVersionType() : "";
+
         if(fromResourceSourceView){
         	hostname = request.getParameter("hostname");
         	port = request.getParameter("port");
@@ -193,10 +198,14 @@
         
         port = String.valueOf(apiData.getPort() != -1 ? apiData.getPort() : "");
         hostname = apiData.getHost() != null? apiData.getHost() : "";
+        version = apiData.getVersion() != null? apiData.getVersion() : "";
+        versionType = apiData.getVersionType() != null? apiData.getVersionType() : "";
         
         if(fromResourceSourceView){
         	hostname = request.getParameter("hostname");
         	port = request.getParameter("port");
+            version = request.getParameter("version");
+            versionType = request.getParameter("version");
         }
     }
     String index = (String) session.getAttribute("index");
@@ -227,6 +236,8 @@ function init() {
         loadResource('<%=resourceIndex%>');
     <%}%>
 <%}%>
+    // invoking this to enable/disable version textbox at the page load
+    onSelectVersionType();
 }
 
 function treeColapse(icon) {
@@ -442,11 +453,22 @@ function updateResource(v) {
     var apiHostnameValue = document.getElementById('api.hostname').value;
     var apiPortValue = document.getElementById('api.port').value;
     var apiNameRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+    var version = document.getElementById('api.version').value;
+    var versionTypeElement = document.getElementById('api.version.type');
+    var versionType = versionTypeElement.options[versionTypeElement.selectedIndex].text;
 
 
-    if (apiNameRegex.test(apiNameValue)) {
-        CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
-        return false;
+    if (apiNameValue) {
+        var splittedName = apiNameValue.split(":");
+        if (splittedName.length == 2) {
+            if (apiNameRegex.test(splittedName[0]) || apiNameRegex.test(splittedName[1])) {
+                CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
+                return false;
+            }
+        } else if (apiNameRegex.test(apiNameValue)) {
+            CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
+            return false;
+        }
     }
     var methodList = document.apiForm.methods;
     var isTemp;
@@ -495,7 +517,7 @@ function updateResource(v) {
                         index:index, methods:methods, urlStyle:urlStyle, url:url,
                         inSequence:inSequence, outSequence:outSequence, faultSequence:faultSequence,
                         isSeqIsInline:inSeqIsInline, outSeqIsInline:outSeqIsInline, faultSeqIsInline:faultSeqIsInline,
-                        isTemp:isTemp},
+                        isTemp:isTemp, version:version, versionType:versionType},
                     success: function(data) {
                         hideResourceInfo();
                         //we are adding a new resource.
@@ -528,7 +550,7 @@ function updateResource(v) {
     return true;
 }
 
-function saveApi(apiNameValue, apiContextValue, hostname, port) {
+function saveApi(apiNameValue, apiContextValue, hostname, port, version, versionType) {
     var apiFileName = document.getElementById("apiFileName").value;
 
     apiContextValue = "/" + apiContextValue;
@@ -542,7 +564,7 @@ function saveApi(apiNameValue, apiContextValue, hostname, port) {
     jQuery.ajax({
                     type: "POST",
                     url: "addapi-ajaxprocessor.jsp",
-                    data: { apiName:apiNameValue, apiContext:apiContextValue, hostname:hostname, port:port },
+                    data: { apiName:apiNameValue, apiContext:apiContextValue, hostname:hostname, port:port, version:version, versionType:versionType },
                     success: function(data) {
                         CARBON.showInfoDialog("<fmt:message key="api.add.success"/> ", function() {
                             document.location.href = "index.jsp";
@@ -563,7 +585,7 @@ function saveApi(apiNameValue, apiContextValue, hostname, port) {
     jQuery.ajax({
                     type: "POST",
                     url: "editapi-ajaxprocessor.jsp",
-                    data: { apiName:apiNameValue, apiContext:apiContextValue, filename:apiFileName, hostname:hostname, port:port },
+                    data: { apiName:apiNameValue, apiContext:apiContextValue, filename:apiFileName, hostname:hostname, port:port, version:version, versionType:versionType},
                     success: function(data) {
                         CARBON.showInfoDialog("<fmt:message key="api.update.success"/> ", function() {
                             document.location.href = "index.jsp";
@@ -585,6 +607,10 @@ function validateAndSaveApi() {
     var apiContextValue = document.getElementById('api.context').value;
     var hostname = document.getElementById('api.hostname').value;
     var port = document.getElementById('api.port').value;
+    var version = document.getElementById('api.version').value;
+    var versionTypeElement = document.getElementById('api.version.type');
+    var versionType = versionTypeElement.options[versionTypeElement.selectedIndex].text;
+    apiNameValue = apiNameValue.split(":")[0];
     var apiNameRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
 
     if (apiNameValue == null || apiNameRegex.test(apiNameValue)) {
@@ -609,13 +635,31 @@ function validateAndSaveApi() {
             return false;
         }
     }
+    else if (versionType == "context" || versionType == "url") {
+        if (version == null || version == "") {
+            CARBON.showWarningDialog('<fmt:message key="api.version.required"/>');
+            return false;
+        }
+    }
+    else if (apiNameValue) {
+        var splittedName = apiNameValue.split(":");
+        if (splittedName.length == 2) {
+            if (apiNameRegex.test(splittedName[0]) || apiNameRegex.test(splittedName[1])) {
+                CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
+                return false;
+            }
+        } else if (apiNameRegex.test(apiNameValue)) {
+            CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
+            return false;
+        }
+    }
 
     jQuery.ajax({
                     type: "POST",
                     url: "validateResources-ajaxprocessor.jsp",
                     data: "data=null" ,
                     success:function() {
-                        return saveApi(apiNameValue, apiContextValue, hostname, port);
+                        return saveApi(apiNameValue, apiContextValue, hostname, port, version, versionType);
                     },
                     error:function() {
                         CARBON.showWarningDialog('<fmt:message key="api.resources.empty"/>');
@@ -658,6 +702,10 @@ function resourceSourceView() {
     var apiContextValue = "/" + document.getElementById('api.context').value;
     var hostname = document.getElementById('api.hostname').value;
     var port = document.getElementById('api.port').value;
+    var version = document.getElementById('api.version').value;
+    var versionTypeElement = document.getElementById('api.version.type');
+    var versionType = versionTypeElement.options[versionTypeElement.selectedIndex].text;
+    apiNameValue = apiNameValue.split(":")[0];
     
     if(port != null && port != ""){
     	if(!(/^\d{1,5}([ ]\d{1,5})*$/).test(port)){
@@ -665,15 +713,21 @@ function resourceSourceView() {
             return false;
     	}
     }
+    if (versionType == "none") {
+        versionType = "";
+        version = "";
+    }
     
     var result = updateResource("true");
     if (result != false)  {
         document.location.href = "sourceView_resource.jsp?ordinal=1&mode=" + "<%=Encode.forHtml(mode)%>" +
-                             "&apiName=" + apiNameValue +
-                             "&apiContext=" + apiContextValue +
-                             "&hostname=" + hostname + 
-                             "&port=" + port +
-                             "&index=" + index;
+            "&apiName=" + apiNameValue +
+            "&apiContext=" + apiContextValue +
+            "&hostname=" + hostname +
+            "&port=" + port +
+            "&index=" + index +
+            "&version=" + version +
+            "&versionType=" + versionType;
         goBack(1);
 
     }
@@ -684,6 +738,15 @@ function sourceView() {
     var apiContextValue = "/" + document.getElementById('api.context').value;
     var hostname = document.getElementById('api.hostname').value;
     var port = document.getElementById('api.port').value;
+    var version = document.getElementById('api.version').value;
+    var versionTypeElement = document.getElementById('api.version.type');
+    var versionType = versionTypeElement.options[versionTypeElement.selectedIndex].text;
+    apiNameValue = apiNameValue.split(":")[0];
+
+    if (versionType == "none") {
+        versionType = "";
+        version = "";
+    }
     
     if(port != null && port != ""){
     	if(!(/^\d{1,5}([ ]\d{1,5})*$/).test(port)){
@@ -693,13 +756,29 @@ function sourceView() {
     }
 
     document.location.href = "sourceview_api.jsp?ordinal=1&mode=" + "<%=Encode.forHtml(mode)%>" +
-                             "&apiName=" + apiNameValue +
-                             "&apiContext=" + apiContextValue + 
-                             "&hostname=" + hostname + 
-                             "&port=" + port;
+        "&apiName=" + apiNameValue +
+        "&apiContext=" + apiContextValue +
+        "&hostname=" + hostname +
+        "&port=" + port +
+        "&version=" + version +
+        "&versionType=" + versionType;
 
     goBack(1);
 }
+
+function onSelectVersionType() {
+    var version = document.getElementById('api.version');
+    var versionTypeElement = document.getElementById('api.version.type');
+    var versionType = versionTypeElement.options[versionTypeElement.selectedIndex].text;
+    // set editable false if version-type is selected as "none"
+    if (versionType == "none") {
+        version.readOnly = true;
+        version.value = "";
+    } else {
+        version.readOnly = false;
+    }
+}
+
 </script>
 
 <div id="middle">
@@ -782,6 +861,34 @@ function sourceView() {
                                 <td>
                                     <input type="text" id="api.port" value="<%=port%>"/>
                                     <input type="hidden" name="api.port" value="<%=port%>"/>
+                                </td>
+                            </tr>
+                            <!-- API Version -->
+                            <tr>
+                                <td class="leftCol-small">
+                                    <fmt:message key="api.version.type"/>
+                                </td>
+                                <td>
+                                    <select name="build.message" id="api.version.type" onchange="onSelectVersionType()">
+                                        <option value="context" <%= "context".equals(versionType) ?
+                                                "selected=\"true\"" : ""%>>context
+                                        </option>
+                                        <option value="url" <%= "url".equals(versionType) ?
+                                                "selected=\"true\"" : ""%>>url
+                                        </option>
+                                        <option value="false" <%= (versionType == null || versionType.isEmpty()) ?
+                                                "selected=\"true\"" : ""%>>none
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="leftCol-small">
+                                    <fmt:message key="api.version"/>
+                                </td>
+                                <td>
+                                    <input type="text" id="api.version" value="<%=version%>"/>
+                                    <input type="hidden" name="api.version" value="<%=version%>"/>
                                 </td>
                             </tr>
                             <!-- Resources -->

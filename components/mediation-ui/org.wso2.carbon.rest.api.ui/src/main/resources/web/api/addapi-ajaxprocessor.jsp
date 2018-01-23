@@ -49,6 +49,13 @@
 	String apiContext = request.getParameter("apiContext");
 	String hostname = request.getParameter("hostname");
 	String port = request.getParameter("port");
+	String version = request.getParameter("version");
+	String versionType = request.getParameter("versionType");
+
+	if ("none".equals(versionType)) {
+	    // in synapse, default version type is picked from empty string
+	    versionType = "";
+    }
 	
 	if(port == null || "".equals(port)){
 		port = "-1";
@@ -82,6 +89,8 @@
 	apiData.setContext(apiContext);
 	apiData.setHost(hostname);
 	apiData.setPort(Integer.parseInt(port));
+	apiData.setVersion(version);
+	apiData.setVersionType(versionType);
 	ResourceData resources[] = new ResourceData[resourceList.size()];
 	apiData.setResources(resourceList.toArray(resources));
     try {
@@ -101,7 +110,7 @@
 				apiContext = "/t/" + tenantDomain + apiContext;
             }
             for (String name : names) {
-                APIData data = client.getApiByNane(name);
+                APIData data = client.getApiByName(name);
                 if (data.getContext().equals(apiContext)) {
                     response.setStatus(453);
                     return;

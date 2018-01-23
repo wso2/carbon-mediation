@@ -47,6 +47,15 @@ public class RestApiAdminUtils {
         if(apiData.getPort() != -1){
             api.addAttribute("port", String.valueOf(apiData.getPort()), nullNS);
         }
+
+        if(apiData.getVersion() != null){
+            api.addAttribute("version", String.valueOf(apiData.getVersion()), nullNS);
+        }
+
+        if(apiData.getVersionType() != null){
+            api.addAttribute("version-type", String.valueOf(apiData.getVersionType()), nullNS);
+        }
+
 		if(apiData.getResources() != null && apiData.getResources().length != 0){
 			for(ResourceData resourceData : apiData.getResources()){
 				api.addChild(retrieveResourceOMElement(resourceData));
@@ -197,6 +206,8 @@ public class RestApiAdminUtils {
         apiData.setHost(api.getHost());
         apiData.setPort(api.getPort());
         apiData.setFileName(api.getFileName());
+        apiData.setVersion(api.getVersion());
+        apiData.setVersionType(api.getVersionStrategy().getVersionType());
 
         Resource[] resources = api.getResources();
         ResourceData[] resourceDatas = new ResourceData[resources.length];
