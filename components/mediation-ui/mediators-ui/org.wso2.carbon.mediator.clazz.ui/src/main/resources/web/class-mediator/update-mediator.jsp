@@ -15,8 +15,15 @@
   ~  limitations under the License.
   --%>
 
-<%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
+<%@ page import="org.apache.synapse.util.xpath.SynapseJsonPath" %>
+<%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
+<%@ page import="org.jaxen.JaxenException" %>
 <%@ page import="org.wso2.carbon.mediator.clazz.ClassMediator" %>
+<%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
+<%@ page import="org.wso2.carbon.mediator.service.util.MediatorProperty" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
 
 <%
@@ -26,17 +33,43 @@
         throw new RuntimeException("Unable to edit the mediator");
     }
     ClassMediator classMediator = (ClassMediator) mediator;
+
+    XPathFactory xPathFactory = XPathFactory.getInstance();
     String propertyCountParameter = request.getParameter("propertyCount");
     classMediator.getProperties().clear(); // to avoid duplications
     if (propertyCountParameter != null && !"".equals(propertyCountParameter)) {
         int propertyCount = 0;
-        propertyCount = Integer.parseInt(propertyCountParameter.trim());
-        for(int i = 0;i < propertyCount ;i++){
-            String propertyName = request.getParameter("propertyName" + i);
-            String propertyValue = request.getParameter("propertyValue" + i);
-            if(propertyName!=null && propertyValue !=null){
-                classMediator.addProperty(propertyName,propertyValue);
+        try {
+            propertyCount = Integer.parseInt(propertyCountParameter.trim());
+            for (int i = 0; i <= propertyCount; i++) {
+                String name = request.getParameter("propertyName" + i);
+                if (name != null && !name.isEmpty()) {
+                    String valueId = "propertyValue" + i;
+                    String value = request.getParameter(valueId);
+                    String expression = request.getParameter("propertyTypeSelection" + i);
+                    boolean isExpression = expression != null && "expression".equals(expression.trim());
+                    MediatorProperty mp = new MediatorProperty();
+                    mp.setName(name.trim());
+                    if (value != null) {
+                        if (isExpression) {
+                            if (value.trim().startsWith("json-eval(")) {
+                                SynapsePath jsonPath = new SynapseJsonPath(
+                                        value.trim().substring(10, value.length() - 1));
+                                mp.setPathExpression(jsonPath);
+                            } else {
+                                mp.setExpression(xPathFactory.createSynapseXPath(valueId, value.trim(), session));
+                            }
+                        } else {
+                            mp.setValue(value.trim());
+                        }
+                    }
+                    classMediator.addProperty(mp);
+                }
             }
+        } catch (NumberFormatException ignored) {
+            throw new RuntimeException("Invalid number format");
+        } catch (JaxenException exception) {
+            throw new RuntimeException("Invalid Path Expression");
         }
     }
 %>

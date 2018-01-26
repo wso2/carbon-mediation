@@ -17,12 +17,20 @@
  -->
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 
-<%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
+<%@ page import="org.apache.synapse.config.xml.SynapsePath" %>
+<%@ page import="org.apache.synapse.util.xpath.SynapseJsonPath" %>
+<%@ page import="org.apache.synapse.util.xpath.SynapseXPath" %>
+<%@ page import="org.jaxen.JaxenException" %>
 <%@ page import="org.wso2.carbon.mediator.clazz.ClassMediator" %>
+<%@ page import="org.wso2.carbon.mediator.service.ui.Mediator" %>
+<%@ page import="org.wso2.carbon.mediator.service.util.MediatorProperty" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.NameSpacesRegistrar" %>
+<%@ page import="org.wso2.carbon.sequences.ui.util.ns.XPathFactory" %>
 <%@ page import="org.wso2.carbon.sequences.ui.util.SequenceEditorHelper" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.Set" %>
-<%@ page import="java.util.Iterator" %>
+
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -33,8 +41,10 @@
         throw new RuntimeException("Unable to edit the mediator");
     }
     ClassMediator classMediator = (ClassMediator) mediator;
-    Map propMap = classMediator.getProperties();
-    String propertyTableStyle = propMap.isEmpty() ? "display:none;" : "";
+   List<MediatorProperty> mediatorPropertyList = classMediator.getProperties();
+   NameSpacesRegistrar nameSpacesRegistrar = NameSpacesRegistrar.getInstance();
+       nameSpacesRegistrar.registerNameSpaces(mediatorPropertyList, "propertyValue", session);
+    String propertyTableStyle = mediatorPropertyList.isEmpty() ? "display:none;" : "";
 
 %>
 
@@ -42,7 +52,7 @@
     <carbon:jsi18n
             resourceBundle="org.wso2.carbon.mediator.clazz.ui.i18n.JSResources"
             request="<%=request%>"
-            i18nObjectName="classi18n"/>
+            i18nObjectName="clazzi18n"/>
     <div>
 
         <script type="text/javascript" src="../class-mediator/js/mediator-util.js"></script>
@@ -76,7 +86,7 @@
                             <td align="left"><input type="text" id="mediatorInputId" name="mediatorInput" size="40"
                                                     value="<%= classMediator.getMediator()!=null?classMediator.getMediator():""%>"/>&nbsp&nbsp&nbsp
                             </td>
-                            <td><input id="actionID" type="button" value="<fmt:message key="mediator.clazz.LoadClass"/>"
+                            <td><input id="actionID" type="button" value="<fmt:message key="mediator.clazz.loadClass"/>"
                                        class="button"/>
                             </td>
                         </tr>
@@ -94,38 +104,98 @@
                             <table id="propertytable" style="<%=propertyTableStyle%>;" class="styledInner">
                             <thead>
                                 <tr>
-                                    <th width="10%"><fmt:message key="mediator.clazz.PropName"/></th>
-                                    <th width="10%"><fmt:message key="mediator.clazz.PropValue"/></th>
-                                    <th><fmt:message key="mediator.clazz.Action"/></th>
+                                    <th width="15%"><fmt:message key="mediator.clazz.propName"/></th>
+                                    <th width="10%"><fmt:message key="mediator.clazz.propValue"/></th>
+                                    <th width="15%"><fmt:message key="mediator.clazz.propertyExp"/></th>
+                                    <th id="ns-edior-th" style="display:none;" width="15%"><fmt:message
+                                            key="mediator.clazz.nsEditor"/></th>
+                                    <th><fmt:message key="mediator.clazz.action"/></th>
                                 </tr>
                                 <tbody>
                                     <%
                                         int i = 0;
-                                        Set keys = propMap.keySet();
-                                        Iterator keyItr = keys.iterator();
-                                        while (keyItr.hasNext()) {
-                                            Object key = keyItr.next();
-                                            Object value = propMap.get(key);
+                                        for (MediatorProperty mp : mediatorPropertyList) {
+                                            if (mp != null) {
+                                                String value = mp.getValue();
+                                                boolean isLiteral = value != null && !value.isEmpty();
+
+                                                String pathValue = "";
+                                                SynapsePath path = null;
+                                                SynapseXPath synapseXPath = mp.getExpression();
+                                                if(!isLiteral) {
+                                                    if(synapseXPath == null) {
+                                                        path = mp.getPathExpression();
+                                                        pathValue = path.toString();
+                                                    } else {
+                                                        path = synapseXPath;
+                                                        pathValue = path.toString();
+                                                    }
+                                                }
                                     %>
                                     <tr id="propertyRaw<%=i%>">
-                                        <td align="left"><input type="hidden" name="propertyName<%=i%>"
-                                                                id="propertyName<%=i%>"
-                                                                value="<%= key%>"/><%= key%>
-                                        </td>
-                                        <td><input type="text" name="propertyValue<%=i%>"
-                                                   id="propertyValue<%=i%>"
+                                        <td><input type="text" name="propertyName<%=i%>" id="propertyName<%=i%>"
                                                    class="esb-edit small_textbox"
-                                                   value="<%= value%>"/>
+                                                   value="<%=mp.getName()%>"/>
                                         </td>
-                                        <td><a href="#" class="icon-link"
-                                               style="background-image:url(../admin/images/delete.gif);"
-                                               onclick="deleteRowClazz(this)"><fmt:message
-                                                key="mediator.clazz.Delete"/></a></td>
+                                        <td>
+                                            <select class="esb-edit small_textbox" name="propertyTypeSelection<%=i%>"
+                                                    id="propertyTypeSelection<%=i%>"
+                                                    onchange="onPropertyTypeSelectionChange('<%=i%>','<fmt:message key="mediator.clazz.namespace"/>')">
+                                                <% if (isLiteral) {%>
+                                                <option value="literal">
+                                                    <fmt:message key="mediator.clazz.value"/>
+                                                </option>
+                                                <option value="expression">
+                                                    <fmt:message key="mediator.clazz.expression"/>
+                                                </option>
+                                                <%} else if (path != null) {%>
+                                                <option value="expression">
+                                                    <fmt:message key="mediator.clazz.expression"/>
+                                                </option>
+                                                <option value="literal">
+                                                    <fmt:message key="mediator.clazz.value"/>
+                                                </option>
+                                                <%} else { %>
+                                                <option value="literal">
+                                                    <fmt:message key="mediator.clazz.value"/>
+                                                </option>
+                                                <option value="expression">
+                                                    <fmt:message key="mediator.clazz.expression"/>
+                                                </option>
+                                                <% }%>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <% if (value != null && !"".equals(value)) {%>
+                                            <input id="propertyValue<%=i%>" name="propertyValue<%=i%>" type="text"
+                                                   value="<%=value%>"
+                                                   class="esb-edit"/>
+                                            <%} else if (path != null) {%>
+                                            <input id="propertyValue<%=i%>" name="propertyValue<%=i%>" type="text"
+                                                   value="<%=pathValue%>" class="esb-edit"/>
+                                            <%} else { %>
+                                            <input id="propertyValue<%=i%>" name="propertyValue<%=i%>" type="text"
+                                                   class="esb-edit"/>
+                                            <% }%>
+                                        </td>
+                                        <td id="nsEditorButtonTD<%=i%>" style="<%=isLiteral?"display:none;":""%>">
+                                            <% if (!isLiteral && path != null) {%>
+                                            <script type="text/javascript">
+                                                document.getElementById("ns-edior-th").style.display = "";
+                                            </script>
+                                            <a href="#nsEditorLink" class="nseditor-icon-link"
+                                               style="padding-left:40px"
+                                               onclick="showNameSpaceEditor('propertyValue<%=i%>')">
+                                                <fmt:message key="mediator.clazz.namespace"/></a>
+                                        </td>
+                                        <%}%>
+                                        <td><a href="#" class="delete-icon-link"
+                                               onclick="deleteproperty(<%=i%>);return false;"><fmt:message
+                                                key="mediator.clazz.delete"/></a></td>
                                     </tr>
-                                    <%
-                                            i++;
-                                        }
-                                    %>
+                                    <% }
+                                        i++;
+                                    } %>
                                     <input type="hidden" name="propertyCount" id="propertyCount"
                                            value="<%=i%>"/>
                                 </tbody>
