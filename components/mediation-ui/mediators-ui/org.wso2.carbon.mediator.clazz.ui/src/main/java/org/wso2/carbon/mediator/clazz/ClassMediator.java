@@ -15,20 +15,19 @@
  **/
 package org.wso2.carbon.mediator.clazz;
 
-import org.wso2.carbon.mediator.service.ui.AbstractMediator;
-import org.wso2.carbon.mediator.service.MediatorException;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.wso2.carbon.mediator.service.MediatorException;
+import org.wso2.carbon.mediator.service.ui.AbstractMediator;
+import org.wso2.carbon.mediator.service.util.MediatorProperty;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClassMediator extends AbstractMediator {
     private String mediator;
 
-    private final Map<String, Object> properties = new HashMap<String, Object>();
+    private final List<MediatorProperty> properties = new ArrayList<MediatorProperty>();
 
     public String getMediator() {
         return mediator;
@@ -38,12 +37,16 @@ public class ClassMediator extends AbstractMediator {
         this.mediator = mediator;
     }
 
-    public void addProperty(String name, Object value) {
-        properties.put(name, value);
+    public void addProperty(MediatorProperty property) {
+        properties.add(property);
     }
 
-    public Map getProperties() {
+    public List<MediatorProperty> getProperties() {
         return this.properties;
+    }
+
+    public void addAllProperties(List<MediatorProperty> propertyList) {
+        properties.addAll(propertyList);
     }
 
     public OMElement serialize(OMElement parent) {
@@ -57,20 +60,7 @@ public class ClassMediator extends AbstractMediator {
             throw new MediatorException("Invalid class mediator. The class name is required");
         }
 
-        Iterator itr = properties.keySet().iterator();
-        while(itr.hasNext()) {
-            String propName = (String) itr.next();
-            Object o = properties.get(propName);
-            OMElement prop = fac.createOMElement(PROP_Q);
-            prop.addAttribute(fac.createOMAttribute("name", nullNS, propName));
-
-            if (o instanceof String) {
-                prop.addAttribute(fac.createOMAttribute("value", nullNS, (String) o));
-            } else {
-                prop.addChild((OMNode) o);
-            }
-            clazz.addChild(prop);
-        }
+        serializeMediatorProperties(clazz, properties, PROP_Q);
 
         if (parent != null) {
             parent.addChild(clazz);
@@ -85,29 +75,8 @@ public class ClassMediator extends AbstractMediator {
             throw new MediatorException(msg);
         }
         this.mediator = name.getAttributeValue();
-        
-        for (Iterator it = elem.getChildrenWithName(PROP_Q); it.hasNext();) {
-            OMElement child = (OMElement) it.next();
 
-            String propName = child.getAttribute(ATT_NAME).getAttributeValue();
-            if (propName == null) {
-                throw new MediatorException(
-                    "A Class mediator property must specify the name attribute");
-            } else {
-                if (child.getAttribute(ATT_VALUE) != null) {
-                    String value = child.getAttribute(ATT_VALUE).getAttributeValue();
-                    properties.put(propName, value);
-                } else {
-                    OMNode omElt = child.getFirstElement();
-                    if (omElt != null) {
-                        properties.put(propName, omElt);
-                    } else {
-                        throw new MediatorException("A Class mediator property must specify " +
-                            "name and value attributes, or a name and a child XML fragment");
-                    }
-                }
-            }
-        }
+        addAllProperties(getMediatorProperties(elem));
 
         processAuditStatus(this, elem);        
     }
