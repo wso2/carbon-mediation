@@ -39,8 +39,10 @@ public class APIData {
 
 	private boolean isTracingEnable;
 
+	// API version that is defined as an attribute in api tag
 	private String version;
 
+	// version type describes the way "version" will be used
 	private String versionType;
 
 	public String getName() {
@@ -139,18 +141,34 @@ public class APIData {
 		isTracingEnable = tracingEnable;
 	}
 
+	/**
+	 *
+	 * @returns API version
+	 */
 	public String getVersion() {
 		return version;
 	}
 
+	/**
+	 * Set the given version as the API version
+	 * @param version
+	 */
 	public void setVersion(String version) {
 		this.version = version;
 	}
 
+	/**
+	 *
+	 * @returns the version type of the API
+	 */
 	public String getVersionType() {
 		return versionType;
 	}
 
+	/**
+	 * Set the given version type for the API
+	 * @param versionType
+	 */
 	public void setVersionType(String versionType) {
 		this.versionType = versionType;
 	}

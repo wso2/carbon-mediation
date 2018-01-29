@@ -26,6 +26,7 @@
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.wso2.carbon.rest.api.ui.client.RestApiAdminClient" %>
+<%@ page import="org.wso2.carbon.rest.api.ui.util.RestAPIConstants" %>
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -52,13 +53,13 @@
     String version = request.getParameter("version");
     String versionType = request.getParameter("versionType");
 
-    if ("none".equals(versionType)) {
+    if (RestAPIConstants.VERSION_TYPE_NONE.equals(versionType)) {
         // in synapse, default version type is picked from empty string
         versionType = "";
     }
 
     if (port == null || port.isEmpty()) {
-        port = "-1";
+        port = RestAPIConstants.DEFAULT_PORT;
     }
 
     List<ResourceData> resourceList =
