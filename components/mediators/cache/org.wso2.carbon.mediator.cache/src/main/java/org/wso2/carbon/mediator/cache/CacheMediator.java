@@ -566,7 +566,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      *
      * @return DigestGenerator used evaluate hash values.
      */
-    DigestGenerator getDigestGenerator() {
+    public DigestGenerator getDigestGenerator() {
         return digestGenerator;
     }
 
@@ -575,7 +575,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      *
      * @param digestGenerator DigestGenerator to be set to evaluate hash values.
      */
-    void setDigestGenerator(DigestGenerator digestGenerator) {
+    public void setDigestGenerator(DigestGenerator digestGenerator) {
         this.digestGenerator = digestGenerator;
     }
 
