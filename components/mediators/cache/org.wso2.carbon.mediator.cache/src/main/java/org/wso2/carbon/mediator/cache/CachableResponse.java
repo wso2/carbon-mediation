@@ -100,6 +100,11 @@ public class CachableResponse implements Serializable {
     private Pattern responseCodePattern;
 
     /**
+     * This holds whether the response is doing REST.
+     */
+    private boolean doingREST;
+
+    /**
      * Sets the responsePayload and the headerProperties to null
      */
     public void clean() {
@@ -321,5 +326,19 @@ public class CachableResponse implements Serializable {
      */
     public void setHttpMethod(String httpMethod) {
         this.httpMethod = httpMethod;
+    }
+
+    /**
+     * @return whether the response is doing REST or not.
+     */
+    public boolean isDoingREST() {
+        return doingREST;
+    }
+
+    /**
+     * @param doingREST whether the response doing REST or not
+     */
+    public void setDoingREST(boolean doingREST) {
+        this.doingREST = doingREST;
     }
 }
