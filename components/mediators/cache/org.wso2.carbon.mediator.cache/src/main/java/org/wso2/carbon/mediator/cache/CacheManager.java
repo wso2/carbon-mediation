@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * There would be two instances of the cache mediator in a single mediation flow. Hence it must be possible for the
  * cache created in one instance to be reused in the next. This CacheManager enables this feature with static methods.
  */
-class CacheManager {
+public class CacheManager {
 
     /**
      * Maps the id with the relevant LoadingCache
