@@ -212,7 +212,7 @@ public class RestApiAdminUtils {
         Resource[] resources = api.getResources();
         ResourceData[] resourceDatas = new ResourceData[resources.length];
 
-        for (int i=0; i<resources.length; i++) {
+        for (int i = 0; i < resources.length; i++) {
 
             Resource resource = resources[i];
             ResourceData data = new ResourceData();
@@ -224,8 +224,7 @@ public class RestApiAdminUtils {
             DispatcherHelper dispatcherHelper = resource.getDispatcherHelper();
             if (dispatcherHelper instanceof URITemplateHelper) {
                 data.setUriTemplate(dispatcherHelper.getString());
-            }
-            else if (dispatcherHelper instanceof URLMappingHelper) {
+            } else if (dispatcherHelper instanceof URLMappingHelper) {
                 data.setUrlMapping(dispatcherHelper.getString());
             }
 

@@ -477,7 +477,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         }
 	}
 
-	public APIData	getApiByName(String apiName) {
+	public APIData getApiByName(String apiName) {
 		final Lock lock = getLock();
 		try {
 			lock.lock();
@@ -704,22 +704,21 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		Resource[] resources = api.getResources();
 		ResourceData[] resourceDatas = new ResourceData[resources.length];
 
-		for (int i=0; i<resources.length; i++) {
+        for (int i = 0; i < resources.length; i++) {
 
-			Resource resource = resources[i];
-			ResourceData data = new ResourceData();
+            Resource resource = resources[i];
+            ResourceData data = new ResourceData();
 
-			String[] methods = resource.getMethods();
-			data.setMethods(methods);
-			data.setContentType(resource.getContentType());
-			data.setProtocol(resource.getProtocol());
-			DispatcherHelper dispatcherHelper = resource.getDispatcherHelper();
-			if (dispatcherHelper instanceof URITemplateHelper) {
-				data.setUriTemplate(dispatcherHelper.getString());
-			}
-			else if (dispatcherHelper instanceof URLMappingHelper) {
-				data.setUrlMapping(dispatcherHelper.getString());
-			}
+            String[] methods = resource.getMethods();
+            data.setMethods(methods);
+            data.setContentType(resource.getContentType());
+            data.setProtocol(resource.getProtocol());
+            DispatcherHelper dispatcherHelper = resource.getDispatcherHelper();
+            if (dispatcherHelper instanceof URITemplateHelper) {
+                data.setUriTemplate(dispatcherHelper.getString());
+            } else if (dispatcherHelper instanceof URLMappingHelper) {
+                data.setUrlMapping(dispatcherHelper.getString());
+            }
 
             if (resource.getInSequenceKey() != null) {
                 data.setInSequenceKey(resource.getInSequenceKey());
@@ -742,8 +741,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                         resource.getFaultSequence(), "faultSequence").toString());
             }
             data.setUserAgent(resource.getUserAgent());
-			resourceDatas[i] = data;
-		}
+            resourceDatas[i] = data;
+        }
 		apiData.setResources(resourceDatas);
 		return apiData;
 	}
