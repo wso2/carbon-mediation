@@ -21,70 +21,69 @@ public class ApiEditorHelper {
     private static String PROTOCOL_HTTP = "http";
     private static String PROTOCOL_HTTPS = "https";
 
-	public static String parseStringToPrettyfiedString(String ugly){
-		ByteArrayInputStream byteArrayInputStream
-		= new ByteArrayInputStream(ugly.getBytes());
-		XMLPrettyPrinter printer = new XMLPrettyPrinter(byteArrayInputStream);
-		return printer.xmlFormat();
-	}
-	
-	public static APIData convertStringToAPIData(String xml) throws XMLStreamException{
-		APIData apiData = new APIData();
-		
-		OMElement apiOM = AXIOMUtil.stringToOM(xml);
-		
-		OMAttribute name = apiOM.getAttribute(new QName("name"));
-		if(name != null){
-			apiData.setName(name.getAttributeValue());
-		}
-		
-		OMAttribute context = apiOM.getAttribute(new QName("context"));
-		if(context != null){
-			apiData.setContext(context.getAttributeValue());
-		}
-		
-		OMAttribute host = apiOM.getAttribute(new QName("hostname"));
-		if(host != null){
-			apiData.setHost(host.getAttributeValue());
-		}
-		
-		OMAttribute port = apiOM.getAttribute(new QName("port"));
-		if(port != null){
-			apiData.setPort(Integer.parseInt(port.getAttributeValue()));
-		}
-		else{
-			apiData.setPort(-1);
-		}
+    public static String parseStringToPrettyfiedString(String ugly) {
+        ByteArrayInputStream byteArrayInputStream
+                = new ByteArrayInputStream(ugly.getBytes());
+        XMLPrettyPrinter printer = new XMLPrettyPrinter(byteArrayInputStream);
+        return printer.xmlFormat();
+    }
+
+    public static APIData convertStringToAPIData(String xml) throws XMLStreamException {
+        APIData apiData = new APIData();
+
+        OMElement apiOM = AXIOMUtil.stringToOM(xml);
+
+        OMAttribute name = apiOM.getAttribute(new QName("name"));
+        if (name != null) {
+            apiData.setName(name.getAttributeValue());
+        }
+
+        OMAttribute context = apiOM.getAttribute(new QName("context"));
+        if (context != null) {
+            apiData.setContext(context.getAttributeValue());
+        }
+
+        OMAttribute host = apiOM.getAttribute(new QName("hostname"));
+        if (host != null) {
+            apiData.setHost(host.getAttributeValue());
+        }
+
+        OMAttribute port = apiOM.getAttribute(new QName("port"));
+        if (port != null) {
+            apiData.setPort(Integer.parseInt(port.getAttributeValue()));
+        } else {
+            apiData.setPort(-1);
+        }
 
         OMAttribute version = apiOM.getAttribute(new QName("version"));
-        if(version != null){
+        if (version != null) {
             apiData.setVersion(version.getAttributeValue());
         }
 
         OMAttribute versionType = apiOM.getAttribute(new QName("version-type"));
-        if(versionType != null){
+        if (versionType != null) {
             apiData.setVersionType(versionType.getAttributeValue());
         }
-		
-		Iterator childIterator = apiOM.getChildElements();
-		if(childIterator == null){
-			return apiData;
-		}
-		
-		List<ResourceData> resources = new ArrayList<ResourceData>();
-		
-		while(childIterator.hasNext()){
-			OMElement resourceOM = (OMElement)childIterator.next();
-			ResourceData resource = new ResourceData();
-			convertResource(resourceOM, resource);
-			resources.add(resource);
-		}
-		
-		ResourceData[] resourceArray = new ResourceData[resources.size()];
-		apiData.setResources(resources.toArray(resourceArray));
-		
-		return apiData;
-	}
+
+        Iterator childIterator = apiOM.getChildElements();
+        if (childIterator == null) {
+            return apiData;
+        }
+
+        List<ResourceData> resources = new ArrayList<ResourceData>();
+
+        while (childIterator.hasNext()) {
+            OMElement resourceOM = (OMElement) childIterator.next();
+            ResourceData resource = new ResourceData();
+            convertResource(resourceOM, resource);
+            resources.add(resource);
+        }
+
+        ResourceData[] resourceArray = new ResourceData[resources.size()];
+        apiData.setResources(resources.toArray(resourceArray));
+
+        return apiData;
+    }
 
     public static ResourceData convertStringToResourceData(String xml) throws XMLStreamException {
         ResourceData resourceData = new ResourceData();
@@ -94,7 +93,7 @@ public class ApiEditorHelper {
     }
 
     private static void convertResource(OMElement resourceOM, ResourceData resourceData)
-        throws XMLStreamException {
+            throws XMLStreamException {
         OMAttribute methods = resourceOM.getAttribute(new QName("methods"));
         if (methods != null) {
             resourceData.setMethods(methods.getAttributeValue().split(" "));
@@ -117,9 +116,9 @@ public class ApiEditorHelper {
 
         OMAttribute protocol = resourceOM.getAttribute(new QName("protocol"));
         if (protocol != null) {
-            if(protocol.getAttributeValue().equals(PROTOCOL_HTTP)) {
+            if (protocol.getAttributeValue().equals(PROTOCOL_HTTP)) {
                 resourceData.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);
-            } else if(protocol.getAttributeValue().equals(PROTOCOL_HTTPS)) {
+            } else if (protocol.getAttributeValue().equals(PROTOCOL_HTTPS)) {
                 resourceData.setProtocol(RESTConstants.PROTOCOL_HTTPS_ONLY);
             } else {
                 resourceData.setProtocol(Integer.parseInt(protocol.getAttributeValue()));
@@ -150,14 +149,11 @@ public class ApiEditorHelper {
             Iterator<OMElement> iterator = resourceOM.getChildElements();
             for (; iterator.hasNext(); ) {
                 OMElement elem = iterator.next();
-                if ("inSequence".equals(elem.getLocalName())
-                    && inSequence == null) {
+                if ("inSequence".equals(elem.getLocalName()) && inSequence == null) {
                     resourceData.setInSeqXml(elem.toString());
-                } else if ("outSequence".equals(elem.getLocalName())
-                           && outSequence == null) {
+                } else if ("outSequence".equals(elem.getLocalName()) && outSequence == null) {
                     resourceData.setOutSeqXml(elem.toString());
-                } else if ("faultSequence".equals(elem.getLocalName())
-                           && faultSequence == null) {
+                } else if ("faultSequence".equals(elem.getLocalName()) && faultSequence == null) {
                     resourceData.setFaultSeqXml(elem.toString());
                 }
             }

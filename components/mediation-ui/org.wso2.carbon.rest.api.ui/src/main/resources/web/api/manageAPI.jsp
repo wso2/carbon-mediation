@@ -132,16 +132,16 @@
 			} else {
 				apiName = apiData.getName();
 				//if page loaded from API List view, new APIData should be loaded again.
-				if(!fromSourceView && !fromResourceSourceView){
-                                    try {
-                                        apiData = client.getApiByName(apiName);
-                                    } catch (Exception e) {
-                                        String msg = "Unable to get API data: "
-                                                + e.getMessage();
-                                        CarbonUIMessage.sendCarbonUIMessage(msg,
-                                                CarbonUIMessage.ERROR, request);
-                                    }
-                                }
+				if (!fromSourceView && !fromResourceSourceView) {
+                    try {
+                        apiData = client.getApiByName(apiName);
+                    } catch (Exception e) {
+                        String msg = "Unable to get API data: "
+                                + e.getMessage();
+                        CarbonUIMessage.sendCarbonUIMessage(msg,
+                                CarbonUIMessage.ERROR, request);
+                    }
+                }
 			}
 
         apiContext = apiData.getContext();
@@ -152,12 +152,11 @@
         }
         filename = apiData.getFileName();
         port = String.valueOf(apiData.getPort() != -1 ? apiData.getPort() : "");
-        hostname = apiData.getHost() != null? apiData.getHost() : "";
-
+        hostname = apiData.getHost() != null ? apiData.getHost() : "";
         version = apiData.getVersion() != null ? apiData.getVersion() : "";
         versionType = apiData.getVersionType() != null ? apiData.getVersionType() : "";
 
-        if(fromResourceSourceView){
+        if (fromResourceSourceView) {
         	hostname = request.getParameter("hostname");
         	port = request.getParameter("port");
         }
@@ -197,11 +196,11 @@
         }
         
         port = String.valueOf(apiData.getPort() != -1 ? apiData.getPort() : "");
-        hostname = apiData.getHost() != null? apiData.getHost() : "";
-        version = apiData.getVersion() != null? apiData.getVersion() : "";
-        versionType = apiData.getVersionType() != null? apiData.getVersionType() : "";
+        hostname = apiData.getHost() != null ? apiData.getHost() : "";
+        version = apiData.getVersion() != null ? apiData.getVersion() : "";
+        versionType = apiData.getVersionType() != null ? apiData.getVersionType() : "";
         
-        if(fromResourceSourceView){
+        if (fromResourceSourceView) {
         	hostname = request.getParameter("hostname");
         	port = request.getParameter("port");
             version = request.getParameter("version");
@@ -218,7 +217,7 @@
 
     boolean isResourceUpdatePending = false;
     String rIndex = request.getParameter("resourceIndex");
-    if(null != rIndex) {
+    if (null != rIndex) {
         isResourceUpdatePending = true;
     }
 %>
@@ -707,8 +706,8 @@ function resourceSourceView() {
     var versionType = versionTypeElement.options[versionTypeElement.selectedIndex].text;
     apiNameValue = apiNameValue.split(":")[0];
     
-    if(port != null && port != ""){
-    	if(!(/^\d{1,5}([ ]\d{1,5})*$/).test(port)){
+    if (port != null && port != "") {
+    	if (!(/^\d{1,5}([ ]\d{1,5})*$/).test(port)) {
     		CARBON.showWarningDialog('<fmt:message key="api.port.invalid"/>');
             return false;
     	}
@@ -719,7 +718,7 @@ function resourceSourceView() {
     }
     
     var result = updateResource("true");
-    if (result != false)  {
+    if (result != false) {
         document.location.href = "sourceView_resource.jsp?ordinal=1&mode=" + "<%=Encode.forHtml(mode)%>" +
             "&apiName=" + apiNameValue +
             "&apiContext=" + apiContextValue +
@@ -748,8 +747,8 @@ function sourceView() {
         version = "";
     }
     
-    if(port != null && port != ""){
-    	if(!(/^\d{1,5}([ ]\d{1,5})*$/).test(port)){
+    if (port != null && port != "") {
+    	if (!(/^\d{1,5}([ ]\d{1,5})*$/).test(port)) {
     		CARBON.showWarningDialog('<fmt:message key="api.port.invalid"/>');
             return false;
     	}

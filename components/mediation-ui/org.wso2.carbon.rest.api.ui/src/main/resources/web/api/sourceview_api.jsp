@@ -70,8 +70,8 @@
         APIData apiData = new APIData();
         apiData.setName(apiName);
         apiData.setContext(apiContext != null && !"/".equals(apiContext.trim()) ? apiContext : "");
-        apiData.setHost(hostname == null || "".equals(hostname) ? null : hostname);
-        apiData.setPort(Integer.parseInt(port != null && !"".equals(port) ? port : "-1"));
+        apiData.setHost(hostname == null || hostname.isEmpty() ? null : hostname);
+        apiData.setPort(Integer.parseInt(port != null && !port.isEmpty() ? port : "-1"));
         apiData.setVersion(version == null || version.isEmpty() ? null : version);
         apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
         apiData.setResources(resources.toArray(resourceArray));
@@ -81,8 +81,8 @@
         APIData apiData = new APIData();
         apiData.setName(apiName != null ? apiName : "");
         apiData.setContext(apiContext != null && !"/".equals(apiContext.trim()) ? apiContext : "");
-        apiData.setHost(hostname == null || "".equals(hostname) ? null : hostname);
-        apiData.setPort(Integer.parseInt(port != null && !"".equals(port) ? port : "-1"));
+        apiData.setHost(hostname == null || hostname.isEmpty() ? null : hostname);
+        apiData.setPort(Integer.parseInt(port != null && !port.isEmpty() ? port : "-1"));
         apiData.setVersion(version == null || version.isEmpty() ? null : version);
         apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
         apiData.setResources(resources.toArray(resourceArray));
@@ -137,7 +137,7 @@
             return false;
         }
 
-        <%if("edit".equals(mode)){%>
+        <%if ("edit".equals(mode)) {%>
             jQuery.ajax({
                 type: "POST",
                 url: "savesource-ajaxprocessor.jsp",
@@ -155,7 +155,7 @@
                 }
             });
         <%}
-        else{%>
+        else {%>
             jQuery.ajax({
                 type: "POST",
                 url: "savesource-ajaxprocessor.jsp",

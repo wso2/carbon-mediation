@@ -31,59 +31,59 @@
 
 
 <%
-	ResourceBundle bundle = ResourceBundle.getBundle(
-			"org.wso2.carbon.rest.api.ui.i18n.Resources",
-			request.getLocale());
-	String url = CarbonUIUtil.getServerURL(this.getServletConfig()
-		.getServletContext(), session);
-	ConfigurationContext configContext = (ConfigurationContext) config
-		.getServletContext().getAttribute(
-				CarbonConstants.CONFIGURATION_CONTEXT);
-	String cookie = (String) session
-		.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-	RestApiAdminClient client = new RestApiAdminClient(
-		configContext, url, cookie, bundle.getLocale());
+    ResourceBundle bundle = ResourceBundle.getBundle(
+            "org.wso2.carbon.rest.api.ui.i18n.Resources",
+            request.getLocale());
+    String url = CarbonUIUtil.getServerURL(this.getServletConfig()
+            .getServletContext(), session);
+    ConfigurationContext configContext = (ConfigurationContext) config
+            .getServletContext().getAttribute(
+                    CarbonConstants.CONFIGURATION_CONTEXT);
+    String cookie = (String) session
+            .getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
+    RestApiAdminClient client = new RestApiAdminClient(
+            configContext, url, cookie, bundle.getLocale());
 
-	String apiName = request.getParameter("apiName");
-	String apiContext = request.getParameter("apiContext");
-	String filename = request.getParameter("filename");
-	String hostname = request.getParameter("hostname");
-	String port = request.getParameter("port");
-	String version = request.getParameter("version");
-	String versionType = request.getParameter("versionType");
+    String apiName = request.getParameter("apiName");
+    String apiContext = request.getParameter("apiContext");
+    String filename = request.getParameter("filename");
+    String hostname = request.getParameter("hostname");
+    String port = request.getParameter("port");
+    String version = request.getParameter("version");
+    String versionType = request.getParameter("versionType");
 
     if ("none".equals(versionType)) {
         // in synapse, default version type is picked from empty string
         versionType = "";
     }
-	
-	if(port == null || "".equals(port)){
-		port = "-1";
-	}
 
-	List<ResourceData> resourceList = 
-			(ArrayList<ResourceData>)session.getAttribute("apiResources");
-	APIData apiData = new APIData();
-	apiData.setName(apiName);
-	apiData.setContext(apiContext);
-	apiData.setHost(hostname);
-	apiData.setPort(Integer.parseInt(port));
-	apiData.setVersion(version);
-	apiData.setVersionType(versionType);
-	apiData.setFileName(filename);
-	ResourceData resources[] = new ResourceData[resourceList.size()];
+    if (port == null || port.isEmpty()) {
+        port = "-1";
+    }
 
-	// appending api version to the api name
-	apiName = (version != null && !version.isEmpty()) ? apiName + ":v" + version : apiName;
-	
-	if(resourceList != null) {
+    List<ResourceData> resourceList =
+            (ArrayList<ResourceData>) session.getAttribute("apiResources");
+    APIData apiData = new APIData();
+    apiData.setName(apiName);
+    apiData.setContext(apiContext);
+    apiData.setHost(hostname);
+    apiData.setPort(Integer.parseInt(port));
+    apiData.setVersion(version);
+    apiData.setVersionType(versionType);
+    apiData.setFileName(filename);
+    ResourceData resources[] = new ResourceData[resourceList.size()];
+
+    // appending api version to the api name
+    apiName = (version != null && !version.isEmpty()) ? apiName + ":v" + version : apiName;
+
+    if (resourceList != null) {
 
         for (int i = 0; i < resourceList.size() - 1; ++i) {
             ResourceData a = resourceList.get(i);
             for (int j = i + 1; j < resourceList.size(); ++j) {
                 ResourceData b = resourceList.get(j);
                 if (a.getUrlMapping() != null &&
-                    a.getUrlMapping().equals(b.getUrlMapping())) {
+                        a.getUrlMapping().equals(b.getUrlMapping())) {
                     for (String aMethod : a.getMethods()) {
                         for (String bMethod : b.getMethods()) {
                             if (aMethod != null && aMethod.equals(bMethod)) {
@@ -95,9 +95,9 @@
                 }
             }
         }
-	}
-	
-	apiData.setResources(resourceList.toArray(resources));
+    }
+
+    apiData.setResources(resourceList.toArray(resources));
     try {
         String[] names = client.getApiNames();
 

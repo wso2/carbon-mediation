@@ -69,7 +69,7 @@ public class RestApiAdminClient {
         options.setProperty(org.apache.axis2.transport.http.HTTPConstants.COOKIE_STRING, cookie);
 	}
 
-	public String[] getApiNames() throws AxisFault{
+	public String[] getApiNames() throws AxisFault {
 		try {
             String [] result = stub.getApiNames();
             if (result == null || result.length == 0 || result[0] == null) {
@@ -91,7 +91,7 @@ public class RestApiAdminClient {
 		return null;
 	}
 
-	public APIData[] getAPIsForListing(int pageNumber, int itemsPerPage) throws AxisFault{
+	public APIData[] getAPIsForListing(int pageNumber, int itemsPerPage) throws AxisFault {
 		try {
 			return stub.getAPIsForListing(pageNumber, itemsPerPage);
 		} catch (Exception e) {
@@ -114,7 +114,7 @@ public class RestApiAdminClient {
         return false;
     }
 
-    public APIData[] getAPIsForSearchListing(int pageNumber, int itemsPerPage, String searchText) throws AxisFault{
+    public APIData[] getAPIsForSearchListing(int pageNumber, int itemsPerPage, String searchText) throws AxisFault {
 
         ArrayList<org.wso2.carbon.rest.api.stub.types.carbon.APIData> apis = new ArrayList<org.wso2.carbon.rest.api.stub.types.carbon.APIData>();
         try {
@@ -126,7 +126,8 @@ public class RestApiAdminClient {
             for (org.wso2.carbon.rest.api.stub.types.carbon.APIData info : tempAPI) {
 
                 if (isApiSatisfySearchString(searchText, info.getName())) {
-                    org.wso2.carbon.rest.api.stub.types.carbon.APIData api = new org.wso2.carbon.rest.api.stub.types.carbon.APIData();
+                    org.wso2.carbon.rest.api.stub.types.carbon.APIData api =
+							new org.wso2.carbon.rest.api.stub.types.carbon.APIData();
                     api.setName(info.getName());
                     api.setContext(info.getContext());
                     api.setFileName(info.getFileName());
@@ -147,7 +148,7 @@ public class RestApiAdminClient {
 
 
 
-	public int getAPICount() throws AxisFault{
+	public int getAPICount() throws AxisFault {
 		try {
 			return stub.getAPICount();
 		} catch (Exception e) {
@@ -156,7 +157,7 @@ public class RestApiAdminClient {
 		return 0;
 	}
 
-	public void deleteApi(String apiName) throws AxisFault{
+	public void deleteApi(String apiName) throws AxisFault {
 		try {
 			stub.deleteApi(apiName);
 		} catch (Exception e) {
@@ -164,7 +165,7 @@ public class RestApiAdminClient {
 		}
 	}
 
-	public void addApi(APIData apiData) throws AxisFault{
+	public void addApi(APIData apiData) throws AxisFault {
 		try {
 			stub.addApi(apiData);
 		} catch (Exception e) {
@@ -172,7 +173,7 @@ public class RestApiAdminClient {
 		}
 	}
 
-	public void updateApi(APIData apiData) throws AxisFault{
+	public void updateApi(APIData apiData) throws AxisFault {
 		try {
 			String apiName = apiData.getName();
 			if (apiData.getVersion() != null && !apiData.getVersion().isEmpty()) {
@@ -184,7 +185,7 @@ public class RestApiAdminClient {
 		}
 	}
 
-	public String[] getDefinedSequences() throws AxisFault{
+	public String[] getDefinedSequences() throws AxisFault {
 		try {
 			String[] sequences = stub.getSequences();
 			if(sequences != null && sequences.length != 0){
@@ -197,7 +198,7 @@ public class RestApiAdminClient {
 		return null;
 	}
 
-	public String getApiSource(APIData apiData) throws AxisFault{
+	public String getApiSource(APIData apiData) throws AxisFault {
 		try {
 			return stub.getApiSource(apiData);
 		} catch (Exception e) {
@@ -215,7 +216,7 @@ public class RestApiAdminClient {
         return null;
     }
 
-	public void addApiFromString(String apiData) throws AxisFault{
+	public void addApiFromString(String apiData) throws AxisFault {
 		try {
 			stub.addApiFromString(apiData);
 		} catch (AxisFault af) {
@@ -225,7 +226,7 @@ public class RestApiAdminClient {
 		}
 	}
 
-	public void updateApiFromString(String apiName, String apiData) throws AxisFault{
+	public void updateApiFromString(String apiName, String apiData) throws AxisFault {
 		try {
 			stub.updateApiFromString(apiName, apiData);
 		} catch (AxisFault af) {
@@ -235,69 +236,67 @@ public class RestApiAdminClient {
 		}
 	}
 
-     private String ReadWSDLPrefix(String svrURL){
-         try{
-			 String confPath = System.getProperty(CONF_LOCATION);
-			 if (confPath == null) {
-				 confPath = Paths.get("repository", "conf").toString();
-			 }
-			 InputStream in = new FileInputStream(Paths.get(confPath, "axis2", "axis2.xml").toString());
-			 OMElement results = OMXMLBuilderFactory.createOMBuilder(in).getDocumentElement();
+	private String ReadWSDLPrefix() throws AxisFault {
+		try {
+			String confPath = System.getProperty(CONF_LOCATION);
+			if (confPath == null) {
+				confPath = Paths.get("repository", "conf").toString();
+			}
+			InputStream in = new FileInputStream(Paths.get(confPath, "axis2", "axis2.xml").toString());
+			OMElement results = OMXMLBuilderFactory.createOMBuilder(in).getDocumentElement();
 
-             AXIOMXPath xpathExpression = new AXIOMXPath ("/axisconfig/transportReceiver/parameter[@name='WSDLEPRPrefix']");
-             List nodeList = (List) xpathExpression.selectNodes(results);
+			AXIOMXPath xpathExpression =
+					new AXIOMXPath("/axisconfig/transportReceiver/parameter[@name='WSDLEPRPrefix']");
+			List nodeList = (List) xpathExpression.selectNodes(results);
 
-             if(!nodeList.isEmpty()){
-                 OMNode value = (OMNode) nodeList.get(0);
-                 String server = ((OMElementImpl) value).getText() ;
+			if (!nodeList.isEmpty()) {
+				OMNode value = (OMNode) nodeList.get(0);
+				String server = ((OMElementImpl) value).getText();
 
-                 if(server.contains("http") || server.contains("https")){
-                     return server;
-                 }
-             }
-         }catch(Exception e){
-             System.out.println(e.toString());
-         }
+				if (server.contains("http") || server.contains("https")) {
+					return server;
+				}
+			}
+		} catch (Exception e) {
+			handleException(bundle.getString("failed.to.read.wsdl.prefix"), e);
+		}
+		return null;
+	}
 
-         return "";
-     }
-
-     public String getServerContext() throws AxisFault {
-           try {
-                  String returnValue = ReadWSDLPrefix(stub.getServerContext());
-
-                  if(returnValue != ""){
-                           return returnValue;
-                  }else{
-                          return stub.getServerContext();
-                  }
-           } catch (Exception e) {
-                        handleException(bundle.getString("failed.to.get.servercontext"), e);
-           }
-         return null;
-     }
+	public String getServerContext() throws AxisFault {
+		try {
+			String returnValue = ReadWSDLPrefix();
+			if (returnValue != null && returnValue.isEmpty()) {
+				return returnValue;
+			} else {
+				return stub.getServerContext();
+			}
+		} catch (Exception e) {
+			handleException(bundle.getString("failed.to.get.servercontext"), e);
+		}
+		return null;
+	}
 
 	private void handleException(String msg, Exception e) throws AxisFault {
-        log.error(msg, e);
-        throw new AxisFault(msg, e);
-    }
+		log.error(msg, e);
+		throw new AxisFault(msg, e);
+	}
 
-    public void deleteSelectedApi(String[] apiNames)throws  AxisFault{
-        try {
-            stub.deleteSelectedApi(apiNames);
-        } catch (Exception e){
-            handleException(bundle.getString("could.not.selected.delete.api"),e);
-        }
-    }
+	public void deleteSelectedApi(String[] apiNames) throws AxisFault {
+		try {
+			stub.deleteSelectedApi(apiNames);
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.selected.delete.api"), e);
+		}
+	}
 
-    public void deleteAllApi()throws AxisFault{
-        try {
-            stub.deleteAllApi();
-        }
-        catch (Exception e){
-            handleException(bundle.getString("could.not.All.delete.api"),e);
-        }
-    }
+	public void deleteAllApi() throws AxisFault {
+		try {
+			stub.deleteAllApi();
+		} catch (Exception e) {
+			handleException(bundle.getString("could.not.All.delete.api"), e);
+		}
+	}
 
 	public String enableStatistics(String apiName) throws AxisFault {
 		try {
