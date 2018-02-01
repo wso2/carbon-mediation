@@ -425,13 +425,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                             }
                         }
                     }
-                    response.setDoingREST(msgCtx.isDoingREST());
                     response.setResponsePayload(null);
                     response.setResponseEnvelope(clonedEnvelope);
                     response.setJson(false);
 
                 }
 
+                response.setDoingREST(msgCtx.isDoingREST());
                 if (synLog.isTraceOrDebugEnabled()) {
                     synLog.traceOrDebug("Storing the response message into the cache with ID : "
                                                 + id + " for request hash : " + response.getRequestHash());
