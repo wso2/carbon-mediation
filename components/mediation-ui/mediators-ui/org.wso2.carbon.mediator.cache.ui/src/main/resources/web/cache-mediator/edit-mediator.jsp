@@ -175,6 +175,50 @@
                                                                 size="40" /></div>
                                 </td>
                             </tr>
+                            <tr>
+                                <td><fmt:message key="mediator.cache.cacheControlEnabled"/></td>
+                                <td>
+                                    <select name="enableCacheControl" id="enableCacheControl"
+                                            class="esb-edit small_textbox">
+                                        <%
+                                            if (cacheMediator.isCacheControlEnabled()) {
+                                        %>
+                                        <option selected="true" value="true">True</option>
+                                        <option value="false">False</option>
+                                        <%
+                                        } else {
+                                        %>
+                                        <option value="true">True</option>
+                                        <option selected="true" value="false">False</option>
+                                        <%
+                                            }
+                                        %>
+                                    </select>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><fmt:message key="mediator.cache.includeAgeHeader"/></td>
+                                <td>
+                                    <select name="includeAgeHeader" id="includeAgeHeader"
+                                            class="esb-edit small_textbox">
+                                        <%
+                                            if (cacheMediator.isAddAgeHeaderEnabled()) {
+                                        %>
+                                        <option selected="true" value="true">True</option>
+                                        <option value="false">False</option>
+                                        <%
+                                        } else {
+                                        %>
+                                        <option value="true">True</option>
+                                        <option selected="true" value="false">False</option>
+                                        <%
+                                            }
+                                        %>
+                                    </select>
+                                </td>
+                                <td></td>
+                            </tr>
                         </table>
                     </div>
                 </td>

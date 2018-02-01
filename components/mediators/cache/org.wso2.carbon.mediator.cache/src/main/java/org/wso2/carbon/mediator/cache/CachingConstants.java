@@ -83,6 +83,16 @@ public class CachingConstants {
     public static final int DEFAULT_SIZE = -1;
 
     /**
+     * The default value for enableCacheControl.
+     */
+    public static final boolean DEFAULT_ENABLE_CACHE_CONTROL = false;
+
+    /**
+     * The default value for addAgeHeader.
+     */
+    public static final boolean DEFAULT_ADD_AGE_HEADER = false;
+
+    /**
      * Following names represent the local names used in QNames in MediatorFactory, Serializer and the UI
      * CacheMediator.
      */
@@ -99,5 +109,7 @@ public class CachingConstants {
     public static final String HASH_GENERATOR_STRING = "hashGenerator";
     public static final String IMPLEMENTATION_STRING = "implementation";
     public static final String MAX_SIZE_STRING = "maxSize";
+    public static final String ENABLE_CACHE_CONTROL_STRING = "enableCacheControl";
+    public static final String INCLUDE_AGE_HEADER_STRING = "includeAgeHeader";
 
 }

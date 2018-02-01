@@ -43,8 +43,10 @@ import org.apache.synapse.util.FixedByteArrayOutputStream;
 import org.apache.synapse.util.MessageHelper;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediator.cache.digest.DigestGenerator;
+import org.wso2.carbon.mediator.cache.util.HttpCachingFilter;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -140,6 +142,21 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      * The http method type that needs to be cached.
      */
     private String[] hTTPMethodsToCache = {CachingConstants.ALL};
+
+    /**
+     * This specifies whether the mediator should honor cache-control header.
+     */
+    private boolean cacheControlEnabled = CachingConstants.DEFAULT_ENABLE_CACHE_CONTROL;
+
+    /**
+     * This specifies whether an Age header needs to be included in the cached response.
+     */
+    private boolean addAgeHeaderEnabled = CachingConstants.DEFAULT_ADD_AGE_HEADER;
+
+    /**
+     * Variable to represent NOT_MODIFIED status code.
+     */
+    private static final String SC_NOT_MODIFIED = "304";
 
     /**
      * The cache manager to be used.
@@ -252,92 +269,109 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
         cachedResponse.setResponseCodePattern(responseCodePattern);
         cachedResponse.setHTTPMethodsToCache(hTTPMethodsToCache);
         cachedResponse.setMaxMessageSize(maxMessageSize);
-        Map<String, Object> headerProperties;
+        cachedResponse.setCacheControlEnabled(cacheControlEnabled);
+        cachedResponse.setAddAgeHeaderEnabled(addAgeHeaderEnabled);
         if (cachedResponse.getResponsePayload() != null || cachedResponse.getResponseEnvelope() != null) {
             // get the response from the cache and attach to the context and change the
             // direction of the message
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("Cache-hit for message ID : " + synCtx.getMessageID());
             }
+            //Validate the response based on max-age and no-cache headers.
+            if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(getProtocolType())
+                    && cachedResponse.isCacheControlEnabled() &&
+                    HttpCachingFilter.validateCachedResponse(cachedResponse, synCtx)) {
+                return true;
+            }
             // mark as a response and replace envelope from cache
             synCtx.setResponse(true);
-            try {
-                if (cachedResponse.isJson()) {
-                    byte[] payload = cachedResponse.getResponsePayload();
-                    OMElement response = JsonUtil.getNewJsonPayload(msgCtx, payload, 0,
-                                                                    payload.length, false, false);
-                    if (msgCtx.getEnvelope().getBody().getFirstElement() != null) {
-                        msgCtx.getEnvelope().getBody().getFirstElement().detach();
-                    }
-                    msgCtx.getEnvelope().getBody().addChild(response);
-
-                } else {
-                    msgCtx.setEnvelope(MessageHelper.cloneSOAPEnvelope(cachedResponse.getResponseEnvelope()));
-                }
-            } catch (AxisFault e) {
-                handleException("Error creating response OM from cache : " + id, synCtx);
-            }
-            if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(getProtocolType())) {
-                if (cachedResponse.getStatusCode() != null) {
-                    msgCtx.setProperty(NhttpConstants.HTTP_SC,
-                                       Integer.parseInt(cachedResponse.getStatusCode().toString()));
-                }
-                if (cachedResponse.getStatusReason() != null) {
-                    msgCtx.setProperty(PassThroughConstants.HTTP_SC_DESC, cachedResponse.getStatusReason());
-                }
-            }
-            msgCtx.setDoingREST(cachedResponse.isDoingREST());
-
-            if (cachedResponse.isDoingREST()) {
-
-                msgCtx.removeProperty(PassThroughConstants.NO_ENTITY_BODY);
-                msgCtx.removeProperty(Constants.Configuration.CONTENT_TYPE);
-            }
-            if ((headerProperties = cachedResponse.getHeaderProperties()) != null) {
-                Map<String, Object> headers = new HashMap<>();
-                headers.putAll(headerProperties);
-
-                msgCtx.setProperty(Constants.Configuration.MESSAGE_TYPE,
-                                   headers.remove(Constants.Configuration.MESSAGE_TYPE));
-                msgCtx.setProperty(Constants.Configuration.CONTENT_TYPE,
-                                   headers.remove(Constants.Configuration.CONTENT_TYPE));
-                msgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
-                                   headers);
-            }
-
-            // take specified action on cache hit
-            if (onCacheHitSequence != null) {
-                // if there is an onCacheHit use that for the mediation
-                synLog.traceOrDebug("Delegating message to the onCachingHit "
-                                            + "Anonymous sequence");
-                ContinuationStackManager.addReliantContinuationState(synCtx, 0, getMediatorPosition());
-                if (onCacheHitSequence.mediate(synCtx)) {
-                    ContinuationStackManager.removeReliantContinuationState(synCtx);
-                }
-
-            } else if (onCacheHitRef != null) {
-                if (synLog.isTraceOrDebugEnabled()) {
-                    synLog.traceOrDebug("Delegating message to the onCachingHit "
-                                                + "sequence : " + onCacheHitRef);
-                }
-                ContinuationStackManager.updateSeqContinuationState(synCtx, getMediatorPosition());
-                synCtx.getSequence(onCacheHitRef).mediate(synCtx);
-
-            } else {
-
-                if (synLog.isTraceOrDebugEnabled()) {
-                    synLog.traceOrDebug("Request message " + synCtx.getMessageID() +
-                                                " was served from the cache");
-                }
-                // send the response back if there is not onCacheHit is specified
-                synCtx.setTo(null);
-                //Todo continueExecution if needed
-                Axis2Sender.sendBack(synCtx);
-
-            }
+            returnCachedResponse(synCtx, synLog, msgCtx, cachedResponse);
             return false;
         }
         return true;
+    }
+
+    private void returnCachedResponse(MessageContext synCtx, SynapseLog synLog,
+                                      org.apache.axis2.context.MessageContext msgCtx, CachableResponse cachedResponse) {
+        Map<String, Object> headerProperties;
+        try {
+            if (cachedResponse.isJson()) {
+                byte[] payload = cachedResponse.getResponsePayload();
+                OMElement response = JsonUtil.getNewJsonPayload(msgCtx, payload, 0,
+                                                                payload.length, false, false);
+                if (msgCtx.getEnvelope().getBody().getFirstElement() != null) {
+                    msgCtx.getEnvelope().getBody().getFirstElement().detach();
+                }
+                msgCtx.getEnvelope().getBody().addChild(response);
+
+            } else {
+                msgCtx.setEnvelope(MessageHelper.cloneSOAPEnvelope(cachedResponse.getResponseEnvelope()));
+            }
+        } catch (AxisFault e) {
+            handleException("Error creating response OM from cache : " + id, synCtx);
+        }
+        if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(getProtocolType())) {
+            if (cachedResponse.getStatusCode() != null) {
+                msgCtx.setProperty(NhttpConstants.HTTP_SC,
+                                   Integer.parseInt(cachedResponse.getStatusCode()));
+            }
+            if (cachedResponse.getStatusReason() != null) {
+                msgCtx.setProperty(PassThroughConstants.HTTP_SC_DESC, cachedResponse.getStatusReason());
+            }
+            //Set Age header to the cached response.
+            if (cachedResponse.isAddAgeHeaderEnabled()) {
+                HttpCachingFilter.setAgeHeader(cachedResponse, msgCtx);
+            }
+        }
+        msgCtx.setDoingREST(cachedResponse.isDoingREST());
+
+        if (cachedResponse.isDoingREST()) {
+
+            msgCtx.removeProperty(PassThroughConstants.NO_ENTITY_BODY);
+            msgCtx.removeProperty(Constants.Configuration.CONTENT_TYPE);
+        }
+        if ((headerProperties = cachedResponse.getHeaderProperties()) != null) {
+            Map<String, Object> headers = new HashMap<>();
+            headers.putAll(headerProperties);
+
+            msgCtx.setProperty(Constants.Configuration.MESSAGE_TYPE,
+                               headers.remove(Constants.Configuration.MESSAGE_TYPE));
+            msgCtx.setProperty(Constants.Configuration.CONTENT_TYPE,
+                               headers.remove(Constants.Configuration.CONTENT_TYPE));
+            msgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS,
+                               headers);
+        }
+
+        // take specified action on cache hit
+        if (onCacheHitSequence != null) {
+            // if there is an onCacheHit use that for the mediation
+            synLog.traceOrDebug("Delegating message to the onCachingHit "
+                                        + "Anonymous sequence");
+            ContinuationStackManager.addReliantContinuationState(synCtx, 0, getMediatorPosition());
+            if (onCacheHitSequence.mediate(synCtx)) {
+                ContinuationStackManager.removeReliantContinuationState(synCtx);
+            }
+
+        } else if (onCacheHitRef != null) {
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Delegating message to the onCachingHit "
+                                            + "sequence : " + onCacheHitRef);
+            }
+            ContinuationStackManager.updateSeqContinuationState(synCtx, getMediatorPosition());
+            synCtx.getSequence(onCacheHitRef).mediate(synCtx);
+
+        } else {
+
+            if (synLog.isTraceOrDebugEnabled()) {
+                synLog.traceOrDebug("Request message " + synCtx.getMessageID() +
+                                            " was served from the cache");
+            }
+            // send the response back if there is not onCacheHit is specified
+            synCtx.setTo(null);
+            //Todo continueExecution if needed
+            Axis2Sender.sendBack(synCtx);
+
+        }
     }
 
     /**
@@ -360,6 +394,11 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
             if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(response.getProtocolType())) {
                 Object httpStatus = msgCtx.getProperty(NhttpConstants.HTTP_SC);
                 String statusCode = null;
+                //Honor no-store header if cacheControlEnabled.
+                if(response.isCacheControlEnabled() && HttpCachingFilter.isNoStore(synCtx)) {
+                    response.clean();
+                    return;
+                }
                 //Need to check the data type of HTTP_SC to avoid classcast exceptions.
                 if (httpStatus instanceof String) {
                     statusCode = ((String) httpStatus).trim();
@@ -368,6 +407,11 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                 }
 
                 if (statusCode != null) {
+                    //If status code is SC_NOT_MODIFIED then return the cached response.
+                    if(statusCode.equals(SC_NOT_MODIFIED)) {
+                        returnCachedResponse(synCtx, synLog, msgCtx, response);
+                        return;
+                    }
                     // Now create matcher object.
                     Matcher m = response.getResponseCodePattern().matcher(statusCode);
                     if (m.matches()) {
@@ -425,13 +469,13 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                             }
                         }
                     }
-                    response.setDoingREST(msgCtx.isDoingREST());
                     response.setResponsePayload(null);
                     response.setResponseEnvelope(clonedEnvelope);
                     response.setJson(false);
 
                 }
 
+                response.setDoingREST(msgCtx.isDoingREST());
                 if (synLog.isTraceOrDebugEnabled()) {
                     synLog.traceOrDebug("Storing the response message into the cache with ID : "
                                                 + id + " for request hash : " + response.getRequestHash());
@@ -447,6 +491,16 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
                 String messageType = (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
                 Map<String, Object> headerProperties = new HashMap<>();
+
+                //Store the response fetched time.
+                if (response.isCacheControlEnabled() || response.isAddAgeHeaderEnabled()) {
+                    try {
+                        HttpCachingFilter.setResponseCachedTime(headers, response);
+                    } catch (ParseException e) {
+                        synLog.auditWarn("Error occurred while parsing the date." + e.getMessage());
+                    }
+                }
+
                 //Individually copying All TRANSPORT_HEADERS to headerProperties Map instead putting whole
                 //TRANSPORT_HEADERS map as single Key/Value pair to fix hazelcast serialization issue.
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
@@ -756,4 +810,39 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
         this.maxMessageSize = maxMessageSize;
     }
 
+    /**
+     * This method returns whether cache-control is enabled or not.
+     *
+     * @return whether cache-control is enabled or not.
+     */
+    public boolean isCacheControlEnabled() {
+        return cacheControlEnabled;
+    }
+
+    /**
+     * This method sets whether cache-control is enabled or not.
+     *
+     * @param cacheControlEnabled whether cache-control is enabled or not.
+     */
+    public void setCacheControlEnabled(boolean cacheControlEnabled) {
+        this.cacheControlEnabled = cacheControlEnabled;
+    }
+
+    /**
+     * This method returns whether an Age header needs to be included or not.
+     *
+     * @return whether an Age header needs to be included or not.
+     */
+    public boolean isAddAgeHeaderEnabled() {
+        return addAgeHeaderEnabled;
+    }
+
+    /**
+     * This method sets whether an Age header needs to be included or not.
+     *
+     * @param addAgeHeaderEnabled whether an Age header needs to be included or not.
+     */
+    public void setAddAgeHeaderEnabled(boolean addAgeHeaderEnabled) {
+        this.addAgeHeaderEnabled = addAgeHeaderEnabled;
+    }
 }
