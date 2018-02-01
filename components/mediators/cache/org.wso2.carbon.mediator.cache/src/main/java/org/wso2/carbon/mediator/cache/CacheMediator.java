@@ -74,7 +74,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
     /**
      * The value of json content type as it appears in HTTP Content-Type header.
      */
-    private final String jsonContentType = "application/json";
+    private static final String JSON_CONTENT_TYPE = "application/json";
     /**
      * Cache configuration ID.
      */
@@ -193,10 +193,8 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
      * {@inheritDoc}
      */
     public boolean mediate(MessageContext synCtx) {
-        if (synCtx.getEnvironment().isDebuggerEnabled()) {
-            if (super.divertMediationRoute(synCtx)) {
-                return true;
-            }
+        if (synCtx.getEnvironment().isDebuggerEnabled() && super.divertMediationRoute(synCtx)) {
+            return true;
         }
         SynapseLog synLog = getLog(synCtx);
         if (synLog.isTraceOrDebugEnabled()) {
@@ -280,7 +278,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
             //Validate the response based on max-age and no-cache headers.
             if (CachingConstants.HTTP_PROTOCOL_TYPE.equals(getProtocolType())
                     && cachedResponse.isCacheControlEnabled() &&
-                    HttpCachingFilter.validateCachedResponse(cachedResponse, synCtx)) {
+                    HttpCachingFilter.isValidResponse(cachedResponse, synCtx)) {
                 return true;
             }
             // mark as a response and replace envelope from cache
@@ -351,7 +349,6 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
             if (onCacheHitSequence.mediate(synCtx)) {
                 ContinuationStackManager.removeReliantContinuationState(synCtx);
             }
-
         } else if (onCacheHitRef != null) {
             if (synLog.isTraceOrDebugEnabled()) {
                 synLog.traceOrDebug("Delegating message to the onCachingHit "
@@ -359,7 +356,6 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
             }
             ContinuationStackManager.updateSeqContinuationState(synCtx, getMediatorPosition());
             synCtx.getSequence(onCacheHitRef).mediate(synCtx);
-
         } else {
 
             if (synLog.isTraceOrDebugEnabled()) {
@@ -436,7 +432,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
             if (toCache) {
                 String contentType = (String) msgCtx.getProperty(Constants.Configuration.CONTENT_TYPE);
 
-                if (contentType.split(";")[0].equals(jsonContentType)) {
+                if (contentType.split(";")[0].equals(JSON_CONTENT_TYPE)) {
                     byte[] responsePayload = JsonUtil.jsonPayloadToByteArray(msgCtx);
                     if (response.getMaxMessageSize() > -1 &&
                             responsePayload.length > response.getMaxMessageSize()) {
@@ -472,7 +468,6 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                     response.setResponsePayload(null);
                     response.setResponseEnvelope(clonedEnvelope);
                     response.setJson(false);
-
                 }
 
                 response.setDoingREST(msgCtx.isDoingREST());

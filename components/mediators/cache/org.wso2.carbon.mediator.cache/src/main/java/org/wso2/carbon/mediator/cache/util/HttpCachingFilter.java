@@ -25,6 +25,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.wso2.carbon.mediator.cache.CachableResponse;
+import org.wso2.carbon.mediator.cache.CachingConstants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,10 +43,14 @@ public class HttpCachingFilter {
     private HttpCachingFilter() {
     }
 
-    private static final String NO_CACHE_STRING = "no-cache";
-    private static final String MAX_AGE_STRING = "max-age";
-
-    public static boolean validateCachedResponse(CachableResponse cachedResponse, MessageContext synCtx) {
+    /**
+     * This method returns whether the cached response is valid or not.
+     *
+     * @param cachedResponse the cached response.
+     * @param synCtx         message context.
+     * @return true if response need to validated with backend.
+     */
+    public static boolean isValidResponse(CachableResponse cachedResponse, MessageContext synCtx) {
         Map<String, Object> httpHeaders = cachedResponse.getHeaderProperties();
         org.apache.axis2.context.MessageContext msgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
         String eTagValue = null;
@@ -53,33 +58,37 @@ public class HttpCachingFilter {
         long maxAge = -1;
         //Read cache-control, max-age and ETag header from cached response.
         if (httpHeaders != null) {
-            if (httpHeaders.get(HttpHeaders.ETAG) != null) {
-                eTagValue = String.valueOf(httpHeaders.get(HttpHeaders.ETAG));
-            }
+            eTagValue = getETagValue(httpHeaders);
             if (httpHeaders.get(HttpHeaders.CACHE_CONTROL) != null) {
                 String cacheControlHeaderValue = String.valueOf(httpHeaders.get(HttpHeaders.CACHE_CONTROL));
                 List<String> cacheControlHeaders = Arrays.asList(cacheControlHeaderValue.split("\\s*,\\s*"));
                 for (String cacheControlHeader : cacheControlHeaders) {
-                    if (cacheControlHeader.equalsIgnoreCase(NO_CACHE_STRING)) {
+                    if (cacheControlHeader.equalsIgnoreCase(CachingConstants.NO_CACHE_STRING)) {
                         isNoCache = true;
                     }
-                    if (cacheControlHeader.contains(MAX_AGE_STRING)) {
+                    if (cacheControlHeader.contains(CachingConstants.MAX_AGE_STRING)) {
                         maxAge = Long.parseLong(cacheControlHeader.split("=")[1]);
                     }
                 }
             }
         }
-        //Validate the TTL of the cached response.
-        if (maxAge > -1) {
-            long responseExpirationTime = cachedResponse.getResponseFetchedTime() + maxAge * 1000;
-            if (responseExpirationTime < System.currentTimeMillis()) {
-                return true;
-            }
-        }
-        //Validate the response with ETag value.
+        return isCachedResponseExpired(cachedResponse, maxAge) ||
+                isValidateResponseWithETag(msgCtx, eTagValue, isNoCache);
+    }
+
+    /**
+     * This method returns whether the cached response need to be validated using ETag.
+     *
+     * @param msgCtx    messageContext.
+     * @param eTagValue value of ETag header.
+     * @param isNoCache whether no-cache is exist or not.
+     * @return true if the cached response need to be validated using ETag.
+     */
+    private static boolean isValidateResponseWithETag(org.apache.axis2.context.MessageContext msgCtx, String eTagValue,
+                                                      boolean isNoCache) {
         if (isNoCache && StringUtils.isNotEmpty(eTagValue)) {
             Map<String, Object> headerProp = new HashMap<>();
-            headerProp.put("IF-None-Match", eTagValue);
+            headerProp.put(CachingConstants.IF_NONE_MATCH, eTagValue);
             msgCtx.setProperty(org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS, headerProp);
             return true;
         }
@@ -87,17 +96,48 @@ public class HttpCachingFilter {
     }
 
     /**
+     * This method returns whether cached response is expired or not.
+     *
+     * @param cachedResponse cached response.
+     * @param maxAge         the value of max-age header.
+     * @return true if cached response is expired.
+     */
+    private static boolean isCachedResponseExpired(CachableResponse cachedResponse, long maxAge) {
+        //Validate the TTL of the cached response.
+        if (maxAge > -1) {
+            long responseExpirationTime = cachedResponse.getResponseFetchedTime() + maxAge * 1000;
+            if (responseExpirationTime < System.currentTimeMillis()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This method returns the ETag value.
+     *
+     * @param httpHeaders http headers.
+     * @return eTag value.
+     */
+    private static String getETagValue(Map<String, Object> httpHeaders) {
+        if (httpHeaders.get(HttpHeaders.ETAG) != null) {
+            return String.valueOf(httpHeaders.get(HttpHeaders.ETAG));
+        }
+        return null;
+    }
+
+    /**
      * This method sets the Age header.
      *
      * @param cachedResponse cached response to be returned.
-     * @param msgCtx messageContext.
+     * @param msgCtx         messageContext.
      */
     @SuppressWarnings("unchecked")
     public static void setAgeHeader(CachableResponse cachedResponse,
                                     org.apache.axis2.context.MessageContext msgCtx) {
         Map excessHeaders = new MultiValueMap();
         long responseCachedTime = cachedResponse.getResponseFetchedTime();
-        long age = Math.abs((responseCachedTime - System.currentTimeMillis())/1000);
+        long age = Math.abs((responseCachedTime - System.currentTimeMillis()) / 1000);
         excessHeaders.put(HttpHeaders.AGE, String.valueOf(age));
 
         msgCtx.setProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS, excessHeaders);
@@ -106,19 +146,18 @@ public class HttpCachingFilter {
     /**
      * Set the response fetched time in milliseconds.
      *
-     * @param headers transport headers
-     * @param response response to be cached
-     * @throws ParseException throws exception if exception happen while parsing the date
+     * @param headers  transport headers.
+     * @param response response to be cached.
+     * @throws ParseException throws exception if exception happen while parsing the date.
      */
     public static void setResponseCachedTime(Map<String, String> headers, CachableResponse response) throws
             ParseException {
         long responseFetchedTime;
         String fetchedTime;
         if ((fetchedTime = headers.get(HttpHeaders.DATE)) != null) {
-            String datePattern = "EEE, dd MMM yyyy HH:mm:ss z";
-            SimpleDateFormat format = new SimpleDateFormat(datePattern);
-                Date d = format.parse(fetchedTime);
-                responseFetchedTime = d.getTime();
+            SimpleDateFormat format = new SimpleDateFormat(CachingConstants.DATE_PATTERN);
+            Date d = format.parse(fetchedTime);
+            responseFetchedTime = d.getTime();
         } else {
             responseFetchedTime = System.currentTimeMillis();
         }
@@ -139,6 +178,7 @@ public class HttpCachingFilter {
                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         String cacheControlHeaderValue = headers.get(HttpHeaders.CACHE_CONTROL);
 
-        return StringUtils.isNotEmpty(cacheControlHeaderValue) && cacheControlHeaderValue.contains("no-store");
+        return StringUtils.isNotEmpty(cacheControlHeaderValue)
+                && cacheControlHeaderValue.contains(CachingConstants.NO_STORE_STRING);
     }
 }

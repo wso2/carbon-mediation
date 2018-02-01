@@ -111,5 +111,10 @@ public class CachingConstants {
     public static final String MAX_SIZE_STRING = "maxSize";
     public static final String ENABLE_CACHE_CONTROL_STRING = "enableCacheControl";
     public static final String INCLUDE_AGE_HEADER_STRING = "includeAgeHeader";
+    public static final String IF_NONE_MATCH = "IF-None-Match";
+    public static final String DATE_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
+    public static final String NO_CACHE_STRING = "no-cache";
+    public static final String MAX_AGE_STRING = "max-age";
+    public static final String NO_STORE_STRING = "no-store";
 
 }
