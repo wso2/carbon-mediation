@@ -46,9 +46,9 @@ public class HttpCachingFilter {
     /**
      * This method returns whether the cached response is valid or not.
      *
-     * @param cachedResponse the cached response.
-     * @param synCtx         message context.
-     * @return true if response need to validated with backend.
+     * @param cachedResponse The cached response.
+     * @param synCtx         The message context.
+     * @return True if response need to validated with backend.
      */
     public static boolean isValidResponse(CachableResponse cachedResponse, MessageContext synCtx) {
         Map<String, Object> httpHeaders = cachedResponse.getHeaderProperties();
@@ -79,10 +79,10 @@ public class HttpCachingFilter {
     /**
      * This method returns whether the cached response need to be validated using ETag.
      *
-     * @param msgCtx    messageContext.
-     * @param eTagValue value of ETag header.
-     * @param isNoCache whether no-cache is exist or not.
-     * @return true if the cached response need to be validated using ETag.
+     * @param msgCtx    The messageContext.
+     * @param eTagValue Value of ETag header.
+     * @param isNoCache Whether no-cache is exist or not.
+     * @return True if the cached response need to be validated using ETag.
      */
     private static boolean isValidateResponseWithETag(org.apache.axis2.context.MessageContext msgCtx, String eTagValue,
                                                       boolean isNoCache) {
@@ -98,9 +98,9 @@ public class HttpCachingFilter {
     /**
      * This method returns whether cached response is expired or not.
      *
-     * @param cachedResponse cached response.
-     * @param maxAge         the value of max-age header.
-     * @return true if cached response is expired.
+     * @param cachedResponse Cached response.
+     * @param maxAge         The value of max-age header.
+     * @return True if cached response is expired.
      */
     private static boolean isCachedResponseExpired(CachableResponse cachedResponse, long maxAge) {
         //Validate the TTL of the cached response.
@@ -116,8 +116,8 @@ public class HttpCachingFilter {
     /**
      * This method returns the ETag value.
      *
-     * @param httpHeaders http headers.
-     * @return eTag value.
+     * @param httpHeaders Http headers.
+     * @return ETag value.
      */
     private static String getETagValue(Map<String, Object> httpHeaders) {
         if (httpHeaders.get(HttpHeaders.ETAG) != null) {
@@ -129,8 +129,8 @@ public class HttpCachingFilter {
     /**
      * This method sets the Age header.
      *
-     * @param cachedResponse cached response to be returned.
-     * @param msgCtx         messageContext.
+     * @param cachedResponse The cached response to be returned.
+     * @param msgCtx         The messageContext.
      */
     @SuppressWarnings("unchecked")
     public static void setAgeHeader(CachableResponse cachedResponse,
@@ -146,8 +146,8 @@ public class HttpCachingFilter {
     /**
      * Set the response fetched time in milliseconds.
      *
-     * @param headers  transport headers.
-     * @param response response to be cached.
+     * @param headers  Transport headers.
+     * @param response Response to be cached.
      * @throws ParseException throws exception if exception happen while parsing the date.
      */
     public static void setResponseCachedTime(Map<String, String> headers, CachableResponse response) throws
@@ -167,8 +167,8 @@ public class HttpCachingFilter {
     /**
      * This method returns whether no-store header exists in the response.
      *
-     * @param synCtx messageContext with the transport headers.
-     * @return whether no-store exists or not.
+     * @param synCtx MessageContext with the transport headers.
+     * @return Whether no-store exists or not.
      */
     @SuppressWarnings("unchecked")
     public static boolean isNoStore(MessageContext synCtx) {
