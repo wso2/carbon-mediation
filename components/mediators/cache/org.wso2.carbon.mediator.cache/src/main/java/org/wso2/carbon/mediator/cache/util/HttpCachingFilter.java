@@ -103,7 +103,6 @@ public class HttpCachingFilter {
      * @return True if cached response is expired.
      */
     private static boolean isCachedResponseExpired(CachableResponse cachedResponse, long maxAge) {
-        //Validate the TTL of the cached response.
         if (maxAge > -1) {
             long responseExpirationTime = cachedResponse.getResponseFetchedTime() + maxAge * 1000;
             if (responseExpirationTime < System.currentTimeMillis()) {

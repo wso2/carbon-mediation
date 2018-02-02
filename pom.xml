@@ -27,7 +27,7 @@
 
     <groupId>org.wso2.carbon.mediation</groupId>
 	<artifactId>carbon-mediation</artifactId>
- 	<version>4.6.54-SNAPSHOT</version>
+ 	<version>4.6.57-SNAPSHOT</version>
 	<packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -2304,7 +2304,7 @@
     <properties>
 
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.6.54-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.6.57-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.import.feature.version>4.6.0</carbon.mediation.import.feature.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
@@ -2340,7 +2340,7 @@
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v37</synapse.version>
+        <synapse.version>2.1.7-wso2v38</synapse.version>
 
         <carbon.identity.entitlement.proxy.version>5.1.1</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>

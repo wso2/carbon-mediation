@@ -100,11 +100,6 @@ public class CachableResponse implements Serializable {
     private Pattern responseCodePattern;
 
     /**
-     * This holds whether the response is doing REST.
-     */
-    private boolean doingREST;
-
-    /**
      * This is used to store the originated time of the response.
      */
     private long responseFetchedTime;
@@ -344,23 +339,9 @@ public class CachableResponse implements Serializable {
     }
 
     /**
-     * @return whether the response is doing REST or not.
-     */
-    public boolean isDoingREST() {
-        return doingREST;
-    }
-
-    /**
-     * @param doingREST whether the response doing REST or not
-     */
-    public void setDoingREST(boolean doingREST) {
-        this.doingREST = doingREST;
-    }
-
-    /**
      * This method returns the originated time of the response.
      *
-     * @return the originated time of the response.
+     * @return The originated time of the response.
      */
     public long getResponseFetchedTime() {
         return responseFetchedTime;
@@ -369,7 +350,7 @@ public class CachableResponse implements Serializable {
     /**
      * This method sets the originated time of the response.
      *
-     * @param responseFetchedTime originated time of the response.
+     * @param responseFetchedTime Originated time of the response.
      */
     public void setResponseFetchedTime(long responseFetchedTime) {
         this.responseFetchedTime = responseFetchedTime;
@@ -378,7 +359,7 @@ public class CachableResponse implements Serializable {
     /**
      * This method returns whether cache-control is enabled or not.
      *
-     * @return whether cache-control is enabled or not.
+     * @return Whether cache-control is enabled or not.
      */
     public boolean isCacheControlEnabled() {
         return cacheControlEnabled;
@@ -387,7 +368,7 @@ public class CachableResponse implements Serializable {
     /**
      * This method sets whether cache-control is enabled or not.
      *
-     * @param cacheControlEnabled whether cache-control is enabled or not.
+     * @param cacheControlEnabled Whether cache-control is enabled or not.
      */
     public void setCacheControlEnabled(boolean cacheControlEnabled) {
         this.cacheControlEnabled = cacheControlEnabled;
@@ -396,7 +377,7 @@ public class CachableResponse implements Serializable {
     /**
      * This method returns whether an Age header needs to be included or not.
      *
-     * @return whether an Age header needs to be included or not.
+     * @return Whether an Age header needs to be included or not.
      */
     public boolean isAddAgeHeaderEnabled() {
         return addAgeHeaderEnabled;
@@ -405,7 +386,7 @@ public class CachableResponse implements Serializable {
     /**
      * This method sets whether an Age header needs to be included or not.
      *
-     * @param addAgeHeaderEnabled whether an Age header needs to be included or not.
+     * @param addAgeHeaderEnabled Whether an Age header needs to be included or not.
      */
     public void setAddAgeHeaderEnabled(boolean addAgeHeaderEnabled) {
         this.addAgeHeaderEnabled = addAgeHeaderEnabled;
