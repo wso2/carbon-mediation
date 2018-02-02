@@ -43,6 +43,8 @@ public class CacheMediatorTest extends XMLTestCase {
                     "               <methods>POST, GET</methods>\n" +
                     "               <headersToExcludeInHash>ab, abc</headersToExcludeInHash>\n" +
                     "               <responseCodes>2|5[0-9][0-9]</responseCodes>\n" +
+                    "               <enableCacheControl>true</enableCacheControl>\n" +
+                    "               <includeAgeHeader>true</includeAgeHeader>\n" +
                     "               <hashGenerator>org.wso2.carbon.mediator.cache.digest" +
                     ".HttpRequestHashGenerator</hashGenerator>\n" +
                     "            </protocol>\n" +

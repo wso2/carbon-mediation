@@ -115,6 +115,18 @@ public class CacheMediatorSerializer extends AbstractMediatorSerializer {
                 responseCodesElem.setText(responseCodes);
                 protocolElem.addChild(responseCodesElem);
 
+                boolean cacheControlEnabled = cacheMediator.isCacheControlEnabled();
+                OMElement enableCacheControlElem = fac.createOMElement(CachingConstants.ENABLE_CACHE_CONTROL_STRING,
+                        synNS);
+                enableCacheControlElem.setText(String.valueOf(cacheControlEnabled));
+                protocolElem.addChild(enableCacheControlElem);
+
+                boolean addAgeHeaderEnabled = cacheMediator.isAddAgeHeaderEnabled();
+                OMElement addAgeHeaderEnabledElem = fac.createOMElement(CachingConstants.INCLUDE_AGE_HEADER_STRING,
+                        synNS);
+                addAgeHeaderEnabledElem.setText(String.valueOf(addAgeHeaderEnabled));
+                protocolElem.addChild(addAgeHeaderEnabledElem);
+
             }
 
             OMElement hashGeneratorElem = fac.createOMElement(CachingConstants.HASH_GENERATOR_STRING, synNS);

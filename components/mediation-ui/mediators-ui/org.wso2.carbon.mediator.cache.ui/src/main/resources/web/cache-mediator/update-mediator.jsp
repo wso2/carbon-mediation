@@ -45,6 +45,8 @@
     String hashGen = request.getParameter("hashGen");
     String maxSize = request.getParameter("maxSize").trim();
     String sequenceOption = request.getParameter("sequenceOption");
+    String enableCacheControl = request.getParameter("enableCacheControl");
+    String includeAgeHeader = request.getParameter("includeAgeHeader");
 
     if (notNullChecker(cacheType)) {
         if (cacheType.equalsIgnoreCase("Collector")) {
@@ -124,5 +126,16 @@
     } else {
         cacheMediator.setOnCacheHitRef(null);
     }
-%>
 
+    if (notNullChecker(enableCacheControl)) {
+        cacheMediator.setCacheControlEnabled(Boolean.parseBoolean(enableCacheControl));
+    } else {
+        cacheMediator.setCacheControlEnabled(CachingConstants.DEFAULT_ENABLE_CACHE_CONTROL);
+    }
+
+    if (notNullChecker(includeAgeHeader)) {
+        cacheMediator.setAddAgeHeaderEnabled(Boolean.parseBoolean(includeAgeHeader));
+    } else {
+        cacheMediator.setAddAgeHeaderEnabled(CachingConstants.DEFAULT_ADD_AGE_HEADER);
+    }
+%>
