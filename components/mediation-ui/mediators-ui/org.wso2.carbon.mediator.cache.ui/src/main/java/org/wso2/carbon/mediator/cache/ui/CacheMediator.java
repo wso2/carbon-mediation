@@ -397,7 +397,7 @@ public class CacheMediator extends AbstractListMediator {
     }
 
     /**
-     * This method sets whether an Age header need to be included in the cached response
+     * This method sets whether an Age header need to be included in the cached response.
      *
      * @param addAgeHeaderEnabled specifies whether include an Age header or not.
      */
