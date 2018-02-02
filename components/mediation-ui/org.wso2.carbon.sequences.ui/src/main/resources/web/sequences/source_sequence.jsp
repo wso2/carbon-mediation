@@ -148,7 +148,7 @@
     function cancelSequence() {
         <%
         String annonOriginator = (String) session.getAttribute("sequenceAnonOriginator");
-        if (annonOriginator != null && annonOriginator.equals("registry_sequence.jsp")) {
+        if (annonOriginator != null && annonOriginator.equals("../proxyservices/anonSequenceHandler.jsp")) {
         %>
             window.location.href='<%=annonOriginator%>' + '?cancelled=true';
         <%} else {
