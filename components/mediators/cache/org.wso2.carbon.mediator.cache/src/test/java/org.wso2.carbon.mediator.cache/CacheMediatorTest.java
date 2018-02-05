@@ -119,25 +119,11 @@ public class CacheMediatorTest extends XMLTestCase {
         }
     }
 
-    public void testSetAgeHeader() {
-        CachableResponse cachedResponse = new CachableResponse();
-        cachedResponse.setResponseFetchedTime(System.currentTimeMillis() - 3000);
-        org.apache.axis2.context.MessageContext msgCtx = new org.apache.axis2.context.MessageContext();
-        HttpCachingFilter.setAgeHeader(cachedResponse, msgCtx);
-        Map excessHeaders = (MultiValueMap) msgCtx.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
-        assertTrue(excessHeaders.get("Age") != null);
-    }
-
-    public void testSetResponseCachedTime() throws ParseException {
-        CachableResponse cachedResponse = new CachableResponse();
-        Map<String, String> headers = new HashMap<>();
-        DateFormat dateFormat = new SimpleDateFormat(CachingConstants.DATE_PATTERN);
-        String responseOriginatedTime = dateFormat.format(new Date());
-        headers.put("Date", responseOriginatedTime);
-        HttpCachingFilter.setResponseCachedTime(headers, cachedResponse);
-        assertEquals(dateFormat.format(cachedResponse.getResponseFetchedTime()), responseOriginatedTime);
-    }
-
+    /**
+     * Test case for isValidResponse() with no-store header.
+     *
+     * @throws AxisFault when exception happens on message context creation.
+     */
     public void testIsNoStore() throws AxisFault {
         MessageContext synCtx = createMessageContext();
         org.apache.axis2.context.MessageContext msgCtx =  ((Axis2MessageContext) synCtx).getAxis2MessageContext();
@@ -151,6 +137,11 @@ public class CacheMediatorTest extends XMLTestCase {
         assertEquals("no-store cache-control does not exist.", HttpCachingFilter.isNoStore(synCtx), true);
     }
 
+    /**
+     * Test case for isValidResponse() with no-cache and ETag headers.
+     *
+     * @throws AxisFault when exception happens on message context creation.
+     */
     public void testIsValidResponseWithNoCache() throws AxisFault {
         CachableResponse cachedResponse = new CachableResponse();
         MessageContext synCtx = createMessageContext();
@@ -162,26 +153,30 @@ public class CacheMediatorTest extends XMLTestCase {
                 HttpCachingFilter.isValidResponse(cachedResponse, synCtx), true);
     }
 
-    public void testIsValidResponseWithExpiredCache() throws AxisFault, ParseException {
+    /**
+     * Test case for isValidResponse() with an expired cache.
+     *
+     * @throws AxisFault when exception happens on message context creation.
+     */
+    public void testIsValidResponseWithExpiredCache() throws AxisFault {
         CachableResponse cachedResponse = new CachableResponse();
         MessageContext synCtx = createMessageContext();
-        Map<String, String> headers = new HashMap<>();
         Map<String, Object> httpHeaders = new HashMap<>();
 
         httpHeaders.put(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER);
         cachedResponse.setHeaderProperties(httpHeaders);
 
         //Set the response fetched time with an old date time.
-        DateFormat dateFormat = new SimpleDateFormat(CachingConstants.DATE_PATTERN);
-        Date date = new Date();
-        date.setTime(System.currentTimeMillis() - 100000);
-        String responseOriginatedTime = dateFormat.format(date);
-        headers.put("Date", responseOriginatedTime);
-        HttpCachingFilter.setResponseCachedTime(headers, cachedResponse);
+        cachedResponse.setResponseFetchedTime(System.currentTimeMillis() - 100000);
         assertEquals("Cached response does not expired.",
                 HttpCachingFilter.isValidResponse(cachedResponse, synCtx), true);
     }
 
+    /**
+     * Test case for isValidResponse() with a valid cache response.
+     *
+     * @throws AxisFault when exception happens on message context creation.
+     */
     public void testIsValidResponseWithValidCache() throws AxisFault, ParseException {
         CachableResponse cachedResponse = new CachableResponse();
         MessageContext synCtx = createMessageContext();
@@ -198,10 +193,37 @@ public class CacheMediatorTest extends XMLTestCase {
     }
 
     /**
+     * Test case for setAgeHeader() method
+     */
+    public void testSetAgeHeader() {
+        CachableResponse cachedResponse = new CachableResponse();
+        cachedResponse.setResponseFetchedTime(System.currentTimeMillis() - 3000);
+        org.apache.axis2.context.MessageContext msgCtx = new org.apache.axis2.context.MessageContext();
+        HttpCachingFilter.setAgeHeader(cachedResponse, msgCtx);
+        Map excessHeaders = (MultiValueMap) msgCtx.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
+        assertTrue(excessHeaders.get("Age") != null);
+    }
+
+    /**
+     * Tests case for setResponseCachedTime() method.
+     *
+     * @throws ParseException on exception while parsing the date
+     */
+    public void testSetResponseCachedTime() throws ParseException {
+        CachableResponse cachedResponse = new CachableResponse();
+        Map<String, String> headers = new HashMap<>();
+        DateFormat dateFormat = new SimpleDateFormat(CachingConstants.DATE_PATTERN);
+        String responseOriginatedTime = dateFormat.format(new Date());
+        headers.put("Date", responseOriginatedTime);
+        HttpCachingFilter.setResponseCachedTime(headers, cachedResponse);
+        assertEquals(dateFormat.format(cachedResponse.getResponseFetchedTime()), responseOriginatedTime);
+    }
+
+    /**
      * Create Axis2 Message Context.
      *
      * @return msgCtx created message context.
-     * @throws AxisFault
+     * @throws AxisFault when exception happens on message context creation.
      */
     private MessageContext createMessageContext() throws AxisFault {
         MessageContext msgCtx = createSynapseMessageContext();
@@ -216,7 +238,7 @@ public class CacheMediatorTest extends XMLTestCase {
      * Create Synapse Context.
      *
      * @return mc created message context.
-     * @throws AxisFault
+     * @throws AxisFault when exception happens on message context creation.
      */
     private MessageContext createSynapseMessageContext() throws AxisFault {
         org.apache.axis2.context.MessageContext axis2MC = new org.apache.axis2.context.MessageContext();
