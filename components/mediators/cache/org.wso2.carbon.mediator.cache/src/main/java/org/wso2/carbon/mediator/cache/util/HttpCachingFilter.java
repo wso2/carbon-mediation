@@ -154,7 +154,7 @@ public class HttpCachingFilter {
             ParseException {
         long responseFetchedTime;
         String fetchedTime;
-        if ((fetchedTime = headers.get(HttpHeaders.DATE)) != null) {
+        if (headers != null && (fetchedTime = headers.get(HttpHeaders.DATE)) != null) {
             SimpleDateFormat format = new SimpleDateFormat(CachingConstants.DATE_PATTERN);
             Date d = format.parse(fetchedTime);
             responseFetchedTime = d.getTime();
@@ -174,9 +174,11 @@ public class HttpCachingFilter {
     public static boolean isNoStore(MessageContext synCtx) {
         Map<String, String> headers;
         org.apache.axis2.context.MessageContext msgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-        headers = (Map<String, String>) msgCtx.getProperty(
-                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
-        String cacheControlHeaderValue = headers.get(HttpHeaders.CACHE_CONTROL);
+        headers = (Map<String, String>) msgCtx.getProperty("org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS");
+        String cacheControlHeaderValue = null;
+        if (headers != null) {
+            cacheControlHeaderValue = headers.get(HttpHeaders.CACHE_CONTROL);
+        }
 
         return StringUtils.isNotEmpty(cacheControlHeaderValue)
                 && cacheControlHeaderValue.contains(CachingConstants.NO_STORE_STRING);

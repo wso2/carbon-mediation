@@ -17,12 +17,34 @@
 
 package org.wso2.carbon.mediator.cache;
 
+import com.google.common.net.HttpHeaders;
+import com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl;
+import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.UUIDGenerator;
+import org.apache.axiom.util.UIDGenerator;
+import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.OperationContext;
+import org.apache.axis2.context.ServiceContext;
+import org.apache.axis2.description.InOutAxisOperation;
+import org.apache.commons.collections.map.MultiValueMap;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfigUtils;
+import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
+import org.apache.synapse.transport.nhttp.NhttpConstants;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.wso2.carbon.mediator.cache.util.HttpCachingFilter;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -50,6 +72,9 @@ public class CacheMediatorTest extends XMLTestCase {
                     "            </protocol>\n" +
                     "            <implementation maxSize=\"20\"/>\n" +
                     "         </cache>";
+    public static final String CACHE_CONTROL_HEADER = "no-cache, no-store, max-age=80";
+    private ConfigurationContext configContext;
+    private SynapseConfiguration synapseConfig;
 
     public CacheMediatorTest(String name) {
         super(name);
@@ -72,6 +97,8 @@ public class CacheMediatorTest extends XMLTestCase {
         assertEquals("Incorrect value for the hashGenerator",mediator.getDigestGenerator().getClass().getName(),
                      "org.wso2.carbon.mediator.cache.digest.HttpRequestHashGenerator");
         assertEquals("Incorrect value for the maxSize",mediator.getInMemoryCacheSize(), 20);
+        assertEquals("Incorrect value for the enableCacheControl",mediator.isCacheControlEnabled(), true);
+        assertEquals("Incorrect value for the includeAgeHeader",mediator.isAddAgeHeaderEnabled(), true);
     }
 
 
@@ -90,5 +117,119 @@ public class CacheMediatorTest extends XMLTestCase {
             assertXMLEqual(serializedMediatorElement.toString(), mediatorXml);
         } catch (Exception ignored) {
         }
+    }
+
+    public void testSetAgeHeader() {
+        CachableResponse cachedResponse = new CachableResponse();
+        cachedResponse.setResponseFetchedTime(System.currentTimeMillis() - 3000);
+        org.apache.axis2.context.MessageContext msgCtx = new org.apache.axis2.context.MessageContext();
+        HttpCachingFilter.setAgeHeader(cachedResponse, msgCtx);
+        Map excessHeaders = (MultiValueMap) msgCtx.getProperty(NhttpConstants.EXCESS_TRANSPORT_HEADERS);
+        assertTrue(excessHeaders.get("Age") != null);
+    }
+
+    public void testSetResponseCachedTime() throws ParseException {
+        CachableResponse cachedResponse = new CachableResponse();
+        Map<String, String> headers = new HashMap<>();
+        DateFormat dateFormat = new SimpleDateFormat(CachingConstants.DATE_PATTERN);
+        String responseOriginatedTime = dateFormat.format(new Date());
+        headers.put("Date", responseOriginatedTime);
+        HttpCachingFilter.setResponseCachedTime(headers, cachedResponse);
+        assertEquals(dateFormat.format(cachedResponse.getResponseFetchedTime()), responseOriginatedTime);
+    }
+
+    public void testIsNoStore() throws AxisFault {
+        MessageContext synCtx = createMessageContext();
+        org.apache.axis2.context.MessageContext msgCtx =  ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER);
+        if (msgCtx != null) {
+            msgCtx.setProperty("org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS", headers);
+            ((Axis2MessageContext) synCtx).setAxis2MessageContext(msgCtx);
+        }
+        assertEquals("no-store cache-control does not exist.", HttpCachingFilter.isNoStore(synCtx), true);
+    }
+
+    public void testIsValidResponseWithNoCache() throws AxisFault {
+        CachableResponse cachedResponse = new CachableResponse();
+        MessageContext synCtx = createMessageContext();
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER);
+        headers.put(HttpHeaders.ETAG, "2046-64-77-50-35-75-11038-459-486126-71-58");
+        cachedResponse.setHeaderProperties(headers);
+        assertEquals("no-cache or ETag header does not exist.",
+                HttpCachingFilter.isValidResponse(cachedResponse, synCtx), true);
+    }
+
+    public void testIsValidResponseWithExpiredCache() throws AxisFault, ParseException {
+        CachableResponse cachedResponse = new CachableResponse();
+        MessageContext synCtx = createMessageContext();
+        Map<String, String> headers = new HashMap<>();
+        Map<String, Object> httpHeaders = new HashMap<>();
+
+        httpHeaders.put(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER);
+        cachedResponse.setHeaderProperties(httpHeaders);
+
+        //Set the response fetched time with an old date time.
+        DateFormat dateFormat = new SimpleDateFormat(CachingConstants.DATE_PATTERN);
+        Date date = new Date();
+        date.setTime(System.currentTimeMillis() - 100000);
+        String responseOriginatedTime = dateFormat.format(date);
+        headers.put("Date", responseOriginatedTime);
+        HttpCachingFilter.setResponseCachedTime(headers, cachedResponse);
+        assertEquals("Cached response does not expired.",
+                HttpCachingFilter.isValidResponse(cachedResponse, synCtx), true);
+    }
+
+    public void testIsValidResponseWithValidCache() throws AxisFault, ParseException {
+        CachableResponse cachedResponse = new CachableResponse();
+        MessageContext synCtx = createMessageContext();
+        Map<String, String> headers = new HashMap<>();
+        Map<String, Object> httpHeaders = new HashMap<>();
+
+        httpHeaders.put(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER);
+        cachedResponse.setHeaderProperties(httpHeaders);
+
+        HttpCachingFilter.setResponseCachedTime(headers, cachedResponse);
+
+        assertEquals("Cached response is expired.",
+        HttpCachingFilter.isValidResponse(cachedResponse, synCtx), false);
+    }
+
+    /**
+     * Create Axis2 Message Context.
+     *
+     * @return msgCtx created message context.
+     * @throws AxisFault
+     */
+    private MessageContext createMessageContext() throws AxisFault {
+        MessageContext msgCtx = createSynapseMessageContext();
+        org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) msgCtx).getAxis2MessageContext();
+        axis2MsgCtx.setServerSide(true);
+        axis2MsgCtx.setMessageID(UUIDGenerator.getUUID());
+
+        return msgCtx;
+    }
+
+    /**
+     * Create Synapse Context.
+     *
+     * @return mc created message context.
+     * @throws AxisFault
+     */
+    private MessageContext createSynapseMessageContext() throws AxisFault {
+        org.apache.axis2.context.MessageContext axis2MC = new org.apache.axis2.context.MessageContext();
+        axis2MC.setConfigurationContext(this.configContext);
+        ServiceContext svcCtx = new ServiceContext();
+        OperationContext opCtx = new OperationContext(new InOutAxisOperation(), svcCtx);
+        axis2MC.setServiceContext(svcCtx);
+        axis2MC.setOperationContext(opCtx);
+        Axis2MessageContext mc = new Axis2MessageContext(axis2MC, this.synapseConfig, null);
+        mc.setMessageID(UIDGenerator.generateURNString());
+        mc.setEnvelope(OMAbstractFactory.getSOAP12Factory().createSOAPEnvelope());
+        mc.getEnvelope().addChild(OMAbstractFactory.getSOAP12Factory().createSOAPBody());
+
+        return mc;
     }
 }
