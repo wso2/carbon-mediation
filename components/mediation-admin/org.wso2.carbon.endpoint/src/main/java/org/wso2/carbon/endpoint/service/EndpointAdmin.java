@@ -19,6 +19,7 @@ import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointContext;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.registry.Registry;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.endpoint.EndpointAdminException;
 import org.wso2.carbon.endpoint.util.ConfigHolder;
 import org.wso2.carbon.mediation.dependency.mgt.ConfigurationObject;
@@ -196,6 +197,49 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             lock.unlock();
         }
         return false;
+    }
+
+    /**
+     * Set the tenant domain when a publisher publishes his API in MT mode. When publisher publishes
+     * the API, we login the gateway as supretenant. But we need to create the endpoint file in the
+     * particular tenant domain.
+     *
+     * @param endpointData Endpoint file content
+     * @param tenantDomain Domain of the logged tenant
+     * @return
+     * @throws EndpointAdminException Thrown if an error occur
+     */
+    public boolean addEndpointForTenant(String endpointData, String tenantDomain) throws EndpointAdminException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
+                    true);
+            boolean status = addEndpoint(endpointData);
+            return status;
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    /**
+     * Set the tenant domain when a publisher publishes his API in MT mode. When publisher publishes
+     * the API, we login the gateway as supretenant. But we need to delete the endpoint file in the
+     * particular tenant domain.
+     *
+     * @param endpointName Name of the endpoint file to be deleted
+     * @param tenantDomain Domain of the logged tenant
+     * @return
+     * @throws EndpointAdminException Thrown if an error occur
+     */
+    public boolean deleteEndpointForTenant(String endpointName, String tenantDomain) throws EndpointAdminException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            boolean status = deleteEndpoint(endpointName);
+            return status;
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
     }
 
     /**
