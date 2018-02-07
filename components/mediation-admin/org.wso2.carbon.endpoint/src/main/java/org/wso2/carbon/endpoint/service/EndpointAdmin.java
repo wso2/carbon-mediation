@@ -240,6 +240,25 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
     }
 
     /**
+     * Set the tenant domain when a publisher publishes his API in MT mode. When publisher publishes
+     * the API, we login the gateway as super tenant. But we need to get the names of the endpoint files
+     * in the particular tenant domain.
+     *
+     * @param tenantDomain Domain of the logged tenant
+     * @return Returns an array of Strings with endpoint names
+     * @throws EndpointAdminException Thrown if an error occurs
+     */
+    public String[] getEndPointsNamesForTenant(String tenantDomain) throws EndpointAdminException {
+        try {
+            PrivilegedCarbonContext.startTenantFlow();
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            return getEndPointsNames();
+        } finally {
+            PrivilegedCarbonContext.endTenantFlow();
+        }
+    }
+
+    /**
      * Deletes the endpoint from the SynapseConfiguration
      *
      * @param endpointName - name of the endpoint to be deleted

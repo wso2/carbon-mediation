@@ -12,6 +12,13 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="switchOn">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
             <xs:element name="addEndpointForTenant">
                 <xs:complexType>
                     <xs:sequence>
@@ -68,17 +75,24 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="switchOn">
+            <xs:element name="switchOff">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="switchOff">
+            <xs:element name="getEndPointsNamesForTenant">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndPointsNamesForTenantResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -252,20 +266,6 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="saveEndpoint">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="epString" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveEndpointResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
             <xs:element name="disableStatistics">
                 <xs:complexType>
                     <xs:sequence>
@@ -277,6 +277,20 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveEndpoint">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="epString" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveEndpointResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -437,6 +451,12 @@
     <wsdl:message name="switchOffRequest">
         <wsdl:part name="parameters" element="ns1:switchOff"/>
     </wsdl:message>
+    <wsdl:message name="getEndPointsNamesForTenantRequest">
+        <wsdl:part name="parameters" element="ns1:getEndPointsNamesForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="getEndPointsNamesForTenantResponse">
+        <wsdl:part name="parameters" element="ns1:getEndPointsNamesForTenantResponse"/>
+    </wsdl:message>
     <wsdl:message name="deleteAllEndpointGroupsRequest">
         <wsdl:part name="parameters" element="ns1:deleteAllEndpointGroups"/>
     </wsdl:message>
@@ -550,6 +570,11 @@
         <wsdl:operation name="switchOff">
             <wsdl:input message="tns:switchOffRequest" wsaw:Action="urn:switchOff"/>
             <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:switchOffEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointsNamesForTenant">
+            <wsdl:input message="tns:getEndPointsNamesForTenantRequest" wsaw:Action="urn:getEndPointsNamesForTenant"/>
+            <wsdl:output message="tns:getEndPointsNamesForTenantResponse" wsaw:Action="urn:getEndPointsNamesForTenantResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:getEndPointsNamesForTenantEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
         <wsdl:operation name="deleteAllEndpointGroups">
             <wsdl:input message="tns:deleteAllEndpointGroupsRequest" wsaw:Action="urn:deleteAllEndpointGroups"/>
@@ -795,6 +820,18 @@
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointsNamesForTenant">
+            <soap:operation soapAction="urn:getEndPointsNamesForTenant" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
             <wsdl:fault name="EndpointAdminEndpointAdminException">
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
@@ -1066,6 +1103,18 @@
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="getEndPointsNamesForTenant">
+            <soap12:operation soapAction="urn:getEndPointsNamesForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
         <wsdl:operation name="deleteAllEndpointGroups">
             <soap12:operation soapAction="urn:deleteAllEndpointGroups" style="document"/>
             <wsdl:input>
@@ -1275,6 +1324,15 @@
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointsNamesForTenant">
+            <http:operation location="getEndPointsNamesForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="deleteAllEndpointGroups">
             <http:operation location="deleteAllEndpointGroups"/>
