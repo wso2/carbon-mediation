@@ -333,6 +333,8 @@
                <xs:element maxOccurs="unbounded" minOccurs="0" name="resources" nillable="true" type="ax2550:ResourceData"/>
                <xs:element minOccurs="0" name="statisticsEnable" type="xs:boolean"/>
                <xs:element minOccurs="0" name="tracingEnable" type="xs:boolean"/>
+               <xs:element minOccurs="0" name="version" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" name="versionType" nillable="true" type="xs:string"/>
             </xs:sequence>
          </xs:complexType>
          <xs:complexType name="ResourceData">

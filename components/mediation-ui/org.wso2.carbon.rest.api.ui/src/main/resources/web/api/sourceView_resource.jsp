@@ -44,12 +44,14 @@
         RestApiAdminClient client = new RestApiAdminClient(
                 configContext, url, cookie, bundle.getLocale());
 
-        String apiName = "";
-        String apiContext = "";
-        String hostname = "";
-        String port = "";
-        String source = "";
-        String sourceXml = "";
+        String apiName;
+        String apiContext;
+        String hostname;
+        String port;
+        String source;
+        String sourceXml;
+        String version;
+        String versionType;
 
         String mode = request.getParameter("mode");
         List<ResourceData> resources = (List<ResourceData>) session.getAttribute("apiResources");
@@ -61,6 +63,8 @@
         apiName = request.getParameter("apiName");
         hostname = request.getParameter("hostname");
         port = request.getParameter("port");
+        version = request.getParameter("version");
+        versionType = request.getParameter("versionType");
         
         APIData apiData = new APIData();
         
@@ -69,12 +73,16 @@
             apiData.setContext(apiContext);
             apiData.setHost(hostname == null || "".equals(hostname) ? null : hostname);
             apiData.setPort(Integer.parseInt(port != null && !"".equals(port) ? port : "-1"));
+            apiData.setVersion(version == null || version.isEmpty() ? null : version);
+            apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
             apiData.setResources(resources.toArray(resourceArray));
         } else {
             apiData.setName(apiName != null ? apiName : "");
             apiData.setContext(apiContext != null ? apiContext : "/");
             apiData.setHost(hostname == null || "".equals(hostname) ? null : hostname);
             apiData.setPort(Integer.parseInt(port != null && !"".equals(port) ? port : "-1"));
+            apiData.setVersion(version == null || version.isEmpty() ? null : version);
+            apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
             apiData.setResources(resources.toArray(resourceArray));
         }
         ResourceData resourceData;
@@ -157,8 +165,10 @@
                             data: { resourceSource:source, index:'<%=index%>' },
                             success: function(data) {
                                 <%session.setAttribute("index", index);%>
-                                document.location.href = "manageAPI.jsp?mode=" + "<%=mode%>" + "&apiName=" + "<%=apiName%>" + 
-                                						 "&hostname=" + "<%=hostname%>" + "&port=" + "<%=port%>";
+                                document.location.href = "manageAPI.jsp?mode=" + "<%=mode%>" + "&apiName=" + "<%=apiName%>" +
+                                    "&hostname=" + "<%=hostname%>" + "&port=" + "<%=port%>" +
+                                    "$version=" + "<%=version%>" + "$versionType=" + "<%=versionType%>";
+
                             },
                             error: function() {
                                   CARBON.showInfoDialog("Could not convert resource source to resource data. ", function() {

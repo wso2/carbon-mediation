@@ -36,19 +36,28 @@ public class RestApiAdminUtils {
         OMElement api = fac.createOMElement("api", syn);
         api.addAttribute("name", apiData.getName(), nullNS);
 
-        if(apiData.getContext() != null){
+        if (apiData.getContext() != null) {
             api.addAttribute("context", apiData.getContext(), nullNS);
         }
 
-        if(apiData.getHost() != null){
+        if (apiData.getHost() != null) {
             api.addAttribute("hostname", apiData.getHost(), nullNS);
         }
 
-        if(apiData.getPort() != -1){
+        if (apiData.getPort() != -1) {
             api.addAttribute("port", String.valueOf(apiData.getPort()), nullNS);
         }
-		if(apiData.getResources() != null && apiData.getResources().length != 0){
-			for(ResourceData resourceData : apiData.getResources()){
+
+        if (apiData.getVersion() != null) {
+            api.addAttribute("version", String.valueOf(apiData.getVersion()), nullNS);
+        }
+
+        if (apiData.getVersionType() != null) {
+            api.addAttribute("version-type", String.valueOf(apiData.getVersionType()), nullNS);
+        }
+
+		if (apiData.getResources() != null && apiData.getResources().length != 0) {
+			for (ResourceData resourceData : apiData.getResources()) {
 				api.addChild(retrieveResourceOMElement(resourceData));
 			}
 		}
@@ -64,23 +73,23 @@ public class RestApiAdminUtils {
 
         OMElement resource = fac.createOMElement("resource", syn);
         
-        if(resourceData.getMethods() != null && resourceData.getMethods().length != 0){
+        if (resourceData.getMethods() != null && resourceData.getMethods().length != 0) {
         	String methodsString = createSSString(resourceData.getMethods());
         	resource.addAttribute("methods", methodsString, nullNS);
         }
-        if(resourceData.getUriTemplate() != null){
+        if (resourceData.getUriTemplate() != null) {
         	resource.addAttribute("uri-template", resourceData.getUriTemplate(), nullNS);
         }
-        else if(resourceData.getUrlMapping() != null){
+        else if (resourceData.getUrlMapping() != null) {
         	resource.addAttribute("url-mapping", resourceData.getUrlMapping(), nullNS);
         }
-        if(resourceData.getContentType() != null){
+        if (resourceData.getContentType() != null) {
         	resource.addAttribute("contentType", resourceData.getContentType(), nullNS);
         }
-        if(resourceData.getUserAgent() != null){
+        if (resourceData.getUserAgent() != null) {
         	resource.addAttribute("userAgent", resourceData.getUserAgent(), nullNS);
         }
-        if(resourceData.getProtocol() != RESTConstants.PROTOCOL_HTTP_AND_HTTPS){
+        if (resourceData.getProtocol() != RESTConstants.PROTOCOL_HTTP_AND_HTTPS) {
             if (resourceData.getProtocol() == RESTConstants.PROTOCOL_HTTP_ONLY) {
         	    resource.addAttribute("protocol", PROTOCOL_HTTP, nullNS);
             } else if (resourceData.getProtocol() == RESTConstants.PROTOCOL_HTTPS_ONLY) {
@@ -91,19 +100,19 @@ public class RestApiAdminUtils {
         }
 
         try {
-            if(resourceData.getInSequenceKey() != null){
+            if (resourceData.getInSequenceKey() != null) {
                 resource.addAttribute("inSequence", resourceData.getInSequenceKey(), nullNS);
-            } else if (resourceData.getInSeqXml() != null && !"".equals(resourceData.getInSeqXml())) {
+            } else if (resourceData.getInSeqXml() != null && !resourceData.getInSeqXml().isEmpty()) {
                 resource.addChild(AXIOMUtil.stringToOM(resourceData.getInSeqXml()));
             }
-            if(resourceData.getOutSequenceKey() != null){
+            if (resourceData.getOutSequenceKey() != null) {
                 resource.addAttribute("outSequence", resourceData.getOutSequenceKey(), nullNS);
-            } else if (resourceData.getOutSeqXml() != null && !"".equals(resourceData.getOutSeqXml())) {
+            } else if (resourceData.getOutSeqXml() != null && !resourceData.getOutSeqXml().isEmpty()) {
                 resource.addChild(AXIOMUtil.stringToOM(resourceData.getOutSeqXml()));
             }
-            if(resourceData.getFaultSequenceKey() != null){
+            if (resourceData.getFaultSequenceKey() != null) {
                 resource.addAttribute("faultSequence", resourceData.getFaultSequenceKey(), nullNS);
-            } else if (resourceData.getFaultSeqXml() != null && !"".equals(resourceData.getFaultSeqXml())) {
+            } else if (resourceData.getFaultSeqXml() != null && !resourceData.getFaultSeqXml().isEmpty()) {
                 resource.addChild(AXIOMUtil.stringToOM(resourceData.getFaultSeqXml()));
             }
         } catch (XMLStreamException e) {
@@ -186,8 +195,8 @@ public class RestApiAdminUtils {
                 SynapseConstants.SYNAPSE_ENV).getValue();
     }
 
-    public static APIData convertApiToAPIData(API api){
-        if(api == null){
+    public static APIData convertApiToAPIData(API api) {
+        if (api == null) {
             return null;
         }
 
@@ -197,11 +206,13 @@ public class RestApiAdminUtils {
         apiData.setHost(api.getHost());
         apiData.setPort(api.getPort());
         apiData.setFileName(api.getFileName());
+        apiData.setVersion(api.getVersion());
+        apiData.setVersionType(api.getVersionStrategy().getVersionType());
 
         Resource[] resources = api.getResources();
         ResourceData[] resourceDatas = new ResourceData[resources.length];
 
-        for(int i=0; i<resources.length; i++){
+        for (int i = 0; i < resources.length; i++) {
 
             Resource resource = resources[i];
             ResourceData data = new ResourceData();
@@ -211,10 +222,9 @@ public class RestApiAdminUtils {
             data.setContentType(resource.getContentType());
             data.setProtocol(resource.getProtocol());
             DispatcherHelper dispatcherHelper = resource.getDispatcherHelper();
-            if(dispatcherHelper instanceof URITemplateHelper){
+            if (dispatcherHelper instanceof URITemplateHelper) {
                 data.setUriTemplate(dispatcherHelper.getString());
-            }
-            else if(dispatcherHelper instanceof URLMappingHelper){
+            } else if (dispatcherHelper instanceof URLMappingHelper) {
                 data.setUrlMapping(dispatcherHelper.getString());
             }
 
@@ -260,7 +270,7 @@ public class RestApiAdminUtils {
     }
 
     public static boolean isNullOrEmpty(String s) {
-        return (s == null || "".equals(s));
+        return (s == null || s.isEmpty());
     }
 
 }

@@ -17,7 +17,9 @@
 package org.wso2.carbon.rest.api.ui.util;
 
 public final class RestAPIConstants {
-	
-	public static int APIS_PER_PAGE = 10;
+
+    public static int APIS_PER_PAGE = 10;
+    public static final String VERSION_TYPE_NONE = "none";
+    public static final String DEFAULT_PORT = "-1";
 
 }

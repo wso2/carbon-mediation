@@ -51,7 +51,10 @@
         APIData apiData = (APIData) session.getAttribute("apiData");
         if (resourceData != null && apiData != null) {
             apiData.setResources(resources.toArray(new ResourceData[resources.size()]));
-            forwardTo = "manageAPI.jsp?" + "mode=" + session.getAttribute("mode") + "&apiName=" + apiData.getName() + "&resourceIndex=" + index;
+            forwardTo = "manageAPI.jsp?" + "mode=" + session.getAttribute("mode") + "&apiName=" + apiData.getName()
+                    + "&resourceIndex=" + index
+                    + "&version=" + apiData.getVersion()
+                    + "&versionType=" + apiData.getVersionType();
             ///
             session.setAttribute("resourceData", resourceData);
             session.removeAttribute("resource");
