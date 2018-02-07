@@ -201,7 +201,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
 
     /**
      * Set the tenant domain when a publisher publishes his API in MT mode. When publisher publishes
-     * the API, we login the gateway as supretenant. But we need to create the endpoint file in the
+     * the API, we login the gateway as super tenant. But we need to create the endpoint file in the
      * particular tenant domain.
      *
      * @param endpointData Endpoint file content
@@ -223,7 +223,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
 
     /**
      * Set the tenant domain when a publisher publishes his API in MT mode. When publisher publishes
-     * the API, we login the gateway as supretenant. But we need to delete the endpoint file in the
+     * the API, we login the gateway as super tenant. But we need to delete the endpoint file in the
      * particular tenant domain.
      *
      * @param endpointName Name of the endpoint file to be deleted
