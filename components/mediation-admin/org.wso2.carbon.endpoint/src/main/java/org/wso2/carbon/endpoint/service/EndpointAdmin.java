@@ -212,10 +212,8 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
     public boolean addEndpointForTenant(String endpointData, String tenantDomain) throws EndpointAdminException {
         try {
             PrivilegedCarbonContext.startTenantFlow();
-            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
-                    true);
-            boolean status = addEndpoint(endpointData);
-            return status;
+            PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
+            return addEndpoint(endpointData);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
@@ -235,8 +233,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
         try {
             PrivilegedCarbonContext.startTenantFlow();
             PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
-            boolean status = deleteEndpoint(endpointName);
-            return status;
+            return deleteEndpoint(endpointName);
         } finally {
             PrivilegedCarbonContext.endTenantFlow();
         }
