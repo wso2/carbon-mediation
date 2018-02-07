@@ -206,7 +206,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
      *
      * @param endpointData Endpoint file content
      * @param tenantDomain Domain of the logged tenant
-     * @return
+     * @return true if the endpoint was successfully added to tenant space and false otherwise
      * @throws EndpointAdminException Thrown if an error occur
      */
     public boolean addEndpointForTenant(String endpointData, String tenantDomain) throws EndpointAdminException {
@@ -228,7 +228,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
      *
      * @param endpointName Name of the endpoint file to be deleted
      * @param tenantDomain Domain of the logged tenant
-     * @return
+     * @return true if the endpoint was successfully deleted from tenant space and false otherwise
      * @throws EndpointAdminException Thrown if an error occur
      */
     public boolean deleteEndpointForTenant(String endpointName, String tenantDomain) throws EndpointAdminException {

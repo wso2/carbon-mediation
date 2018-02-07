@@ -1,219 +1,29 @@
-<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-                  xmlns:ax2116="http://mgt.dependency.mediation.carbon.wso2.org/xsd"
-                  xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ax2114="http://service.endpoint.carbon.wso2.org/xsd"
-                  xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
-                  xmlns:tns="http://service.endpoint.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
-                  xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-                  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:ax2112="http://endpoint.carbon.wso2.org/xsd"
-                  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
-                  targetNamespace="http://service.endpoint.carbon.wso2.org">
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ax2246="http://service.endpoint.carbon.wso2.org/xsd" xmlns:ax2248="http://mgt.dependency.mediation.carbon.wso2.org/xsd" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://service.endpoint.carbon.wso2.org" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ax2244="http://endpoint.carbon.wso2.org/xsd" targetNamespace="http://service.endpoint.carbon.wso2.org">
     <wsdl:documentation>EndpointAdmin</wsdl:documentation>
     <wsdl:types>
-        <xs:schema xmlns:ax2115="http://service.endpoint.carbon.wso2.org/xsd" xmlns:ns="http://org.apache.axis2/xsd"
-                   xmlns:ax2113="http://endpoint.carbon.wso2.org/xsd"
-                   xmlns:ax2117="http://mgt.dependency.mediation.carbon.wso2.org/xsd" attributeFormDefault="qualified"
-                   elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
+        <xs:schema xmlns:ax2245="http://endpoint.carbon.wso2.org/xsd" xmlns:ax2247="http://service.endpoint.carbon.wso2.org/xsd" xmlns:ax2249="http://mgt.dependency.mediation.carbon.wso2.org/xsd" xmlns:ns="http://org.apache.axis2/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://org.apache.axis2/xsd">
             <xs:import namespace="http://endpoint.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://service.endpoint.carbon.wso2.org/xsd"/>
             <xs:import namespace="http://mgt.dependency.mediation.carbon.wso2.org/xsd"/>
             <xs:element name="EndpointAdminEndpointAdminException">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="EndpointAdminException" nillable="true"
-                                    type="ax2113:EndpointAdminException"/>
+                        <xs:element minOccurs="0" name="EndpointAdminException" nillable="true" type="ax2245:EndpointAdminException"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="switchOn">
+            <xs:element name="addEndpointForTenant">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="endpointData" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="switchOff">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveEndpoint">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="epString" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveEndpointResponse">
+            <xs:element name="addEndpointForTenantResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveDynamicEndpoint">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
-                        <xs:element minOccurs="0" name="epName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="saveDynamicEndpointResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="isRegisterNull">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="isRegisterNullResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndpointsData">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndpointsDataResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true"
-                                    type="ax2115:EndpointMetaData"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndpoints">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndpointsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndpointCount">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndpointCountResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:int"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndpointConfiguration">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndpointConfigurationResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndPointsNames">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getEndPointsNamesResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDynamicEndpoints">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDynamicEndpointsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDynamicEndpointCount">
-                <xs:complexType>
-                    <xs:sequence/>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDynamicEndpointCountResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" type="xs:int"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDynamicEndpoint">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDynamicEndpointResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDependents">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="getDependentsResponse">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true"
-                                    type="ax2116:ConfigurationObject"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="enableStatistics">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="disableStatistics">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
-            <xs:element name="deleteSelectedEndpoint">
-                <xs:complexType>
-                    <xs:sequence>
-                        <xs:element maxOccurs="unbounded" minOccurs="0" name="endpointNames" nillable="true"
-                                    type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -231,17 +41,51 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="deleteDynamicEndpoint">
+            <xs:element name="deleteEndpointForTenant">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="tenantDomain" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="deleteDynamicEndpointResponse">
+            <xs:element name="deleteEndpointForTenantResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndPointsNames">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndPointsNamesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="switchOn">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="switchOff">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteSelectedEndpoint">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="endpointNames" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
@@ -250,14 +94,41 @@
                     <xs:sequence/>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="addEndpoint">
+            <xs:element name="getEndpointConfiguration">
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element minOccurs="0" name="epString" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
-            <xs:element name="addEndpointResponse">
+            <xs:element name="getEndpointConfigurationResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndpointsData">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndpointsDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2246:EndpointMetaData"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveDynamicEndpoint">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="epName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveDynamicEndpointResponse">
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element minOccurs="0" name="return" type="xs:boolean"/>
@@ -279,9 +150,152 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element name="getDynamicEndpoint">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDynamicEndpointResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isRegisterNull">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="isRegisterNullResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDynamicEndpoints">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDynamicEndpointsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteDynamicEndpoint">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="deleteDynamicEndpointResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndpointCount">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndpointCountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDynamicEndpointCount">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDynamicEndpointCountResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addEndpoint">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="epString" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="addEndpointResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndpoints">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getEndpointsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveEndpoint">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="epString" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="saveEndpointResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:boolean"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="disableStatistics">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="enableStatistics">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDependents">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="endpointName" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="getDependentsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="return" nillable="true" type="ax2248:ConfigurationObject"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
         </xs:schema>
-        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified"
-                   targetNamespace="http://mgt.dependency.mediation.carbon.wso2.org/xsd">
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://mgt.dependency.mediation.carbon.wso2.org/xsd">
             <xs:complexType name="ConfigurationObject">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="id" nillable="true" type="xs:string"/>
@@ -290,59 +304,33 @@
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
-        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified"
-                   targetNamespace="http://service.endpoint.carbon.wso2.org/xsd">
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://service.endpoint.carbon.wso2.org/xsd">
             <xs:complexType name="EndpointMetaData">
                 <xs:sequence>
                     <xs:element minOccurs="0" name="artifactContainerName" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="description" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="enableStatistics" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="endpointString" nillable="true" type="xs:string"/>
-                    <xs:element minOccurs="0" name="isEdited" nillable="true" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="isEdited" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="switchOn" type="xs:boolean"/>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>
-        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified"
-                   targetNamespace="http://endpoint.carbon.wso2.org/xsd">
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://endpoint.carbon.wso2.org/xsd">
             <xs:complexType name="EndpointAdminException">
                 <xs:sequence/>
             </xs:complexType>
         </xs:schema>
     </wsdl:types>
-    <wsdl:message name="getEndpointConfigurationRequest">
-        <wsdl:part name="parameters" element="ns1:getEndpointConfiguration"/>
+    <wsdl:message name="getEndpointsRequest">
+        <wsdl:part name="parameters" element="ns1:getEndpoints"/>
     </wsdl:message>
-    <wsdl:message name="getEndpointConfigurationResponse">
-        <wsdl:part name="parameters" element="ns1:getEndpointConfigurationResponse"/>
+    <wsdl:message name="getEndpointsResponse">
+        <wsdl:part name="parameters" element="ns1:getEndpointsResponse"/>
     </wsdl:message>
     <wsdl:message name="EndpointAdminEndpointAdminException">
         <wsdl:part name="parameters" element="ns1:EndpointAdminEndpointAdminException"/>
-    </wsdl:message>
-    <wsdl:message name="addEndpointRequest">
-        <wsdl:part name="parameters" element="ns1:addEndpoint"/>
-    </wsdl:message>
-    <wsdl:message name="addEndpointResponse">
-        <wsdl:part name="parameters" element="ns1:addEndpointResponse"/>
-    </wsdl:message>
-    <wsdl:message name="deleteSelectedEndpointRequest">
-        <wsdl:part name="parameters" element="ns1:deleteSelectedEndpoint"/>
-    </wsdl:message>
-    <wsdl:message name="enableStatisticsRequest">
-        <wsdl:part name="parameters" element="ns1:enableStatistics"/>
-    </wsdl:message>
-    <wsdl:message name="saveDynamicEndpointRequest">
-        <wsdl:part name="parameters" element="ns1:saveDynamicEndpoint"/>
-    </wsdl:message>
-    <wsdl:message name="saveDynamicEndpointResponse">
-        <wsdl:part name="parameters" element="ns1:saveDynamicEndpointResponse"/>
-    </wsdl:message>
-    <wsdl:message name="addDynamicEndpointRequest">
-        <wsdl:part name="parameters" element="ns1:addDynamicEndpoint"/>
-    </wsdl:message>
-    <wsdl:message name="addDynamicEndpointResponse">
-        <wsdl:part name="parameters" element="ns1:addDynamicEndpointResponse"/>
     </wsdl:message>
     <wsdl:message name="saveEndpointRequest">
         <wsdl:part name="parameters" element="ns1:saveEndpoint"/>
@@ -350,14 +338,11 @@
     <wsdl:message name="saveEndpointResponse">
         <wsdl:part name="parameters" element="ns1:saveEndpointResponse"/>
     </wsdl:message>
-    <wsdl:message name="getEndpointsRequest">
-        <wsdl:part name="parameters" element="ns1:getEndpoints"/>
+    <wsdl:message name="isRegisterNullRequest">
+        <wsdl:part name="parameters" element="ns1:isRegisterNull"/>
     </wsdl:message>
-    <wsdl:message name="getEndpointsResponse">
-        <wsdl:part name="parameters" element="ns1:getEndpointsResponse"/>
-    </wsdl:message>
-    <wsdl:message name="switchOnRequest">
-        <wsdl:part name="parameters" element="ns1:switchOn"/>
+    <wsdl:message name="isRegisterNullResponse">
+        <wsdl:part name="parameters" element="ns1:isRegisterNullResponse"/>
     </wsdl:message>
     <wsdl:message name="deleteEndpointRequest">
         <wsdl:part name="parameters" element="ns1:deleteEndpoint"/>
@@ -365,11 +350,11 @@
     <wsdl:message name="deleteEndpointResponse">
         <wsdl:part name="parameters" element="ns1:deleteEndpointResponse"/>
     </wsdl:message>
-    <wsdl:message name="isRegisterNullRequest">
-        <wsdl:part name="parameters" element="ns1:isRegisterNull"/>
+    <wsdl:message name="saveDynamicEndpointRequest">
+        <wsdl:part name="parameters" element="ns1:saveDynamicEndpoint"/>
     </wsdl:message>
-    <wsdl:message name="isRegisterNullResponse">
-        <wsdl:part name="parameters" element="ns1:isRegisterNullResponse"/>
+    <wsdl:message name="saveDynamicEndpointResponse">
+        <wsdl:part name="parameters" element="ns1:saveDynamicEndpointResponse"/>
     </wsdl:message>
     <wsdl:message name="getDynamicEndpointsRequest">
         <wsdl:part name="parameters" element="ns1:getDynamicEndpoints"/>
@@ -377,47 +362,14 @@
     <wsdl:message name="getDynamicEndpointsResponse">
         <wsdl:part name="parameters" element="ns1:getDynamicEndpointsResponse"/>
     </wsdl:message>
-    <wsdl:message name="getEndPointsNamesRequest">
-        <wsdl:part name="parameters" element="ns1:getEndPointsNames"/>
-    </wsdl:message>
-    <wsdl:message name="getEndPointsNamesResponse">
-        <wsdl:part name="parameters" element="ns1:getEndPointsNamesResponse"/>
-    </wsdl:message>
     <wsdl:message name="deleteDynamicEndpointRequest">
         <wsdl:part name="parameters" element="ns1:deleteDynamicEndpoint"/>
     </wsdl:message>
     <wsdl:message name="deleteDynamicEndpointResponse">
         <wsdl:part name="parameters" element="ns1:deleteDynamicEndpointResponse"/>
     </wsdl:message>
-    <wsdl:message name="getDynamicEndpointCountRequest">
-        <wsdl:part name="parameters" element="ns1:getDynamicEndpointCount"/>
-    </wsdl:message>
-    <wsdl:message name="getDynamicEndpointCountResponse">
-        <wsdl:part name="parameters" element="ns1:getDynamicEndpointCountResponse"/>
-    </wsdl:message>
-    <wsdl:message name="disableStatisticsRequest">
-        <wsdl:part name="parameters" element="ns1:disableStatistics"/>
-    </wsdl:message>
-    <wsdl:message name="getDependentsRequest">
-        <wsdl:part name="parameters" element="ns1:getDependents"/>
-    </wsdl:message>
-    <wsdl:message name="getDependentsResponse">
-        <wsdl:part name="parameters" element="ns1:getDependentsResponse"/>
-    </wsdl:message>
-    <wsdl:message name="getEndpointsDataRequest">
-        <wsdl:part name="parameters" element="ns1:getEndpointsData"/>
-    </wsdl:message>
-    <wsdl:message name="getEndpointsDataResponse">
-        <wsdl:part name="parameters" element="ns1:getEndpointsDataResponse"/>
-    </wsdl:message>
-    <wsdl:message name="switchOffRequest">
-        <wsdl:part name="parameters" element="ns1:switchOff"/>
-    </wsdl:message>
-    <wsdl:message name="getEndpointCountRequest">
-        <wsdl:part name="parameters" element="ns1:getEndpointCount"/>
-    </wsdl:message>
-    <wsdl:message name="getEndpointCountResponse">
-        <wsdl:part name="parameters" element="ns1:getEndpointCountResponse"/>
+    <wsdl:message name="switchOnRequest">
+        <wsdl:part name="parameters" element="ns1:switchOn"/>
     </wsdl:message>
     <wsdl:message name="getDynamicEndpointRequest">
         <wsdl:part name="parameters" element="ns1:getDynamicEndpoint"/>
@@ -425,205 +377,199 @@
     <wsdl:message name="getDynamicEndpointResponse">
         <wsdl:part name="parameters" element="ns1:getDynamicEndpointResponse"/>
     </wsdl:message>
+    <wsdl:message name="addEndpointForTenantRequest">
+        <wsdl:part name="parameters" element="ns1:addEndpointForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="addEndpointForTenantResponse">
+        <wsdl:part name="parameters" element="ns1:addEndpointForTenantResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addEndpointRequest">
+        <wsdl:part name="parameters" element="ns1:addEndpoint"/>
+    </wsdl:message>
+    <wsdl:message name="addEndpointResponse">
+        <wsdl:part name="parameters" element="ns1:addEndpointResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getDependentsRequest">
+        <wsdl:part name="parameters" element="ns1:getDependents"/>
+    </wsdl:message>
+    <wsdl:message name="getDependentsResponse">
+        <wsdl:part name="parameters" element="ns1:getDependentsResponse"/>
+    </wsdl:message>
+    <wsdl:message name="enableStatisticsRequest">
+        <wsdl:part name="parameters" element="ns1:enableStatistics"/>
+    </wsdl:message>
+    <wsdl:message name="deleteSelectedEndpointRequest">
+        <wsdl:part name="parameters" element="ns1:deleteSelectedEndpoint"/>
+    </wsdl:message>
+    <wsdl:message name="disableStatisticsRequest">
+        <wsdl:part name="parameters" element="ns1:disableStatistics"/>
+    </wsdl:message>
+    <wsdl:message name="getEndpointsDataRequest">
+        <wsdl:part name="parameters" element="ns1:getEndpointsData"/>
+    </wsdl:message>
+    <wsdl:message name="getEndpointsDataResponse">
+        <wsdl:part name="parameters" element="ns1:getEndpointsDataResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getEndpointCountRequest">
+        <wsdl:part name="parameters" element="ns1:getEndpointCount"/>
+    </wsdl:message>
+    <wsdl:message name="getEndpointCountResponse">
+        <wsdl:part name="parameters" element="ns1:getEndpointCountResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getDynamicEndpointCountRequest">
+        <wsdl:part name="parameters" element="ns1:getDynamicEndpointCount"/>
+    </wsdl:message>
+    <wsdl:message name="getDynamicEndpointCountResponse">
+        <wsdl:part name="parameters" element="ns1:getDynamicEndpointCountResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getEndpointConfigurationRequest">
+        <wsdl:part name="parameters" element="ns1:getEndpointConfiguration"/>
+    </wsdl:message>
+    <wsdl:message name="getEndpointConfigurationResponse">
+        <wsdl:part name="parameters" element="ns1:getEndpointConfigurationResponse"/>
+    </wsdl:message>
+    <wsdl:message name="getEndPointsNamesRequest">
+        <wsdl:part name="parameters" element="ns1:getEndPointsNames"/>
+    </wsdl:message>
+    <wsdl:message name="getEndPointsNamesResponse">
+        <wsdl:part name="parameters" element="ns1:getEndPointsNamesResponse"/>
+    </wsdl:message>
+    <wsdl:message name="switchOffRequest">
+        <wsdl:part name="parameters" element="ns1:switchOff"/>
+    </wsdl:message>
     <wsdl:message name="deleteAllEndpointGroupsRequest">
         <wsdl:part name="parameters" element="ns1:deleteAllEndpointGroups"/>
     </wsdl:message>
+    <wsdl:message name="deleteEndpointForTenantRequest">
+        <wsdl:part name="parameters" element="ns1:deleteEndpointForTenant"/>
+    </wsdl:message>
+    <wsdl:message name="deleteEndpointForTenantResponse">
+        <wsdl:part name="parameters" element="ns1:deleteEndpointForTenantResponse"/>
+    </wsdl:message>
+    <wsdl:message name="addDynamicEndpointRequest">
+        <wsdl:part name="parameters" element="ns1:addDynamicEndpoint"/>
+    </wsdl:message>
+    <wsdl:message name="addDynamicEndpointResponse">
+        <wsdl:part name="parameters" element="ns1:addDynamicEndpointResponse"/>
+    </wsdl:message>
     <wsdl:portType name="EndpointAdminPortType">
-        <wsdl:operation name="getEndpointConfiguration">
-            <wsdl:input message="tns:getEndpointConfigurationRequest" wsaw:Action="urn:getEndpointConfiguration"/>
-            <wsdl:output message="tns:getEndpointConfigurationResponse"
-                         wsaw:Action="urn:getEndpointConfigurationResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:getEndpointConfigurationEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
-        <wsdl:operation name="addEndpoint">
-            <wsdl:input message="tns:addEndpointRequest" wsaw:Action="urn:addEndpoint"/>
-            <wsdl:output message="tns:addEndpointResponse" wsaw:Action="urn:addEndpointResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:addEndpointEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
-        <wsdl:operation name="deleteSelectedEndpoint">
-            <wsdl:input message="tns:deleteSelectedEndpointRequest" wsaw:Action="urn:deleteSelectedEndpoint"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:deleteSelectedEndpointEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
-        <wsdl:operation name="enableStatistics">
-            <wsdl:input message="tns:enableStatisticsRequest" wsaw:Action="urn:enableStatistics"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:enableStatisticsEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
-        <wsdl:operation name="saveDynamicEndpoint">
-            <wsdl:input message="tns:saveDynamicEndpointRequest" wsaw:Action="urn:saveDynamicEndpoint"/>
-            <wsdl:output message="tns:saveDynamicEndpointResponse" wsaw:Action="urn:saveDynamicEndpointResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:saveDynamicEndpointEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
-        <wsdl:operation name="addDynamicEndpoint">
-            <wsdl:input message="tns:addDynamicEndpointRequest" wsaw:Action="urn:addDynamicEndpoint"/>
-            <wsdl:output message="tns:addDynamicEndpointResponse" wsaw:Action="urn:addDynamicEndpointResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:addDynamicEndpointEndpointAdminEndpointAdminException"/>
+        <wsdl:operation name="getEndpoints">
+            <wsdl:input message="tns:getEndpointsRequest" wsaw:Action="urn:getEndpoints"/>
+            <wsdl:output message="tns:getEndpointsResponse" wsaw:Action="urn:getEndpointsResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:getEndpointsEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
         <wsdl:operation name="saveEndpoint">
             <wsdl:input message="tns:saveEndpointRequest" wsaw:Action="urn:saveEndpoint"/>
             <wsdl:output message="tns:saveEndpointResponse" wsaw:Action="urn:saveEndpointResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:saveEndpointEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
-        <wsdl:operation name="getEndpoints">
-            <wsdl:input message="tns:getEndpointsRequest" wsaw:Action="urn:getEndpoints"/>
-            <wsdl:output message="tns:getEndpointsResponse" wsaw:Action="urn:getEndpointsResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:getEndpointsEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
-        <wsdl:operation name="switchOn">
-            <wsdl:input message="tns:switchOnRequest" wsaw:Action="urn:switchOn"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:switchOnEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
-        <wsdl:operation name="deleteEndpoint">
-            <wsdl:input message="tns:deleteEndpointRequest" wsaw:Action="urn:deleteEndpoint"/>
-            <wsdl:output message="tns:deleteEndpointResponse" wsaw:Action="urn:deleteEndpointResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:deleteEndpointEndpointAdminEndpointAdminException"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:saveEndpointEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
         <wsdl:operation name="isRegisterNull">
             <wsdl:input message="tns:isRegisterNullRequest" wsaw:Action="urn:isRegisterNull"/>
             <wsdl:output message="tns:isRegisterNullResponse" wsaw:Action="urn:isRegisterNullResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:isRegisterNullEndpointAdminEndpointAdminException"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:isRegisterNullEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteEndpoint">
+            <wsdl:input message="tns:deleteEndpointRequest" wsaw:Action="urn:deleteEndpoint"/>
+            <wsdl:output message="tns:deleteEndpointResponse" wsaw:Action="urn:deleteEndpointResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:deleteEndpointEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="saveDynamicEndpoint">
+            <wsdl:input message="tns:saveDynamicEndpointRequest" wsaw:Action="urn:saveDynamicEndpoint"/>
+            <wsdl:output message="tns:saveDynamicEndpointResponse" wsaw:Action="urn:saveDynamicEndpointResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:saveDynamicEndpointEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
         <wsdl:operation name="getDynamicEndpoints">
             <wsdl:input message="tns:getDynamicEndpointsRequest" wsaw:Action="urn:getDynamicEndpoints"/>
             <wsdl:output message="tns:getDynamicEndpointsResponse" wsaw:Action="urn:getDynamicEndpointsResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:getDynamicEndpointsEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
-        <wsdl:operation name="getEndPointsNames">
-            <wsdl:input message="tns:getEndPointsNamesRequest" wsaw:Action="urn:getEndPointsNames"/>
-            <wsdl:output message="tns:getEndPointsNamesResponse" wsaw:Action="urn:getEndPointsNamesResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:getEndPointsNamesEndpointAdminEndpointAdminException"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:getDynamicEndpointsEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
         <wsdl:operation name="deleteDynamicEndpoint">
             <wsdl:input message="tns:deleteDynamicEndpointRequest" wsaw:Action="urn:deleteDynamicEndpoint"/>
             <wsdl:output message="tns:deleteDynamicEndpointResponse" wsaw:Action="urn:deleteDynamicEndpointResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:deleteDynamicEndpointEndpointAdminEndpointAdminException"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:deleteDynamicEndpointEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpointCount">
-            <wsdl:input message="tns:getDynamicEndpointCountRequest" wsaw:Action="urn:getDynamicEndpointCount"/>
-            <wsdl:output message="tns:getDynamicEndpointCountResponse"
-                         wsaw:Action="urn:getDynamicEndpointCountResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:getDynamicEndpointCountEndpointAdminEndpointAdminException"/>
+        <wsdl:operation name="switchOn">
+            <wsdl:input message="tns:switchOnRequest" wsaw:Action="urn:switchOn"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:switchOnEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
-        <wsdl:operation name="disableStatistics">
-            <wsdl:input message="tns:disableStatisticsRequest" wsaw:Action="urn:disableStatistics"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:disableStatisticsEndpointAdminEndpointAdminException"/>
+        <wsdl:operation name="getDynamicEndpoint">
+            <wsdl:input message="tns:getDynamicEndpointRequest" wsaw:Action="urn:getDynamicEndpoint"/>
+            <wsdl:output message="tns:getDynamicEndpointResponse" wsaw:Action="urn:getDynamicEndpointResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:getDynamicEndpointEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addEndpointForTenant">
+            <wsdl:input message="tns:addEndpointForTenantRequest" wsaw:Action="urn:addEndpointForTenant"/>
+            <wsdl:output message="tns:addEndpointForTenantResponse" wsaw:Action="urn:addEndpointForTenantResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:addEndpointForTenantEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addEndpoint">
+            <wsdl:input message="tns:addEndpointRequest" wsaw:Action="urn:addEndpoint"/>
+            <wsdl:output message="tns:addEndpointResponse" wsaw:Action="urn:addEndpointResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:addEndpointEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
         <wsdl:operation name="getDependents">
             <wsdl:input message="tns:getDependentsRequest" wsaw:Action="urn:getDependents"/>
             <wsdl:output message="tns:getDependentsResponse" wsaw:Action="urn:getDependentsResponse"/>
         </wsdl:operation>
+        <wsdl:operation name="enableStatistics">
+            <wsdl:input message="tns:enableStatisticsRequest" wsaw:Action="urn:enableStatistics"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:enableStatisticsEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSelectedEndpoint">
+            <wsdl:input message="tns:deleteSelectedEndpointRequest" wsaw:Action="urn:deleteSelectedEndpoint"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:deleteSelectedEndpointEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="disableStatistics">
+            <wsdl:input message="tns:disableStatisticsRequest" wsaw:Action="urn:disableStatistics"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:disableStatisticsEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
         <wsdl:operation name="getEndpointsData">
             <wsdl:input message="tns:getEndpointsDataRequest" wsaw:Action="urn:getEndpointsData"/>
             <wsdl:output message="tns:getEndpointsDataResponse" wsaw:Action="urn:getEndpointsDataResponse"/>
         </wsdl:operation>
-        <wsdl:operation name="switchOff">
-            <wsdl:input message="tns:switchOffRequest" wsaw:Action="urn:switchOff"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:switchOffEndpointAdminEndpointAdminException"/>
-        </wsdl:operation>
         <wsdl:operation name="getEndpointCount">
             <wsdl:input message="tns:getEndpointCountRequest" wsaw:Action="urn:getEndpointCount"/>
             <wsdl:output message="tns:getEndpointCountResponse" wsaw:Action="urn:getEndpointCountResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:getEndpointCountEndpointAdminEndpointAdminException"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:getEndpointCountEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpoint">
-            <wsdl:input message="tns:getDynamicEndpointRequest" wsaw:Action="urn:getDynamicEndpoint"/>
-            <wsdl:output message="tns:getDynamicEndpointResponse" wsaw:Action="urn:getDynamicEndpointResponse"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:getDynamicEndpointEndpointAdminEndpointAdminException"/>
+        <wsdl:operation name="getDynamicEndpointCount">
+            <wsdl:input message="tns:getDynamicEndpointCountRequest" wsaw:Action="urn:getDynamicEndpointCount"/>
+            <wsdl:output message="tns:getDynamicEndpointCountResponse" wsaw:Action="urn:getDynamicEndpointCountResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:getDynamicEndpointCountEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getEndpointConfiguration">
+            <wsdl:input message="tns:getEndpointConfigurationRequest" wsaw:Action="urn:getEndpointConfiguration"/>
+            <wsdl:output message="tns:getEndpointConfigurationResponse" wsaw:Action="urn:getEndpointConfigurationResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:getEndpointConfigurationEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointsNames">
+            <wsdl:input message="tns:getEndPointsNamesRequest" wsaw:Action="urn:getEndPointsNames"/>
+            <wsdl:output message="tns:getEndPointsNamesResponse" wsaw:Action="urn:getEndPointsNamesResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:getEndPointsNamesEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="switchOff">
+            <wsdl:input message="tns:switchOffRequest" wsaw:Action="urn:switchOff"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:switchOffEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
         <wsdl:operation name="deleteAllEndpointGroups">
             <wsdl:input message="tns:deleteAllEndpointGroupsRequest" wsaw:Action="urn:deleteAllEndpointGroups"/>
-            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException"
-                        wsaw:Action="urn:deleteAllEndpointGroupsEndpointAdminEndpointAdminException"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:deleteAllEndpointGroupsEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="deleteEndpointForTenant">
+            <wsdl:input message="tns:deleteEndpointForTenantRequest" wsaw:Action="urn:deleteEndpointForTenant"/>
+            <wsdl:output message="tns:deleteEndpointForTenantResponse" wsaw:Action="urn:deleteEndpointForTenantResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:deleteEndpointForTenantEndpointAdminEndpointAdminException"/>
+        </wsdl:operation>
+        <wsdl:operation name="addDynamicEndpoint">
+            <wsdl:input message="tns:addDynamicEndpointRequest" wsaw:Action="urn:addDynamicEndpoint"/>
+            <wsdl:output message="tns:addDynamicEndpointResponse" wsaw:Action="urn:addDynamicEndpointResponse"/>
+            <wsdl:fault message="tns:EndpointAdminEndpointAdminException" name="EndpointAdminEndpointAdminException" wsaw:Action="urn:addDynamicEndpointEndpointAdminEndpointAdminException"/>
         </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="EndpointAdminSoap11Binding" type="tns:EndpointAdminPortType">
         <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="addEndpoint">
-            <soap:operation soapAction="urn:addEndpoint" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="getEndpointConfiguration">
-            <soap:operation soapAction="urn:getEndpointConfiguration" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="enableStatistics">
-            <soap:operation soapAction="urn:enableStatistics" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="deleteSelectedEndpoint">
-            <soap:operation soapAction="urn:deleteSelectedEndpoint" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="saveDynamicEndpoint">
-            <soap:operation soapAction="urn:saveDynamicEndpoint" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
         <wsdl:operation name="saveEndpoint">
             <soap:operation soapAction="urn:saveEndpoint" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="addDynamicEndpoint">
-            <soap:operation soapAction="urn:addDynamicEndpoint" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -642,15 +588,6 @@
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="switchOn">
-            <soap:operation soapAction="urn:switchOn" style="document"/>
-            <wsdl:input>
-                <soap:body use="literal"/>
-            </wsdl:input>
             <wsdl:fault name="EndpointAdminEndpointAdminException">
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
@@ -679,8 +616,8 @@
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpoints">
-            <soap:operation soapAction="urn:getDynamicEndpoints" style="document"/>
+        <wsdl:operation name="saveDynamicEndpoint">
+            <soap:operation soapAction="urn:saveDynamicEndpoint" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -691,8 +628,8 @@
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getEndPointsNames">
-            <soap:operation soapAction="urn:getEndPointsNames" style="document"/>
+        <wsdl:operation name="getDynamicEndpoints">
+            <soap:operation soapAction="urn:getDynamicEndpoints" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -715,8 +652,17 @@
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpointCount">
-            <soap:operation soapAction="urn:getDynamicEndpointCount" style="document"/>
+        <wsdl:operation name="switchOn">
+            <soap:operation soapAction="urn:switchOn" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getDynamicEndpoint">
+            <soap:operation soapAction="urn:getDynamicEndpoint" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -727,11 +673,26 @@
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="disableStatistics">
-            <soap:operation soapAction="urn:disableStatistics" style="document"/>
+        <wsdl:operation name="addEndpointForTenant">
+            <soap:operation soapAction="urn:addEndpointForTenant" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addEndpoint">
+            <soap:operation soapAction="urn:addEndpoint" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
             <wsdl:fault name="EndpointAdminEndpointAdminException">
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
@@ -745,8 +706,26 @@
                 <soap:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="switchOff">
-            <soap:operation soapAction="urn:switchOff" style="document"/>
+        <wsdl:operation name="enableStatistics">
+            <soap:operation soapAction="urn:enableStatistics" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSelectedEndpoint">
+            <soap:operation soapAction="urn:deleteSelectedEndpoint" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="disableStatistics">
+            <soap:operation soapAction="urn:disableStatistics" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
@@ -775,14 +754,47 @@
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpoint">
-            <soap:operation soapAction="urn:getDynamicEndpoint" style="document"/>
+        <wsdl:operation name="getDynamicEndpointCount">
+            <soap:operation soapAction="urn:getDynamicEndpointCount" style="document"/>
             <wsdl:input>
                 <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
                 <soap:body use="literal"/>
             </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getEndpointConfiguration">
+            <soap:operation soapAction="urn:getEndpointConfiguration" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointsNames">
+            <soap:operation soapAction="urn:getEndPointsNames" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="switchOff">
+            <soap:operation soapAction="urn:switchOff" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
             <wsdl:fault name="EndpointAdminEndpointAdminException">
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
@@ -796,77 +808,35 @@
                 <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-    </wsdl:binding>
-    <wsdl:binding name="EndpointAdminSoap12Binding" type="tns:EndpointAdminPortType">
-        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-        <wsdl:operation name="addEndpoint">
-            <soap12:operation soapAction="urn:addEndpoint" style="document"/>
+        <wsdl:operation name="deleteEndpointForTenant">
+            <soap:operation soapAction="urn:deleteEndpointForTenant" style="document"/>
             <wsdl:input>
-                <soap12:body use="literal"/>
+                <soap:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
-                <soap12:body use="literal"/>
+                <soap:body use="literal"/>
             </wsdl:output>
             <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="getEndpointConfiguration">
-            <soap12:operation soapAction="urn:getEndpointConfiguration" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="enableStatistics">
-            <soap12:operation soapAction="urn:enableStatistics" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="deleteSelectedEndpoint">
-            <soap12:operation soapAction="urn:deleteSelectedEndpoint" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="saveDynamicEndpoint">
-            <soap12:operation soapAction="urn:saveDynamicEndpoint" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="saveEndpoint">
-            <soap12:operation soapAction="urn:saveEndpoint" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
-            <wsdl:output>
-                <soap12:body use="literal"/>
-            </wsdl:output>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="addDynamicEndpoint">
-            <soap12:operation soapAction="urn:addDynamicEndpoint" style="document"/>
+            <soap:operation soapAction="urn:addDynamicEndpoint" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="EndpointAdminSoap12Binding" type="tns:EndpointAdminPortType">
+        <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="saveEndpoint">
+            <soap12:operation soapAction="urn:saveEndpoint" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -885,15 +855,6 @@
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
-            <wsdl:fault name="EndpointAdminEndpointAdminException">
-                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
-            </wsdl:fault>
-        </wsdl:operation>
-        <wsdl:operation name="switchOn">
-            <soap12:operation soapAction="urn:switchOn" style="document"/>
-            <wsdl:input>
-                <soap12:body use="literal"/>
-            </wsdl:input>
             <wsdl:fault name="EndpointAdminEndpointAdminException">
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
@@ -922,8 +883,8 @@
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpoints">
-            <soap12:operation soapAction="urn:getDynamicEndpoints" style="document"/>
+        <wsdl:operation name="saveDynamicEndpoint">
+            <soap12:operation soapAction="urn:saveDynamicEndpoint" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -934,8 +895,8 @@
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getEndPointsNames">
-            <soap12:operation soapAction="urn:getEndPointsNames" style="document"/>
+        <wsdl:operation name="getDynamicEndpoints">
+            <soap12:operation soapAction="urn:getDynamicEndpoints" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -958,8 +919,17 @@
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpointCount">
-            <soap12:operation soapAction="urn:getDynamicEndpointCount" style="document"/>
+        <wsdl:operation name="switchOn">
+            <soap12:operation soapAction="urn:switchOn" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getDynamicEndpoint">
+            <soap12:operation soapAction="urn:getDynamicEndpoint" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -970,11 +940,26 @@
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="disableStatistics">
-            <soap12:operation soapAction="urn:disableStatistics" style="document"/>
+        <wsdl:operation name="addEndpointForTenant">
+            <soap12:operation soapAction="urn:addEndpointForTenant" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addEndpoint">
+            <soap12:operation soapAction="urn:addEndpoint" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
             <wsdl:fault name="EndpointAdminEndpointAdminException">
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
@@ -988,8 +973,26 @@
                 <soap12:body use="literal"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="switchOff">
-            <soap12:operation soapAction="urn:switchOff" style="document"/>
+        <wsdl:operation name="enableStatistics">
+            <soap12:operation soapAction="urn:enableStatistics" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSelectedEndpoint">
+            <soap12:operation soapAction="urn:deleteSelectedEndpoint" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="disableStatistics">
+            <soap12:operation soapAction="urn:disableStatistics" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
@@ -1018,14 +1021,47 @@
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpoint">
-            <soap12:operation soapAction="urn:getDynamicEndpoint" style="document"/>
+        <wsdl:operation name="getDynamicEndpointCount">
+            <soap12:operation soapAction="urn:getDynamicEndpointCount" style="document"/>
             <wsdl:input>
                 <soap12:body use="literal"/>
             </wsdl:input>
             <wsdl:output>
                 <soap12:body use="literal"/>
             </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getEndpointConfiguration">
+            <soap12:operation soapAction="urn:getEndpointConfiguration" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointsNames">
+            <soap12:operation soapAction="urn:getEndPointsNames" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="switchOff">
+            <soap12:operation soapAction="urn:switchOff" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
             <wsdl:fault name="EndpointAdminEndpointAdminException">
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
@@ -1039,59 +1075,35 @@
                 <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
             </wsdl:fault>
         </wsdl:operation>
+        <wsdl:operation name="deleteEndpointForTenant">
+            <soap12:operation soapAction="urn:deleteEndpointForTenant" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addDynamicEndpoint">
+            <soap12:operation soapAction="urn:addDynamicEndpoint" style="document"/>
+            <wsdl:input>
+                <soap12:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap12:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="EndpointAdminEndpointAdminException">
+                <soap12:fault use="literal" name="EndpointAdminEndpointAdminException"/>
+            </wsdl:fault>
+        </wsdl:operation>
     </wsdl:binding>
     <wsdl:binding name="EndpointAdminHttpBinding" type="tns:EndpointAdminPortType">
         <http:binding verb="POST"/>
-        <wsdl:operation name="addEndpoint">
-            <http:operation location="addEndpoint"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="getEndpointConfiguration">
-            <http:operation location="getEndpointConfiguration"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="enableStatistics">
-            <http:operation location="enableStatistics"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="deleteSelectedEndpoint">
-            <http:operation location="deleteSelectedEndpoint"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-        </wsdl:operation>
-        <wsdl:operation name="saveDynamicEndpoint">
-            <http:operation location="saveDynamicEndpoint"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
         <wsdl:operation name="saveEndpoint">
             <http:operation location="saveEndpoint"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
-            <wsdl:output>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="addDynamicEndpoint">
-            <http:operation location="addDynamicEndpoint"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1107,12 +1119,6 @@
             <wsdl:output>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
-        </wsdl:operation>
-        <wsdl:operation name="switchOn">
-            <http:operation location="switchOn"/>
-            <wsdl:input>
-                <mime:content type="text/xml" part="parameters"/>
-            </wsdl:input>
         </wsdl:operation>
         <wsdl:operation name="isRegisterNull">
             <http:operation location="isRegisterNull"/>
@@ -1132,8 +1138,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpoints">
-            <http:operation location="getDynamicEndpoints"/>
+        <wsdl:operation name="saveDynamicEndpoint">
+            <http:operation location="saveDynamicEndpoint"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1141,8 +1147,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getEndPointsNames">
-            <http:operation location="getEndPointsNames"/>
+        <wsdl:operation name="getDynamicEndpoints">
+            <http:operation location="getDynamicEndpoints"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1159,8 +1165,14 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpointCount">
-            <http:operation location="getDynamicEndpointCount"/>
+        <wsdl:operation name="switchOn">
+            <http:operation location="switchOn"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="getDynamicEndpoint">
+            <http:operation location="getDynamicEndpoint"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1168,11 +1180,23 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="disableStatistics">
-            <http:operation location="disableStatistics"/>
+        <wsdl:operation name="addEndpointForTenant">
+            <http:operation location="addEndpointForTenant"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addEndpoint">
+            <http:operation location="addEndpoint"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
         </wsdl:operation>
         <wsdl:operation name="getDependents">
             <http:operation location="getDependents"/>
@@ -1183,8 +1207,20 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="switchOff">
-            <http:operation location="switchOff"/>
+        <wsdl:operation name="enableStatistics">
+            <http:operation location="enableStatistics"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteSelectedEndpoint">
+            <http:operation location="deleteSelectedEndpoint"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="disableStatistics">
+            <http:operation location="disableStatistics"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1207,8 +1243,8 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
-        <wsdl:operation name="getDynamicEndpoint">
-            <http:operation location="getDynamicEndpoint"/>
+        <wsdl:operation name="getDynamicEndpointCount">
+            <http:operation location="getDynamicEndpointCount"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
@@ -1216,11 +1252,53 @@
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:output>
         </wsdl:operation>
+        <wsdl:operation name="getEndpointConfiguration">
+            <http:operation location="getEndpointConfiguration"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="getEndPointsNames">
+            <http:operation location="getEndPointsNames"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="switchOff">
+            <http:operation location="switchOff"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+        </wsdl:operation>
         <wsdl:operation name="deleteAllEndpointGroups">
             <http:operation location="deleteAllEndpointGroups"/>
             <wsdl:input>
                 <mime:content type="text/xml" part="parameters"/>
             </wsdl:input>
+        </wsdl:operation>
+        <wsdl:operation name="deleteEndpointForTenant">
+            <http:operation location="deleteEndpointForTenant"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="addDynamicEndpoint">
+            <http:operation location="addDynamicEndpoint"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="parameters"/>
+            </wsdl:output>
         </wsdl:operation>
     </wsdl:binding>
     <wsdl:service name="EndpointAdmin">
