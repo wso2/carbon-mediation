@@ -105,7 +105,16 @@ public class CacheMediator extends AbstractListMediator {
      */
     private static final QName HASH_GENERATOR_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
                                                             CachingConstants.HASH_GENERATOR_STRING);
-
+    /**
+     * QName of the enableCacheControlHeader.
+     */
+    private static final QName ENABLE_CACHE_CONTROL_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
+                                                            CachingConstants.ENABLE_CACHE_CONTROL_STRING);
+    /**
+     * QName of the includeAgeHeader.
+     */
+    private static final QName INCLUDE_AGE_HEADER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
+                                                            CachingConstants.INCLUDE_AGE_HEADER_STRING);
     /**
      * This specifies whether the mediator should be in the incoming path (to check the request) or in the outgoing path
      * (to cache the response).
@@ -158,6 +167,16 @@ public class CacheMediator extends AbstractListMediator {
      * The http method type that needs to be cached.
      */
     private String hTTPMethodsToCache = CachingConstants.ALL;
+
+    /**
+     * This is used to specify whether cache-control headers need to honored. By default false.
+     */
+    private boolean cacheControlEnabled = CachingConstants.DEFAULT_ENABLE_CACHE_CONTROL;
+
+    /**
+     * This variable is used to specify whether an Age header need to included in the cached response.
+     */
+    private boolean addAgeHeaderEnabled = CachingConstants.DEFAULT_ADD_AGE_HEADER;
 
     /**
      * This method gives whether the mediator should be in the incoming path or in the outgoing path as a boolean.
@@ -349,6 +368,42 @@ public class CacheMediator extends AbstractListMediator {
     }
 
     /**
+     * This method returns whether cache-control headers need to be honored when caching.
+     *
+     * @return cacheControlEnabled whether enable cache control or not.
+     */
+    public boolean isCacheControlEnabled() {
+        return cacheControlEnabled;
+    }
+
+    /**
+     * This method sets whether cache-control headers need to be honored when caching.
+     *
+     * @param cacheControlEnabled specifies whether cache-control headers need to be honored.
+     */
+    public void setCacheControlEnabled(boolean cacheControlEnabled) {
+        this.cacheControlEnabled = cacheControlEnabled;
+    }
+
+    /**
+     * This method returns whether an Age header need to be included in the cached response.
+     *
+     * @return addAgeHeaderEnabled whether include an Age header or not.
+     */
+    public boolean isAddAgeHeaderEnabled() {
+        return addAgeHeaderEnabled;
+    }
+
+    /**
+     * This method sets whether an Age header need to be included in the cached response.
+     *
+     * @param addAgeHeaderEnabled specifies whether include an Age header or not.
+     */
+    public void setAddAgeHeaderEnabled(boolean addAgeHeaderEnabled) {
+        this.addAgeHeaderEnabled = addAgeHeaderEnabled;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public OMElement serialize(OMElement parent) {
@@ -400,6 +455,16 @@ public class CacheMediator extends AbstractListMediator {
                 OMElement responseCodesElem = fac.createOMElement(CachingConstants.RESPONSE_CODES_STRING, synNS);
                 responseCodesElem.setText(responseCodes);
                 protocolElem.addChild(responseCodesElem);
+
+                OMElement enableCacheControlElem = fac.createOMElement(CachingConstants.ENABLE_CACHE_CONTROL_STRING,
+                        synNS);
+                enableCacheControlElem.setText(String.valueOf(cacheControlEnabled));
+                protocolElem.addChild(enableCacheControlElem);
+
+                OMElement includeAgeHeaderElem = fac.createOMElement(CachingConstants.INCLUDE_AGE_HEADER_STRING,
+                        synNS);
+                includeAgeHeaderElem.setText(String.valueOf(addAgeHeaderEnabled));
+                protocolElem.addChild(includeAgeHeaderElem);
 
             }
 
@@ -469,6 +534,15 @@ public class CacheMediator extends AbstractListMediator {
                                 HEADERS_TO_EXCLUDE_IN_HASH_Q);
                         if (headersToExclude != null) {
                             headersToExcludeInHash = headersToExclude.getText();
+                        }
+                        OMElement enableCacheControlElem = protocolElem.getFirstChildWithName(ENABLE_CACHE_CONTROL_Q);
+                        if (enableCacheControlElem != null) {
+                            cacheControlEnabled = Boolean.parseBoolean(enableCacheControlElem.getText());
+                        }
+
+                        OMElement addAgeHeaderEnabledElem = protocolElem.getFirstChildWithName(INCLUDE_AGE_HEADER_Q);
+                        if (addAgeHeaderEnabledElem != null) {
+                            addAgeHeaderEnabled = Boolean.parseBoolean(addAgeHeaderEnabledElem.getText());
                         }
                     }
                     OMElement responseElem = protocolElem.getFirstChildWithName(RESPONSE_CODES_Q);
