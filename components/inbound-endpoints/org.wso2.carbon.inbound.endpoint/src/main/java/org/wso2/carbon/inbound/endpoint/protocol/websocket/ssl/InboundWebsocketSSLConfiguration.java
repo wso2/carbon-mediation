@@ -17,6 +17,8 @@
 package org.wso2.carbon.inbound.endpoint.protocol.websocket.ssl;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InboundWebsocketSSLConfiguration {
     private File keyStore;
@@ -24,6 +26,24 @@ public class InboundWebsocketSSLConfiguration {
     private String certPass;
     private File trustStore;
     private String trustStorePass;
+    private String[] sslProtocols;
+    private String[] cipherSuites;
+
+    public String[] getSslProtocols() {
+        return sslProtocols;
+    }
+
+    public void setSslProtocols(String[] sslProtocols) {
+        this.sslProtocols = sslProtocols;
+    }
+
+    public String[] getCipherSuites() {
+        return cipherSuites;
+    }
+
+    public void setCipherSuites(String[] cipherSuites) {
+        this.cipherSuites = cipherSuites;
+    }
 
     public InboundWebsocketSSLConfiguration(File keyStore, String keyStorePass) {
         this.keyStore = keyStore;
@@ -72,6 +92,8 @@ public class InboundWebsocketSSLConfiguration {
         private String trustStoreFile;
         private String trustStorePass;
         private String certPass;
+        private String sslProtocols;
+        private String cipherSuites;
 
         public SSLConfigurationBuilder(String keyStoreFile,
                                        String keyStorePass,
@@ -84,6 +106,17 @@ public class InboundWebsocketSSLConfiguration {
             this.trustStorePass = trustStorePass;
             this.certPass = certPass;
 
+        }
+
+        public SSLConfigurationBuilder(String keyStoreFile, String keyStorePass, String trustStoreFile,
+                String trustStorePass, String certPass, String sslProtocols, String cipherSuites) {
+            this.keyStoreFile = keyStoreFile;
+            this.keyStorePass = keyStorePass;
+            this.trustStoreFile = trustStoreFile;
+            this.trustStorePass = trustStorePass;
+            this.certPass = certPass;
+            this.sslProtocols = sslProtocols;
+            this.cipherSuites = cipherSuites;
         }
 
         public InboundWebsocketSSLConfiguration build() {
@@ -108,6 +141,35 @@ public class InboundWebsocketSSLConfiguration {
                     throw new IllegalArgumentException("trustStorePass is not defined ");
                 }
                 sslConfig.setTrustStore(trustStore).setTrustStorePass(trustStorePass);
+            }
+
+            if (sslProtocols == null || sslProtocols.trim().isEmpty() ) {
+                sslProtocols = "TLS";
+            }
+
+            String[] preferredSSLProtocols = sslProtocols.trim().split(",");
+            List<String> protocolList = new ArrayList<>(preferredSSLProtocols.length);
+            for (String protocol : preferredSSLProtocols) {
+                if (!protocol.trim().isEmpty()) {
+                    protocolList.add(protocol.trim());
+                }
+            }
+            preferredSSLProtocols = protocolList.toArray(new String[protocolList.size()]);
+
+            sslConfig.setSslProtocols(preferredSSLProtocols);
+
+            if (cipherSuites != null && cipherSuites.trim().length() != 0) {
+
+                String[] preferredCipherSuites = cipherSuites.trim().split(",");
+                List<String> cipherSuiteList = new ArrayList<>(preferredCipherSuites.length);
+                for (String cipherSuite : preferredCipherSuites) {
+                    if (!cipherSuite.trim().isEmpty()) {
+                        cipherSuiteList.add(cipherSuite.trim());
+                    }
+                }
+                preferredCipherSuites = cipherSuiteList.toArray(new String[cipherSuiteList.size()]);
+
+                sslConfig.setCipherSuites(preferredCipherSuites);
             }
             return sslConfig;
         }

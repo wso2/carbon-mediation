@@ -280,8 +280,9 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
                         InboundWebsocketConstants.INBOUND_SSL_TRUST_STORE_FILE),
                 params.getProperties().getProperty(
                         InboundWebsocketConstants.INBOUND_SSL_TRUST_STORE_PASS),
-                params.getProperties().getProperty(
-                        InboundWebsocketConstants.INBOUND_SSL_CERT_PASS)).build();
+                params.getProperties().getProperty(InboundWebsocketConstants.INBOUND_SSL_CERT_PASS),
+                params.getProperties().getProperty(InboundWebsocketConstants.SSL_PROTOCOLS),
+                params.getProperties().getProperty(InboundWebsocketConstants.CIPHER_SUITES)).build();
     }
 
     public void loadEndpointListeners() {

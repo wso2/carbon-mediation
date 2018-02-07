@@ -30,6 +30,8 @@ public class InboundWebsocketConstants {
     public static final String INBOUND_SSL_TRUST_STORE_FILE = "wss.ssl.trust.store.file";
     public static final String INBOUND_SSL_TRUST_STORE_PASS = "wss.ssl.trust.store.pass";
     public static final String INBOUND_SSL_CERT_PASS = "wss.ssl.cert.pass";
+    public static final String SSL_PROTOCOLS = "wss.ssl.protocols";
+    public static final String CIPHER_SUITES = "wss.ssl.cipher.suites";
 
     @Deprecated
     public static final String WEBSOCKET_SOURCE_HANDSHAKE_PRESENT = "websocket.source.handshake.present";
