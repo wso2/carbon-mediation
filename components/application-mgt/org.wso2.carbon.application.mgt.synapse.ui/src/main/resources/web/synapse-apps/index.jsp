@@ -216,7 +216,12 @@
         for (String msgStore : msgStores) {
     %>
     <tr>
-        <td><a href="../message_store/viewMessageStore.jsp?messageStoreName=<%= msgStore%>"><%= msgStore%></a></td>
+        <td>
+            <a href="#"
+               onclick="editCAppArtifact('../message_store/jmsMessageStore.jsp?messageStoreName=<%= msgStore%>')">
+                <%= msgStore%>
+            </a>
+        </td>
     </tr>
     <%
         }
