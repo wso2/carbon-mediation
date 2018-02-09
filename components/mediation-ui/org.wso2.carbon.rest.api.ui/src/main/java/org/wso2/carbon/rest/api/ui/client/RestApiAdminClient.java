@@ -134,6 +134,9 @@ public class RestApiAdminClient {
                     api.setHost(info.getHost());
                     api.setPort(info.getPort());
                     api.setResources(info.getResources());
+                    if (info.isArtifactContainerNameSpecified()) {
+                        api.setArtifactContainerName(info.getArtifactContainerName());
+                    }
                     apis.add(api);
                 }
             }
