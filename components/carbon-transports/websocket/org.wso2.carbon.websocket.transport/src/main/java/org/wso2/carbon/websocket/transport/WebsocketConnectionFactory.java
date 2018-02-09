@@ -37,6 +37,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import org.apache.axiom.om.OMElement;
+import org.apache.axis2.AxisFault;
 import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.TransportOutDescription;
 import org.apache.commons.logging.Log;
@@ -51,21 +52,34 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebsocketConnectionFactory {
 
     private static final Log log = LogFactory.getLog(WebsocketConnectionFactory.class);
-    private static WebsocketConnectionFactory instance = null;
 
     private final TransportOutDescription transportOut;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>
             channelHandlerPool = new ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>();
 
-    public WebsocketConnectionFactory(TransportOutDescription transportOut) {
+    public WebsocketConnectionFactory(TransportOutDescription transportOut) throws AxisFault {
         this.transportOut = transportOut;
-    }
+        boolean sslEnabled = WebsocketConstants.WSS.equalsIgnoreCase(transportOut.getName());
+        if (sslEnabled) {
+            Parameter trustParam = transportOut.getParameter(WebsocketConstants.TRUST_STORE_CONFIG_ELEMENT);
+            if (trustParam != null) {
+                OMElement trustStoreLocationElem = trustParam.getParameterElement().
+                        getFirstChildWithName(new QName(WebsocketConstants.TRUST_STORE_LOCATION));
+                OMElement trustStorePasswordElem = trustParam.getParameterElement().
+                        getFirstChildWithName(new QName(WebsocketConstants.
+                                TRUST_STORE_PASSWORD));
 
-    public static WebsocketConnectionFactory getInstance(TransportOutDescription transportOut) {
-        if (instance == null) {
-            instance = new WebsocketConnectionFactory(transportOut);
+                if (trustStoreLocationElem == null || trustStorePasswordElem == null) {
+                    handleWssTrustStoreParameterError("Unable to read parameter(s) "
+                            + WebsocketConstants.TRUST_STORE_LOCATION + " and/or "
+                            + WebsocketConstants.TRUST_STORE_PASSWORD + " from Transport configurations");
+                }
+            } else {
+                handleWssTrustStoreParameterError("Unable to read parameter(s) "
+                        + WebsocketConstants.TRUST_STORE_LOCATION + " and/or "
+                        + WebsocketConstants.TRUST_STORE_PASSWORD + " from Transport configurations");
+            }
         }
-        return instance;
     }
 
     public WebSocketClientHandler getChannelHandler(final URI uri,
@@ -116,20 +130,22 @@ public class WebsocketConnectionFactory {
             final SslContext sslCtx;
             if (ssl) {
                 Parameter trustParam = transportOut.getParameter(WebsocketConstants.TRUST_STORE_CONFIG_ELEMENT);
-                OMElement tsEle = null;
                 if (trustParam != null) {
-                    tsEle = trustParam.getParameterElement().getFirstElement();
+                    OMElement trustStoreLocationElem = trustParam.getParameterElement().
+                            getFirstChildWithName(new QName(WebsocketConstants.TRUST_STORE_LOCATION));
+                    OMElement trustStorePasswordElem = trustParam.getParameterElement().
+                            getFirstChildWithName(new QName(WebsocketConstants.
+                                    TRUST_STORE_PASSWORD));
+
+                    final String location = trustStoreLocationElem.getText();
+                    final String storePassword = trustStorePasswordElem.getText();
+                    sslCtx = SslContextBuilder.forClient()
+                            .trustManager(SSLUtil.createTrustmanager(location,
+                                    storePassword))
+                            .build();
+                } else {
+                    sslCtx = null;
                 }
-                final String location =
-                        tsEle.getFirstChildWithName(new QName(WebsocketConstants.TRUST_STORE_LOCATION))
-                                .getText();
-                final String storePassword =
-                        tsEle.getFirstChildWithName(new QName(WebsocketConstants.TRUST_STORE_PASSWORD))
-                                .getText();
-                sslCtx = SslContextBuilder.forClient()
-                        .trustManager(SSLUtil.createTrustmanager(location,
-                                storePassword))
-                        .build();
             } else {
                 sslCtx = null;
             }
@@ -186,6 +202,11 @@ public class WebsocketConnectionFactory {
         }
 
         return null;
+    }
+
+    private static void handleWssTrustStoreParameterError(String errorMsg) throws AxisFault {
+        log.error(errorMsg);
+        throw new AxisFault(errorMsg);
     }
 
     public void addChannelHandler(String sourceIdentifier,
