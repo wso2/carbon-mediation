@@ -52,21 +52,34 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebsocketConnectionFactory {
 
     private static final Log log = LogFactory.getLog(WebsocketConnectionFactory.class);
-    private static WebsocketConnectionFactory instance = null;
 
     private final TransportOutDescription transportOut;
     private ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>
             channelHandlerPool = new ConcurrentHashMap<String, ConcurrentHashMap<String, WebSocketClientHandler>>();
 
-    public WebsocketConnectionFactory(TransportOutDescription transportOut) {
+    public WebsocketConnectionFactory(TransportOutDescription transportOut) throws AxisFault {
         this.transportOut = transportOut;
-    }
+        boolean sslEnabled = WebsocketConstants.WSS.equalsIgnoreCase(transportOut.getName());
+        if (sslEnabled) {
+            Parameter trustParam = transportOut.getParameter(WebsocketConstants.TRUST_STORE_CONFIG_ELEMENT);
+            if (trustParam != null) {
+                OMElement trustStoreLocationElem = trustParam.getParameterElement().
+                        getFirstChildWithName(new QName(WebsocketConstants.TRUST_STORE_LOCATION));
+                OMElement trustStorePasswordElem = trustParam.getParameterElement().
+                        getFirstChildWithName(new QName(WebsocketConstants.
+                                TRUST_STORE_PASSWORD));
 
-    public static WebsocketConnectionFactory getInstance(TransportOutDescription transportOut) {
-        if (instance == null) {
-            instance = new WebsocketConnectionFactory(transportOut);
+                if (trustStoreLocationElem == null || trustStorePasswordElem == null) {
+                    handleWssTrustStoreParameterError("Unable to read parameter(s) "
+                            + WebsocketConstants.TRUST_STORE_LOCATION + " and/or "
+                            + WebsocketConstants.TRUST_STORE_PASSWORD + " from Transport configurations");
+                }
+            } else {
+                handleWssTrustStoreParameterError("Unable to read parameter(s) "
+                        + WebsocketConstants.TRUST_STORE_LOCATION + " and/or "
+                        + WebsocketConstants.TRUST_STORE_PASSWORD + " from Transport configurations");
+            }
         }
-        return instance;
     }
 
     public WebSocketClientHandler getChannelHandler(final URI uri,
@@ -74,7 +87,7 @@ public class WebsocketConnectionFactory {
                                                     final boolean handshakePresent,
                                                     final String dispatchSequence,
                                                     final String dispatchErrorSequence,
-                                                    final String contentType) throws InterruptedException, AxisFault {
+                                                    final String contentType) throws InterruptedException {
         WebSocketClientHandler channelHandler;
         if (handshakePresent) {
             channelHandler = cacheNewConnection(uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence, contentType);
@@ -99,7 +112,7 @@ public class WebsocketConnectionFactory {
                                                      final String sourceIdentifier,
                                                      String dispatchSequence,
                                                      String dispatchErrorSequence,
-                                                     String contentType) throws AxisFault {
+                                                     String contentType) {
         if (log.isDebugEnabled()) {
             log.debug("Creating a Connection for the specified WS endpoint.");
         }
@@ -124,13 +137,6 @@ public class WebsocketConnectionFactory {
                             getFirstChildWithName(new QName(WebsocketConstants.
                                     TRUST_STORE_PASSWORD));
 
-                    if (trustStoreLocationElem == null || trustStorePasswordElem == null) {
-                        handleWssTrustStoreParameterError
-                                ("Unable to read parameter(s) " + WebsocketConstants.TRUST_STORE_LOCATION +
-                                        " and/or " + WebsocketConstants.TRUST_STORE_PASSWORD +
-                                        " from Transport configurations");
-                    }
-
                     final String location = trustStoreLocationElem.getText();
                     final String storePassword = trustStorePasswordElem.getText();
                     sslCtx = SslContextBuilder.forClient()
@@ -139,9 +145,6 @@ public class WebsocketConnectionFactory {
                             .build();
                 } else {
                     sslCtx = null;
-                    handleWssTrustStoreParameterError
-                            ("Unable to read parameter " + WebsocketConstants.TRUST_STORE_CONFIG_ELEMENT +
-                                    " from Transport configurations");
                 }
             } else {
                 sslCtx = null;

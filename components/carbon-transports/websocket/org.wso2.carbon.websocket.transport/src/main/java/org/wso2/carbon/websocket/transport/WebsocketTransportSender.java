@@ -61,7 +61,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             log.debug("Initializing WS Connection Factory.");
         }
         super.init(cfgCtx, transportOut);
-        connectionFactory = WebsocketConnectionFactory.getInstance(transportOut);
+        connectionFactory = new WebsocketConnectionFactory(transportOut);
     }
 
     public void sendMessage(MessageContext msgCtx, String targetEPR, OutTransportInfo trpOut)
