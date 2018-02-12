@@ -33,6 +33,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.MessageContextCreatorForAxis2;
+import org.apache.synapse.core.axis2.ResponseState;
+import org.apache.synapse.core.axis2.SynapseMessageReceiver;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.inbound.InboundEndpointConstants;
 import org.apache.synapse.mediators.MediatorFaultHandler;
@@ -90,6 +92,8 @@ public class InboundHttpServerWorker extends ServerWorker {
                 updateAxis2MessageContextForSynapse(synCtx);
 
                 setInboundProperties(synCtx);
+                // setting ResponseState for http inbound endpoint request
+                synCtx.setProperty(SynapseConstants.RESPONSE_STATE, new ResponseState());
                 String method = request.getRequest() != null ? request.getRequest().
                         getRequestLine().getMethod().toUpperCase() : "";
                 processHttpRequestUri(axis2MsgContext, method);
@@ -192,7 +196,7 @@ public class InboundHttpServerWorker extends ServerWorker {
                     injectToMainSequence(synCtx, endpoint);
                 }
 
-
+                SynapseMessageReceiver.doPostInjectUpdates(synCtx);
                 // send ack for client if needed
                 sendAck(axis2MsgContext);
             } catch (Exception e) {
