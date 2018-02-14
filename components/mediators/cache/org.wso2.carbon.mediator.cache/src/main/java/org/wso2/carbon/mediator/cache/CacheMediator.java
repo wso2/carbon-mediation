@@ -47,10 +47,10 @@ import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.mediator.cache.digest.DigestGenerator;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -449,7 +449,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                         (Map<String, String>) msgCtx.getProperty(
                                 org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
                 String messageType = (String) msgCtx.getProperty(Constants.Configuration.MESSAGE_TYPE);
-                Map<String, Object> headerProperties = new HashMap<>();
+                ConcurrentHashMap<String, Object> headerProperties = new ConcurrentHashMap<>();
                 //Individually copying All TRANSPORT_HEADERS to headerProperties Map instead putting whole
                 //TRANSPORT_HEADERS map as single Key/Value pair to fix hazelcast serialization issue.
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
