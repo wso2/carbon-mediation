@@ -57,6 +57,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import java.util.function.Consumer;
+import java.util.Calendar;
+import ca.uhn.hl7v2.util.Terser;
+
+
 /**
  * This class represents an HL7 message processing context.
  */
@@ -446,8 +451,12 @@ public class HL7ProcessingContext {
 				+ "generate ACK message or not.";
         if (("true").equalsIgnoreCase(applicationAck)) {
             try {
-                Message response = applicationResponses.poll(timeOutVal, TimeUnit.MILLISECONDS);
-                return response;
+            	
+            	Terser terser = new Terser(hl7Msg);
+            	String messageControlID_in = terser.get("/MSH-10");
+            	
+            	Message response= pollMyResponse(messageControlID_in);
+            	return response;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -459,6 +468,40 @@ public class HL7ProcessingContext {
             }
         }
         return this.createNack(hl7Msg, errMsg);
+	}
+	
+	
+	/**
+	 * Try to get ACK response from applicationResponses. If no response match with messageControlID_in
+	 * it retry every 1 second until the timeOutVal is triggered  
+	 * @param messageControlID_in
+	 * @return
+	 * @throws InterruptedException after Transport Timeout
+	 */
+	private Message pollMyResponse(String messageControlID_in) throws InterruptedException {
+		
+		long timeStart=Calendar.getInstance().getTimeInMillis();
+		long timeEnd=0;
+		long timeDiff=0;
+		log.debug("thread["+Thread.currentThread().getId()+"] startTime: "+timeStart+" timeOutVal: "+timeOutVal);
+		MsgWrapper responseWrapper= new MsgWrapper();
+		Hl7Consumer consumer=new Hl7Consumer(messageControlID_in,responseWrapper);
+		Message response=null;
+		do{
+			applicationResponses.forEach(consumer);
+			timeEnd=Calendar.getInstance().getTimeInMillis();
+			timeDiff=timeEnd-timeStart;
+			response=responseWrapper.getMsg();
+			if(response==null)
+				Thread.sleep(1000);
+		}while(response==null && timeDiff < timeOutVal);
+		if(response== null){
+			log.error("thread["+Thread.currentThread().getId()+"] No response received for messageControlID_in:"+messageControlID_in );
+			throw new InterruptedException("No response received for messageControlID_in:"+messageControlID_in );
+		}
+		
+		log.debug("thread["+Thread.currentThread().getId()+"] found response for messageControlID_in:"+messageControlID_in );
+		return response;
 	}
 	
 	/**
@@ -519,4 +562,60 @@ public class HL7ProcessingContext {
 	public void setTimeOutVal(int timeOut) {
 	    this.timeOutVal = timeOut;
     }
+	
+	
+	/**
+	 * Custom Consumer for match and return response ACK
+	 *
+	 */
+	private class Hl7Consumer implements Consumer<Message>{
+
+		private String msgControlId;
+		private MsgWrapper responseWrapper;
+		
+		public Hl7Consumer(String msgControlId,MsgWrapper responseWrapper) {
+			this.msgControlId=msgControlId;
+			this.responseWrapper=responseWrapper;
+		}
+
+		@Override
+		public void accept(Message t) {
+			
+			Terser terser = new Terser(t);
+			String messageControlerID_out=null;
+            try {
+				messageControlerID_out = terser.get("/MSA-2");
+			} catch (HL7Exception e) {
+				log.error("Missing field MSA-2 for message:"+t);
+				return;
+			}
+			if(msgControlId.equals(messageControlerID_out)){
+				log.debug("thread["+Thread.currentThread().getId()+"] accept response");
+				responseWrapper.setMsg(t);
+				applicationResponses.remove(t);
+			}
+			
+		}
+		
+	}
+	
+	/**
+	 * Simple message wrapper class
+	 *
+	 */
+	private class MsgWrapper {
+		private Message msg;
+		
+		
+		public void setMsg(Message msg) {
+			this.msg = msg;
+		}
+		
+		
+		public Message getMsg() {
+			return msg;
+		}
+		
+		
+	}
 }
