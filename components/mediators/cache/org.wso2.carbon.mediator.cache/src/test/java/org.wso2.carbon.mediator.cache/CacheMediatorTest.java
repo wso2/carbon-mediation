@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Test the functionality of the {@link CacheMediatorFactory} and the {@link CacheMediatorSerializer}
@@ -130,10 +131,10 @@ public class CacheMediatorTest extends XMLTestCase {
         Map<String, String> headers = new HashMap<>();
         headers.put(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER);
         if (msgCtx != null) {
-            msgCtx.setProperty("org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS", headers);
+            msgCtx.setProperty("TRANSPORT_HEADERS", headers);
             ((Axis2MessageContext) synCtx).setAxis2MessageContext(msgCtx);
         }
-        assertEquals("no-store cache-control does not exist.", HttpCachingFilter.isNoStore(synCtx), true);
+        assertEquals("no-store cache-control does not exist.", HttpCachingFilter.isNoStore(msgCtx), true);
     }
 
     /**
@@ -144,7 +145,7 @@ public class CacheMediatorTest extends XMLTestCase {
     public void testIsValidResponseWithNoCache() throws AxisFault {
         CachableResponse cachedResponse = new CachableResponse();
         MessageContext synCtx = createMessageContext();
-        Map<String, Object> headers = new HashMap<>();
+        ConcurrentHashMap<String, Object> headers = new ConcurrentHashMap<>();
         headers.put(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER);
         headers.put(HttpHeaders.ETAG, "2046-64-77-50-35-75-11038-459-486126-71-58");
         cachedResponse.setHeaderProperties(headers);
@@ -160,7 +161,7 @@ public class CacheMediatorTest extends XMLTestCase {
     public void testIsValidResponseWithExpiredCache() throws AxisFault {
         CachableResponse cachedResponse = new CachableResponse();
         MessageContext synCtx = createMessageContext();
-        Map<String, Object> httpHeaders = new HashMap<>();
+        ConcurrentHashMap<String, Object> httpHeaders = new ConcurrentHashMap<>();
 
         httpHeaders.put(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER);
         cachedResponse.setHeaderProperties(httpHeaders);
@@ -180,7 +181,7 @@ public class CacheMediatorTest extends XMLTestCase {
         CachableResponse cachedResponse = new CachableResponse();
         MessageContext synCtx = createMessageContext();
         Map<String, String> headers = new HashMap<>();
-        Map<String, Object> httpHeaders = new HashMap<>();
+        ConcurrentHashMap<String, Object> httpHeaders = new ConcurrentHashMap<>();
 
         httpHeaders.put(HttpHeaders.CACHE_CONTROL, CACHE_CONTROL_HEADER);
         cachedResponse.setHeaderProperties(httpHeaders);

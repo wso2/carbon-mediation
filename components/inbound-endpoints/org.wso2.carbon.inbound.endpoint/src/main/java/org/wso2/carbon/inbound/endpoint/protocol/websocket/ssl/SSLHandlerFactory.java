@@ -41,6 +41,8 @@ public class SSLHandlerFactory {
     private static final String protocol = "TLS";
     private final SSLContext serverContext;
     private boolean needClientAuth;
+    private String[] cipherSuites;
+    private String[] sslProtocols;
 
     public SSLHandlerFactory(InboundWebsocketSSLConfiguration sslConfiguration) {
         String algorithm = Security.getProperty("ssl.KeyManagerFactory.algorithm");
@@ -63,6 +65,8 @@ public class SSLHandlerFactory {
             }
             serverContext = SSLContext.getInstance(protocol);
             serverContext.init(keyManagers, trustManagers, null);
+            cipherSuites = sslConfiguration.getCipherSuites();
+            sslProtocols = sslConfiguration.getSslProtocols();
         } catch (UnrecoverableKeyException | KeyManagementException |
                 NoSuchAlgorithmException | KeyStoreException | IOException ex) {
             throw new IllegalArgumentException("Failed to initialize the server side SSLContext", ex);
@@ -82,6 +86,12 @@ public class SSLHandlerFactory {
 
     public SslHandler create() {
         SSLEngine engine = serverContext.createSSLEngine();
+        if (cipherSuites != null) {
+            engine.setEnabledCipherSuites(cipherSuites);
+        }
+        if (sslProtocols != null) {
+            engine.setEnabledProtocols(sslProtocols);
+        }
         engine.setNeedClientAuth(needClientAuth);
         engine.setUseClientMode(false);
         return new SslHandler(engine);

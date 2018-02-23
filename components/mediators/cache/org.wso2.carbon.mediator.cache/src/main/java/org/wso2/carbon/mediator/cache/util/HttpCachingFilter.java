@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class is used to apply the filter.
@@ -66,7 +67,7 @@ public class HttpCachingFilter {
                 String cacheControlHeaderValue = String.valueOf(httpHeaders.get(HttpHeaders.CACHE_CONTROL));
                 List<String> cacheControlHeaders = Arrays.asList(cacheControlHeaderValue.split("\\s*,\\s*"));
                 for (String cacheControlHeader : cacheControlHeaders) {
-                    if (cacheControlHeader.equalsIgnoreCase(CachingConstants.NO_CACHE_STRING)) {
+                    if (CachingConstants.NO_CACHE_STRING.equalsIgnoreCase(cacheControlHeader)) {
                         isNoCache = true;
                     }
                     if (cacheControlHeader.contains(CachingConstants.MAX_AGE_STRING)) {
@@ -170,17 +171,22 @@ public class HttpCachingFilter {
     /**
      * This method returns whether no-store header exists in the response.
      *
-     * @param synCtx MessageContext with the transport headers.
+     * @param msgCtx MessageContext with the transport headers.
      * @return Whether no-store exists or not.
      */
     @SuppressWarnings("unchecked")
-    public static boolean isNoStore(MessageContext synCtx) {
-        Map<String, String> headers;
-        org.apache.axis2.context.MessageContext msgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
-        headers = (Map<String, String>) msgCtx.getProperty("org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS");
+    public static boolean isNoStore(org.apache.axis2.context.MessageContext msgCtx) {
+        ConcurrentHashMap<String, Object> headerProperties = new ConcurrentHashMap<>();
+        Map<String, String> headers = (Map<String, String>) msgCtx.getProperty(
+                org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
         String cacheControlHeaderValue = null;
-        if (headers != null) {
-            cacheControlHeaderValue = headers.get(HttpHeaders.CACHE_CONTROL);
+
+        //Copying All TRANSPORT_HEADERS to headerProperties Map.
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            headerProperties.put(entry.getKey(), entry.getValue());
+        }
+        if (headerProperties.get(HttpHeaders.CACHE_CONTROL) != null) {
+            cacheControlHeaderValue = String.valueOf(headerProperties.get(HttpHeaders.CACHE_CONTROL));
         }
 
         return StringUtils.isNotEmpty(cacheControlHeaderValue)

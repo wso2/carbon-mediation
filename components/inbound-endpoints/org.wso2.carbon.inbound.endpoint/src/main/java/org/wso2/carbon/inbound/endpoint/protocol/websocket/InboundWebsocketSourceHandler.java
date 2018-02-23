@@ -541,6 +541,12 @@ public class InboundWebsocketSourceHandler extends ChannelInboundHandlerAdapter 
             log.debug("injecting message to sequence : " + endpoint.getInjectingSeq());
         }
         synCtx.setProperty("inbound.endpoint.name", endpoint.getName());
+        if (dispatchToCustomSequence) {
+            String context = (subscriberPath.getPath()).substring(1);
+            context = context.replace('/', '-');
+            if (synCtx.getConfiguration().getDefinedSequences().containsKey(context))
+                injectingSequence = (SequenceMediator) synCtx.getSequence(context);
+        }
         synCtx.getEnvironment().injectMessage(synCtx, injectingSequence);
     }
 

@@ -1,10 +1,7 @@
 package org.wso2.carbon.rest.api.service;
 
-import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.Constants;
@@ -18,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.SynapseConfiguration;
-import org.apache.synapse.config.xml.SequenceMediatorSerializer;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -50,7 +46,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -62,12 +57,12 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     private static Log log = LogFactory.getLog(RestApiAdmin.class);
     private static final String TENANT_DELIMITER = "/t/";
 	
-	public boolean addApi(APIData apiData) throws APIException{
+	public boolean addApi(APIData apiData) throws APIException {
 		final Lock lock = getLock();
         try {
             lock.lock();
             String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain(true);
-            if (tenantDomain != null && !tenantDomain.equals("")
+            if (tenantDomain != null && !tenantDomain.isEmpty()
                     && !tenantDomain.equals(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME)) {
                 String tenantApiContext = apiData.getContext();
                 apiData.setContext(TENANT_DELIMITER + tenantDomain + tenantApiContext);
@@ -79,7 +74,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         }
 	}
 	
-	public boolean addApiFromString(String apiData) throws APIException{
+	public boolean addApiFromString(String apiData) throws APIException {
 		final Lock lock = getLock();
         try {
             lock.lock();
@@ -117,7 +112,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		}
 	}
 	
-	public boolean updateApi(String apiName, APIData apiData) throws APIException{
+	public boolean updateApi(String apiName, APIData apiData) throws APIException {
 		
 		final Lock lock = getLock();
         try {
@@ -154,7 +149,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         }
 	}
 	
-	public boolean updateApiFromString(String apiName, String apiData) throws APIException{
+	public boolean updateApiFromString(String apiName, String apiData) throws APIException {
 		
 		final Lock lock = getLock();
         try {
@@ -165,17 +160,16 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             
             //Set API name to old value since we do not allow editing the API name.
             OMAttribute nameAttribute = apiElement.getAttribute(new QName("name"));
-            if(nameAttribute == null || "".equals(nameAttribute.getAttributeValue().trim())){
+            if (nameAttribute == null || nameAttribute.getAttributeValue().trim().isEmpty()) {
             	apiElement.addAttribute("name", apiName, null);
             }
             
-            API oldAPI = null;
             API api = APIFactory.createAPI(apiElement);
             
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
-            
-            oldAPI = synapseConfiguration.getAPI(apiName);
-            if (oldAPI != null){
+
+            API oldAPI = synapseConfiguration.getAPI(apiName);
+            if (oldAPI != null) {
                 oldAPI.destroy();
             	api.setFileName(oldAPI.getFileName());
             }
@@ -187,14 +181,13 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             if (oldAPI.getArtifactContainerName() != null) {
                 api.setArtifactContainerName(oldAPI.getArtifactContainerName());
                 api.setIsEdited(true);
-                getApiByName(apiName).setIsEdited(true);
+                getApiByName(api.getName()).setIsEdited(true);
             } else {
                 MediationPersistenceManager pm = getMediationPersistenceManager();
                 String fileName = api.getFileName();
                 pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
                 pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
             }
-    		
     		return true;
         } catch (XMLStreamException e) {
 			handleException(log, "Could not parse String to OMElement", e);
@@ -215,8 +208,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 	 * @return
 	 * @throws APIException
 	 */
-	public boolean updateApiForTenant(String apiName, String apiData, String tenantDomain)
-	                                                                                      throws APIException {
+	public boolean updateApiForTenant(String apiName, String apiData, String tenantDomain) throws APIException {
 
 		try {
 			PrivilegedCarbonContext.startTenantFlow();
@@ -229,7 +221,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		}
 	}
 	
-	public boolean deleteApi(String apiName) throws APIException{
+	public boolean deleteApi(String apiName) throws APIException {
 		final Lock lock = getLock();
         try {
             lock.lock();
@@ -266,7 +258,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * @return
      * @throws APIException
      */
-    public void deleteSelectedApi(String[] apiNames) throws APIException{
+    public void deleteSelectedApi(String[] apiNames) throws APIException {
         final Lock lock = getLock();
         try {
             lock.lock();
@@ -303,7 +295,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * Delete All API in the synapse configuration
      * @throws APIException
      */
-    public void deleteAllApi() throws APIException{
+    public void deleteAllApi() throws APIException {
         String[] allApiNames = this.getApiNames();
         this.deleteSelectedApi(allApiNames);
     }
@@ -320,7 +312,6 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 	 * @throws APIException
 	 */
 	public boolean deleteApiForTenant(String apiName, String tenantDomain) throws APIException {
-
 		try {
 			PrivilegedCarbonContext.startTenantFlow();
 			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
@@ -333,7 +324,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 	}
 	
 	
-    public APIData[] getAPIsForListing(int pageNumber, int itemsPerPage){
+    public APIData[] getAPIsForListing(int pageNumber, int itemsPerPage) {
         final Lock lock = getLock();
         try {
             lock.lock();
@@ -341,10 +332,10 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             Collection<API> apis = synapseConfiguration.getAPIs();
 
             List<APIData> apiDataList = null;
-            if(apis != null){
+            if (apis != null) {
                 apiDataList = new ArrayList<APIData>(apis.size());
 
-                for(API api : apis){
+                for (API api : apis) {
                     //Populate the fields we need to show
                     APIData apiData = new APIData();
                     apiData.setName(api.getName());
@@ -367,7 +358,6 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     if (api.isEdited()) {
                         apiData.setIsEdited(true);
                     }
-
                     apiDataList.add(apiData);
                 }
                 //Sort APIs by name.
@@ -380,26 +370,24 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 List<APIData> returnList = null;
 
                 //We do not have enough APIs
-                if(size <= startIndex){
+                if (size <= startIndex) {
                     return null;
                 }
-                else if(size <= endIndex){
+                else if (size <= endIndex) {
                     returnList = apiDataList.subList(startIndex, size);
                 }
-                else{
+                else {
                     returnList = apiDataList.subList(startIndex, endIndex);
                 }
-
                 return  returnList.toArray(new APIData[returnList.size()]);
             }
-
             return null;
         } finally {
             lock.unlock();
         }
     }
 
-    public int getAPICount(){
+    public int getAPICount() {
 
         final Lock lock = getLock();
         try {
@@ -424,8 +412,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             handleException(log, "Could not retrieve server context", e);
         }
 
-        String portValue = "";
-        String protocol = "";
+        String portValue;
+        String protocol;
 
         TransportInDescription transportInDescription = configuration.getTransportIn("http");
         if (transportInDescription == null) {
@@ -439,14 +427,14 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             throw new APIException("http/https transport required");
         }
 		
-        String host = null;
+        String host;
 
         Parameter hostParam =  configuration.getParameter("hostname");
 
-        if(hostParam != null){
+        if (hostParam != null) {
             host = (String)hostParam.getValue();
         }
-        else{
+        else {
             try {
                 host = NetworkUtils.getLocalHostname();
             } catch (SocketException e) {
@@ -476,7 +464,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 
 
-	public String[] getApiNames(){
+	public String[] getApiNames() {
 		final Lock lock = getLock();
         try {
             lock.lock();
@@ -489,14 +477,14 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         }
 	}
 
-	public APIData	getApiByName(String apiName){
+	public APIData getApiByName(String apiName) {
 		final Lock lock = getLock();
-		try{
+		try {
 			lock.lock();
 			SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
 			API api = synapseConfiguration.getAPI(apiName);
 			return convertApiToAPIData(api);
-		}finally{
+		} finally {
 			lock.unlock();
 		}
 	}
@@ -516,8 +504,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
 		try {
 			PrivilegedCarbonContext.startTenantFlow();
-			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain,
-			                                                                      true);
+			PrivilegedCarbonContext.getThreadLocalCarbonContext().setTenantDomain(tenantDomain, true);
 			APIData data = getApiByName(apiName);
 			return data;
 		} finally {
@@ -525,22 +512,22 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		}
 	}
 	
-	public String[] getSequences(){
+	public String[] getSequences() {
 		final Lock lock = getLock();
 		String[] sequenceNames = new String[0];
-		try{
+		try {
 			lock.lock();
 			SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
 			Map<String, SequenceMediator> sequences = synapseConfiguration.getDefinedSequences();
 
-			if(sequences != null && !sequences.isEmpty()){
+			if (sequences != null && !sequences.isEmpty()) {
 				sequenceNames = new String[sequences.size()];
 				return sequences.keySet().toArray(sequenceNames);
 			}
-			else{
+			else {
 				return sequenceNames;
 			}
-		}finally{
+		} finally {
 			lock.unlock();
 		}
 	}
@@ -681,7 +668,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         return null;
     }
 
-	public String getApiSource(APIData apiData){
+	public String getApiSource(APIData apiData) {
 		return RestApiAdminUtils.retrieveAPIOMElement(apiData).toString();
 	}
 
@@ -689,8 +676,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         return RestApiAdminUtils.retrieveResourceOMElement(resourceData).toString();
     }
 
-	private APIData convertApiToAPIData(API api){
-		if(api == null){
+	private APIData convertApiToAPIData(API api) {
+		if (api == null) {
 			return null;
 		}
 
@@ -700,6 +687,8 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		apiData.setHost(api.getHost());
 		apiData.setPort(api.getPort());
 		apiData.setFileName(api.getFileName());
+		apiData.setVersion(api.getVersion());
+		apiData.setVersionType(api.getVersionStrategy().getVersionType());
 
         if (api.getAspectConfiguration() != null && api.getAspectConfiguration().isStatisticsEnable()) {
             apiData.setStatisticsEnable(true);
@@ -715,82 +704,48 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 		Resource[] resources = api.getResources();
 		ResourceData[] resourceDatas = new ResourceData[resources.length];
 
-		for(int i=0; i<resources.length; i++){
+        for (int i = 0; i < resources.length; i++) {
 
-			Resource resource = resources[i];
-			ResourceData data = new ResourceData();
+            Resource resource = resources[i];
+            ResourceData data = new ResourceData();
 
-			String[] methods = resource.getMethods();
-			data.setMethods(methods);
-			data.setContentType(resource.getContentType());
-			data.setProtocol(resource.getProtocol());
-			DispatcherHelper dispatcherHelper = resource.getDispatcherHelper();
-			if(dispatcherHelper instanceof URITemplateHelper){
-				data.setUriTemplate(dispatcherHelper.getString());
-			}
-			else if(dispatcherHelper instanceof URLMappingHelper){
-				data.setUrlMapping(dispatcherHelper.getString());
-			}
+            String[] methods = resource.getMethods();
+            data.setMethods(methods);
+            data.setContentType(resource.getContentType());
+            data.setProtocol(resource.getProtocol());
+            DispatcherHelper dispatcherHelper = resource.getDispatcherHelper();
+            if (dispatcherHelper instanceof URITemplateHelper) {
+                data.setUriTemplate(dispatcherHelper.getString());
+            } else if (dispatcherHelper instanceof URLMappingHelper) {
+                data.setUrlMapping(dispatcherHelper.getString());
+            }
 
             if (resource.getInSequenceKey() != null) {
                 data.setInSequenceKey(resource.getInSequenceKey());
             } else if (resource.getInSequence() != null) {
-                data.setInSeqXml(createAnonymousSequenceElement(
-                        resource.getInSequence(),
-                        "inSequence"
-                ).toString());
+                data.setInSeqXml(RestApiAdminUtils.createAnonymousSequenceElement(
+                        resource.getInSequence(), "inSequence").toString());
             }
 
             if (resource.getOutSequenceKey() != null) {
                 data.setOutSequenceKey(resource.getOutSequenceKey());
             } else if (resource.getOutSequence() != null) {
-                data.setOutSeqXml(createAnonymousSequenceElement(
-                        resource.getOutSequence(),
-                        "outSequence"
-                ).toString());
+                data.setOutSeqXml(RestApiAdminUtils.createAnonymousSequenceElement(
+                        resource.getOutSequence(), "outSequence").toString());
             }
 
             if (resource.getFaultSequenceKey() != null) {
                 data.setFaultSequenceKey(resource.getFaultSequenceKey());
             } else if (resource.getFaultSequence() != null) {
-                data.setFaultSeqXml(createAnonymousSequenceElement(
-                        resource.getFaultSequence(),
-                        "faultSequence"
-                ).toString());
+                data.setFaultSeqXml(RestApiAdminUtils.createAnonymousSequenceElement(
+                        resource.getFaultSequence(), "faultSequence").toString());
             }
             data.setUserAgent(resource.getUserAgent());
-
-			resourceDatas[i] = data;
-		}
+            resourceDatas[i] = data;
+        }
 		apiData.setResources(resourceDatas);
 		return apiData;
 	}
-
-    private OMElement createAnonymousSequenceElement(SequenceMediator sequenceMediator, String seqElemName) {
-        SequenceMediatorSerializer serializer = new SequenceMediatorSerializer();
-        OMElement sequenceElem = serializer.serializeAnonymousSequence(null, sequenceMediator);
-        if (!"inSequence".equals(seqElemName)
-                && !"outSequence".equals(seqElemName)
-                && !"faultSequence".equals(seqElemName)) {
-            return null;
-        }
-        OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMNamespace syn = SynapseConstants.SYNAPSE_OMNAMESPACE;
-        OMNamespace nullNS = fac.createOMNamespace("","");
-
-        OMElement seq = fac.createOMElement(seqElemName, syn);
-        Iterator<OMAttribute> attributes = sequenceElem.getAllAttributes();
-        for (; attributes.hasNext(); ) {
-            OMAttribute attrb = attributes.next();
-            seq.addAttribute(attrb.getLocalName(), attrb.getAttributeValue(), nullNS);
-        }
-        Iterator<OMElement> children = sequenceElem.getChildElements();
-        for (; children.hasNext(); ) {
-            OMElement child = children.next();
-            seq.addChild(child);
-        }
-        return seq;
-    }
 
 	private String[] listToNames(API[] apis) {
         if (apis == null) {
@@ -813,8 +768,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
      * @throws APIException if the element is not an api or if an api with the
      *                   same name exists
      */
-	private void addApi(OMElement apiElement,
-                                 String fileName, boolean updateMode) throws APIException{
+	private void addApi(OMElement apiElement, String fileName, boolean updateMode) throws APIException {
 
 		try {
 			if (apiElement.getQName().getLocalPart()
@@ -834,15 +788,15 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 
 						//addParameterObserver(api.getName());
 
-						if(log.isDebugEnabled()) {
+						if (log.isDebugEnabled()) {
 							log.debug("Added API : " + apiName);
                             log.debug("Authorized Transports : " + apiTransports);
 						}
 
-                        if(apiTransports != null){
-                            if(Constants.TRANSPORT_HTTP.equalsIgnoreCase(apiTransports)){
+                        if (apiTransports != null) {
+                            if (Constants.TRANSPORT_HTTP.equalsIgnoreCase(apiTransports)) {
                                 api.setProtocol(RESTConstants.PROTOCOL_HTTP_ONLY);
-                            }else if(Constants.TRANSPORT_HTTPS.equalsIgnoreCase(apiTransports)){
+                            } else if (Constants.TRANSPORT_HTTPS.equalsIgnoreCase(apiTransports)) {
                                 api.setProtocol(RESTConstants.PROTOCOL_HTTPS_ONLY);
                             }
                         }
@@ -965,5 +919,4 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
 			return CarbonConfigurationContextFactory.getConfigurationContext();
 		}
 	}
-
 }

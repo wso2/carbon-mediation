@@ -223,7 +223,7 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
                                     protocolElem.getFirstChildWithName(ENABLE_CACHE_CONTROL_Q);
                             if (enableCacheControlElem != null) {
                                 String cacheControlElemText = enableCacheControlElem.getText();
-                                if(StringUtils.isNotEmpty(cacheControlElemText)) {
+                                if (StringUtils.isNotEmpty(cacheControlElemText)) {
                                     cache.setCacheControlEnabled(Boolean.parseBoolean(cacheControlElemText));
                                 }
                             } else {

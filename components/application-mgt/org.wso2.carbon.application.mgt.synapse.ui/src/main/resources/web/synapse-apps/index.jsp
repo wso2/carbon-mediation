@@ -20,6 +20,7 @@
 <%@ page import="org.wso2.carbon.utils.ServerConstants" %>
 <%@ page import="org.wso2.carbon.CarbonConstants" %>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
+<%@ page import="org.owasp.encoder.Encode" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
 <%@ page import="org.wso2.carbon.application.mgt.synapse.stub.types.carbon.SynapseApplicationMetadata" %>
 <%@ page import="org.wso2.carbon.application.mgt.synapse.ui.SynapseAppAdminClient" %>
@@ -61,6 +62,18 @@
 
 <fmt:bundle basename="org.wso2.carbon.application.mgt.synapse.ui.i18n.Resources">
 <script type="text/javascript">
+
+    function editCAppArtifact(url) {
+        CARBON.showConfirmationDialog("The changes will not persist to the CAPP after restart or redeploy. " +
+                                      "Do you want to Edit?", function () {
+            $.ajax({
+                       type: 'POST',
+                       success: function () {
+                           document.location.href = url;
+                       }
+                   });
+        });
+    }
 
 </script>
 
@@ -108,8 +121,12 @@
         for (String sequenceName : sequences) {
     %>
     <tr>
-        <td><a href="../sequences/design_sequence.jsp?sequenceAction=edit&sequenceName=<%= sequenceName%>"><%= sequenceName%></a></td>
-        <%--<td><a href="#" class="icon-link-nofloat" style="background-image:url(images/delete.gif);" onclick="deleteArtifact('<%= sequenceName%>', 'sequence', '../synapse-apps/delete_synapse_artifact.jsp');" title="<%= bundle.getString("carbonapps.delete.sequence")%>"><%= bundle.getString("carbonapps.delete")%></a></td>--%>
+        <td>
+            <a href="#"
+               onclick="editCAppArtifact('../sequences/design_sequence.jsp?sequenceAction=edit&sequenceName=<%= Encode.forJavaScriptAttribute(sequenceName) %>')">
+                <%= sequenceName%>
+            </a>
+        </td>
     </tr>
     <%
         }
@@ -141,8 +158,12 @@
             }
     %>
     <tr>
-        <td><a href="../endpoints/<%= epType%>Endpoint.jsp?endpointName=<%= epData.getName()%>&endpointAction=edit"><%= epData.getName()%></a></td>
-        <%--<td><a href="#" class="icon-link-nofloat" style="background-image:url(images/delete.gif);" onclick="deleteArtifact('<%= endpointName%>', 'endpoint', '../synapse-apps/delete_synapse_artifact.jsp');" title="<%= bundle.getString("carbonapps.delete.endpoint")%>"><%= bundle.getString("carbonapps.delete")%></a></td>--%>
+        <td>
+            <a href="#"
+               onclick="editCAppArtifact('../endpoints/<%=epType%>Endpoint.jsp?endpointName=<%= Encode.forJavaScriptAttribute(epData.getName()) %>&endpointAction=edit')">
+                <%= epData.getName()%>
+            </a>
+        </td>
     </tr>
     <%
         }
@@ -195,7 +216,12 @@
         for (String msgStore : msgStores) {
     %>
     <tr>
-        <td><a href="../message_store/viewMessageStore.jsp?messageStoreName=<%= msgStore%>"><%= msgStore%></a></td>
+        <td>
+            <a href="#"
+               onclick="editCAppArtifact('../message_store/jmsMessageStore.jsp?messageStoreName=<%= msgStore%>')">
+                <%= msgStore%>
+            </a>
+        </td>
     </tr>
     <%
         }
@@ -351,7 +377,11 @@
         for (String api : apis) {
     %>
     <tr>
-         <td><a href="../api/manageAPI.jsp?mode=edit&apiName=<%= api%>"><%= api%></a></td>
+        <td>
+            <a href="#"
+               onclick="editCAppArtifact('../api/manageAPI.jsp?mode=edit&apiName=<%= Encode.forJavaScriptAttribute(api) %>')"><%= api%>
+            </a>
+        </td>
     </tr>
     <%
     }

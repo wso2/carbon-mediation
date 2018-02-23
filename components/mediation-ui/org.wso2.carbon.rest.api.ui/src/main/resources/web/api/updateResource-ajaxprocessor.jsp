@@ -36,11 +36,15 @@
             String context = request.getParameter("apiContext");
             String hostname = request.getParameter("apiHostname");
             String sPort = request.getParameter("apiPort");
+            String version = request.getParameter("version");
+            String versionType = request.getParameter("versionType");
             APIData apiData = (APIData) session.getAttribute("apiData");
             if (apiData != null) {
                 apiData.setName(name);
                 apiData.setContext(context);
                 apiData.setHost(hostname);
+                apiData.setVersion(version);
+                apiData.setVersionType(versionType);
                 int iPort = -1;
                 if(null != sPort && !"".equals(sPort)) {
                     try {
