@@ -38,6 +38,9 @@ public class JMSConstants {
     public static final String JMS_CLIENT_POLLING_SUSPENSION_PERIOD = "transport.jms.PollingSuspensionPeriod";
     // Default time in milliseconds for the polling suspension period.
     public static final int DEFAULT_JMS_CLIENT_POLLING_SUSPENSION_PERIOD = 60000;
+    // This property need to be enabled if the connection need to be reset after polling suspension.
+    public static final String JMS_CLIENT_CONNECTION_RESET_AFTER_POLLING_SUSPENSION
+            = "transport.jms.ResetConnectionOnPollingSuspension";
 
     public static final String TOPIC_PREFIX = "topic.";
     public static final String QUEUE_PREFIX = "queue.";

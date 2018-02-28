@@ -70,6 +70,9 @@ public class JMSPollingConsumer {
     private int pollingSuspensionLimit = -1;
     private int pollingSuspensionPeriod = JMSConstants.DEFAULT_JMS_CLIENT_POLLING_SUSPENSION_PERIOD;
     private boolean pollingSuspensionEnabled = false; // by default polling is enabled.
+    // resets the JMS connection after the polling suspension is enabled.
+    // This will create a new subscription
+    private boolean resetConnectionAfterPollingSuspension = false;
 
     public JMSPollingConsumer( Properties jmsProperties, long scanInterval, String name) {
         this.jmsConnectionFactory = new CachedJMSConnectionFactory(jmsProperties);
@@ -116,6 +119,15 @@ public class JMSPollingConsumer {
                     logger.warn("No value specified for pollingSuspensionPeriod, hence default value of 60000 "
                             + "milliseconds will be accounted.");
                 }
+
+                String connectionResetAfterPollingSuspension = jmsProperties
+                        .getProperty(JMSConstants.JMS_CLIENT_CONNECTION_RESET_AFTER_POLLING_SUSPENSION);
+
+                if (connectionResetAfterPollingSuspension != null && !connectionResetAfterPollingSuspension.isEmpty()
+                        && connectionResetAfterPollingSuspension.trim().equals("true")) {
+                    resetConnectionAfterPollingSuspension = true;  // default false
+                }
+
             }
         }
         
@@ -175,11 +187,8 @@ public class JMSPollingConsumer {
             if (pollingSuspended) {
                 if (lastRanTime + pollingSuspensionPeriod <= currentTime) {
                     pollingSuspended = false;
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
-                                "Polling re-started since the suspension period of " + pollingSuspensionPeriod + " "
-                                        + "milliseconds exceeded.");
-                    }
+                    logger.info("Polling re-started since the suspension period of " + pollingSuspensionPeriod + " "
+                            + "milliseconds exceeded.");
                 } else {
                     if (logger.isDebugEnabled()) {
                         logger.debug(
@@ -202,6 +211,16 @@ public class JMSPollingConsumer {
         } catch (Exception e) {
             logger.error("Error while retrieving or injecting JMS message. " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Resets the JMS connection if the polling is restarted. This will enable making a new connection
+     * and the redelivery attempts that were accounted earlier will be discarded.
+     */
+    private void resetConnection() {
+        logger.info("Resetting the JMS connection.");
+        destroy();
+        jmsConnectionFactory.createConnection(strUserName, strPassword);
     }
 
     /**
@@ -277,23 +296,6 @@ public class JMSPollingConsumer {
                     injectHandler.setConnection(connection);
                     commitOrAck = injectHandler.invoke(msg, name);
 
-                    if (pollingSuspensionEnabled) {
-                        if (!commitOrAck) {
-                            currentNegativeCommitOrAckCount++;
-                            if (currentNegativeCommitOrAckCount >= pollingSuspensionLimit) {
-                                pollingSuspended = true;
-                                currentNegativeCommitOrAckCount = 0;
-                                logger.info(
-                                        "Suspending polling as the pollingSuspensionLimit of " + pollingSuspensionLimit
-                                                + " reached. Polling will be re-started after "
-                                                + pollingSuspensionPeriod + " milliseconds");
-                                break;
-                            }
-                        } else {
-                            currentNegativeCommitOrAckCount = 0;
-                        }
-                    }
-
                     // if client acknowledgement is selected, and processing
                     // requested ACK
                     if (jmsConnectionFactory.getSessionAckMode() == Session.CLIENT_ACKNOWLEDGE) {
@@ -346,6 +348,27 @@ public class JMSPollingConsumer {
                                     e);
                         }
                     }
+
+                    if (pollingSuspensionEnabled) {
+                        if (!commitOrAck) {
+                            currentNegativeCommitOrAckCount++;
+                            if (currentNegativeCommitOrAckCount >= pollingSuspensionLimit) {
+                                pollingSuspended = true;
+                                currentNegativeCommitOrAckCount = 0;
+                                logger.info(
+                                        "Suspending polling as the pollingSuspensionLimit of " + pollingSuspensionLimit
+                                                + " reached. Polling will be re-started after "
+                                                + pollingSuspensionPeriod + " milliseconds");
+                                if (resetConnectionAfterPollingSuspension) {
+                                    resetConnection();
+                                }
+                                break;
+                            }
+                        } else {
+                            currentNegativeCommitOrAckCount = 0;
+                        }
+                    }
+
                 } else {
                     return msg;
                 }
