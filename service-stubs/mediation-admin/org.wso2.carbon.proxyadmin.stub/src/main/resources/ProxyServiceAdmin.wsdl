@@ -41,6 +41,7 @@
                     <xs:element minOccurs="0" name="outSeqXML" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="pinnedServers" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="policies" nillable="true" type="ax2160:ProxyServicePolicyInfo"/>
+                    <xs:element minOccurs="0" name="preservePolicy" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="publishWSDLEndpoint" nillable="true" type="xs:string"/>
                     <xs:element minOccurs="0" name="running" type="xs:boolean"/>
                     <xs:element minOccurs="0" name="serviceGroup" nillable="true" type="xs:string"/>

@@ -41,6 +41,7 @@
             hideElem('wsdlReg');
             hideElem('wsdlEP');
             hideElem('wsdlResourceTr');
+            hideElem('PolicyList');
             
             jQuery("#wsdlInlineText").rules("remove");
             jQuery("#wsdlUriText").rules("remove");
@@ -52,6 +53,7 @@
             hideElem('wsdlReg');
             hideElem('wsdlEP');
             showElem('wsdlResourceTr');
+            showElem('PolicyList');
 
             jQuery("#wsdlInlineText").rules("add",{
                 required:true
@@ -65,6 +67,7 @@
             hideElem('wsdlReg');
             hideElem('wsdlEP');
             showElem('wsdlResourceTr');
+            showElem('PolicyList');
 
             jQuery("#wsdlInlineText").rules("remove");
             jQuery("#wsdlUriText").rules("add",{
@@ -78,6 +81,7 @@
             hideElem('wsdlUri');
             hideElem('wsdlEP');
             showElem('wsdlResourceTr');
+            showElem('PolicyList');
 
             jQuery("#wsdlInlineText").rules("remove");
             jQuery("#wsdlUriText").rules("remove");
@@ -91,6 +95,7 @@
             hideElem('wsdlUri');
             showElem('wsdlEP');
             hideElem('wsdlResourceTr');
+            showElem('PolicyList');
 
             jQuery("#wsdlInlineText").rules("remove");
             jQuery("#wsdlUriText").rules("remove");
@@ -100,6 +105,18 @@
             });
         }
 
+    }
+
+    function updateSelectedPolicyOption() {
+       var index = document.getElementById('preservePolicy').selectedIndex;
+       if(index == 0) {
+          document.getElementById('preservePolicyYes').selected = true;
+          document.getElementById('preservePolicyNo').selected = false;
+       }
+       if(index == 1) {
+          document.getElementById('preservePolicyYes').selected = false;
+          document.getElementById('preservePolicyNo').selected = true;
+       }
     }
 
     function testWsdlUri() {
@@ -311,6 +328,15 @@
                                         </table>
                                     </td>
                                 </tr>
+                                 <tr id="PolicyList" style="display:none;">
+                                   <td style="vertical-align:top!important"><fmt:message key="preserve.policy"/></td>
+                                   <td>
+                                      <select id="preservePolicy" name="preservePolicy" onchange="updateSelectedPolicyOption();">
+                                       <option id="preservePolicyYes" selected="selected" value="true"><fmt:message key="preserve.policy.yes"/></option>
+                                       <option id="preservePolicyNo" value="false"><fmt:message key="preserve.policy.no"/></option>
+                                      </select>
+                                   </td>
+                                 </tr>
                                 <tr id="wsdlResourceTr" style="display:none;">
                                     <td style="vertical-align:top!important">
                                         <fmt:message key="wsdl.resource"/>

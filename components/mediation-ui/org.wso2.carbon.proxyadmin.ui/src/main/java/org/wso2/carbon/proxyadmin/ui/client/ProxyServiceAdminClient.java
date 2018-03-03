@@ -363,10 +363,15 @@ public class ProxyServiceAdminClient {
             OMElement wsdl = elem.getFirstChildWithName(
                     new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "publishWSDL"));
             if (wsdl != null) {
+                OMAttribute preservePolicyOption = wsdl.getAttribute(
+                        new QName(XMLConfigConstants.NULL_NAMESPACE, "preservePolicy"));
                 OMAttribute wsdlkey = wsdl.getAttribute(
                         new QName(XMLConfigConstants.NULL_NAMESPACE, "key"));
                 OMAttribute wsdlEP = wsdl.getAttribute(
                         new QName(XMLConfigConstants.NULL_NAMESPACE, "endpoint"));
+                if (preservePolicyOption != null) {
+                    pd.setPreservePolicy(preservePolicyOption.getAttributeValue());
+                }
                 if(wsdlEP != null){
                     pd.setPublishWSDLEndpoint(wsdlEP.getAttributeValue());
                 } else if (wsdlkey != null) {

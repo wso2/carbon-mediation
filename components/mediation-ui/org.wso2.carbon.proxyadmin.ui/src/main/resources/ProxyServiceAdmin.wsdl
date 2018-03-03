@@ -49,6 +49,7 @@
                     <xs:element minOccurs="0" name="wsdlKey" nillable="true" type="xs:string"/>
                     <xs:element maxOccurs="unbounded" minOccurs="0" name="wsdlResources" nillable="true" type="ax2160:Entry"/>
                     <xs:element minOccurs="0" name="wsdlURI" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="preservePolicy" nillable="true" type="xs:string"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:complexType name="ProxyServicePolicyInfo">

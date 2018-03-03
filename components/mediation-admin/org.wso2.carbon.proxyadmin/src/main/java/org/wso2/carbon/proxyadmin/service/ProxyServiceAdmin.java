@@ -860,6 +860,9 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
             } else if (ps.getPublishWSDLEndpoint() != null) {
                 pd.setPublishWSDLEndpoint(ps.getPublishWSDLEndpoint().toString());
             }
+            if (ps.getPreservePolicy() != null) {
+                pd.setPreservePolicy(ps.getPreservePolicy().toString());
+            }
             Map <String, String> map;
             if (ps.getResourceMap() != null
                     && (map = ps.getResourceMap().getResources()) != null && !map.isEmpty()) {
