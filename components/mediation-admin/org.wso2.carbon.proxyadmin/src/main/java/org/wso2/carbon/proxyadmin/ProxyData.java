@@ -64,6 +64,8 @@ public class ProxyData {
     private String wsdlDef;
     // additional resources required by the WSDL
     private Entry [] wsdlResources;
+    //property to check if the security policies of the published wsdl needs to be preserved
+    private String preservePolicy;
 
     // true if either wsdlKey, wsdlURI or wsdlDef is present
     private boolean publishWSDL;
@@ -84,6 +86,14 @@ public class ProxyData {
 
     /** Whether the artifact is edited via the management console or not */
     private boolean isEdited;
+
+    public String getPreservePolicy() {
+        return preservePolicy;
+    }
+
+    public void setPreservePolicy(String preservePolicy) {
+        this.preservePolicy = preservePolicy;
+    }
 
     public String getDescription() {
         return description;
@@ -411,6 +421,10 @@ public class ProxyData {
         }
 
         if (publishWSDL){
+            if (preservePolicy != null) {
+                //Add preservePolicy attribute to PublishWSDL element
+                element.addAttribute("preservePolicy", preservePolicy, nullNS);
+            }
             // builds the additional resources (if any) required by the WSDL
             if (wsdlResources != null && wsdlResources.length != 0) {
                 OMElement resource;

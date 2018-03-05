@@ -24,10 +24,13 @@
     if (proxyObj != null) {
         ProxyData proxy = (ProxyData) proxyObj;
         String wsdlMode = request.getParameter("publishWsdlCombo");
+        String policyPreserveOption = request.getParameter("preservePolicy");
         Object resourcesOnly = request.getAttribute("processResourcesOnly");
 
         if (!"true".equals(resourcesOnly)) {
-            
+            if (policyPreserveOption != null) {
+              proxy.setPreservePolicy(policyPreserveOption);
+            }
             if ("inline".equals(wsdlMode)) {
                 String inlineTxt = request.getParameter("wsdlInlineText");
                 if (inlineTxt != null && !"".equals(inlineTxt)) {

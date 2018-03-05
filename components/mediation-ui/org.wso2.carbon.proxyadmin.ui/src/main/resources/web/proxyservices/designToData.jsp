@@ -106,6 +106,8 @@
         } else if ("ep".equals(publishWsdlCombo)) {
             pd.setPublishWSDLEndpoint(request.getParameter("wsdlEPText"));
         }
+        String preservePolicy = request.getParameter("preservePolicy");
+        pd.setPreservePolicy(preservePolicy);
         String wsdlResources = request.getParameter("wsdlResourceList");
         if (wsdlResources != null && !"".equals(wsdlResources)) {
             String [] resources = wsdlResources.split("::");

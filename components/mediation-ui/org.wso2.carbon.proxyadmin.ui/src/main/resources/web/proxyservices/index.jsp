@@ -380,9 +380,12 @@
     }
 
     String publishWsdl = "none";
+    String preservePolicyOption = "false";
     String wsdlText = "";
     if (pd != null) {
-
+        if (pd.getPreservePolicy() != null) {
+           preservePolicyOption = pd.getPreservePolicy();
+        }
         if ((wsdlText = pd.getWsdlDef()) != null && !"".equals(wsdlText)) {
             publishWsdl = "inline";
             // create a one line string with no unnecessary whitespaces
@@ -488,6 +491,7 @@
 
     function showHidePublishWsdlOptionsOnLoad() {
         var publishWsdl = '<%=publishWsdl%>';
+        var preservePolicy = '<%=preservePolicyOption%>';
         if (publishWsdl == 'none') {
             getElement('publishWsdlCombo').selectedIndex = 0;
             showHidePublishWsdlOptions();
@@ -497,20 +501,45 @@
             text = text.replace(/^<br>/,"");
             text = text.replace(/<br>/g,"\r\n");
             getElement('wsdlInlineText').value = text;
+            setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'reg') {
             getElement('publishWsdlCombo').selectedIndex = 3;
             getElement('wsdlRegText').value = '<%=wsdlText%>';
+            setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'uri') {
             getElement('publishWsdlCombo').selectedIndex = 2;
             getElement('wsdlUriText').value = '<%=wsdlText%>';
+            setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         } else if (publishWsdl == 'ep') {
             getElement('publishWsdlCombo').selectedIndex = 4;
             getElement('wsdlEPText').value = '<%=wsdlText%>';
+            setSelectedForPreservePolicy();
             showHidePublishWsdlOptions();
         }
+    }
+
+    function updateSelectedPolicyOption() {
+    	var index = document.getElementById('preservePolicy').selectedIndex;
+    	if (index == 0) {
+    		document.getElementById('preservePolicyYes').selected = true;
+    		document.getElementById('preservePolicyNo').selected = false;
+    	}
+    	if (index == 1) {
+    		document.getElementById('preservePolicyYes').selected = false;
+    		document.getElementById('preservePolicyNo').selected = true;
+    	}
+    }
+
+    function setSelectedForPreservePolicy() {
+       var preservePolicy = '<%=preservePolicyOption%>';
+    	if (preservePolicy == 'true') {
+   		getElement('preservePolicy').selectedIndex = 0;
+    	} else if (preservePolicy == 'false') {
+    		getElement('preservePolicy').selectedIndex = 1;
+    	}
     }
 
     function showPageOnLoad() {
@@ -1004,30 +1033,35 @@
             hideElem('wsdlReg');
             hideElem('wsdlEP');
             hideElem('wsdlResourceTr');
+            hideElem('PolicyList');
         } else if (index == 1) {
             showElem('wsdlInline');
             hideElem('wsdlUri');
             hideElem('wsdlReg');
             hideElem('wsdlEP');
             showElem('wsdlResourceTr');
+            showElem('PolicyList');
         } else if (index == 2) {
             hideElem('wsdlInline');
             showElem('wsdlUri');
             hideElem('wsdlReg');
             hideElem('wsdlEP');
             showElem('wsdlResourceTr');
+            showElem('PolicyList');
         } else if (index == 3) {
             hideElem('wsdlInline');
             hideElem('wsdlUri');
             hideElem('wsdlEP');
             showElem('wsdlReg');
             showElem('wsdlResourceTr');
+            showElem('PolicyList');
         } else if (index == 4) {
             hideElem('wsdlInline');
             hideElem('wsdlUri');
             hideElem('wsdlReg');
             showElem('wsdlEP');
             hideElem('wsdlResourceTr');
+            showElem('PolicyList');
         }
     }
 
@@ -1268,6 +1302,15 @@
                                     </td>
                                 </tr>
                             </table>
+                        </td>
+                    </tr>
+                     <tr id="PolicyList" style="display:none;">
+                        <td style="vertical-align:top!important"><fmt:message key="preserve.policy"/></td>
+                        <td>
+                          <select id="preservePolicy" name="preservePolicy" onchange="updateSelectedPolicyOption();">
+                            <option id="preservePolicyYes" selected="selected" value="true"><fmt:message key="preserve.policy.yes"/></option>
+                            <option id="preservePolicyNo" value="false"><fmt:message key="preserve.policy.no"/></option>
+                          </select>
                         </td>
                     </tr>
                             <tr id="wsdlResourceTr">
