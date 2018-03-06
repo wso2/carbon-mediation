@@ -18,6 +18,7 @@ package org.wso2.carbon.mediator.cache;
 
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.commons.lang.StringUtils;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.SequenceMediatorFactory;
@@ -110,6 +111,16 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
      */
     private static final QName ATT_SIZE = new QName(CachingConstants.MAX_SIZE_STRING);
 
+    /**
+     * QName of the enableCacheControl.
+     */
+    private static final QName ENABLE_CACHE_CONTROL_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
+                                                            CachingConstants.ENABLE_CACHE_CONTROL_STRING);
+    /**
+     * QName of the includeAgeHeader.
+     */
+    private static final QName INCLUDE_AGE_HEADER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE,
+                                                            CachingConstants.INCLUDE_AGE_HEADER_STRING);
     /**
      * The cache manager to be used in each cache instance.
      */
@@ -207,6 +218,29 @@ public class CacheMediatorFactory extends AbstractMediatorFactory {
                             } else {
                                 cache.setResponseCodes(CachingConstants.ANY_RESPONSE_CODE);
                             }
+
+                            OMElement enableCacheControlElem =
+                                    protocolElem.getFirstChildWithName(ENABLE_CACHE_CONTROL_Q);
+                            if (enableCacheControlElem != null) {
+                                String cacheControlElemText = enableCacheControlElem.getText();
+                                if (StringUtils.isNotEmpty(cacheControlElemText)) {
+                                    cache.setCacheControlEnabled(Boolean.parseBoolean(cacheControlElemText));
+                                }
+                            } else {
+                                cache.setCacheControlEnabled(CachingConstants.DEFAULT_ENABLE_CACHE_CONTROL);
+                            }
+
+                            OMElement addAgeHeaderElem =
+                                    protocolElem.getFirstChildWithName(INCLUDE_AGE_HEADER_Q);
+                            if (addAgeHeaderElem != null) {
+                                String addAgeHeaderElemText = addAgeHeaderElem.getText();
+                                if (StringUtils.isNotEmpty(addAgeHeaderElemText)) {
+                                    cache.setAddAgeHeaderEnabled(Boolean.parseBoolean(addAgeHeaderElemText));
+                                }
+                            } else {
+                                cache.setCacheControlEnabled(CachingConstants.DEFAULT_ADD_AGE_HEADER);
+                            }
+
                             props.put("headers-to-exclude", cache.getHeadersToExcludeInHash());
                         }
                     } else {
