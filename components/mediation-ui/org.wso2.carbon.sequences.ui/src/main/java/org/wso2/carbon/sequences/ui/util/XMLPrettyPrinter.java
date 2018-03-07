@@ -19,6 +19,8 @@ package org.wso2.carbon.sequences.ui.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.impl.Constants;
+import org.apache.xerces.util.SecurityManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
@@ -26,6 +28,7 @@ import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -38,13 +41,48 @@ import java.io.Writer;
 */
 public class XMLPrettyPrinter {
 
+    private static final int ENTITY_EXPANSION_LIMIT = 0;
+    private static final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
+    private static Log log = LogFactory.getLog(XMLPrettyPrinter.class);
+
+    static {
+        documentBuilderFactory.setNamespaceAware(true);
+        documentBuilderFactory.setXIncludeAware(false);
+        documentBuilderFactory.setExpandEntityReferences(false);
+
+        try {
+            documentBuilderFactory
+                    .setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, false);
+        } catch (ParserConfigurationException e) {
+            log.error("Failed to load XML Processor Feature " + Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE, e);
+        }
+
+        try {
+            documentBuilderFactory
+                    .setFeature(Constants.SAX_FEATURE_PREFIX + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, false);
+        } catch (ParserConfigurationException e) {
+            log.error("Failed to load XML Processor Feature " + Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE, e);
+        }
+
+        try {
+            documentBuilderFactory
+                    .setFeature(Constants.XERCES_FEATURE_PREFIX + Constants.LOAD_EXTERNAL_DTD_FEATURE, false);
+        } catch (ParserConfigurationException e) {
+            log.error("Failed to load XML Processor Feature " + Constants.LOAD_EXTERNAL_DTD_FEATURE, e);
+        }
+
+        SecurityManager securityManager = new SecurityManager();
+        securityManager.setEntityExpansionLimit(ENTITY_EXPANSION_LIMIT);
+        documentBuilderFactory
+                .setAttribute(Constants.XERCES_PROPERTY_PREFIX + Constants.SECURITY_MANAGER_PROPERTY, securityManager);
+    }
+
     private InputStream in;
     private boolean xmlFormat;
     private boolean numericEnc;
     private boolean done = false;
     private String encoding = "UTF-8";
-
-    private static Log log = LogFactory.getLog(XMLPrettyPrinter.class);
 
     public XMLPrettyPrinter(InputStream in, boolean format, boolean numeric, String encoding) {
         this.in = in;
@@ -74,8 +112,7 @@ public class XMLPrettyPrinter {
         LSSerializer lsSerializer;
 
         try {
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            doc = documentBuilderFactory.newDocumentBuilder().parse(in);
+            doc = getDocumentBuilderFactory().newDocumentBuilder().parse(in);
 
             DOMImplementationLS domImplementation = (DOMImplementationLS) doc.getImplementation();
             lsSerializer = domImplementation.createLSSerializer();
@@ -97,6 +134,10 @@ public class XMLPrettyPrinter {
             log.error("XML Pretty Printer failed. ", e);
         }
         return xmlOutput;
+    }
+
+    private DocumentBuilderFactory getDocumentBuilderFactory() {
+        return documentBuilderFactory;
     }
 
 }
