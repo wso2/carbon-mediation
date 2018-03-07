@@ -74,19 +74,20 @@ public class InboundRunner implements Runnable {
         // Wait for the clustering configuration to be loaded.
         while (!init) {
             log.debug("Waiting for the configuration context to be loaded to run Inbound Endpoint.");
-            Boolean isSinglNode = ClusteringAgentUtil.isSingleNode();
-            Parameter clusteringPattern = ServiceReferenceHolder.getInstance().getConfigurationContextService().
-                    getServerConfigContext().getAxisConfiguration().getClusteringAgent().
-                    getParameter(CLUSTERING_PATTERN);
-            Boolean isWorkerManager = clusteringPattern != null && clusteringPattern.getValue() != null
-                    && clusteringPattern.getValue().toString().equals(CLUSTERING_PATTERN_WORKER_MANAGER);
-            if (isSinglNode != null) {
-                if (!isSinglNode && !CarbonUtils.isWorkerNode() && !runOnManagerOverride && isWorkerManager) {
+            Boolean isSingleNode = ClusteringAgentUtil.getClusteringAgent() == null ? true : false;
+            if (!isSingleNode) {
+                Parameter clusteringPattern = ServiceReferenceHolder.getInstance().getConfigurationContextService().
+                        getServerConfigContext().getAxisConfiguration().getClusteringAgent().
+                        getParameter(CLUSTERING_PATTERN);
+                Boolean isWorkerManager = clusteringPattern != null && clusteringPattern.getValue() != null
+                        && clusteringPattern.getValue().toString().equals(CLUSTERING_PATTERN_WORKER_MANAGER);
+                if (!isSingleNode && !CarbonUtils.isWorkerNode() && !runOnManagerOverride && isWorkerManager) {
                     // Given node is the manager in the cluster, and not
                     // required to run the service
                     execute = false;
                     log.info("Inbound EP will not run in manager node. Same will run on worker(s).");
                 }
+            } else {
                 init = true;
             }
             try {
