@@ -25,9 +25,8 @@
             <artifactId>org.wso2.carbon.cloud.gateway</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.framework</groupId>
             <artifactId>org.wso2.carbon.user.mgt</artifactId>
-            <version>${carbon.identity.version}</version>
         </dependency>
         <dependency>
             <groupId>libthrift.wso2</groupId>
@@ -62,7 +61,7 @@
                             </adviceFile>
                             <bundles>
                                 <bundleDef>libthrift.wso2:libthrift</bundleDef>
-                                <bundleDef>org.wso2.carbon.identity:org.wso2.carbon.user.mgt</bundleDef>
+                                <bundleDef>org.wso2.carbon.identity.framework:org.wso2.carbon.user.mgt</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.cloud.gateway</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.cloud.gateway.common</bundleDef>
                             </bundles>

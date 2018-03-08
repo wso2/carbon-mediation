@@ -603,17 +603,17 @@
 
             <!--7  Carbon-Identity -->
             <dependency>
-                <groupId>org.wso2.carbon.identity</groupId>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.user.mgt</artifactId>
                 <version>${carbon.identity.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity</groupId>
+                <groupId>org.wso2.carbon.identity.framework</groupId>
                 <artifactId>org.wso2.carbon.identity.entitlement.stub</artifactId>
                 <version>${carbon.identity.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.wso2.carbon.identity</groupId>
+                <groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
                 <artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
                 <version>${carbon.identity.oauth.version}</version>
             </dependency>
@@ -2310,67 +2310,67 @@
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.4.18</carbon.kernel.version>
+        <carbon.kernel.version>4.4.24</carbon.kernel.version>
         <carbon.kernel.import.feature.version>4.4.0</carbon.kernel.import.feature.version>
         <carbon.kernel.imp.pkg.version>[4.4.0, 4.5.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
 
         <!-- Carbon Commons version-->
-        <carbon.commons.version>4.6.16</carbon.commons.version>
+        <carbon.commons.version>4.6.19</carbon.commons.version>
         <carbon.commons.imp.pkg.version>[4.5.0, 5.0.0)</carbon.commons.imp.pkg.version>
 
         <!-- Carbon Deployment version-->
-        <carbon.deployment.version>4.7.0</carbon.deployment.version>
+        <carbon.deployment.version>4.7.13</carbon.deployment.version>
         <carbon.deployment.imp.pkg.version>[4.6.0, 5.0.0)</carbon.deployment.imp.pkg.version>
 
         <!-- Carbon Registry version-->
-        <carbon.registry.version>4.6.16</carbon.registry.version>
+        <carbon.registry.version>4.6.27</carbon.registry.version>
         <carbon.registry.imp.pkg.version>[4.5.0, 5.0.0)</carbon.registry.imp.pkg.version>
 
         <!-- Analytic Commons version-->
-        <carbon.analytics.common.version>5.1.1</carbon.analytics.common.version>
+        <carbon.analytics.common.version>5.1.31</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.1.0, 6.0.0)</carbon.analytics.common.imp.pkg.version>
 
         <!-- Carbon Identity version-->
-        <carbon.identity.version>5.2.0</carbon.identity.version>
+        <carbon.identity.version>5.11.112</carbon.identity.version>
         <carbon.identity.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.imp.pkg.version>
 
         <!-- Carbon Rule version -->
-        <carbon.rule.version>4.4.1</carbon.rule.version>
+        <carbon.rule.version>4.4.6</carbon.rule.version>
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v43</synapse.version>
+        <synapse.version>2.1.7-wso2v44</synapse.version>
 
         <carbon.identity.entitlement.proxy.version>5.1.1</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
 
-        <carbon.identity.oauth.version>5.1.2</carbon.identity.oauth.version>
+        <carbon.identity.oauth.version>5.6.46</carbon.identity.oauth.version>
         <carbon.identity.oauth.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.oauth.imp.pkg.version>
 
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1.wso2v12</orbit.version.axis2>
-        <orbit.version.axis2.client>1.6.1.wso2v12</orbit.version.axis2.client>
-        <orbit.version.axiom>1.2.11.wso2v10</orbit.version.axiom>
+        <orbit.version.axis2>1.6.1-wso2v23</orbit.version.axis2>
+        <orbit.version.axis2.client>1.6.1-wso2v23</orbit.version.axis2.client>
+        <orbit.version.axiom>1.2.11.wso2v11</orbit.version.axiom>
         <axis2-transports.base.version>1.6.1-wso2v12</axis2-transports.base.version>
-        <axis2.osgi.version.range>[1.6.1.wso2v11, 1.7.0)</axis2.osgi.version.range>
-        <axis2.json.version>1.6.1-wso2v5</axis2.json.version>
+        <axis2.osgi.version.range>[1.6.1.wso2v23, 1.7.0)</axis2.osgi.version.range>
+        <axis2.json.version>1.6.1-wso2v23</axis2.json.version>
 
         <!-- Axiom Version -->
-        <axiom.api.wso2.version>1.2.11-wso2v10</axiom.api.wso2.version>
-        <axiom.wso2.version>1.2.11.wso2v10</axiom.wso2.version>
-        <axiom.version>1.2.11.wso2v10</axiom.version>
+        <axiom.api.wso2.version>1.2.11-wso2v11</axiom.api.wso2.version>
+        <axiom.wso2.version>1.2.11.wso2v11</axiom.wso2.version>
+        <axiom.version>1.2.11.wso2v11</axiom.version>
         <axiom.osgi.version.range>[1.2.11, 1.3.0)</axiom.osgi.version.range>
 
         <!-- Apache Versions -->
-        <rampart.version>1.6.1.wso2v18</rampart.version>
-        <rampart.mar.version>1.6.1-wso2v18</rampart.mar.version>
+        <rampart.version>1.6.1-wso2v26</rampart.version>
+        <rampart.mar.version>1.6.1-wso2v26</rampart.mar.version>
         <neethi.version>3.0.2</neethi.version>
         <neethi.osgi.version>2.0.4.wso2v4</neethi.osgi.version>
         <wss4j.version>1.5.11.wso2v17</wss4j.version>
         <orbit.version.xmlschema>1.4.7.wso2v2</orbit.version.xmlschema>
         <commons.lang.wso2.version>2.6.0.wso2v1</commons.lang.wso2.version>
-        <rampart.wso2.version>1.6.1.wso2v18</rampart.wso2.version>
+        <rampart.wso2.version>1.6.1-wso2v26</rampart.wso2.version>
         <httpcore.wso2.version>4.3.3.wso2v1</httpcore.wso2.version>
         <httpcore-nio.wso2.version>4.3.3.wso2v4</httpcore-nio.wso2.version>
         <httpclient.wso2.version>4.3.2.wso2v1</httpclient.wso2.version>
