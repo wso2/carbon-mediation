@@ -34,7 +34,7 @@
 			<artifactId>org.wso2.carbon.identity.oauth.mediator</artifactId>
 		</dependency>
 		<dependency>
-            		<groupId>org.wso2.carbon.identity</groupId>
+            		<groupId>org.wso2.carbon.identity.inbound.auth.oauth2</groupId>
             		<artifactId>org.wso2.carbon.identity.oauth.stub</artifactId>
         	</dependency>
 	</dependencies>
@@ -62,7 +62,7 @@
 							</adviceFile>
 							<bundles>
 								<bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.identity.oauth.mediator</bundleDef>
-								<bundleDef>org.wso2.carbon.identity:org.wso2.carbon.identity.oauth.stub</bundleDef>
+								<bundleDef>org.wso2.carbon.identity.inbound.auth.oauth2:org.wso2.carbon.identity.oauth.stub</bundleDef>
 							</bundles>
 							<importFeatures>
 								<importFeatureDef>org.wso2.carbon.core.server:${carbon.kernel.version}</importFeatureDef>
