@@ -404,7 +404,7 @@ public class CacheMediator extends AbstractMediator implements ManagedLifecycle,
                 Object httpStatus = msgCtx.getProperty(NhttpConstants.HTTP_SC);
                 String statusCode = null;
                 //Honor no-store header if cacheControlEnabled.
-                // If “no-store” header presents in the response, returned response can not be cached.
+                // If "no-store" header presents in the response, returned response can not be cached.
                 if (response.isCacheControlEnabled() && HttpCachingFilter.isNoStore(msgCtx)) {
                     response.clean();
                     return;
