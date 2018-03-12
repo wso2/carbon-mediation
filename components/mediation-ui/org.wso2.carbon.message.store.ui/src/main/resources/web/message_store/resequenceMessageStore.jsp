@@ -435,7 +435,7 @@
                                     <td><input type="password" name="password" id="password" style="width:300px"
                                                value="<%=((null!=messageStore)&&(messageStore.getParams()
                                                .get("store.jdbc.password")!=null))
-                                               ?messageStore.getParams().get("store.jdbc.password"):""%>"/>
+                                               ?messageStore.getParams().get("store.jdbc.password"):""%>" autocomplete="off"/>
                                     </td>
                                 </tr>
                                 <tr id="store.polling.count" <%=!displayCommonProps ? "style=\"display:none;\"" : ""%>>
