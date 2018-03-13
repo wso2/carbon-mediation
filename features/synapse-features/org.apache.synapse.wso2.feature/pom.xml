@@ -142,7 +142,7 @@
                                 <!-- Json schema validator dependencies -->
                                 <bundleDef>org.wso2.orbit.com.googlecode.libphonenumber:libphonenumber</bundleDef>
                                 <bundleDef>com.fasterxml.jackson.core:jackson-core:${fasterxml.jackson.version}</bundleDef>
-                                <bundleDef>com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.version}</bundleDef>
+                                <bundleDef>com.fasterxml.jackson.core:jackson-databind:${fasterxml.jackson.databind.version}</bundleDef>
                                 <bundleDef>com.fasterxml.jackson.core:jackson-annotations:${fasterxml.jackson.version}</bundleDef>
                                 <!--<bundleDef>org.wso2.orbit.joda-time:joda-time:${joda-time.version}</bundleDef>-->
                                 <bundleDef>com.google.guava:guava:${google.guava.version}</bundleDef>
