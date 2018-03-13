@@ -2223,7 +2223,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${fasterxml.jackson.version}</version>
+                <version>${fasterxml.jackson.databind.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -2478,7 +2478,8 @@
         <jetty.wso2.version>8.1.17.v20150415.wso2v1</jetty.wso2.version>
         <libthrift.version>0.8.0.wso2v1</libthrift.version>
         <opencsv.version>2.3</opencsv.version>
-        <fasterxml.jackson.version>2.9.1</fasterxml.jackson.version>
+        <fasterxml.jackson.databind.version>2.6.7.1</fasterxml.jackson.databind.version>
+        <fasterxml.jackson.version>2.6.7</fasterxml.jackson.version>
         <json.simple.version>1.1.1</json.simple.version>
         <esotericsoftware.kryo.version>3.0.3</esotericsoftware.kryo.version>
         <org.objenesis.version>2.1</org.objenesis.version>
