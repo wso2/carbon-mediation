@@ -2340,7 +2340,7 @@
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v53</synapse.version>
+        <synapse.version>2.1.7-wso2v54</synapse.version>
 
         <carbon.identity.entitlement.proxy.version>5.1.1</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
@@ -2467,7 +2467,7 @@
         <fge.json.schema.validator.version>2.2.6.wso2v3</fge.json.schema.validator.version>
         <com.googlecode.libphonenumber.version>7.4.2.wso2v1</com.googlecode.libphonenumber.version>
         <joda-time.version>2.8.2.wso2v1</joda-time.version>
-        <google.guava.version>19.0</google.guava.version>
+        <google.guava.version>18.0</google.guava.version>
 
         <!-- publishEvent mediator versions -->
         <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
