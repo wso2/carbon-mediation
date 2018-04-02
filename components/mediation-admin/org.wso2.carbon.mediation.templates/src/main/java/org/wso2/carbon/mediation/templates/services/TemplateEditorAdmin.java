@@ -379,7 +379,9 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             template = (TemplateMediator) getSynapseConfiguration().getSequenceTemplate(templateName);
             if (template != null) {
                 template.enableStatistics();
-                persistTemplate(template);
+                if (template.getArtifactContainerName() == null) {
+                    persistTemplate(template);
+                }
                 return templateName;
             } else {
                 handleException("No defined template with name " + templateName
