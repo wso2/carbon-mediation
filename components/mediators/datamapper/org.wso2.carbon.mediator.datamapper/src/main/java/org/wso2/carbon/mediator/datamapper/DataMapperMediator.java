@@ -24,6 +24,7 @@ import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axis2.AxisFault;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -310,12 +311,15 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     .doMap(getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()),
                             propertiesMap);
 
-            if (InputOutputDataType.CSV.toString().equals(outputType)) {
-                outputResult = cSVToXMLOpeningTag + outputResult + cSVToXMLClosingTag;
+            if (InputOutputDataType.CSV.toString().equals(outputType) &&
+                    !InputOutputDataType.CSV.toString().equals(inputType)) {
+                outputResult = cSVToXMLOpeningTag + StringEscapeUtils.escapeXml(outputResult) + cSVToXMLClosingTag;
             }
 
-            if (InputOutputDataType.XML.toString().equals(outputType) || InputOutputDataType.CSV.toString()
-                    .equals(outputType)) {
+            if (InputOutputDataType.XML.toString().equals(outputType) ||
+                    (InputOutputDataType.CSV.toString().equals(outputType) && !InputOutputDataType.CSV.toString()
+                            .equals(inputType))) {
+
                 OMElement outputMessage = AXIOMUtil.stringToOM(outputResult);
                 if (outputMessage != null) {
                     if (log.isDebugEnabled()) {
@@ -350,6 +354,9 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 org.apache.axis2.context.MessageContext axis2MessageContext = ((Axis2MessageContext) synCtx)
                         .getAxis2MessageContext();
                 JsonUtil.newJsonPayload(axis2MessageContext, outputResult, true, true);
+            } else if (InputOutputDataType.CSV.toString().equals(outputType)) {
+                synCtx.getEnvelope().getBody().getFirstElement().setText(outputResult.toString());
+
             }
         } catch (ReaderException | InterruptedException | XMLStreamException | SchemaException
                 | IOException | JSException | WriterException e) {
