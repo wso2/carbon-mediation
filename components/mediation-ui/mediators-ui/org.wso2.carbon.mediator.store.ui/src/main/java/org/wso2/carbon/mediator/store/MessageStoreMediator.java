@@ -162,12 +162,12 @@ public class MessageStoreMediator extends AbstractMediator {
         throw new SynapseException(msg);
     }
 
-    public boolean hasBraces(OMAttribute atr) {
+    private boolean hasBraces(OMAttribute atr) {
         String trimmed = atr.getAttributeValue().trim();
         return ((trimmed.startsWith("{")) && (trimmed.endsWith("}")));
     }
 
-    public String removeBraces(OMAttribute atr) {
+    private String removeBraces(OMAttribute atr) {
         String trimmed = atr.getAttributeValue().trim();
         String path = trimmed.substring(1, trimmed.length() - 1);
         return path;
