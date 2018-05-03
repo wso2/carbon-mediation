@@ -395,7 +395,12 @@
     tabIndex = 1;
     <%}%>
     $(document).ready(function() {
-        var $tabs = $('#tabs > ul').tabs({ cookie: { expires: 30 } });
+	var $tabs;
+  	if (window.location.protocol === "https:") {
+    		$tabs = $('#tabs > ul').tabs({ cookie: { expires: 30, secure: true } });
+  	} else {
+        	$tabs = $('#tabs > ul').tabs({ cookie: { expires: 30 } });
+  	}
         $('a', $tabs).click(function() {
             if ($(this).parent().hasClass('ui-tabs-selected')) {
                 $tabs.tabs('load', $('a', $tabs).index(this));
