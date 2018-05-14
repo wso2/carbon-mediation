@@ -65,7 +65,7 @@
                             </bundles>
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server</importFeatureDef>
+                                <!--<importFeatureDef>org.wso2.carbon.mediation.initializer.server</importFeatureDef>-->
                                 <importFeatureDef>org.wso2.carbon.databridge.datapublisher:compatible:${carbon.analytics.common.version}</importFeatureDef>
                             </importFeatures>
                         </configuration>
