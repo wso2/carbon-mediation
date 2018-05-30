@@ -22,11 +22,11 @@
     <parent>
         <artifactId>cg</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
-        <version>4.6.79-SNAPSHOT</version>
+        <version>4.6.79</version>
 		<relativePath>../pom.xml</relativePath>
     </parent>
 
-    <version>4.6.79-SNAPSHOT</version>
+    <version>4.6.79</version>
     <artifactId>org.wso2.carbon.cloud.gateway</artifactId>
     <packaging>bundle</packaging>
     <name>Cloud Gateway server component</name>
