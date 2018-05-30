@@ -660,16 +660,23 @@ public class EILightweightRegistry extends AbstractRegistry {
             String resourcePath = "";
             if (key.startsWith(ESBRegistryConstants.CONFIG_REGISTRY_PREFIX)) {
                 registryRoot = configRegistry;
-                resourcePath = key.substring(ESBRegistryConstants.CONFIG_REGISTRY_PREFIX.length() + 1);
+                resourcePath = key.substring(ESBRegistryConstants.CONFIG_REGISTRY_PREFIX.length());
 
             } else if (key.startsWith(ESBRegistryConstants.GOVERNANCE_REGISTRY_PREFIX)) {
                 registryRoot = govRegistry;
-                resourcePath = key.substring(ESBRegistryConstants.GOVERNANCE_REGISTRY_PREFIX.length() + 1);
+                resourcePath = key.substring(ESBRegistryConstants.GOVERNANCE_REGISTRY_PREFIX.length());
 
             } else if (key.startsWith(ESBRegistryConstants.LOCAL_REGISTRY_PREFIX)) {
                 registryRoot = localRegistry;
-                resourcePath = key.substring(ESBRegistryConstants.LOCAL_REGISTRY_PREFIX.length() + 1);
+                resourcePath = key.substring(ESBRegistryConstants.LOCAL_REGISTRY_PREFIX.length());
 
+            } else {
+                registryRoot = govRegistry;
+                resourcePath = key;
+            }
+
+            if (resourcePath.startsWith(ESBRegistryConstants.URL_SEPARATOR)) {
+                resourcePath = resourcePath.substring(1);
             }
 
             if (ESBRegistryConstants.URL_SEPARATOR_CHAR != File.separatorChar && registryRoot.startsWith(ESBRegistryConstants.PROTOCOL_FILE)) {
