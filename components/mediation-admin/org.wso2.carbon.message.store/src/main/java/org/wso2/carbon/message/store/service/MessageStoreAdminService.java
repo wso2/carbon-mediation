@@ -17,7 +17,11 @@
 */
 package org.wso2.carbon.message.store.service;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.AxisFault;
 import org.apache.commons.logging.Log;
@@ -26,19 +30,24 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MessageStoreFactory;
 import org.apache.synapse.config.xml.MessageStoreSerializer;
+import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.message.store.MessageStore;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 
@@ -49,6 +58,18 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
 
 
     public static final int MSGS_PER_PAGE = 10;
+
+    public static final QName NAME_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "name");
+    public static final QName SEQUENCE_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "sequence");
+    public static final QName KEY_Q = new QName(XMLConfigConstants.NULL_NAMESPACE, "key");
+    public static final QName PARAMETER_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
+
+    public static final String REGISTRY_KEY_PREFIX = "$registry:";
+    public static final String EMPTY_STRING = "";
+
+    protected static final OMFactory fac = OMAbstractFactory.getOMFactory();
+    protected static final OMNamespace nullNS
+            = fac.createOMNamespace(XMLConfigConstants.NULL_NAMESPACE, "");
 
     /**
      * Get an XML configuration element for a message store from the FE and creates and add
@@ -61,13 +82,14 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
     public void addMessageStore(String xml) throws AxisFault {
         try {
             OMElement msElem = createElement(xml);
+            SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
+            reformatKeyParameters(msElem, synapseConfiguration);
             MessageStore messageStore =
-                    MessageStoreFactory.createMessageStore(msElem, new Properties());
+                    MessageStoreFactory.createMessageStore(msElem, new Properties(), synapseConfiguration);
             if (messageStore != null && messageStore.getName() != null) {
                 // Here we must Init the message store and set a file name and then
                 // save it to the configuration.
                 // Then We must persist the created Message Store
-                SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
                 String fileName = ServiceBusUtils.generateFileName(messageStore.getName());
                 messageStore.setFileName(fileName);
                 messageStore.init(getSynapseEnvironment());
@@ -99,16 +121,16 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
     public void modifyMessageStore(String xml) throws AxisFault {
         try {
             OMElement msElem = createElement(xml);
+            SynapseConfiguration configuration = getSynapseConfiguration();
+            reformatKeyParameters(msElem, configuration);
             MessageStore messageStore =
-                    MessageStoreFactory.createMessageStore(msElem, new Properties());
+                    MessageStoreFactory.createMessageStore(msElem, new Properties(), configuration);
 
             if(messageStore == null) {
                 String message = "Unable to edit the message Store. Error in the configuration";
                 handleException(log,message,null);
             }
 
-
-            SynapseConfiguration configuration = getSynapseConfiguration();
             MessageStore oldMessageStore = configuration.getMessageStore(messageStore.getName());
             if(oldMessageStore != null) {
                 // this means there is an existing message store
@@ -116,6 +138,7 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
                 //1st we clean up the old
                 configuration.removeMessageStore(oldMessageStore.getName());
                 oldMessageStore.destroy();
+
 
                 // then we startup the new.
                 String fileName = oldMessageStore.getFileName();
@@ -146,6 +169,31 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
         }
     }
 
+    private OMElement reformatKeyParameters(OMElement elem, SynapseConfiguration config) throws AxisFault {
+        Iterator params = elem.getChildrenWithName(PARAMETER_Q);
+        Map<String, Object> parameters = new HashMap<String, Object>();
+
+        while (params.hasNext()) {
+            Object o = params.next();
+            if (o instanceof OMElement) {
+                OMElement prop = (OMElement) o;
+                OMAttribute paramName = prop.getAttribute(NAME_Q);
+                String paramValue = prop.getText();
+                if (paramName != null && paramValue != null && paramValue.startsWith(REGISTRY_KEY_PREFIX)) {
+                    prop.addAttribute(fac.createOMAttribute(KEY_Q.getLocalPart(), nullNS,
+                            paramValue.replace(REGISTRY_KEY_PREFIX, "")));
+                    prop.setText(EMPTY_STRING);
+                } else if (paramName == null) {
+                    String msg = "Invalid MessageStore parameter - Parameter must have a name.";
+                    handleException(log, msg, null);
+                } else if (paramValue == null) {
+                    String msg = "Invalid MessageStore parameter - Parameter: " + paramName + " value cannot be null.";
+                    handleException(log, msg, null);
+                }
+            }
+        }
+        return elem;
+    }
 
     public String getMessageStore(String name) throws AxisFault {
         SynapseConfiguration configuration = getSynapseConfiguration();
