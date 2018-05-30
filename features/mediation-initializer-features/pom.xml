@@ -34,6 +34,7 @@
     <modules>
         <module>org.wso2.carbon.mediation.initializer.feature</module>
         <module>org.wso2.carbon.mediation.initializer.server.feature</module>
+        <module>org.wso2.carbon.mediation.light.initializer.server.feature</module>
         <module>org.wso2.carbon.mediation.initializer.ui.feature</module>
     </modules>
 </project>
