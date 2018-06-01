@@ -71,7 +71,7 @@ import java.util.Set;
  * bind="setServiceAdminService" unbind="unsetServiceAdminService"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic"
+ * cardinality="0..1" policy="dynamic"
  * bind="setRegistryService" unbind="unsetRegistryService"
  * @scr.reference name="dependency.mgt.service"
  * interface="org.wso2.carbon.mediation.dependency.mgt.services.DependencyManagementService"
