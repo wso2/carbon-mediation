@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  ~ Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ WSO2 Inc. licenses this file to you under the Apache License,
@@ -15,28 +14,23 @@
  ~ KIND, either express or implied.  See the License for the
  ~ specific language governing permissions and limitations
  ~ under the License.
- -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+ --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-	<parent>
+    <parent>
         <artifactId>cg</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
         <version>4.6.80-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
-
+        <relativePath>../pom.xml</relativePath>
+    </parent>
     <version>4.6.80-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.cloud.gateway.common</artifactId>
     <packaging>bundle</packaging>
     <name>Cloud Gateway common component</name>
     <url>http://wso2.org</url>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <libthrift.version>0.8.0.wso2v1</libthrift.version>
     </properties>
-
     <profiles>
         <profile>
             <id>gen-csg-thrift-classes</id>
@@ -56,11 +50,11 @@
                                 <configuration>
                                     <tasks>
                                         <exec executable="thrift">
-                                            <arg value="--gen" />
-                                            <arg value="java" />
-                                            <arg value="-out" />
-                                            <arg value="src/main/java" />
-                                            <arg value="src/main/resources/cg.thrift" />
+                                            <arg value="--gen"/>
+                                            <arg value="java"/>
+                                            <arg value="-out"/>
+                                            <arg value="src/main/java"/>
+                                            <arg value="src/main/resources/cg.thrift"/>
                                         </exec>
                                     </tasks>
                                 </configuration>
@@ -70,12 +64,10 @@
                             </execution>
                         </executions>
                     </plugin>
-
                 </plugins>
             </build>
         </profile>
     </profiles>
-
     <build>
         <plugins>
             <plugin>
@@ -95,9 +87,16 @@
                     </instructions>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
-    
     <dependencies>
         <!--Do not change the order of dependency as it caused an older version to come through -->
         <!--transitive dependency-->
@@ -127,5 +126,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

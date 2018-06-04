@@ -1,24 +1,19 @@
-<?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="utf-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <artifactId>cg-features</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
         <version>4.6.80-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <version>4.6.80-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.cloud.gateway.proxyadmin.ui.feature</artifactId>
     <packaging>pom</packaging>
     <name>WSO2 Carbon - Cloud Gateway proxy admin UI feature</name>
     <url>http://wso2.org</url>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -30,7 +25,6 @@
             <artifactId>org.wso2.carbon.cloud.gateway.proxyadmin.ui</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -62,7 +56,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
-
 </project>

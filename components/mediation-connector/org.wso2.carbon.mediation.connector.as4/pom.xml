@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
    Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 
    WSO2 Inc. licenses this file to you under the Apache License,
@@ -15,20 +14,17 @@
    KIND, either express or implied. See the License for the
    specific language governing permissions and limitations
    under the License.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-connector</artifactId>
         <version>4.6.80-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.connector.as4</artifactId>
     <name>WSO2 Carbon - Connector For as4</name>
     <packaging>bundle</packaging>
-
     <properties>
         <connector.name>as4</connector.name>
         <test.framework.version>4.2.0</test.framework.version>
@@ -38,7 +34,6 @@
         <org.testng.version>6.1.1</org.testng.version>
         <integration.base.version>1.0.1</integration.base.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
@@ -269,6 +264,7 @@
                         </property>
                     </systemProperties>
                     <workingDirectory>${basedir}/target</workingDirectory>
+                    <argLine>${argLine}</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -292,7 +288,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -328,10 +323,12 @@
                     </instructions>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
-
     <distributionManagement>
         <repository>
             <id>nexus-releases</id>
