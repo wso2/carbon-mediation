@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
  ~ Copyright (c) 2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  ~
  ~ WSO2 Inc. licenses this file to you under the Apache License,
@@ -15,8 +14,7 @@
  ~ KIND, either express or implied.  See the License for the
  ~ specific language governing permissions and limitations
  ~ under the License.
- -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+ --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>inbound-endpoints</artifactId>
         <groupId>org.wso2.carbon.mediation</groupId>
@@ -26,7 +24,6 @@
     <artifactId>org.wso2.carbon.inbound.endpoint</artifactId>
     <packaging>bundle</packaging>
     <version>4.6.80-SNAPSHOT</version>
-
     <dependencies>
         <dependency>
             <groupId>javax.jms</groupId>
@@ -106,7 +103,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -148,9 +144,9 @@
                             </value>
                         </property>
                     </systemProperties>
+                    <argLine>${argLine}</argLine>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -182,5 +178,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
