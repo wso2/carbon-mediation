@@ -547,9 +547,6 @@ public class ServiceBusInitializer {
         return configurationInformation;
     }
 
-/*    protected static RegistryService getRegistryService() {
-        return registryService;
-    }*/
 
     protected static ServerConfigurationInformation getServerConfigurationInformation() {
         return configurationInformation;
