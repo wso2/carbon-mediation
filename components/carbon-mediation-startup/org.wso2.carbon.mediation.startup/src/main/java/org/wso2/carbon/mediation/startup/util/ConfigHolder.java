@@ -19,7 +19,6 @@
 package org.wso2.carbon.mediation.startup.util;
 
 import org.apache.synapse.config.SynapseConfiguration;
-import org.wso2.carbon.registry.core.session.UserRegistry;
 import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
 
 import java.util.Map;
@@ -30,8 +29,6 @@ public class ConfigHolder {
 
 	private Map<Integer, SynapseEnvironmentService> synapseEnvironmentServices =
 			new HashMap<Integer, SynapseEnvironmentService>();
-
-	private UserRegistry registry;
 
 	private ConfigHolder() {
 	}
@@ -47,14 +44,6 @@ public class ConfigHolder {
 		}
 
 		return null;
-	}
-
-	public UserRegistry getRegistry() {
-		return registry;
-	}
-
-	public void setRegistry(UserRegistry registry) {
-		this.registry = registry;
 	}
 
 	public SynapseEnvironmentService getSynapseEnvironmentService(int id) {

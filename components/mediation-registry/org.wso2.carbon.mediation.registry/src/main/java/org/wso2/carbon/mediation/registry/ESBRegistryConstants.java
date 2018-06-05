@@ -45,4 +45,19 @@ public class ESBRegistryConstants {
 
     public final static String SYNAPSE_REGISTRY_ROOT = "SYNAPSE_REGISTRY_ROOT";
 
+    public static final String CONF_REG_ROOT = "ConfigRegRoot";
+    public static final String GOV_REG_ROOT = "GovRegRoot";
+    public static final String LOCAL_REG_ROOT = "LocalRegRoot";
+
+    public static final String PROTOCOL_FILE = "file";
+    public static final String PROTOCOL_HTTP = "http";
+    public static final String PROTOCOL_HTTPS = "https";
+
+
+    public static final String CONFIG_REGISTRY_PREFIX = "conf:";
+    public static final String GOVERNANCE_REGISTRY_PREFIX = "gov:";
+    public static final String LOCAL_REGISTRY_PREFIX = "local:";
+
+    public static final char URL_SEPARATOR_CHAR = '/';
+    public static final String URL_SEPARATOR = "/";
 }

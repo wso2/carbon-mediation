@@ -65,7 +65,7 @@
 
                             <importFeatures>
                                 <importFeatureDef>org.apache.synapse.wso2:${carbon.mediation.version}</importFeatureDef>
-                                <importFeatureDef>org.wso2.carbon.mediation.initializer.server:${carbon.mediation.version}</importFeatureDef>
+                                <!--<importFeatureDef>org.wso2.carbon.mediation.initializer.server:${carbon.mediation.version}</importFeatureDef>-->
                             </importFeatures>
                         </configuration>
                     </execution>

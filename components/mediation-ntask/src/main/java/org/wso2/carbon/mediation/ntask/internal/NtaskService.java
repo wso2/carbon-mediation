@@ -30,7 +30,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
  * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"
  * policy="dynamic" bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
  * @scr.reference name="org.wso2.carbon.tenantPreLoadComponent.user.realmservice.default"
- * interface="org.wso2.carbon.user.core.service.RealmService" cardinality="1..1"
+ * interface="org.wso2.carbon.user.core.service.RealmService" cardinality="0..1"
  * policy="dynamic" bind="setRealmService" unbind="unsetRealmService"
  * 
  **/
