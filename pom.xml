@@ -2315,7 +2315,7 @@
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
 
         <!-- Carbon kernel version-->
-        <carbon.kernel.version>4.4.26</carbon.kernel.version>
+        <carbon.kernel.version>4.4.31</carbon.kernel.version>
         <carbon.kernel.import.feature.version>4.4.0</carbon.kernel.import.feature.version>
         <carbon.kernel.imp.pkg.version>[4.4.0, 4.5.0)</carbon.kernel.imp.pkg.version>
         <carbon.kernel.registry.imp.pkg.version>[1.0.1, 2.0.0)</carbon.kernel.registry.imp.pkg.version>
@@ -2345,7 +2345,7 @@
         <carbon.rule.imp.pkg.version>[4.4.0, 4.5.0)</carbon.rule.imp.pkg.version>
 
         <!-- Synapse Version -->
-        <synapse.version>2.1.7-wso2v61</synapse.version>
+        <synapse.version>2.1.7-wso2v63-SNAPSHOT</synapse.version>
 
         <carbon.identity.entitlement.proxy.version>5.1.1</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
