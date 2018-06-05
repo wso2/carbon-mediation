@@ -2460,7 +2460,7 @@
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
         <jsonpath.version>0.8.1.wso2v1</jsonpath.version>
         <json.smart.version>1.2</json.smart.version>
-        <damnhandy.version>1.1.7.wso2v1</damnhandy.version>
+        <damnhandy.version>2.1.6.wso2v1</damnhandy.version>
         <netty.version>4.0.39.Final</netty.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
@@ -2472,7 +2472,7 @@
         <project.scm.id>wso2-scm-server</project.scm.id>
         <fge.json.schema.validator.version>2.2.6.wso2v4</fge.json.schema.validator.version>
         <com.googlecode.libphonenumber.version>7.4.2.wso2v1</com.googlecode.libphonenumber.version>
-        <joda-time.version>2.8.2.wso2v1</joda-time.version>
+        <joda-time.version>2.9.4.wso2v1</joda-time.version>
         <google.guava.version>19.0</google.guava.version>
         <!-- publishEvent mediator versions -->
         <javax.xml.namespace.version>0.0.0</javax.xml.namespace.version>
