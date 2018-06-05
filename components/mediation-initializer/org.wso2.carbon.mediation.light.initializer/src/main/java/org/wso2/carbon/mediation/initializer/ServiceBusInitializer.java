@@ -45,13 +45,10 @@ import org.apache.synapse.task.TaskScheduler;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
-import org.wso2.carbon.application.deployer.service.ApplicationManagerService;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.core.ServerShutdownHandler;
-import org.wso2.carbon.event.core.EventBroker;
 import org.wso2.carbon.inbound.endpoint.EndpointListenerLoader;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService;
-import org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.initializer.handler.ProxyLogHandler;
 import org.wso2.carbon.mediation.initializer.handler.SynapseExternalPropertyConfigurator;
@@ -87,10 +84,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @scr.component name="esb.core.initializer" immediate="true"
- * @scr.reference name="application.manager"
- * interface="org.wso2.carbon.application.deployer.service.ApplicationManagerService"
- * cardinality="1..1" policy="dynamic"
- * bind="setAppManager" unbind="unsetAppManager"
  * @scr.reference name="task.description.repository.service"
  * interface="org.wso2.carbon.task.services.TaskDescriptionRepositoryService"
  * cardinality="1..1" policy="dynamic"
@@ -107,19 +100,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * interface="org.wso2.carbon.securevault.SecretCallbackHandlerService"
  * cardinality="1..1" policy="dynamic"
  * bind="setSecretCallbackHandlerService" unbind="unsetSecretCallbackHandlerService"
- * @scr.reference name="config.tracking.service"
- * interface="org.wso2.carbon.mediation.dependency.mgt.services.ConfigurationTrackingService"
- * cardinality="1..1" policy="dynamic"
- * bind="setConfigTrackingService" unbind="unsetConfigTrackingService"
- * @scr.reference name="eventbroker.service"
- * interface="org.wso2.carbon.event.core.EventBroker" cardinality="1..1"
- * policy="dynamic" bind="setEventBroker" unbind="unSetEventBroker"
  * @scr.reference name="esbntask.taskservice"
  * interface="org.wso2.carbon.mediation.ntask.internal.NtaskService" cardinality="0..1"
  * policy="dynamic" bind="setTaskService" unbind="unsetTaskService"
  * @scr.reference name="inbound.endpoint.persistence.service"
  * interface="org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService"
- * cardinality="1..1" policy="dynamic"
+ * cardinality="0..1" policy="dynamic"
  * bind="setInboundPersistenceService" unbind="unsetInboundPersistenceService"
  */
 @SuppressWarnings({"JavaDoc", "UnusedDeclaration"})
@@ -127,9 +113,7 @@ public class ServiceBusInitializer {
     private static final Log log = LogFactory.getLog(ServiceBusInitializer.class);
 
     //    private static RegistryService registryService;
-    private static ConfigurationTrackingService configTrackingService;
     private static ServerConfigurationInformation configurationInformation;
-    private static ApplicationManagerService applicationManager;
 
     private static String configPath;
     private ConfigurationContextService configCtxSvc;
@@ -138,7 +122,6 @@ public class ServiceBusInitializer {
     private TaskDescriptionRepositoryService repositoryService;
     private TaskSchedulerService taskSchedulerService;
     private SecretCallbackHandlerService secretCallbackHandlerService;
-    private static EventBroker eventBroker;
 
     private ServerManager serverManager;
 
@@ -177,9 +160,11 @@ public class ServiceBusInitializer {
             configurationManager.init();
 
             // set the event broker as a property
+/*
             if (eventBroker != null) {
                 configCtxSvc.getServerConfigContext().setProperty("mediation.event.broker", eventBroker);
             }
+*/
 
             // Initialize Synapse
             ServerContextInformation contextInfo = initESB("");
@@ -204,15 +189,6 @@ public class ServiceBusInitializer {
 
                 if (log.isDebugEnabled()) {
                     log.debug("SynapseConfigurationService Registered");
-                }
-
-                if (configTrackingService != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Publishing the SynapseConfiguration to the " +
-                                "ConfigurationTrackingService");
-                    }
-                    configTrackingService.setSynapseConfiguration(contextInfo.
-                            getSynapseConfiguration());
                 }
 
             } else {
@@ -252,7 +228,8 @@ public class ServiceBusInitializer {
                     ConfigurationManager.CONFIGURATION_MANAGER, configurationManager);
 
             // Start Inbound Endpoint Listeners
-            EndpointListenerLoader.loadListeners();
+            //tOdO need to fix inbound endpoints
+//            EndpointListenerLoader.loadListeners();
 
             registerInboundDeployer(configCtxSvc.getServerConfigContext()
                             .getAxisConfiguration(),
@@ -560,72 +537,16 @@ public class ServiceBusInitializer {
         this.secretCallbackHandlerService = null;
     }
 
-    protected void setAppManager(ApplicationManagerService appService) {
-        if (log.isDebugEnabled()) {
-            log.debug("CarbonApplicationService bound to the ESB initialization process");
-        }
-        applicationManager = appService;
-    }
-
-    protected void unsetAppManager(ApplicationManagerService appService) {
-        if (log.isDebugEnabled()) {
-            log.debug("CarbonApplicationService unbound from the ESB environment");
-        }
-        applicationManager = null;
-    }
-
-    protected void setConfigTrackingService(ConfigurationTrackingService configTrackingService) {
-        if (log.isDebugEnabled()) {
-            log.debug("ConfigurationTrackingService bound to the ESB initialization process");
-        }
-        ServiceBusInitializer.configTrackingService = configTrackingService;
-    }
-
-    protected void unsetConfigTrackingService(ConfigurationTrackingService configTrackingService) {
-        if (log.isDebugEnabled()) {
-            log.debug("ConfigurationTrackingService unbound from the ESB environment");
-        }
-        ServiceBusInitializer.configTrackingService = null;
-    }
-
-    protected void setEventBroker(EventBroker eventBroker) {
-        ServiceBusInitializer.eventBroker = eventBroker;
-    }
-
-    protected void unSetEventBroker(EventBroker eventBroker) {
-        ServiceBusInitializer.eventBroker = null;
-    }
-
     protected void setTaskService(NtaskService taskService) {
     }
 
     protected void unsetTaskService(NtaskService ntaskService) {
     }
 
-    public static EventBroker getEventBroker() {
-        return eventBroker;
-    }
-
-    public static ConfigurationTrackingService getConfigurationTrackingService() {
-        return configTrackingService;
-    }
-
-    public static ApplicationManagerService getAppManager() {
-        if (applicationManager == null) {
-            String msg = "Before activating Mediation initializer service bundle, an instance of "
-                    + "CarbonApplicationService should be in existance";
-            log.error(msg);
-        }
-        return applicationManager;
-    }
-
     public static ServerConfigurationInformation getConfigurationInformation() {
         return configurationInformation;
     }
 
-/*    protected static RegistryService getRegistryService() {
-        return registryService;
-    }*/
 
     protected static ServerConfigurationInformation getServerConfigurationInformation() {
         return configurationInformation;

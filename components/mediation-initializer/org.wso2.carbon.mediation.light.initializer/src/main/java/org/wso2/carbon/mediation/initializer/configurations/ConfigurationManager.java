@@ -1,17 +1,17 @@
 /**
- *  Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Copyright (c) 2009, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.wso2.carbon.mediation.initializer.configurations;
 
@@ -53,7 +53,6 @@ import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServic
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServiceImpl;
 import org.wso2.carbon.mediation.initializer.utils.ConfigurationHolder;
 import org.wso2.carbon.mediation.registry.WSO2Registry;
-import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 
 import java.io.File;
@@ -134,6 +133,13 @@ public class ConfigurationManager {
 
             // if this configuration is not created before we are going to
             // create a default configuration
+            // if this configuration is not created before we are going to
+            // create a default configuration
+            newSynapseConfiguration = createDefaultConfiguration();
+            loadLocation = 1;
+            log.info("A default Synapse Configuration is created " +
+                    "for the configuration: " + name);
+
 
             Properties properties = SynapsePropertiesLoader.loadSynapseProperties();
             if (getServerConfigurationInformation().getResolveRoot() != null) {
@@ -171,7 +177,7 @@ public class ConfigurationManager {
 
                 try {
                     ConfigurationUtils.destroyConfiguration(oldSynapseConfiguration,
-                        configurationContext.getAxisConfiguration(), oldSynapseEnvironment);
+                            configurationContext.getAxisConfiguration(), oldSynapseEnvironment);
                 } catch (Exception e) {
                     // we are going to ignore and continue
                     log.warn("Error while destroying the current configuration.. " +
@@ -200,7 +206,7 @@ public class ConfigurationManager {
             }
 
             configurationContext.getAxisConfiguration().addParameter(
-                            new Parameter(ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION, name));
+                    new Parameter(ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION, name));
 
             // initilze the configuration
             initializeConfiguration(synpaseConfigurationsRoot + File.separator + name,
@@ -215,7 +221,7 @@ public class ConfigurationManager {
             unregisterServices();
 
             registerServices();
-            
+
             return true;
         } catch (AxisFault axisFault) {
             handleException("Error while setting up the new configuration");
@@ -265,7 +271,7 @@ public class ConfigurationManager {
 
         if (serviceRegistration != null) {
             SynapseRegistrationsService synapseRegistrationsService =
-                (SynapseRegistrationsService) bundleContext.getService(serviceRegistration.getReference());
+                    (SynapseRegistrationsService) bundleContext.getService(serviceRegistration.getReference());
 
             ServiceRegistration synConfigServiceRegistration =
                     synapseRegistrationsService.getSynapseConfigurationServiceRegistration();
@@ -287,7 +293,7 @@ public class ConfigurationManager {
 
     /**
      * Create the default configuration
-     *    
+     *
      * @return the default configuration
      */
     private SynapseConfiguration createDefaultConfiguration() {
@@ -302,7 +308,7 @@ public class ConfigurationManager {
         faultSequence.setFileName(faultSequence.getName());
 
         // set the governance registry
-        Registry registry = new WSO2Registry();        
+        Registry registry = new WSO2Registry();
         newSynapseConfiguration.setRegistry(registry);
 
         newSynapseConfiguration.setProperty(
@@ -423,8 +429,8 @@ public class ConfigurationManager {
             }
         }
 
-		synEnv.getTaskManager().init(repository, taskScheduler,
-				newSynapseConfiguration.getTaskManager());
+        synEnv.getTaskManager().init(repository, taskScheduler,
+                newSynapseConfiguration.getTaskManager());
         // init the synapse configuration
         newSynapseConfiguration.init(synEnv);
         synEnv.setInitialized(true);
@@ -436,7 +442,7 @@ public class ConfigurationManager {
      */
     private boolean isLoadFromRegistry() {
         return "true".equals(
-                        ConfigurationUtils.getParameter(ServiceBusConstants.LOAD_FROM_REGISTRY));
+                ConfigurationUtils.getParameter(ServiceBusConstants.LOAD_FROM_REGISTRY));
     }
 
     private SynapseEnvironment getSynapseEnvironment() {
@@ -480,5 +486,5 @@ public class ConfigurationManager {
     private void handleException(String msg, Exception e) throws ConfigurationInitilizerException {
         log.warn(msg, e);
         throw new ConfigurationInitilizerException(msg, e);
-    }    
+    }
 }
