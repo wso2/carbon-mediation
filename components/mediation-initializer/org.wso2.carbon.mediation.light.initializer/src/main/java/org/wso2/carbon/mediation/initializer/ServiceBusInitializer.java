@@ -167,7 +167,7 @@ public class ServiceBusInitializer {
 */
 
             // Initialize Synapse
-            ServerContextInformation contextInfo = initESB("");
+            ServerContextInformation contextInfo = initESB("default");
 
             ServiceRegistration synCfgRegistration = null;
             ServiceRegistration synEnvRegistration = null;
