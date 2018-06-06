@@ -72,7 +72,7 @@
             <artifactId>json-smart</artifactId>
         </dependency>
       	<dependency>
-            <groupId>com.damnhandy</groupId>
+            <groupId>com.damnhandy.wso2</groupId>
             <artifactId>handy-uri-templates</artifactId>
 	    </dependency>
         <dependency>
@@ -136,7 +136,7 @@
                                 <bundleDef>org.quartz-scheduler.wso2:quartz</bundleDef>
                                 <bundleDef>com.google.code.gson:gson:${gson.version}</bundleDef>
                                 <bundleDef>org.wso2.caching:wso2caching-core</bundleDef>
-                                <bundleDef>com.damnhandy:handy-uri-templates</bundleDef>
+                                <bundleDef>com.damnhandy.wso2:handy-uri-templates</bundleDef>
                                 <bundleDef>org.wso2.orbit.com.jayway.jsonpath:com.jayway.jsonpath</bundleDef>
                                 <bundleDef>net.minidev:json-smart</bundleDef>
                                 <!-- Json schema validator dependencies -->
