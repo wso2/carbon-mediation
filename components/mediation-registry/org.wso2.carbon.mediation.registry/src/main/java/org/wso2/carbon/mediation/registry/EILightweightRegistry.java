@@ -94,9 +94,9 @@ public class EILightweightRegistry extends AbstractRegistry {
         //create default file system paths for registry
         //Default registry local registry location : <CARBON_HOME>/registry/local
         this.localRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "local" + File.separator;
-        //Default registry config registry location : <CARBON_HOME>/registry/local
+        //Default registry config registry location : <CARBON_HOME>/registry/config
         this.configRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "config" + File.separator;
-        //Default registry governance registry location : <CARBON_HOME>/registry/local
+        //Default registry governance registry location : <CARBON_HOME>/registry/governance
         this.govRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "governance" + File.separator;
     }
 
