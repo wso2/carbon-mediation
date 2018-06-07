@@ -104,6 +104,10 @@
          <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.mediator.log.ui</artifactId>
       </dependency>
+       <dependency>
+           <groupId>org.wso2.carbon.mediation</groupId>
+           <artifactId>org.wso2.carbon.mediator.kerberos.ui</artifactId>
+       </dependency>
       <dependency>
          <groupId>org.wso2.carbon.mediation</groupId>
          <artifactId>org.wso2.carbon.mediator.oauth.ui</artifactId>
@@ -284,6 +288,7 @@
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.iterate.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.log.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.oauth.ui</bundleDef>
+                        <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.kerberos.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.out.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.property.ui</bundleDef>
                         <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediator.rule.ui</bundleDef>
