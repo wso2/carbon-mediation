@@ -57,6 +57,7 @@ public class ESBRegistryConstants {
     public static final String CONFIG_REGISTRY_PREFIX = "conf:";
     public static final String GOVERNANCE_REGISTRY_PREFIX = "gov:";
     public static final String LOCAL_REGISTRY_PREFIX = "local:";
+    public static final String FILE_URI_PREFIX = "file:";
 
     public static final char URL_SEPARATOR_CHAR = '/';
     public static final String URL_SEPARATOR = "/";

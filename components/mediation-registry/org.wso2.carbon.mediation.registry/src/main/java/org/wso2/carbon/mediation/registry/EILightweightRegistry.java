@@ -92,9 +92,12 @@ public class EILightweightRegistry extends AbstractRegistry {
         defaultFSRegRoot += "registry" + File.separator;
 
         //create default file system paths for registry
-        this.localRegistry = defaultFSRegRoot + "local" + File.separator;//<CARBON_HOME>/registry/local
-        this.configRegistry = defaultFSRegRoot + "config" + File.separator;//<CARBON_HOME>/registry/config
-        this.govRegistry = defaultFSRegRoot + "governance" + File.separator;//<CARBON_HOME>/registry/governance
+        //Default registry local registry location : <CARBON_HOME>/registry/local
+        this.localRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "local" + File.separator;
+        //Default registry config registry location : <CARBON_HOME>/registry/local
+        this.configRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "config" + File.separator;
+        //Default registry governance registry location : <CARBON_HOME>/registry/local
+        this.govRegistry = ESBRegistryConstants.FILE_URI_PREFIX + defaultFSRegRoot + "governance" + File.separator;
     }
 
     @Override
@@ -135,7 +138,9 @@ public class EILightweightRegistry extends AbstractRegistry {
             try {
                 url.openStream();
             } catch (IOException e) {
-                log.error("Error occurred while accessing registry resource: " + key, e);
+                if (log.isDebugEnabled()) {
+                    log.debug("Error occurred while accessing registry resource: " + key, e);
+                }
                 return null;
             }
         }
