@@ -64,7 +64,7 @@
 	%>
 	<script type="text/javascript">
     jQuery(document).ready(function() {
-        CARBON.showErrorDialog('<%=responseInformation.getMessage()%>', function () {
+        CARBON.showErrorDialog('<%=Encode.forHtmlAttribute(responseInformation.getMessage())%>', function () {
             goBackOnePage();
         }, function () {
             goBackOnePage();
