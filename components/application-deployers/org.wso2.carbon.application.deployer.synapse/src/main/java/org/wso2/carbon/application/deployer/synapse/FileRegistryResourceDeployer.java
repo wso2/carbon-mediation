@@ -47,7 +47,6 @@ import java.util.List;
  */
 public class FileRegistryResourceDeployer implements AppDeploymentHandler {
 
-
     private Registry lightweightRegistry;
 
     public static final Log log = LogFactory.getLog(FileRegistryResourceDeployer.class);
@@ -157,8 +156,7 @@ public class FileRegistryResourceDeployer implements AppDeploymentHandler {
 
 
     /**
-     * Writes all registry contents (resources, collections and associations) of the given
-     * artifact to the registry.
+     * Writes all registry contents (resources) of the given artifact to the registry.
      *
      * @param registryConfig - Artifact instance
      */
@@ -166,6 +164,7 @@ public class FileRegistryResourceDeployer implements AppDeploymentHandler {
 
         // write resources
         List<RegistryConfig.Resourse> resources = registryConfig.getResources();
+
         for (RegistryConfig.Resourse resource : resources) {
             String filePath = registryConfig.getExtractedPath() + File.separator +
                     AppDeployerConstants.RESOURCES_DIR + File.separator + resource.getFileName();
@@ -176,14 +175,20 @@ public class FileRegistryResourceDeployer implements AppDeploymentHandler {
                 log.error("Specified file to be written as a resource is " + "not found at : " + filePath);
                 continue;
             }
-
             String resourcePath = AppDeployerUtils.computeResourcePath(createRegistryKey(resource),resource.getFileName());
             lightweightRegistry.newNonEmptyResource(resourcePath, false, null, readResourceContent(file), null);
 
         }
     }
 
+    /**
+     * Function to create registry key from registry path
+     *
+     * @param resourse resourse
+     * @return
+     */
     private String createRegistryKey(RegistryConfig.Resourse resourse) {
+
         String key = resourse.getPath();
         if (key.startsWith(GOV_REGISTRY_PATH)) {
             key = GOV_REGISTRY_PREFIX + key.substring(19);
@@ -194,8 +199,15 @@ public class FileRegistryResourceDeployer implements AppDeploymentHandler {
             key = GOV_REGISTRY_PREFIX + key;
         }
         return key;
+
     }
 
+    /**
+     * Function to retrieve file content to a string
+     *
+     * @param file target file
+     * @return String containing the content of the file
+     */
     private String readResourceContent (File file) {
 
         try (InputStream is = new FileInputStream(file)) {
@@ -214,6 +226,7 @@ public class FileRegistryResourceDeployer implements AppDeploymentHandler {
                 }
             }
             return strBuilder.toString();
+
         } catch (FileNotFoundException e) {
             log.error("Unable to find file at: " + file.getAbsolutePath(), e);
         } catch (IOException e) {
