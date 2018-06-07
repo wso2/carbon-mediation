@@ -26,7 +26,7 @@
     </parent>
     <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>carbon-mediation</artifactId>
-    <version>4.6.81-SNAPSHOT</version>
+    <version>4.6.84-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -2105,7 +2105,7 @@
                 <version>${json.smart.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.damnhandy</groupId>
+                <groupId>com.damnhandy.wso2</groupId>
                 <artifactId>handy-uri-templates</artifactId>
                 <version>${damnhandy.version}</version>
             </dependency>
@@ -2333,7 +2333,7 @@
     </dependencyManagement>
     <properties>
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.6.81-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.6.84-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.import.feature.version>4.6.0</carbon.mediation.import.feature.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
@@ -2425,7 +2425,7 @@
         <commons-collections.version>3.2.1</commons-collections.version>
         <commons-beanutils.version>1.8.3</commons-beanutils.version>
         <commons-digester.version>1.8</commons-digester.version>
-        <commons-codec.version>1.3</commons-codec.version>
+        <commons-codec.version>1.10</commons-codec.version>
         <org.eclipse.osgi.version>3.7.0.v20110613</org.eclipse.osgi.version>
         <imp.pkg.version.javax.servlet.jsp>[2.2.0, 2.3.0)</imp.pkg.version.javax.servlet.jsp>
         <imp.pkg.version.javax.servlet.jsp.jstl>[1.2.1, 1.3.0)</imp.pkg.version.javax.servlet.jsp.jstl>
@@ -2468,7 +2468,7 @@
         <saxon.wso2.version>8.9.0.wso2v2</saxon.wso2.version>
         <jsonpath.version>0.8.1.wso2v1</jsonpath.version>
         <json.smart.version>1.2</json.smart.version>
-        <damnhandy.version>2.1.6</damnhandy.version>
+        <damnhandy.version>2.1.6.wso2v2</damnhandy.version>
         <netty.version>4.0.39.Final</netty.version>
         <quickfixj.wso2.version>1.4.0.wso2v2</quickfixj.wso2.version>
         <javax.servlet.imp.pkg.version>[2.4.0, 3.0.0)</javax.servlet.imp.pkg.version>
