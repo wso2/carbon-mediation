@@ -59,6 +59,7 @@
                 <module>components/application-mgt</module>
                 <module>components/mediation-throttle</module>
                 <module>components/mediation-cg</module>
+                <module>features/thirdpartylib-features</module>
                 <module>features/event-sink</module>
                 <module>features/carbon-transports</module>
                 <module>features/scheduled-tasks</module>
