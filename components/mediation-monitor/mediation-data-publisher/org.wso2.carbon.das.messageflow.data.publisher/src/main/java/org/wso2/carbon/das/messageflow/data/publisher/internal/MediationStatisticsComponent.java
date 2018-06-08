@@ -50,7 +50,7 @@ import java.util.Set;
  * cardinality="1..1" policy="dynamic" bind="setConfigurationContextService"
  * unbind="unsetConfigurationContextService"
  * @scr.reference name="org.wso2.carbon.registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService" cardinality="1..1"
+ * interface="org.wso2.carbon.registry.core.service.RegistryService" cardinality="0..1"
  * policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
  * @scr.reference name="synapse.env.service"
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService"
