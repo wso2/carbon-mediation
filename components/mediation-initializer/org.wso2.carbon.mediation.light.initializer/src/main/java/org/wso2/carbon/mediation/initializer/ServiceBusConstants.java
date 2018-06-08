@@ -79,6 +79,7 @@ public final class ServiceBusConstants {
     public static final String CARBON_TASK_REPOSITORY = "CARBON_TASK_REPOSITORY";
     public static final String DEFAULT_SYNAPSE_CONFIGS_LOCATION = "repository/deployment/server/synapse-configs";
     public static final String SYNAPSE_CONFIGS = "synapse-configs";
+    public static final String SYNAPSE_LIB_CONFIGS = "synapse-libs";
     public static final String SYNAPSE_CONFIG_LOCK = "synapse.config.lock";
 
     public static final String SEQUENCE_TYPE = "synapse/sequence";
@@ -122,6 +123,11 @@ public final class ServiceBusConstants {
     public static final String ESB_DEBUG_SYSTEM_PROPERTY = "esb.debug";
     public static final String ESB_DEBUG_EVENT_PORT = "synapse.debugger.port.event";
     public static final String ESB_DEBUG_COMMAND_PORT = "synapse.debugger.port.command";
+
+    // Constant holding synapse import config path from axis2 repository root
+    public static final String SYNAPSE_IMPORTS_CONFIG_PATH = "synapse-configs/default/imports";
+    public static final String SYNAPSE_CONNECTOR_PACKAGE = "org.wso2.carbon.connector";
+    public static final String DISABLE_CONNECTOR_INIT_SYSTEM_PROPERTY = "esb.connector.startup.init.disable";
 
 }
 

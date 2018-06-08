@@ -47,7 +47,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
 import org.wso2.carbon.core.ServerShutdownHandler;
-import org.wso2.carbon.inbound.endpoint.EndpointListenerLoader;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
 import org.wso2.carbon.mediation.initializer.handler.ProxyLogHandler;
@@ -60,6 +59,7 @@ import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentServiceI
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService;
 import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServiceImpl;
 import org.wso2.carbon.mediation.initializer.utils.ConfigurationHolder;
+import org.wso2.carbon.mediation.initializer.utils.SynapseArtifactInitUtils;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
 import org.wso2.carbon.securevault.SecretCallbackHandlerService;
 import org.wso2.carbon.task.services.TaskDescriptionRepositoryService;
@@ -408,6 +408,13 @@ public class ServiceBusInitializer {
             if (isRunningDebugMode()) {
                 log.info("ESB Started in Debug mode for super tenant");
                 createSynapseDebugEnvironment(contextInfo);
+            }
+
+            boolean initConnectors =
+                    !Boolean.valueOf(System.getProperty(ServiceBusConstants.DISABLE_CONNECTOR_INIT_SYSTEM_PROPERTY));
+            if (initConnectors) {
+                // Enable connectors
+                SynapseArtifactInitUtils.initializeConnectors(axisConf);
             }
 
             serverManager.init(configurationInformation, contextInfo);
