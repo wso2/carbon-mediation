@@ -18,8 +18,9 @@
 
 package org.wso2.carbon.mediation.initializer.utils;
 
-import org.apache.axiom.om.OMDocument;
+import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,11 +28,22 @@ import org.apache.synapse.config.xml.SynapseImportSerializer;
 import org.apache.synapse.libraries.imports.SynapseImport;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * Utility class containing util functions to initialize synapse artifacts
@@ -39,6 +51,20 @@ import javax.xml.namespace.QName;
 public class SynapseArtifactInitUtils {
 
     private static final Log log = LogFactory.getLog(SynapseArtifactInitUtils.class);
+    private static final String CONNECTOR_XML = "connector.xml";
+
+    private static String APP_UNZIP_DIR;
+    private static boolean isAppDirCreated = false;
+
+    static {
+        String javaTmpDir = System.getProperty("java.io.tmpdir");
+        APP_UNZIP_DIR = javaTmpDir.endsWith(File.separator) ? javaTmpDir + ServiceBusConstants.SYNAPSE_LIB_CONFIGS :
+                javaTmpDir + File.separator + ServiceBusConstants.SYNAPSE_LIB_CONFIGS;
+    }
+
+    public static String getAppUnzipDir() {
+        return APP_UNZIP_DIR;
+    }
 
     /**
      * Function to create synapse imports to enable installed connectors
@@ -78,9 +104,13 @@ public class SynapseArtifactInitUtils {
                 if (log.isDebugEnabled()) {
                     log.debug("Generating import for connector deployed with package: " + connectorZip.getName());
                 }
+
+                String connectorExtractedPath = extractConnector(connectorZip.getAbsolutePath());
+                String packageName = retrievePackageName(connectorExtractedPath);
+
                 // Retrieve connector name
                 String connectorName = connectorZip.getName().substring(0, connectorZip.getName().indexOf('-'));
-                QName qualifiedName = new QName(ServiceBusConstants.SYNAPSE_CONNECTOR_PACKAGE, connectorName);
+                QName qualifiedName = new QName(packageName, connectorName);
                 File importFile = new File(importsDir, qualifiedName.toString() + ".xml");
 
                 if (!importFile.exists()) {
@@ -118,4 +148,125 @@ public class SynapseArtifactInitUtils {
                     qualifiedName.getLocalPart() + " packageName : " + qualifiedName.getNamespaceURI());
         }
     }
+
+
+    private static String retrievePackageName(String extractedPath) {
+        String packageName = null;
+        File connectorXml = new File(extractedPath + CONNECTOR_XML);
+        if (!connectorXml.exists()) {
+            log.error("connector.xml file not found at : " + extractedPath);
+        }
+
+        try (InputStream xmlInputStream =  new FileInputStream(connectorXml)) {
+            OMElement connectorDef = new StAXOMBuilder(xmlInputStream).getDocumentElement();
+            OMAttribute packageAttr = connectorDef.getFirstElement().getAttribute(new QName("package"));
+            if (packageAttr != null) {
+                packageName = packageAttr.getAttributeValue();
+            }
+        } catch (XMLStreamException e) {
+            log.error("Error while parsing the connector.xml file ", e);
+        } catch (FileNotFoundException e) {
+            log.error("artifacts.xml File cannot be loaded from " + extractedPath, e);
+        } catch (IOException e) {
+            log.error("Error occurred while reading: " + connectorXml.getPath());
+        }
+        return packageName;
+    }
+
+
+
+    /**
+     * Extract the connector at the provided path to the java temp dir. Return the
+     * extracted location
+     *
+     * @param connectorPath - Absolute path of the Carbon application .car file
+     * @return - extracted location
+     * @throws org.wso2.carbon.CarbonException - error on extraction
+     */
+    public static String extractConnector(String connectorPath) {
+        createTempDirectory();
+
+        String tempConnectorPathFormatted = formatPath(connectorPath);
+        String fileName = tempConnectorPathFormatted.substring(tempConnectorPathFormatted.lastIndexOf('/') + 1);
+        String dest = getAppUnzipDir() + File.separator + System.currentTimeMillis() + fileName + File.separator;
+
+        createDir(dest);
+
+        try {
+            extract(connectorPath, dest);
+        } catch (IOException e) {
+            log.error("Error while extracting Connector zip : " + fileName, e);
+            return null;
+        }
+        return dest;
+    }
+
+    private static void createTempDirectory(){
+        if(isAppDirCreated){
+            return;
+        }
+        createDir(getAppUnzipDir());
+        isAppDirCreated = true;
+    }
+
+    public static void createDir(String path) {
+        File temp = new File(path);
+        if (!temp.exists() && !temp.mkdirs()) {
+            log.error("Error while creating directory : " + path);
+            return;
+        }
+
+    }
+
+    /**
+     * Format the string paths to match any platform.. windows, linux etc..
+     *
+     * @param path - input file path
+     * @return formatted file path
+     */
+    public static String formatPath(String path) {
+        // removing white spaces
+        String pathformatted = path.replaceAll("\\b\\s+\\b", "%20");
+        try {
+            pathformatted = java.net.URLDecoder.decode(pathformatted, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Unsupported Encoding in the path :"+ pathformatted);
+        }
+        // replacing all "\" with "/"
+        return pathformatted.replace('\\', '/');
+    }
+
+    private static void extract(String sourcePath, String destPath) throws IOException {
+        Enumeration entries;
+        ZipFile zipFile;
+
+        zipFile = new ZipFile(sourcePath);
+        entries = zipFile.entries();
+
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = (ZipEntry) entries.nextElement();
+
+            // if the entry is a directory, create a new dir
+            if (!entry.isDirectory() && entry.getName().equalsIgnoreCase(CONNECTOR_XML)) {
+                // if the entry is a file, write the file
+                copyInputStream(zipFile.getInputStream(entry),
+                        new BufferedOutputStream(new FileOutputStream(destPath + entry.getName())));
+            }
+        }
+        zipFile.close();
+    }
+
+    private static void copyInputStream(InputStream in, OutputStream out)
+            throws IOException {
+        byte[] buffer = new byte[40960];
+        int len;
+
+        while ((len = in.read(buffer)) >= 0) {
+            out.write(buffer, 0, len);
+        }
+
+        in.close();
+        out.close();
+    }
+
 }
