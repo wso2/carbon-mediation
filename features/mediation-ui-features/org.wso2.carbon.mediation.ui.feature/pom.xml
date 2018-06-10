@@ -36,10 +36,13 @@
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.endpoint.stub</artifactId>
         </dependency>
+        <!--
+        Remove Artifact deployment UI (No longer used)
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.artifactuploader.ui</artifactId>
         </dependency>
+        -->
         <dependency>
             <groupId>org.wso2.carbon.mediation</groupId>
             <artifactId>org.wso2.carbon.mediation.templates.ui</artifactId>
@@ -183,7 +186,10 @@
                             <bundles>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.endpoint.ui</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.endpoint.stub</bundleDef>
+                                <!--
+                                Remove Artifact deployment UI (No longer used)
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.artifactuploader.ui</bundleDef>
+                                -->
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.artifactuploader.stub</bundleDef>
                                 <bundleDef>org.wso2.carbon.mediation:org.wso2.carbon.mediation.templates.ui</bundleDef>
                                 <bundleDef>
