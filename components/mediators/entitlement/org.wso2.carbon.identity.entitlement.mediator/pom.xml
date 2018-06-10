@@ -69,7 +69,7 @@
             <artifactId>slf4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.wso2.carbon.identity</groupId>
+            <groupId>org.wso2.carbon.identity.agent.entitlement.mediator</groupId>
             <artifactId>org.wso2.carbon.identity.entitlement.proxy</artifactId>
         </dependency>
     </dependencies>
