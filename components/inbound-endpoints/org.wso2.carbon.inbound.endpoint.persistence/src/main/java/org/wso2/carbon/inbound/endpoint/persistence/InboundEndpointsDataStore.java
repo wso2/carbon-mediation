@@ -67,7 +67,6 @@ public class InboundEndpointsDataStore {
                     if (fetchedResource.getContent() instanceof byte[]) {
                         fetchedData = new String((byte[]) fetchedResource.getContent());
                     }
-                    ;
                     OMElement fetchedOM = null;
                     try {
                         fetchedOM = AXIOMUtil.stringToOM(fetchedData);
