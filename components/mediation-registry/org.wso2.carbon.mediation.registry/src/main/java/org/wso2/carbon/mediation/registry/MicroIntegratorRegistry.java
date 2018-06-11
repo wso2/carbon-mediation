@@ -48,9 +48,9 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-public class EILightweightRegistry extends AbstractRegistry {
+public class MicroIntegratorRegistry extends AbstractRegistry {
 
-    private static final Log log = LogFactory.getLog(EILightweightRegistry.class);
+    private static final Log log = LogFactory.getLog(MicroIntegratorRegistry.class);
 
     private static final int DELETE_RETRY_SLEEP_TIME = 10;
     private static final long DEFAULT_CACHABLE_DURATION = 0;
@@ -82,7 +82,7 @@ public class EILightweightRegistry extends AbstractRegistry {
     private int registryProtocol = FILE;
 
 
-    public EILightweightRegistry() {
+    public MicroIntegratorRegistry() {
         //default registry is file system based resided in carbon home
         String defaultFSRegRoot = RegistryHelper.getHome();
         if (!defaultFSRegRoot.endsWith(File.separator)) {
