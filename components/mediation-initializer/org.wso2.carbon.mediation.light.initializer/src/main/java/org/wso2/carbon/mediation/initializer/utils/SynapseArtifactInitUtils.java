@@ -104,8 +104,13 @@ public class SynapseArtifactInitUtils {
                 if (log.isDebugEnabled()) {
                     log.debug("Generating import for connector deployed with package: " + connectorZip.getName());
                 }
-
-                String connectorExtractedPath = extractConnector(connectorZip.getAbsolutePath());
+                String connectorExtractedPath = null;
+                try {
+                    connectorExtractedPath = extractConnector(connectorZip.getAbsolutePath());
+                } catch (IOException e) {
+                    log.error("Error while extracting Connector zip : " + connectorZip.getAbsolutePath(), e);
+                    continue;
+                }
                 String packageName = retrievePackageName(connectorExtractedPath);
 
                 // Retrieve connector name
@@ -166,7 +171,7 @@ public class SynapseArtifactInitUtils {
         } catch (XMLStreamException e) {
             log.error("Error while parsing the connector.xml file ", e);
         } catch (FileNotFoundException e) {
-            log.error("artifacts.xml File cannot be loaded from " + extractedPath, e);
+            log.error("connector.xml File cannot be loaded from " + extractedPath, e);
         } catch (IOException e) {
             log.error("Error occurred while reading: " + connectorXml.getPath());
         }
@@ -183,7 +188,7 @@ public class SynapseArtifactInitUtils {
      * @return - extracted location
      * @throws org.wso2.carbon.CarbonException - error on extraction
      */
-    public static String extractConnector(String connectorPath) {
+    public static String extractConnector(String connectorPath) throws IOException {
         createTempDirectory();
 
         String tempConnectorPathFormatted = formatPath(connectorPath);
@@ -192,12 +197,7 @@ public class SynapseArtifactInitUtils {
 
         createDir(dest);
 
-        try {
-            extract(connectorPath, dest);
-        } catch (IOException e) {
-            log.error("Error while extracting Connector zip : " + fileName, e);
-            return null;
-        }
+        extract(connectorPath, dest);
         return dest;
     }
 
@@ -243,9 +243,13 @@ public class SynapseArtifactInitUtils {
         zipFile = new ZipFile(sourcePath);
         entries = zipFile.entries();
 
+        String canonicalDestPath = new File(destPath).getCanonicalPath();
         while (entries.hasMoreElements()) {
             ZipEntry entry = (ZipEntry) entries.nextElement();
-
+            String canonicalEntryPath = new File(destPath + entry.getName()).getCanonicalPath();
+            if(!canonicalEntryPath.startsWith(canonicalDestPath)){
+                throw new IOException("Entry is outside of the target dir: " + entry.getName());
+            }
             // if the entry is a directory, create a new dir
             if (!entry.isDirectory() && entry.getName().equalsIgnoreCase(CONNECTOR_XML)) {
                 // if the entry is a file, write the file
