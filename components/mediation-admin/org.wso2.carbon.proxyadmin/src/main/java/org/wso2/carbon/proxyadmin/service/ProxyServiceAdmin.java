@@ -386,8 +386,10 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
                         if (currentProxy.getArtifactContainerName() != null) {
                             proxy.setArtifactContainerName(currentProxy.getArtifactContainerName());
                             proxy.setIsEdited(true);
-                            MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-                            pm.deleteItem(proxy.getName(), proxy.getName() + FILE_TYPE_EXTENSION_XML, ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+                            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                                MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+                                pm.deleteItem(proxy.getName(), proxy.getName() + FILE_TYPE_EXTENSION_XML, ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+                            }
                         }
                     } catch (Exception e) {
 
@@ -446,9 +448,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
             ProxyService proxy = synapseConfiguration.getProxyService(proxyName);
             if (proxy != null) {
                 synapseConfiguration.removeProxyService(proxyName);
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                pm.deleteItem(proxyName, proxy.getFileName(),
-                        ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    pm.deleteItem(proxyName, proxy.getFileName(),
+                            ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+                }
                 if(log.isDebugEnabled()) {
                     log.debug("Proxy service : " + proxyName + " deleted");
                 }
@@ -941,9 +945,11 @@ public class ProxyServiceAdmin extends AbstractServiceBusAdmin {
     }
 
     public void persistProxyService(ProxyService proxy) throws ProxyAdminException {
-        MediationPersistenceManager pm = getMediationPersistenceManager();
-        if (pm != null) {
-            pm.saveItem(proxy.getName(), ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            MediationPersistenceManager pm = getMediationPersistenceManager();
+            if (pm != null) {
+                pm.saveItem(proxy.getName(), ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+            }
         }
     }
 

@@ -72,8 +72,10 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
                 messageStore.setFileName(fileName);
                 messageStore.init(getSynapseEnvironment());
                 synapseConfiguration.addMessageStore(messageStore.getName(), messageStore);
-                MediationPersistenceManager mp = getMediationPersistenceManager();
-                mp.saveItem(messageStore.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager mp = getMediationPersistenceManager();
+                    mp.saveItem(messageStore.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                }
             } else {
                 String message = "Unable to create Message Store ";
                 handleException(log, message, null);
@@ -126,8 +128,10 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
                     messageStore.setIsEdited(true);
                 }
                 else {
-                    MediationPersistenceManager mp = getMediationPersistenceManager();
-                    mp.saveItem(messageStore.getName(),ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        MediationPersistenceManager mp = getMediationPersistenceManager();
+                        mp.saveItem(messageStore.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+                    }
                 }
             } else {
                 assert false;
@@ -174,10 +178,11 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
             configuration.removeMessageStore(name);
             String fileName = removedMessageStore.getFileName();
             removedMessageStore.destroy();
-
-            MediationPersistenceManager pm = getMediationPersistenceManager();
-            pm.deleteItem(removedMessageStore.getName(),
-                    fileName,ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                MediationPersistenceManager pm = getMediationPersistenceManager();
+                pm.deleteItem(removedMessageStore.getName(),
+                        fileName, ServiceBusConstants.ITEM_TYPE_MESSAGE_STORE);
+            }
 
         } else {
             handleException(log, "Message Store " + name + " does not exist", null);

@@ -57,8 +57,10 @@ public class MLLPTransportServiceComponent {
             }
 
             // Save the transport configuration in the registry if not already done so
-            new TransportPersistenceManager(configContext.getAxisConfiguration()).saveTransportConfiguration(HL7TransportService.TRANSPORT_NAME,
-                    ctxt.getBundleContext().getBundle().getResource(HL7TransportService.TRANSPORT_CONF));
+            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                new TransportPersistenceManager(configContext.getAxisConfiguration()).saveTransportConfiguration(HL7TransportService.TRANSPORT_NAME,
+                        ctxt.getBundleContext().getBundle().getResource(HL7TransportService.TRANSPORT_CONF));
+            }
 
             // Instantiate HL7TransportService
             HL7Transport = new HL7TransportService();

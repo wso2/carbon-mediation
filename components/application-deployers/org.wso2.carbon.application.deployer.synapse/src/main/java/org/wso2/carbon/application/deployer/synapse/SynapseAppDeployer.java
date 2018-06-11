@@ -622,9 +622,11 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                                     synapseConfiguration.getProperties());
                     entry.setFileName(ServiceBusUtils.generateFileName(entry.getKey()));
                     synapseConfiguration.addEntry(entryKey, entry);
-                    MediationPersistenceManager pm =
-                            ServiceBusUtils.getMediationPersistenceManager(axisConfig);
-                    pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        MediationPersistenceManager pm =
+                                ServiceBusUtils.getMediationPersistenceManager(axisConfig);
+                        pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    }
                 }
                 if (log.isDebugEnabled()) {
                     log.debug("Local registry entry : " + entryKey + " added to the configuration");
@@ -675,10 +677,12 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                 Entry entry = synapseConfiguration.getDefinedEntries().get(entryKey);
                 if (entry != null) {
                     synapseConfiguration.removeEntry(entryKey);
-                    MediationPersistenceManager pm =
-                            ServiceBusUtils.getMediationPersistenceManager(axisConfig);
-                    pm.deleteItem(entryKey, entry.getFileName(),
-                            ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        MediationPersistenceManager pm =
+                                ServiceBusUtils.getMediationPersistenceManager(axisConfig);
+                        pm.deleteItem(entryKey, entry.getFileName(),
+                                ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    }
                     if (log.isDebugEnabled()) {
                         log.debug("Deleted local entry with key : " + entryKey);
                     }

@@ -67,7 +67,7 @@ import java.util.Set;
  * cardinality="1..n" policy="dynamic"
  * bind="setSynapseEnvironmentService" unbind="unsetSynapseEnvironmentService"
  * @scr.reference name="service.admin.service" interface="org.wso2.carbon.service.mgt.ServiceAdmin"
- * cardinality="1..1" policy="dynamic"
+ * cardinality="0..1" policy="dynamic"
  * bind="setServiceAdminService" unbind="unsetServiceAdminService"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"

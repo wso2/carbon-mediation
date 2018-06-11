@@ -209,9 +209,11 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
             Template sequence = synCfg.getEndpointTemplates().get(templateName);
             if (sequence != null) {
                 synCfg.removeEndpointTemplate(templateName);
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                pm.deleteItem(templateName, sequence.getFileName(),
-                              ServiceBusConstants.ITEM_TYPE_TEMPLATE_ENDPOINTS);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    pm.deleteItem(templateName, sequence.getFileName(),
+                            ServiceBusConstants.ITEM_TYPE_TEMPLATE_ENDPOINTS);
+                }
             } else {
                 handleException("No defined endpoint template with name " + templateName
                                 + " found to delete in the Synapse configuration");
@@ -410,8 +412,10 @@ public class EndpointTemplateEditorAdmin extends AbstractServiceBusAdmin {
 
     private void persistTemplate(Template template) throws AxisFault {
        if (template instanceof Template) {
-            MediationPersistenceManager pm = getMediationPersistenceManager();
-            pm.saveItem(((Template) template).getName(), ServiceBusConstants.ITEM_TYPE_TEMPLATE_ENDPOINTS);
+           if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+               MediationPersistenceManager pm = getMediationPersistenceManager();
+               pm.saveItem(((Template) template).getName(), ServiceBusConstants.ITEM_TYPE_TEMPLATE_ENDPOINTS);
+           }
         }
     }
 

@@ -127,7 +127,9 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             elem.addChild(params);
             SynapseXMLConfigurationFactory.defineInboundEndpoint(synapseConfiguration, elem, synapseConfiguration.getProperties());
             InboundEndpoint inboundEndpoint = getInboundEndpoint(name);
-            persistInboundEndpoint(inboundEndpoint);
+            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                persistInboundEndpoint(inboundEndpoint);
+            }
             inboundEndpoint.init(getSynapseEnvironment());
         } catch (Exception ex) {
             log.error("Error adding inbound Endpoint", ex);
@@ -160,7 +162,9 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
         } catch (InboundManagementException e) {
             log.error(e.getMessage());
         }
-        persistInboundEndpoint(inboundEndpoint);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            persistInboundEndpoint(inboundEndpoint);
+        }
         inboundEndpoint.init(getSynapseEnvironment());
     }
 
@@ -221,14 +225,18 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             inboundEndpoint.setArtifactContainerName(oldInboundEndpoint.getArtifactContainerName());
             inboundEndpoint.setIsEdited(true);
         }
-        persistInboundEndpoint(inboundEndpoint);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            persistInboundEndpoint(inboundEndpoint);
+        }
         try {
             inboundEndpoint.init(getSynapseEnvironment());
         } catch (Exception e) {
             inboundEndpoint.destroy();
             synapseConfiguration.removeInboundEndpoint(name);
             synapseConfiguration.addInboundEndpoint(oldInboundEndpoint.getName(), oldInboundEndpoint);
-            persistInboundEndpoint(oldInboundEndpoint);
+            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                persistInboundEndpoint(oldInboundEndpoint);
+            }
             oldInboundEndpoint.init(getSynapseEnvironment());
             throw e;
         }
@@ -251,9 +259,11 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
             if (inboundEndpoint != null && inboundEndpoint.getArtifactContainerName() == null) {
                 synapseConfiguration.removeInboundEndpoint(name);
                 inboundEndpoint.destroy();
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                pm.deleteItem(name, inboundEndpoint.getFileName(),
-                        ServiceBusConstants.ITEM_TYPE_INBOUND);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    pm.deleteItem(name, inboundEndpoint.getFileName(),
+                            ServiceBusConstants.ITEM_TYPE_INBOUND);
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("Inbound service : " + name + " deleted");
                 }
@@ -287,7 +297,9 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 
                 /** Persist the api service if it is not deployed via an artifact container */
                 if (inboundEndpoint.getArtifactContainerName() == null) {
-                    persistInboundEndpoint(inboundEndpoint);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        persistInboundEndpoint(inboundEndpoint);
+                    }
                 }
                 return inboundEndpointName;
             } else {
@@ -320,7 +332,9 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 
                 /** Persist the api service if it is not deployed via an artifact container */
                 if (inboundEndpoint.getArtifactContainerName() == null) {
-                    persistInboundEndpoint(inboundEndpoint);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        persistInboundEndpoint(inboundEndpoint);
+                    }
                 }
                 return inboundEndpointName;
             } else {
@@ -355,7 +369,9 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 
                 /** Persist the api service if it is not deployed via an artifact container */
                 if (inboundEndpoint.getArtifactContainerName() == null) {
-                    persistInboundEndpoint(inboundEndpoint);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        persistInboundEndpoint(inboundEndpoint);
+                    }
                 }
                 return inboundEndpointName;
             } else {
@@ -388,7 +404,9 @@ public class CarbonInboundManagementService extends AbstractServiceBusAdmin {
 
                 /** Persist the api service if it is not deployed via an artifact container */
                 if (inboundEndpoint.getArtifactContainerName() == null) {
-                    persistInboundEndpoint(inboundEndpoint);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        persistInboundEndpoint(inboundEndpoint);
+                    }
                 }
                 return inboundEndpointName;
             } else {

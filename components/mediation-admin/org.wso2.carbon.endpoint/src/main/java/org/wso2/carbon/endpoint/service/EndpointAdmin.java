@@ -278,12 +278,14 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             SynapseConfiguration synapseConfiguration = getSynapseConfiguration();
             Endpoint endpoint = synapseConfiguration.getDefinedEndpoints().get(endpointName);
             synapseConfiguration.removeEndpoint(endpointName);
-            MediationPersistenceManager pm = getMediationPersistenceManager();
             String fileName = null;
             if (endpoint instanceof AbstractEndpoint) {
                 fileName = endpoint.getFileName();
             }
-            pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                MediationPersistenceManager pm = getMediationPersistenceManager();
+                pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+            }
             if (log.isDebugEnabled()) {
                 log.debug("Endpoint : " + endpointName + " removed from the configuration");
             }
@@ -323,7 +325,10 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                     if (endpoint instanceof AbstractEndpoint) {
                         fileName = endpoint.getFileName();
                     }
-                    pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+
+                        pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+                    }
                     if (log.isDebugEnabled()) {
                         log.debug("Endpoint : " + endpointName + " removed from the configuration");
                     }
@@ -361,12 +366,14 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
                             log.debug("Deleting endpoint : " + endpointName + " from the configuration");
                         }
                         synapseConfiguration.removeEndpoint(endpointName);
-                        MediationPersistenceManager pm = getMediationPersistenceManager();
                         String fileName = null;
                         if (endpoint instanceof AbstractEndpoint) {
                             fileName = endpoint.getFileName();
                         }
-                        pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                            MediationPersistenceManager pm = getMediationPersistenceManager();
+                            pm.deleteItem(endpointName, fileName, ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+                        }
                         if (log.isDebugEnabled()) {
                             log.debug("Endpoint : " + endpointName + " removed from the configuration");
                         }
@@ -558,8 +565,11 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
     }
 
     private void persistEndpoint(Endpoint ep) throws EndpointAdminException {
-        MediationPersistenceManager pm = getMediationPersistenceManager();
-        pm.saveItem(ep.getName(), ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+
+            MediationPersistenceManager pm = getMediationPersistenceManager();
+            pm.saveItem(ep.getName(), ServiceBusConstants.ITEM_TYPE_ENDPOINT);
+        }
     }
 
     private void assertNameNotEmpty(String endpointName) throws EndpointAdminException {

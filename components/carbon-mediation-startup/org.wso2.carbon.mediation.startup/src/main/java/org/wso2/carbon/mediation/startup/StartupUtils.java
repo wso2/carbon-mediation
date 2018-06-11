@@ -103,9 +103,11 @@ public class StartupUtils {
 				fileName = st.getFileName();
 			}
 			synapseConfiguration.removeStartup(name);
-			MediationPersistenceManager pm =
-					ServiceBusUtils.getMediationPersistenceManager(synapseConfiguration.getAxisConfiguration());
-			pm.deleteItem(name, fileName, ServiceBusConstants.ITEM_TYPE_TASK);
+			if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+				MediationPersistenceManager pm =
+						ServiceBusUtils.getMediationPersistenceManager(synapseConfiguration.getAxisConfiguration());
+				pm.deleteItem(name, fileName, ServiceBusConstants.ITEM_TYPE_TASK);
+			}
 
 		} else {
 			log.warn("Cannot delete the startup named " + name + ", it doesn't exists in the SynapseConfiguration");
@@ -155,8 +157,10 @@ public class StartupUtils {
 	}
 
 	private static void persistStartup(Startup startup, AxisConfiguration axisCfg) {
-		MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(axisCfg);
-		pm.saveItem(startup.getName(), ServiceBusConstants.ITEM_TYPE_TASK);
+		if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+			MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(axisCfg);
+			pm.saveItem(startup.getName(), ServiceBusConstants.ITEM_TYPE_TASK);
+		}
 	}
 
 	private static void handleException(String msg) {

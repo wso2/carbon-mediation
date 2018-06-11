@@ -85,9 +85,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                 messageProcessor.setFileName(fileName);
                 synapseConfiguration.addMessageProcessor(messageProcessor.getName(),
                         messageProcessor);
-                MediationPersistenceManager mp = getMediationPersistenceManager();
-                mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
-
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager mp = getMediationPersistenceManager();
+                    mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                }
             } else {
                 String message = "Unable to create Message Processor ";
                 handleException(log, message, null);
@@ -130,8 +131,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     messageProcessor.setIsEdited(true);
                 }
                 else {
-                    MediationPersistenceManager mp = getMediationPersistenceManager();
-                    mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        MediationPersistenceManager mp = getMediationPersistenceManager();
+                        mp.saveItem(messageProcessor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                    }
                 }
             } else {
                 String message = "Unable to Update Message Processor ";
@@ -186,10 +189,11 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                 processor.destroy();
             }
 
-
-            MediationPersistenceManager pm = getMediationPersistenceManager();
-            pm.deleteItem(processor.getName(),
-                    fileName, ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                MediationPersistenceManager pm = getMediationPersistenceManager();
+                pm.deleteItem(processor.getName(),
+                        fileName, ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+            }
 
         } else {
             handleException(log, "Message Store " + name + " does not exist", null);
@@ -570,8 +574,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     if (!view.isActive()) {
                         view.activate();
                         if (processor.getArtifactContainerName() == null) {
-                            getMediationPersistenceManager()
-                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                                getMediationPersistenceManager()
+                                        .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                            }
                         }
                     } else {
                         log.warn("Scheduled Message Forwarding Processor is already active");
@@ -591,8 +597,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     if (!view.isActive()) {
                         view.activate();
                         if (processor.getArtifactContainerName() == null) {
-                            getMediationPersistenceManager()
-                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                                getMediationPersistenceManager()
+                                        .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                            }
                         }
                     } else {
                         log.warn("Sampling Processor is already active");
@@ -640,8 +648,10 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                     if (view.isActive()) {
                         view.deactivate();
                         if (processor.getArtifactContainerName() == null) {
-                            getMediationPersistenceManager()
-                                    .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                                getMediationPersistenceManager()
+                                        .saveItem(processor.getName(), ServiceBusConstants.ITEM_TYPE_MESSAGE_PROCESSOR);
+                            }
                         }
                     } else {
                         log.warn("Sampling Message Processor - already in the deactivated state");

@@ -46,7 +46,9 @@ public class TemplateDeploymentInterceptor extends SequenceDeployer {
     public String deploySynapseArtifact(OMElement artifactConfig, String fileName,
                                         Properties properties) {
         String seqName = super.deploySynapseArtifact(artifactConfig, fileName, properties);
-        mpm.saveItemToRegistry(seqName, ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            mpm.saveItemToRegistry(seqName, ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+        }
         return seqName;
     }
 
@@ -55,19 +57,25 @@ public class TemplateDeploymentInterceptor extends SequenceDeployer {
                                         String existingArtifactName, Properties properties) {
         String seqName = super.updateSynapseArtifact(
                 artifactConfig, fileName, existingArtifactName, properties);
-        mpm.saveItemToRegistry(seqName, ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            mpm.saveItemToRegistry(seqName, ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+        }
         return seqName;
     }
 
     @Override
     public void undeploySynapseArtifact(String artifactName) {
         super.undeploySynapseArtifact(artifactName);
-        mpm.deleteItemFromRegistry(artifactName, ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            mpm.deleteItemFromRegistry(artifactName, ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+        }
     }
 
     @Override
     public void restoreSynapseArtifact(String artifactName) {
         super.restoreSynapseArtifact(artifactName);
-        mpm.saveItemToRegistry(artifactName, ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            mpm.saveItemToRegistry(artifactName, ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+        }
     }
 }

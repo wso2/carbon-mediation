@@ -149,9 +149,12 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
                     (UserRegistry) getConfigSystemRegistry());
             updater.update(configElement);
 
-            MediationPersistenceManager pm = getMediationPersistenceManager();
-            if (pm != null) {
-                pm.saveItem(null, ServiceBusConstants.ITEM_TYPE_FULL_CONFIG);
+            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+
+                MediationPersistenceManager pm = getMediationPersistenceManager();
+                if (pm != null) {
+                    pm.saveItem(null, ServiceBusConstants.ITEM_TYPE_FULL_CONFIG);
+                }
             }
 
         } catch (Exception e) {
@@ -164,14 +167,16 @@ public class ConfigAdmin extends AbstractServiceBusAdmin {
     }
 
     public ValidationError[] validateConfiguration(OMElement configElement) {
-        MediationPersistenceManager pm = getMediationPersistenceManager();
-        if (pm != null) {
-            String path = getSynapseConfiguration().getPathToConfigFile();
-            MultiXMLConfigurationSerializer serializer = new MultiXMLConfigurationSerializer(path);
-            if (!serializer.isWritable()) {
-                return new ValidationError[] {
-                        new ValidationError("Configuration Directory", "Locked by another process")
-                };
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            MediationPersistenceManager pm = getMediationPersistenceManager();
+            if (pm != null) {
+                String path = getSynapseConfiguration().getPathToConfigFile();
+                MultiXMLConfigurationSerializer serializer = new MultiXMLConfigurationSerializer(path);
+                if (!serializer.isWritable()) {
+                    return new ValidationError[]{
+                            new ValidationError("Configuration Directory", "Locked by another process")
+                    };
+                }
             }
         }
 

@@ -212,9 +212,11 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
             TemplateMediator sequence = synCfg.getSequenceTemplates().get(templateName);
             if (sequence != null) {
                 synCfg.removeSequenceTemplate(templateName);
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                pm.deleteItem(templateName, sequence.getFileName(),
-                              ServiceBusConstants.ITEM_TYPE_TEMPLATE);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    pm.deleteItem(templateName, sequence.getFileName(),
+                            ServiceBusConstants.ITEM_TYPE_TEMPLATE);
+                }
             } else {
                 handleException("No defined sequence with name " + templateName
                                 + " found to delete in the Synapse configuration");
@@ -700,8 +702,10 @@ public class TemplateEditorAdmin extends AbstractServiceBusAdmin {
 
     private void persistTemplate(Mediator template) throws AxisFault {
        if (template instanceof TemplateMediator) {
-            MediationPersistenceManager pm = getMediationPersistenceManager();
-            pm.saveItem(((TemplateMediator) template).getName(), ServiceBusConstants.ITEM_TYPE_TEMPLATE);
+           if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+               MediationPersistenceManager pm = getMediationPersistenceManager();
+               pm.saveItem(((TemplateMediator) template).getName(), ServiceBusConstants.ITEM_TYPE_TEMPLATE);
+           }
         }
     }
 }

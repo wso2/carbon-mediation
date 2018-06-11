@@ -29,7 +29,7 @@ import org.wso2.carbon.utils.ConfigurationContextService;
 /**
  * @scr.component name="inbound.endpoint.persistence.service" immediate="true"
  * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService" cardinality="1..1"
+ * interface="org.wso2.carbon.registry.core.service.RegistryService" cardinality="0..1"
  * policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
  * @scr.reference name="config.context.service"
  * interface="org.wso2.carbon.utils.ConfigurationContextService" cardinality="1..1"

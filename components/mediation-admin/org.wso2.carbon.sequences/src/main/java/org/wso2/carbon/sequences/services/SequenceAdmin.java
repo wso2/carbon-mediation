@@ -217,9 +217,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
             SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
             if (sequence != null && sequence.getArtifactContainerName() == null) {
                 synCfg.removeSequence(sequenceName);
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                pm.deleteItem(sequenceName, sequence.getFileName(),
-                        ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    pm.deleteItem(sequenceName, sequence.getFileName(),
+                            ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+                }
             } else {
                 handleException("No defined sequence with name " + sequenceName
                         + " found to delete in the Synapse configuration");
@@ -274,9 +276,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                 SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
                 if (sequence != null && sequence.getArtifactContainerName() == null) {
                     synCfg.removeSequence(sequenceName);
-                    MediationPersistenceManager pm = getMediationPersistenceManager();
-                    pm.deleteItem(sequenceName, sequence.getFileName(),
-                            ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        MediationPersistenceManager pm = getMediationPersistenceManager();
+                        pm.deleteItem(sequenceName, sequence.getFileName(),
+                                ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+                    }
                 }
             }
         } catch (Exception fault) {
@@ -304,9 +308,11 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
                     if ((!sequence.getName().equals("main")) && (!sequence.getName().equals("fault"))
                             && sequence.getArtifactContainerName() == null) {
                         synCfg.removeSequence(sequence.getName());
-                        MediationPersistenceManager pm = getMediationPersistenceManager();
-                        pm.deleteItem(sequence.getName(), sequence.getFileName(),
-                                ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                            MediationPersistenceManager pm = getMediationPersistenceManager();
+                            pm.deleteItem(sequence.getName(), sequence.getFileName(),
+                                    ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+                        }
                     }
                 }
             }
@@ -865,12 +871,14 @@ public class SequenceAdmin extends AbstractServiceBusAdmin {
     }
 
     private void persistSequence(SequenceMediator sequence) throws SequenceEditorException {
-        MediationPersistenceManager pm = getMediationPersistenceManager();
-        if (pm == null){
-            handleException("Cannot Persist sequence because persistence manager is null, " +
-                    "probably persistence is disabled");
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            MediationPersistenceManager pm = getMediationPersistenceManager();
+            if (pm == null) {
+                handleException("Cannot Persist sequence because persistence manager is null, " +
+                        "probably persistence is disabled");
+            }
+            pm.saveItem(sequence.getName(), ServiceBusConstants.ITEM_TYPE_SEQUENCE);
         }
-        pm.saveItem(sequence.getName(), ServiceBusConstants.ITEM_TYPE_SEQUENCE);
     }
     
     /**

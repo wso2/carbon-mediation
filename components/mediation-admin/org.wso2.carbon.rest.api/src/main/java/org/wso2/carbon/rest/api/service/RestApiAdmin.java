@@ -137,10 +137,12 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.setArtifactContainerName(oldAPI.getArtifactContainerName());
                 apiData.setIsEdited(true);
             } else {
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                String fileName = api.getFileName();
-                pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
-                pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    String fileName = api.getFileName();
+                    pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                    pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                }
             }
     		
     		return true;
@@ -183,10 +185,12 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.setIsEdited(true);
                 getApiByName(api.getName()).setIsEdited(true);
             } else {
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                String fileName = api.getFileName();
-                pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
-                pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    String fileName = api.getFileName();
+                    pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                    pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                }
             }
     		return true;
         } catch (XMLStreamException e) {
@@ -238,9 +242,11 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                 api.destroy();
                 synapseConfiguration.removeAPI(apiName);
 
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                String fileName = api.getFileName();
-                pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    String fileName = api.getFileName();
+                    pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                }
 
                 if (log.isDebugEnabled()) {
                     log.debug("Api : " + apiName + " removed from the configuration");
@@ -276,9 +282,11 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
                     api.destroy();
                     synapseConfiguration.removeAPI(apiName);
 
-                    MediationPersistenceManager pm = getMediationPersistenceManager();
-                    String fileName = api.getFileName();
-                    pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        MediationPersistenceManager pm = getMediationPersistenceManager();
+                        String fileName = api.getFileName();
+                        pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                    }
 
                     if (log.isDebugEnabled()) {
                         log.debug("Api : " + apiName + " removed from the configuration");
@@ -846,9 +854,11 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
     }
 	
 	private void persistApi(API api) throws APIException {
-        MediationPersistenceManager pm = getMediationPersistenceManager();
-        if (pm != null) {
-            pm.saveItem(api.getName(), ServiceBusConstants.ITEM_TYPE_REST_API);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            MediationPersistenceManager pm = getMediationPersistenceManager();
+            if (pm != null) {
+                pm.saveItem(api.getName(), ServiceBusConstants.ITEM_TYPE_REST_API);
+            }
         }
     }
 	

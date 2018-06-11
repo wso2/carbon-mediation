@@ -215,9 +215,11 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                             getSynapseConfiguration().getProperties());
                     entry.setFileName(ServiceBusUtils.generateFileName(entry.getKey()));
                     getSynapseConfiguration().addEntry(entryKey, entry);
-                    MediationPersistenceManager pm
-                            = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-                    pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        MediationPersistenceManager pm
+                                = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+                        pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    }
                 }
                 if (log.isDebugEnabled()) {
                     log.debug("Local registry entry : " + entryKey + " added to the configuration");
@@ -280,9 +282,11 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
                         entry.setIsEdited(true);
                     }
                     else {
-                        MediationPersistenceManager pm
-                                = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-                        pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
+                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                            MediationPersistenceManager pm
+                                    = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+                            pm.saveItem(key, ServiceBusConstants.ITEM_TYPE_ENTRY);
+                        }
                     }
 
                     if (log.isDebugEnabled()) {
@@ -365,9 +369,11 @@ public class LocalEntryAdmin extends AbstractServiceBusAdmin {
             Entry entry = synapseConfiguration.getDefinedEntries().get(entryKey);
             if (entry != null) {
                 synapseConfiguration.removeEntry(entryKey);
-                MediationPersistenceManager pm
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm
                             = ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-                pm.deleteItem(entryKey, entry.getFileName(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+                    pm.deleteItem(entryKey, entry.getFileName(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("Deleted local entry with key : " + entryKey);
                 }

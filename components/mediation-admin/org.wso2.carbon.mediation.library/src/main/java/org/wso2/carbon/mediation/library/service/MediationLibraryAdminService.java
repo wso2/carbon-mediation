@@ -99,8 +99,10 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 				if (synLib != null) {
 					LibDeployerUtils.loadLibArtifacts(synapseImport, synLib);
 				}
-				MediationPersistenceManager mp = getMediationPersistenceManager();
-				mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
+				if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+					MediationPersistenceManager mp = getMediationPersistenceManager();
+					mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
+				}
 
 			} else {
 				String message = "Unable to create a Synapse Import for :  " + xml;
@@ -252,9 +254,10 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 				synLib.unLoadLibrary();
 				undeployingLocalEntries(synLib, configuration);
 			}
-
-			MediationPersistenceManager pm = getMediationPersistenceManager();
-			pm.deleteItem(synapseImport.getName(), fileName, ServiceBusConstants.ITEM_TYPE_IMPORT);
+			if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+				MediationPersistenceManager pm = getMediationPersistenceManager();
+				pm.deleteItem(synapseImport.getName(), fileName, ServiceBusConstants.ITEM_TYPE_IMPORT);
+			}
 
 		}
 
@@ -454,8 +457,10 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 				}
 
 				// update synapse configuration.
-				MediationPersistenceManager mp = getMediationPersistenceManager();
-				mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);				
+				if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+					MediationPersistenceManager mp = getMediationPersistenceManager();
+					mp.saveItem(synapseImport.getName(), ServiceBusConstants.ITEM_TYPE_IMPORT);
+				}
 			}
 
 		} catch (Exception e) {
@@ -536,9 +541,11 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 					                                       getSynapseConfiguration().getProperties());
 					entry.setFileName(ServiceBusUtils.generateFileName(entry.getKey()));
 					getSynapseConfiguration().addEntry(entryKey, entry);
-					MediationPersistenceManager pm =
-					                                 ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-					pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+					if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+						MediationPersistenceManager pm =
+								ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+						pm.saveItem(entry.getKey(), ServiceBusConstants.ITEM_TYPE_ENTRY);
+					}
 				}
 				if (log.isDebugEnabled()) {
 					log.debug("Local registry entry : " + entryKey + " added to the configuration");
@@ -586,10 +593,12 @@ public class MediationLibraryAdminService extends AbstractServiceBusAdmin {
 				Entry entry = synapseConfiguration.getDefinedEntries().get(entryKey);
 				if (entry != null) {
 					synapseConfiguration.removeEntry(entryKey);
-					MediationPersistenceManager pm =
-					                                 ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
-					pm.deleteItem(entryKey, entry.getFileName(),
-					              ServiceBusConstants.ITEM_TYPE_ENTRY);
+					if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+						MediationPersistenceManager pm =
+								ServiceBusUtils.getMediationPersistenceManager(getAxisConfig());
+						pm.deleteItem(entryKey, entry.getFileName(),
+								ServiceBusConstants.ITEM_TYPE_ENTRY);
+					}
 					if (log.isDebugEnabled()) {
 						log.debug("Deleted local entry with key : " + entryKey);
 					}

@@ -38,24 +38,32 @@ public class StartupTaskDeployer extends TaskDeployer {
 
 	@Override public String deploySynapseArtifact(OMElement artifactConfig, String fileName, Properties properties) {
 		String taskName = super.deploySynapseArtifact(artifactConfig, fileName, properties);
-		mpm.saveItemToRegistry(taskName, ServiceBusConstants.ITEM_TYPE_TASK);
+		if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+			mpm.saveItemToRegistry(taskName, ServiceBusConstants.ITEM_TYPE_TASK);
+		}
 		return taskName;
 	}
 
 	@Override public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
 	                                              String existingArtifactName, Properties properties) {
 		String taskName = super.updateSynapseArtifact(artifactConfig, fileName, existingArtifactName, properties);
-		mpm.saveItemToRegistry(taskName, ServiceBusConstants.ITEM_TYPE_TASK);
+		if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+			mpm.saveItemToRegistry(taskName, ServiceBusConstants.ITEM_TYPE_TASK);
+		}
 		return taskName;
 	}
 
 	@Override public void undeploySynapseArtifact(String artifactName) {
 		super.undeploySynapseArtifact(artifactName);
-		mpm.deleteItemFromRegistry(artifactName, ServiceBusConstants.ITEM_TYPE_TASK);
+		if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+			mpm.deleteItemFromRegistry(artifactName, ServiceBusConstants.ITEM_TYPE_TASK);
+		}
 	}
 
 	@Override public void restoreSynapseArtifact(String artifactName) {
 		super.restoreSynapseArtifact(artifactName);
-		mpm.saveItemToRegistry(artifactName, ServiceBusConstants.ITEM_TYPE_TASK);
+		if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+			mpm.saveItemToRegistry(artifactName, ServiceBusConstants.ITEM_TYPE_TASK);
+		}
 	}
 }
