@@ -57,9 +57,11 @@ public class SequenceAdminService {
             SequenceMediator sequence = synCfg.getDefinedSequences().get(sequenceName);
             if (sequence != null && sequence.getArtifactContainerName() == null) {
                 synCfg.removeSequence(sequenceName);
-                MediationPersistenceManager pm = SequenceAdminUtil.getMediationPersistenceManager();
-                pm.deleteItem(sequenceName, sequence.getFileName(),
-                        ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = SequenceAdminUtil.getMediationPersistenceManager();
+                    pm.deleteItem(sequenceName, sequence.getFileName(),
+                            ServiceBusConstants.ITEM_TYPE_SEQUENCE);
+                }
             } else {
                 handleException("No defined sequence with name " + sequenceName
                         + " found to delete in the Synapse configuration");
@@ -182,12 +184,14 @@ public class SequenceAdminService {
     }
 
     private void persistSequence(SequenceMediator sequence) throws SequenceEditorException {
-        MediationPersistenceManager pm = SequenceAdminUtil.getMediationPersistenceManager();
-        if (pm == null){
-            handleException("Cannot Persist sequence because persistence manager is null, " +
-                    "probably persistence is disabled");
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            MediationPersistenceManager pm = SequenceAdminUtil.getMediationPersistenceManager();
+            if (pm == null) {
+                handleException("Cannot Persist sequence because persistence manager is null, " +
+                        "probably persistence is disabled");
+            }
+            pm.saveItem(sequence.getName(), ServiceBusConstants.ITEM_TYPE_SEQUENCE);
         }
-        pm.saveItem(sequence.getName(), ServiceBusConstants.ITEM_TYPE_SEQUENCE);
     }
 
 }

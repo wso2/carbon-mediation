@@ -136,9 +136,11 @@ public class TaskManager {
         if (className != null && !"".equals(className)) {
             taskManagementServiceHandler.editTaskDescription(taskDescription, className);
             if (artifactContainerName != null) {
-                MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(axisConfig);
-                pm.deleteItem(taskDescription.getName(), taskDescription.getName() + ".xml",
-                        ServiceBusConstants.ITEM_TYPE_TASK);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = ServiceBusUtils.getMediationPersistenceManager(axisConfig);
+                    pm.deleteItem(taskDescription.getName(), taskDescription.getName() + ".xml",
+                            ServiceBusConstants.ITEM_TYPE_TASK);
+                }
                 synapseConfig.getStartup(startupName).setIsEdited(true);
                 synapseConfig.getStartup(startupName).setArtifactContainerName(artifactContainerName);
             }

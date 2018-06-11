@@ -263,9 +263,11 @@ public class RestApiAdminUtils {
     }
 
     public static void persistApi(API api) throws APIException {
-        MediationPersistenceManager pm = RestApiAdminUtils.getMediationPersistenceManager();
-        if (pm != null) {
-            pm.saveItem(api.getName(), ServiceBusConstants.ITEM_TYPE_REST_API);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            MediationPersistenceManager pm = RestApiAdminUtils.getMediationPersistenceManager();
+            if (pm != null) {
+                pm.saveItem(api.getName(), ServiceBusConstants.ITEM_TYPE_REST_API);
+            }
         }
     }
 

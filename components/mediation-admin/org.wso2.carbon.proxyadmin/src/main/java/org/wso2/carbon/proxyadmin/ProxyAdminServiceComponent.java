@@ -58,11 +58,11 @@ import java.util.Set;
  * cardinality="1..n" policy="dynamic"
  * bind="setSynapseEnvironmentService" unbind="unsetSynapseEnvironmentService"
  * @scr.reference name="service.admin.service" interface="org.wso2.carbon.service.mgt.ServiceAdmin"
- *  cardinality="1..1" policy="dynamic"
+ *  cardinality="0..1" policy="dynamic"
  *  bind="setServiceadminService" unbind="unsetServiceAdminService"
  * @scr.reference name="registry.service"
  * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="1..1" policy="dynamic"
+ * cardinality="0..1" policy="dynamic"
  * bind="setRegistryService" unbind="unsetRegistryService"
  * @scr.reference name="synapse.registrations.service"
  * interface="org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsService"
@@ -100,18 +100,20 @@ public class ProxyAdminServiceComponent extends AbstractAxis2ConfigurationContex
                         getAxisConfiguration();
                 
                 try {
-                    ProxyObserver proxyObserver = new ProxyObserver(synEnvService,
-                            ConfigHolder.getInstance().getRegistryService().
-                                    getConfigSystemRegistry());
+                    if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                        ProxyObserver proxyObserver = new ProxyObserver(synEnvService,
+                                ConfigHolder.getInstance().getRegistryService().
+                                        getConfigSystemRegistry());
+                        ConfigHolder.getInstance().addProxyObserver(
+                                MultitenantConstants.SUPER_TENANT_ID, proxyObserver);
 
-                    ConfigHolder.getInstance().addProxyObserver(
-                            MultitenantConstants.SUPER_TENANT_ID, proxyObserver);
+                        axisConf.addObservers(proxyObserver);
+                        proxyObserver.setSynapseEnvironmentService(synEnvService);
+                    }
 
-                    axisConf.addObservers(proxyObserver);
 
                     registerDeployer(synEnvService.getConfigurationContext().getAxisConfiguration(),
                             synEnvService.getSynapseEnvironment());
-                    proxyObserver.setSynapseEnvironmentService(synEnvService);
 
                     bindProxyParameterObserver(axisConf);
                 } catch (ProxyAdminException e) {

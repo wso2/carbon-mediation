@@ -233,10 +233,12 @@ public class RestApiAdminService {
                 api.setIsEdited(true);
                 getApiByName(apiName).setIsEdited(true);
             } else {
-                MediationPersistenceManager pm = RestApiAdminUtils.getMediationPersistenceManager();
-                String fileName = api.getFileName();
-                pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
-                pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = RestApiAdminUtils.getMediationPersistenceManager();
+                    String fileName = api.getFileName();
+                    pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                    pm.saveItem(apiName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                }
             }
 
             return true;
@@ -297,11 +299,11 @@ public class RestApiAdminService {
                 }
                 api.destroy();
                 synapseConfiguration.removeAPI(apiName);
-
-                MediationPersistenceManager pm = RestApiAdminUtils.getMediationPersistenceManager();
-                String fileName = api.getFileName();
-                pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
-
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = RestApiAdminUtils.getMediationPersistenceManager();
+                    String fileName = api.getFileName();
+                    pm.deleteItem(apiName, fileName, ServiceBusConstants.ITEM_TYPE_REST_API);
+                }
                 if (log.isDebugEnabled()) {
                     log.debug("Api : " + apiName + " removed from the configuration");
                 }

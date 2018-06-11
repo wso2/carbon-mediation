@@ -153,9 +153,11 @@ public class ProxyObserver implements AxisObserver {
                     ProxyService proxySvc = getSynapseConfiguration().getProxyService(axisService.getName());
                     if (proxySvc != null) {
                         getSynapseConfiguration().removeProxyService(axisService.getName());
-                        MediationPersistenceManager pm = getMediationPersistenceManager();
-                        pm.deleteItem(proxySvc.getName(), proxySvc.getFileName(),
-                                ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+                        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                            MediationPersistenceManager pm = getMediationPersistenceManager();
+                            pm.deleteItem(proxySvc.getName(), proxySvc.getFileName(),
+                                    ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+                        }
                         log.info("Deleted the proxy service : " + proxySvc.getName());
 
                     } else if (log.isDebugEnabled()) {
@@ -365,9 +367,11 @@ public class ProxyObserver implements AxisObserver {
         if (param != null && Boolean.parseBoolean((String) param.getValue())) {
             return;
         }
-        MediationPersistenceManager mpm = getMediationPersistenceManager();
-        if (mpm != null) {
-            mpm.saveItem(proxyName, ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            MediationPersistenceManager mpm = getMediationPersistenceManager();
+            if (mpm != null) {
+                mpm.saveItem(proxyName, ServiceBusConstants.ITEM_TYPE_PROXY_SERVICE);
+            }
         }
     }
 

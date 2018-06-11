@@ -59,28 +59,33 @@ public class InboundEndpointsDataStore {
         } catch (RegistryException e) {
             handleException("Error while obtaining a registry instance", e);
         }
-
-        try {
-            Resource fetchedResource = registry.get(rootPath);
-            if (fetchedResource != null) {
-                String fetchedData=null;
-               if(fetchedResource.getContent() instanceof byte[]){
-                   fetchedData = new String((byte[])fetchedResource.getContent());
-               };
-                OMElement fetchedOM = null;
-                try {
-                    fetchedOM = AXIOMUtil.stringToOM(fetchedData);
-                } catch (XMLStreamException e) {
-                    handleException("Error while converting fetched registry data to a OM", e);
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            try {
+                Resource fetchedResource = registry.get(rootPath);
+                if (fetchedResource != null) {
+                    String fetchedData = null;
+                    if (fetchedResource.getContent() instanceof byte[]) {
+                        fetchedData = new String((byte[]) fetchedResource.getContent());
+                    }
+                    ;
+                    OMElement fetchedOM = null;
+                    try {
+                        fetchedOM = AXIOMUtil.stringToOM(fetchedData);
+                    } catch (XMLStreamException e) {
+                        handleException("Error while converting fetched registry data to a OM", e);
+                    }
+                    endpointListeningInfo = PersistenceUtils.convertOMToEndpointListeningInfo(fetchedOM);
+                    endpointPollingInfo = PersistenceUtils.convertOMToEndpointPollingInfo(fetchedOM);
                 }
-                endpointListeningInfo = PersistenceUtils.convertOMToEndpointListeningInfo(fetchedOM);
-                endpointPollingInfo = PersistenceUtils.convertOMToEndpointPollingInfo(fetchedOM);
+            } catch (ResourceNotFoundException ex) {
+                log.info("Inbound endpoint registry data not found, so re-initializing registry data");
+                initRegistryData();
+            } catch (RegistryException e) {
+                handleException("Error occurred while fetching inbound endpoint data from registry", e);
             }
-        } catch (ResourceNotFoundException ex) {
-            log.info("Inbound endpoint registry data not found, so re-initializing registry data");
-            initRegistryData();
-        } catch (RegistryException e) {
-            handleException("Error occurred while fetching inbound endpoint data from registry", e);
+        } else {
+            endpointListeningInfo = new ConcurrentHashMap<>();
+            endpointPollingInfo = new ConcurrentHashMap<>();
         }
     }
 
@@ -121,7 +126,9 @@ public class InboundEndpointsDataStore {
             endpointListeningInfo.put(port, tenantList);
         }
         tenantList.add(new InboundEndpointInfoDTO(tenantDomain, protocol, name, params));
-        updateRegistry();
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            updateRegistry();
+        }
     }
 
     /**
@@ -138,7 +145,9 @@ public class InboundEndpointsDataStore {
         }
         lNames.add(name);
         endpointPollingInfo.put(tenantDomain, lNames);
-        updateRegistry();
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            updateRegistry();
+        }
     }
     
     /**
@@ -161,8 +170,9 @@ public class InboundEndpointsDataStore {
         InboundEndpointInfoDTO inboundEndpointInfoDTO = new InboundEndpointInfoDTO(tenantDomain, protocol, name, params);
         inboundEndpointInfoDTO.setSslConfiguration(sslConfiguration);
         tenantList.add(inboundEndpointInfoDTO);
-
-        updateRegistry();
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            updateRegistry();
+        }
     }
 
     /**
@@ -203,7 +213,9 @@ public class InboundEndpointsDataStore {
         if (endpointListeningInfo.get(port) != null && endpointListeningInfo.get(port).size() == 0) {
       	  endpointListeningInfo.remove(port);
         }
-        updateRegistry();
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            updateRegistry();
+        }
     }
 
     /**
@@ -224,8 +236,10 @@ public class InboundEndpointsDataStore {
             if(lNames.isEmpty()){
             	endpointPollingInfo.remove(tenantDomain);
             }
-        }        
-        updateRegistry();
+        }
+        if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+            updateRegistry();
+        }
     }    
 
     /**

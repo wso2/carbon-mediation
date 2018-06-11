@@ -51,8 +51,10 @@ public class PriorityMediationAdmin extends AbstractServiceBusAdmin {
             ex.setFileName(ServiceBusUtils.generateFileName(ex.getName()));
             ex.init();
             config.addPriorityExecutor(name, ex);
-            MediationPersistenceManager pm = getMediationPersistenceManager();
-            pm.saveItem(name, ServiceBusConstants.ITEM_TYPE_EXECUTOR);
+            if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                MediationPersistenceManager pm = getMediationPersistenceManager();
+                pm.saveItem(name, ServiceBusConstants.ITEM_TYPE_EXECUTOR);
+            }
             log.info("Adding priority-executor with name: " + name);
         } catch (AxisFault axisFault) {
             log.error("Error occurred while building a priority executor from " +
@@ -115,8 +117,6 @@ public class PriorityMediationAdmin extends AbstractServiceBusAdmin {
                 oldExecutor.destroy();
                 log.info("Removed priority executor with name: " + name);
                 String oldFileName = oldExecutor.getFileName();
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                pm.deleteItem(name, oldFileName, ServiceBusConstants.ITEM_TYPE_EXECUTOR);
 
                 PriorityExecutor ex = PriorityExecutorFactory.
                     createExecutor(SynapseConstants.SYNAPSE_NAMESPACE, executor,
@@ -125,7 +125,11 @@ public class PriorityMediationAdmin extends AbstractServiceBusAdmin {
                 ex.init();
                 config.addPriorityExecutor(name, ex);
                 log.info("Updated and restored priority executor with name: " + name);
-                pm.saveItem(name, ServiceBusConstants.ITEM_TYPE_EXECUTOR);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    pm.deleteItem(name, oldFileName, ServiceBusConstants.ITEM_TYPE_EXECUTOR);
+                    pm.saveItem(name, ServiceBusConstants.ITEM_TYPE_EXECUTOR);
+                }
             }
         } finally {
             lock.unlock();
@@ -143,9 +147,11 @@ public class PriorityMediationAdmin extends AbstractServiceBusAdmin {
             if (executor != null) {
                 executor.destroy();
                 log.info("Removed priority executor with name: " + name);
-                MediationPersistenceManager pm = getMediationPersistenceManager();
-                pm.deleteItem(name, executor.getFileName(),
-                        ServiceBusConstants.ITEM_TYPE_EXECUTOR);
+                if(!Boolean.parseBoolean(System.getProperty("NonRegistryMode"))) {
+                    MediationPersistenceManager pm = getMediationPersistenceManager();
+                    pm.deleteItem(name, executor.getFileName(),
+                            ServiceBusConstants.ITEM_TYPE_EXECUTOR);
+                }
             }
         } finally {
             lock.unlock();

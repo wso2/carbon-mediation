@@ -186,7 +186,7 @@ public class ServiceBusInitializer {
                         new MPMShutdownHandler(
                                 synCfgSvc.getSynapseConfiguration().getAxisConfiguration()),
                         null);
-
+                initPersistence(synCfgSvc,"default");
                 if (log.isDebugEnabled()) {
                     log.debug("SynapseConfigurationService Registered");
                 }
