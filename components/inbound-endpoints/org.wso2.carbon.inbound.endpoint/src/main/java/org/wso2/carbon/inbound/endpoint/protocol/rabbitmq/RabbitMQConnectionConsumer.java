@@ -141,11 +141,6 @@ public class RabbitMQConnectionConsumer {
             channel = connection.createChannel();
             log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
         }
-        //set the qos value for the consumer//
-        String qos = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_QOS);
-        if (qos != null && !qos.isEmpty()) {
-            channel.basicQos(Integer.parseInt(qos));
-        }
 
         //unable to connect to the queue
         if (queueingConsumer == null) {
@@ -265,11 +260,17 @@ public class RabbitMQConnectionConsumer {
             log.debug("Channel is not open. Creating a new channel for inbound " + inboundName);
         }
 
-        //set QoS parameter for the channel before it is assigned to the consumer
+        // set QoS parameter for the channel before it is assigned to the consumer
         String qos = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_QOS);
         if (qos != null && !qos.isEmpty()) {
-            channel.basicQos(Integer.parseInt(qos));
+            try {
+                channel.basicQos(Integer.parseInt(qos));
+            } catch (NumberFormatException e) {
+                log.warn("Unable to parse given QoS value, " + qos + " as an integer. Therefore using channel " +
+                        "without QoS.");
+            }
         }
+
         queueingConsumer = new QueueingConsumer(channel);
 
         consumerTagString = rabbitMQProperties.getProperty(RabbitMQConstants.CONSUMER_TAG);
