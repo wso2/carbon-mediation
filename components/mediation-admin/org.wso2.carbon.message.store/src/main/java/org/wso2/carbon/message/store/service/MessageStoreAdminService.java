@@ -174,9 +174,9 @@ public class MessageStoreAdminService extends AbstractServiceBusAdmin {
         Map<String, Object> parameters = new HashMap<String, Object>();
 
         while (params.hasNext()) {
-            Object o = params.next();
-            if (o instanceof OMElement) {
-                OMElement prop = (OMElement) o;
+            Object paramElement = params.next();
+            if (paramElement instanceof OMElement) {
+                OMElement prop = (OMElement) paramElement;
                 OMAttribute paramName = prop.getAttribute(NAME_Q);
                 String paramValue = prop.getText();
                 if (paramName != null && paramValue != null && paramValue.startsWith(REGISTRY_KEY_PREFIX)) {

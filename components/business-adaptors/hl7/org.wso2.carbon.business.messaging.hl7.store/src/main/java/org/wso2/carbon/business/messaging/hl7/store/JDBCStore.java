@@ -174,7 +174,7 @@ public class JDBCStore implements MessageStore {
     }
 
     @Override
-    public Map<String, Object> getParameterKeyMap() {
+    public Map<String, String> getParameterKeyMap() {
         return null;
     }
 
