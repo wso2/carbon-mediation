@@ -51,6 +51,8 @@ public class MessageStoreData {
 
     private boolean isEdited;
 
+    public static final String REGISTRY_KEY_PREFIX = "$registry:";
+
     public MessageStoreData(){}
 
     public MessageStoreData(String xml) throws XMLStreamException, JaxenException {
@@ -125,6 +127,7 @@ public class MessageStoreData {
             OMElement paramElem = it.next();
             OMAttribute nameAtt = paramElem.getAttribute(MessageStoreFactory.NAME_Q);
             OMAttribute expressionAttribute = paramElem.getAttribute(MessageStoreFactory.EXPRESSION_Q);
+            OMAttribute keyAtt = paramElem.getAttribute(MessageStoreFactory.KEY_Q);
             assert nameAtt != null;
             String name = nameAtt.getAttributeValue();
             String value;
@@ -138,6 +141,8 @@ public class MessageStoreData {
                     SynapseJsonPath jsonPath = new SynapseJsonPath(value);
                     this.pathInfo.setJsonPath(jsonPath);
                 }
+            } else if (keyAtt != null) {
+                value = REGISTRY_KEY_PREFIX + keyAtt.getAttributeValue();
             } else {
                 value = paramElem.getText();
             }

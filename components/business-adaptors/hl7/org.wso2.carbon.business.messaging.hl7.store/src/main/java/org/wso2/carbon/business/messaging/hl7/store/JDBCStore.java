@@ -160,6 +160,25 @@ public class JDBCStore implements MessageStore {
     }
 
     @Override
+    public void addParameter(String s, String s1) {
+
+    }
+
+    @Override
+    public void addParameterKey(String s, String s1) {
+
+    }
+
+    @Override public String getParameterKey(String s) {
+        return null;
+    }
+
+    @Override
+    public Map<String, String> getParameterKeyMap() {
+        return null;
+    }
+
+    @Override
     public int getType() {
         return Constants.JDBC_MS;
     }
