@@ -46,6 +46,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.base.ServerConfiguration;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.wso2.carbon.core.ServerShutdownHandler;
 import org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService;
 import org.wso2.carbon.mediation.initializer.configurations.ConfigurationManager;
@@ -128,6 +129,11 @@ public class ServiceBusInitializer {
     protected void activate(ComponentContext ctxt) {
 
         log.info("Starting light weight ESB...");
+
+        PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext
+                .getThreadLocalCarbonContext();
+        privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
+        privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
 
         // FIXME: this is a hack to get rid of the https port retrieval from the axis2
         // configuration returning the non blocking https transport. Ideally we should be able
