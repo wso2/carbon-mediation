@@ -62,6 +62,7 @@ import org.wso2.carbon.mediation.initializer.services.SynapseRegistrationsServic
 import org.wso2.carbon.mediation.initializer.utils.ConfigurationHolder;
 import org.wso2.carbon.mediation.initializer.utils.SynapseArtifactInitUtils;
 import org.wso2.carbon.mediation.ntask.internal.NtaskService;
+import org.wso2.carbon.ntask.core.service.TaskService;
 import org.wso2.carbon.securevault.SecretCallbackHandlerService;
 import org.wso2.carbon.task.services.TaskDescriptionRepositoryService;
 import org.wso2.carbon.task.services.TaskSchedulerService;
@@ -108,6 +109,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * interface="org.wso2.carbon.inbound.endpoint.persistence.service.InboundEndpointPersistenceService"
  * cardinality="0..1" policy="dynamic"
  * bind="setInboundPersistenceService" unbind="unsetInboundPersistenceService"
+ * @scr.reference name="ntask.service"
+ * interface="org.wso2.carbon.ntask.core.service.TaskService"
+ * cardinality="1..1" policy="dynamic" bind="setTaskService"
+ * unbind="unsetTaskService"
  */
 @SuppressWarnings({"JavaDoc", "UnusedDeclaration"})
 public class ServiceBusInitializer {
@@ -125,6 +130,7 @@ public class ServiceBusInitializer {
     private SecretCallbackHandlerService secretCallbackHandlerService;
 
     private ServerManager serverManager;
+    private TaskService taskService;
 
     protected void activate(ComponentContext ctxt) {
 
@@ -134,6 +140,11 @@ public class ServiceBusInitializer {
                 .getThreadLocalCarbonContext();
         privilegedCarbonContext.setTenantDomain(MultitenantConstants.SUPER_TENANT_DOMAIN_NAME);
         privilegedCarbonContext.setTenantId(MultitenantConstants.SUPER_TENANT_ID);
+
+        if (taskService != null && !taskService.isServerInit()) {
+            log.debug("Initialize Task Service");
+            taskService.serverInitialized();
+        }
 
         // FIXME: this is a hack to get rid of the https port retrieval from the axis2
         // configuration returning the non blocking https transport. Ideally we should be able
@@ -646,6 +657,15 @@ public class ServiceBusInitializer {
     }
 
     protected void unsetInboundPersistenceService(InboundEndpointPersistenceService inboundEndpoint) {
+    }
+
+    protected void setTaskService(TaskService taskService) {
+        log.debug("Set Task Service");
+        this.taskService = taskService;
+    }
+
+    protected void unsetTaskService(TaskService taskService) {
+        this.taskService = null;
     }
 
 }
