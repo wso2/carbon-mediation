@@ -18,6 +18,7 @@ package org.wso2.carbon.inbound.endpoint.protocol.securewebsocket;
 
 import org.apache.log4j.Logger;
 import org.apache.synapse.inbound.InboundProcessorParams;
+import org.wso2.carbon.inbound.endpoint.persistence.PersistenceUtils;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketConstants;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.InboundWebsocketListener;
 import org.wso2.carbon.inbound.endpoint.protocol.websocket.management.WebsocketEndpointManager;
@@ -46,7 +47,8 @@ public class InboundSecureWebsocketListener extends InboundWebsocketListener {
 
     @Override
     public void init() {
-        WebsocketEndpointManager.getInstance().startSSLEndpoint(port, name, processorParams);
+        int offsetPort = port + PersistenceUtils.getPortOffset(processorParams.getProperties());
+        WebsocketEndpointManager.getInstance().startSSLEndpoint(offsetPort, name, processorParams);
     }
 
 }
