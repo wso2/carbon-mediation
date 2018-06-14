@@ -167,7 +167,7 @@ public class CarbonSynapseController extends Axis2SynapseController {
         if (synapseConfig == null) {
             // If the configuration has not been loaded from the registry load it
             // from the file system
-            log.info("Loading the mediation configuration from the file system");
+            log.debug("Loading the mediation configuration from the file system");
             synapseConfig = super.createSynapseConfiguration();
 
 
@@ -253,7 +253,7 @@ public class CarbonSynapseController extends Axis2SynapseController {
             registryFailSafe = false;
         }
 
-        log.info("Loading the mediation configuration from the registry");
+        log.debug("Loading the mediation configuration from the registry");
         //TODO
 /*        RegistryBasedSynapseConfigBuilder builder =
                 new RegistryBasedSynapseConfigBuilder(registry, currentConfigurationName,
