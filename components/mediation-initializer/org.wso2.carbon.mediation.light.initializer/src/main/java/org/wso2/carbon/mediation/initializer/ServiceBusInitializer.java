@@ -134,7 +134,7 @@ public class ServiceBusInitializer {
 
     protected void activate(ComponentContext ctxt) {
 
-        log.info("Starting light weight ESB...");
+        log.debug("Activating Micro Integrator...");
 
         PrivilegedCarbonContext privilegedCarbonContext = PrivilegedCarbonContext
                 .getThreadLocalCarbonContext();
@@ -357,7 +357,7 @@ public class ServiceBusInitializer {
         if (configCtxSvc != null) {
             ConfigurationContext configContext = configCtxSvc.getServerConfigContext();
 
-            log.info("Initializing Apache Synapse...");
+            log.debug("Initializing Apache Synapse...");
             configurationInformation =
                     ServerConfigurationInformationFactory.createServerConfigurationInformation(
                             configContext.getAxisConfiguration());
@@ -423,7 +423,7 @@ public class ServiceBusInitializer {
                     new Parameter(ServiceBusConstants.SYNAPSE_CURRENT_CONFIGURATION, name));
 
             if (isRunningDebugMode()) {
-                log.info("ESB Started in Debug mode for super tenant");
+                log.info("Micro Integrator started in Debug mode for super tenant");
                 createSynapseDebugEnvironment(contextInfo);
             }
 
