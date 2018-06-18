@@ -197,12 +197,21 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
             try {
                 MessageContext synCtx = sourceHandler.getSynapseMessageContext(sourceHandler.getTenantDomain());
                 InboundEndpoint endpoint = synCtx.getConfiguration().getInboundEndpoint(endpointName);
-                shutdownStatusCode = Integer.parseInt(endpoint.getParametersMap().get("ws.shutdown.status.code"));
                 shutdownStatusMessage = endpoint.getParametersMap().get("ws.shutdown.status.message");
 
-                if (shutdownStatusCode == null) {
+                String shutdownStatusCodeValue = endpoint.getParametersMap().get("ws.shutdown.status.code");
+                if (shutdownStatusCodeValue != null) {
+                    try {
+                        shutdownStatusCode = Integer.parseInt(shutdownStatusCodeValue);
+                    } catch (NumberFormatException ex) {
+                        log.warn("Please specify a valid Integer for \"ws.shutdown.status.code\" parameter. Assigning"
+                                + " the default value 1001");
+                        shutdownStatusCode = 1001;
+                    }
+                } else {
                     shutdownStatusCode = 1001;
                 }
+
                 if (shutdownStatusMessage == null) {
                     shutdownStatusMessage = "shutdown";
                 }
