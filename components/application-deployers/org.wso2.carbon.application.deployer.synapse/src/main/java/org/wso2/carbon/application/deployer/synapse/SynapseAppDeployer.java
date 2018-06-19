@@ -1067,7 +1067,7 @@ public class SynapseAppDeployer implements AppDeploymentHandler {
                     } catch (Throwable e) {
                         artifact.setDeploymentStatus(AppDeployerConstants.DEPLOYMENT_STATUS_FAILED);
                         if(!( e instanceof DeploymentException )) {
-                            throw   new DeploymentException(e);
+                            throw new DeploymentException(e);
                         } else {
                             throw e;
                         }
