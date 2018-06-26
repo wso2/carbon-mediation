@@ -263,7 +263,7 @@ public class WebsocketEndpointManager extends AbstractInboundEndpointManager {
     protected int validateBroadcastLevelParam(String broadcastLevelParam) {
         int broadcastLevel = 0;
         try {
-            if (broadcastLevelParam != null && broadcastLevelParam.trim() != "") {
+            if (broadcastLevelParam != null && !"".equals(broadcastLevelParam.trim())) {
                 broadcastLevel = Integer.parseInt(broadcastLevelParam);
                 if (broadcastLevel < 0 || broadcastLevel > 2) {
                     String msg = "Validation failed. Unknown client broadcast level.";
