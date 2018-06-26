@@ -190,6 +190,14 @@ public class HL7Configuration {
                 log.error(msg, e);
             }
         }
+
+        if (in != null) {
+            try {
+                in.close();
+            } catch (IOException e) {
+
+            }
+        }
         return properties;
     }
 }
