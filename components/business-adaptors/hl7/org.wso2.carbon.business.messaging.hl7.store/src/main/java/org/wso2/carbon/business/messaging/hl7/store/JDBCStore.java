@@ -93,15 +93,18 @@ public class JDBCStore implements MessageStore {
     }
 
     private boolean initTables() throws SQLException {
+        boolean isInitialized = false;
         Statement statement = conn.createStatement();
         ResultSet result = statement.executeQuery(JDBCUtils.getTableExistsQuery(getName()));
 
         if(!result.next()) {
             statement.execute(JDBCUtils.getCreateTableQuery(getName()));
-            return true;
-        } else {
-            return false;
+            isInitialized = true;
         }
+        if (statement != null) {
+            statement.close();
+        }
+        return isInitialized;
     }
 
     @Override

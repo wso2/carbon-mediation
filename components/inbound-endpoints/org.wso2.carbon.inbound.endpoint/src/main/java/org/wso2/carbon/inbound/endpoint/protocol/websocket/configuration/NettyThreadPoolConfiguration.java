@@ -28,12 +28,12 @@ public class NettyThreadPoolConfiguration {
     public NettyThreadPoolConfiguration(String bossThreadPoolSize, String workerThreadPoolSize) {
 
         try {
-            if (bossThreadPoolSize != null && bossThreadPoolSize.trim() != "") {
+            if (bossThreadPoolSize != null && !"".equals(bossThreadPoolSize.trim())) {
                 this.bossThreadPoolSize = Integer.parseInt(bossThreadPoolSize);
             } else {
                 this.bossThreadPoolSize = Runtime.getRuntime().availableProcessors();
             }
-            if (workerThreadPoolSize != null && workerThreadPoolSize.trim() != "") {
+            if (workerThreadPoolSize != null && !"".equals(workerThreadPoolSize.trim())) {
                 this.workerThreadPoolSize = Integer.parseInt(workerThreadPoolSize);
             } else {
                 this.workerThreadPoolSize = Runtime.getRuntime().availableProcessors() * 2;
