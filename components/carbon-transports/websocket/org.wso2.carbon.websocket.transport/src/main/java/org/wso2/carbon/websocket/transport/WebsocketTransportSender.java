@@ -48,6 +48,8 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WebsocketTransportSender extends AbstractTransportSender {
 
@@ -71,6 +73,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         String responceDispatchSequence = null;
         String responceErrorSequence = null;
         String messageType = null;
+        Map<String, String> customHeaders = new HashMap<>();
 
         InboundResponseSender responseSender = null;
         if (msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER) != null) {
@@ -99,12 +102,17 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             messageType = (String) msgCtx.getProperty(WebsocketConstants.CONTENT_TYPE);
         }
 
+        if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_JWT_TOKEN) != null) {
+            customHeaders.put(WebsocketConstants.WEBSOCKET_JWT_HEADER, ((String) msgCtx.getProperty
+                    (WebsocketConstants.WEBSOCKET_JWT_TOKEN)));
+        }
+
         try {
             if (log.isDebugEnabled()) {
                 log.debug("Fetching a Connection from the WS(WSS) Connection Factory.");
             }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR), sourceIdentier,
-                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType);
+                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, customHeaders);
             String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
             if (tenantDomain != null) {
                 clientHandler.setTenantDomain(tenantDomain);
