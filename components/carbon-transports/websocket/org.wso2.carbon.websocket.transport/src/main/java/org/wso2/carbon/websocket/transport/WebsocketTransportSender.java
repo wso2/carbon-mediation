@@ -49,6 +49,7 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class WebsocketTransportSender extends AbstractTransportSender {
@@ -102,9 +103,25 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             messageType = (String) msgCtx.getProperty(WebsocketConstants.CONTENT_TYPE);
         }
 
-        if (msgCtx.getProperty(WebsocketConstants.WEBSOCKET_JWT_TOKEN) != null) {
-            customHeaders.put(WebsocketConstants.WEBSOCKET_JWT_HEADER, ((String) msgCtx.getProperty
-                    (WebsocketConstants.WEBSOCKET_JWT_TOKEN)));
+        /*
+        * Get all the message property names and check whether the properties with the websocket custom header
+        * prefix are exist in the property map.
+        *
+        * This is used to add new headers to the handshake request. The property format
+        * <prefix>.<header>
+        *
+        * If there is any property with the prefix, extract the header string from the property key and put to the
+        * customHeaders map.
+        */
+        Iterator propertyNames = msgCtx.getPropertyNames();
+
+        while (propertyNames.hasNext()) {
+            String propertyName = (String) propertyNames.next();
+            String value;
+            if (propertyName.startsWith(WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_PREFIX)) {
+                value = (String) msgCtx.getProperty(propertyName);
+                customHeaders.put(propertyName.split(WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_PREFIX)[1], value);
+            }
         }
 
         try {

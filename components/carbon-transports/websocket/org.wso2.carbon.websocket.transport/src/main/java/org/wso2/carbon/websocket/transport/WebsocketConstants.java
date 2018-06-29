@@ -48,6 +48,5 @@ public class WebsocketConstants {
     public static final String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse";
     public static final String WEBSOCKET_SUBSCRIBER_PATH = "websocket.subscriber.path";
 
-    public static final String WEBSOCKET_JWT_TOKEN = "ws.inbound.jwt";
-    public static final String WEBSOCKET_JWT_HEADER = "X-JWT-Assertion";
+    public static final String WEBSOCKET_CUSTOM_HEADER_PREFIX = "websocket.custom.header.";
 }
