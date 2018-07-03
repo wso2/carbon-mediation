@@ -24,6 +24,7 @@ import org.apache.synapse.config.xml.ValueSerializer;
 import org.apache.synapse.mediators.Value;
 import org.wso2.carbon.mediator.service.ui.AbstractMediator;
 import org.wso2.carbon.mediator.service.MediatorException;
+
 import javax.xml.namespace.QName;
 
 public class KerberosMediator extends AbstractMediator {
@@ -53,24 +54,24 @@ public class KerberosMediator extends AbstractMediator {
             kerberosService.addAttribute(fac.createOMAttribute(KerberosConstants.LOGIN_CONTEXT_NAME_STRING, nullNS,
                     loginContextName));
         }
-        if(loginConfig != null){
+        if (loginConfig != null) {
             kerberosService.addAttribute(fac.createOMAttribute(KerberosConstants.LOGIN_CONFIG_STRING, nullNS,
                     loginConfig));
         }
-        if(krb5Config != null){
+        if (krb5Config != null) {
             kerberosService.addAttribute(fac.createOMAttribute(KerberosConstants.KRB5_CONFIG_STRING, nullNS, krb5Config));
         }
-        if(spn != null){
+        if (spn != null) {
             kerberosService.addAttribute(fac.createOMAttribute(KerberosConstants.SPN_STRING, nullNS, spn));
         }
-        if(clientPrincipal != null){
+        if (clientPrincipal != null) {
             new ValueSerializer().serializeValue(clientPrincipal, KerberosConstants.CLIENT_PRINCIPAL_STRING,
                     kerberosService);
         }
-        if(password != null){
+        if (password != null) {
             new ValueSerializer().serializeValue(password, KerberosConstants.PASSWORD_STRING, kerberosService);
         }
-        if(keytabPath != null){
+        if (keytabPath != null) {
             new ValueSerializer().serializeValue(keytabPath, KerberosConstants.KEYTAB_PATH_STRING, kerberosService);
         }
 
@@ -97,21 +98,21 @@ public class KerberosMediator extends AbstractMediator {
 
         if (attLoginContextName != null) {
             this.loginContextName = attLoginContextName.getAttributeValue();
-        } 
-        if(attLoginConfig != null) {
+        }
+        if (attLoginConfig != null) {
             this.loginConfig = attLoginConfig.getAttributeValue();
-        } 
-        if(attKrb5Config != null) {
+        }
+        if (attKrb5Config != null) {
             this.krb5Config = attKrb5Config.getAttributeValue();
         } else {
             throw new MediatorException("The 'krb5Config' attribute is required for the Kerberos mediator ");
         }
-        if(attSPN != null) {
+        if (attSPN != null) {
             this.spn = attSPN.getAttributeValue();
         } else {
             throw new MediatorException("The 'spn' attribute is required for the Kerberos mediator ");
         }
-        if(attClientPrincipal != null) {
+        if (attClientPrincipal != null) {
             try {
                 Value client = valueFactory.createValue(KerberosConstants.CLIENT_PRINCIPAL_STRING, elem);
                 this.clientPrincipal = client;
@@ -121,10 +122,10 @@ public class KerberosMediator extends AbstractMediator {
         } else {
             throw new MediatorException("The 'clientPrincipal' is required for the Kerberos mediator ");
         }
-        if(attPassword == null && attKeytabPath == null) {
+        if (attPassword == null && attKeytabPath == null) {
             throw new MediatorException("The 'keytabPath' or 'password' is required for the Kerberos mediator");
         } else {
-            if(attPassword != null && attPassword.getAttributeValue() != null) {
+            if (attPassword != null && attPassword.getAttributeValue() != null) {
                 try {
                     Value pass = valueFactory.createValue(KerberosConstants.PASSWORD_STRING, elem);
                     this.password = pass;
@@ -132,7 +133,7 @@ public class KerberosMediator extends AbstractMediator {
                     throw new MediatorException("Unable to load the corelate XPATH expression" + e.getMessage());
                 }
             }
-            if(attKeytabPath != null && attKeytabPath.getAttributeValue() != null) {
+            if (attKeytabPath != null && attKeytabPath.getAttributeValue() != null) {
                 try {
                     Value keytab = valueFactory.createValue(KerberosConstants.KEYTAB_PATH_STRING, elem);
                     this.keytabPath = keytab;
