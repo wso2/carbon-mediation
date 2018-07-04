@@ -90,7 +90,7 @@ public class WebsocketConnectionFactory {
                                                     final String dispatchSequence,
                                                     final String dispatchErrorSequence,
                                                     final String contentType,
-                                                    final Map<String, String> headers) throws InterruptedException {
+                                                    final Map<String, Object> headers) throws InterruptedException {
         WebSocketClientHandler channelHandler;
         if (handshakePresent) {
             channelHandler = cacheNewConnection(uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
@@ -117,7 +117,7 @@ public class WebsocketConnectionFactory {
                                                      final String sourceIdentifier,
                                                      String dispatchSequence,
                                                      String dispatchErrorSequence,
-                                                     String contentType, Map<String, String> headers) {
+                                                     String contentType, Map<String, Object> headers) {
         if (log.isDebugEnabled()) {
             log.debug("Creating a Connection for the specified WS endpoint.");
         }
@@ -171,9 +171,8 @@ public class WebsocketConnectionFactory {
 
             // If there are any custom headers, add them to the defaultHttpHeader.
             if (headers.size() > 0) {
-                for (Object o : headers.entrySet()) {
-                    Map.Entry header = (Map.Entry) o;
-                    defaultHttpHeaders.add(header.getKey().toString(), header.getValue().toString());
+                for (Map.Entry<String, Object> header : headers.entrySet()) {
+                    defaultHttpHeaders.add(header.getKey(), header.getValue());
                 }
             }
 

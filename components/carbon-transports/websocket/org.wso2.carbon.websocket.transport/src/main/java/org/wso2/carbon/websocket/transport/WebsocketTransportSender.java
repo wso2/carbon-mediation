@@ -74,7 +74,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         String responceDispatchSequence = null;
         String responceErrorSequence = null;
         String messageType = null;
-        Map<String, String> customHeaders = new HashMap<>();
+        Map<String, Object> customHeaders = new HashMap<>();
 
         InboundResponseSender responseSender = null;
         if (msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER) != null) {
@@ -113,13 +113,12 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         * If there is any property with the prefix, extract the header string from the property key and put to the
         * customHeaders map.
         */
-        Iterator propertyNames = msgCtx.getPropertyNames();
+        Iterator<String> propertyNames = msgCtx.getPropertyNames();
 
         while (propertyNames.hasNext()) {
-            String propertyName = (String) propertyNames.next();
-            String value;
+            String propertyName = propertyNames.next();
             if (propertyName.startsWith(WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_PREFIX)) {
-                value = (String) msgCtx.getProperty(propertyName);
+                Object value = msgCtx.getProperty(propertyName);
                 customHeaders.put(propertyName.split(WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_PREFIX)[1], value);
             }
         }
