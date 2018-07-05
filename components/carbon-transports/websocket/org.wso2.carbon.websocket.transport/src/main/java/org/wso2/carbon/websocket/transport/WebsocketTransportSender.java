@@ -48,6 +48,9 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class WebsocketTransportSender extends AbstractTransportSender {
 
@@ -71,6 +74,7 @@ public class WebsocketTransportSender extends AbstractTransportSender {
         String responceDispatchSequence = null;
         String responceErrorSequence = null;
         String messageType = null;
+        Map<String, Object> customHeaders = new HashMap<>();
 
         InboundResponseSender responseSender = null;
         if (msgCtx.getProperty(InboundEndpointConstants.INBOUND_ENDPOINT_RESPONSE_WORKER) != null) {
@@ -99,12 +103,32 @@ public class WebsocketTransportSender extends AbstractTransportSender {
             messageType = (String) msgCtx.getProperty(WebsocketConstants.CONTENT_TYPE);
         }
 
+        /*
+        * Get all the message property names and check whether the properties with the websocket custom header
+        * prefix are exist in the property map.
+        *
+        * This is used to add new headers to the handshake request. The property format
+        * <prefix>.<header>
+        *
+        * If there is any property with the prefix, extract the header string from the property key and put to the
+        * customHeaders map.
+        */
+        Iterator<String> propertyNames = msgCtx.getPropertyNames();
+
+        while (propertyNames.hasNext()) {
+            String propertyName = propertyNames.next();
+            if (propertyName.startsWith(WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_PREFIX)) {
+                Object value = msgCtx.getProperty(propertyName);
+                customHeaders.put(propertyName.split(WebsocketConstants.WEBSOCKET_CUSTOM_HEADER_PREFIX)[1], value);
+            }
+        }
+
         try {
             if (log.isDebugEnabled()) {
                 log.debug("Fetching a Connection from the WS(WSS) Connection Factory.");
             }
             WebSocketClientHandler clientHandler = connectionFactory.getChannelHandler(new URI(targetEPR), sourceIdentier,
-                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType);
+                    handshakePresent, responceDispatchSequence, responceErrorSequence, messageType, customHeaders);
             String tenantDomain = (String) msgCtx.getProperty(MultitenantConstants.TENANT_DOMAIN);
             if (tenantDomain != null) {
                 clientHandler.setTenantDomain(tenantDomain);

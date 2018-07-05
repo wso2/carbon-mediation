@@ -48,4 +48,5 @@ public class WebsocketConstants {
     public static final String SYNAPSE_SUBPROTOCOL_PREFIX = "synapse";
     public static final String WEBSOCKET_SUBSCRIBER_PATH = "websocket.subscriber.path";
 
+    public static final String WEBSOCKET_CUSTOM_HEADER_PREFIX = "websocket.custom.header.";
 }

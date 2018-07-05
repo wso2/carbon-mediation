@@ -47,6 +47,8 @@ import org.wso2.carbon.websocket.transport.utils.SSLUtil;
 import javax.net.ssl.SSLException;
 import javax.xml.namespace.QName;
 import java.net.URI;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebsocketConnectionFactory {
@@ -87,14 +89,17 @@ public class WebsocketConnectionFactory {
                                                     final boolean handshakePresent,
                                                     final String dispatchSequence,
                                                     final String dispatchErrorSequence,
-                                                    final String contentType) throws InterruptedException {
+                                                    final String contentType,
+                                                    final Map<String, Object> headers) throws InterruptedException {
         WebSocketClientHandler channelHandler;
         if (handshakePresent) {
-            channelHandler = cacheNewConnection(uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence, contentType);
+            channelHandler = cacheNewConnection(uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
+                    contentType, headers);
         } else {
             channelHandler = getChannelHandlerFromPool(sourceIdentifier, getClientHandlerIdentifier(uri));
             if (channelHandler == null) {
-                channelHandler = cacheNewConnection(uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence, contentType);
+                channelHandler = cacheNewConnection(uri, sourceIdentifier, dispatchSequence, dispatchErrorSequence,
+                        contentType, headers);
             }
         }
         channelHandler.handshakeFuture().sync();
@@ -112,7 +117,7 @@ public class WebsocketConnectionFactory {
                                                      final String sourceIdentifier,
                                                      String dispatchSequence,
                                                      String dispatchErrorSequence,
-                                                     String contentType) {
+                                                     String contentType, Map<String, Object> headers) {
         if (log.isDebugEnabled()) {
             log.debug("Creating a Connection for the specified WS endpoint.");
         }
@@ -162,12 +167,20 @@ public class WebsocketConnectionFactory {
 
             }
 
+            DefaultHttpHeaders defaultHttpHeaders = new DefaultHttpHeaders();
+
+            // If there are any custom headers, add them to the defaultHttpHeader.
+            if (headers.size() > 0) {
+                for (Map.Entry<String, Object> header : headers.entrySet()) {
+                    defaultHttpHeaders.add(header.getKey(), header.getValue());
+                }
+            }
+
             final EventLoopGroup group = new NioEventLoopGroup();
             handler = new WebSocketClientHandler(WebSocketClientHandshakerFactory.newHandshaker(uri,
                     WebSocketVersion.V13,
                     contentType != null ? SubprotocolBuilderUtil.contentTypeToSyanapeSubprotocol(contentType) : null,
-                    false,
-                    new DefaultHttpHeaders()));
+                    false, defaultHttpHeaders));
             Bootstrap b = new Bootstrap();
             b.group(group).channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
