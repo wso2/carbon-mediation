@@ -118,9 +118,6 @@ public class XMLWriter implements Writer {
                     }
                 } else if (name.equals(SCHEMA_XML_ELEMENT_TEXT_VALUE_FIELD)){
                     xmlStreamWriter.writeCharacters(value);
-                } else if (name.equals(latestElementName)) {
-                    xmlStreamWriter.writeCharacters(value);
-                    xmlStreamWriter.writeEndElement();
                 } else {
                     writeStartElement(name, xmlStreamWriter);
                     xmlStreamWriter.writeCharacters(value);
