@@ -56,10 +56,6 @@ function setProperty() {
                 	reason += validateEmptySV(document.getElementById('propValue'),
                 	    org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
                 }
-				if (reason === "") {
-					reason += validateValueForInputSV(document.getElementById('propValue'),
-					    org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
-				}
 				if(reason === ""){
 					if(document.getElementById('propValue').value != document.getElementById('propValueConfirm').value){
 					    reason += org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value.confirmation.invalid"];
@@ -148,9 +144,6 @@ function editProperty(rowid) {
 						+ rowid);
 				var propertyValueConfim = document.getElementById('propValueConfirm_'
 						+ rowid);
-				reason += validateValueForInputSV(
-						propertyValue,
-						org_wso2_carbon_mediation_secure_vault_ui_jsi18n["property.value"]);
 
 				// Check for the previously entered property
 				var duplicatePropNameCount = 0;
@@ -302,15 +295,6 @@ function validateForInputSV(fld, fldName) {
 	var illegalChars = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]/;
 	if (illegalChars.test(fld.value)) {
 		error = "The " + fldName + " has illegal characters";
-	}
-	return error;
-}
-
-function validateValueForInputSV(fld, fldName) {
-	var error = "";
-	var regex = /^[\S]{5,30}$/;
-	if (!regex.test(fld.value)) {
-		error = "The " + fldName + " length should be within 5 to 30 characters";
 	}
 	return error;
 }
