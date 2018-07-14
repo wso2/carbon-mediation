@@ -35,6 +35,9 @@
         String passwordType = request.getParameter("passwordType");
         String keytabPath = request.getParameter("keytabPath");
         String keytabPathType = request.getParameter("keytabPathType");
+        String krb5Option = request.getParameter("krb5Option");
+        String loginOption = request.getParameter("loginOption");
+        String keyTabOption = request.getParameter("keyTabOption");
 
         Mediator mediator = SequenceEditorHelper.getEditingMediator(request, session);
         if (!(mediator instanceof KerberosMediator)) {
@@ -43,29 +46,50 @@
         KerberosMediator kerberosMediator = (KerberosMediator) mediator;
         XPathFactory xPathFactory = XPathFactory.getInstance();
         kerberosMediator.setLoginContextName(loginContextName);
-        kerberosMediator.setLoginConfig(loginConfig);
-        kerberosMediator.setKrb5Config(krb5Config);
         kerberosMediator.setSpn(spn);
 
         if (clientPrincipalType != null && "expression".equals(clientPrincipalType.trim())) {
-            kerberosMediator.setClientPrincipal(new Value(xPathFactory.createSynapseXPath("clientPrincipalType", 
+            kerberosMediator.setClientPrincipal(new Value(xPathFactory.createSynapseXPath("clientPrincipalType",
                                                 clientPrincipal.trim(), session)));
         } else {
             kerberosMediator.setClientPrincipal(new Value(clientPrincipal));
         }
-        
+
+        if ("selectFromRegistry".equals(krb5Option)) {
+            String selectFromRegistry = request.getParameter("krb5ConfigKey");
+            if (selectFromRegistry != null) {
+                kerberosMediator.setKrb5ConfigKey(new Value(selectFromRegistry));
+            }
+        } else {
+            kerberosMediator.setKrb5Config(krb5Config);
+        }
+
+        if ("selectFromRegistryLoginConfig".equals(loginOption)) {
+            String loginConfigFromRegistry = request.getParameter("loginConfigKey");
+            if (loginConfigFromRegistry != null) {
+                kerberosMediator.setLoginConfigKey(new Value(loginConfigFromRegistry));
+            }
+        } else {
+            kerberosMediator.setLoginConfig(loginConfig);
+        }
+
         if (passwordType != null && "expression".equals(passwordType.trim())) {
             kerberosMediator.setPassword(new Value(xPathFactory.createSynapseXPath("passwordType", password.trim(),
                                                 session)));
         } else {
             kerberosMediator.setPassword(new Value(password));
         }
-        
-        if (keytabPathType != null && "expression".equals(keytabPathType.trim())) {
-            kerberosMediator.setKeytabPath(new Value(xPathFactory.createSynapseXPath("keytabPathType", 
-                                                keytabPath.trim(), session)));
+
+        if ("selectFromRegistryKeyTab".equals(keyTabOption)) {
+            String keyTabConfigFromRegistry = request.getParameter("keyTabKey");
+            if (keyTabConfigFromRegistry != null) {
+                kerberosMediator.setRegistryKeyTabValue(new Value(keyTabConfigFromRegistry));
+            }
+        } else if (keytabPathType != null && "expression".equals(keytabPathType.trim())) {
+            kerberosMediator.setKeytabPath(new Value(xPathFactory.createSynapseXPath("keytabPathType",
+            keytabPath.trim(), session)));
         } else {
-            kerberosMediator.setKeytabPath(new Value(keytabPath));
+               kerberosMediator.setKeytabPath(new Value(keytabPath));
         }
     } catch (Exception e) {
         session.setAttribute("sequence.error.message", e.getMessage());

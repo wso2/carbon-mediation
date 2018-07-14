@@ -1,6 +1,6 @@
 
 function kerberosMediatorValidate(){
-    if(document.getElementById('krb5Config').value == ''){
+    if(document.getElementById('krb5Config').value == '' && document.getElementById('krb5ConfigKey').value == ''){
         CARBON.showErrorDialog(enti18n["valid.krb5Config.required"]);
         return false;
 	}
@@ -12,7 +12,8 @@ function kerberosMediatorValidate(){
         CARBON.showErrorDialog(enti18n["valid.cpn.required"]);
         return false;
     }
-	if(document.getElementById('password').value == '' && document.getElementById('keytabPath').value ==''){
+	if(document.getElementById('password').value == '' && document.getElementById('keytabPath').value =='' &&
+	    document.getElementById('keyTabKey').value ==''){
         CARBON.showErrorDialog(enti18n["valid.password.required"]);
         return false;
     }
