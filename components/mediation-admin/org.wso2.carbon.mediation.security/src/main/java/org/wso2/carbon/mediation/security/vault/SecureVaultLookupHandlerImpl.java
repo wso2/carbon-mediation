@@ -25,6 +25,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.registry.Registry;
+import org.apache.synapse.registry.RegistryEntry;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
 import org.wso2.carbon.registry.core.service.RegistryService;
@@ -38,16 +40,14 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 
 	private ServerConfigurationService serverConfigService;
 
-	private RegistryService registryService;
-
-	UserRegistry registry = null;
+	private Registry registry;
 	
 	Object decryptlockObj = new Object();
 
 	private SecureVaultLookupHandlerImpl(ServerConfigurationService serverConfigurationService,
-	                                     RegistryService registryService) throws RegistryException {
+	                                     Registry registry) throws RegistryException {
 		this.serverConfigService = serverConfigurationService;
-		this.registryService = registryService;
+			this.registry = registry;
 		try {
 			init();
 		} catch (RegistryException e) {
@@ -59,23 +59,21 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 	public static SecureVaultLookupHandlerImpl getDefaultSecurityService() throws RegistryException {
 		return getDefaultSecurityService(SecurityServiceHolder.getInstance()
 		                                                      .getServerConfigurationService(),
-		                                 SecurityServiceHolder.getInstance().getRegistryService());
+		                                 SecurityServiceHolder.getInstance().getRegistry());
 	}
 
 	private static SecureVaultLookupHandlerImpl getDefaultSecurityService(ServerConfigurationService serverConfigurationService,
-	                                                                      RegistryService registryService)
+	                                                                      Registry registry)
 	                                                                                                      throws RegistryException {
 		if (instance == null) {
 			instance =
-			           new SecureVaultLookupHandlerImpl(serverConfigurationService, registryService);
+			           new SecureVaultLookupHandlerImpl(serverConfigurationService, registry);
 		}
 		return instance;
 	}
 
 	private void init() throws RegistryException {
 		try {
-			registry = registryService.getConfigSystemRegistry();
-
 			// creating vault-specific storage repository (this happens only if
 			// not resource not existing)
 			initRegistryRepo();
@@ -91,27 +89,28 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 	 * @throws RegistryException
 	 */
 	private void initRegistryRepo() throws RegistryException {
-
 		if (!isRepoExists()) {
-			org.wso2.carbon.registry.core.Collection secureVaultCollection =
-			                                                                 registry.newCollection();
-			registry.put(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY,
-			             secureVaultCollection);
+			registry.newResource(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY,
+			             true);
 		}
 	}
 
 	/**
 	 * Checks whether the given repository already existing.
-	 * 
+	 *
 	 * @return
 	 */
 	protected boolean isRepoExists() {
+		RegistryEntry vaultRegistryEntry;
 		try {
-			registry.get(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY);
-		} catch (RegistryException e) {
-			return false;
+			vaultRegistryEntry =
+					registry.getRegistryEntry(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY);
+		} catch (Exception e) {
+	    	log.error("Error in fetching secure vault registry entry: " +
+					SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY, e);
+	    	return false;
 		}
-		return true;
+		return vaultRegistryEntry.getName() != null;
 	}
 
 	public String getProviderClass() {
