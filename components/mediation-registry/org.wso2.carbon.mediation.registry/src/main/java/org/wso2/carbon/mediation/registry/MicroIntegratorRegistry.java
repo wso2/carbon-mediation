@@ -33,6 +33,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +44,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -206,6 +208,97 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         return result;
     }
 
+    /**
+     * The micro integrator expects the properties of a directory to be available inside the given directory as a
+     * property file. For an example, if a directory key, conf:/foo/bar is passed as the key, the micro integrator
+     * registry expects the properties to be available in the file, conf:/foo/bar/bar.properties.
+     *
+     * @param key the path to the directory
+     * @return the properties defined
+     */
+    public Properties lookupProperties(String key) {
+        if (log.isDebugEnabled()) {
+            log.debug("==> Repository fetch of resource with key : " + key);
+        }
+        key = appendPropertyFile(key);
+
+        String resolvedRegKeyPath = resolveRegistryPath(key);
+        URLConnection urlConnection;
+        URL url = null;
+        try {
+            url = new URL(resolvedRegKeyPath);
+        } catch (MalformedURLException e) {
+            handleException("Invalid path '" + resolvedRegKeyPath + "' for URL", e);
+        }
+
+        if (url == null) {
+            handleException("Unable to create URL for target resource : " + key);
+        }
+
+        if ("file".equals(url.getProtocol())) {
+            try {
+                url.openStream();
+            } catch (FileNotFoundException e) {
+                return null;
+            } catch (IOException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Error occurred while accessing registry resource: " + key, e);
+                }
+                return null;
+            }
+        }
+
+        try {
+            urlConnection = url.openConnection();
+            urlConnection.connect();
+        } catch (IOException e) {
+            return null;
+        }
+
+        InputStream input = null;
+        try {
+            input = urlConnection.getInputStream();
+        } catch (IOException e) {
+            handleException("Error when getting a stream from the URL", e);
+        }
+
+        if (input == null) {
+            return null;
+        }
+
+        Properties result = new Properties();
+
+        try {
+            result.load(input);
+        } catch (IOException e) {
+            log.error("Error in loading properties");
+        } finally {
+            try {
+                input.close();
+            } catch (IOException e) {
+                log.error("Error in closing the input stream.", e);
+            }
+
+        }
+        return result;
+    }
+
+    /**
+     * This methods append the properties file to the directory URL
+     *
+     * @param originalURL the path to the directory
+     * @return URL of the relevant property file
+     */
+    private String appendPropertyFile(String originalURL) {
+        originalURL = originalURL.trim();
+        String[] pathSegments = originalURL.split(ESBRegistryConstants.URL_SEPARATOR);
+        String folderName = pathSegments[pathSegments.length - 1];
+        if (originalURL.lastIndexOf(ESBRegistryConstants.URL_SEPARATOR) == (originalURL.length() - 1)) {
+            return originalURL + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
+        }
+        return originalURL + ESBRegistryConstants.URL_SEPARATOR + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
+    }
+
     @Override
     public RegistryEntry getRegistryEntry(String key) {
 
@@ -217,6 +310,8 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             if ("file".equals(url.getProtocol())) {
                 try {
                     url.openStream();
+                } catch (FileNotFoundException e) {
+                    return entryEmbedded;
                 } catch (IOException e) {
                     log.error("Error occurred while accessing registry resource: " + key, e);
                     return null;
@@ -823,6 +918,27 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         } else {
             log.debug("Name and Value must need");
         }
+    }
+
+    @Override
+    public Properties getResourceProperties(String entryKey) {
+
+        Properties properties = new Properties();
+        Properties resourceProperties = lookupProperties(entryKey);
+        if (resourceProperties != null) {
+            for (Object key : resourceProperties.keySet()) {
+                Object value = resourceProperties.get(key);
+                if (value instanceof List) {
+                    if (((List) value).size() > 0) {
+                        properties.put(key, ((List) value).get(0));
+                    }
+                } else {
+                    properties.put(key, value);
+                }
+            }
+            return properties;
+        }
+        return null;
     }
 
 }
