@@ -221,7 +221,6 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             log.debug("==> Repository fetch of resource with key : " + key);
         }
         key = appendPropertyFile(key);
-
         String resolvedRegKeyPath = resolveRegistryPath(key);
         URLConnection urlConnection;
         URL url = null;
@@ -230,55 +229,25 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         } catch (MalformedURLException e) {
             handleException("Invalid path '" + resolvedRegKeyPath + "' for URL", e);
         }
-
         if (url == null) {
             handleException("Unable to create URL for target resource : " + key);
         }
-
-        if ("file".equals(url.getProtocol())) {
-            try {
-                url.openStream();
-            } catch (FileNotFoundException e) {
-                return null;
-            } catch (IOException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Error occurred while accessing registry resource: " + key, e);
-                }
-                return null;
-            }
-        }
-
+        Properties result = new Properties();
         try {
+            if ("file".equals(url.getProtocol())) {
+                url.openStream();
+            }
             urlConnection = url.openConnection();
             urlConnection.connect();
-        } catch (IOException e) {
-            return null;
-        }
-
-        InputStream input = null;
-        try {
-            input = urlConnection.getInputStream();
-        } catch (IOException e) {
-            handleException("Error when getting a stream from the URL", e);
-        }
-
-        if (input == null) {
-            return null;
-        }
-
-        Properties result = new Properties();
-
-        try {
-            result.load(input);
-        } catch (IOException e) {
-            log.error("Error in loading properties");
-        } finally {
-            try {
-                input.close();
-            } catch (IOException e) {
-                log.error("Error in closing the input stream.", e);
+            try (InputStream input = urlConnection.getInputStream()) {
+                if (input == null) {
+                    return null;
+                }
+                result.load(input);
             }
-
+        } catch (IOException e) {
+            log.error("Error in loading properties", e);
+            return null;
         }
         return result;
     }
@@ -311,7 +280,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 try {
                     url.openStream();
                 } catch (FileNotFoundException e) {
-                    return entryEmbedded;
+                    return null;
                 } catch (IOException e) {
                     log.error("Error occurred while accessing registry resource: " + key, e);
                     return null;
@@ -940,5 +909,4 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         }
         return null;
     }
-
 }

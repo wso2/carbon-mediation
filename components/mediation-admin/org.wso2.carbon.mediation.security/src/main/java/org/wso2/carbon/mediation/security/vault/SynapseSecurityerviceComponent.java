@@ -67,7 +67,7 @@ public class SynapseSecurityerviceComponent {
 
 	protected void setRegistryService(SynapseConfigurationService regService) {
 		if (log.isDebugEnabled()) {
-			log.debug("RegistryService bound to the ESB initialization process");
+			log.debug("Registry bound to the ESB initialization process");
 		}
 		SecurityServiceHolder.getInstance().setRegistry(regService.getSynapseConfiguration().getRegistry());
 	}

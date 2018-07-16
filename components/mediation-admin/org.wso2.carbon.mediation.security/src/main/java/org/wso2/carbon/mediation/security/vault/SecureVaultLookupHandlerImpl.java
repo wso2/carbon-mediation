@@ -29,8 +29,6 @@ import org.apache.synapse.registry.Registry;
 import org.apache.synapse.registry.RegistryEntry;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.registry.core.service.RegistryService;
-import org.wso2.carbon.registry.core.session.UserRegistry;
 
 public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 
@@ -110,6 +108,9 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 					SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY, e);
 	    	return false;
 		}
+		if (vaultRegistryEntry == null) {
+		    return false;
+        }
 		return vaultRegistryEntry.getName() != null;
 	}
 
