@@ -98,7 +98,7 @@
             kerberosMediator.setKeytabPath(new Value(xPathFactory.createSynapseXPath("keytabPathType",
             keytabPath.trim(), session)));
         } else {
-               kerberosMediator.setKeytabPath(new Value(keytabPath));
+            kerberosMediator.setKeytabPath(new Value(keytabPath));
         }
     } catch (Exception e) {
         session.setAttribute("sequence.error.message", e.getMessage());

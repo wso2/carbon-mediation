@@ -144,11 +144,9 @@ public class KerberosMediator extends AbstractMediator {
      * Retrieve the spn value from registry.
      *
      * @param msgCtx message context.
-     *
      */
     private String getSpnValueFromRegistry(MessageContext msgCtx) {
 
-        OMTextImpl text = null;
         if (getSpnKey() != null) {
             String generatedSpnConfigKey = getSpnKey().evaluateValue(msgCtx);
             Object entry = msgCtx.getEntry(generatedSpnConfigKey);
@@ -157,16 +155,13 @@ public class KerberosMediator extends AbstractMediator {
             }
             if (entry instanceof OMTextImpl) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Retrieving the krb5Config key :" + generatedSpnConfigKey);
+                    log.debug("Retrieving the spnConfig key :" + generatedSpnConfigKey);
                 }
-                text = (OMTextImpl) entry;
+                OMTextImpl text = (OMTextImpl) entry;
+                return text.getText();
             }
         }
-        if (text != null) {
-            return text.getText();
-        } else {
-            return null;
-        }
+        return null;
     }
 
     /**

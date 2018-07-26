@@ -70,7 +70,7 @@ public class KerberosMediator extends AbstractMediator {
         }
         if (spnConfigKey != null) {
             OMElement spnConfigEle = fac.createOMElement(KerberosConstants.SPN_STRING, synNS);
-            spnConfigEle.addAttribute(fac.createOMAttribute("key", nullNS, spnConfigKey.getKeyValue()));
+            spnConfigEle.addAttribute(fac.createOMAttribute(XMLConfigConstants.KEY, nullNS, spnConfigKey.getKeyValue()));
             kerberosService.addChild(spnConfigEle);
         } else if (spn != null) {
             kerberosService.addAttribute(fac.createOMAttribute(KerberosConstants.SPN_STRING, nullNS, spn));
@@ -84,21 +84,21 @@ public class KerberosMediator extends AbstractMediator {
         }
         if (keyTabKey != null) {
             OMElement keyTabKeyEle = fac.createOMElement(KerberosConstants.KEYTAB_PATH_STRING, synNS);
-            keyTabKeyEle.addAttribute(fac.createOMAttribute("key", nullNS, keyTabKey.getKeyValue()));
+            keyTabKeyEle.addAttribute(fac.createOMAttribute(XMLConfigConstants.KEY, nullNS, keyTabKey.getKeyValue()));
             kerberosService.addChild(keyTabKeyEle);
         } else if (keytabPath != null) {
             new ValueSerializer().serializeValue(keytabPath, KerberosConstants.KEYTAB_PATH_STRING, kerberosService);
         }
         if (krb5ConfigKey != null) {
             OMElement krb5ConfigEle = fac.createOMElement(KerberosConstants.KRB5_CONFIG_STRING, synNS);
-            krb5ConfigEle.addAttribute(fac.createOMAttribute("key", nullNS, krb5ConfigKey.getKeyValue()));
+            krb5ConfigEle.addAttribute(fac.createOMAttribute(XMLConfigConstants.KEY, nullNS, krb5ConfigKey.getKeyValue()));
             kerberosService.addChild(krb5ConfigEle);
         } else if (krb5Config != null) {
             kerberosService.addAttribute(fac.createOMAttribute(KerberosConstants.KRB5_CONFIG_STRING, nullNS, krb5Config));
         }
         if (loginConfigKey != null) {
             OMElement loginConfigEle = fac.createOMElement(KerberosConstants.LOGIN_CONFIG_STRING, synNS);
-            loginConfigEle.addAttribute(fac.createOMAttribute("key", nullNS, loginConfigKey.getKeyValue()));
+            loginConfigEle.addAttribute(fac.createOMAttribute(XMLConfigConstants.KEY, nullNS, loginConfigKey.getKeyValue()));
             kerberosService.addChild(loginConfigEle);
         } else if (loginConfig != null) {
             kerberosService.addAttribute(fac.createOMAttribute(KerberosConstants.LOGIN_CONFIG_STRING, nullNS,

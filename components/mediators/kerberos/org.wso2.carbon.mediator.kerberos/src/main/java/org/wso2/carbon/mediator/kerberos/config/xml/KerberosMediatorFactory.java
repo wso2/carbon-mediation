@@ -63,8 +63,8 @@ public class KerberosMediatorFactory extends AbstractMediatorFactory {
         if (krb5ConfigKey != null && krb5ConfigKey.hasNext()) {
             OMElement krb5ConfigElem = (OMElement) krb5ConfigKey.next();
             if (krb5ConfigElem != null) {
-                OMAttribute n = krb5ConfigElem.getAttribute(ATT_KEY);
-                if (n != null) {
+                OMAttribute attribute = krb5ConfigElem.getAttribute(ATT_KEY);
+                if (attribute != null) {
                     ValueFactory keyFac = new ValueFactory();
                     Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, krb5ConfigElem);
                     mediator.setKrb5ConfigKey(generatedKey);
@@ -83,8 +83,8 @@ public class KerberosMediatorFactory extends AbstractMediatorFactory {
         if (spnConfigKey != null && spnConfigKey.hasNext()) {
             OMElement spnConfigElem = (OMElement) spnConfigKey.next();
             if (spnConfigElem != null) {
-                OMAttribute n = spnConfigElem.getAttribute(ATT_KEY);
-                if (n != null) {
+                OMAttribute attribute = spnConfigElem.getAttribute(ATT_KEY);
+                if (attribute != null) {
                     ValueFactory keyFac = new ValueFactory();
                     Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, spnConfigElem);
                     mediator.setSpnKey(generatedKey);
@@ -103,8 +103,8 @@ public class KerberosMediatorFactory extends AbstractMediatorFactory {
         if (loginConfigKey != null && loginConfigKey.hasNext()) {
             OMElement loginConfigElem = (OMElement) loginConfigKey.next();
             if (loginConfigElem != null) {
-                OMAttribute n = loginConfigElem.getAttribute(ATT_KEY);
-                if (n != null) {
+                OMAttribute attribute = loginConfigElem.getAttribute(ATT_KEY);
+                if (attribute != null) {
                     ValueFactory keyFac = new ValueFactory();
                     Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, loginConfigElem);
                     mediator.setLoginConfigKey(generatedKey);
@@ -147,8 +147,8 @@ public class KerberosMediatorFactory extends AbstractMediatorFactory {
         if (keytabConfig != null && keytabConfig.hasNext()) {
             OMElement keytabConfigElem = (OMElement) keytabConfig.next();
             if (keytabConfigElem != null) {
-                OMAttribute n = keytabConfigElem.getAttribute(ATT_KEY);
-                if (n != null) {
+                OMAttribute attribute = keytabConfigElem.getAttribute(ATT_KEY);
+                if (attribute != null) {
                     mediator.setRegistryKeyTabValue(new ValueFactory().createValue(XMLConfigConstants.KEY, keytabConfigElem));
                 }
                 isPasswordProvided = true;

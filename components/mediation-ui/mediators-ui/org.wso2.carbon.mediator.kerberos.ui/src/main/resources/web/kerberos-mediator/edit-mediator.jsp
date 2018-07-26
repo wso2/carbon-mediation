@@ -175,7 +175,6 @@
             loginConfigAnonOption.style.display = loginConfigOption.checked ? "block" : "none";
             document.getElementById("mediator.kerberos.loginConfigKey.txt.div").style.display='none';
             document.getElementById("mediator.kerberos.loginConfigKey.link.div").style.display='none';
-
         }
 
         function loginConfigRegistrySelected() {
