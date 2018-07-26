@@ -50,7 +50,11 @@ public class KerberosMediatorSerializer extends AbstractMediatorSerializer {
         OMElement kerberosElem = fac.createOMElement(KerberosConstants.KERBEROS_SERVICE_STRING, synNS);
         saveTracingState(kerberosElem, kerberos);
 
-        if (StringUtils.isNotEmpty(kerberos.getSpn())) {
+        if (kerberos.getSpnKey() != null) {
+            OMElement spnConfEle = fac.createOMElement(KerberosConstants.SPN_STRING, synNS);
+            spnConfEle.addAttribute(fac.createOMAttribute("key", nullNS, kerberos.getSpnKey().getKeyValue()));
+            kerberosElem.addChild(spnConfEle);
+        } else if (StringUtils.isNotEmpty(kerberos.getSpn())) {
             kerberosElem.addAttribute(fac.createOMAttribute(KerberosConstants.SPN_STRING, nullNS, kerberos.getSpn()));
         }
 
@@ -58,9 +62,9 @@ public class KerberosMediatorSerializer extends AbstractMediatorSerializer {
             OMElement krb5ConfigEle = fac.createOMElement(KerberosConstants.KRB5_CONFIG_STRING, synNS);
             krb5ConfigEle.addAttribute(fac.createOMAttribute("key", nullNS, kerberos.getKrb5ConfigKey().getKeyValue()));
             kerberosElem.addChild(krb5ConfigEle);
-        } else {
-            kerberosElem.addAttribute(fac.createOMAttribute(KerberosConstants.KRB5_CONFIG_STRING, nullNS, kerberos.getKrb5Config()));
-
+        } else if (StringUtils.isNotEmpty(kerberos.getKrb5Config())) {
+            kerberosElem.addAttribute(fac.createOMAttribute(KerberosConstants.KRB5_CONFIG_STRING, nullNS,
+                    kerberos.getKrb5Config()));
         }
         if (StringUtils.isNotEmpty(kerberos.getLoginContextName())) {
             kerberosElem.addAttribute(fac.createOMAttribute(KerberosConstants.LOGIN_CONTEXT_NAME_STRING, nullNS,
@@ -70,7 +74,7 @@ public class KerberosMediatorSerializer extends AbstractMediatorSerializer {
             OMElement loginConfigEle = fac.createOMElement(KerberosConstants.LOGIN_CONFIG_STRING, synNS);
             loginConfigEle.addAttribute(fac.createOMAttribute("key", nullNS, kerberos.getLoginConfigKey().getKeyValue()));
             kerberosElem.addChild(loginConfigEle);
-        } else {
+        } else if (StringUtils.isNotEmpty(kerberos.getLoginConfig())) {
             kerberosElem.addAttribute(fac.createOMAttribute(KerberosConstants.LOGIN_CONFIG_STRING, nullNS,
                     kerberos.getLoginConfig()));
         }
@@ -86,8 +90,9 @@ public class KerberosMediatorSerializer extends AbstractMediatorSerializer {
             OMElement keyTabKeyEle = fac.createOMElement(KerberosConstants.KEYTAB_PATH_STRING, synNS);
             keyTabKeyEle.addAttribute(fac.createOMAttribute("key", nullNS, kerberos.getRegistryKeyTabValue().getKeyValue()));
             kerberosElem.addChild(keyTabKeyEle);
-        } else {
-            new ValueSerializer().serializeValue(kerberos.getKeytabPath(), KerberosConstants.KEYTAB_PATH_STRING, kerberosElem);
+        } else if (kerberos.getKeytabPath() != null) {
+            new ValueSerializer().serializeValue(kerberos.getKeytabPath(), KerberosConstants.KEYTAB_PATH_STRING,
+                    kerberosElem);
         }
 
         return kerberosElem;

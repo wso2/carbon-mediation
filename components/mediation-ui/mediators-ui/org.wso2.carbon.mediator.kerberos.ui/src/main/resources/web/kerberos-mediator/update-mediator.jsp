@@ -36,6 +36,7 @@
         String keytabPath = request.getParameter("keytabPath");
         String keytabPathType = request.getParameter("keytabPathType");
         String krb5Option = request.getParameter("krb5Option");
+        String spnOption = request.getParameter("spnOption");
         String loginOption = request.getParameter("loginOption");
         String keyTabOption = request.getParameter("keyTabOption");
 
@@ -46,7 +47,6 @@
         KerberosMediator kerberosMediator = (KerberosMediator) mediator;
         XPathFactory xPathFactory = XPathFactory.getInstance();
         kerberosMediator.setLoginContextName(loginContextName);
-        kerberosMediator.setSpn(spn);
 
         if (clientPrincipalType != null && "expression".equals(clientPrincipalType.trim())) {
             kerberosMediator.setClientPrincipal(new Value(xPathFactory.createSynapseXPath("clientPrincipalType",
@@ -62,6 +62,15 @@
             }
         } else {
             kerberosMediator.setKrb5Config(krb5Config);
+        }
+
+        if ("spnSelectFromRegistry".equals(spnOption)) {
+            String spnFromRegistry = request.getParameter("spnConfigKey");
+            if (spnFromRegistry != null) {
+                kerberosMediator.setSpnConfigKey(new Value(spnFromRegistry));
+            }
+        } else {
+            kerberosMediator.setSpn(spn);;
         }
 
         if ("selectFromRegistryLoginConfig".equals(loginOption)) {

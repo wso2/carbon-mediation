@@ -4,7 +4,7 @@ function kerberosMediatorValidate(){
         CARBON.showErrorDialog(enti18n["valid.krb5Config.required"]);
         return false;
 	}
-	if(document.getElementById('spn').value == ''){
+	if(document.getElementById('spn').value == '' && document.getElementById('spnConfigKey').value == ''){
         CARBON.showErrorDialog(enti18n["valid.spn.required"]);
         return false;
     }

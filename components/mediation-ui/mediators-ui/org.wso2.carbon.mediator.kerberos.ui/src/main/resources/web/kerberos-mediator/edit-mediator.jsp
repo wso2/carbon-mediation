@@ -37,6 +37,7 @@
     Value password = null;
     Value keytabPath = null;
     Value krb5ConfigRegistryPath = null;
+    Value spnConfigRegistryPath = null;
     Value loginConfigRegistryPath = null;
     Value keyTabRegistryPath = null;
 
@@ -54,6 +55,7 @@
         password = kerberosMediator.getPassword();
         keytabPath = kerberosMediator.getKeytabPath();
         krb5ConfigRegistryPath = kerberosMediator.getKrb5ConfigKey();
+        spnConfigRegistryPath = kerberosMediator.getSpnConfigKey();
         loginConfigRegistryPath = kerberosMediator.getLoginConfigKey();
         keyTabRegistryPath = kerberosMediator.getRegistryKeyTabValue();
 
@@ -135,6 +137,20 @@
         }
        %>
 
+       <%
+            if (spnConfigRegistryPath == null) {
+       %>
+            document.getElementById("spnConfigOptionAnon").checked = true;
+            spnConfigOptionAnonSelected();
+       <%
+            } else {
+       %>
+            document.getElementById("spnConfigOptionReference").checked = true;
+            spnConfigOptionReferenceSelected()();
+       <%
+        }
+       %>
+
         function anonSelected() {
             var krb5ConfigAnnonButton = document.getElementById("krb5ConfigOptionAnon");
             var krb5ConfigYes = document.getElementById("mediator.kerberos.krb5Config.txt.div");
@@ -189,6 +205,24 @@
              registryConf.style.display = keyTabOptionRef.checked ? "block" : "none";
              document.getElementById("mediator.kerberos.keytab.txt.div").style.display='none';
              document.getElementById("mediator.kerberos.keytabSelection.txt.div").style.display='none';
+        }
+
+        function spnConfigOptionAnonSelected() {
+             var spnConfigAnnonButton = document.getElementById("spnConfigOptionAnon");
+             var spnConfig = document.getElementById("mediator.kerberos.spn.txt.div");
+             spnConfig.style.display = spnConfigAnnonButton.checked ? "block" : "none";
+             document.getElementById("mediator.kerberos.spnKey.txt.div").style.display='none';
+             document.getElementById("mediator.kerberos.spn.link.div").style.display='none';
+
+         }
+
+        function spnConfigOptionReferenceSelected() {
+             var spnConfigRefButton = document.getElementById("spnConfigOptionReference");
+             var spnConfigRegistry = document.getElementById("mediator.kerberos.spnKey.txt.div");
+             spnConfigRegistry.style.display = spnConfigRefButton.checked ? "block" : "none";
+             var loadSpnFromRegistry = document.getElementById("mediator.kerberos.spn.link.div");
+             loadSpnFromRegistry.style.display = spnConfigRefButton.checked ? "block" : "none";
+             document.getElementById("mediator.kerberos.spn.txt.div").style.display='none';
         }
 
 </script>
@@ -247,15 +281,48 @@
                     </tr>
                     <tr></tr>
                     <tr>
-                        <td class="leftCol-small">
+                        <td class="leftCol-small" rowspan="3">
                             <fmt:message key="mediator.kerberos.spn"/><span class="required">*</span>
                         </td>
-                        <td class="text-box-big">
-                            <input type="text" id="spn" name="spn" value="<%=spn%>" />
+                        <td>
+                            <input type="radio" id="spnConfigOptionAnon" name="spnOption" value="annonSpn"
+                            onclick="spnConfigOptionAnonSelected()"/><fmt:message key="mediator.kerberos.anonymous"/>
+                        </td>
+                        <td>
+                            <div id="mediator.kerberos.spn.txt.div" style="display: none">
+                                <input type="text" id="spn" name="spn" value="<%=spn%>" />
+                            </div>
                         </td>
                         <td></td>
                         <td></td>
                     </tr>
+                    <tr>
+                    <td>
+                        <input type="radio" id="spnConfigOptionReference" name="spnOption"
+                        value="spnSelectFromRegistry" onclick="spnConfigOptionReferenceSelected()"/>
+                        <fmt:message key="mediator.kerberos.registry"/>
+                    </td>
+                    <td>
+                        <div id="mediator.kerberos.spnKey.txt.div" style="display: none">
+                            <input type="text" id="spnConfigKey" name="spnConfigKey"
+                            value="<%=(spnConfigRegistryPath != null)?spnConfigRegistryPath.getKeyValue():""%>"
+                            readonly="true"/>
+                        </div>
+                    </td>
+                    <td>
+                    <div id="mediator.kerberos.spn.link.div" style="display: none">
+                        <a href="#registryBrowserLink"
+                        class="registry-picker-icon-link"
+                        onclick="showRegistryBrowser('spnConfigKey','/_system/config')"><fmt:message
+                        key="mediator.kerberos.conf.registry.browser"/></a>
+                        <a href="#registryBrowserLink"
+                        class="registry-picker-icon-link"
+                        onclick="showRegistryBrowser('spnConfigKey','/_system/governance')"><fmt:message
+                        key="mediator.kerberos.gov.registry.browser"/></a>
+                    </div>
+                    </td>
+                    </tr>
+                    <tr></tr>
                     <tr>
                         <td class="leftCol-small">
                             <fmt:message key="mediator.kerberos.clientPrincipal"/><span class="required">*</span>
