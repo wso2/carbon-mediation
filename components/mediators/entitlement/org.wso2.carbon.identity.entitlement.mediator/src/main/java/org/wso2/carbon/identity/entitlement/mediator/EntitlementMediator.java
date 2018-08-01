@@ -17,10 +17,7 @@
  */
 package org.wso2.carbon.identity.entitlement.mediator;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.*;
 import org.apache.axiom.om.impl.llom.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
@@ -73,6 +70,9 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
     private String remoteServiceUserName;
     private String remoteServicePassword;
     private String remoteServiceUrl;
+    private String remoteServiceUserNameKey;
+    private String remoteServicePasswordKey;
+    private String remoteServiceUrlKey;
     private String callbackClass;
     private String client;
     private String thriftPort;
@@ -99,6 +99,7 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
     /* The in-line advice sequence */
     private Mediator adviceMediator = null;
     private PEPProxy pepProxy;
+    private PEPProxyConfig config;
 
     private final String ORIGINAL_ENTITLEMENT_PAYLOAD = "ORIGINAL_ENTITLEMENT_PAYLOAD";
     private final String ENTITLEMENT_DECISION = "ENTITLEMENT_DECISION";
@@ -124,6 +125,13 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
 
         if (log.isDebugEnabled()) {
             log.debug("Mediation for Entitlement started");
+        }
+
+        try {
+            resolveEntitlementServerDynamicConfigs(synCtx);
+        } catch (EntitlementProxyException e) {
+            log.error("Error while initializing the PEP Proxy" + e);
+            throw new SynapseException("Error while initializing the Entitlement PEP Proxy");
         }
 
         try {
@@ -347,6 +355,13 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
             synLog.traceOrDebug("Entitlement mediator : Mediating from ContinuationState");
         }
 
+        try {
+            resolveEntitlementServerDynamicConfigs(synCtx);
+        } catch (EntitlementProxyException e) {
+            log.error("Error while initializing the PEP Proxy" + e);
+            throw new SynapseException("Error while initializing the Entitlement PEP Proxy");
+        }
+
         boolean result = false;
         int subBranch = ((ReliantContinuationState) continuationState).getSubBranch();
         if (subBranch == 0) {   // For Advice mediator
@@ -478,44 +493,62 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
                 callback = new UTEntitlementCallbackHandler();
             }
 
+            String remoteServiceUrlResolved = remoteServiceUrl;
+            String remoteServiceUsernameResolved = remoteServiceUserName;
+            String remoteServicePasswordResolved = remoteServicePassword;
+
+            if (remoteServiceUrlKey != null && remoteServiceUrlKey.trim().length() > 0) {
+                remoteServiceUrlResolved = resolveRegistryEntryText(synEnv, remoteServiceUrlKey);
+            }
+
+            if (remoteServiceUserNameKey != null && remoteServiceUserNameKey.trim().length() > 0) {
+                remoteServiceUsernameResolved = resolveRegistryEntryText(synEnv, remoteServiceUserNameKey);
+            }
+
+            if (remoteServicePasswordKey != null && remoteServicePasswordKey.trim().length() > 0) {
+                remoteServicePasswordResolved = resolveRegistryEntryText(synEnv, remoteServicePasswordKey);
+            }
+
             Map<String,Map<String,String>> appToPDPClientConfigMap = new HashMap<String, Map<String,String>>();
             Map<String,String> clientConfigMap = new HashMap<String, String>();
 
             if(client !=null && client.equals(EntitlementConstants.SOAP)){
                 clientConfigMap.put(EntitlementConstants.CLIENT, client);
-                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrl);
-                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUserName);
-                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePassword);
+                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrlResolved);
+                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUsernameResolved);
+                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePasswordResolved);
                 clientConfigMap.put(EntitlementConstants.REUSE_SESSION, reuseSession);
             }else if(client !=null && client.equals(EntitlementConstants.BASIC_AUTH)){
                 clientConfigMap.put(EntitlementConstants.CLIENT, client);
-                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrl);
-                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUserName);
-                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePassword);
+                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrlResolved);
+                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUsernameResolved);
+                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePasswordResolved);
             }else if(client !=null && client.equals(EntitlementConstants.THRIFT)){
                 clientConfigMap.put(EntitlementConstants.CLIENT, client);
-                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrl);
-                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUserName);
-                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePassword);
+                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrlResolved);
+                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUsernameResolved);
+                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePasswordResolved);
                 clientConfigMap.put(EntitlementConstants.REUSE_SESSION, reuseSession);
                 clientConfigMap.put(EntitlementConstants.THRIFT_HOST, thriftHost);
                 clientConfigMap.put(EntitlementConstants.THRIFT_PORT, thriftPort);
             } else if(client !=null && client.equals(EntitlementConstants.WS_XACML)){
                 clientConfigMap.put(EntitlementConstants.CLIENT, client);
-                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrl);
-                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUserName);
-                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePassword);
+                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrlResolved);
+                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUsernameResolved);
+                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePasswordResolved);
             }else if(client == null){
-                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrl);
-                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUserName);
-                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePassword);
+                clientConfigMap.put(EntitlementConstants.SERVER_URL, remoteServiceUrlResolved);
+                clientConfigMap.put(EntitlementConstants.USERNAME, remoteServiceUsernameResolved);
+                clientConfigMap.put(EntitlementConstants.PASSWORD, remoteServicePasswordResolved);
             } else {
                 log.error("EntitlementMediator initialization error: Unsupported client");
                 throw new SynapseException("EntitlementMediator initialization error: Unsupported client");
             }
 
-            appToPDPClientConfigMap.put("EntitlementMediator", clientConfigMap);
-            PEPProxyConfig config = new PEPProxyConfig(appToPDPClientConfigMap,"EntitlementMediator", cacheType, invalidationInterval, maxCacheEntries);
+            appToPDPClientConfigMap.put(EntitlementConstants.PDP_CONFIG_MAP_ENTITLEMENT_MEDIATOR_ENTRY, clientConfigMap);
+            config = new PEPProxyConfig(appToPDPClientConfigMap,
+                    EntitlementConstants.PDP_CONFIG_MAP_ENTITLEMENT_MEDIATOR_ENTRY, cacheType, invalidationInterval,
+                    maxCacheEntries);
 
             try {
                 pepProxy = new PEPProxy(config);
@@ -550,6 +583,9 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
         remoteServiceUserName = null;
         remoteServicePassword = null;
         remoteServiceUrl = null;
+        remoteServiceUserNameKey = null;
+        remoteServicePasswordKey = null;
+        remoteServiceUrlKey = null;
         callbackClass = null;
         client = null;
         thriftPort = null;
@@ -636,6 +672,80 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
         return soapFactory.getDefaultEnvelope();
     }
 
+    private String resolveRegistryEntryText(SynapseEnvironment synEnv, String regEntryKey){
+        Object regEntry = synEnv.getSynapseConfiguration().getRegistry().lookup(regEntryKey);
+        String resolvedValue = "";
+        if (regEntry instanceof OMElement) {
+            OMElement e = (OMElement) regEntry;
+            resolvedValue = e.toString();
+        } else if (regEntry instanceof OMText) {
+            resolvedValue = ((OMText) regEntry).getText();
+        } else if (regEntry instanceof String) {
+            resolvedValue = (String) regEntry;
+        }
+
+        if (resolvedValue.startsWith(EntitlementConstants.ENCODE_PREFIX)) {
+            try {
+                resolvedValue = new String(CryptoUtil.getDefaultCryptoUtil()
+                        .base64DecodeAndDecrypt(resolvedValue.substring(4)));
+            } catch (CryptoException e) {
+                log.error(e);
+            }
+        }
+
+        return resolvedValue;
+
+    }
+
+    private String resolveRegistryEntryText(MessageContext synCtx, String regEntryKey){
+        Object regEntry = synCtx.getEntry(regEntryKey);
+        String resolvedValue = "";
+        if (regEntry instanceof OMElement) {
+            OMElement e = (OMElement) regEntry;
+            resolvedValue = e.toString();
+        } else if (regEntry instanceof OMText) {
+            resolvedValue = ((OMText) regEntry).getText();
+        } else if (regEntry instanceof String) {
+            resolvedValue = (String) regEntry;
+        }
+
+        if (resolvedValue.startsWith(EntitlementConstants.ENCODE_PREFIX)) {
+            try {
+                resolvedValue = new String(CryptoUtil.getDefaultCryptoUtil()
+                        .base64DecodeAndDecrypt(resolvedValue.substring(4)));
+            } catch (CryptoException e) {
+                log.error(e);
+            }
+        }
+
+        return resolvedValue;
+    }
+
+    private void resolveEntitlementServerDynamicConfigs(MessageContext synCtx) throws EntitlementProxyException {
+        boolean keyInvolved = false;
+        if (remoteServiceUrlKey != null && remoteServiceUrlKey.trim().length() > 0) {
+            config.getAppToPDPClientConfigMap().get(EntitlementConstants.PDP_CONFIG_MAP_ENTITLEMENT_MEDIATOR_ENTRY)
+                    .put(EntitlementConstants.SERVER_URL, resolveRegistryEntryText(synCtx, remoteServiceUrlKey));
+            keyInvolved = true;
+        }
+
+        if (remoteServiceUserNameKey != null && remoteServiceUserNameKey.trim().length() > 0) {
+            config.getAppToPDPClientConfigMap().get(EntitlementConstants.PDP_CONFIG_MAP_ENTITLEMENT_MEDIATOR_ENTRY)
+                    .put(EntitlementConstants.USERNAME, resolveRegistryEntryText(synCtx, remoteServiceUserNameKey));
+            keyInvolved = true;
+        }
+
+        if (remoteServicePasswordKey != null && remoteServicePasswordKey.trim().length() > 0) {
+            config.getAppToPDPClientConfigMap().get(EntitlementConstants.PDP_CONFIG_MAP_ENTITLEMENT_MEDIATOR_ENTRY)
+                    .put(EntitlementConstants.PASSWORD, resolveRegistryEntryText(synCtx, remoteServicePasswordKey));
+            keyInvolved = true;
+        }
+
+        if(keyInvolved){
+            pepProxy = new PEPProxy(config);
+        }
+    }
+
     public String getCallbackClass() {
         return callbackClass;
     }
@@ -652,10 +762,27 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
         this.remoteServiceUserName = remoteServiceUserName;
     }
 
+    public String getRemoteServiceUserNameKey() {
+        return remoteServiceUserNameKey;
+    }
+
+    public void setRemoteServiceUserNameKey(String remoteServiceUserNameKey) {
+        this.remoteServiceUserNameKey = remoteServiceUserNameKey;
+    }
+
+    public String getRemoteServicePasswordKey() {
+        return remoteServicePasswordKey;
+    }
+
+    public void setRemoteServicePasswordKey(String remoteServicePasswordKey) {
+        this.remoteServicePasswordKey = remoteServicePasswordKey;
+    }
+
     public String getRemoteServicePassword() {
-        if (!remoteServicePassword.startsWith("enc:")) {
+        if (remoteServicePassword != null && !remoteServicePassword.isEmpty()
+                && !remoteServicePassword.startsWith(EntitlementConstants.ENCODE_PREFIX)) {
             try {
-                return "enc:"
+                return EntitlementConstants.ENCODE_PREFIX
                         + CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(
                                 remoteServicePassword.getBytes());
             } catch (CryptoException e) {
@@ -666,7 +793,7 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
     }
 
     public void setRemoteServicePassword(String remoteServicePassword) {
-        if (remoteServicePassword.startsWith("enc:")) {
+        if (remoteServicePassword.startsWith(EntitlementConstants.ENCODE_PREFIX)) {
             try {
                 this.remoteServicePassword = new String(CryptoUtil.getDefaultCryptoUtil()
                         .base64DecodeAndDecrypt(remoteServicePassword.substring(4)));
@@ -677,13 +804,21 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
             this.remoteServicePassword = remoteServicePassword;
         }
     }
-    
+
     public String getRemoteServiceUrl() {
         return remoteServiceUrl;
     }
 
     public void setRemoteServiceUrl(String remoteServiceUrl) {
         this.remoteServiceUrl = remoteServiceUrl;
+    }
+
+    public String getRemoteServiceUrlKey() {
+        return remoteServiceUrlKey;
+    }
+
+    public void setRemoteServiceUrlKey(String remoteServiceUrlKey) {
+        this.remoteServiceUrlKey = remoteServiceUrlKey;
     }
 
     public String getCacheType() {

@@ -32,8 +32,11 @@
 
 <%
         String remoteServiceUserName = null;
-		String remoteServicePassword = null;
-		String remoteServiceUrl = null;
+        String remoteServicePassword = null;
+        String remoteServiceUrl = null;
+        String remoteServiceUserNameKey = null;
+        String remoteServicePasswordKey = null;
+        String remoteServiceUrlKey = null;
         boolean utCBH = false, x509CBH = false, samlCBH = false, kerberosCBH = false, customCBH = false;
         String callbackClass = null;
         String client = null;
@@ -42,6 +45,9 @@
         boolean acceptInline = false;
         boolean rejectInline = false;
         boolean obligationsInline = false;
+        boolean remoteUrlKey = false;
+        boolean remoteUsernameKey = false;
+        boolean remotePasswordKey = false;
         boolean adviceInline = false;
         String acceptKey = "", rejectKey = "", obligationsKey = "", adviceKey = "";
 
@@ -52,16 +58,34 @@
             }
             EntitlementMediator entMediator = (EntitlementMediator)mediator;
             remoteServiceUrl = entMediator.getRemoteServiceUrl();
-            if(remoteServiceUrl==null){
-            	remoteServiceUrl ="";
+            if(remoteServiceUrl == null) {
+            	remoteServiceUrl = "";
+            }
+            remoteServiceUrlKey = entMediator.getRemoteServiceUrlKey();
+            if(remoteServiceUrlKey != null && !remoteServiceUrlKey.isEmpty()) {
+                remoteUrlKey = true;
+            } else {
+                remoteServiceUrlKey = "";
             }
             remoteServiceUserName = entMediator.getRemoteServiceUserName();
-            if(remoteServiceUserName==null){
-            	remoteServiceUserName ="";
+            if(remoteServiceUserName == null) {
+            	remoteServiceUserName = "";
+            }
+            remoteServiceUserNameKey = entMediator.getRemoteServiceUserNameKey();
+            if(remoteServiceUserNameKey != null && !remoteServiceUserNameKey.isEmpty()) {
+                remoteUsernameKey = true;
+            } else {
+                remoteServiceUserNameKey = "";
             }
             remoteServicePassword = entMediator.getRemoteServicePassword();
-            if(remoteServicePassword==null){
-            	remoteServicePassword ="";
+            if(remoteServicePassword == null) {
+            	remoteServicePassword = "";
+            }
+            remoteServicePasswordKey = entMediator.getRemoteServicePasswordKey();
+            if(remoteServicePasswordKey != null && !remoteServicePasswordKey.isEmpty()) {
+                remotePasswordKey = true;
+            } else {
+                remoteServicePasswordKey = "";
             }
             callbackClass = entMediator.getCallbackClass();
             if(callbackClass == null  ||
@@ -148,27 +172,102 @@
             <td>
                 <table style="width: 100%">
                     <tr>
-                        <td class="leftCol-small">
-                            <fmt:message key="mediator.ent.remoteservice"/>
+                        <td><fmt:message key="mediator.ent.remoteservice"/></td>
+                        <td colspan="2">
+                            <input type="radio"
+                                   onclick="javascript:displayElement('remoteservice', true);displayElement('remoteservicekey', false);clearTextField('remoteServiceUrlKey');"
+                                   name="remoteservicegroup" value="inline" <% if (!remoteUrlKey) { %> checked="checked" <% } %> />
+                            <label><fmt:message key="inline.entry"/></label>
+                            <input type="radio"
+                                   onclick="javascript:displayElement('remoteservice', false);displayElement('remoteservicekey', true);clearTextField('remoteServiceUrl');"
+                                   name="remoteservicegroup" value="key" <% if (remoteUrlKey) { %> checked="checked" <% } %> />
+                            <label><fmt:message key="key.entry"/></label>
                         </td>
+                    </tr>
+                    <tr id="remoteservice" style="<%=remoteUrlKey ? "display:none" : ""%>">
+                        <td colspan="1"/>
                         <td class="text-box-big">
                             <input type="text" id="remoteServiceUrl" name="remoteServiceUrl" value="<%=remoteServiceUrl%>" />
                         </td>
                     </tr>
-                      <tr>
-                        <td class="leftCol-small">
-                            <fmt:message key="mediator.ent.remoteservice.user"/>
+                    <tr id="remoteservicekey" style="<%=remoteUrlKey ? "" : "display:none"%>">
+                        <td colspan="1"/>
+                        <td class="text-box-big">
+                            <input type="text" id="remoteServiceUrlKey" name="remoteServiceUrlKey" value="<%=remoteServiceUrlKey%>" readonly/>
+                        <a href="#registryBrowserLink" id="confRegUrlKey"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('remoteServiceUrlKey','/_system/config');">
+                                    Configuration Registry</a>
+                        <a href="#registryBrowserLink" id="govRegUrlKey"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('remoteServiceUrlKey','/_system/governance');">
+                                    Governance Registry</a>
                         </td>
+                    </tr>
+                    <tr>
+                        <td><fmt:message key="mediator.ent.remoteservice.user"/></td>
+                        <td colspan="2">
+                            <input type="radio"
+                                   onclick="javascript:displayElement('remoteserviceuser', true);displayElement('remoteserviceuserkey', false);clearTextField('remoteServiceUserNameKey');"
+                                   name="remoteserviceusergroup" value="inline" <% if (!remoteUsernameKey) { %> checked="checked" <% } %> />
+                            <label>Inline</label>
+                            <input type="radio"
+                                   onclick="javascript:displayElement('remoteserviceuser', false);displayElement('remoteserviceuserkey', true);clearTextField('remoteServiceUserName');"
+                                   name="remoteserviceusergroup" value="key" <% if (remoteUsernameKey) { %> checked="checked" <% } %> />
+                            <label>Registry Key</label>
+                        </td>
+                    </tr>
+                      <tr id="remoteserviceuser" style="<%=remoteUsernameKey ? "display:none" : ""%>">
+                        <td colspan="1"/>
                         <td class="text-box-big">
                             <input type="text" id="remoteServiceUserName" name="remoteServiceUserName" value="<%=remoteServiceUserName%>" />
                         </td>
                     </tr>
-                      <tr>
-                        <td class="leftCol-small">
-                            <fmt:message key="mediator.ent.remoteservice.password"/>
+                    <tr id="remoteserviceuserkey" style="<%=remoteUsernameKey ? "" : "display:none"%>">
+                        <td colspan="1"/>
+                        <td class="text-box-big">
+                            <input type="text" id="remoteServiceUserNameKey" name="remoteServiceUserNameKey" value="<%=remoteServiceUserNameKey%>" readonly/>
+                            <a href="#registryBrowserLink" id="confRegUserNameKey"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('remoteServiceUserNameKey','/_system/config');">
+                                    Configuration Registry</a>
+                            <a href="#registryBrowserLink" id="govUserNameKey"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('remoteServiceUserNameKey','/_system/governance');">
+                                    Governance Registry</a>
                         </td>
+                    </tr>
+                    <tr>
+                        <td><fmt:message key="mediator.ent.remoteservice.password"/></td>
+                        <td colspan="2">
+                            <input type="radio"
+                                   onclick="javascript:displayElement('remoteservicepassword', true);displayElement('remoteservicepasswordkey', false);clearTextField('remoteServicePasswordKey');"
+                                   name="remoteservicepasswordgroup" value="inline" <% if (!remotePasswordKey) { %> checked="checked" <% } %> />
+                            <label>Inline</label>
+                            <input type="radio"
+                                   onclick="javascript:displayElement('remoteservicepassword', false);displayElement('remoteservicepasswordkey', true);clearTextField('remoteServicePassword');"
+                                   name="remoteservicepasswordgroup" value="key" <% if (remotePasswordKey) { %> checked="checked" <% } %> />
+                            <label>Registry Key</label>
+                        </td>
+                    </tr>
+                      <tr id="remoteservicepassword" style="<%=remotePasswordKey ? "display:none" : ""%>">
+                      <td colspan="1"/>
                         <td class="text-box-big">
                             <input type="password" id="remoteServicePassword" name="remoteServicePassword" value="<%=remoteServicePassword%>" />
+                        </td>
+                    </tr>
+                    <tr id="remoteservicepasswordkey" style="<%=remotePasswordKey ? "" : "display:none"%>">
+                    <td colspan="1"/>
+                        <td class="text-box-big">
+                            <input type="password" id="remoteServicePasswordKey" name="remoteServicePasswordKey" value="<%=remoteServicePasswordKey%>" readonly/>
+                            <a href="#registryBrowserLink" id="confRegPasswordKey"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('remoteServicePasswordKey','/_system/config');">
+                                    Configuration Registry</a>
+                            <a href="#registryBrowserLink" id="govRegPasswordKey"
+                                   class="registry-picker-icon-link"
+                                   onclick="showRegistryBrowser('remoteServicePasswordKey','/_system/governance');">
+                                    Governance Registry</a>
                         </td>
                     </tr>
                     <tr>

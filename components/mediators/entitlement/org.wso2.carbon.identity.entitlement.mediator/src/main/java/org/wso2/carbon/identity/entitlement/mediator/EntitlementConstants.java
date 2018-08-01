@@ -37,6 +37,12 @@ public class EntitlementConstants {
 
     public static final QName ATTR_NAME_PASSWORD = new QName("remoteServicePassword");
 
+    public static final QName ATTR_SERVER_URL_KEY = new QName("remoteServiceUrlKey");
+
+    public static final QName ATTR_USER_NAME_KEY = new QName("remoteServiceUserNameKey");
+
+    public static final QName ATTR_NAME_PASSWORD_KEY = new QName("remoteServicePasswordKey");
+
     public static final QName ATTR_CALLBACK_CLASS = new QName("callbackClass");
 
     public static final QName ATTR_CACHE_TYPE = new QName("cacheType");
@@ -76,5 +82,9 @@ public class EntitlementConstants {
     public static final String BASIC_AUTH = "basicAuth";
 
     public static final String WS_XACML = "wsXacml";
+
+    public static final String ENCODE_PREFIX = "enc:";
+
+    public static final String PDP_CONFIG_MAP_ENTITLEMENT_MEDIATOR_ENTRY = "EntitlementMediator";
 
 }
