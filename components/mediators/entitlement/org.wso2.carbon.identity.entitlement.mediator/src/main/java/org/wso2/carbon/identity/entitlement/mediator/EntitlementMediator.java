@@ -17,7 +17,11 @@
  */
 package org.wso2.carbon.identity.entitlement.mediator;
 
-import org.apache.axiom.om.*;
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMNamespace;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.OMText;
 import org.apache.axiom.om.impl.llom.util.AXIOMUtil;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAP12Constants;
@@ -100,6 +104,7 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
     private Mediator adviceMediator = null;
     private PEPProxy pepProxy;
     private PEPProxyConfig config;
+    private boolean keyInvolved = false;
 
     private final String ORIGINAL_ENTITLEMENT_PAYLOAD = "ORIGINAL_ENTITLEMENT_PAYLOAD";
     private final String ENTITLEMENT_DECISION = "ENTITLEMENT_DECISION";
@@ -122,16 +127,21 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
         String action;
         String resourceName;
         Attribute[] otherAttributes;
+        PEPProxy resolvedPepProxy;
 
         if (log.isDebugEnabled()) {
             log.debug("Mediation for Entitlement started");
         }
 
-        try {
-            resolveEntitlementServerDynamicConfigs(synCtx);
-        } catch (EntitlementProxyException e) {
-            log.error("Error while initializing the PEP Proxy" + e);
-            throw new SynapseException("Error while initializing the Entitlement PEP Proxy");
+        resolvedPepProxy = pepProxy;
+
+        if (keyInvolved) {
+            try {
+                resolvedPepProxy = resolveEntitlementServerDynamicConfigs(synCtx);
+            } catch (EntitlementProxyException e) {
+                log.error("Error while initializing the PEP Proxy" + e);
+                throw new SynapseException("Error while initializing the Entitlement PEP Proxy");
+            }
         }
 
         try {
@@ -190,7 +200,7 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
                 tempArr[3+i]= otherAttributes[i];
             }
 
-            decisionString = pepProxy.getDecision(tempArr);
+            decisionString = resolvedPepProxy.getDecision(tempArr);
             String simpleDecision;
             OMElement obligations;
             OMElement advice;
@@ -355,11 +365,13 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
             synLog.traceOrDebug("Entitlement mediator : Mediating from ContinuationState");
         }
 
-        try {
-            resolveEntitlementServerDynamicConfigs(synCtx);
-        } catch (EntitlementProxyException e) {
-            log.error("Error while initializing the PEP Proxy" + e);
-            throw new SynapseException("Error while initializing the Entitlement PEP Proxy");
+        if (keyInvolved) {
+            try {
+                resolveEntitlementServerDynamicConfigs(synCtx);
+            } catch (EntitlementProxyException e) {
+                log.error("Error while initializing the PEP Proxy" + e);
+                throw new SynapseException("Error while initializing the Entitlement PEP Proxy");
+            }
         }
 
         boolean result = false;
@@ -499,14 +511,17 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
 
             if (remoteServiceUrlKey != null && remoteServiceUrlKey.trim().length() > 0) {
                 remoteServiceUrlResolved = resolveRegistryEntryText(synEnv, remoteServiceUrlKey);
+                keyInvolved = true;
             }
 
             if (remoteServiceUserNameKey != null && remoteServiceUserNameKey.trim().length() > 0) {
                 remoteServiceUsernameResolved = resolveRegistryEntryText(synEnv, remoteServiceUserNameKey);
+                keyInvolved = true;
             }
 
             if (remoteServicePasswordKey != null && remoteServicePasswordKey.trim().length() > 0) {
                 remoteServicePasswordResolved = resolveRegistryEntryText(synEnv, remoteServicePasswordKey);
+                keyInvolved = true;
             }
 
             Map<String,Map<String,String>> appToPDPClientConfigMap = new HashMap<String, Map<String,String>>();
@@ -672,6 +687,13 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
         return soapFactory.getDefaultEnvelope();
     }
 
+    /**
+     * Resolves the registry key and evaluates the value for encoded content
+     * This method uses SynapseEnvironment to resolve the keys
+     * @param synEnv SynapseEnvironment when using this in init phase
+     * @param regEntryKey registry entry key to be resolved
+     * @return Resolved and decoded reg entry
+     */
     private String resolveRegistryEntryText(SynapseEnvironment synEnv, String regEntryKey){
         Object regEntry = synEnv.getSynapseConfiguration().getRegistry().lookup(regEntryKey);
         String resolvedValue = "";
@@ -689,7 +711,7 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
                 resolvedValue = new String(CryptoUtil.getDefaultCryptoUtil()
                         .base64DecodeAndDecrypt(resolvedValue.substring(4)));
             } catch (CryptoException e) {
-                log.error(e);
+                log.error("Error decrypting key " + e);
             }
         }
 
@@ -697,6 +719,13 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
 
     }
 
+    /**
+     * Resolves the registry key and evaluates the value for encoded content
+     * This method uses Message Context to resolve the keys
+     * @param synCtx MessageContext when using this in mediate phase
+     * @param regEntryKey registry entry key to be resolved
+     * @return Resolved and decoded reg entry
+     */
     private String resolveRegistryEntryText(MessageContext synCtx, String regEntryKey){
         Object regEntry = synCtx.getEntry(regEntryKey);
         String resolvedValue = "";
@@ -714,36 +743,36 @@ public class EntitlementMediator extends AbstractMediator implements ManagedLife
                 resolvedValue = new String(CryptoUtil.getDefaultCryptoUtil()
                         .base64DecodeAndDecrypt(resolvedValue.substring(4)));
             } catch (CryptoException e) {
-                log.error(e);
+                log.error("Error decrypting key " + e);
             }
         }
 
         return resolvedValue;
     }
 
-    private void resolveEntitlementServerDynamicConfigs(MessageContext synCtx) throws EntitlementProxyException {
-        boolean keyInvolved = false;
+    /**
+     * This method resolves the dynamic configs used to init pepProxy in the runtime
+     * @param synCtx to resolve registry entries
+     * @throws EntitlementProxyException If pepproxy init fails
+     */
+    private PEPProxy resolveEntitlementServerDynamicConfigs(MessageContext synCtx) throws EntitlementProxyException {
+
         if (remoteServiceUrlKey != null && remoteServiceUrlKey.trim().length() > 0) {
             config.getAppToPDPClientConfigMap().get(EntitlementConstants.PDP_CONFIG_MAP_ENTITLEMENT_MEDIATOR_ENTRY)
                     .put(EntitlementConstants.SERVER_URL, resolveRegistryEntryText(synCtx, remoteServiceUrlKey));
-            keyInvolved = true;
         }
 
         if (remoteServiceUserNameKey != null && remoteServiceUserNameKey.trim().length() > 0) {
             config.getAppToPDPClientConfigMap().get(EntitlementConstants.PDP_CONFIG_MAP_ENTITLEMENT_MEDIATOR_ENTRY)
                     .put(EntitlementConstants.USERNAME, resolveRegistryEntryText(synCtx, remoteServiceUserNameKey));
-            keyInvolved = true;
         }
 
         if (remoteServicePasswordKey != null && remoteServicePasswordKey.trim().length() > 0) {
             config.getAppToPDPClientConfigMap().get(EntitlementConstants.PDP_CONFIG_MAP_ENTITLEMENT_MEDIATOR_ENTRY)
                     .put(EntitlementConstants.PASSWORD, resolveRegistryEntryText(synCtx, remoteServicePasswordKey));
-            keyInvolved = true;
         }
 
-        if(keyInvolved){
-            pepProxy = new PEPProxy(config);
-        }
+        return new PEPProxy(config);
     }
 
     public String getCallbackClass() {
