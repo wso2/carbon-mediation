@@ -33,7 +33,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -220,20 +219,12 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         if (log.isDebugEnabled()) {
             log.debug("==> Repository fetch of resource with key : " + key);
         }
-        key = appendPropertyFile(key);
         String resolvedRegKeyPath = resolveRegistryPath(key);
         URLConnection urlConnection;
-        URL url = null;
-        try {
-            url = new URL(resolvedRegKeyPath);
-        } catch (MalformedURLException e) {
-            handleException("Invalid path '" + resolvedRegKeyPath + "' for URL", e);
-        }
-        if (url == null) {
-            handleException("Unable to create URL for target resource : " + key);
-        }
         Properties result = new Properties();
         try {
+            resolvedRegKeyPath = appendPropertyFile(resolvedRegKeyPath);
+            URL url = new URL(resolvedRegKeyPath);
             if ("file".equals(url.getProtocol())) {
                 url.openStream();
             }
@@ -245,6 +236,8 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 }
                 result.load(input);
             }
+        } catch (MalformedURLException e) {
+            handleException("Invalid path '" + resolvedRegKeyPath + "' for URL", e);
         } catch (IOException e) {
             log.error("Error in loading properties", e);
             return null;
@@ -258,14 +251,21 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
      * @param originalURL the path to the directory
      * @return URL of the relevant property file
      */
-    private String appendPropertyFile(String originalURL) {
+    private String appendPropertyFile(String originalURL) throws MalformedURLException {
         originalURL = originalURL.trim();
-        String[] pathSegments = originalURL.split(ESBRegistryConstants.URL_SEPARATOR);
+        boolean isDirectory = new File(new URL(originalURL).getFile()).isDirectory();
+        if (!isDirectory) {
+            if (originalURL.endsWith(File.separator)) {
+                originalURL = originalURL.substring(0, originalURL.length() - 1);
+            }
+            return originalURL + ESBRegistryConstants.PROPERTY_EXTENTION;
+        }
+        String[] pathSegments = originalURL.split(File.separator);
         String folderName = pathSegments[pathSegments.length - 1];
-        if (originalURL.lastIndexOf(ESBRegistryConstants.URL_SEPARATOR) == (originalURL.length() - 1)) {
+        if (originalURL.endsWith(File.separator)) {
             return originalURL + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
         }
-        return originalURL + ESBRegistryConstants.URL_SEPARATOR + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
+        return originalURL + File.separator + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
     }
 
     @Override
@@ -279,8 +279,6 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             if ("file".equals(url.getProtocol())) {
                 try {
                     url.openStream();
-                } catch (FileNotFoundException e) {
-                    return null;
                 } catch (IOException e) {
                     log.error("Error occurred while accessing registry resource: " + key, e);
                     return null;
