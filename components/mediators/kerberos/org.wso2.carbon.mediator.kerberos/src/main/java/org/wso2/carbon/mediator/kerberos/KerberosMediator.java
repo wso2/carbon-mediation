@@ -60,6 +60,21 @@ import org.ietf.jgss.Oid;
 
 public class KerberosMediator extends AbstractMediator {
 
+    /**
+     * <p> The Kerberos Mediator provides support to access the Kerberos secured REST backend services.</p>
+     *
+     * <p>You have the following configurations under the Kerberos Mediator.</p>
+     *
+     * <p> spn -  SPN of the backend service </p>
+     * <p> clientPrincipal - Username of the client </p>
+     * <p> password - The password of the above client </p>
+     * <p> keytabPath - The path of the keytab file which has the password of the client </p>
+     * <p> krb5Config - Location of the Kerberos Configuration file </p>
+     * <p> loginContextName - Name of the login context defined in the login configuration file </p>
+     * <p> loginConfig - Location of the JASS Configuration file </p>
+     *
+     */
+
     private static final Log log = LogFactory.getLog(KerberosMediator.class);
 
     // Basic configuration parameters.
