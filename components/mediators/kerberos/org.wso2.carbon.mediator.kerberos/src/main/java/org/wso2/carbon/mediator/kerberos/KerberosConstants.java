@@ -45,4 +45,5 @@ public final class KerberosConstants {
     public static final String USE_KEYTAB = "useKeyTab";
     public static final String KEYTAB = "keyTab";
     public static final String DEBUG = "debug";
+    public static final String KEY = "key";
 }

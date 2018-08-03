@@ -39,6 +39,7 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -57,8 +58,22 @@ import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
 
-
 public class KerberosMediator extends AbstractMediator {
+
+    /**
+     * <p> The Kerberos Mediator provides support to access the Kerberos secured REST backend services.</p>
+     *
+     * <p>You have the following configurations under the Kerberos Mediator.</p>
+     *
+     * <p> spn -  SPN of the backend service </p>
+     * <p> clientPrincipal - Username of the client </p>
+     * <p> password - The password of the above client </p>
+     * <p> keytabPath - The path of the keytab file which has the password of the client </p>
+     * <p> krb5Config - Location of the Kerberos Configuration file </p>
+     * <p> loginContextName - Name of the login context defined in the login configuration file </p>
+     * <p> loginConfig - Location of the JASS Configuration file </p>
+     *
+     */
 
     private static final Log log = LogFactory.getLog(KerberosMediator.class);
 
@@ -75,7 +90,10 @@ public class KerberosMediator extends AbstractMediator {
     // Optional parameters.
     private String loginContextName;
     private String loginConfig;
-
+    private Value krb5ConfigKey;
+    private Value loginConfigKey;
+    private Value keyTabKey;
+    private Value spnKey;
 
     private GSSManager gssManager = GSSManager.getInstance();
 
@@ -98,10 +116,15 @@ public class KerberosMediator extends AbstractMediator {
 
         //Create Kerberos token and set to the message context header.
         GSSContext gssContext = null;
+        GSSName serverName;
         try {
             Oid mechanismOId = new Oid(KerberosConstants.SPNEGO_BASED_OID);
-            GSSCredential gssCredentials = createCredentials(mechanismOId);
-            GSSName serverName = gssManager.createName(getSpn(), GSSName.NT_USER_NAME);
+            GSSCredential gssCredentials = createCredentials(mechanismOId, synCtx);
+            if (StringUtils.isNotEmpty(getSpnValueFromRegistry(synCtx))) {
+                serverName = gssManager.createName(getSpnValueFromRegistry(synCtx), GSSName.NT_USER_NAME);
+            } else {
+                serverName = gssManager.createName(getSpn(), GSSName.NT_USER_NAME);
+            }
             gssContext = gssManager.createContext(serverName.canonicalize(mechanismOId),
                     mechanismOId, gssCredentials, GSSContext.DEFAULT_LIFETIME);
             byte[] token = new byte[0];
@@ -133,6 +156,30 @@ public class KerberosMediator extends AbstractMediator {
     }
 
     /**
+     * Retrieve the spn value from registry.
+     *
+     * @param msgCtx message context.
+     */
+    private String getSpnValueFromRegistry(MessageContext msgCtx) {
+
+        if (getSpnKey() != null) {
+            String generatedSpnConfigKey = getSpnKey().evaluateValue(msgCtx);
+            Object entry = msgCtx.getEntry(generatedSpnConfigKey);
+            if (entry == null) {
+                handleException("Key " + generatedSpnConfigKey + " not found ", msgCtx);
+            }
+            if (entry instanceof OMTextImpl) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Retrieving the spnConfig key :" + generatedSpnConfigKey);
+                }
+                OMTextImpl text = (OMTextImpl) entry;
+                return text.getText();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Set the values for username, password and keytab path.
      *
      * @param synCtx message context.
@@ -149,7 +196,9 @@ public class KerberosMediator extends AbstractMediator {
         }
 
         //Set keytab path.
-        if (getKeytabPath() != null) {
+        if (getRegistryKeyTabValue() != null) {
+            this.keytabPathValue = getRegistryKeyTabValue().evaluateValue(synCtx);
+        } else if (getKeytabPath() != null) {
             this.keytabPathValue = getKeytabPath().evaluateValue(synCtx);
         }
     }
@@ -163,6 +212,7 @@ public class KerberosMediator extends AbstractMediator {
      */
     private void setAuthorizationHeader(Axis2MessageContext synCtx, byte[] serviceTicket)
             throws UnsupportedEncodingException {
+
         org.apache.axis2.context.MessageContext msgCtx = synCtx.getAxis2MessageContext();
         Map<String, Object> headerProp = new HashMap<>();
         headerProp.put(HttpHeaders.AUTHORIZATION, KerberosConstants.NEGOTIATE + " " +
@@ -189,15 +239,16 @@ public class KerberosMediator extends AbstractMediator {
      * @throws PrivilegedActionException
      * @throws GSSException
      */
-    private GSSCredential createCredentials(Oid mechanismOId) throws LoginException, PrivilegedActionException,
-            GSSException {
+    private GSSCredential createCredentials(Oid mechanismOId, MessageContext synCtx) throws LoginException,
+            PrivilegedActionException, GSSException {
+
         CallbackHandler callbackHandler;
         if (StringUtils.isNotEmpty(clientPrincipalValue)) {
             if (StringUtils.isNotEmpty(passwordValue)) {
-                setJASSConfiguration(false);
+                setJASSConfiguration(false, synCtx);
                 callbackHandler = getUserNamePasswordCallbackHandler(clientPrincipalValue, passwordValue.toCharArray());
             } else if (StringUtils.isNotEmpty(keytabPathValue)) {
-                setJASSConfiguration(true);
+                setJASSConfiguration(true, synCtx);
                 callbackHandler = null;
             } else {
                 throw new SynapseException("Could not find the password or keyTab to authenticate the user.");
@@ -220,6 +271,7 @@ public class KerberosMediator extends AbstractMediator {
      */
     private GSSCredential createClientCredentials(CallbackHandler callbackHandler, final Oid mechanismOId)
             throws LoginException, PrivilegedActionException, GSSException {
+
         LoginContext loginContext;
         String loginName;
         if (StringUtils.isNotEmpty(getLoginContextName())) {
@@ -241,6 +293,7 @@ public class KerberosMediator extends AbstractMediator {
         final GSSName clientName = gssManager.createName(clientPrincipalValue, GSSName.NT_USER_NAME);
         final PrivilegedExceptionAction<GSSCredential> action = new PrivilegedExceptionAction<GSSCredential>() {
             public GSSCredential run() throws GSSException {
+
                 return gssManager.createCredential(clientName.canonicalize(mechanismOId),
                         GSSCredential.DEFAULT_LIFETIME, mechanismOId, GSSCredential.INITIATE_ONLY);
             }
@@ -265,8 +318,10 @@ public class KerberosMediator extends AbstractMediator {
      * @return CallbackHandler.
      */
     private CallbackHandler getUserNamePasswordCallbackHandler(final String username, final char[] password) {
+
         return new CallbackHandler() {
             public void handle(final Callback[] callback) {
+
                 for (Callback currentCallBack : callback) {
                     if (currentCallBack instanceof NameCallback) {
                         final NameCallback nameCallback = (NameCallback) currentCallBack;
@@ -288,7 +343,22 @@ public class KerberosMediator extends AbstractMediator {
      * @param msgCtx message context.
      */
     private void setKerberosConfigurations(MessageContext msgCtx) {
-        if (StringUtils.isNotEmpty(getKrb5Config())) {
+
+        if (getKrb5ConfigKey() != null) {
+            String generatedKrb5ConfigKey = getKrb5ConfigKey().evaluateValue(msgCtx);
+            Object entry = msgCtx.getEntry(generatedKrb5ConfigKey);
+            if (entry == null) {
+                handleException("Key " + generatedKrb5ConfigKey + " not found ", msgCtx);
+            }
+            if (entry instanceof OMTextImpl) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Retrieving the krb5Config key :" + generatedKrb5ConfigKey);
+                }
+                OMTextImpl text = (OMTextImpl) entry;
+                String content = text.getText();
+                System.setProperty(KerberosConstants.KERBEROS_CONFIG_PROPERTY, new File(content).getAbsolutePath());
+            }
+        } else if (StringUtils.isNotEmpty(getKrb5Config())) {
             System.setProperty(KerberosConstants.KERBEROS_CONFIG_PROPERTY, new File(getKrb5Config()).getAbsolutePath());
         } else {
             handleException("Could not find the Kerberos configuration.", msgCtx);
@@ -298,7 +368,8 @@ public class KerberosMediator extends AbstractMediator {
     /**
      * Set JASS configuration with the principal and keyTab.
      */
-    private void setJASSConfiguration(boolean useKeyTab) {
+    private void setJASSConfiguration(boolean useKeyTab, MessageContext msgCtx) {
+
         Map<String, Object> optionSet = new HashMap<>();
         if (StringUtils.isNotEmpty(getLoginConfig())) {
             System.setProperty(KerberosConstants.JAAS_CONFIG_PROPERTY, new File(getLoginConfig()).getAbsolutePath());
@@ -308,12 +379,41 @@ public class KerberosMediator extends AbstractMediator {
             for (String s : options.keySet()) {
                 optionSet.put(s, options.get(s));
             }
+        } else if (getLoginConfigKey() != null) {
+            String generatedLoginConfigKey = getLoginConfigKey().evaluateValue(msgCtx);
+            Object entry = msgCtx.getEntry(generatedLoginConfigKey);
+            if (entry instanceof OMTextImpl) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Retrieving the loginConfig key :" + generatedLoginConfigKey);
+                }
+                OMTextImpl text = (OMTextImpl) entry;
+                String content = text.getText();
+                String[] loginConfigArr = content.split("\n| ");
+                for (String aLoginConfigArr : loginConfigArr) {
+                    if (aLoginConfigArr.contains("=")) {
+                        String[] keyValuePair = aLoginConfigArr.split("=");
+                        for (int j = 0; j <= keyValuePair.length; j++) {
+                            optionSet.put(keyValuePair[0], keyValuePair[1]);
+                        }
+                    }
+                }
+            }
         }
         optionSet.put(KerberosConstants.IS_INITIATOR, "true");
         optionSet.put(KerberosConstants.PRINCIPAL, clientPrincipalValue);
         optionSet.put(KerberosConstants.USE_KEYTAB, String.valueOf(useKeyTab));
         if (useKeyTab) {
-            optionSet.put(KerberosConstants.KEYTAB, new File(keytabPathValue).getAbsolutePath());
+            Object entry = msgCtx.getEntry(keytabPathValue);
+            if (entry != null && entry instanceof OMTextImpl) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Retrieving the keytab path key :" + keytabPathValue);
+                }
+                OMTextImpl text = (OMTextImpl) entry;
+                String content = text.getText();
+                optionSet.put(KerberosConstants.KEYTAB, new File(content).getAbsolutePath());
+            } else {
+                optionSet.put(KerberosConstants.KEYTAB, new File(keytabPathValue).getAbsolutePath());
+            }
         } else {
             optionSet.put(KerberosConstants.KEYTAB, null);
         }
@@ -324,6 +424,7 @@ public class KerberosMediator extends AbstractMediator {
         Configuration.setConfiguration(new Configuration() {
             @Override
             public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
+
                 return new AppConfigurationEntry[]{
                         new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
                                 AppConfigurationEntry.LoginModuleControlFlag.REQUIRED, finalOptionSet)
@@ -333,63 +434,118 @@ public class KerberosMediator extends AbstractMediator {
     }
 
     public String getLoginContextName() {
+
         return loginContextName;
     }
 
     public void setLoginContextName(String loginContextName) {
+
         this.loginContextName = loginContextName;
     }
 
     public String getLoginConfig() {
+
         return loginConfig;
     }
 
     public void setLoginConfig(String loginConfig) {
+
         this.loginConfig = loginConfig;
     }
 
     public String getKrb5Config() {
+
         return krb5Config;
     }
 
     public void setKrb5Config(String krb5Config) {
+
         this.krb5Config = krb5Config;
     }
 
     public String getSpn() {
+
         return spn;
     }
 
     public void setSpn(String spn) {
+
         this.spn = spn;
     }
 
     public Value getClientPrincipal() {
+
         return clientPrincipal;
     }
 
     public void setClientPrincipal(Value clientPrincipal) {
+
         this.clientPrincipal = clientPrincipal;
     }
 
     public Value getPassword() {
+
         return password;
     }
 
     public void setPassword(Value password) {
+
         this.password = password;
     }
 
     public Value getKeytabPath() {
+
         return keytabPath;
     }
 
     public void setKeytabPath(Value keytabPath) {
+
         this.keytabPath = keytabPath;
+    }
+
+    public Value getKrb5ConfigKey() {
+
+        return krb5ConfigKey;
+    }
+
+    public void setKrb5ConfigKey(Value krb5ConfigKey) {
+
+        this.krb5ConfigKey = krb5ConfigKey;
+    }
+
+    public Value getLoginConfigKey() {
+
+        return loginConfigKey;
+    }
+
+    public void setLoginConfigKey(Value loginConfigKey) {
+
+        this.loginConfigKey = loginConfigKey;
+    }
+
+    public Value getRegistryKeyTabValue() {
+
+        return keyTabKey;
+    }
+
+    public void setRegistryKeyTabValue(Value keyTabKey) {
+
+        this.keyTabKey = keyTabKey;
+    }
+
+    public Value getSpnKey() {
+
+        return spnKey;
+    }
+
+    public void setSpnKey(Value spnKey) {
+
+        this.spnKey = spnKey;
     }
 
     @Override
     public boolean isContentAware() {
+
         return false;
     }
 

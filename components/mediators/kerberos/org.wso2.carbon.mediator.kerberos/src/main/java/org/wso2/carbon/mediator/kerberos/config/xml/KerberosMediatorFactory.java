@@ -24,11 +24,13 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.ValueFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.mediators.Value;
 import org.wso2.carbon.mediator.kerberos.KerberosConstants;
 import org.wso2.carbon.mediator.kerberos.KerberosMediator;
 import org.wso2.carbon.mediator.service.MediatorException;
 
 import javax.xml.namespace.QName;
+import java.util.Iterator;
 import java.util.Properties;
 
 public class KerberosMediatorFactory extends AbstractMediatorFactory {
@@ -47,44 +49,86 @@ public class KerberosMediatorFactory extends AbstractMediatorFactory {
      * {@inheritDoc}
      */
     public Mediator createSpecificMediator(OMElement element, Properties properties) {
+
         if (!ELEMENT_KERBEROS.equals(element.getQName())) {
             handleException("Unable to create the Kerberos mediator. "
                     + "Unexpected element as the Kerberos mediator configuration");
         }
 
         KerberosMediator mediator;
-        OMAttribute spn;
         OMAttribute loginContextName;
-        OMAttribute loginConfig;
-        OMAttribute krb5Config;
         boolean isPasswordProvided = false;
         mediator = new KerberosMediator();
-
-        spn = element.getAttribute(ATTR_NAME_SPN);
-        if (spn != null && StringUtils.isNotEmpty(spn.getAttributeValue())) {
-            mediator.setSpn(spn.getAttributeValue());
+        Iterator krb5ConfigKey = element.getChildrenWithName(ATTR_NAME_KRB5_CONFIG);
+        if (krb5ConfigKey != null && krb5ConfigKey.hasNext()) {
+            OMElement krb5ConfigElem = (OMElement) krb5ConfigKey.next();
+            if (krb5ConfigElem != null) {
+                OMAttribute attribute = krb5ConfigElem.getAttribute(ATT_KEY);
+                if (attribute != null) {
+                    ValueFactory keyFac = new ValueFactory();
+                    Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, krb5ConfigElem);
+                    mediator.setKrb5ConfigKey(generatedKey);
+                }
+            }
         } else {
-            throw new MediatorException("The 'spn' attribute is required for the Kerberos mediator");
-        }
-
-        krb5Config = element.getAttribute(ATTR_NAME_KRB5_CONFIG);
-
-        loginConfig = element.getAttribute(ATTR_NAME_LOGIN_CONFIG);
-        if (loginConfig != null && StringUtils.isNotEmpty(loginConfig.getAttributeValue())) {
-            mediator.setLoginConfig(loginConfig.getAttributeValue());
-            loginContextName = element.getAttribute(ATTR_NAME_LOGIN_CONTEXT_NAME);
-            if (loginContextName != null && StringUtils.isNotEmpty(loginContextName.getAttributeValue())) {
-                mediator.setLoginContextName(loginContextName.getAttributeValue());
+            OMAttribute krb5Config = element.getAttribute(ATTR_NAME_KRB5_CONFIG);
+            if (krb5Config != null && StringUtils.isNotEmpty(krb5Config.getAttributeValue())) {
+                mediator.setKrb5Config(krb5Config.getAttributeValue());
             } else {
-                throw new MediatorException(
-                        "The 'loginContextName' attribute is required for the Kerberos mediator");
+                throw new MediatorException("The 'krb5Config' attribute is required for the Kerberos mediator");
             }
         }
 
-        if (krb5Config != null && StringUtils.isNotEmpty(krb5Config.getAttributeValue())) {
-            mediator.setKrb5Config(krb5Config.getAttributeValue());
+        Iterator spnConfigKey = element.getChildrenWithName(ATTR_NAME_SPN);
+        if (spnConfigKey != null && spnConfigKey.hasNext()) {
+            OMElement spnConfigElem = (OMElement) spnConfigKey.next();
+            if (spnConfigElem != null) {
+                OMAttribute attribute = spnConfigElem.getAttribute(ATT_KEY);
+                if (attribute != null) {
+                    ValueFactory keyFac = new ValueFactory();
+                    Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, spnConfigElem);
+                    mediator.setSpnKey(generatedKey);
+                }
+            }
         } else {
-            throw new MediatorException("The 'krb5Config' attribute is required for the Kerberos mediator");
+            OMAttribute spn = element.getAttribute(ATTR_NAME_SPN);
+            if (spn != null && StringUtils.isNotEmpty(spn.getAttributeValue())) {
+                mediator.setSpn(spn.getAttributeValue());
+            } else {
+                throw new MediatorException("The 'spn' attribute is required for the Kerberos mediator");
+            }
+        }
+
+        Iterator loginConfigKey = element.getChildrenWithName(ATTR_NAME_LOGIN_CONFIG);
+        if (loginConfigKey != null && loginConfigKey.hasNext()) {
+            OMElement loginConfigElem = (OMElement) loginConfigKey.next();
+            if (loginConfigElem != null) {
+                OMAttribute attribute = loginConfigElem.getAttribute(ATT_KEY);
+                if (attribute != null) {
+                    ValueFactory keyFac = new ValueFactory();
+                    Value generatedKey = keyFac.createValue(XMLConfigConstants.KEY, loginConfigElem);
+                    mediator.setLoginConfigKey(generatedKey);
+                }
+                loginContextName = element.getAttribute(ATTR_NAME_LOGIN_CONTEXT_NAME);
+                if (loginContextName != null && StringUtils.isNotEmpty(loginContextName.getAttributeValue())) {
+                    mediator.setLoginContextName(loginContextName.getAttributeValue());
+                } else {
+                    throw new MediatorException(
+                            "The 'loginContextName' attribute is required for the Kerberos mediator");
+                }
+            }
+        } else {
+            OMAttribute loginConfig = element.getAttribute(ATTR_NAME_LOGIN_CONFIG);
+            if (loginConfig != null && StringUtils.isNotEmpty(loginConfig.getAttributeValue())) {
+                mediator.setLoginConfig(loginConfig.getAttributeValue());
+                loginContextName = element.getAttribute(ATTR_NAME_LOGIN_CONTEXT_NAME);
+                if (loginContextName != null && StringUtils.isNotEmpty(loginContextName.getAttributeValue())) {
+                    mediator.setLoginContextName(loginContextName.getAttributeValue());
+                } else {
+                    throw new MediatorException(
+                            "The 'loginContextName' attribute is required for the Kerberos mediator");
+                }
+            }
         }
 
         OMAttribute client = element.getAttribute(ATTR_NAME_CLIENT_PRINCIPAL);
@@ -99,11 +143,24 @@ public class KerberosMediatorFactory extends AbstractMediatorFactory {
             isPasswordProvided = true;
         }
 
-        OMAttribute keytab = element.getAttribute(ATTR_NAME_KEYTAB_PATH);
-        if (keytab != null && StringUtils.isNotEmpty(keytab.getAttributeValue())) {
-            mediator.setKeytabPath(new ValueFactory().createValue(KerberosConstants.KEYTAB_PATH_STRING, element));
-            isPasswordProvided = true;
+        Iterator keytabConfig = element.getChildrenWithName(ATTR_NAME_KEYTAB_PATH);
+        if (keytabConfig != null && keytabConfig.hasNext()) {
+            OMElement keytabConfigElem = (OMElement) keytabConfig.next();
+            if (keytabConfigElem != null) {
+                OMAttribute attribute = keytabConfigElem.getAttribute(ATT_KEY);
+                if (attribute != null) {
+                    mediator.setRegistryKeyTabValue(new ValueFactory().createValue(XMLConfigConstants.KEY, keytabConfigElem));
+                }
+                isPasswordProvided = true;
+            }
+        } else {
+            OMAttribute keytab = element.getAttribute(ATTR_NAME_KEYTAB_PATH);
+            if (keytab != null && StringUtils.isNotEmpty(keytab.getAttributeValue())) {
+                mediator.setKeytabPath(new ValueFactory().createValue(KerberosConstants.KEYTAB_PATH_STRING, element));
+                isPasswordProvided = true;
+            }
         }
+
         if (!isPasswordProvided) {
             throw new MediatorException("The 'password' or 'keytabPath' attribute is required for" +
                     " the Kerberos mediator.");
@@ -115,6 +172,7 @@ public class KerberosMediatorFactory extends AbstractMediatorFactory {
      * {@inheritDoc}
      */
     public QName getTagQName() {
+
         return ELEMENT_KERBEROS;
     }
 
