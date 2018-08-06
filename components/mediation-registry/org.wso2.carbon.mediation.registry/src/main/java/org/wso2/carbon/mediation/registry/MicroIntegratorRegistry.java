@@ -207,6 +207,18 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         return result;
     }
 
+    @Override
+    public boolean isExists(String key) {
+        String resolvedRegKeyPath = resolveRegistryPath(key);
+        try {
+            File file = new File(new URL(resolvedRegKeyPath).getFile());
+            return file.exists();
+        } catch (MalformedURLException e) {
+            log.error("Error in fetching resource: " + key, e);
+            return false;
+        }
+    }
+
     /**
      * The micro integrator expects the properties of a directory to be available inside the given directory as a
      * property file. For an example, if a directory key, conf:/foo/bar is passed as the key, the micro integrator
@@ -701,7 +713,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             search for parent. if found, create the new FOLDER in it.
         */
         File parent = new File(parentName);
-        if (parent.exists()) {
+        if (parent.exists() || parent.mkdirs()) {
             File newEntry = new File(parent, newFolderName);
             boolean success = newEntry.mkdir();
             if (!success) {
@@ -709,7 +721,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             }
 
         } else {
-            handleException("Parent folder: " + parentName + " does not exists.");
+            handleException("Parent folder: " + parentName + " cannot be created.");
         }
     }
 

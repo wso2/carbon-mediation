@@ -71,13 +71,8 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 	}
 
 	private void init() throws RegistryException {
-		try {
-			// creating vault-specific storage repository (this happens only if
-			// not resource not existing)
-			initRegistryRepo();
-		} catch (RegistryException e) {
-			throw new RegistryException("Error while intializing the registry");
-		}
+		// creating vault-specific storage repository (this happens only if resource not existing)
+		initRegistryRepo();
 	}
 
 	/**
@@ -86,32 +81,10 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 	 * 
 	 * @throws RegistryException
 	 */
-	private void initRegistryRepo() throws RegistryException {
-		if (!isRepoExists()) {
-			registry.newResource(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY,
-			             true);
+	private void initRegistryRepo() {
+		if (!registry.isExists(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY)) {
+			registry.newResource(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY, true);
 		}
-	}
-
-	/**
-	 * Checks whether the given repository already existing.
-	 *
-	 * @return
-	 */
-	protected boolean isRepoExists() {
-		RegistryEntry vaultRegistryEntry;
-		try {
-			vaultRegistryEntry =
-					registry.getRegistryEntry(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY);
-		} catch (Exception e) {
-	    	log.error("Error in fetching secure vault registry entry: " +
-					SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY, e);
-	    	return false;
-		}
-		if (vaultRegistryEntry == null) {
-		    return false;
-        }
-		return vaultRegistryEntry.getName() != null;
 	}
 
 	public String getProviderClass() {
