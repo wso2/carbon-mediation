@@ -208,7 +208,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     }
 
     @Override
-    public boolean isExists(String key) {
+    public boolean isResourceExists(String key) {
         String resolvedRegKeyPath = resolveRegistryPath(key);
         try {
             File file = new File(new URL(resolvedRegKeyPath).getFile());

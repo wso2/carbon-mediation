@@ -284,7 +284,7 @@ public class ESBRegistry extends AbstractRegistry {
     }
 
     @Override
-    public boolean isExists(String s) {
+    public boolean isResourceExists(String s) {
         //TODO
         return false;
     }

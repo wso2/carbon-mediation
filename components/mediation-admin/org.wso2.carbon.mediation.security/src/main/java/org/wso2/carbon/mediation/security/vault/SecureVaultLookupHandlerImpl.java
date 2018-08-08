@@ -82,7 +82,7 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 	 * @throws RegistryException
 	 */
 	private void initRegistryRepo() {
-		if (!registry.isExists(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY)) {
+		if (!registry.isResourceExists(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY)) {
 			registry.newResource(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY, true);
 		}
 	}
