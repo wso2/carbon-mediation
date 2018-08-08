@@ -718,10 +718,8 @@ public class WSO2Registry extends AbstractRegistry {
     @Override
     public boolean isResourceExists(String path) {
         setTenantInfo();
-
         Registry registry = getRegistry(path);
         String key = resolvePath(path);
-
         try {
             return registry.resourceExists(key);
         } catch (RegistryException e) {

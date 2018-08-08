@@ -54,11 +54,7 @@ public class SynapseSecurityerviceComponent {
         BundleContext bundleCtx = ctxt.getBundleContext();
         bundleCtx.registerService(MediationSecurityAdminService.class.getName(),
                 new MediationSecurityAdminService(), null);
-		try {
-			SecureVaultLookupHandlerImpl.getDefaultSecurityService();
-		} catch (RegistryException e) {
-			log.error("Error while activating secure vault registry component", e);
-		}
+        SecureVaultLookupHandlerImpl.getDefaultSecurityService();
 	}
 
 	protected void deactivate(ComponentContext ctxt) {

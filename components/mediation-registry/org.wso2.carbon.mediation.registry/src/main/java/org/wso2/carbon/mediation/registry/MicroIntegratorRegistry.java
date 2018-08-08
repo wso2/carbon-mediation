@@ -211,6 +211,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     public boolean isResourceExists(String key) {
         String resolvedRegKeyPath = resolveRegistryPath(key);
         try {
+            // here, a URL object is created in order to remove the protocol from the file path
             File file = new File(new URL(resolvedRegKeyPath).getFile());
             return file.exists();
         } catch (MalformedURLException e) {
@@ -222,7 +223,8 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     /**
      * The micro integrator expects the properties of a directory to be available inside the given directory as a
      * property file. For an example, if a directory key, conf:/foo/bar is passed as the key, the micro integrator
-     * registry expects the properties to be available in the file, conf:/foo/bar/bar.properties.
+     * registry expects the properties to be available in the file, conf:/foo/bar/bar.properties. For a file,
+     * conf:/foo/bar/example.xml, the properties need to be given in the file, conf:/foo/bar/example.xml.properties
      *
      * @param key the path to the directory
      * @return the properties defined
@@ -235,7 +237,8 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         URLConnection urlConnection;
         Properties result = new Properties();
         try {
-            resolvedRegKeyPath = appendPropertyFile(resolvedRegKeyPath);
+            // get the path to the relevant property file
+            resolvedRegKeyPath = getPropertyFilePath(resolvedRegKeyPath);
             URL url = new URL(resolvedRegKeyPath);
             if ("file".equals(url.getProtocol())) {
                 url.openStream();
@@ -258,20 +261,24 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
     }
 
     /**
-     * This methods append the properties file to the directory URL
+     * This methods append the properties file to the resource URL
      *
-     * @param originalURL the path to the directory
+     * @param originalURL the path to the resource
      * @return URL of the relevant property file
      */
-    private String appendPropertyFile(String originalURL) throws MalformedURLException {
+    private String getPropertyFilePath(String originalURL) throws MalformedURLException {
+
         originalURL = originalURL.trim();
+        // here, a URL object is created in order to remove the protocol from the file path
         boolean isDirectory = new File(new URL(originalURL).getFile()).isDirectory();
         if (!isDirectory) {
+            // if the url is a file, the property file is expected to be present as a sibling
             if (originalURL.endsWith(File.separator)) {
                 originalURL = originalURL.substring(0, originalURL.length() - 1);
             }
             return originalURL + ESBRegistryConstants.PROPERTY_EXTENTION;
         }
+        // if the url is a folder, the property file is expected to be present as a child
         String[] pathSegments = originalURL.split(File.separator);
         String folderName = pathSegments[pathSegments.length - 1];
         if (originalURL.endsWith(File.separator)) {
