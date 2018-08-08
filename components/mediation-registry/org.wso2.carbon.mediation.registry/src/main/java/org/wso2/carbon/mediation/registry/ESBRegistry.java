@@ -283,6 +283,12 @@ public class ESBRegistry extends AbstractRegistry {
         persistenceManager.saveOrUpdateRegistryEntry(registryEntryDO);
     }
 
+    @Override
+    public boolean isResourceExists(String s) {
+        //TODO
+        return false;
+    }
+
     /**
      * Updates the registry resource pointed by the given key.
      *

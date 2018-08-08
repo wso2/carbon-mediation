@@ -1,19 +1,17 @@
 /*
- * Copyright (c) 2005-2008, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- * 
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.wso2.carbon.mediation.security.vault;
@@ -25,10 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.registry.Registry;
 import org.wso2.carbon.base.api.ServerConfigurationService;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
-import org.wso2.carbon.registry.core.service.RegistryService;
-import org.wso2.carbon.registry.core.session.UserRegistry;
 
 public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 
@@ -38,80 +35,43 @@ public class SecureVaultLookupHandlerImpl implements SecureVaultLookupHandler {
 
 	private ServerConfigurationService serverConfigService;
 
-	private RegistryService registryService;
-
-	UserRegistry registry = null;
+	private Registry registry;
 	
 	Object decryptlockObj = new Object();
 
-	private SecureVaultLookupHandlerImpl(ServerConfigurationService serverConfigurationService,
-	                                     RegistryService registryService) throws RegistryException {
+	private SecureVaultLookupHandlerImpl(ServerConfigurationService serverConfigurationService, Registry registry) {
 		this.serverConfigService = serverConfigurationService;
-		this.registryService = registryService;
-		try {
-			init();
-		} catch (RegistryException e) {
-			throw new RegistryException("Error while intializing the registry");
-		}
-
+		this.registry = registry;
+		init();
 	}
 
-	public static SecureVaultLookupHandlerImpl getDefaultSecurityService() throws RegistryException {
-		return getDefaultSecurityService(SecurityServiceHolder.getInstance()
-		                                                      .getServerConfigurationService(),
-		                                 SecurityServiceHolder.getInstance().getRegistryService());
+	public static SecureVaultLookupHandlerImpl getDefaultSecurityService() {
+		return getDefaultSecurityService(SecurityServiceHolder.getInstance().getServerConfigurationService(),
+		                                 SecurityServiceHolder.getInstance().getRegistry());
 	}
 
-	private static SecureVaultLookupHandlerImpl getDefaultSecurityService(ServerConfigurationService serverConfigurationService,
-	                                                                      RegistryService registryService)
-	                                                                                                      throws RegistryException {
+	private static SecureVaultLookupHandlerImpl getDefaultSecurityService(
+			ServerConfigurationService serverConfigurationService, Registry registry) {
 		if (instance == null) {
-			instance =
-			           new SecureVaultLookupHandlerImpl(serverConfigurationService, registryService);
+			instance = new SecureVaultLookupHandlerImpl(serverConfigurationService, registry);
 		}
 		return instance;
 	}
 
-	private void init() throws RegistryException {
-		try {
-			registry = registryService.getConfigSystemRegistry();
-
-			// creating vault-specific storage repository (this happens only if
-			// not resource not existing)
-			initRegistryRepo();
-		} catch (RegistryException e) {
-			throw new RegistryException("Error while intializing the registry");
-		}
+	private void init() {
+		// creating vault-specific storage repository (this happens only if resource not existing)
+		initRegistryRepo();
 	}
 
 	/**
 	 * Initializing the repository which requires to store the secure vault
 	 * cipher text
-	 * 
-	 * @throws RegistryException
 	 */
-	private void initRegistryRepo() throws RegistryException {
-
-		if (!isRepoExists()) {
-			org.wso2.carbon.registry.core.Collection secureVaultCollection =
-			                                                                 registry.newCollection();
-			registry.put(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY,
-			             secureVaultCollection);
+	private void initRegistryRepo() {
+		 //	Here, the secure vault resource is created, if it does not exist in the registry.
+		if (!registry.isResourceExists(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY)) {
+			registry.newResource(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY, true);
 		}
-	}
-
-	/**
-	 * Checks whether the given repository already existing.
-	 * 
-	 * @return
-	 */
-	protected boolean isRepoExists() {
-		try {
-			registry.get(SecureVaultConstants.CONNECTOR_SECURE_VAULT_CONFIG_REPOSITORY);
-		} catch (RegistryException e) {
-			return false;
-		}
-		return true;
 	}
 
 	public String getProviderClass() {

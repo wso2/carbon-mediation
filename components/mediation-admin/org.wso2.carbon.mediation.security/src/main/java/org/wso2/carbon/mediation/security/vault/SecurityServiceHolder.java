@@ -18,12 +18,12 @@
 
 package org.wso2.carbon.mediation.security.vault;
 
+import org.apache.synapse.registry.Registry;
 import org.wso2.carbon.base.api.ServerConfigurationService;
-import org.wso2.carbon.registry.core.service.RegistryService;
 
 public class SecurityServiceHolder {
 
-	private RegistryService registryService;
+	private Registry registry;
 
 	private ServerConfigurationService serverConfigurationService;
 
@@ -37,12 +37,12 @@ public class SecurityServiceHolder {
 		return INSTANCE;
 	}
 
-	public RegistryService getRegistryService() {
-		return registryService;
+	public Registry getRegistry() {
+		return registry;
 	}
 
-	public void setRegistryService(RegistryService registryService) {
-		this.registryService = registryService;
+	public void setRegistry(Registry registry) {
+		this.registry = registry;
 	}
 
 	public ServerConfigurationService getServerConfigurationService() {

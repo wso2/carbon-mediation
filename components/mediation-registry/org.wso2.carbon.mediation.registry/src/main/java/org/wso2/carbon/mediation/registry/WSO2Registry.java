@@ -715,6 +715,19 @@ public class WSO2Registry extends AbstractRegistry {
         return null;
     }
 
+    @Override
+    public boolean isResourceExists(String path) {
+        setTenantInfo();
+        Registry registry = getRegistry(path);
+        String key = resolvePath(path);
+        try {
+            return registry.resourceExists(key);
+        } catch (RegistryException e) {
+            log.error("Error in fetching resource: " + path, e);
+            return false;
+        }
+    }
+
     private void registerExtension(String className) {
         try {
             Class clazz = this.getClass().getClassLoader().loadClass(className.trim());

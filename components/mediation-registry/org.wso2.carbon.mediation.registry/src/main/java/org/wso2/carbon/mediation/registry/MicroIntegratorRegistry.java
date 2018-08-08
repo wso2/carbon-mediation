@@ -43,6 +43,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -204,6 +205,86 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
 
         }
         return result;
+    }
+
+    @Override
+    public boolean isResourceExists(String key) {
+        String resolvedRegKeyPath = resolveRegistryPath(key);
+        try {
+            // here, a URL object is created in order to remove the protocol from the file path
+            File file = new File(new URL(resolvedRegKeyPath).getFile());
+            return file.exists();
+        } catch (MalformedURLException e) {
+            log.error("Error in fetching resource: " + key, e);
+            return false;
+        }
+    }
+
+    /**
+     * The micro integrator expects the properties of a directory to be available inside the given directory as a
+     * property file. For an example, if a directory key, conf:/foo/bar is passed as the key, the micro integrator
+     * registry expects the properties to be available in the file, conf:/foo/bar/bar.properties. For a file,
+     * conf:/foo/bar/example.xml, the properties need to be given in the file, conf:/foo/bar/example.xml.properties
+     *
+     * @param key the path to the directory
+     * @return the properties defined
+     */
+    public Properties lookupProperties(String key) {
+        if (log.isDebugEnabled()) {
+            log.debug("==> Repository fetch of resource with key : " + key);
+        }
+        String resolvedRegKeyPath = resolveRegistryPath(key);
+        URLConnection urlConnection;
+        Properties result = new Properties();
+        try {
+            // get the path to the relevant property file
+            resolvedRegKeyPath = getPropertyFilePath(resolvedRegKeyPath);
+            URL url = new URL(resolvedRegKeyPath);
+            if ("file".equals(url.getProtocol())) {
+                url.openStream();
+            }
+            urlConnection = url.openConnection();
+            urlConnection.connect();
+            try (InputStream input = urlConnection.getInputStream()) {
+                if (input == null) {
+                    return null;
+                }
+                result.load(input);
+            }
+        } catch (MalformedURLException e) {
+            handleException("Invalid path '" + resolvedRegKeyPath + "' for URL", e);
+        } catch (IOException e) {
+            log.error("Error in loading properties", e);
+            return null;
+        }
+        return result;
+    }
+
+    /**
+     * This methods append the properties file to the resource URL
+     *
+     * @param originalURL the path to the resource
+     * @return URL of the relevant property file
+     */
+    private String getPropertyFilePath(String originalURL) throws MalformedURLException {
+
+        originalURL = originalURL.trim();
+        // here, a URL object is created in order to remove the protocol from the file path
+        boolean isDirectory = new File(new URL(originalURL).getFile()).isDirectory();
+        if (!isDirectory) {
+            // if the url is a file, the property file is expected to be present as a sibling
+            if (originalURL.endsWith(File.separator)) {
+                originalURL = originalURL.substring(0, originalURL.length() - 1);
+            }
+            return originalURL + ESBRegistryConstants.PROPERTY_EXTENTION;
+        }
+        // if the url is a folder, the property file is expected to be present as a child
+        String[] pathSegments = originalURL.split(File.separator);
+        String folderName = pathSegments[pathSegments.length - 1];
+        if (originalURL.endsWith(File.separator)) {
+            return originalURL + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
+        }
+        return originalURL + File.separator + folderName + ESBRegistryConstants.PROPERTY_EXTENTION;
     }
 
     @Override
@@ -639,7 +720,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             search for parent. if found, create the new FOLDER in it.
         */
         File parent = new File(parentName);
-        if (parent.exists()) {
+        if (parent.exists() || parent.mkdirs()) {
             File newEntry = new File(parent, newFolderName);
             boolean success = newEntry.mkdir();
             if (!success) {
@@ -647,7 +728,7 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             }
 
         } else {
-            handleException("Parent folder: " + parentName + " does not exists.");
+            handleException("Parent folder: " + parentName + " cannot be created.");
         }
     }
 
@@ -825,4 +906,24 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
         }
     }
 
+    @Override
+    public Properties getResourceProperties(String entryKey) {
+
+        Properties properties = new Properties();
+        Properties resourceProperties = lookupProperties(entryKey);
+        if (resourceProperties != null) {
+            for (Object key : resourceProperties.keySet()) {
+                Object value = resourceProperties.get(key);
+                if (value instanceof List) {
+                    if (((List) value).size() > 0) {
+                        properties.put(key, ((List) value).get(0));
+                    }
+                } else {
+                    properties.put(key, value);
+                }
+            }
+            return properties;
+        }
+        return null;
+    }
 }
