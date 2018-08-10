@@ -300,11 +300,11 @@ public class PublishEventMediator extends AbstractMediator {
 		isAsync = async;
 	}
 
-	protected boolean isAsync() {
+	public boolean isAsync() {
 		return isAsync;
 	}
 
-	protected long getAsyncTimeout() {
+	public long getAsyncTimeout() {
 		return asyncTimeout;
 	}
 
