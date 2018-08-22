@@ -19,10 +19,10 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>mediation-initializer</artifactId>
-        <version>4.6.99</version>
+        <version>4.6.100-SNAPSHOT</version>
     </parent>
 
-    <version>4.6.99</version>
+    <version>4.6.100-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.mediation.light.initializer</artifactId>
     <packaging>bundle</packaging>
