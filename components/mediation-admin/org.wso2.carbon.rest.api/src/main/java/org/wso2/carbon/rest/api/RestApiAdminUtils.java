@@ -61,11 +61,45 @@ public class RestApiAdminUtils {
 				api.addChild(retrieveResourceOMElement(resourceData));
 			}
 		}
-		
+
+        if (apiData.getHandlers() != null && apiData.getHandlers().length != 0) {
+
+            OMElement handlers = fac.createOMElement("handlers", syn);
+            for (HandlerData handlerData : apiData.getHandlers()) {
+                handlers.addChild(retrieveHandlersOMElement(handlerData));
+            }
+            api.addChild(handlers);
+        }
         return api;
 	}
-	
-	public static OMElement retrieveResourceOMElement(ResourceData resourceData) {
+
+    private static OMNode retrieveHandlersOMElement(HandlerData handlerData) {
+        OMFactory fac = OMAbstractFactory.getOMFactory();
+
+        OMNamespace syn = SynapseConstants.SYNAPSE_OMNAMESPACE;
+        OMNamespace nullNS = fac.createOMNamespace("","");
+
+        OMElement handler = fac.createOMElement("handler", syn);
+
+        if (handlerData.getHandler() != null) {
+            handler.addAttribute("class", handlerData.getHandler(), nullNS);
+        }
+        String[] properties = handlerData.getProperties();
+        if (properties != null && properties.length != 0) {
+            for (String property : properties) {
+                if (!property.equals("")) {
+                    String[] propertyItems = property.split("::::");
+                    OMElement propertyElem = fac.createOMElement("property", syn);
+                    propertyElem.addAttribute("name", propertyItems[0], nullNS);
+                    propertyElem.addAttribute("value", propertyItems[1], nullNS);
+                    handler.addChild(propertyElem);
+                }
+            }
+        }
+        return handler;
+    }
+
+    public static OMElement retrieveResourceOMElement(ResourceData resourceData) {
 		OMFactory fac = OMAbstractFactory.getOMFactory();
 
         OMNamespace syn = SynapseConstants.SYNAPSE_OMNAMESPACE;

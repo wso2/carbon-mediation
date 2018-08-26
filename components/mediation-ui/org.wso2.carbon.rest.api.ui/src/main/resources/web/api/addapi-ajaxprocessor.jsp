@@ -20,6 +20,7 @@
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.APIData"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.ResourceData"%>
+<%@page import="org.wso2.carbon.rest.api.stub.types.carbon.HandlerData"%>
 <%@page import="java.util.List"%>
 <%@ page import="org.apache.axis2.context.ConfigurationContext" %>
 <%@ page import="java.util.ResourceBundle" %>
@@ -64,6 +65,7 @@
 
     List<ResourceData> resourceList =
             (ArrayList<ResourceData>) session.getAttribute("apiResources");
+    List<HandlerData> handlerList = (ArrayList<HandlerData>) session.getAttribute("apiHandlers");
 
     if (resourceList != null) {
         for (int i = 0; i < resourceList.size() - 1; ++i) {
@@ -94,6 +96,8 @@
     apiData.setVersionType(versionType);
     ResourceData resources[] = new ResourceData[resourceList.size()];
     apiData.setResources(resourceList.toArray(resources));
+    HandlerData handlers[] = new HandlerData[handlerList.size()];
+    apiData.setHandlers(handlerList.toArray(handlers));
     try {
         String[] names = client.getApiNames();
         if (names != null) {
@@ -132,6 +136,7 @@
         response.setStatus(450);
     }
     session.removeAttribute("apiResources");
+    session.removeAttribute("apiHandlers");
     session.removeAttribute("resourceData");
     session.removeAttribute("apiData");
     session.removeAttribute("inSeqXml");

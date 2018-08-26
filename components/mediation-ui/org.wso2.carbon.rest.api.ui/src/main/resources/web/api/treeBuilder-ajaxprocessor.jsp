@@ -15,6 +15,7 @@
   --%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.ResourceData"%>
+<%@page import="org.wso2.carbon.rest.api.stub.types.carbon.HandlerData"%>
 <%@page import="java.util.List"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
@@ -22,6 +23,8 @@
 <%
 	List<ResourceData> resourceList =
 			(ArrayList<ResourceData>)session.getAttribute("apiResources");
+	List<HandlerData> handlerList =
+			(ArrayList<HandlerData>)session.getAttribute("apiHandlers");
 
     boolean isResourceUpdatePending = false;
     String rIndex = request.getParameter("updatePending");
@@ -30,7 +33,6 @@
     } else {
         isResourceUpdatePending = false;
     }
-
 %>
 
 <div id="treeColapser"
@@ -44,6 +46,12 @@
          style="width:100px;" onclick="addResource()">
         <div>
             <a class="addChildStyle">Add Resource</a>
+        </div>
+    </div>
+    <div class="sequenceToolbar"
+         style="width:100px;margin-left:2px;" onclick="addHandler()">
+        <div>
+            <a class="addChildStyle">Add Handler</a>
         </div>
     </div>
 </div>
@@ -69,4 +77,20 @@
 		</li>
 	    </ul>
 	<%}
+	for(int i=0; i<handlerList.size(); i++){
 %>
+<div id="<%="branch." + i%>" class="branch-node"></div>
+		<ul id="<%="ul." + i%>" class="child-list">
+	  	<li>
+			<div class="dot-icon"></div>
+			<div id="<%="handler." + i%>" class="handler">
+                <a class="handler" onclick="loadHandlerData(this)">Handler</a>
+				<div style="width: 100px;" class="sequenceToolbar">
+					<div>
+						<a class="deleteStyle" onclick="<%="deleteHandler(" + i + ")"%>">Delete</a>
+					</div>
+				</div>
+			</div>
+		</li>
+	    </ul>
+	<%}%>

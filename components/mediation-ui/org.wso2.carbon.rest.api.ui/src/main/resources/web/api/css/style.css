@@ -72,6 +72,16 @@ margin-left:2px;
 margin-top:0;
 vertical-align:middle;
 }
+.handler {
+background-image:url(../images/node-normal.gif);
+background-position:2px 3px;
+background-repeat:no-repeat;
+float:left;
+line-height:22px;
+margin-left:2px;
+margin-top:0;
+vertical-align:middle;
+}
 .resources a{
     background-position:3px 2px;
 background-repeat:no-repeat;
@@ -87,6 +97,23 @@ height: 21px;
 padding-right:5px;
 text-indent:24px;
 white-space:nowrap;
+}
+
+.handler a{
+    background-position: 3px 2px;
+    background-repeat: no-repeat;
+    border-color: #E8E8E8 #E8E8E8 #E8E8E8 #CCCCCC;
+    border-color: #E8E8E8 #E8E8E8 #E8E8E8 #CCCCCC;
+    border-color: #E8E8E8 #E8E8E8 #E8E8E8 #CCCCCC;
+    color: #00447C;
+    cursor: pointer;
+    display: block;
+    float: left;
+    line-height: 21px;
+    height: 21px;
+    padding-right: 5px;
+    text-indent: 24px;
+    white-space: nowrap;
 }
 .root-api, .resource{
     background-image: url( ../images/node-normal.gif );

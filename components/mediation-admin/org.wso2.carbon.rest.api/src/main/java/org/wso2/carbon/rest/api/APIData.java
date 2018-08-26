@@ -35,6 +35,8 @@ public class APIData {
 	
 	private ResourceData[] resources;
 
+	private HandlerData[] handlers;
+
 	private boolean isStatisticsEnable;
 
 	private boolean isTracingEnable;
@@ -93,7 +95,15 @@ public class APIData {
 		this.fileName = fileName;
 	}
 
-	/**
+    public HandlerData[] getHandlers() {
+        return handlers;
+    }
+
+    public void setHandlers(HandlerData[] handlers) {
+        this.handlers = handlers;
+    }
+
+    /**
 	 * Get the artifactContainer of the endpoint which deployed from
 	 * @return endpoint description
 	 */

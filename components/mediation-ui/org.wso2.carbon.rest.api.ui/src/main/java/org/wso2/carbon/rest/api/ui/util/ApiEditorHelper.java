@@ -12,6 +12,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.util.AXIOMUtil;
 import org.wso2.carbon.rest.api.stub.types.carbon.APIData;
+import org.wso2.carbon.rest.api.stub.types.carbon.HandlerData;
 import org.wso2.carbon.rest.api.stub.types.carbon.ResourceData;
 import org.wso2.carbon.utils.xml.XMLPrettyPrinter;
 import org.apache.synapse.rest.RESTConstants;
@@ -71,18 +72,53 @@ public class ApiEditorHelper {
         }
 
         List<ResourceData> resources = new ArrayList<ResourceData>();
+        List<HandlerData> handlers = new ArrayList<HandlerData>();
 
         while (childIterator.hasNext()) {
-            OMElement resourceOM = (OMElement) childIterator.next();
-            ResourceData resource = new ResourceData();
-            convertResource(resourceOM, resource);
-            resources.add(resource);
+            OMElement childOM = (OMElement) childIterator.next();
+            if ("handlers".equals(childOM.getLocalName())) {
+                Iterator handlerIterator = childOM.getChildElements();
+                if (handlerIterator == null) {
+                    return apiData;
+                }
+                while (handlerIterator.hasNext()) {
+                    OMElement handlerdOM = (OMElement) handlerIterator.next();
+                    HandlerData handler = new HandlerData();
+                    convertHandler(handlerdOM, handler);
+                    handlers.add(handler);
+                }
+            } else {
+                ResourceData resource = new ResourceData();
+                convertResource(childOM, resource);
+                resources.add(resource);
+            }
         }
 
         ResourceData[] resourceArray = new ResourceData[resources.size()];
         apiData.setResources(resources.toArray(resourceArray));
 
+        HandlerData[] handlerArray = new HandlerData[handlers.size()];
+        apiData.setHandlers(handlers.toArray(handlerArray));
+
         return apiData;
+    }
+
+    private static void convertHandler(OMElement handlerdOM, HandlerData handlerData) {
+        OMAttribute classPath = handlerdOM.getAttribute(new QName("class"));
+        Iterator propertyIterator = handlerdOM.getChildElements();
+        if (propertyIterator != null) {
+            ArrayList<String> properties = new ArrayList<>();
+            while (propertyIterator.hasNext()) {
+                OMElement property = (OMElement) propertyIterator.next();
+                String propertyName = property.getAttribute(new QName("name")).getAttributeValue().trim();
+                String propertyValue = property.getAttribute(new QName("value")).getAttributeValue().trim();
+                properties.add(propertyName + "::::" + propertyValue);
+            }
+            handlerData.setProperties(properties.toArray(new String[0]));
+        }
+        if (classPath != null) {
+            handlerData.setHandler(classPath.getAttributeValue().trim());
+        }
     }
 
     public static ResourceData convertStringToResourceData(String xml) throws XMLStreamException {

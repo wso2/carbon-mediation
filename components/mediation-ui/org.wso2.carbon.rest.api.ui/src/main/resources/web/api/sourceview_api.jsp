@@ -16,6 +16,7 @@
 <%@page import="org.wso2.carbon.rest.api.ui.util.ApiEditorHelper" %>
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.APIData" %>
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.ResourceData" %>
+<%@page import="org.wso2.carbon.rest.api.stub.types.carbon.HandlerData" %>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="org.wso2.carbon.rest.api.ui.client.RestApiAdminClient" %>
@@ -56,7 +57,9 @@
 
     String mode = request.getParameter("mode");
     List<ResourceData> resources = (List<ResourceData>) session.getAttribute("apiResources");
+    List<HandlerData> handlers = (List<HandlerData>) session.getAttribute("apiHandlers");
     ResourceData resourceArray[] = new ResourceData[resources.size()];
+    HandlerData handlerArray[] = new HandlerData[handlers.size()];
 
     apiContext = request.getParameter("apiContext");
     apiName = request.getParameter("apiName");
@@ -75,6 +78,7 @@
         apiData.setVersion(version == null || version.isEmpty() ? null : version);
         apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
         apiData.setResources(resources.toArray(resourceArray));
+        apiData.setHandlers(handlers.toArray(handlerArray));
         source = client.getApiSource(apiData);
         sourceXml = ApiEditorHelper.parseStringToPrettyfiedString(source);
     } else {
@@ -86,6 +90,7 @@
         apiData.setVersion(version == null || version.isEmpty() ? null : version);
         apiData.setVersionType(versionType == null || versionType.isEmpty() ? null : versionType);
         apiData.setResources(resources.toArray(resourceArray));
+        apiData.setHandlers(handlers.toArray(handlerArray));
         source = client.getApiSource(apiData);
         sourceXml = ApiEditorHelper.parseStringToPrettyfiedString(source);
     }

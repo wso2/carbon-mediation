@@ -19,6 +19,7 @@ import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.rest.APIFactory;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.rest.API;
+import org.apache.synapse.rest.Handler;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.rest.Resource;
 import org.apache.synapse.rest.dispatch.DispatcherHelper;
@@ -35,6 +36,7 @@ import org.wso2.carbon.rest.api.APIData;
 import org.wso2.carbon.rest.api.APIDataSorter;
 import org.wso2.carbon.rest.api.APIException;
 import org.wso2.carbon.rest.api.ConfigHolder;
+import org.wso2.carbon.rest.api.HandlerData;
 import org.wso2.carbon.rest.api.ResourceData;
 import org.wso2.carbon.rest.api.RestApiAdminUtils;
 import org.wso2.carbon.utils.NetworkUtils;
@@ -708,6 +710,23 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         } else {
             apiData.setTracingEnable(false);
         }
+
+        Handler[] handlers = api.getHandlers();
+        HandlerData[] handlerDatas = new HandlerData[handlers.length];
+        for (int i = 0; i < handlers.length; i++) {
+            HandlerData data = new HandlerData();
+            String handler = handlers[i].toString();
+            data.setHandler(handler.substring(0, handler.lastIndexOf("@")));
+            Map<String, String> propertiesMap = handlers[i].getProperties();
+            ArrayList<String> properties = new ArrayList<>();
+            for (Map.Entry<String, String> entry : propertiesMap.entrySet())
+            {
+                properties.add(entry.getKey() + "::::" + entry.getValue());
+            }
+            data.setProperties(properties.toArray(new String[propertiesMap.size()]));
+            handlerDatas[i] = data;
+        }
+        apiData.setHandlers(handlerDatas);
 
 		Resource[] resources = api.getResources();
 		ResourceData[] resourceDatas = new ResourceData[resources.length];

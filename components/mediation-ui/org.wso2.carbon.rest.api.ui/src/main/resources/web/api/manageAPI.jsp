@@ -17,6 +17,7 @@
 <%@page import="org.wso2.carbon.CarbonConstants" %>
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.APIData" %>
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.ResourceData" %>
+<%@page import="org.wso2.carbon.rest.api.stub.types.carbon.HandlerData" %>
 <%@page import="org.wso2.carbon.rest.api.ui.client.RestApiAdminClient" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIMessage" %>
 <%@ page import="org.wso2.carbon.ui.CarbonUIUtil" %>
@@ -94,6 +95,7 @@
     APIData apiData = null;
 
     List<ResourceData> resourceList;
+    List<HandlerData> handlerList;
     session.removeAttribute("mode");
     session.setAttribute("mode", mode);
     if ("edit".equals(mode)) {
@@ -166,6 +168,12 @@
         } else {
             resourceList = new ArrayList<ResourceData>();
         }
+
+        if (apiData.getHandlers() != null && apiData.getHandlers()[0] != null) {
+            handlerList = new ArrayList<HandlerData>(Arrays.asList(apiData.getHandlers()));
+        } else {
+            handlerList = new ArrayList<HandlerData>();
+        }
     }
     //If not in edit mode, we are adding an API
     else {
@@ -184,6 +192,12 @@
             } else {
                 resourceList = new ArrayList<ResourceData>();
             }
+
+            if (apiData.getHandlers() != null && apiData.getHandlers()[0] != null) {
+                handlerList = new ArrayList<HandlerData>(Arrays.asList(apiData.getHandlers()));
+            } else {
+                handlerList = new ArrayList<HandlerData>();
+            }
             //session.removeAttribute("fromSourceView");
         } else {
             if (apiData == null) {
@@ -193,6 +207,7 @@
             	apiData = (APIData) session.getAttribute("apiData");
             }
             resourceList = new ArrayList<ResourceData>();
+            handlerList = new ArrayList<HandlerData>();
         }
         
         port = String.valueOf(apiData.getPort() != -1 ? apiData.getPort() : "");
@@ -212,7 +227,9 @@
     if (index != null) {
         resourceIndex = Integer.parseInt(index);
     }
+    List<HandlerData> handlerList1 = (ArrayList<HandlerData>) session.getAttribute("apiHandlers");
     session.setAttribute("apiResources", resourceList);
+    session.setAttribute("apiHandlers", handlerList);
     session.setAttribute("apiData", apiData);
 
     boolean isResourceUpdatePending = false;
@@ -291,6 +308,20 @@ function addResource() {
     showResourceInfo();
 }
 
+function addHandler() {
+    jQuery.ajax({
+                    type: "GET",
+                    url: "addHandler-ajaxprocessor.jsp",
+                    data:  "data=null",
+                    success: function(data) {
+                        jQuery("#handler-info").html(data);
+                    }
+                });
+
+    document.getElementById('handIndex').value = "-1";
+    showHandlerInfo();
+}
+
 function loadResource(index, isUpdatePending) {
     if(isUpdatePending) {
         CARBON.showConfirmationDialog('<fmt:message key="resource.update.pending"/>', function() {
@@ -322,6 +353,36 @@ function loadResource(index, isUpdatePending) {
         document.getElementById('resIndex').value = index;
         showResourceInfo();
     }
+}
+
+function loadHandler(index) {
+        jQuery.ajax({
+            type: "GET",
+            url: "loadHandler-ajaxprocessor.jsp",
+            cache: false,
+            data: { index:index },
+            success: function(data) {
+                jQuery("#handler-info").html(data);
+            }
+        });
+
+        document.getElementById('handIndex').value = index;
+        showHandlerInfo();
+}
+
+function loadHandlerData(a) {
+
+    var allNodes = document.getElementById("parent").getElementsByTagName("*");
+    for (var i = 0; i < allNodes.length; i++) {
+        if (YAHOO.util.Dom.hasClass(allNodes[i], "selected-node")) {
+            YAHOO.util.Dom.removeClass(allNodes[i], "selected-node");
+        }
+    }
+    YAHOO.util.Dom.addClass(a, "selected-node");
+
+    var parentId = a.parentNode.id;
+    var index = parentId.split('.')[1];
+    loadHandler(index);
 }
 
 function loadResourceData(a, isUpdatePending) {
@@ -362,6 +423,52 @@ function getResourceNode(idSuffix) {
     return html;
 }
 
+function getHandlerNode(idSuffix) {
+    var html = "<div id=\"branch." + idSuffix + "\" class=\"branch-node\"></div>";
+    html += "<ul id=\"ul." + idSuffix + "\" class=\"child-list\">" +
+            "<li>" +
+            "<div class=\"dot-icon\"></div>" +
+            "<div id=\"handler." + idSuffix + "\" class=\"handler\">" +
+
+                "<a class=\"handler\" onclick=\"loadHandlerData(this)\">Handler</a>" +
+
+            "<div style=\"width: 100px;\" class=\"sequenceToolbar\">" +
+            "<div>" +
+            "<a class=\"deleteStyle\" onclick=\"deleteHandler(" + idSuffix + ")\">Delete</a>" +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "</li>" +
+            "</ul>";
+
+    return html;
+}
+
+function addProperty() {
+    jQuery.ajax({
+                    type: "GET",
+                    url: "addProperty-ajaxprocessor.jsp",
+                    data:  "data=null",
+                    success: function(data) {
+                        jQuery("#property-info").html(data);
+                    }
+                });
+    showPropertyInfo();
+}
+
+function editProperty(propIndex) {
+    var index = document.getElementById('handIndex').value;
+    jQuery.ajax({
+        type: "GET",
+        url: "editProperty-ajaxprocessor.jsp",
+        data: { index:index, propIndex: propIndex },
+        success: function(data) {
+            jQuery("#property-info").html(data);
+        }
+    });
+    showPropertyInfo();
+}
+
 function showResourceInfo() {
     //Show hidden form
     document.getElementById('resourceInfo').style.display = '';
@@ -370,6 +477,27 @@ function showResourceInfo() {
 function hideResourceInfo() {
     //Hide form.
     document.getElementById('resourceInfo').style.display = 'none';
+}
+
+function showHandlerInfo() {
+    //Show hidden form
+    document.getElementById('handlerInfo').style.display = '';
+}
+
+function hideHandlerInfo() {
+    //Hide form.
+    document.getElementById('handlerInfo').style.display = 'none';
+}
+
+function showPropertyInfo() {
+    //Show hidden form
+    document.getElementById('propertyInfo').style.display = '';
+}
+
+function hidePropertyInfo() {
+    //Hide form.
+    document.getElementById('propertyInfo').style.display = 'none';
+    <%session.setAttribute("propertyIndex", null);%>
 }
 
 function urlStyleChanged() {
@@ -549,6 +677,90 @@ function updateResource(v) {
     return true;
 }
 
+function updateHandler(v) {
+    var index = document.getElementById('handIndex').value;
+    var handler = "";
+    var propertyKey = "";
+    var propertyVal = "";
+    var apiNameValue = document.getElementById('api.name').value;
+    var apiContextValue = document.getElementById('api.context').value;
+    var apiHostnameValue = document.getElementById('api.hostname').value;
+    var apiPortValue = document.getElementById('api.port').value;
+    var apiNameRegex = /[~!@#$%^&*()\\\/+=\:;<>'"?[\]{}|\s,]|^$/;
+    var version = document.getElementById('api.version').value;
+    var versionTypeElement = document.getElementById('api.version.type');
+    var versionType = versionTypeElement.options[versionTypeElement.selectedIndex].text;
+
+
+    if (apiNameValue) {
+        var splittedName = apiNameValue.split(":");
+        if (splittedName.length == 2) {
+            if (apiNameRegex.test(splittedName[0]) || apiNameRegex.test(splittedName[1])) {
+                CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
+                return false;
+            }
+        } else if (apiNameRegex.test(apiNameValue)) {
+            CARBON.showWarningDialog('<fmt:message key="api.name.not.valid"/>');
+            return false;
+        }
+    }
+    var isProperty;
+    if (v) {
+        isProperty = v;
+    }
+    var classPathElement = document.getElementById('handlerClasspath');
+    if(classPathElement != null) {
+        handler = classPathElement.value;
+    }
+    var keyElement = document.getElementById('propertyKey');
+    if (keyElement != null) {
+        propertyKey = keyElement.value;
+    }
+    var valElement = document.getElementById('propertyVal');
+    if (valElement != null) {
+        propertyVal = valElement.value;
+    }
+
+    jQuery.ajax({
+                    type: "POST",
+                    url: "updateHandler-ajaxprocessor.jsp",
+                    async: false,
+                    data: {apiName:apiNameValue, apiContext:apiContextValue,apiHostname:apiHostnameValue, apiPort:apiPortValue,
+                        version:version, versionType:versionType,
+                        index:index, isProperty:isProperty, classPath:handler, propertyKey:propertyKey, propertyVal:propertyVal},
+                    success: function(data) {
+                        hidePropertyInfo();
+                        hideHandlerInfo();
+                        //we are adding a new resource.
+                        if (index == -1) {
+                            //Add a new node to the resource tree.
+                            <%
+                            handlerList = (ArrayList<HandlerData>)session.getAttribute("apiHandlers");
+                            %>
+                            document.getElementById("handlerSizeVar").innerHTML = data;
+                            var tempsize = document.getElementById("handlersSize");
+                            if(tempsize) {
+                                size = tempsize.value;
+                            } else {
+                                size = 0;
+                            }
+                            var parentNode = document.getElementById("parent");
+                            var innerHtml = parentNode.innerHTML;
+                            innerHtml += getHandlerNode(size-1);
+                            parentNode.innerHTML = innerHtml;
+                        }
+                        jQuery.each(jQuery(".resources .resource"), function() { jQuery(this).attr("onClick", "loadResourceData(this, false)")});
+                    },
+                    error:function() {
+                        if (v == null) {
+                            CARBON.showErrorDialog("<fmt:message key="api.update.error.451"/> ");
+                            return false;
+                        }
+                    }
+                });
+    return true;
+}
+
 function saveApi(apiNameValue, apiContextValue, hostname, port, version, versionType) {
     var apiFileName = document.getElementById("apiFileName").value;
 
@@ -556,6 +768,8 @@ function saveApi(apiNameValue, apiContextValue, hostname, port, version, version
 <%
     resourceList =
             (ArrayList<ResourceData>)session.getAttribute("apiResources");
+    handlerList =
+            (ArrayList<HandlerData>)session.getAttribute("apiHandlers");
 
 
         %>
@@ -682,6 +896,41 @@ function deleteResource(index) {
                             hideResourceInfo();
                         }
                     });
+    });
+}
+
+function deleteHandler(index) {
+
+    CARBON.showConfirmationDialog("<fmt:message key="handler.delete.confirmation"/> ", function() {
+
+        jQuery.ajax({
+                        type: "POST",
+                        url: "deleteHandler-ajaxprocessor.jsp",
+                        data: { index:index },
+                        success: function(data) {
+                            //build whole tree to assign new ids.
+                            buildResourceTree();
+                            hideHandlerInfo();
+                        }
+                    });
+    });
+}
+
+function deleteProperty(propIndex) {
+
+    var index = document.getElementById('handIndex').value;
+    CARBON.showConfirmationDialog("<fmt:message key="property.delete.confirmation"/> ", function() {
+
+        jQuery.ajax({
+            type: "POST",
+            url: "deleteProperty-ajaxprocessor.jsp",
+            data: { index:index, propIndex:propIndex },
+            success: function(data) {
+                //build whole tree to assign new ids.
+                buildResourceTree();
+                hideHandlerInfo();
+            }
+        });
     });
 }
 
@@ -943,9 +1192,59 @@ function onSelectVersionType() {
                                 </tr>
                             </table>
                         </div>
+                        <div id="handlerInfo" style="display:none">
+                            <table class="normal" width="100%">
+                                <tr>
+                                    <td>
+                                        <table class="styledLeft" cellspacing="0">
+                                            <tr>
+                                                <td class="middle-header">
+                                                    <span style="float:left;position:relative; margin-top:2px;">
+                                                        <fmt:message key="design.view.of.the.handler"/>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 0px !important;">
+                                                    <div id="handler-info" class="tabPaneContentMain"
+                                                         style="width:auto;padding:0px;">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div id="propertyInfo" style="display:none">
+                            <table class="normal" width="100%">
+                                <tr>
+                                    <td>
+                                        <table class="styledLeft" cellspacing="0">
+                                            <tr>
+                                                <td class="middle-header">
+                                                    <span style="float:left;position:relative; margin-top:2px;">
+                                                        <fmt:message key="design.view.of.the.property"/>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 0px !important;">
+                                                    <div id="property-info" class="tabPaneContentMain"
+                                                         style="width:auto;padding:0px;">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                         <input type="hidden" id="resIndex" name="resIndex"/>
+                        <input type="hidden" id="handIndex" name="handIndex"/>
                         <input type="hidden" id="apiFileName" name="apiFileName"/>
                         <div id="resourceSizeVar" name="resourceSizeVar"/>
+                        <div id="handlerSizeVar" name="handlerSizeVar"/>
                     </td>
                 </tr>
                 <tr>

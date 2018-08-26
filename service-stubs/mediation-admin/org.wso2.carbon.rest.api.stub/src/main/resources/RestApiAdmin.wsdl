@@ -326,6 +326,7 @@
                <xs:element minOccurs="0" name="artifactContainerName" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="context" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="fileName" nillable="true" type="xs:string"/>
+               <xs:element maxOccurs="unbounded" minOccurs="0" name="handlers" nillable="true" type="ax2550:HandlerData"/>
                <xs:element minOccurs="0" name="host" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="isEdited" type="xs:boolean"/>
                <xs:element minOccurs="0" name="name" nillable="true" type="xs:string"/>
@@ -351,6 +352,12 @@
                <xs:element minOccurs="0" name="uriTemplate" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="urlMapping" nillable="true" type="xs:string"/>
                <xs:element minOccurs="0" name="userAgent" nillable="true" type="xs:string"/>
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="HandlerData">
+            <xs:sequence>
+               <xs:element minOccurs="0" name="handler" nillable="true" type="xs:string"/>
+               <xs:element minOccurs="0" maxOccurs="unbounded" name="properties" nillable="true" type="xs:string"/>
             </xs:sequence>
          </xs:complexType>
       </xs:schema>
