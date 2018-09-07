@@ -2378,12 +2378,12 @@
         <carbon.identity.oauth.version>5.6.46</carbon.identity.oauth.version>
         <carbon.identity.oauth.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.oauth.imp.pkg.version>
         <!--Axis2 versions-->
-        <orbit.version.axis2>1.6.1-wso2v27</orbit.version.axis2>
-        <orbit.version.axis2.client>1.6.1-wso2v27</orbit.version.axis2.client>
+        <orbit.version.axis2>1.6.1-wso2v28</orbit.version.axis2>
+        <orbit.version.axis2.client>1.6.1-wso2v28</orbit.version.axis2.client>
         <orbit.version.axiom>1.2.11.wso2v11</orbit.version.axiom>
-        <axis2-transports.base.version>1.6.1-wso2v27</axis2-transports.base.version>
+        <axis2-transports.base.version>1.6.1-wso2v28</axis2-transports.base.version>
         <axis2.osgi.version.range>[1.6.1, 1.7.0)</axis2.osgi.version.range>
-        <axis2.json.version>1.6.1-wso2v27</axis2.json.version>
+        <axis2.json.version>1.6.1-wso2v28</axis2.json.version>
         <!-- Axiom Version -->
         <axiom.api.wso2.version>1.2.11-wso2v11</axiom.api.wso2.version>
         <axiom.wso2.version>1.2.11.wso2v11</axiom.wso2.version>
