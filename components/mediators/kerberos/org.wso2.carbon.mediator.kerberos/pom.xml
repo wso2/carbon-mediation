@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>kerberos-mediator</artifactId>
-        <version>4.6.100-SNAPSHOT</version>
+        <version>4.6.100</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.6.100-SNAPSHOT</version>
+    <version>4.6.100</version>
     <artifactId>org.wso2.carbon.mediator.kerberos</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Identity Kerberos Mediator</name>
