@@ -87,9 +87,9 @@ public class InboundRunner implements Runnable {
                     execute = false;
                     log.info("Inbound EP will not run in manager node. Same will run on worker(s).");
                 }
-            } else {
-                init = true;
             }
+            init = true;
+
             try {
                 Thread.sleep(interval);
             } catch (InterruptedException e) {
