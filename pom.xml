@@ -2401,7 +2401,7 @@
         <httpcore.wso2.version>4.3.3.wso2v1</httpcore.wso2.version>
         <httpcore-nio.wso2.version>4.3.3.wso2v4</httpcore-nio.wso2.version>
         <httpclient.wso2.version>4.3.6.wso2v2</httpclient.wso2.version>
-        <commons.vfs.version>2.2-wso2v3</commons.vfs.version>
+        <commons.vfs.version>2.2-wso2v4</commons.vfs.version>
         <httpcore.nio.version>4.3.3</httpcore.nio.version>
         <httpcore.version>4.3.3</httpcore.version>
         <httpclient.version>4.3.2</httpclient.version>
