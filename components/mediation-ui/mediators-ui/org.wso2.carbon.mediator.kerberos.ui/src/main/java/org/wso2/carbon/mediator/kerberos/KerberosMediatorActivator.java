@@ -39,7 +39,7 @@ public class KerberosMediatorActivator implements BundleActivator {
                 MediatorService.class.getName(), new KerberosMediatorService(), null);
 
         if (log.isDebugEnabled()) {
-            log.debug("Successfully registered the property mediator service");
+            log.debug("Successfully registered the Kerberos mediator service");
         }
     }
 

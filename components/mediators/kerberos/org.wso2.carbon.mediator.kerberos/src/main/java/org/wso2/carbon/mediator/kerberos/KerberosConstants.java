@@ -36,7 +36,7 @@ public final class KerberosConstants {
     public static final String SPN_STRING = "spn";
     public static final String CLIENT_PRINCIPAL_STRING = "clientPrincipal";
     public static final String PASSWORD_STRING = "password";
-    public static final String KEYTAB_PATH_STRING = "keytabPath";
+    public static final String KEYTAB_PATH_STRING = "keytabConfig";
     public static final String KRB5_CONFIG_STRING = "krb5Config";
     public static final String LOGIN_CONFIG_STRING = "loginConfig";
     public static final String LOGIN_CONTEXT_NAME_STRING = "loginContextName";
@@ -46,4 +46,7 @@ public final class KerberosConstants {
     public static final String KEYTAB = "keyTab";
     public static final String DEBUG = "debug";
     public static final String KEY = "key";
+    public static final String CARBON_HOME = "carbon.home";
+    public static final String DEFAULT_KERBEROS_CONFIG_FILE = "krb5.conf";
+    public static final String DEFAULT_LOGIN_CONFIG_FILE = "login.conf";
 }

@@ -1,23 +1,62 @@
 
 function kerberosMediatorValidate(){
-    if(document.getElementById('krb5Config').value == '' && document.getElementById('krb5ConfigKey').value == ''){
+    keytabvalue = false;
+    if (document.getElementById('keytabauthgroup').checked) {
+        keytabvalue = true;
+    }
+
+    if(keytabvalue){
+        if(document.getElementById('loginContextName').value == ''){
+            CARBON.showErrorDialog(enti18n["valid.lcn.required"]);
+            return false;
+        }
+    } else {
+    	if(document.getElementById('clientPrincipal').value == ''){
+            CARBON.showErrorDialog(enti18n["valid.cpn.required"]);
+            return false;
+        }
+        if(document.getElementById('password').value == ''){
+            CARBON.showErrorDialog(enti18n["valid.password.required"]);
+            return false;
+        }
+    }
+
+/*    if(document.getElementById('krb5Config').value == ''){
         CARBON.showErrorDialog(enti18n["valid.krb5Config.required"]);
         return false;
-	}
+	}*/
 	if(document.getElementById('spn').value == '' && document.getElementById('spnConfigKey').value == ''){
         CARBON.showErrorDialog(enti18n["valid.spn.required"]);
         return false;
     }
-	if(document.getElementById('clientPrincipal').value == ''){
-        CARBON.showErrorDialog(enti18n["valid.cpn.required"]);
-        return false;
-    }
-	if(document.getElementById('password').value == '' && document.getElementById('keytabPath').value =='' &&
-	    document.getElementById('keyTabKey').value ==''){
+
+/*	if(document.getElementById('password').value == '' && document.getElementById('keytabConfig').value ==''){
         CARBON.showErrorDialog(enti18n["valid.password.required"]);
         return false;
-    }
+    }*/
     return true;
+}
+
+function displayElement(elementId, isDisplay) {
+    var toDisplayElement = document.getElementById(elementId);
+    if (toDisplayElement != null) {
+        if (isDisplay) {
+            toDisplayElement.style.display = '';
+        } else {
+            toDisplayElement.style.display = 'none';
+        }
+    }
+}
+
+function clearValues(elementId) {
+    if (elementId == 'keytab') {
+        document.getElementById('clientPrincipal').value = '';
+        document.getElementById('password').value = '';
+    } else {
+        document.getElementById('loginContextName').value = '';
+        document.getElementById('krb5Config').value = '';
+        document.getElementById('loginConfig').value = '';
+    }
 }
 
 function onTypeSelectionChange(typeElementName, nstbId) {

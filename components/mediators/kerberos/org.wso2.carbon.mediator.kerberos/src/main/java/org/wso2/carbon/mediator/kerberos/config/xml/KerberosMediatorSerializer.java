@@ -42,8 +42,7 @@ public class KerberosMediatorSerializer extends AbstractMediatorSerializer {
     public OMElement serializeSpecificMediator(Mediator mediator) {
 
         if (!(mediator instanceof KerberosMediator)) {
-            handleException("Unsupported mediator passed in for serialization : "
-                    + mediator.getType());
+            handleException("Unsupported mediator passed in for serialization : " + mediator.getType());
         }
 
         KerberosMediator kerberos = (KerberosMediator) mediator;
@@ -58,43 +57,31 @@ public class KerberosMediatorSerializer extends AbstractMediatorSerializer {
             kerberosElem.addAttribute(fac.createOMAttribute(KerberosConstants.SPN_STRING, nullNS, kerberos.getSpn()));
         }
 
-        if (kerberos.getKrb5ConfigKey() != null) {
-            OMElement krb5ConfigEle = fac.createOMElement(KerberosConstants.KRB5_CONFIG_STRING, synNS);
-            krb5ConfigEle.addAttribute(fac.createOMAttribute(KerberosConstants.KEY, nullNS, kerberos.getKrb5ConfigKey().getKeyValue()));
-            kerberosElem.addChild(krb5ConfigEle);
-        } else if (StringUtils.isNotEmpty(kerberos.getKrb5Config())) {
+        if (StringUtils.isNotEmpty(kerberos.getKrb5Config())) {
             kerberosElem.addAttribute(fac.createOMAttribute(KerberosConstants.KRB5_CONFIG_STRING, nullNS,
                     kerberos.getKrb5Config()));
         }
+
         if (StringUtils.isNotEmpty(kerberos.getLoginContextName())) {
             kerberosElem.addAttribute(fac.createOMAttribute(KerberosConstants.LOGIN_CONTEXT_NAME_STRING, nullNS,
                     kerberos.getLoginContextName()));
         }
-        if (kerberos.getLoginConfigKey() != null) {
-            OMElement loginConfigEle = fac.createOMElement(KerberosConstants.LOGIN_CONFIG_STRING, synNS);
-            loginConfigEle.addAttribute(fac.createOMAttribute(KerberosConstants.KEY, nullNS, kerberos.getLoginConfigKey().getKeyValue()));
-            kerberosElem.addChild(loginConfigEle);
-        } else if (StringUtils.isNotEmpty(kerberos.getLoginConfig())) {
+
+        if (StringUtils.isNotEmpty(kerberos.getLoginConfig())) {
             kerberosElem.addAttribute(fac.createOMAttribute(KerberosConstants.LOGIN_CONFIG_STRING, nullNS,
                     kerberos.getLoginConfig()));
         }
+
         if (kerberos.getClientPrincipal() != null) {
             new ValueSerializer().serializeValue(kerberos.getClientPrincipal(),
                     KerberosConstants.CLIENT_PRINCIPAL_STRING, kerberosElem);
         }
+
         if (kerberos.getPassword() != null) {
             new ValueSerializer().serializeValue(kerberos.getPassword(), KerberosConstants.PASSWORD_STRING,
                     kerberosElem);
         }
-        if (kerberos.getRegistryKeyTabValue() != null) {
-            OMElement keyTabKeyEle = fac.createOMElement(KerberosConstants.KEYTAB_PATH_STRING, synNS);
-            keyTabKeyEle.addAttribute(fac.createOMAttribute(KerberosConstants.KEY, nullNS, kerberos.getRegistryKeyTabValue().getKeyValue()));
-            kerberosElem.addChild(keyTabKeyEle);
-        } else if (kerberos.getKeytabPath() != null) {
-            new ValueSerializer().serializeValue(kerberos.getKeytabPath(), KerberosConstants.KEYTAB_PATH_STRING,
-                    kerberosElem);
-        }
-
+        
         return kerberosElem;
     }
 }
