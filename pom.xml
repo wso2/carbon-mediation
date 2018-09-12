@@ -2376,7 +2376,7 @@
         <carbon.identity.entitlement.proxy.version>5.1.5</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
         <carbon.identity.oauth.version>6.0.53</carbon.identity.oauth.version>
-        <carbon.identity.oauth.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.oauth.imp.pkg.version>
+        <carbon.identity.oauth.imp.pkg.version>[6.0.0, 7.0.0)</carbon.identity.oauth.imp.pkg.version>
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1-wso2v28</orbit.version.axis2>
         <orbit.version.axis2.client>1.6.1-wso2v28</orbit.version.axis2.client>
