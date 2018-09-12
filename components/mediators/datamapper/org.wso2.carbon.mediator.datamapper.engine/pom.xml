@@ -94,5 +94,9 @@
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>net.sf.saxon.wso2</groupId>
+            <artifactId>saxon</artifactId>
+        </dependency>
     </dependencies>
 </project>
