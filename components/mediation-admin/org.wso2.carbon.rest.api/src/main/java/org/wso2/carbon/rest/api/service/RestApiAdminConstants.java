@@ -1,11 +1,11 @@
 /*
- *  Copyright (c) 2008, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,13 +14,12 @@
  *  limitations under the License.
  */
 
-package org.wso2.carbon.rest.api.ui.util;
+package org.wso2.carbon.rest.api.service;
 
-public final class RestAPIConstants {
+/**
+ * Consists of constants used in RestApiAdmin
+ */
+public class RestApiAdminConstants {
 
-    public static int APIS_PER_PAGE = 10;
-    public static final String VERSION_TYPE_NONE = "none";
-    public static final String DEFAULT_PORT = "-1";
     public static final String PROPERTY_KEY_VALUE_DELIMITER = "::::";
-
 }

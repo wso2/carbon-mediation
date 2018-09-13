@@ -17,6 +17,7 @@ import org.apache.synapse.rest.dispatch.URLMappingHelper;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
+import org.wso2.carbon.rest.api.service.RestApiAdminConstants;
 
 import javax.xml.stream.XMLStreamException;
 import java.util.Iterator;
@@ -89,7 +90,7 @@ public class RestApiAdminUtils {
             for (String property : properties) {
                 if (!property.equals("")) {
                     // the property value is split into it's key and value
-                    String[] propertyItems = property.split("::::");
+                    String[] propertyItems = property.split(RestApiAdminConstants.PROPERTY_KEY_VALUE_DELIMITER);
                     OMElement propertyElem = fac.createOMElement("property", syn);
                     // the key and value fetched above are assigned as attributes
                     propertyElem.addAttribute("name", propertyItems[0], nullNS);

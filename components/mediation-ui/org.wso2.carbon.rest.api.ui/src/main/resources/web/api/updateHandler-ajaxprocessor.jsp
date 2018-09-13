@@ -17,6 +17,7 @@
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.APIData" %>
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.HandlerData"%>
 <%@page import="java.util.List"%>
+<%@ page import="org.wso2.carbon.rest.api.ui.util.RestAPIConstants" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -42,13 +43,14 @@
             int i = 0;
             if (propertyIndex != null) {
                 newProperties = oldProperties;
-                newProperties[Integer.parseInt(propertyIndex)] = propertyKey + "::::" + propertyVal;
+                newProperties[Integer.parseInt(propertyIndex)] = propertyKey +
+                        RestAPIConstants.PROPERTY_KEY_VALUE_DELIMITER + propertyVal;
             } else {
                 for (String prop : oldProperties) {
                     newProperties[i] = prop;
                     i++;
                 }
-                newProperties[i] = propertyKey + "::::" + propertyVal;
+                newProperties[i] = propertyKey + RestAPIConstants.PROPERTY_KEY_VALUE_DELIMITER + propertyVal;
             }
         }
         data.setProperties(newProperties);

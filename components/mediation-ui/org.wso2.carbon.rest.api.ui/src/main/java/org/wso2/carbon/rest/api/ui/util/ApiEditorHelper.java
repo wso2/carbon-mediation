@@ -118,7 +118,7 @@ public class ApiEditorHelper {
                 OMElement property = (OMElement) propertyIterator.next();
                 String propertyName = property.getAttribute(new QName("name")).getAttributeValue().trim();
                 String propertyValue = property.getAttribute(new QName("value")).getAttributeValue().trim();
-                properties.add(propertyName + "::::" + propertyValue);
+                properties.add(propertyName + RestAPIConstants.PROPERTY_KEY_VALUE_DELIMITER + propertyValue);
             }
             handlerData.setProperties(properties.toArray(new String[0]));
         }

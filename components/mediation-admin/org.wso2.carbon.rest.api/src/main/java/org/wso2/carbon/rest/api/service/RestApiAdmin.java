@@ -724,7 +724,7 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
             ArrayList<String> properties = new ArrayList<>();
             for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
                 // here a delimiter is used to facilitate splitting the key and value of a property
-                properties.add(entry.getKey() + "::::" + entry.getValue());
+                properties.add(entry.getKey() + RestApiAdminConstants.PROPERTY_KEY_VALUE_DELIMITER + entry.getValue());
             }
             data.setProperties(properties.toArray(new String[propertiesMap.size()]));
             handlerDatas[i] = data;

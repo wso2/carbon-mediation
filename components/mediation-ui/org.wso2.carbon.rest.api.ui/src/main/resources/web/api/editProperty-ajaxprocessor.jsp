@@ -16,6 +16,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.wso2.carbon.rest.api.stub.types.carbon.HandlerData" %>
+<%@ page import="org.wso2.carbon.rest.api.ui.util.RestAPIConstants" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -25,8 +26,8 @@
     List<HandlerData> handlerList = (ArrayList<HandlerData>) session.getAttribute("apiHandlers");
     HandlerData handler = handlerList.get(index);
     String property = handler.getProperties()[propertyIndex];
-    String propertyKey = property.split("::::")[0];
-    String propertyVal = property.split("::::")[1];
+    String propertyKey = property.split(RestAPIConstants.PROPERTY_KEY_VALUE_DELIMITER)[0];
+    String propertyVal = property.split(RestAPIConstants.PROPERTY_KEY_VALUE_DELIMITER)[1];
     session.setAttribute("propertyIndex", Integer.toString(propertyIndex));
 %>
 

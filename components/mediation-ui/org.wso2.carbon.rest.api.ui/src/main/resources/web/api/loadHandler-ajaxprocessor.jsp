@@ -16,6 +16,7 @@
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.HandlerData" %>
 <%@page import="java.util.ArrayList" %>
 <%@page import="java.util.List" %>
+<%@ page import="org.wso2.carbon.rest.api.ui.util.RestAPIConstants" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -74,8 +75,8 @@
                 <th colspan="2">Action</th>
             </tr>
         </thead>
-        <%  for(int i = 0; i < properties.length; i++){
-            String[] entry = properties[i].split("::::");
+        <%  for(int i = 0; i < properties.length; i++) {
+            String[] entry = properties[i].split(RestAPIConstants.PROPERTY_KEY_VALUE_DELIMITER);
             key = entry[0].trim();
             value = entry[1].trim();
         %>
