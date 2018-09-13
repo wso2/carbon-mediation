@@ -712,15 +712,18 @@ public class RestApiAdmin extends AbstractServiceBusAdmin{
         }
 
         Handler[] handlers = api.getHandlers();
+        // defining new string array to store handlers
         HandlerData[] handlerDatas = new HandlerData[handlers.length];
         for (int i = 0; i < handlers.length; i++) {
             HandlerData data = new HandlerData();
             String handler = handlers[i].toString();
+            // extract the handler classpath and updating the handler object
             data.setHandler(handler.substring(0, handler.lastIndexOf("@")));
             Map<String, String> propertiesMap = handlers[i].getProperties();
+            // defining new array list to store properties
             ArrayList<String> properties = new ArrayList<>();
-            for (Map.Entry<String, String> entry : propertiesMap.entrySet())
-            {
+            for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
+                // here a delimiter is used to facilitate splitting the key and value of a property
                 properties.add(entry.getKey() + "::::" + entry.getValue());
             }
             data.setProperties(properties.toArray(new String[propertiesMap.size()]));

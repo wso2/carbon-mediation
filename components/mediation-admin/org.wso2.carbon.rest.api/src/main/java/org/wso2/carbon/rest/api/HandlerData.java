@@ -16,8 +16,9 @@
 
 package org.wso2.carbon.rest.api;
 
-import java.util.Map;
-
+/**
+ * This class manages the attributes of a handler
+ */
 public class HandlerData {
 	
 	private String handler;

@@ -88,8 +88,10 @@ public class RestApiAdminUtils {
         if (properties != null && properties.length != 0) {
             for (String property : properties) {
                 if (!property.equals("")) {
+                    // the property value is split into it's key and value
                     String[] propertyItems = property.split("::::");
                     OMElement propertyElem = fac.createOMElement("property", syn);
+                    // the key and value fetched above are assigned as attributes
                     propertyElem.addAttribute("name", propertyItems[0], nullNS);
                     propertyElem.addAttribute("value", propertyItems[1], nullNS);
                     handler.addChild(propertyElem);

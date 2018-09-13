@@ -16,7 +16,6 @@
 <%@page import="org.wso2.carbon.rest.api.stub.types.carbon.HandlerData" %>
 <%@page import="java.util.ArrayList" %>
 <%@page import="java.util.List" %>
-<%@page import="java.util.ResourceBundle" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
@@ -25,12 +24,7 @@
 
 <fmt:bundle basename="org.wso2.carbon.rest.api.ui.i18n.Resources">
 
-<%
-    ResourceBundle bundle = ResourceBundle.getBundle(
-            "org.wso2.carbon.rest.api.ui.i18n.Resources",
-            request.getLocale());
-
-    List<HandlerData> handlers = (ArrayList<HandlerData>) session.getAttribute("apiHandlers");
+<%  List<HandlerData> handlers = (ArrayList<HandlerData>) session.getAttribute("apiHandlers");
     HandlerData selectedHandler;
     String index = request.getParameter("index");
 
@@ -49,7 +43,6 @@
     }
 
     session.setAttribute("index", index);
-    session.setAttribute("apiHandlers", handlers);
 %>
 
 <table class="normal-nopadding" width="100%">

@@ -227,7 +227,6 @@
     if (index != null) {
         resourceIndex = Integer.parseInt(index);
     }
-    List<HandlerData> handlerList1 = (ArrayList<HandlerData>) session.getAttribute("apiHandlers");
     session.setAttribute("apiResources", resourceList);
     session.setAttribute("apiHandlers", handlerList);
     session.setAttribute("apiData", apiData);
@@ -731,7 +730,7 @@ function updateHandler(v) {
                     success: function(data) {
                         hidePropertyInfo();
                         hideHandlerInfo();
-                        //we are adding a new resource.
+                        //we are adding a new handler.
                         if (index == -1) {
                             //Add a new node to the resource tree.
                             <%
@@ -749,7 +748,6 @@ function updateHandler(v) {
                             innerHtml += getHandlerNode(size-1);
                             parentNode.innerHTML = innerHtml;
                         }
-                        jQuery.each(jQuery(".resources .resource"), function() { jQuery(this).attr("onClick", "loadResourceData(this, false)")});
                     },
                     error:function() {
                         if (v == null) {

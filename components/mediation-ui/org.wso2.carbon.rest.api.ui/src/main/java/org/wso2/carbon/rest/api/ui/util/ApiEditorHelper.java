@@ -103,9 +103,15 @@ public class ApiEditorHelper {
         return apiData;
     }
 
-    private static void convertHandler(OMElement handlerdOM, HandlerData handlerData) {
-        OMAttribute classPath = handlerdOM.getAttribute(new QName("class"));
-        Iterator propertyIterator = handlerdOM.getChildElements();
+    /**
+     * Convert the handler OMElement to a HandlerData object
+     *
+     * @param handlerOM handler OMElement
+     * @param handlerData the HandlerData object created using the handler OMElement
+     */
+    private static void convertHandler(OMElement handlerOM, HandlerData handlerData) {
+        OMAttribute classPath = handlerOM.getAttribute(new QName("class"));
+        Iterator propertyIterator = handlerOM.getChildElements();
         if (propertyIterator != null) {
             ArrayList<String> properties = new ArrayList<>();
             while (propertyIterator.hasNext()) {
