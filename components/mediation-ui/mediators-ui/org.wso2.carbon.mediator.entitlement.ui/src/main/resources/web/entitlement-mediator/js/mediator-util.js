@@ -1,14 +1,14 @@
 
 function entitlementMediatorValidate(){
-    if(document.getElementById('remoteServiceUrl').value == ''){
+    if(document.getElementById('remoteServiceUrl').value == '' && document.getElementById('remoteServiceUrlKey').value == '') {
         CARBON.showWarningDialog(enti18n["valid.remoteservice.required"]);
         return false;
     }
-    if(document.getElementById('remoteServiceUserName').value == ''){
+    if(document.getElementById('remoteServiceUserName').value == '' && document.getElementById('remoteServiceUserNameKey').value == '') {
         CARBON.showWarningDialog(enti18n["valid.remoteservice.user.required"]);
         return false;
     }
-    if(document.getElementById('remoteServicePassword').value == ''){
+    if(document.getElementById('remoteServicePassword').value == '' && document.getElementById('remoteServicePasswordKey').value == '') {
         CARBON.showWarningDialog(enti18n["valid.remoteservice.password.required"]);
         return false;
     }
@@ -108,4 +108,8 @@ function toggleClient(client){
         client.ownerDocument.getElementsByName('thriftHost')[0].disabled = false;
         client.ownerDocument.getElementsByName('thriftPort')[0].disabled = false;
     }
+}
+
+function clearTextField(element){
+    document.getElementById(element).value = "";
 }

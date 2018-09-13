@@ -50,12 +50,31 @@ public class EntitlementMediatorSerializer extends AbstractMediatorSerializer {
         entitlement = (EntitlementMediator) mediator;
         entitlementElem = fac.createOMElement("entitlementService", synNS);
         saveTracingState(entitlementElem, entitlement);
-        entitlementElem.addAttribute(fac.createOMAttribute("remoteServiceUrl", nullNS, entitlement
-                .getRemoteServiceUrl()));
-        entitlementElem.addAttribute(fac.createOMAttribute("remoteServiceUserName", nullNS,
-                entitlement.getRemoteServiceUserName()));
-        entitlementElem.addAttribute(fac.createOMAttribute("remoteServicePassword", nullNS,
-                entitlement.getRemoteServicePassword()));
+        if(entitlement.getRemoteServiceUrl() != null && !entitlement.getRemoteServiceUrl().isEmpty()) {
+            entitlementElem.addAttribute(fac.createOMAttribute("remoteServiceUrl", nullNS, entitlement
+                    .getRemoteServiceUrl()));
+        } else if(entitlement.getRemoteServiceUrlKey() != null && !entitlement.getRemoteServiceUrlKey().isEmpty()) {
+            entitlementElem.addAttribute(fac.createOMAttribute("remoteServiceUrlKey", nullNS, entitlement
+                    .getRemoteServiceUrlKey()));
+        }
+
+        if(entitlement.getRemoteServiceUserName() != null && !entitlement.getRemoteServiceUserName().isEmpty()) {
+            entitlementElem.addAttribute(fac.createOMAttribute("remoteServiceUserName", nullNS,
+                    entitlement.getRemoteServiceUserName()));
+        } else if(entitlement.getRemoteServiceUserNameKey() != null
+                && !entitlement.getRemoteServiceUserNameKey().isEmpty()) {
+            entitlementElem.addAttribute(fac.createOMAttribute("remoteServiceUserNameKey", nullNS,
+                    entitlement.getRemoteServiceUserNameKey()));
+        }
+
+        if(entitlement.getRemoteServicePassword() != null && !entitlement.getRemoteServicePassword().isEmpty()) {
+            entitlementElem.addAttribute(fac.createOMAttribute("remoteServicePassword", nullNS,
+                    entitlement.getRemoteServicePassword()));
+        } else if(entitlement.getRemoteServicePasswordKey() != null
+                && !entitlement.getRemoteServicePasswordKey().isEmpty()) {
+            entitlementElem.addAttribute(fac.createOMAttribute("remoteServicePasswordKey", nullNS,
+                    entitlement.getRemoteServicePasswordKey()));
+        }
 
         if (entitlement.getCallbackClass() != null) {
             entitlementElem.addAttribute(fac.createOMAttribute("callbackClass", nullNS,
