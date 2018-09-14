@@ -234,16 +234,35 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
             log.debug("==> Repository fetch of resource with key : " + key);
         }
         String resolvedRegKeyPath = resolveRegistryPath(key);
-        URLConnection urlConnection;
         Properties result = new Properties();
+
+        URL url = null;
+        // get the path to the relevant property file
         try {
-            // get the path to the relevant property file
             resolvedRegKeyPath = getPropertyFilePath(resolvedRegKeyPath);
-            URL url = new URL(resolvedRegKeyPath);
-            if ("file".equals(url.getProtocol())) {
+            url = new URL(resolvedRegKeyPath);
+        } catch (MalformedURLException e) {
+            handleException("Invalid path '" + resolvedRegKeyPath + "' for URL", e);
+        }
+
+        if (url == null) {
+            handleException("Unable to create URL for target resource : " + key);
+        }
+
+        if ("file".equals(url.getProtocol())) {
+            //Check existence of the file
+            try {
                 url.openStream();
+            } catch (IOException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Error occurred while accessing registry resource: " + key, e);
+                }
+                return null;
             }
-            urlConnection = url.openConnection();
+        }
+
+        try {
+            URLConnection urlConnection = url.openConnection();
             urlConnection.connect();
             try (InputStream input = urlConnection.getInputStream()) {
                 if (input == null) {
@@ -251,8 +270,6 @@ public class MicroIntegratorRegistry extends AbstractRegistry {
                 }
                 result.load(input);
             }
-        } catch (MalformedURLException e) {
-            handleException("Invalid path '" + resolvedRegKeyPath + "' for URL", e);
         } catch (IOException e) {
             log.error("Error in loading properties", e);
             return null;
