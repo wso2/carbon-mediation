@@ -26,7 +26,7 @@
     </parent>
     <groupId>org.wso2.carbon.mediation</groupId>
     <artifactId>carbon-mediation</artifactId>
-    <version>4.6.102-SNAPSHOT</version>
+    <version>4.6.106-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>WSO2 Carbon Mediation - Aggregator Pom</name>
     <url>http://wso2.org</url>
@@ -2344,7 +2344,7 @@
     </dependencyManagement>
     <properties>
         <!-- Carbon mediation version -->
-        <carbon.mediation.version>4.6.102-SNAPSHOT</carbon.mediation.version>
+        <carbon.mediation.version>4.6.106-SNAPSHOT</carbon.mediation.version>
         <carbon.mediation.import.feature.version>4.6.0</carbon.mediation.import.feature.version>
         <carbon.mediation.exp.pkg.version>${carbon.mediation.version}</carbon.mediation.exp.pkg.version>
         <carbon.mediation.imp.pkg.version>[4.3.0, 5.0.0)</carbon.mediation.imp.pkg.version>
@@ -2366,7 +2366,7 @@
         <carbon.analytics.common.version>5.1.42</carbon.analytics.common.version>
         <carbon.analytics.common.imp.pkg.version>[5.1.0, 6.0.0)</carbon.analytics.common.imp.pkg.version>
         <!-- Carbon Identity version-->
-        <carbon.identity.version>5.11.256</carbon.identity.version>
+        <carbon.identity.version>5.12.153</carbon.identity.version>
         <carbon.identity.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.imp.pkg.version>
         <!-- Carbon Rule version -->
         <carbon.rule.version>4.4.9</carbon.rule.version>
@@ -2375,8 +2375,8 @@
         <synapse.version>2.1.7-wso2v80</synapse.version>
         <carbon.identity.entitlement.proxy.version>5.1.5</carbon.identity.entitlement.proxy.version>
         <carbon.identity.entitlement.proxy.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.entitlement.proxy.imp.pkg.version>
-        <carbon.identity.oauth.version>5.6.46</carbon.identity.oauth.version>
-        <carbon.identity.oauth.imp.pkg.version>[5.0.0, 6.0.0)</carbon.identity.oauth.imp.pkg.version>
+        <carbon.identity.oauth.version>6.0.53</carbon.identity.oauth.version>
+        <carbon.identity.oauth.imp.pkg.version>[6.0.0, 7.0.0)</carbon.identity.oauth.imp.pkg.version>
         <!--Axis2 versions-->
         <orbit.version.axis2>1.6.1-wso2v28</orbit.version.axis2>
         <orbit.version.axis2.client>1.6.1-wso2v28</orbit.version.axis2.client>

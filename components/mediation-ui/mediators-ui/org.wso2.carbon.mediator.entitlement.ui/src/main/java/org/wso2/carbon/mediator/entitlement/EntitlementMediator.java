@@ -30,6 +30,9 @@ public class EntitlementMediator extends AbstractListMediator {
     private String remoteServiceUserName;
     private String remoteServicePassword;
     private String remoteServiceUrl;
+    private String remoteServiceUserNameKey;
+    private String remoteServicePasswordKey;
+    private String remoteServiceUrlKey;
     private String callbackClass;
     private String thriftHost;
     private String thriftPort;
@@ -37,6 +40,9 @@ public class EntitlementMediator extends AbstractListMediator {
     private static final QName PROP_NAME_SERVICE_EPR = new QName("remoteServiceUrl");
     private static final QName PROP_NAME_USER = new QName("remoteServiceUserName");
     private static final QName PROP_NAME_PASSWORD = new QName("remoteServicePassword");
+    private static final QName PROP_NAME_SERVICE_EPR_KEY = new QName("remoteServiceUrlKey");
+    private static final QName PROP_NAME_USER_KEY = new QName("remoteServiceUserNameKey");
+    private static final QName PROP_NAME_PASSWORD_KEY = new QName("remoteServicePasswordKey");
     private static final QName PROP_NAME_CALLBACK_CLASS = new QName("callbackClass");
     private static final QName PROP_NAME_THRIFT_HOST = new QName("thriftHost");
     private static final QName PROP_NAME_THRIFT_PORT = new QName("thriftPort");
@@ -61,25 +67,34 @@ public class EntitlementMediator extends AbstractListMediator {
     public OMElement serialize(OMElement parent) {
         OMElement entitlementService = fac.createOMElement("entitlementService", synNS);
 
-        if (remoteServiceUrl != null) {
+        if (remoteServiceUrl != null && remoteServiceUrl.trim().length() != 0) {
             entitlementService.addAttribute(fac.createOMAttribute("remoteServiceUrl", nullNS,
                     remoteServiceUrl));
+        } else if (remoteServiceUrlKey != null && remoteServiceUrlKey.trim().length() != 0) {
+            entitlementService.addAttribute(fac.createOMAttribute("remoteServiceUrlKey", nullNS,
+                    remoteServiceUrlKey));
         } else {
             throw new MediatorException(
                     "Invalid Entitlement mediator.Entitlement service epr required");
         }
 
-        if (remoteServiceUserName != null) {
+        if (remoteServiceUserName != null && remoteServiceUserName.trim().length() != 0) {
             entitlementService.addAttribute(fac.createOMAttribute("remoteServiceUserName", nullNS,
                     remoteServiceUserName));
+        } else if (remoteServiceUserNameKey != null && remoteServiceUserNameKey.trim().length() != 0) {
+            entitlementService.addAttribute(fac.createOMAttribute("remoteServiceUserNameKey", nullNS,
+                    remoteServiceUserNameKey));
         } else {
             throw new MediatorException(
                     "Invalid Entitlement mediator. Remote service user name required");
         }
 
-        if (remoteServicePassword != null) {
+        if (remoteServicePassword != null && remoteServicePassword.trim().length() != 0) {
             entitlementService.addAttribute(fac.createOMAttribute("remoteServicePassword", nullNS,
                     remoteServicePassword));
+        } else if (remoteServicePasswordKey != null && remoteServicePasswordKey.trim().length() != 0) {
+            entitlementService.addAttribute(fac.createOMAttribute("remoteServicePasswordKey", nullNS,
+                    remoteServicePasswordKey));
         } else {
             throw new MediatorException(
                     "Invalid Entitlement mediator. Remote service password required");
@@ -161,6 +176,9 @@ public class EntitlementMediator extends AbstractListMediator {
         OMAttribute attRemoteServiceUri = elem.getAttribute(PROP_NAME_SERVICE_EPR);
         OMAttribute attRemoteServiceUserName = elem.getAttribute(PROP_NAME_USER);
         OMAttribute attRemoteServicePassword = elem.getAttribute(PROP_NAME_PASSWORD);
+        OMAttribute attRemoteServiceUriKey = elem.getAttribute(PROP_NAME_SERVICE_EPR_KEY);
+        OMAttribute attRemoteServiceUserNameKey = elem.getAttribute(PROP_NAME_USER_KEY);
+        OMAttribute attRemoteServicePasswordKey = elem.getAttribute(PROP_NAME_PASSWORD_KEY);
         OMAttribute attCallbackClass = elem.getAttribute(PROP_NAME_CALLBACK_CLASS);
         OMAttribute attThriftHost = elem.getAttribute(PROP_NAME_THRIFT_HOST);
         OMAttribute attThriftPort = elem.getAttribute(PROP_NAME_THRIFT_PORT);
@@ -172,6 +190,8 @@ public class EntitlementMediator extends AbstractListMediator {
 
         if (attRemoteServiceUri != null) {
             remoteServiceUrl = attRemoteServiceUri.getAttributeValue();
+        } else if (attRemoteServiceUriKey != null) {
+            setRemoteServiceUrlKey(attRemoteServiceUriKey.getAttributeValue());
         } else {
             throw new MediatorException(
                     "The 'remoteServiceUrl' attribute is required for the Entitlement mediator");
@@ -179,6 +199,8 @@ public class EntitlementMediator extends AbstractListMediator {
 
         if (attRemoteServiceUserName != null) {
             remoteServiceUserName = attRemoteServiceUserName.getAttributeValue();
+        } else if (attRemoteServiceUserNameKey != null) {
+            setRemoteServiceUserNameKey(attRemoteServiceUserNameKey.getAttributeValue());
         } else {
             throw new MediatorException(
                     "The 'remoteServiceUserName' attribute is required for the Entitlement mediator");
@@ -186,6 +208,8 @@ public class EntitlementMediator extends AbstractListMediator {
 
         if (attRemoteServicePassword != null) {
             remoteServicePassword = attRemoteServicePassword.getAttributeValue();
+        } else if (attRemoteServicePasswordKey != null) {
+            setRemoteServicePasswordKey(attRemoteServicePasswordKey.getAttributeValue());
         } else {
             throw new MediatorException(
                     "The 'remoteServicePassword' attribute is required for the Entitlement mediator");
@@ -359,6 +383,30 @@ public class EntitlementMediator extends AbstractListMediator {
 
     public void setObligationsSeqKey(String obligationsSeqKey) {
         this.obligationsSeqKey = obligationsSeqKey;
+    }
+
+    public String getRemoteServiceUserNameKey() {
+        return remoteServiceUserNameKey;
+    }
+
+    public void setRemoteServiceUserNameKey(String remoteServiceUserNameKey) {
+        this.remoteServiceUserNameKey = remoteServiceUserNameKey;
+    }
+
+    public String getRemoteServicePasswordKey() {
+        return remoteServicePasswordKey;
+    }
+
+    public void setRemoteServicePasswordKey(String remoteServicePasswordKey) {
+        this.remoteServicePasswordKey = remoteServicePasswordKey;
+    }
+
+    public String getRemoteServiceUrlKey() {
+        return remoteServiceUrlKey;
+    }
+
+    public void setRemoteServiceUrlKey(String remoteServiceUrlKey) {
+        this.remoteServiceUrlKey = remoteServiceUrlKey;
     }
 
     /**

@@ -19,17 +19,29 @@
 <%
     try {       
         String remoteServiceUserName = null;
-		String remoteServicePassword = null;
-		String remoteServiceUrl = null;
+        String remoteServicePassword = null;
+        String remoteServiceUrl = null;
+        String remoteServiceGroup = null;
+        String remoteServiceUserGroup = null;
+        String remoteServicePasswordGroup = null;
+        String remoteServiceUserNameKey = null;
+        String remoteServicePasswordKey = null;
+        String remoteServiceUrlKey = null;
         String callbackClass = null;
         String thriftHost = null;
         String thriftPort = null;
         String client = null;
         String param = null;
 
-		remoteServiceUserName = request.getParameter("remoteServiceUserName");
-		remoteServicePassword = request.getParameter("remoteServicePassword");
-		remoteServiceUrl = request.getParameter("remoteServiceUrl");
+        remoteServiceUserName = request.getParameter("remoteServiceUserName");
+        remoteServicePassword = request.getParameter("remoteServicePassword");
+        remoteServiceUrl = request.getParameter("remoteServiceUrl");
+        remoteServiceGroup = request.getParameter("remoteservicegroup");
+        remoteServiceUserGroup = request.getParameter("remoteserviceusergroup");
+        remoteServicePasswordGroup = request.getParameter("remoteservicepasswordgroup");
+        remoteServiceUserNameKey = request.getParameter("remoteServiceUserNameKey");
+        remoteServicePasswordKey = request.getParameter("remoteServicePasswordKey");
+        remoteServiceUrlKey = request.getParameter("remoteServiceUrlKey");
         callbackClass = request.getParameter("callbackClass");
         thriftHost = request.getParameter("thriftHost");
         thriftPort = request.getParameter("thriftPort");
@@ -41,9 +53,12 @@
             throw new RuntimeException("Unable to update the mediator");
         }
         EntitlementMediator entMediator = (EntitlementMediator) mediator;
-        entMediator.setRemoteServiceUrl(remoteServiceUrl);
         entMediator.setRemoteServiceUserName(remoteServiceUserName);
+        entMediator.setRemoteServiceUserNameKey(remoteServiceUserNameKey);
         entMediator.setRemoteServicePassword(remoteServicePassword);
+        entMediator.setRemoteServicePasswordKey(remoteServicePasswordKey);
+        entMediator.setRemoteServiceUrl(remoteServiceUrl);
+        entMediator.setRemoteServiceUrlKey(remoteServiceUrlKey);
         entMediator.setCallbackClass(callbackClass);
         entMediator.setThriftHost(thriftHost);
         entMediator.setThriftPort(thriftPort);

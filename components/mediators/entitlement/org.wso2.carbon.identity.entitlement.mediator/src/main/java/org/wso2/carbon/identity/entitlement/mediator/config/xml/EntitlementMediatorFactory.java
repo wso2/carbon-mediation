@@ -53,6 +53,9 @@ public class EntitlementMediatorFactory extends AbstractMediatorFactory {
         OMAttribute remoteServiceUrl = null;
         OMAttribute remoteServiceUserName = null;
         OMAttribute remoteServicePassword = null;
+        OMAttribute remoteServiceUrlKey = null;
+        OMAttribute remoteServiceUserNameKey = null;
+        OMAttribute remoteServicePasswordKey = null;
         OMAttribute callbackClass = null;
         OMAttribute cacheType = null;
         OMAttribute invalidationInterval = null;
@@ -66,18 +69,27 @@ public class EntitlementMediatorFactory extends AbstractMediatorFactory {
         mediator = new EntitlementMediator();
 
         remoteServiceUrl = element.getAttribute(EntitlementConstants.ATTR_SERVER_URL);
+        remoteServiceUrlKey = element.getAttribute(EntitlementConstants.ATTR_SERVER_URL_KEY);
         if (remoteServiceUrl != null && remoteServiceUrl.getAttributeValue() != null) {
             mediator.setRemoteServiceUrl(remoteServiceUrl.getAttributeValue());
+        } else if (remoteServiceUrlKey != null && remoteServiceUrlKey.getAttributeValue() != null) {
+            mediator.setRemoteServiceUrlKey(remoteServiceUrlKey.getAttributeValue());
         }
 
         remoteServiceUserName = element.getAttribute(EntitlementConstants.ATTR_USER_NAME);
+        remoteServiceUserNameKey = element.getAttribute(EntitlementConstants.ATTR_USER_NAME_KEY);
         if (remoteServiceUserName != null && remoteServiceUserName.getAttributeValue() != null) {
             mediator.setRemoteServiceUserName(remoteServiceUserName.getAttributeValue());
+        } else if (remoteServiceUserNameKey != null && remoteServiceUserNameKey.getAttributeValue() != null) {
+            mediator.setRemoteServiceUserNameKey(remoteServiceUserNameKey.getAttributeValue());
         }
 
         remoteServicePassword = element.getAttribute(EntitlementConstants.ATTR_NAME_PASSWORD);
+        remoteServicePasswordKey = element.getAttribute(EntitlementConstants.ATTR_NAME_PASSWORD_KEY);
         if (remoteServicePassword != null && remoteServicePassword.getAttributeValue() != null) {
             mediator.setRemoteServicePassword(remoteServicePassword.getAttributeValue());
+        } else if (remoteServicePasswordKey != null && remoteServicePasswordKey.getAttributeValue() != null) {
+            mediator.setRemoteServicePasswordKey(remoteServicePasswordKey.getAttributeValue());
         }
         
         callbackClass = element.getAttribute(EntitlementConstants.ATTR_CALLBACK_CLASS);

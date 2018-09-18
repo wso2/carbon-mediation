@@ -39,6 +39,7 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import com.sun.security.auth.login.ConfigFile;
 import org.apache.axiom.om.impl.llom.OMTextImpl;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -57,45 +58,38 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
+import org.wso2.carbon.core.util.CryptoException;
+import org.wso2.carbon.core.util.CryptoUtil;
 
 public class KerberosMediator extends AbstractMediator {
-
-    /**
-     * <p> The Kerberos Mediator provides support to access the Kerberos secured REST backend services.</p>
-     *
-     * <p>You have the following configurations under the Kerberos Mediator.</p>
-     *
-     * <p> spn -  SPN of the backend service </p>
-     * <p> clientPrincipal - Username of the client </p>
-     * <p> password - The password of the above client </p>
-     * <p> keytabPath - The path of the keytab file which has the password of the client </p>
-     * <p> krb5Config - Location of the Kerberos Configuration file </p>
-     * <p> loginContextName - Name of the login context defined in the login configuration file </p>
-     * <p> loginConfig - Location of the JASS Configuration file </p>
-     *
-     */
 
     private static final Log log = LogFactory.getLog(KerberosMediator.class);
 
     // Basic configuration parameters.
     private String spn;
+    private Value spnKey;
     private Value clientPrincipal;
     private Value password;
-    private Value keytabPath;
+    private Value keytabFile;
     private String krb5Config;
     private String clientPrincipalValue;
     private String passwordValue;
-    private String keytabPathValue;
+    private String keytabPath;
+    private Map<String, ?> logDetails = new HashMap<>();
 
     // Optional parameters.
     private String loginContextName;
     private String loginConfig;
-    private Value krb5ConfigKey;
-    private Value loginConfigKey;
-    private Value keyTabKey;
-    private Value spnKey;
 
     private GSSManager gssManager = GSSManager.getInstance();
+
+    private static final String ROOT = System.getProperty(KerberosConstants.CARBON_HOME, ".");
+    private static final String CONFIG_PATH = ROOT + File.separator + "repository" + File.separator
+            + "resources" + File.separator + "security" + File.separator;
+    private static final String DEFAULT_KERBEROS_CONFIG_PATH = ROOT + File.separator + "repository" + File.separator
+            + "resources" + File.separator + "security" + File.separator + KerberosConstants.DEFAULT_KERBEROS_CONFIG_FILE;
+    private static final String DEFAULT_LOGIN_CONFIG_PATH = ROOT + File.separator + "repository" + File.separator
+            + "resources" + File.separator + "security" + File.separator + KerberosConstants.DEFAULT_LOGIN_CONFIG_FILE;
 
     /**
      * {@inheritDoc}
@@ -103,13 +97,12 @@ public class KerberosMediator extends AbstractMediator {
     @Override
     public boolean mediate(MessageContext synCtx) {
 
-        if (synCtx.getEnvironment().isDebuggerEnabled()) {
-            if (super.divertMediationRoute(synCtx)) {
-                return true;
-            }
+        if (synCtx.getEnvironment().isDebuggerEnabled() && super.divertMediationRoute(synCtx)) {
+            return true;
         }
-        //Evaluate and set the values for username, password and keytab elements
-        setElements(synCtx);
+
+        //Evaluate values
+        extractDataFromLoginConf(synCtx);
 
         //Set kerberos configurations.
         setKerberosConfigurations(synCtx);
@@ -184,22 +177,24 @@ public class KerberosMediator extends AbstractMediator {
      *
      * @param synCtx message context.
      */
-    private void setElements(MessageContext synCtx) {
+    private void setElements(Map<String, ? > logDetails, MessageContext synCtx) {
         //Set username.
         if (getClientPrincipal() != null) {
-            this.clientPrincipalValue = getClientPrincipal().evaluateValue(synCtx);
+            this.clientPrincipalValue = getClientPrincipal().getKeyValue();
+        } else {
+            this.clientPrincipalValue = logDetails.get("principal").toString();
         }
 
         //Set password.
-        if (getPassword() != null) {
-            this.passwordValue = getPassword().evaluateValue(synCtx);
+        if (this.password != null) {
+            this.passwordValue = this.password.getKeyValue();
         }
 
         //Set keytab path.
-        if (getRegistryKeyTabValue() != null) {
-            this.keytabPathValue = getRegistryKeyTabValue().evaluateValue(synCtx);
-        } else if (getKeytabPath() != null) {
-            this.keytabPathValue = getKeytabPath().evaluateValue(synCtx);
+        if (getKeytabFileName() != null) {
+            this.keytabPath = CONFIG_PATH + getKeytabFileName().evaluateValue(synCtx);
+        } else {
+            this.keytabPath = logDetails.get("keyTab").toString();
         }
     }
 
@@ -247,7 +242,7 @@ public class KerberosMediator extends AbstractMediator {
             if (StringUtils.isNotEmpty(passwordValue)) {
                 setJASSConfiguration(false, synCtx);
                 callbackHandler = getUserNamePasswordCallbackHandler(clientPrincipalValue, passwordValue.toCharArray());
-            } else if (StringUtils.isNotEmpty(keytabPathValue)) {
+            } else if (StringUtils.isNotEmpty(keytabPath)) {
                 setJASSConfiguration(true, synCtx);
                 callbackHandler = null;
             } else {
@@ -343,25 +338,75 @@ public class KerberosMediator extends AbstractMediator {
      * @param msgCtx message context.
      */
     private void setKerberosConfigurations(MessageContext msgCtx) {
-
-        if (getKrb5ConfigKey() != null) {
-            String generatedKrb5ConfigKey = getKrb5ConfigKey().evaluateValue(msgCtx);
-            Object entry = msgCtx.getEntry(generatedKrb5ConfigKey);
-            if (entry == null) {
-                handleException("Key " + generatedKrb5ConfigKey + " not found ", msgCtx);
-            }
-            if (entry instanceof OMTextImpl) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Retrieving the krb5Config key :" + generatedKrb5ConfigKey);
-                }
-                OMTextImpl text = (OMTextImpl) entry;
-                String content = text.getText();
-                System.setProperty(KerberosConstants.KERBEROS_CONFIG_PROPERTY, new File(content).getAbsolutePath());
-            }
-        } else if (StringUtils.isNotEmpty(getKrb5Config())) {
-            System.setProperty(KerberosConstants.KERBEROS_CONFIG_PROPERTY, new File(getKrb5Config()).getAbsolutePath());
+        String krb5ConfigPath = null;
+        if (StringUtils.isNotEmpty(getKrb5Config())) {
+            krb5ConfigPath = CONFIG_PATH + getKrb5Config();
+        } else {
+            krb5ConfigPath = DEFAULT_KERBEROS_CONFIG_PATH;
+        }
+        File file = new File(krb5ConfigPath);
+        if (file.exists()) {
+            System.setProperty(KerberosConstants.KERBEROS_CONFIG_PROPERTY, file.getAbsolutePath());
         } else {
             handleException("Could not find the Kerberos configuration.", msgCtx);
+        }
+    }
+
+    /**
+     * Extracts data from login conf and sets the values
+     * @param msgCtx
+     */
+    private void extractDataFromLoginConf(MessageContext msgCtx) {
+
+        //Read configuration again if type is keytab and config is not configFile
+        if(StringUtils.isNotEmpty(getLoginContextName())) {
+            Configuration.setConfiguration(null);
+        }
+
+        if (StringUtils.isNotEmpty(getLoginConfig())) {
+            String loginConfigPath = CONFIG_PATH + getLoginConfig();
+            File file = new File(loginConfigPath);
+            if (file.exists()) {
+                System.setProperty(KerberosConstants.JAAS_CONFIG_PROPERTY, file.getAbsolutePath());
+                AppConfigurationEntry entries[] = Configuration.getConfiguration()
+                        .getAppConfigurationEntry(getLoginContextName());
+                if(entries != null && entries.length != 0) {
+                    Map<String, ?> options = entries[0].getOptions();
+                    //Evaluate and set the values for username, password and keytab elements
+                    setElements(options, msgCtx);
+                } else {
+                    handleException("Could not find specified service account.", msgCtx);
+                }
+            } else {
+                handleException("Could not find the login configuration.", msgCtx);
+            }
+        } else if (StringUtils.isNotEmpty(getLoginContextName())) {
+            String loginConfigPath = DEFAULT_LOGIN_CONFIG_PATH;
+            File file = new File(loginConfigPath);
+            if (file.exists()) {
+                System.setProperty(KerberosConstants.JAAS_CONFIG_PROPERTY, file.getAbsolutePath());
+                AppConfigurationEntry entries[] = Configuration.getConfiguration()
+                        .getAppConfigurationEntry(getLoginContextName());
+                if(entries != null && entries.length != 0) {
+                    Map<String, ?> options = entries[0].getOptions();
+                    //Evaluate and set the values for username, password and keytab elements
+                    setElements(options, msgCtx);
+                } else {
+                    handleException("Could not find specified service account.", msgCtx);
+                }
+            } else {
+                handleException("Could not find the login configuration.", msgCtx);
+            }
+        } else {
+            //Set username.
+            if (getClientPrincipal() != null && StringUtils.isNotEmpty(getClientPrincipal().getKeyValue())) {
+                this.clientPrincipalValue = getClientPrincipal().getKeyValue();
+            }
+
+            //Set password.
+            if (this.password != null && StringUtils.isNotEmpty(this.password.getKeyValue())) {
+                this.passwordValue = this.password.getKeyValue();
+            }
         }
     }
 
@@ -372,47 +417,53 @@ public class KerberosMediator extends AbstractMediator {
 
         Map<String, Object> optionSet = new HashMap<>();
         if (StringUtils.isNotEmpty(getLoginConfig())) {
-            System.setProperty(KerberosConstants.JAAS_CONFIG_PROPERTY, new File(getLoginConfig()).getAbsolutePath());
-            AppConfigurationEntry entries[] = Configuration.getConfiguration()
-                    .getAppConfigurationEntry(getLoginContextName());
-            Map<String, ?> options = entries[0].getOptions();
-            for (String s : options.keySet()) {
-                optionSet.put(s, options.get(s));
-            }
-        } else if (getLoginConfigKey() != null) {
-            String generatedLoginConfigKey = getLoginConfigKey().evaluateValue(msgCtx);
-            Object entry = msgCtx.getEntry(generatedLoginConfigKey);
-            if (entry instanceof OMTextImpl) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Retrieving the loginConfig key :" + generatedLoginConfigKey);
-                }
-                OMTextImpl text = (OMTextImpl) entry;
-                String content = text.getText();
-                String[] loginConfigArr = content.split("\n| ");
-                for (String aLoginConfigArr : loginConfigArr) {
-                    if (aLoginConfigArr.contains("=")) {
-                        String[] keyValuePair = aLoginConfigArr.split("=");
-                        for (int j = 0; j <= keyValuePair.length; j++) {
-                            optionSet.put(keyValuePair[0], keyValuePair[1]);
-                        }
+            String loginConfigPath = CONFIG_PATH + getLoginConfig();
+            File file = new File(loginConfigPath);
+            if (file.exists()) {
+                System.setProperty(KerberosConstants.JAAS_CONFIG_PROPERTY, file.getAbsolutePath());
+                AppConfigurationEntry entries[] = Configuration.getConfiguration()
+                        .getAppConfigurationEntry(getLoginContextName());
+                if(entries != null && entries.length != 0) {
+                    Map<String, ?> options = entries[0].getOptions();
+                    for (String s : options.keySet()) {
+                        optionSet.put(s, options.get(s));
                     }
+                } else {
+                    handleException("Could not find specified service account.", msgCtx);
                 }
+            } else {
+                handleException("Could not find the login configuration.", msgCtx);
+            }
+        } else if (StringUtils.isNotEmpty(getLoginContextName())) {
+            String loginConfigPath = DEFAULT_LOGIN_CONFIG_PATH;
+            File file = new File(loginConfigPath);
+            if (file.exists()) {
+                System.setProperty(KerberosConstants.JAAS_CONFIG_PROPERTY, file.getAbsolutePath());
+                AppConfigurationEntry entries[] = Configuration.getConfiguration()
+                        .getAppConfigurationEntry(getLoginContextName());
+                if(entries != null && entries.length != 0) {
+                    Map<String, ?> options = entries[0].getOptions();
+                    for (String s : options.keySet()) {
+                        optionSet.put(s, options.get(s));
+                    }
+                } else {
+                    handleException("Could not find specified service account.", msgCtx);
+                }
+            } else {
+                handleException("Could not find the login configuration.", msgCtx);
             }
         }
+
         optionSet.put(KerberosConstants.IS_INITIATOR, "true");
         optionSet.put(KerberosConstants.PRINCIPAL, clientPrincipalValue);
         optionSet.put(KerberosConstants.USE_KEYTAB, String.valueOf(useKeyTab));
         if (useKeyTab) {
-            Object entry = msgCtx.getEntry(keytabPathValue);
-            if (entry != null && entry instanceof OMTextImpl) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Retrieving the keytab path key :" + keytabPathValue);
-                }
-                OMTextImpl text = (OMTextImpl) entry;
-                String content = text.getText();
-                optionSet.put(KerberosConstants.KEYTAB, new File(content).getAbsolutePath());
+            File keyTabFile = new File(keytabPath);
+            if (keyTabFile.exists()) {
+                optionSet.put(KerberosConstants.KEYTAB, keyTabFile.getAbsolutePath());
             } else {
-                optionSet.put(KerberosConstants.KEYTAB, new File(keytabPathValue).getAbsolutePath());
+                handleException("Could not find the keytab file " + keytabPath +
+                        " in the location " + CONFIG_PATH, msgCtx);
             }
         } else {
             optionSet.put(KerberosConstants.KEYTAB, null);
@@ -484,53 +535,39 @@ public class KerberosMediator extends AbstractMediator {
     }
 
     public Value getPassword() {
-
+        if (this.password != null && !this.password.getKeyValue().startsWith("enc:")) {
+            try {
+                return new Value("enc:"
+                        + CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(
+                        this.password.getKeyValue().getBytes()));
+            } catch (CryptoException e) {
+                log.error(e);
+            }
+        }
         return password;
     }
 
     public void setPassword(Value password) {
-
-        this.password = password;
+        if (password.getKeyValue().startsWith("enc:")) {
+            try {
+                this.password = new Value(String.valueOf(CryptoUtil.getDefaultCryptoUtil()
+                        .base64DecodeAndDecrypt(password.getKeyValue().substring(4))));
+            } catch (CryptoException e) {
+                log.error(e);
+            }
+        } else {
+            this.password = password;
+        }
     }
 
-    public Value getKeytabPath() {
+    public Value getKeytabFileName() {
 
-        return keytabPath;
+        return keytabFile;
     }
 
-    public void setKeytabPath(Value keytabPath) {
+    public void setKeytabFileName(Value keytabFile) {
 
-        this.keytabPath = keytabPath;
-    }
-
-    public Value getKrb5ConfigKey() {
-
-        return krb5ConfigKey;
-    }
-
-    public void setKrb5ConfigKey(Value krb5ConfigKey) {
-
-        this.krb5ConfigKey = krb5ConfigKey;
-    }
-
-    public Value getLoginConfigKey() {
-
-        return loginConfigKey;
-    }
-
-    public void setLoginConfigKey(Value loginConfigKey) {
-
-        this.loginConfigKey = loginConfigKey;
-    }
-
-    public Value getRegistryKeyTabValue() {
-
-        return keyTabKey;
-    }
-
-    public void setRegistryKeyTabValue(Value keyTabKey) {
-
-        this.keyTabKey = keyTabKey;
+        this.keytabFile = keytabFile;
     }
 
     public Value getSpnKey() {

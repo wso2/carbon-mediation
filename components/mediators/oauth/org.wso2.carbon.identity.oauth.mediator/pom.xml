@@ -19,11 +19,11 @@
     <parent>
         <groupId>org.wso2.carbon.mediation</groupId>
         <artifactId>oauth-mediator</artifactId>
-        <version>4.6.102-SNAPSHOT</version>
+        <version>4.6.106-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <version>4.6.102-SNAPSHOT</version>
+    <version>4.6.106-SNAPSHOT</version>
     <artifactId>org.wso2.carbon.identity.oauth.mediator</artifactId>
     <packaging>bundle</packaging>
     <name>WSO2 Carbon - Identity OAuth Mediator</name>
@@ -85,7 +85,7 @@
                             !org.apache.axis2.databinding.utils.reader,
                             !org.pache.axis2.databinding.utils.writer,
                             !org.wso2.carbon.identity.oauth.mediator.*,
-                            org.wso2.carbon.identity.oauth2.stub.*;version="${carbon.identity.imp.pkg.version}",
+                            org.wso2.carbon.identity.oauth2.stub.*;version="${carbon.identity.oauth.imp.pkg.version}",
                             org.wso2.carbon.identity.oauth.stub.*;version="${carbon.identity.oauth.imp.pkg.version}",
                             *; resolution:=optional
                         </Import-Package>
