@@ -58,4 +58,8 @@ public class DataMapperEngineConstants {
     public static final String ENCODE_CHAR_HYPHEN = "_EnC0DeCHaRHyPh3n_";
     public static final String HYPHEN = "-";
     public static final String PREFIX_LIST_SEPERATOR = ",";
+    public static final String EMPTY_STRING = "";
+    public static final String PARAMETER_FILE_ROOT = "xsl:stylesheet";
+    public static final String RUN_TIME_PROPERTIES = "xmlns:runTimeProperties";
+    public static final String PROPERTY_SEPERATOR = ",";
 }
