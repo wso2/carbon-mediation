@@ -171,6 +171,14 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     }
 
     /**
+     *
+     * @return dataMapperXsltStyleSheetKey registry key for the input schema
+     */
+    public Value getXsltStyleSheetKey() {
+        return xsltStyleSheetKey;
+    }
+
+    /**
      * Gets the key which is used to pick the output schema from the
      * registry
      *
