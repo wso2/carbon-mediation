@@ -23,12 +23,15 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .PROPERTY_SEPERATOR;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.RUN_TIME_PROPERTIES;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
+        .NOT_XSLT_COMPATIBLE;
 
 public class XSLTMappingResource {
 
     private final Map<String,String> runTimeProperties;
     private String name;
     private String content;
+    private boolean notXSLTCompatible;
 
     public XSLTMappingResource(String content) throws SAXException,
             IOException,
@@ -36,8 +39,12 @@ public class XSLTMappingResource {
         this.content = content;
         this.runTimeProperties = new HashMap<>();
         Document document = getDocument();
-        processOperators(document);
-        processHeader(document);
+        notXSLTCompatible = processOperators(document);
+        if(notXSLTCompatible){
+            this.content = null;
+        }else {
+            processHeader(document);
+        }
     }
 
     InputStream getInputStream(){
@@ -55,7 +62,7 @@ public class XSLTMappingResource {
         return documentBuilder.parse(getInputSource());
     }
 
-    private void processOperators(Document document){
+    private boolean processOperators(Document document){
         Node rootNode = document.getElementsByTagName(PARAMETER_FILE_ROOT).item(0);
         for(int j=0;j<rootNode.getAttributes().getLength();j++){
             Node propertyNode = rootNode.getAttributes().item(j);
@@ -70,8 +77,11 @@ public class XSLTMappingResource {
                     }
                 }
                 break;
+            }else if(propertyNode.getNodeName().equals(NOT_XSLT_COMPATIBLE)){
+                return true;
             }
         }
+        return false;
 
     }
 
@@ -89,5 +99,9 @@ public class XSLTMappingResource {
 
     Map<String, String> getRunTimeProperties() {
         return runTimeProperties;
+    }
+
+    public boolean isNotXSLTCompatible() {
+        return notXSLTCompatible;
     }
 }

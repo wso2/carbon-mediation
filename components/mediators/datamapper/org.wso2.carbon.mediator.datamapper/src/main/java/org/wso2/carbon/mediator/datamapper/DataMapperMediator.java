@@ -279,7 +279,13 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     handleException("DataMapper mediator mapping resource generation failed", e, synCtx);
                 }
             }
-        }else if (mappingResource == null) {
+            if(xsltMappingResource==null || xsltMappingResource.isNotXSLTCompatible()){
+                usingXSLTMapping = false;
+            }
+
+        }
+
+        if (mappingResource == null && !usingXSLTMapping) {
             String configKey = mappingConfigurationKey.evaluateValue(synCtx);
             String inSchemaKey = inputSchemaKey.evaluateValue(synCtx);
             String outSchemaKey = outputSchemaKey.evaluateValue(synCtx);
