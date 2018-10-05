@@ -19,6 +19,8 @@ import java.util.Map;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .EMPTY_STRING;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
+        .FIRST_ELEMENT_OF_THE_INPUT;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .PARAMETER_FILE_ROOT;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .PROPERTY_SEPERATOR;
@@ -39,11 +41,9 @@ public class XSLTMappingResource {
         this.content = content;
         this.runTimeProperties = new HashMap<>();
         Document document = getDocument();
-        notXSLTCompatible = processOperators(document);
+        notXSLTCompatible = processConfigurationDetails(document);
         if(notXSLTCompatible){
             this.content = null;
-        }else {
-            processHeader(document);
         }
     }
 
@@ -62,7 +62,7 @@ public class XSLTMappingResource {
         return documentBuilder.parse(getInputSource());
     }
 
-    private boolean processOperators(Document document){
+    private boolean processConfigurationDetails(Document document){
         Node rootNode = document.getElementsByTagName(PARAMETER_FILE_ROOT).item(0);
         for(int j=0;j<rootNode.getAttributes().getLength();j++){
             Node propertyNode = rootNode.getAttributes().item(j);
@@ -79,17 +79,14 @@ public class XSLTMappingResource {
                 break;
             }else if(propertyNode.getNodeName().equals(NOT_XSLT_COMPATIBLE)){
                 return true;
+            }else if(propertyNode.getNodeName().equals(FIRST_ELEMENT_OF_THE_INPUT)){
+                this.name = propertyNode.getNodeValue();
             }
         }
-        return false;
-
-    }
-
-    private void processHeader(Document document){
-        Node templateNode = document.getElementsByTagName("xsl:template").item(0);
-        for (int i = 0; i < templateNode.getChildNodes().getLength(); i++) {
-            this.name = templateNode.getChildNodes().item(i).getNodeName();
+        if(this.name==null){
+            return true;
         }
+        return false;
 
     }
 

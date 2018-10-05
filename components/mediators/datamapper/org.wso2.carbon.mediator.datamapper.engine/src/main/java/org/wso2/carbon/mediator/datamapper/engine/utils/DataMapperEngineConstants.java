@@ -63,4 +63,5 @@ public class DataMapperEngineConstants {
     public static final String RUN_TIME_PROPERTIES = "xmlns:runTimeProperties";
     public static final String NOT_XSLT_COMPATIBLE = "xmlns:notXSLTCompatible";
     public static final String PROPERTY_SEPERATOR = ",";
+    public static final String FIRST_ELEMENT_OF_THE_INPUT = "xmlns:firstElementOfTheInput";
 }
