@@ -650,7 +650,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                         value = EMPTY_STRING;
                 }
                 if (value == null) {
-                    log.warn(propertyName + "not found. Setting it to an empty value.");
+                    log.warn(propertyName + " not found. Setting it to an empty value.");
                     value = EMPTY_STRING;
                 }
                 propertyValues.put(propertyName, value);
