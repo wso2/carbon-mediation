@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.wso2.carbon.mediator.datamapper.engine.core.mapper;
 
 import org.w3c.dom.Document;
@@ -35,6 +51,7 @@ public class XSLTMappingResource {
     private String content;
     private boolean notXSLTCompatible;
 
+
     public XSLTMappingResource(String content) throws SAXException,
             IOException,
             ParserConfigurationException {
@@ -47,14 +64,32 @@ public class XSLTMappingResource {
         }
     }
 
+    /**
+     * Create a input stream from the available content
+     *
+     * @return Input stream of the xslt stylesheet
+     */
     InputStream getInputStream(){
         return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Create a input source from the available content
+     *
+     * @return Input source of the xslt stylesheet
+     */
     InputSource getInputSource(){
         return new InputSource(new StringReader(content));
     }
 
+    /**
+     * Creating a document to process the xslt stylesheet
+     *
+     * @return document of the xslt stylesheet
+     * @throws SAXException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     */
     private Document getDocument() throws SAXException, IOException,
             ParserConfigurationException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -62,6 +97,12 @@ public class XSLTMappingResource {
         return documentBuilder.parse(getInputSource());
     }
 
+    /**
+     * Process configuration details included in the xslt stylesheet
+     *
+     * @param document
+     * @return
+     */
     private boolean processConfigurationDetails(Document document){
         Node rootNode = document.getElementsByTagName(PARAMETER_FILE_ROOT).item(0);
         for(int j=0;j<rootNode.getAttributes().getLength();j++){
@@ -90,14 +131,29 @@ public class XSLTMappingResource {
 
     }
 
+    /**
+     * Return name of the root element of the input xml
+     *
+     * @return name of the root element of the input xml
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Return run time properties included in the xslt stylesheet
+     *
+     * @return runtime properties
+     */
     public Map<String, String> getRunTimeProperties() {
         return runTimeProperties;
     }
 
+    /**
+     * Indicate whether xslt transformation is possible or not
+     *
+     * @return whether xslt transformation is possible or not
+     */
     public boolean isNotXSLTCompatible() {
         return notXSLTCompatible;
     }
