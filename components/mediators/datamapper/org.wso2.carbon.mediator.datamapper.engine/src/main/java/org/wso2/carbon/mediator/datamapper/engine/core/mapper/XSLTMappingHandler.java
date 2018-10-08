@@ -7,6 +7,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.Map;
+
 import net.sf.saxon.TransformerFactoryImpl;
 
 public class XSLTMappingHandler {
@@ -20,11 +22,12 @@ public class XSLTMappingHandler {
         xsltSource = new javax.xml.transform.stream.StreamSource(xsltMappingResource.getInputStream());
         TransformerFactory transFact = new TransformerFactoryImpl();
         transformer = transFact.newTransformer(xsltSource);
-        setParameters(transformer);
     }
 
-    public String doMap(InputStream inputXML) throws TransformerException{
+    public String doMap(Map<String,Object> properties, InputStream inputXML) throws
+            TransformerException{
 
+        setParameters(properties);
         Source xmlSource = new javax.xml.transform.stream.StreamSource(inputXML);
         StringWriter sw = new StringWriter();
         Result result = new javax.xml.transform.stream.StreamResult(sw);
@@ -33,8 +36,10 @@ public class XSLTMappingHandler {
 
     }
 
-    private void setParameters(Transformer trans){
-        for(String key : xsltMappingResource.getRunTimeProperties().keySet())
-            trans.setParameter(key,xsltMappingResource.getRunTimeProperties().get(key));
+    private void setParameters(Map<String,Object> properties){
+        transformer.clearParameters();
+        for(String key : properties.keySet())
+            transformer.setParameter(key,properties.get(key));
     }
+
 }

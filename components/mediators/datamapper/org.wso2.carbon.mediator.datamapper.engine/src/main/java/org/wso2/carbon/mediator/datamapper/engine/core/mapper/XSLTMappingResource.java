@@ -94,7 +94,7 @@ public class XSLTMappingResource {
         return name;
     }
 
-    Map<String, String> getRunTimeProperties() {
+    public Map<String, String> getRunTimeProperties() {
         return runTimeProperties;
     }
 

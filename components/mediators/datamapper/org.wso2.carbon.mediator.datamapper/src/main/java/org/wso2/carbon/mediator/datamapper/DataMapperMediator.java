@@ -349,7 +349,11 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                         }
                     }
                 }
-                outputResult = xsltMappingHandler.doMap(getInputStream(synCtx, inputType, xsltMappingResource.getName()));
+                outputResult = xsltMappingHandler.doMap(getPropertiesMapForXSLT
+                                (xsltMappingResource.getRunTimeProperties(),synCtx),
+                        getInputStream
+                        (synCtx, inputType,
+                        xsltMappingResource.getName()));
             }else {
                 Map<String, Map<String, Object>> propertiesMap;
 
@@ -592,6 +596,59 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         }
 
         return propertiesMap;
+    }
+
+    private Map<String, Object> getPropertiesMapForXSLT(Map<String,String> properties,
+                                                        MessageContext
+            synCtx) {
+        Map<String,Object> propertyValues = new HashMap<>();
+
+        if(!properties.isEmpty()) {
+            Object value;
+            org.apache.axis2.context.MessageContext axis2MsgCtx = ((Axis2MessageContext) synCtx).getAxis2MessageContext();
+
+            HashMap functionProperties = new HashMap();
+            Stack<TemplateContext> templeteContextStack = ((Stack) synCtx
+                    .getProperty(SynapseConstants.SYNAPSE__FUNCTION__STACK));
+            if (templeteContextStack != null && !templeteContextStack.isEmpty()) {
+                TemplateContext templateContext = templeteContextStack.peek();
+                functionProperties.putAll(templateContext.getMappedValues());
+            }
+            for (String propertyName : properties.keySet()) {
+                switch (properties.get(propertyName)) {
+                    case DEFAULT_CONTEXT:
+                    case SYNAPSE_CONTEXT:
+                        value = synCtx.getProperty(propertyName);
+                        break;
+                    case TRANSPORT_CONTEXT:
+                        value = ((Map) axis2MsgCtx.getProperty(TRANSPORT_HEADERS)).get(propertyName);
+                        break;
+                    case AXIS2_CONTEXT:
+                        value = axis2MsgCtx.getProperty(propertyName);
+                        break;
+                    case AXIS2_CLIENT_CONTEXT:
+                        value = axis2MsgCtx.getOptions().getProperty(propertyName);
+                        break;
+                    case OPERATIONS_CONTEXT:
+                        value = axis2MsgCtx.getOperationContext().getProperty(propertyName);
+                        break;
+                    case FUNCTION_CONTEXT:
+                        value = functionProperties.get(propertyName);
+                        break;
+                    default:
+                        log.warn(propertyName + " scope is not found. Setting it to an empty " +
+                                "value.");
+                        value = EMPTY_STRING;
+                }
+                if (value == null) {
+                    log.warn(propertyName + "not found. Setting it to an empty value.");
+                    value = EMPTY_STRING;
+                }
+                propertyValues.put(propertyName, value);
+            }
+        }
+
+        return propertyValues;
     }
 
     /**
