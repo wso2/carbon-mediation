@@ -29,17 +29,15 @@ import net.sf.saxon.TransformerFactoryImpl;
 
 public class XSLTMappingHandler {
 
-    private final XSLTMappingResource xsltMappingResource;
-    private Source xsltSource;
+    private final Source xsltSource;
     private Transformer transformer;
 
     /**
      *
-     * @param xsltMappingResource
-     * @throws TransformerException
+     * @param xsltMappingResource xslt mapping resource
+     * @throws TransformerException errors arise from xslt transformation
      */
     public XSLTMappingHandler(XSLTMappingResource xsltMappingResource) throws TransformerException {
-        this.xsltMappingResource = xsltMappingResource;
         xsltSource = new javax.xml.transform.stream.StreamSource(xsltMappingResource.getInputStream());
         TransformerFactory transFact = new TransformerFactoryImpl();
         transformer = transFact.newTransformer(xsltSource);
@@ -50,8 +48,8 @@ public class XSLTMappingHandler {
      *
      * @param properties set of runtime properties with values
      * @param inputXML input stream of the input xml message
-     * @return
-     * @throws TransformerException
+     * @return output xml as a string
+     * @throws TransformerException errors arise from xslt transformation
      */
     public String doMap(Map<String,Object> properties, InputStream inputXML) throws
             TransformerException{

@@ -78,7 +78,7 @@ public class XSLTMappingResource {
      *
      * @return Input source of the xslt stylesheet
      */
-    InputSource getInputSource(){
+    private InputSource getInputSource(){
         return new InputSource(new StringReader(content));
     }
 
@@ -100,28 +100,32 @@ public class XSLTMappingResource {
     /**
      * Process configuration details included in the xslt stylesheet
      *
-     * @param document
-     * @return
+     * @param document xslt stylesheet as a document
+     * @return return whether the xslt transformation possible or not
      */
     private boolean processConfigurationDetails(Document document){
         Node rootNode = document.getElementsByTagName(PARAMETER_FILE_ROOT).item(0);
-        for(int j=0;j<rootNode.getAttributes().getLength();j++){
+        label:
+        for (int j = 0; j < rootNode.getAttributes().getLength(); j++) {
             Node propertyNode = rootNode.getAttributes().item(j);
-            if(propertyNode.getNodeName().equals(RUN_TIME_PROPERTIES)){
-                String runTimePropertyString = propertyNode.getNodeValue();
-                if(!EMPTY_STRING.equals(runTimePropertyString)) {
-                    String[] properties = runTimePropertyString.split(PROPERTY_SEPERATOR);
-                    int currentIndex = 0;
-                    while (currentIndex < properties.length) {
-                        runTimeProperties.put(properties[currentIndex], properties[currentIndex + 1]);
-                        currentIndex += 2;
+            switch (propertyNode.getNodeName()) {
+                case RUN_TIME_PROPERTIES:
+                    String runTimePropertyString = propertyNode.getNodeValue();
+                    if (!EMPTY_STRING.equals(runTimePropertyString)) {
+                        String[] properties = runTimePropertyString.split(PROPERTY_SEPERATOR);
+                        int currentIndex = 0;
+                        while (currentIndex < properties.length) {
+                            runTimeProperties.put(properties[currentIndex],
+                                    properties[currentIndex + 1]);
+                            currentIndex += 2;
+                        }
                     }
-                }
-                break;
-            }else if(propertyNode.getNodeName().equals(NOT_XSLT_COMPATIBLE)){
-                return true;
-            }else if(propertyNode.getNodeName().equals(FIRST_ELEMENT_OF_THE_INPUT)){
-                this.name = propertyNode.getNodeValue();
+                    break label;
+                case NOT_XSLT_COMPATIBLE:
+                    return true;
+                case FIRST_ELEMENT_OF_THE_INPUT:
+                    this.name = propertyNode.getNodeValue();
+                    break;
             }
         }
         if(this.name==null){
