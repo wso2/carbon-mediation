@@ -45,6 +45,14 @@ public class XSLTMappingHandler {
         transformer = transFact.newTransformer(xsltSource);
     }
 
+    /**
+     * This method performs xslt transformation from input xml to the output xml
+     *
+     * @param properties set of runtime properties with values
+     * @param inputXML input stream of the input xml message
+     * @return
+     * @throws TransformerException
+     */
     public String doMap(Map<String,Object> properties, InputStream inputXML) throws
             TransformerException{
 
@@ -57,6 +65,11 @@ public class XSLTMappingHandler {
 
     }
 
+    /**
+     * Set runtime properties as parameters in the transformer
+     *
+     * @param properties Map of properties with values
+     */
     private void setParameters(Map<String,Object> properties){
         transformer.clearParameters();
         for(String key : properties.keySet())
