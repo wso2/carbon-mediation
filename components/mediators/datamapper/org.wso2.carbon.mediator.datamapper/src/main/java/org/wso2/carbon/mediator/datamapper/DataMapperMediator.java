@@ -526,9 +526,11 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
     }
 
     /**
+     * When Data mapper mediator has been invoked initially, this creates a new xslt mapping
+     * resource
      *
-     * @param synCtx
-     * @param xsltKey
+     * @param synCtx message context
+     * @param xsltKey the location of the xslt stylesheet
      * @return
      * @throws SAXException
      * @throws IOException
@@ -598,6 +600,13 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         return propertiesMap;
     }
 
+    /**
+     * Retrive property values and return as a map
+     *
+     * @param properties Required properties
+     * @param synCtx Message context
+     * @return Map with values of each property
+     */
     private Map<String, Object> getPropertiesMapForXSLT(Map<String,String> properties,
                                                         MessageContext
             synCtx) {
