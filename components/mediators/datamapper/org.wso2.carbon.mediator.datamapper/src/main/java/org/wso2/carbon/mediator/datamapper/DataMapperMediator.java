@@ -52,6 +52,10 @@ import org.wso2.carbon.mediator.datamapper.engine.core.mapper.XSLTMappingResourc
 import org.wso2.carbon.mediator.datamapper.engine.utils.InputOutputDataType;
 import org.xml.sax.SAXException;
 
+import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,21 +64,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.TransformerException;
 
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CLIENT_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.DEFAULT_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.EMPTY_STRING;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.FUNCTION_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.OPERATIONS_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.SYNAPSE_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_HEADERS;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
+        .AXIS2_CLIENT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
+        .AXIS2_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
+        .DEFAULT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
+        .EMPTY_STRING;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
+        .FUNCTION_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
+        .OPERATIONS_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
+        .SYNAPSE_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
+        .TRANSPORT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
+        .TRANSPORT_HEADERS;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
+        .ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE;
 
 /**
  * By using the input schema, output schema and mapping configuration,
@@ -267,23 +277,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             }
         }
 
-        if(xsltStyleSheetKey!=null && (InputOutputDataType.XML.toString().equals(inputType) &&
-                InputOutputDataType.XML.toString().equals(outputType))) {
-            usingXSLTMapping = true;
-            if(xsltMappingResource == null) {
-                String xsltKey = xsltStyleSheetKey.evaluateValue(synCtx);
-                try {
-                    xsltMappingResource = getXsltMappingResource(synCtx, xsltKey);
-                }catch (SAXException | IOException |
-                        ParserConfigurationException e){
-                    handleException("DataMapper mediator mapping resource generation failed", e, synCtx);
-                }
-            }
-            if(xsltMappingResource==null || xsltMappingResource.isNotXSLTCompatible()){
-                usingXSLTMapping = false;
-            }
-
-        }
+        mediateXSLT(synCtx);
 
         if (mappingResource == null && !usingXSLTMapping) {
             String configKey = mappingConfigurationKey.evaluateValue(synCtx);
@@ -331,6 +325,26 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
         return true;
     }
 
+    private void mediateXSLT(MessageContext synCtx) {
+        if (xsltStyleSheetKey != null && (InputOutputDataType.XML.toString().equals(inputType) &&
+                InputOutputDataType.XML.toString().equals(outputType))) {
+            usingXSLTMapping = true;
+            if (xsltMappingResource == null) {
+                String xsltKey = xsltStyleSheetKey.evaluateValue(synCtx);
+                try {
+                    xsltMappingResource = getXsltMappingResource(synCtx, xsltKey);
+                } catch (SAXException | IOException |
+                        ParserConfigurationException e) {
+                    handleException("DataMapper mediator mapping resource generation failed", e,
+                            synCtx);
+                }
+            }
+            if (xsltMappingResource == null || xsltMappingResource.isNotXSLTCompatible()) {
+                usingXSLTMapping = false;
+            }
+        }
+    }
+
     /**
      * Does message conversion and gives the output message as the final result
      *
@@ -340,20 +354,20 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      */
     private void transform(MessageContext synCtx, String configKey, String inSchemaKey) {
         try {
-            String outputResult = null;
-            if(usingXSLTMapping) {
-                if(xsltMappingHandler==null){
-                    synchronized (xsltHandlerLock){
-                        if(xsltMappingHandler==null){
+            String outputResult;
+            if (usingXSLTMapping) {
+                if (xsltMappingHandler == null) {
+                    synchronized (xsltHandlerLock) {
+                        if (xsltMappingHandler == null) {
                             xsltMappingHandler = new XSLTMappingHandler(this.xsltMappingResource);
                         }
                     }
                 }
                 outputResult = xsltMappingHandler.doMap(getPropertiesMapForXSLT
-                                (xsltMappingResource.getRunTimeProperties(),synCtx),
+                                (xsltMappingResource.getRunTimeProperties(), synCtx),
                         getInputStream
-                        (synCtx, inputType,
-                        xsltMappingResource.getName()));
+                                (synCtx, inputType,
+                                        xsltMappingResource.getName()));
             }else {
                 Map<String, Map<String, Object>> propertiesMap;
 

@@ -118,7 +118,8 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
         }
 
         if (xsltStyleSheetKeyAttribute != null) {
-            Value xsltStyleSheetKeyValue = keyFac.createValue(xsltStyleSheetKeyAttribute.getLocalName(), element);
+            Value xsltStyleSheetKeyValue = keyFac.createValue(xsltStyleSheetKeyAttribute
+                    .getLocalName(), element);
             datamapperMediator.setXsltStyleSheetKey(xsltStyleSheetKeyValue);
         }
 
