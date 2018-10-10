@@ -70,8 +70,8 @@ public class XSLTMappingHandler {
      */
     private void setParameters(Map<String,Object> properties){
         transformer.clearParameters();
-        for(String key : properties.keySet())
-            transformer.setParameter(key,properties.get(key));
+        for(Map.Entry< String, Object > property : properties.entrySet())
+            transformer.setParameter(property.getKey(),property.getValue());
     }
 
 }
