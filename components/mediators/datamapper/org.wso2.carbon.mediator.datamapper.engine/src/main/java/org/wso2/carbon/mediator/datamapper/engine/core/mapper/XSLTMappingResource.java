@@ -37,16 +37,17 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .FIRST_ELEMENT_OF_THE_INPUT;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
+        .NOT_XSLT_COMPATIBLE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .PARAMETER_FILE_ROOT;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .PROPERTY_SEPERATOR;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.RUN_TIME_PROPERTIES;
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .NOT_XSLT_COMPATIBLE;
+        .RUN_TIME_PROPERTIES;
 
 public class XSLTMappingResource {
 
-    private final Map<String,String> runTimeProperties;
+    private final Map<String, String> runTimeProperties;
     private String name;
     private String content;
     private boolean notXSLTCompatible;
@@ -59,7 +60,7 @@ public class XSLTMappingResource {
         this.runTimeProperties = new HashMap<>();
         Document document = getDocument();
         notXSLTCompatible = processConfigurationDetails(document);
-        if(notXSLTCompatible){
+        if (notXSLTCompatible) {
             this.content = null;
         }
     }
@@ -69,7 +70,7 @@ public class XSLTMappingResource {
      *
      * @return Input stream of the xslt stylesheet
      */
-    InputStream getInputStream(){
+    InputStream getInputStream() {
         return new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -78,7 +79,7 @@ public class XSLTMappingResource {
      *
      * @return Input source of the xslt stylesheet
      */
-    private InputSource getInputSource(){
+    private InputSource getInputSource() {
         return new InputSource(new StringReader(content));
     }
 
@@ -103,7 +104,7 @@ public class XSLTMappingResource {
      * @param document xslt stylesheet as a document
      * @return return whether the xslt transformation possible or not
      */
-    private boolean processConfigurationDetails(Document document){
+    private boolean processConfigurationDetails(Document document) {
         Node rootNode = document.getElementsByTagName(PARAMETER_FILE_ROOT).item(0);
         label:
         for (int j = 0; j < rootNode.getAttributes().getLength(); j++) {
@@ -128,7 +129,7 @@ public class XSLTMappingResource {
                     break;
             }
         }
-        if(this.name==null){
+        if (this.name == null) {
             return true;
         }
         return false;

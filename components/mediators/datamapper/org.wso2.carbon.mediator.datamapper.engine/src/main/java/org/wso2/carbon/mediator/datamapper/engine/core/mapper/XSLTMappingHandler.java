@@ -16,6 +16,8 @@
  */
 package org.wso2.carbon.mediator.datamapper.engine.core.mapper;
 
+import net.sf.saxon.TransformerFactoryImpl;
+
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -25,20 +27,18 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Map;
 
-import net.sf.saxon.TransformerFactoryImpl;
-
 public class XSLTMappingHandler {
 
     private final Source xsltSource;
     private Transformer transformer;
 
     /**
-     *
      * @param xsltMappingResource xslt mapping resource
      * @throws TransformerException errors arise from xslt transformation
      */
     public XSLTMappingHandler(XSLTMappingResource xsltMappingResource) throws TransformerException {
-        xsltSource = new javax.xml.transform.stream.StreamSource(xsltMappingResource.getInputStream());
+        xsltSource = new javax.xml.transform.stream.StreamSource(xsltMappingResource
+                .getInputStream());
         TransformerFactory transFact = new TransformerFactoryImpl();
         transformer = transFact.newTransformer(xsltSource);
     }
@@ -47,12 +47,12 @@ public class XSLTMappingHandler {
      * This method performs xslt transformation from input xml to the output xml
      *
      * @param properties set of runtime properties with values
-     * @param inputXML input stream of the input xml message
+     * @param inputXML   input stream of the input xml message
      * @return output xml as a string
      * @throws TransformerException errors arise from xslt transformation
      */
-    public String doMap(Map<String,Object> properties, InputStream inputXML) throws
-            TransformerException{
+    public String doMap(Map<String, Object> properties, InputStream inputXML) throws
+            TransformerException {
 
         setParameters(properties);
         Source xmlSource = new javax.xml.transform.stream.StreamSource(inputXML);
@@ -68,10 +68,10 @@ public class XSLTMappingHandler {
      *
      * @param properties Map of properties with values
      */
-    private void setParameters(Map<String,Object> properties){
+    private void setParameters(Map<String, Object> properties) {
         transformer.clearParameters();
-        for(Map.Entry< String, Object > property : properties.entrySet())
-            transformer.setParameter(property.getKey(),property.getValue());
+        for (Map.Entry<String, Object> property : properties.entrySet())
+            transformer.setParameter(property.getKey(), property.getValue());
     }
 
 }
