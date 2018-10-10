@@ -623,37 +623,37 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 TemplateContext templateContext = templeteContextStack.peek();
                 functionProperties.putAll(templateContext.getMappedValues());
             }
-            for (String propertyName : properties.keySet()) {
-                switch (properties.get(propertyName)) {
+            for (Map.Entry< String, String > property : properties.entrySet()) {
+                switch (property.getValue()) {
                     case DEFAULT_CONTEXT:
                     case SYNAPSE_CONTEXT:
-                        value = synCtx.getProperty(propertyName);
+                        value = synCtx.getProperty(property.getKey());
                         break;
                     case TRANSPORT_CONTEXT:
-                        value = ((Map) axis2MsgCtx.getProperty(TRANSPORT_HEADERS)).get(propertyName);
+                        value = ((Map) axis2MsgCtx.getProperty(TRANSPORT_HEADERS)).get(property.getKey());
                         break;
                     case AXIS2_CONTEXT:
-                        value = axis2MsgCtx.getProperty(propertyName);
+                        value = axis2MsgCtx.getProperty(property.getKey());
                         break;
                     case AXIS2_CLIENT_CONTEXT:
-                        value = axis2MsgCtx.getOptions().getProperty(propertyName);
+                        value = axis2MsgCtx.getOptions().getProperty(property.getKey());
                         break;
                     case OPERATIONS_CONTEXT:
-                        value = axis2MsgCtx.getOperationContext().getProperty(propertyName);
+                        value = axis2MsgCtx.getOperationContext().getProperty(property.getKey());
                         break;
                     case FUNCTION_CONTEXT:
-                        value = functionProperties.get(propertyName);
+                        value = functionProperties.get(property.getKey());
                         break;
                     default:
-                        log.warn(propertyName + " scope is not found. Setting it to an empty " +
+                        log.warn(property.getValue() + " scope is not found. Setting it to an empty " +
                                 "value.");
                         value = EMPTY_STRING;
                 }
                 if (value == null) {
-                    log.warn(propertyName + " not found. Setting it to an empty value.");
+                    log.warn(property.getKey() + " not found. Setting it to an empty value.");
                     value = EMPTY_STRING;
                 }
-                propertyValues.put(propertyName, value);
+                propertyValues.put(property.getKey(), value);
             }
         }
 
