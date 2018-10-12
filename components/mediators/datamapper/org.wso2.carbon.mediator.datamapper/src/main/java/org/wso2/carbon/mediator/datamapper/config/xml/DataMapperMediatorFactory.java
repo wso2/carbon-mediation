@@ -73,8 +73,11 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
                 element.getAttribute(new QName(DataMapperMediatorConstants.OUTPUT_SCHEMA));
         OMAttribute inputTypeAttribute = element.getAttribute(new QName(DataMapperMediatorConstants.INPUT_TYPE));
         OMAttribute outputTypeAttribute = element.getAttribute(new QName(DataMapperMediatorConstants.OUTPUT_TYPE));
+        OMAttribute xsltStyleSheetKeyAttribute = element.getAttribute(new QName
+                (DataMapperMediatorConstants.XSLT_STYLE_SHEET));
 
-		/*
+
+        /*
          * ValueFactory for creating dynamic or static Value and provide methods
 		 * to create value objects
 		 */
@@ -113,6 +116,12 @@ public class DataMapperMediatorFactory extends AbstractMediatorFactory {
             datamapperMediator.setOutputType(outputTypeAttribute.getAttributeValue());
         } else {
             handleException("The output DataType is required for the DataMapper mediator");
+        }
+
+        if (xsltStyleSheetKeyAttribute != null) {
+            Value xsltStyleSheetKeyValue = keyFac.createValue(xsltStyleSheetKeyAttribute
+                    .getLocalName(), element);
+            datamapperMediator.setXsltStyleSheetKey(xsltStyleSheetKeyValue);
         }
 
         processAuditStatus(datamapperMediator, element);
