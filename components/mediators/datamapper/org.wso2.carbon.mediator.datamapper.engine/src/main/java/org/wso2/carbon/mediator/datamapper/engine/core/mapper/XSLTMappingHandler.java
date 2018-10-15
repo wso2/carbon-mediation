@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerFactory;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Map;
+import javax.xml.transform.stream.StreamSource;
 
 public class XSLTMappingHandler {
 
@@ -36,7 +37,7 @@ public class XSLTMappingHandler {
      * @throws TransformerException errors arise from xslt transformation
      */
     public XSLTMappingHandler(XSLTMappingResource xsltMappingResource) throws TransformerException {
-        Source xsltSource = new javax.xml.transform.stream.StreamSource(xsltMappingResource
+        Source xsltSource = new StreamSource(xsltMappingResource
                 .getInputStream());
         TransformerFactory transFact = new TransformerFactoryImpl();
         transformer = transFact.newTransformer(xsltSource);
@@ -54,7 +55,7 @@ public class XSLTMappingHandler {
             TransformerException {
 
         setParameters(properties);
-        Source xmlSource = new javax.xml.transform.stream.StreamSource(inputXML);
+        Source xmlSource = new StreamSource(inputXML);
         StringWriter sw = new StringWriter();
         Result result = new javax.xml.transform.stream.StreamResult(sw);
         transformer.transform(xmlSource, result);
@@ -69,8 +70,9 @@ public class XSLTMappingHandler {
      */
     private void setParameters(Map<String, Object> properties) {
         transformer.clearParameters();
-        for (Map.Entry<String, Object> property : properties.entrySet())
+        for (Map.Entry<String, Object> property : properties.entrySet()){
             transformer.setParameter(property.getKey(), property.getValue());
+        }    
     }
 
 }
