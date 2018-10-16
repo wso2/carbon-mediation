@@ -52,7 +52,7 @@ public class XSLTMappingResource {
     private final Map<String, String> runTimeProperties;
     private String name;
     private String content;
-    private boolean notXSLTCompatible;
+    private boolean xsltCompatible;
 
 
     public XSLTMappingResource(String content) throws SAXException,
@@ -61,8 +61,8 @@ public class XSLTMappingResource {
         this.content = content;
         this.runTimeProperties = new HashMap<>();
         Document document = getDocument();
-        notXSLTCompatible = processConfigurationDetails(document);
-        if (notXSLTCompatible) {
+        xsltCompatible = processConfigurationDetails(document);
+        if (!xsltCompatible) {
             this.content = null;
         }
     }
@@ -107,7 +107,7 @@ public class XSLTMappingResource {
      * @return return whether the xslt transformation possible or not
      */
     private boolean processConfigurationDetails(Document document) {
-        boolean not_compatible = true;
+        boolean compatible = false;
         Node rootNode = document.getElementsByTagName(PARAMETER_FILE_ROOT).item(0);
         for (int j = 0; j < rootNode.getAttributes().getLength(); j++) {
             Node propertyNode = rootNode.getAttributes().item(j);
@@ -126,9 +126,9 @@ public class XSLTMappingResource {
                     break;
                 case NOT_XSLT_COMPATIBLE:
                     if (propertyNode.getNodeValue().equals(XSLT_COMPATIBLE_DEFAULT)) {
-                        not_compatible = false;
+                        compatible = true;
                     } else {
-                        return not_compatible;
+                        return compatible;
                     }
                     break;
                 case FIRST_ELEMENT_OF_THE_INPUT:
@@ -137,9 +137,9 @@ public class XSLTMappingResource {
             }
         }
         if (this.name == null) {
-            return true;
+            return false;
         }
-        return not_compatible;
+        return compatible;
 
     }
 
@@ -166,7 +166,7 @@ public class XSLTMappingResource {
      *
      * @return whether xslt transformation is possible or not
      */
-    public boolean isNotXSLTCompatible() {
-        return notXSLTCompatible;
+    public boolean isXsltCompatible() {
+        return xsltCompatible;
     }
 }

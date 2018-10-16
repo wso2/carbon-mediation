@@ -337,7 +337,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     usingXSLTMapping = false;
                 }
             }
-            if (xsltMappingResource == null || xsltMappingResource.isNotXSLTCompatible()) {
+            if (xsltMappingResource == null || !xsltMappingResource.isXsltCompatible()) {
                 usingXSLTMapping = false;
             }
         }
