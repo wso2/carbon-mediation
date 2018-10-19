@@ -17,6 +17,7 @@
 */
 package org.wso2.carbon.inbound.endpoint.protocol.file;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
@@ -74,6 +75,7 @@ public class FileInjectHandler {
 		
 		ManagedDataSource dataSource = null;;
 		FileObject file = (FileObject)object;
+		InputStream in =  null;
         try {
             org.apache.synapse.MessageContext msgCtx = createMessageContext();
             msgCtx.setProperty("inbound.endpoint.name", name);
@@ -122,7 +124,6 @@ public class FileInjectHandler {
             }
     
             // set the message payload to the message context
-            InputStream in;            
             String streaming = vfsProperties.getProperty(VFSConstants.STREAMING);
             
             if (builder instanceof DataSourceMessageBuilder && "true".equals(streaming)) {
@@ -175,6 +176,11 @@ public class FileInjectHandler {
          if(dataSource != null) {
 				dataSource.destroy();
 			}
+            try {
+                in.close();
+            } catch (IOException e) {
+                throw new SynapseException("Error while closing the input stream", e);
+            }
         }
         return true;
 	}
