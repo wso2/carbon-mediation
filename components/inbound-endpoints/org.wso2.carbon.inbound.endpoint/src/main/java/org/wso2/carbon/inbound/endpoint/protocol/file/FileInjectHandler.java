@@ -174,8 +174,8 @@ public class FileInjectHandler {
             throw new SynapseException("Error while processing the file/folder", e);
         } finally {
             if(dataSource != null) {
-		        dataSource.destroy();
-		    }
+                dataSource.destroy();
+            }
             try {
                 in.close();
             } catch (IOException e) {
