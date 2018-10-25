@@ -177,7 +177,9 @@ public class FileInjectHandler {
                 dataSource.destroy();
             }
             try {
-                in.close();
+                if (in != null) {
+                    in.close();
+                }
             } catch (IOException e) {
                 log.error("Error while closing the input stream", e);
             }
