@@ -179,7 +179,7 @@ public class FileInjectHandler {
             try {
                 in.close();
             } catch (IOException e) {
-                throw new SynapseException("Error while closing the input stream", e);
+                log.error("Error while closing the input stream", e);
             }
         }
         return true;
