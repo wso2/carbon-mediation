@@ -32,6 +32,8 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.securevault.SecretResolver;
+import org.wso2.securevault.SecretResolverFactory;
 
 /**
  * SAP requires to provide destination/server properties. <code>CarbonDestinationDataProvider </code>
@@ -71,6 +73,8 @@ public class CarbonDestinationDataProvider implements DestinationDataProvider, S
     }
 
     public Properties getDestinationProperties(String destination) {
+
+        Properties props = null;
         File file = getConfigurationFile(destination, false);
         if (file != null) {
             if (log.isDebugEnabled()) {
@@ -78,12 +82,24 @@ public class CarbonDestinationDataProvider implements DestinationDataProvider, S
             }
 
             try {
-                Properties props = new Properties();
+                props = new Properties();
                 props.load(new FileInputStream(file));
-                return props;
             } catch (IOException e) {
                 log.error("Error while loading destination configuration from: " + file.getPath(), e);
             }
+            SecretResolver secretResolver = SecretResolverFactory.create(props);
+            for (String key : props.stringPropertyNames()) {
+                if (secretResolver != null && secretResolver.isInitialized()) {
+                    String value = props.getProperty(key);
+                    if (value != null && value.startsWith(SAPConstants.SECRET_ALIAS_PREFIX)) {
+                        value = value.split(SAPConstants.SECRET_ALIAS_PREFIX)[1];
+                        if (secretResolver.isTokenProtected(value)) {
+                            props.put(key, secretResolver.resolve(value));
+                        }
+                    }
+                }
+            }
+            return props;
         }
 
         return null;

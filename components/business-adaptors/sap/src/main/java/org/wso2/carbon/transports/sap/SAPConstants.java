@@ -72,4 +72,6 @@ public class SAPConstants {
     /* bapi for transaction */
     public static final String BAPI_TRANSACTION_COMMIT = "BAPI_TRANSACTION_COMMIT";
     public static final String BAPI_TRANSACTION_ROLLBACK = "BAPI_TRANSACTION_ROLLBACK";
+
+    public static final String SECRET_ALIAS_PREFIX = "secretAlias:";
 }
