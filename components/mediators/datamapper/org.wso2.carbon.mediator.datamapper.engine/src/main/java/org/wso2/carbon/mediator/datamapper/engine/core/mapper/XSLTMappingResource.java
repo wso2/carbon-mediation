@@ -47,6 +47,9 @@ import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineC
 import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
         .XSLT_COMPATIBLE_DEFAULT;
 
+/**
+ * This class contains required resources for the xslt transformation
+ */
 public class XSLTMappingResource {
 
     private final Map<String, String> runTimeProperties;

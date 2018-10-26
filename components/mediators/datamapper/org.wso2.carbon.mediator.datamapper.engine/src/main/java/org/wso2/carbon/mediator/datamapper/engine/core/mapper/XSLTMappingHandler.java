@@ -23,11 +23,15 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Map;
-import javax.xml.transform.stream.StreamSource;
 
+/**
+ * This class handle the transformation of the input xml to the output xml.
+ * Saxon xslt transformation engine is used for the transformation.
+ */
 public class XSLTMappingHandler {
 
     private Transformer transformer;
@@ -37,8 +41,7 @@ public class XSLTMappingHandler {
      * @throws TransformerException errors arise from xslt transformation
      */
     public XSLTMappingHandler(XSLTMappingResource xsltMappingResource) throws TransformerException {
-        Source xsltSource = new StreamSource(xsltMappingResource
-                .getInputStream());
+        Source xsltSource = new StreamSource(xsltMappingResource.getInputStream());
         TransformerFactory transFact = new TransformerFactoryImpl();
         transformer = transFact.newTransformer(xsltSource);
     }
@@ -70,9 +73,9 @@ public class XSLTMappingHandler {
      */
     private void setParameters(Map<String, Object> properties) {
         transformer.clearParameters();
-        for (Map.Entry<String, Object> property : properties.entrySet()){
+        for (Map.Entry<String, Object> property : properties.entrySet()) {
             transformer.setParameter(property.getKey(), property.getValue());
-        }    
+        }
     }
 
 }
