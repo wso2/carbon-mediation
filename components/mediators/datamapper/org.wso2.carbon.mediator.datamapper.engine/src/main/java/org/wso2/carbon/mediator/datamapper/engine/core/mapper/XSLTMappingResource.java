@@ -32,20 +32,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .EMPTY_STRING;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .FIRST_ELEMENT_OF_THE_INPUT;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .NOT_XSLT_COMPATIBLE;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .PARAMETER_FILE_ROOT;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .PROPERTY_SEPERATOR;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .RUN_TIME_PROPERTIES;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .XSLT_COMPATIBLE_DEFAULT;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.EMPTY_STRING;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.FIRST_ELEMENT_OF_THE_INPUT;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.NOT_XSLT_COMPATIBLE;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PARAMETER_FILE_ROOT;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.PROPERTY_SEPERATOR;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.RUN_TIME_PROPERTIES;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.XSLT_COMPATIBLE_DEFAULT;
 
 /**
  * This class contains required resources for the xslt transformation
@@ -59,8 +52,8 @@ public class XSLTMappingResource {
 
 
     public XSLTMappingResource(String content) throws SAXException,
-            IOException,
-            ParserConfigurationException {
+                                                      IOException,
+                                                      ParserConfigurationException {
         this.content = content;
         this.runTimeProperties = new HashMap<>();
         Document document = getDocument();
@@ -97,7 +90,7 @@ public class XSLTMappingResource {
      * @throws ParserConfigurationException
      */
     private Document getDocument() throws SAXException, IOException,
-            ParserConfigurationException {
+                                          ParserConfigurationException {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         return documentBuilder.parse(getInputSource());
@@ -122,7 +115,7 @@ public class XSLTMappingResource {
                         int currentIndex = 0;
                         while (currentIndex < properties.length) {
                             runTimeProperties.put(properties[currentIndex],
-                                    properties[currentIndex + 1]);
+                                                  properties[currentIndex + 1]);
                             currentIndex += 2;
                         }
                     }

@@ -65,26 +65,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
-        .AXIS2_CLIENT_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
-        .AXIS2_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
-        .DEFAULT_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
-        .EMPTY_STRING;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
-        .FUNCTION_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
-        .OPERATIONS_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
-        .SYNAPSE_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
-        .TRANSPORT_CONTEXT;
-import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants
-        .TRANSPORT_HEADERS;
-import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants
-        .ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CLIENT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.AXIS2_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.DEFAULT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.EMPTY_STRING;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.FUNCTION_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.OPERATIONS_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.SYNAPSE_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_CONTEXT;
+import static org.wso2.carbon.mediator.datamapper.config.xml.DataMapperMediatorConstants.TRANSPORT_HEADERS;
+import static org.wso2.carbon.mediator.datamapper.engine.utils.DataMapperEngineConstants.ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE;
 
 /**
  * By using the input schema, output schema and mapping configuration,
@@ -333,7 +323,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
      */
     private void checkForXSLTTransformation(MessageContext synCtx) {
         if (xsltStyleSheetKey != null && (InputOutputDataType.XML.toString().equals(inputType) &&
-                InputOutputDataType.XML.toString().equals(outputType))) {
+                                          InputOutputDataType.XML.toString().equals(outputType))) {
             usingXSLTMapping = true;
             if (xsltMappingResource == null) {
                 String xsltKey = xsltStyleSheetKey.evaluateValue(synCtx);
@@ -342,8 +332,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 } catch (SAXException | IOException |
                         ParserConfigurationException e) {
                     handleException("DataMapper mediator xslt mapping resource generation " +
-                                    "failed", e,
-                            synCtx);
+                                    "failed", e, synCtx);
                     usingXSLTMapping = false;
                 }
             }
@@ -372,10 +361,12 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                     }
                 }
                 outputResult = xsltMappingHandler.doMap(getPropertiesMapForXSLT
-                                (xsltMappingResource.getRunTimeProperties(), synCtx),
-                        getInputStream
-                                (synCtx, inputType,
-                                        xsltMappingResource.getName()));
+                                                                (xsltMappingResource
+                                                                         .getRunTimeProperties(),
+                                                                 synCtx),
+                                                        getInputStream
+                                                                (synCtx, inputType,
+                                                                 xsltMappingResource.getName()));
             }else {
                 Map<String, Map<String, Object>> propertiesMap;
 
@@ -389,10 +380,10 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 propertiesMap = getPropertiesMap(mappingResource.getPropertiesList(), synCtx);
 
                 /* execute mapping on the input stream */
-                outputResult = mappingHandler
-                        .doMap(getInputStream(synCtx, inputType, mappingResource.getInputSchema()
-                                        .getName()),
-                                propertiesMap);
+                outputResult = mappingHandler.doMap(getInputStream(synCtx, inputType,
+                                                                   mappingResource.getInputSchema
+                                                                           ().getName()),
+                                                    propertiesMap);
             }
 
             if (InputOutputDataType.CSV.toString().equals(outputType) &&
@@ -669,8 +660,7 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                         break;
                     default:
                         log.warn(property.getValue() + " scope is not found. Setting it to an " +
-                                "empty " +
-                                "value.");
+                                 "empty value.");
                         value = EMPTY_STRING;
                 }
                 if (value == null) {

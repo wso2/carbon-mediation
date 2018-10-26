@@ -89,8 +89,8 @@ public class DataMapperMediatorSerializer extends AbstractMediatorSerializer {
             ValueSerializer keySerializer = new ValueSerializer();
             keySerializer
                     .serializeValue(dataMapperMediator.getXsltStyleSheetKey(),
-                            DataMapperMediatorConstants.XSLT_STYLE_SHEET,
-                            dataMapperElement);
+                                    DataMapperMediatorConstants.XSLT_STYLE_SHEET,
+                                    dataMapperElement);
         }
 
         dataMapperElement.addAttribute(fac.createOMAttribute(DataMapperMediatorConstants.INPUT_TYPE, nullNS,

@@ -55,7 +55,7 @@ public class XSLTMappingHandler {
      * @throws TransformerException errors arise from xslt transformation
      */
     public String doMap(Map<String, Object> properties, InputStream inputXML) throws
-            TransformerException {
+                                                                              TransformerException {
 
         setParameters(properties);
         Source xmlSource = new StreamSource(inputXML);
