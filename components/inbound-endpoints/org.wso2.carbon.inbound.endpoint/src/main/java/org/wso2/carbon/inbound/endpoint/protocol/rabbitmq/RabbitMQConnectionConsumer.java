@@ -160,6 +160,7 @@ public class RabbitMQConnectionConsumer {
             }
 
             boolean successful = false;
+            boolean mediationError = false;
 
             RabbitMQMessage message = null;
             try {
@@ -173,6 +174,10 @@ public class RabbitMQConnectionConsumer {
                 idle = false;
                 try {
                     successful = injectHandler.invoke(message, inboundName);
+                } catch (Exception e) {         //we need to handle any exception upon injecting to mediation
+                    successful = false;
+                    mediationError = true;
+                    log.error("Error while mediating message", e);
                 } finally {
                     if (successful) {
                         try {
@@ -191,6 +196,18 @@ public class RabbitMQConnectionConsumer {
                             channel.basicRecover();
                         } catch (IOException e) {
                             log.error("Error while trying to roll back transaction", e);
+                        }
+                    }
+
+                    /*
+                     * Upon a mediation error, re-try with a fixed delay. Polling messages cannot be given up
+                     * as there is no way for the user to start the polling task back
+                     */
+                    if (mediationError) {
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
                         }
                     }
                 }
