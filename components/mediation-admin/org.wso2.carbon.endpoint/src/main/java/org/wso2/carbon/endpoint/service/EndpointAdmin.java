@@ -4,6 +4,8 @@ import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.util.AXIOMUtil;
+import org.apache.axis2.clustering.ClusteringAgent;
+import org.apache.axis2.clustering.ClusteringFault;
 import org.apache.axis2.util.XMLPrettyPrinter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +32,7 @@ import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
 import org.wso2.carbon.registry.core.Resource;
 import org.wso2.carbon.registry.core.exceptions.RegistryException;
+import org.wso2.carbon.service.mgt.ServiceConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
@@ -42,6 +45,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -80,6 +85,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             Endpoint ep = getSynapseConfiguration().getEndpoint(endpointName);
             ep.getContext().switchOn();
 
+            sendClusterSyncMessage(EndpointSynchronizeRequest.EndpointOperationType.ACTIVATE, endpointName);
             /**
              * Persist endpoint if it is not deployed via an artifact container
              */
@@ -113,6 +119,7 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             Endpoint ep = getSynapseConfiguration().getEndpoint(endpointName);
             ep.getContext().switchOff();
 
+            sendClusterSyncMessage(EndpointSynchronizeRequest.EndpointOperationType.DEACTIVATE, endpointName);
             /**
              * Persist endpoint if it is not deployed via an artifact container
              */
@@ -1005,5 +1012,47 @@ public class EndpointAdmin extends AbstractServiceBusAdmin {
             handleFault("Error while retrieving dynamic endpoint count", e);
         }
         return 0;
+    }
+
+    private void sendClusterSyncMessage(EndpointSynchronizeRequest.EndpointOperationType epType, String endpointName) {
+        // For sending clustering messages we need to use the super-tenant's AxisConfig (Main ServerAxisConfiguration)
+        // because we are using the clustering facility offered by the ST in the tenants
+        int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+
+        try {
+            ClusteringAgent clusteringAgent = ConfigHolder.getInstance().getAxisConfiguration().getClusteringAgent();
+            if (clusteringAgent != null) {
+                int numberOfRetries = 0;
+                UUID messageId = UUID.randomUUID();
+                EndpointSynchronizeRequest request =
+                        new EndpointSynchronizeRequest(tenantId, tenantDomain, messageId, endpointName, epType);
+                while (numberOfRetries < ServiceConstants.MAX_RETRY_COUNT) {
+                    try {
+                        clusteringAgent.sendMessage(request, true);
+                        log.info("Sent [" + request + "]");
+                        break;
+                    } catch (ClusteringFault e) {
+                        numberOfRetries++;
+                        if (numberOfRetries < ServiceConstants.MAX_RETRY_COUNT) {
+                            log.warn("Could not send EndpointSynchronizeRequest for tenant " +
+                                    + tenantId + ". Retry will be attempted in 2s. Request: " + request, e);
+                        } else {
+                            log.error("Could not send EndpointSynchronizeRequest for tenant " +
+                                    + tenantId + ". Several retries failed. Request:" + request, e);
+                        }
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(ServiceConstants.RETRY_INTERVAL);
+                        } catch (InterruptedException ignored) {
+                            Thread.currentThread().interrupt();
+                            log.error("Could not send EndpointSynchronizeRequest for tenant " +
+                                    + tenantId + ". Request:" + request, e);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Could not send EndpointSynchronizeRequest for tenant " + tenantId, e);
+        }
     }
 }
