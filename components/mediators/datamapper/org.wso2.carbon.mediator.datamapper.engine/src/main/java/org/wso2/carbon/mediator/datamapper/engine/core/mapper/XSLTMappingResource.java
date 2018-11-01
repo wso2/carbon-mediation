@@ -107,13 +107,19 @@ public class XSLTMappingResource {
         Node rootNode = document.getElementsByTagName(PARAMETER_FILE_ROOT).item(0);
         for (int j = 0; j < rootNode.getAttributes().getLength(); j++) {
             Node propertyNode = rootNode.getAttributes().item(j);
+
+            // Process configuration details passed as attributes
             switch (propertyNode.getNodeName()) {
                 case RUN_TIME_PROPERTIES:
+                    //Runtime properties are passed as "propertyName1,propertyScope1,proertyName2,propertyScope2, .."
+                    //Property name followed by its scope, separated by a comma
                     String runTimePropertyString = propertyNode.getNodeValue();
                     if (!EMPTY_STRING.equals(runTimePropertyString)) {
+                        //first element of the array is a property name followed by its scope.
                         String[] properties = runTimePropertyString.split(PROPERTY_SEPERATOR);
                         int currentIndex = 0;
                         while (currentIndex < properties.length) {
+                            //adding property name and its scope to the runTimeProperties map
                             runTimeProperties.put(properties[currentIndex],
                                                   properties[currentIndex + 1]);
                             currentIndex += 2;
