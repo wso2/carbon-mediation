@@ -64,6 +64,7 @@ public class FilePollingConsumer {
     private Long lastRanTime;
     private int lastCycle;
     private FileInjectHandler injectHandler;
+    private Long waitTimeBeforeRead;
 
     private String fileURI;
     private FileObject fileObject;
@@ -431,6 +432,17 @@ public class FilePollingConsumer {
             }
 
         }
+
+        waitTimeBeforeRead = null;
+        String strWaitTimeBeforeRead = vfsProperties.getProperty(VFSConstants.WAIT_TIME_BEFORE_READ);
+        if(strWaitTimeBeforeRead != null) {
+            try {
+                waitTimeBeforeRead = Long.parseLong(strWaitTimeBeforeRead);
+            } catch (Exception e) {
+                waitTimeBeforeRead = null;
+                log.warn("VFS Wait time before read is not set properly. Current value is: " + strWaitTimeBeforeRead, e);
+            }
+        }
     }
 
     private Map<String, String> parseSchemeFileOptions(String fileURI) {
@@ -522,11 +534,12 @@ public class FilePollingConsumer {
                 continue;
             }
             boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child);
+            boolean canBeRead = VFSUtils.canBeRead(child, waitTimeBeforeRead);
             
             // child's file name matches the file name pattern or process all
             // files now we try to get the lock and process
             if ((strFilePattern == null || child.getName().getBaseName().matches(strFilePattern))
-                    && !isFailedRecord) {
+                    && !isFailedRecord && canBeRead) {
 
                 if (log.isDebugEnabled()) {
                     log.debug("Matching file : " + child.getName().getBaseName());
@@ -610,6 +623,8 @@ public class FilePollingConsumer {
                     log.debug("File '" + VFSUtils.maskURLPassword(fileObject.getURL().toString())
                             + "' has been marked as a failed record, it will not " + "process");
                 }
+            } else if (!canBeRead) {
+                log.debug("File cannot be read as it has to wait for some time: " + child.getName().getBaseName());
             }
 
             //close the file system after processing
