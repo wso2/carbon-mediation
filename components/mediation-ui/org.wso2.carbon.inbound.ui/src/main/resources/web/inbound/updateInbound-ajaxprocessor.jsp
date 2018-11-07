@@ -81,7 +81,9 @@
 		           sParams.add((new ParamDTO("coordination",request.getParameter("coordination"))));
                 }else if(strKey.startsWith("pinnedServers")) {
                    sParams.add(new ParamDTO("pinnedServers", request.getParameter("pinnedServers")));
-		        }else if(strKey.startsWith("concurrent.consumers")) {
+                }else if(strKey.startsWith("waitTimeBeforeRead")) {
+                   sParams.add(new ParamDTO("waitTimeBeforeRead", request.getParameter("waitTimeBeforeRead")));
+                }else if(strKey.startsWith("concurrent.consumers")) {
                     sParams.add(new ParamDTO("concurrent.consumers", request.getParameter("concurrent.consumers")));
                 }else if(strKey.startsWith("zookeeper.") || strKey.startsWith("group.id") || strKey.startsWith("auto.")|| strKey.startsWith("topic.filter")|| strKey.equals("topics")||strKey.startsWith("filter.from")||strKey.startsWith("consumer.type")
                       || strKey.startsWith("thread.count")|| strKey.startsWith("simple.")|| strKey.startsWith("content.type") || strKey.startsWith("offsets.") || strKey.startsWith("socket.") || strKey.startsWith("fetch.")
