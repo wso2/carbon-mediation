@@ -438,7 +438,7 @@ public class FilePollingConsumer {
         if(strWaitTimeBeforeRead != null) {
             try {
                 waitTimeBeforeRead = Long.parseLong(strWaitTimeBeforeRead);
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 waitTimeBeforeRead = null;
                 log.warn("VFS Wait time before read is not set properly. Current value is: " + strWaitTimeBeforeRead, e);
             }
