@@ -534,12 +534,12 @@ public class FilePollingConsumer {
                 continue;
             }
             boolean isFailedRecord = VFSUtils.isFailRecord(fsManager, child);
-            boolean canBeRead = VFSUtils.canBeRead(child, waitTimeBeforeRead);
+            boolean isReadyToRead = VFSUtils.isReadyToRead(child, waitTimeBeforeRead);
             
             // child's file name matches the file name pattern or process all
             // files now we try to get the lock and process
             if ((strFilePattern == null || child.getName().getBaseName().matches(strFilePattern))
-                    && !isFailedRecord && canBeRead) {
+                    && !isFailedRecord && isReadyToRead) {
 
                 if (log.isDebugEnabled()) {
                     log.debug("Matching file : " + child.getName().getBaseName());
@@ -623,7 +623,7 @@ public class FilePollingConsumer {
                     log.debug("File '" + VFSUtils.maskURLPassword(fileObject.getURL().toString())
                             + "' has been marked as a failed record, it will not " + "process");
                 }
-            } else if (!canBeRead) {
+            } else if (!isReadyToRead) {
                 log.debug("File cannot be read as it has to wait for some time: " + child.getName().getBaseName());
             }
 
