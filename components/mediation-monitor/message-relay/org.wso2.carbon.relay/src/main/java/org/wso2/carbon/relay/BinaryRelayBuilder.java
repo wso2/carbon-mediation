@@ -53,7 +53,12 @@ public class BinaryRelayBuilder implements Builder{
             messageContext.setProperty(Constants.Configuration.CONTENT_TYPE, contentType);
 
 			//We will create a SOAP message, which holds the input message as a blob
-			SOAPFactory factory = OMAbstractFactory.getSOAP12Factory();
+			SOAPFactory factory;
+			if (messageContext.isSOAP11()) {
+				factory = OMAbstractFactory.getSOAP11Factory();
+			} else {
+				factory = OMAbstractFactory.getSOAP12Factory();
+			}
 			SOAPEnvelope env = factory.getDefaultEnvelope();
             if (inputStream != null) {
                 OMNamespace ns = factory.createOMNamespace(
