@@ -755,4 +755,19 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         }
     }
 
+
+    /*
+     * Get the poisonMessage passed from the synapse
+     */
+
+    public String poisonMessage(String processorName)
+    {
+        SynapseConfiguration configuration = getSynapseConfiguration();
+        String msg = configuration.getPoisonMessage(processorName) + ":ADMIN SERVICE";
+
+        return msg;
+    }
+
+
+
 }

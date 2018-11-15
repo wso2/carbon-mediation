@@ -184,6 +184,11 @@
         });
     }
 
+    function viewPoisonMessage(name)
+    {
+        document.location.href = "managePoisonMessage.jsp?" + "messageProcessorName=" + name;
+    }
+
 </script>
 
 <div id="middle">
@@ -321,6 +326,12 @@
                    id="delete_link" class="icon-link"
                    style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
+                <a onclick="#" href="#"
+                   class="icon-link"
+                   style="color:gray;background-image:url(../admin/images/edit.gif);">ViewMessage</a>
+
+
+
                 <% } else { %>
                 <a onclick="editRow('<%= type%>','<%=mspData.getName()%>')" href="#"
                    class="icon-link"
@@ -356,6 +367,11 @@
                    id="delete_link" class="icon-link"
                    style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                         key="delete"/></a>
+                <a onclick="viewPoisonMessage('<%= mspData.getName()%>')" href="#"
+                   class="icon-link"
+                   style="background-image:url(../admin/images/edit.gif);">ViewMessage</a>
+
+
                 <% } else { %>
                 <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
                    class="icon-link"
