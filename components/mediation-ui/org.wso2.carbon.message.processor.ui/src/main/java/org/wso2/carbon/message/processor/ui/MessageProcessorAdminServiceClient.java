@@ -428,4 +428,19 @@ public class MessageProcessorAdminServiceClient {
         log.error(message);
         throw new Exception(message);
     }
+
+    public String poisonMessage(String name) throws Exception
+    {
+        String msg = null;
+
+        try{
+            if(name!=null) {
+                msg = stub.poisonMessage(name);
+            }
+        } catch (Exception e) {
+            handleException(e);
+        }
+
+        return msg;
+    }
 }
