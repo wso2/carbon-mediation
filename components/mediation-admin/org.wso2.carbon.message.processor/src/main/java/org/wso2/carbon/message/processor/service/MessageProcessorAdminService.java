@@ -23,6 +23,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.MessageContext;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MessageProcessorFactory;
 import org.apache.synapse.config.xml.MessageProcessorSerializer;
@@ -763,7 +764,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     public String poisonMessage(String processorName)
     {
         SynapseConfiguration configuration = getSynapseConfiguration();
-        String msg = configuration.getPoisonMessage(processorName) + ":ADMIN SERVICE";
+        String msg = configuration.getPoisonMessage(processorName);
 
         return msg;
     }
