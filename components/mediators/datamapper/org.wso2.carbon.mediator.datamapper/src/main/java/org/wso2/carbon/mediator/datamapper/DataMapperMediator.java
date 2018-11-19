@@ -374,15 +374,13 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                         .getPropertyValue(ORG_APACHE_SYNAPSE_DATAMAPPER_EXECUTOR_POOL_SIZE, null);
 
                 MappingHandler mappingHandler = new MappingHandler(mappingResource, inputType, outputType,
-
                         dmExecutorPoolSize);
 
                 propertiesMap = getPropertiesMap(mappingResource.getPropertiesList(), synCtx);
 
                 /* execute mapping on the input stream */
                 outputResult = mappingHandler.doMap(getInputStream(synCtx, inputType,
-                                                                   mappingResource.getInputSchema
-                                                                           ().getName()),
+                                                                   mappingResource.getInputSchema().getName()),
                                                     propertiesMap);
             }
 
