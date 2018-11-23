@@ -267,24 +267,26 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
             }
         }
 
-        checkForXSLTTransformation(synCtx);
-
-        if (mappingResource == null && !usingXSLTMapping) {
-            String configKey = mappingConfigurationKey.evaluateValue(synCtx);
-            String inSchemaKey = inputSchemaKey.evaluateValue(synCtx);
-            String outSchemaKey = outputSchemaKey.evaluateValue(synCtx);
-            if (!(StringUtils.isNotEmpty(configKey) && StringUtils.isNotEmpty(inSchemaKey) &&
-                    StringUtils.isNotEmpty(outSchemaKey))) {
-                handleException("DataMapper mediator : Invalid configurations", synCtx);
-            } else {
-                // mapping resources needed to get the final output
-                try {
-                    mappingResource = getMappingResource(synCtx, configKey, inSchemaKey, outSchemaKey);
-                } catch (IOException e) {
-                    handleException("DataMapper mediator mapping resource generation failed", e, synCtx);
+        if (mappingResource == null && xsltMappingResource == null) {
+            checkForXSLTTransformation(synCtx);
+            if (mappingResource == null && !usingXSLTMapping) {
+                String configKey = mappingConfigurationKey.evaluateValue(synCtx);
+                String inSchemaKey = inputSchemaKey.evaluateValue(synCtx);
+                String outSchemaKey = outputSchemaKey.evaluateValue(synCtx);
+                if (!(StringUtils.isNotEmpty(configKey) && StringUtils.isNotEmpty(inSchemaKey) &&
+                      StringUtils.isNotEmpty(outSchemaKey))) {
+                    handleException("DataMapper mediator : Invalid configurations", synCtx);
+                } else {
+                    // mapping resources needed to get the final output
+                    try {
+                        mappingResource = getMappingResource(synCtx, configKey, inSchemaKey, outSchemaKey);
+                    } catch (IOException e) {
+                        handleException("DataMapper mediator mapping resource generation failed", e, synCtx);
+                    }
                 }
             }
         }
+
         // Does message conversion and gives the final result
         transform(synCtx, getInputType(), getOutputType());
         //setting output type in the axis2 message context
@@ -360,14 +362,10 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                         }
                     }
                 }
-                outputResult = xsltMappingHandler.doMap(getPropertiesMapForXSLT
-                                                                (xsltMappingResource
-                                                                         .getRunTimeProperties(),
-                                                                 synCtx),
-                                                        getInputStream
-                                                                (synCtx, inputType,
-                                                                 xsltMappingResource.getName()));
-            }else {
+                outputResult = xsltMappingHandler.doMap(
+                        getPropertiesMapForXSLT(xsltMappingResource.getRunTimeProperties(), synCtx),
+                        getInputStream(synCtx, inputType, xsltMappingResource.getName()));
+            } else {
                 Map<String, Map<String, Object>> propertiesMap;
 
                 String dmExecutorPoolSize = SynapsePropertiesLoader
@@ -379,9 +377,9 @@ public class DataMapperMediator extends AbstractMediator implements ManagedLifec
                 propertiesMap = getPropertiesMap(mappingResource.getPropertiesList(), synCtx);
 
                 /* execute mapping on the input stream */
-                outputResult = mappingHandler.doMap(getInputStream(synCtx, inputType,
-                                                                   mappingResource.getInputSchema().getName()),
-                                                    propertiesMap);
+                outputResult = mappingHandler.doMap(
+                        getInputStream(synCtx, inputType, mappingResource.getInputSchema().getName()),
+                        propertiesMap);
             }
 
             if (InputOutputDataType.CSV.toString().equals(outputType) &&
