@@ -330,9 +330,18 @@
                   id="delete_link" class="icon-link"
                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                   key="delete"/></a>
-               <a onclick="#" href="#"
+               
+                <!--Changed the button to pressable while Message Processor is active -->  
+                <!-- THIS IS THE PREFERRED SCRIPT 
+                <a onclick="#" href="#"
                   class="icon-link"
                   style="color:gray;background-image:url(../admin/images/edit.gif);">ViewMessage</a>
+                -->
+                
+                <!-- THIS IS THE TEST SCRIPT -->
+                 <a onclick="viewPoisonMessage('<%= mspData.getName()%>')" href="#"
+                  class="icon-link"
+                  style="background-image:url(../admin/images/edit.gif);">ViewMessage</a>
 
 
                 <% } else { %>

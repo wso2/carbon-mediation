@@ -57,36 +57,58 @@
         String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
         
         MessageProcessorAdminServiceClient client = new MessageProcessorAdminServiceClient(cookie,url,configContext);
-        
-        //request.getParameter("messageProcessorName")
         String processorName = request.getParameter("messageProcessorName");
-        String msg = "Msg defined in managePoisonMessage.jsp SCRIPT. Processor Name :" + processorName;
         
+        String msg = "Msg defined in managePoisonMessage.jsp SCRIPT. Processor Name :" + processorName;
         
         if( processorName != null )
         {
             try{
-                msg = client.poisonMessage(processorName);
+                msg = client.getPoisonMessage(processorName);
             } catch (Throwable e )
             {
                 msg = "Couldnt get Poison Message : " + e.getMessage();
                 CarbonUIMessage.sendCarbonUIMessage(msg,CarbonUIMessage.ERROR, request); 
             }
             
-        }
+        } 
         
+//        public void popPoisonMessage()
+//        {
+//            client.popPoisonMessage(processorName);
+//        }
     %>
-   
-    
-    
+     
 <div id = "middle">
-   <h2><fmt:message key="message.message.Processors"/></h2>
+   <h2>Message Processor : Message Management</h2>
 
       <div id="workArea" style="background-color:#F4F4F4;">
          <h3> <%=msg%> </h3>
       </div>
-</div>
-    
-         
+      
+<!--      <input id ="popMsgBtn" type="submit" />
+      
+      
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#popMsgBtn').click(function() {
+                    $.ajax({
+                        type: "post",
+                        url: "/path",
+                        data:"",
+                        sucess:function() {
+                            //
+                        }     
+                    });
+                });
+            });
+        </script>
+-->
 
+</div>
+      
+         
 </fmt:bundle>
+
+
+    

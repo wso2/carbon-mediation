@@ -23,6 +23,7 @@ import org.apache.axis2.client.ServiceClient;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.message.processor.MessageProcessor;
 import org.wso2.carbon.message.processor.service.xsd.MessageProcessorMetaData;
 import org.wso2.carbon.message.processor.stub.MessageProcessorAdminServiceStub;
 import org.wso2.carbon.message.processor.ui.utils.MessageProcessorData;
@@ -429,13 +430,13 @@ public class MessageProcessorAdminServiceClient {
         throw new Exception(message);
     }
 
-    public String poisonMessage(String name) throws Exception
+    public String getPoisonMessage(String processorName) throws Exception
     {
         String msg = null;
 
         try{
-            if(name!=null) {
-                msg = stub.poisonMessage(name);
+            if(processorName!=null) {
+                msg = stub.getPoisonMessage(processorName);
             }
         } catch (Exception e) {
             handleException(e);
@@ -443,4 +444,23 @@ public class MessageProcessorAdminServiceClient {
 
         return msg;
     }
+
+
+    public void popPoisonMessage(String processorName) throws Exception
+    {
+
+        try{
+            if(processorName!=null)
+            {
+                stub.popPoisonMessage(processorName);
+            }
+        } catch (Exception e)
+        {
+            handleException(e);
+        }
+
+
+    }
+
+
 }
