@@ -35,6 +35,11 @@
         payloadFactoryMediator.setType(type);
     }
 
+    String escapexmlchars = request.getParameter("escapexmlchar");
+    if (escapexmlchars != null) {
+        payloadFactoryMediator.setEscapeXmlChars(Boolean.parseBoolean(escapexmlchars));
+    }
+
     int maxArgCount = Integer.parseInt(request.getParameter("argCount"));
     XPathFactory xPathFactory = XPathFactory.getInstance();
 
