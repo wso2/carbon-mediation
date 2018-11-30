@@ -430,13 +430,13 @@ public class MessageProcessorAdminServiceClient {
         throw new Exception(message);
     }
 
-    public String getPoisonMessage(String processorName) throws Exception
+    public String getMessage(String processorName) throws Exception
     {
         String msg = null;
 
         try{
             if(processorName!=null) {
-                msg = stub.getPoisonMessage(processorName);
+                msg = stub.getMessage(processorName);
             }
         } catch (Exception e) {
             handleException(e);
@@ -446,13 +446,13 @@ public class MessageProcessorAdminServiceClient {
     }
 
 
-    public void popPoisonMessage(String processorName) throws Exception
+    public void popMessage(String processorName) throws Exception
     {
 
         try{
             if(processorName!=null)
             {
-                stub.popPoisonMessage(processorName);
+                stub.popMessage(processorName);
             }
         } catch (Exception e)
         {

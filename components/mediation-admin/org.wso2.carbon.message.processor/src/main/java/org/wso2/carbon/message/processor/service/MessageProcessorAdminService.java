@@ -763,7 +763,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
      * Get the poisonMessage passed from the synapse
      */
 
-    public String getPoisonMessage(String processorName) throws Exception
+    public String getMessage(String processorName) throws Exception
     {
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
@@ -772,7 +772,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         MessageConsumer messageConsumer = configuration.getMessageStore(messageStoreName).getConsumer();
 
         try {
-            return configuration.getPoisonMessage(messageConsumer);
+            return configuration.getMessage(messageConsumer);
         } catch (Exception e)
         {
             String msg = "Error at MessageProcessorAdminService." + e;
@@ -785,7 +785,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
      */
 
 
-    public void popPoisonMessage(String processorName)
+    public void popMessage(String processorName)
     {
 
         SynapseConfiguration configuration = getSynapseConfiguration();
@@ -795,7 +795,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         MessageConsumer messageConsumer = configuration.getMessageStore(messageStoreName).getConsumer();
 
         try {
-             configuration.getPoisonMessage(messageConsumer);
+             configuration.popMessage(messageConsumer);
         } catch (Exception e)
         {
            log.error("Failed to pop the message", e);

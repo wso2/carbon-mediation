@@ -187,9 +187,9 @@
         });
     }
 
-    function viewPoisonMessage(name)
+    function viewMessage(name)
     {
-      document.location.href = "managePoisonMessage.jsp?" + "messageProcessorName=" + name;
+      document.location.href = "manageMessage.jsp?" + "messageProcessorName=" + name;
     }
 
 
@@ -330,20 +330,10 @@
                   id="delete_link" class="icon-link"
                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                   key="delete"/></a>
-               
-                <!--Changed the button to pressable while Message Processor is active -->  
-                <!-- THIS IS THE PREFERRED SCRIPT 
                 <a onclick="#" href="#"
                   class="icon-link"
                   style="color:gray;background-image:url(../admin/images/edit.gif);">ViewMessage</a>
-                -->
-                
-                <!-- THIS IS THE TEST SCRIPT -->
-                 <a onclick="viewPoisonMessage('<%= mspData.getName()%>')" href="#"
-                  class="icon-link"
-                  style="background-image:url(../admin/images/edit.gif);">ViewMessage</a>
-
-
+              
                 <% } else { %>
                 <a onclick="editRow('<%= type%>','<%=mspData.getName()%>')" href="#"
                    class="icon-link"
@@ -379,7 +369,7 @@
                   id="delete_link" class="icon-link"
                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                   key="delete"/></a>
-               <a onclick="viewPoisonMessage('<%= mspData.getName()%>')" href="#"
+               <a onclick="viewMessage('<%= mspData.getName()%>')" href="#"
                   class="icon-link"
                   style="background-image:url(../admin/images/edit.gif);">ViewMessage</a>
 

@@ -64,7 +64,7 @@
         if( processorName != null )
         {
             try{
-                msg = client.getPoisonMessage(processorName);
+                msg = client.getMessage(processorName);
             } catch (Throwable e )
             {
                 msg = "Couldnt get Poison Message : " + e.getMessage();
@@ -72,42 +72,28 @@
             }
             
         } 
+
+        msg = msg.replace("<","&lt");
+        msg = msg.replace(">","&gt");
         
-//        public void popPoisonMessage()
-//        {
-//            client.popPoisonMessage(processorName);
-//        }
     %>
      
 <div id = "middle">
    <h2>Message Processor : Message Management</h2>
 
       <div id="workArea" style="background-color:#F4F4F4;">
-         <h3> <%=msg%> </h3>
+          <pre> <h3> <%=msg%> </h3> </pre>
       </div>
-      
-<!--      <input id ="popMsgBtn" type="submit" />
-      
-      
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $('#popMsgBtn').click(function() {
-                    $.ajax({
-                        type: "post",
-                        url: "/path",
-                        data:"",
-                        sucess:function() {
-                            //
-                        }     
-                    });
-                });
-            });
-        </script>
--->
-
+     
+      <input type="button" value="Pop Message"/>
+     
+      <script>
+//          function popMessage()
+//          {
+//          }
+      </script>
 </div>
-      
-         
+              
 </fmt:bundle>
 
 
