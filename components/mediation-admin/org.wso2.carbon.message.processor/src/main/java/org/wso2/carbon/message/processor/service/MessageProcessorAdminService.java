@@ -770,14 +770,19 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
 
         final String messageStoreName = processor.getMessageStoreName();
         MessageConsumer messageConsumer = configuration.getMessageStore(messageStoreName).getConsumer();
+        String msg = null;
 
         try {
-            return configuration.getMessage(messageConsumer);
+            String msg = configuration.getMessage(messageConsumer);
         } catch (Exception e)
         {
-            String msg = "Error at MessageProcessorAdminService." + e;
-            return msg;
+            log.error("MessageProcessorAdminService : Failed to get message" + e);
         }
+
+        messageConsumer.cleanup(); //Removes the subscription after getting the message.
+
+        return msg;
+
     }
 
     /*

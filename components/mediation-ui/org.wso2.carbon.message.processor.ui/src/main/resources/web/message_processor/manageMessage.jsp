@@ -78,6 +78,20 @@
         
     %>
      
+    <script>
+          function popMessage(name){
+              CARBON.showConfirmationDialog("<fmt:message key="Do.you.want.to.pop.the.message?"/>", function () {
+            jQuery.ajax({
+                type: "POST",
+                url: "popMessageFromQueue.jsp",
+                data: {"processorName": name},
+            });
+        });
+              
+          }
+    </script>
+    
+    
 <div id = "middle">
    <h2>Message Processor : Message Management</h2>
 
@@ -85,13 +99,8 @@
           <pre> <h3> <%=msg%> </h3> </pre>
       </div>
      
-      <input type="button" value="Pop Message"/>
+      <button onclick="popMessage(<%=processorName%>)">Click me</button>
      
-      <script>
-//          function popMessage()
-//          {
-//          }
-      </script>
 </div>
               
 </fmt:bundle>
