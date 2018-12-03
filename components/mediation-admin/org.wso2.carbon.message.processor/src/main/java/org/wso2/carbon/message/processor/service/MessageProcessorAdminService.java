@@ -773,7 +773,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         String msg = null;
 
         try {
-            String msg = configuration.getMessage(messageConsumer);
+            msg = configuration.getMessage(messageConsumer);
         } catch (Exception e)
         {
             log.error("MessageProcessorAdminService : Failed to get message" + e);
@@ -782,7 +782,6 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         messageConsumer.cleanup(); //Removes the subscription after getting the message.
 
         return msg;
-
     }
 
     /*
