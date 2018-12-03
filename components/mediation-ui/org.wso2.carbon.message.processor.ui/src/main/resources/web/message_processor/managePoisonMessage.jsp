@@ -80,35 +80,39 @@
 
     <div id = "middle">
         <h2><%=processorName%> : Message Management</h2>
+
+        <% if(msg != null) { %>
         <div id="workArea" style="background-color:#F4F4F4;">
-            <% if(msg != null) { %>
-            <pre> <h3><%=msg%></h3> </pre> <br>
-            <input type="button" class="button" onclick="popMessage('<%=processorName%>')" value = "Pop Message">  
-            <% } else { %>
-            <pre> <h3>No message in the subscribed Queue</h3> </pre> <br>
-            <input type="button" class="button" value = "Pop Message" disabled>  
-            <% } %>   
+            <pre> <h3><%=msg%></h3> </pre> <br> 
         </div>
-
-        <script type="text/javascript">
-            function popMessage(name)
-            {
-                CARBON.showConfirmationDialog("<fmt:message key="Do.you.want.to.pop.the.message?"/>", function () {
-                    jQuery.ajax({
-                        type: "POST",
-                        url: "popMessageFromQueue.jsp",
-                        data: {"processorName": name},
-                        success: function (result, status, xhr) {
-                            alert("Message has been sucessfully popped");
-                        }
-                    });
-                });
-            }
-
-        </script>
-
-
+        <input type="button" class="button" onclick="popMessage('<%=processorName%>')" value = "Pop Message">  
+        <% } else { %>
+        <div id="workArea" style="background-color:#dacff4;">
+            <pre> <h3>No message in the subscribed Queue</h3> </pre> <br>
+        </div>
+        <input type="button" class="button" value = "Pop Message" disabled>  
+        <% } %>   
     </div>
+
+    <script type="text/javascript">
+        function popMessage(name)
+        {
+            CARBON.showConfirmationDialog("Do you want to pop the message?", function () {
+                jQuery.ajax({
+                    type: "POST",
+                    url: "popMessageFromQueue.jsp",
+                    data: {"processorName": name},
+                    success: function (result, status, xhr) {
+                        //
+                    }
+                });
+            });
+        }
+
+    </script>
+
+
+</div>
 
 </fmt:bundle>
 

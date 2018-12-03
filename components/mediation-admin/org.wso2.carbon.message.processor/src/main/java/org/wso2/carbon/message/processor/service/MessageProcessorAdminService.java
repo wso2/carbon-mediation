@@ -766,45 +766,43 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     public String getMessage(String processorName) throws Exception
     {
         SynapseConfiguration configuration = getSynapseConfiguration();
-        MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
-
-        final String messageStoreName = processor.getMessageStoreName();
-        MessageConsumer messageConsumer = configuration.getMessageStore(messageStoreName).getConsumer();
+        MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
         String msg = null;
 
         try {
             msg = configuration.getMessage(messageConsumer);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             log.error("MessageProcessorAdminService : Failed to get message" + e);
         }
 
         messageConsumer.cleanup(); //Removes the subscription after getting the message.
-
         return msg;
     }
 
     /*
      * Send request to Synapse to pop the poisonMessage
      */
-
-
     public void popMessage(String processorName)
     {
 
         SynapseConfiguration configuration = getSynapseConfiguration();
-        MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
-
-        final String messageStoreName = processor.getMessageStoreName();
-        MessageConsumer messageConsumer = configuration.getMessageStore(messageStoreName).getConsumer();
+        MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
 
         try {
              configuration.popMessage(messageConsumer);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
            log.error("Failed to pop the message", e);
         }
 
+        messageConsumer.cleanup(); // Removes the subscription after popping the message
+    }
+
+    private MessageConsumer getMessageConsumer(SynapseConfiguration configuration, String processorName)
+    {
+        MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
+        final String messageStoreName = processor.getMessageStoreName();
+        MessageConsumer messageConsumer = configuration.getMessageStore(messageStoreName).getConsumer();
+        return messageConsumer;
     }
 
 }
