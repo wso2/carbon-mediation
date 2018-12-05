@@ -189,7 +189,7 @@
 
     function viewMessage(name)
     {
-      document.location.href = "managePoisonMessage.jsp?" + "messageProcessorName=" + name;
+      document.location.href = "manageMessage.jsp?" + "messageProcessorName=" + name;
     }
 
 

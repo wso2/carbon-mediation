@@ -51,10 +51,6 @@
             CarbonUIMessage.sendCarbonUIMessage(msg,CarbonUIMessage.ERROR, request);     
         }
     }
-    else {
-        msg = "Message Processor name is null";
-        CarbonUIMessage.sendCarbonUIMessage(msg,CarbonUIMessage.ERROR, request);     
-    }
     
 %>    
 </body>
