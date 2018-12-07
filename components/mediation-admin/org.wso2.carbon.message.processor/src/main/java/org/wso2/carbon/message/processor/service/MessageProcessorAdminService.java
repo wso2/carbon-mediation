@@ -28,6 +28,7 @@ import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MessageProcessorFactory;
 import org.apache.synapse.config.xml.MessageProcessorSerializer;
 import org.apache.synapse.message.MessageConsumer;
+import org.apache.synapse.message.MessageProducer;
 import org.apache.synapse.message.processor.MessageProcessor;
 import org.apache.synapse.message.processor.impl.ScheduledMessageProcessor;
 import org.apache.synapse.message.processor.impl.failover.FailoverMessageForwardingProcessorView;
@@ -36,6 +37,7 @@ import org.apache.synapse.message.processor.impl.forwarder.MessageForwardingProc
 import org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor;
 import org.apache.synapse.message.processor.impl.sampler.SamplingProcessor;
 import org.apache.synapse.message.processor.impl.sampler.SamplingProcessorView;
+import org.opensaml.xml.signature.P;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
@@ -763,8 +765,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
      * Get the poisonMessage passed from the synapse
      */
 
-    public String getMessage(String processorName) throws Exception
-    {
+    public String getMessage(String processorName) throws Exception {
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
         String msg = null;
@@ -782,8 +783,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     /*
      * Send request to Synapse to pop the poisonMessage
      */
-    public void popMessage(String processorName)
-    {
+    public void popMessage(String processorName) {
 
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
@@ -797,8 +797,27 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         messageConsumer.cleanup(); // Removes the subscription after popping the message
     }
 
-    private MessageConsumer getMessageConsumer(SynapseConfiguration configuration, String processorName)
-    {
+    public void redirectMessage(String processorName){
+        SynapseConfiguration configuration = getSynapseConfiguration();
+        MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
+        final String messageStoreName = processor.getMessageStoreName();
+
+        MessageConsumer messageConsumer =configuration.getMessageStore(messageStoreName).getConsumer();
+        MessageProducer messageProducer = configuration.getMessageStore("Test").getProducer();
+
+
+
+        try {
+            configuration.redirectMessage(messageProducer, messageConsumer);
+        } catch (Exception e) {
+            log.error("Failed to pop the message",e);
+        }
+
+        messageConsumer.cleanup(); //Removes the subscription after popping the message
+
+    }
+
+    private MessageConsumer getMessageConsumer(SynapseConfiguration configuration, String processorName) {
         MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
         final String messageStoreName = processor.getMessageStoreName();
         MessageConsumer messageConsumer = configuration.getMessageStore(messageStoreName).getConsumer();

@@ -330,10 +330,7 @@
                   id="delete_link" class="icon-link"
                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                   key="delete"/></a>
-                <a onclick="#" href="#"
-                  class="icon-link"
-                  style="color:gray;background-image:url(../admin/images/edit.gif);">ViewMessage</a>
-              
+               
                 <% } else { %>
                 <a onclick="editRow('<%= type%>','<%=mspData.getName()%>')" href="#"
                    class="icon-link"
@@ -369,10 +366,7 @@
                   id="delete_link" class="icon-link"
                   style="color:gray;background-image:url(../admin/images/delete.gif);"><fmt:message
                   key="delete"/></a>
-               <a onclick="viewMessage('<%= mspData.getName()%>')" href="#"
-                  class="icon-link"
-                  style="background-image:url(../admin/images/edit.gif);">ViewMessage</a>
-
+               
                 <% } else { %>
                 <a onclick="editRow('<%= type%>', '<%=mspData.getName()%>')" href="#"
                    class="icon-link"
@@ -388,7 +382,12 @@
                     <fmt:message key="inactive"/>&nbsp;[</span>
                     <a href="#" class="icon-link" id="activate_link"
                        style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
-                       onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a>
+                       onclick="activateRow('<%= mspData.getName()%>')"><fmt:message key="activate"/></a> 
+                    <span class="icon-text"
+                      style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">|</span>
+                    <a href="#" class="icon-link" id="activate_link"
+                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;"
+                       onclick="viewMessage('<%= mspData.getName()%>')">View Message</a> 
                 <span class="icon-text"
                       style="background-image:none !important; margin-left: 0px !important; padding-left: 0px !important;">]</span>
 

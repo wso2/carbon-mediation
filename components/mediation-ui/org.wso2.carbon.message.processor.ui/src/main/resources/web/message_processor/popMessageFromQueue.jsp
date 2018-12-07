@@ -42,6 +42,7 @@
     
     MessageProcessorAdminServiceClient client = new MessageProcessorAdminServiceClient(cookie,url,configContext);
     String processorName = request.getParameter("processorName");
+    System.out.println(processorName);
     
     if( processorName != null ) {
         try{

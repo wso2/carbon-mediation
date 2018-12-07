@@ -430,10 +430,8 @@ public class MessageProcessorAdminServiceClient {
         throw new Exception(message);
     }
 
-    public String getMessage(String processorName) throws Exception
-    {
+    public String getMessage(String processorName) throws Exception {
         String msg = null;
-
         try{
             if(processorName!=null) {
                 msg = stub.getMessage(processorName);
@@ -441,26 +439,28 @@ public class MessageProcessorAdminServiceClient {
         } catch (Exception e) {
             handleException(e);
         }
-
         return msg;
     }
 
-
-    public void popMessage(String processorName) throws Exception
-    {
-
+    public void popMessage(String processorName) throws Exception {
         try{
-            if(processorName!=null)
-            {
+            if(processorName!=null) {
                 stub.popMessage(processorName);
             }
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
+            handleException(e);
+        }
+    }
+
+    public void redirectMessage(String processorName) throws Exception {
+        try{
+            if(processorName!=null) {
+                stub.redirectMessage(processorName);
+            }
+        } catch (Exception e) {
             handleException(e);
         }
 
-
     }
-
 
 }

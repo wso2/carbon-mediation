@@ -31,25 +31,23 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib uri="http://wso2.org/projects/carbon/taglibs/carbontags.jar" prefix="carbon" %>
 
+<carbon:breadcrumb
+        label="Message Processor"
+        resourceBundle="org.wso2.carbon.message.processor.ui.i18n.Resources"
+        topPage="false"
+        request="<%=request%>"/>
+
 
 <fmt:bundle basename="org.wso2.carbon.message.processor.ui.i18n.Resources">
     <carbon:jsi18n resourceBundle="org.wso2.carbon.message.processor.ui.i18n.Resources"
     request="<%=request%>"/>
-    <carbon:breadcrumb
-        label="Message Processors"
-        resourceBundle="org.wso2.carbon.message.processor.ui.i18n.Resources"
-        topPage="true"
-    request="<%=request%>"/>
-
+    
     <script src="../editarea/edit_area_full.js" type="text/javascript"></script>
     <script type="text/javascript" src="localentrycommons.js"></script>
-
-
     <link type="text/css" href="../dialog/js/jqueryui/tabs/ui.all.css" rel="stylesheet"/>
     <script type="text/javascript" src="../dialog/js/jqueryui/tabs/jquery-1.2.6.min.js"></script>
     <script type="text/javascript" src="../dialog/js/jqueryui/tabs/jquery-ui-1.6.custom.min.js"></script>
     <script type="text/javascript" src="../dialog/js/jqueryui/tabs/jquery.cookie.js"></script>
-
 
     <%
 
@@ -86,6 +84,10 @@
             <pre> <h3>No message in the subscribed Queue</h3> </pre> <br>
         </div>
         <input type="button" class="button" value = "Pop Message" disabled>
+        <input type="button" class="button" value = "Redirect Message" disabled>
+        <input type="button" value="<fmt:message key="cancel"/>"
+                   onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
+                   class="button"/>
        
         <% } else if(msg.contains("ERROR")) { %>
         <div id="workArea" style="background-color:#F4F4F4;">
@@ -95,15 +97,21 @@
             </pre> <br>
         </div>
         <input type="button" class="button" value = "Pop Message" disabled>
+        <input type ="button" class ="button" value ="Redirect Message" disabled>
+         <input type="button" value="<fmt:message key="cancel"/>"
+                   onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
+                   class="button"/>
           
         <% } else { %>
         <div id="workArea" style="background-color:#F4F4F4;">
             <pre> <h3><%=msg%></h3> </pre> <br>
         </div>
-        <input type="button" class="button" onclick="popMessage('<%=processorName%>')" value = "Pop Message">
+        <input type="button" class="button" onclick="popMessage('<%=processorName%>')" value = "Pop Message">      
+        <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect Message">
+         <input type="button" value="<fmt:message key="cancel"/>"
+                   onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
+                   class="button"/>
         <% } %>
-        
-        
     </div>
 
     <script type="text/javascript">
@@ -119,6 +127,21 @@
                     }
                 });
             });
+        }
+        
+        function redirectMessage(name)
+        {
+            CARBON.showConfirmationDialog("Do you want to redirect the message?", function () {
+                jQuery.ajax({
+                    type: "POST",
+                    url: "redirectMessageToQueue.jsp",
+                    data: {"processorName": name},
+                    success: function (result, status, xhr) {
+                        alert("Message has been sucessfully redirected");
+                    }
+                });
+            });
+            
         }
 
     </script>
