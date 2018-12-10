@@ -127,4 +127,12 @@ public class ConfigHolder {
     public Map<Integer, SynapseEnvironmentService> getSynapseEnvironmentServices() {
         return synapseEnvironmentServices;
     }
+    /**
+     * Check if synapseConfiguration object is initialized
+     *
+     * @return      ConfigHolder init status
+     */
+    public boolean isSynapseConfigurationInitialized() {
+        return synapseConfiguration != null;
+    }
 }
