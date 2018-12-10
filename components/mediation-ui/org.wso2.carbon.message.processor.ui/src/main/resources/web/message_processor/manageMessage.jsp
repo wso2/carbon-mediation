@@ -22,6 +22,9 @@
 <%@ page import="java.util.Iterator" %>
 <%@ page import="org.wso2.carbon.message.processor.ui.MessageProcessorAdminServiceClient" %>
 <%@ page import="org.wso2.carbon.message.processor.service.xsd.MessageProcessorMetaData" %>
+<%@ page import="org.apache.axiom.om.OMElement" %>
+<%@ page import="org.apache.axiom.om.util.AXIOMUtil" %>
+
 
 <%@ page import="org.wso2.carbon.message.processor.ui.utils.MessageProcessorData" %>
 <%@ page import="org.wso2.carbon.message.processor.ui.MessageStoreAdminServiceClient" %>
@@ -58,6 +61,41 @@
         MessageProcessorAdminServiceClient client = new MessageProcessorAdminServiceClient(cookie,url,configContext);
         String processorName = request.getParameter("messageProcessorName");
         String msg = null;
+        String messageStoreName = request.getParameter("messageProcessorName");
+        
+        String[] messageProcessorNames = client.getMessageProcessorNames();
+        String origin = request.getParameter("origin");
+        MessageProcessorData processorData = null;
+
+        if (messageStoreName != null) {
+            session.setAttribute("edit" + messageStoreName, "true");
+            for (String name : messageProcessorNames) {
+                if (name != null && name.equals(messageStoreName)) {
+                    processorData = client.getMessageProcessor(name);
+                }
+            }
+        } else if (origin != null && !"".equals(origin)) {
+            String mpString = (String) session.getAttribute("messageProcessorConfiguration");
+            String mpName = (String) session.getAttribute("mpName");
+            String mpProvider = (String) session.getAttribute("mpProvider");
+            String mpStore = (String) session.getAttribute("mpStore");
+
+            session.removeAttribute("messageProcessorConfiguration");
+            session.removeAttribute("mpName");
+            session.removeAttribute("mpProvider");
+            session.removeAttribute("mpStore");
+
+            mpString = mpString.replaceAll("\\s\\s+|\\n|\\r", ""); // remove the pretty printing from the string
+            OMElement messageProcessorElement = AXIOMUtil.stringToOM(mpString);
+            processorData = new MessageProcessorData(messageProcessorElement.toString());
+            processorData.setName(mpName);
+            processorData.setClazz(mpProvider);
+            processorData.setMessageStore(mpStore);
+        }
+            
+        MessageStoreAdminServiceClient messageStoreClient =
+            new MessageStoreAdminServiceClient(cookie, url, configContext);
+        String[] messageStores = messageStoreClient.getMessageStoreNames();
 
         if( processorName != null )
         {
@@ -84,11 +122,54 @@
             <pre> <h3>No message in the subscribed Queue</h3> </pre> <br>
         </div>
         <input type="button" class="button" value = "Pop Message" disabled>
-        <input type="button" class="button" value = "Redirect Message" disabled>
-        <input type="button" value="<fmt:message key="cancel"/>"
+                
+        <table>
+            <%if (((null!=processorData)&& processorData.getParams() != null
+                            && !processorData.getParams().isEmpty()
+                            &&(processorData.getParams().get("message.processor.failMessagesStore")!=null))) { %>
+                        <tr>
+                            <td>
+                                <p> Redirect Message to : </p>
+                            </td>
+                            <td>
+                                <input name="FailMessagesStore" id="FailMessagesStore" type="hidden"
+                                       value="<%=processorData.getParams().get("message.processor.failMessagesStore")%>"/>
+                                <label id="FailMessagesStore_label" for="FailMessagesStore"><%=processorData.getParams()
+                                       .get("message.processor.failMessagesStore")%>
+                                </label>
+                                <br/>
+                            </td>
+                            <td>
+                                <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect">
+                            </td>
+                        </tr>
+                        <%} else {%>
+                        <tr>
+                            <td>
+                                <p> Redirect Message to : <p>
+                            </td>
+                            <td>
+                                <select id="FailMessagesStore" name="FailMessagesStore">
+                                    <%for (String msn : messageStores) {%>
+                                    <option selected="true" value="<%=msn%>"><%=msn%>
+                                    </option>
+                                    <%} %>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="button" class="button" value = "Redirect" disabled>
+                            </td>
+                        </tr>
+                    <%}%>  
+        </table>
+                
+       
+        <br><input type="button" value="<fmt:message key="cancel"/>"
                    onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
                    class="button"/>
        
+        
+        
         <% } else if(msg.contains("ERROR")) { %>
         <div id="workArea" style="background-color:#F4F4F4;">
             <pre> 
@@ -97,18 +178,100 @@
             </pre> <br>
         </div>
         <input type="button" class="button" value = "Pop Message" disabled>
-        <input type ="button" class ="button" value ="Redirect Message" disabled>
-         <input type="button" value="<fmt:message key="cancel"/>"
+                
+        <table>
+            <%if (((null!=processorData)&& processorData.getParams() != null
+                            && !processorData.getParams().isEmpty()
+                            &&(processorData.getParams().get("message.processor.failMessagesStore")!=null))) { %>
+                        <tr>
+                            <td>
+                                <h3> Redirect Message to : </h3>
+                            </td>
+                            <td>
+                                <input name="FailMessagesStore" id="FailMessagesStore" type="hidden"
+                                       value="<%=processorData.getParams().get("message.processor.failMessagesStore")%>"/>
+                                <label id="FailMessagesStore_label" for="FailMessagesStore"><%=processorData.getParams()
+                                       .get("message.processor.failMessagesStore")%>
+                                </label>
+                                <br/>
+                            </td>
+                            <td>
+                                <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect">
+                            </td>
+                        </tr>
+                        <%} else {%>
+                        <tr>
+                            <td>
+                                <p> Redirect Message to : </p>
+                            </td>
+                            <td>
+                                <select id="FailMessagesStore" name="FailMessagesStore">
+                                    <%for (String msn : messageStores) {%>
+                                    <option selected="true" value="<%=msn%>"><%=msn%>
+                                    </option>
+                                    <%} %>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="button" class="button" value = "Redirect" disabled>
+                            </td>
+                        </tr>
+                    <%}%>  
+        </table>
+        
+        <br><input type="button" value="<fmt:message key="cancel"/>"
                    onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
                    class="button"/>
           
+        
+        
         <% } else { %>
         <div id="workArea" style="background-color:#F4F4F4;">
             <pre> <h3><%=msg%></h3> </pre> <br>
         </div>
-        <input type="button" class="button" onclick="popMessage('<%=processorName%>')" value = "Pop Message">      
-        <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect Message">
-         <input type="button" value="<fmt:message key="cancel"/>"
+            <input type="button" class="button" onclick="popMessage('<%=processorName%>')" value = "Pop Message"> <br>     
+    
+        <table>
+            <%if (((null!=processorData)&& processorData.getParams() != null
+                            && !processorData.getParams().isEmpty()
+                            &&(processorData.getParams().get("message.processor.failMessagesStore")!=null))) { %>
+                        <tr>
+                            <td>
+                                <h3> Redirect Message to : </h3>
+                            </td>
+                            <td>
+                                <input name="FailMessagesStore" id="FailMessagesStore" type="hidden"
+                                       value="<%=processorData.getParams().get("message.processor.failMessagesStore")%>"/>
+                                <label id="FailMessagesStore_label" for="FailMessagesStore"><%=processorData.getParams()
+                                       .get("message.processor.failMessagesStore")%>
+                                </label>
+                                <br/>
+                            </td>
+                            <td>
+                                <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect">
+                            </td>
+                        </tr>
+                        <%} else {%>
+                        <tr>
+                            <td>
+                                <h3> Redirect Message to : </h3>
+                            </td>
+                            <td>
+                                <select id="FailMessagesStore" name="FailMessagesStore">
+                                    <%for (String msn : messageStores) {%>
+                                    <option selected="true" value="<%=msn%>"><%=msn%>
+                                    </option>
+                                    <%} %>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect">
+                            </td>
+                        </tr>
+                    <%}%>  
+        </table>
+                        
+        <input type="button" value="<fmt:message key="cancel"/>"
                    onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
                    class="button"/>
         <% } %>
@@ -117,6 +280,7 @@
     <script type="text/javascript">
         function popMessage(name)
         {
+            
             CARBON.showConfirmationDialog("Do you want to pop the message?", function () {
                 jQuery.ajax({
                     type: "POST",
@@ -131,11 +295,12 @@
         
         function redirectMessage(name)
         {
-            CARBON.showConfirmationDialog("Do you want to redirect the message?", function () {
+            var store = document.getElementById('FailMessagesStore').value;
+            CARBON.showConfirmationDialog("Do you want to redirect the message to Message Store "+store+"?", function () {
                 jQuery.ajax({
                     type: "POST",
                     url: "redirectMessageToQueue.jsp",
-                    data: {"processorName": name},
+                    data: {"processorName": name, "storeName":store},
                     success: function (result, status, xhr) {
                         alert("Message has been sucessfully redirected");
                     }

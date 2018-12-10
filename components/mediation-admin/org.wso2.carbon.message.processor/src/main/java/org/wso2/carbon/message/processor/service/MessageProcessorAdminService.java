@@ -794,18 +794,13 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
            log.error("Failed to pop the message", e);
         }
 
-        messageConsumer.cleanup(); // Removes the subscription after popping the message
+        messageConsumer.cleanup();
     }
 
-    public void redirectMessage(String processorName){
+    public void redirectMessage(String processorName, String storeName){
         SynapseConfiguration configuration = getSynapseConfiguration();
-        MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
-        final String messageStoreName = processor.getMessageStoreName();
-
-        MessageConsumer messageConsumer =configuration.getMessageStore(messageStoreName).getConsumer();
-        MessageProducer messageProducer = configuration.getMessageStore("Test").getProducer();
-
-
+        MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
+        MessageProducer messageProducer = configuration.getMessageStore(storeName).getProducer();
 
         try {
             configuration.redirectMessage(messageProducer, messageConsumer);
@@ -813,7 +808,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
             log.error("Failed to pop the message",e);
         }
 
-        messageConsumer.cleanup(); //Removes the subscription after popping the message
+        messageConsumer.cleanup();
 
     }
 

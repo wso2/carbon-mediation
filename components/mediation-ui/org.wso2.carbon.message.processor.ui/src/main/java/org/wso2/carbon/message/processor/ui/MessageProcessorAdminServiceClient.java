@@ -452,10 +452,10 @@ public class MessageProcessorAdminServiceClient {
         }
     }
 
-    public void redirectMessage(String processorName) throws Exception {
+    public void redirectMessage(String processorName, String storeName) throws Exception {
         try{
             if(processorName!=null) {
-                stub.redirectMessage(processorName);
+                stub.redirectMessage(processorName, storeName);
             }
         } catch (Exception e) {
             handleException(e);
