@@ -24,11 +24,13 @@ import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.MessageContext;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MessageProcessorFactory;
 import org.apache.synapse.config.xml.MessageProcessorSerializer;
 import org.apache.synapse.message.MessageConsumer;
 import org.apache.synapse.message.MessageProducer;
+import org.apache.synapse.message.StoreForwardException;
 import org.apache.synapse.message.processor.MessageProcessor;
 import org.apache.synapse.message.processor.impl.ScheduledMessageProcessor;
 import org.apache.synapse.message.processor.impl.failover.FailoverMessageForwardingProcessorView;
@@ -42,7 +44,7 @@ import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
 import org.wso2.carbon.mediation.initializer.persistence.MediationPersistenceManager;
-import org.wso2.carbon.mediation.initializer.services.SynapseEnvironmentService;
+
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
@@ -771,13 +773,31 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         String msg = null;
 
         try {
-            msg = configuration.getMessage(messageConsumer);
+            msg = getMessageAsString(messageConsumer);
         } catch (Exception e) {
             log.error("MessageProcessorAdminService : Failed to get message" + e);
         }
 
         messageConsumer.cleanup(); //Removes the subscription after getting the message.
         return msg;
+    }
+
+    private String getMessageAsString(MessageConsumer consumer) throws StoreForwardException {
+        MessageContext messageContext;
+        MessageConsumer messageConsumer = consumer;
+
+        String msg = null;
+
+        if (messageConsumer.isAlive()) {
+            try {
+                messageContext = messageConsumer.receive();
+                msg = messageContext.getEnvelope().toString();
+            } catch (SynapseException e) {
+                log.error("MessageProcessorAdminService : Failed to get message", e);
+            }
+        }
+
+        return  msg;
     }
 
     /*
@@ -789,7 +809,7 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
 
         try {
-             configuration.popMessage(messageConsumer);
+            popMessageFromQueue(messageConsumer);
         } catch (Exception e) {
            log.error("Failed to pop the message", e);
         }
@@ -797,20 +817,53 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
         messageConsumer.cleanup();
     }
 
+    private  void popMessageFromQueue(MessageConsumer consumer) {
+        MessageConsumer messageConsumer = consumer;
+        MessageContext messageContext;
+
+        try{
+            messageContext = messageConsumer.receive();
+            messageConsumer.ack();
+        } catch (SynapseException e) {
+            log.error("Cannot Pop message. SynapseConfig caught exception.",e);
+        }
+    }
+
+    /*
+     * RedirectMessage to specified message store
+     */
+
     public void redirectMessage(String processorName, String storeName){
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
         MessageProducer messageProducer = configuration.getMessageStore(storeName).getProducer();
 
         try {
-            configuration.redirectMessage(messageProducer, messageConsumer);
+            redirectMessageToStore(messageProducer, messageConsumer);
         } catch (Exception e) {
             log.error("Failed to pop the message",e);
         }
 
         messageConsumer.cleanup();
+    }
+
+    private void redirectMessageToStore(MessageProducer producer, MessageConsumer consumer)
+    {
+        MessageProducer messageProducer = producer;
+        MessageConsumer messageConsumer = consumer;
+        MessageContext messageContext;
+
+        try {
+            messageContext = messageConsumer.receive();
+            messageProducer.storeMessage(messageContext);
+            messageConsumer.ack();
+        } catch (SynapseException e) {
+            log.error("Cannot Pop message. SynapseConfig caught exception.",e);
+        }
 
     }
+
+
 
     private MessageConsumer getMessageConsumer(SynapseConfiguration configuration, String processorName) {
         MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
