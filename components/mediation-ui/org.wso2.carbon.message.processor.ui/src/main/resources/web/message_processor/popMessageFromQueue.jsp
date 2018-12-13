@@ -26,8 +26,7 @@
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="org.wso2.carbon.message.processor.ui.MessageProcessorAdminServiceClient" %>
 
-<body>
-    
+<body> 
 <%  
     //ignore methods other than post
     if (!request.getMethod().equalsIgnoreCase("POST")) {
@@ -38,7 +37,7 @@
     String url = CarbonUIUtil.getServerURL(this.getServletConfig().getServletContext(),session);
     ConfigurationContext configContext =(ConfigurationContext)config.getServletContext().getAttribute(CarbonConstants.CONFIGURATION_CONTEXT);
     String cookie = (String) session.getAttribute(ServerConstants.ADMIN_SERVICE_COOKIE);
-    String msg = null; 
+    String msg = null;
     
     MessageProcessorAdminServiceClient client = new MessageProcessorAdminServiceClient(cookie,url,configContext);
     String processorName = request.getParameter("processorName");
@@ -47,8 +46,8 @@
         try{
             client.popMessage(processorName);
         }catch (Throwable e){
-            msg = "Couldnt pop the Message :" + e.getMessage();
-            CarbonUIMessage.sendCarbonUIMessage(msg,CarbonUIMessage.ERROR, request);     
+            msg = "Could not pop the message from the queue" + e;
+            CarbonUIMessage.sendCarbonUIMessage(msg,CarbonUIMessage.ERROR,request);     
         }
     }
     

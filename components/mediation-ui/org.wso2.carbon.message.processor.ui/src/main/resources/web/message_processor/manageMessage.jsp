@@ -97,12 +97,10 @@
             new MessageStoreAdminServiceClient(cookie, url, configContext);
         String[] messageStores = messageStoreClient.getMessageStoreNames();
 
-        if( processorName != null )
-        {
-            try{
+        if( processorName != null ) {
+            try {
                 msg = client.getMessage(processorName);
-
-            } catch (Throwable e ) {
+            } catch (Throwable e) {
                 msg = "ERROR : " + e.getMessage();
                 CarbonUIMessage.sendCarbonUIMessage(msg,CarbonUIMessage.ERROR, request);
             }
@@ -287,7 +285,8 @@
                     url: "popMessageFromQueue.jsp",
                     data: {"processorName": name},
                     success: function (result, status, xhr) {
-                        alert("Message has been sucessfully popped");
+                        if(status == "success")
+                        { CARBON.showInfoDialog("Message successfully popped from Queue"); }
                     }
                 });
             });
@@ -299,10 +298,10 @@
             CARBON.showConfirmationDialog("Do you want to redirect the message to Message Store "+store+"?", function () {
                 jQuery.ajax({
                     type: "POST",
-                    url: "redirectMessageToQueue.jsp",
+                    url: "enqueueMessageToQueue.jsp",
                     data: {"processorName": name, "storeName":store},
                     success: function (result, status, xhr) {
-                        alert("Message has been sucessfully redirected");
+                        CARBON.showInfoDialog("Message successfully enqueued to " + store);
                     }
                 });
             });
