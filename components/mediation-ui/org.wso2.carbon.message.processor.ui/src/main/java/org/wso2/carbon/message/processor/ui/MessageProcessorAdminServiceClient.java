@@ -430,6 +430,14 @@ public class MessageProcessorAdminServiceClient {
         throw new Exception(message);
     }
 
+
+    /**
+     * Get the message from the associated queue
+     *
+     * @param processorName MessageProcessor name
+     * @return <code>msg</code> from the queue as a string
+     * @throws Exception
+     */
     public String getMessage(String processorName) throws Exception {
         String msg = null;
         try{
@@ -442,6 +450,12 @@ public class MessageProcessorAdminServiceClient {
         return msg;
     }
 
+    /**
+     * Pop the message from the associated queue
+     *
+     * @param processorName MessageProcessor name
+     * @throws Exception
+     */
     public void popMessage(String processorName) throws Exception {
         try{
             if(processorName!=null) {
@@ -452,10 +466,18 @@ public class MessageProcessorAdminServiceClient {
         }
     }
 
-    public void redirectMessage(String processorName, String storeName) throws Exception {
+    /**
+     * Pop the message from the associated queue and enqueue to specified queue
+     *
+     * @param processorName MessageProcessor name
+     * @param storeName Name of store to enqueue the message
+     * @throws Exception
+     */
+
+    public void popAndEnqueueMessage(String processorName, String storeName) throws Exception {
         try{
             if(processorName!=null) {
-                stub.redirectMessage(processorName, storeName);
+                stub.popAndEnqueueMessage(processorName, storeName);
             }
         } catch (Exception e) {
             handleException(e);

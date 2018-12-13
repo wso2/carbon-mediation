@@ -97,12 +97,10 @@
             new MessageStoreAdminServiceClient(cookie, url, configContext);
         String[] messageStores = messageStoreClient.getMessageStoreNames();
 
-        if( processorName != null )
-        {
-            try{
+        if( processorName != null ) {
+            try {
                 msg = client.getMessage(processorName);
-
-            } catch (Throwable e ) {
+            } catch (Throwable e) {
                 msg = "ERROR : " + e.getMessage();
                 CarbonUIMessage.sendCarbonUIMessage(msg,CarbonUIMessage.ERROR, request);
             }
@@ -114,167 +112,180 @@
         }
     %>
 
+    <style>
+         pre {
+            overflow-x: auto;
+            white-space: pre-wrap;
+            white-space: -moz-pre-wrap;
+            white-space: -pre-wrap;
+            white-space: -o-pre-wrap;
+            word-wrap: break-word;
+         }
+    </style>
+
     <div id = "middle">
         <h2><%=processorName%> : Message Management</h2>
 
-        <% if(msg == null) { %>
+        <!-- No messages in the Queue -->
+        <% if(msg == null) { %>      
+        <!-- Display -->
         <div id="workArea" style="background-color:#F4F4F4;">
-            <pre> <h3>No message in the subscribed Queue</h3> </pre> <br>
+            <pre><h3>No message in the subscribed Queue</h3></pre>
         </div>
-        <input type="button" class="button" value = "Pop Message" disabled>
+        <br>
+        <!-- Operations -->
+        <div>
+            <table width = "50%">
+                <!-- Pop Message -->
+                <tr>
+                    <td width = "50%" >
+                        <p>Pop the message from the Queue</p>
+                    </td>
+                    <td width = "25%">
+                        <p> </p>
+                    </td>
+                    <td width = "25%">
+                        <input type="button" class="button" value = "Pop Message" disabled>
+                    </td>
+                </tr>
                 
-        <table>
-            <%if (((null!=processorData)&& processorData.getParams() != null
-                            && !processorData.getParams().isEmpty()
-                            &&(processorData.getParams().get("message.processor.failMessagesStore")!=null))) { %>
-                        <tr>
-                            <td>
-                                <p> Redirect Message to : </p>
-                            </td>
-                            <td>
-                                <input name="FailMessagesStore" id="FailMessagesStore" type="hidden"
-                                       value="<%=processorData.getParams().get("message.processor.failMessagesStore")%>"/>
-                                <label id="FailMessagesStore_label" for="FailMessagesStore"><%=processorData.getParams()
-                                       .get("message.processor.failMessagesStore")%>
-                                </label>
-                                <br/>
-                            </td>
-                            <td>
-                                <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect">
-                            </td>
-                        </tr>
-                        <%} else {%>
-                        <tr>
-                            <td>
-                                <p> Redirect Message to : <p>
-                            </td>
-                            <td>
-                                <select id="FailMessagesStore" name="FailMessagesStore">
-                                    <%for (String msn : messageStores) {%>
-                                    <option selected="true" value="<%=msn%>"><%=msn%>
-                                    </option>
-                                    <%} %>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="button" class="button" value = "Redirect" disabled>
-                            </td>
-                        </tr>
-                    <%}%>  
-        </table>
+                <!-- Enqueue Message -->           
+                <tr>
+                    <td width = "50%">
+                        <p>Enqueue message to the Queue </p>
+                        
+                    </td>
+                    <td width = "25%">
+                        <select id="FailMessagesStore" name="FailMessagesStore">
+                            <%for (String msn : messageStores) {%>
+                                <option selected="true" value="<%=msn%>"><%=msn%></option>
+                            <%} %>
+                        </select>
+                    </td>
+                    <td width = "25%">
+                        <input type="button" class="button" value = "Enqueue" disabled>
+                    </td>    
+                </tr>
                 
-       
-        <br><input type="button" value="<fmt:message key="cancel"/>"
-                   onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
-                   class="button"/>
-       
-        
-        
+                <!-- Cancel -->
+                <tr>
+                    <td>
+                        <input type="button" value="<fmt:message key="cancel"/>"
+                               onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
+                               class="button"/>       
+                    </td>
+                </tr>
+    
+            </table>      
+        </div>
+                               
+        <!-- Error occurs -->
         <% } else if(msg.contains("ERROR")) { %>
+        <!-- Display -->
         <div id="workArea" style="background-color:#F4F4F4;">
-            <pre> 
-                <h3><%=msg%></h3>
-                <h4>Message Broker may be inactive</h4>
-            </pre> <br>
+            <pre> <h3><%=msg%></h3>
+            <h4>Message Broker may be inactive</h4>
+            </pre>
         </div>
-        <input type="button" class="button" value = "Pop Message" disabled>
+        <!-- Operation -->    
+        <div>
+            <table width = "50%">
+                <!-- Pop Message -->
+                <tr>
+                    <td width ="50%">
+                        <p>Pop the message from the Queue</p>
+                    </td>
+                    <td width = "25%">
+                        <p> </p>
+                    </td>
+                    <td width = "25%">
+                        <input type="button" class="button" value = "Pop Message" disabled>
+                    </td>
+                </tr>
                 
-        <table>
-            <%if (((null!=processorData)&& processorData.getParams() != null
-                            && !processorData.getParams().isEmpty()
-                            &&(processorData.getParams().get("message.processor.failMessagesStore")!=null))) { %>
-                        <tr>
-                            <td>
-                                <h3> Redirect Message to : </h3>
-                            </td>
-                            <td>
-                                <input name="FailMessagesStore" id="FailMessagesStore" type="hidden"
-                                       value="<%=processorData.getParams().get("message.processor.failMessagesStore")%>"/>
-                                <label id="FailMessagesStore_label" for="FailMessagesStore"><%=processorData.getParams()
-                                       .get("message.processor.failMessagesStore")%>
-                                </label>
-                                <br/>
-                            </td>
-                            <td>
-                                <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect">
-                            </td>
-                        </tr>
-                        <%} else {%>
-                        <tr>
-                            <td>
-                                <p> Redirect Message to : </p>
-                            </td>
-                            <td>
-                                <select id="FailMessagesStore" name="FailMessagesStore">
-                                    <%for (String msn : messageStores) {%>
-                                    <option selected="true" value="<%=msn%>"><%=msn%>
-                                    </option>
-                                    <%} %>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="button" class="button" value = "Redirect" disabled>
-                            </td>
-                        </tr>
-                    <%}%>  
-        </table>
-        
-        <br><input type="button" value="<fmt:message key="cancel"/>"
-                   onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
-                   class="button"/>
+                <!-- Enqueue Message -->
+                 <tr>
+                    <td width = "50%">
+                        <p>Enqueue message to the Queue </p>
+                        
+                    </td>
+                    <td width = "25%">
+                        <select id="FailMessagesStore" name="FailMessagesStore">
+                            <%for (String msn : messageStores) {%>
+                                <option selected="true" value="<%=msn%>"><%=msn%></option>
+                            <%} %>
+                        </select>
+                    </td>
+                    <td width = "25%">
+                        <input type="button" class="button" value = "Enqueue" disabled>
+                    </td>    
+                </tr>
+                
+                <!-- Cancel -->
+                <tr>
+                    <td>
+                        <input type="button" value="<fmt:message key="cancel"/>"
+                               onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
+                               class="button"/>       
+                    </td>
+                </tr>
+                
+            </table>
+        </div>    
           
-        
-        
+        <!-- Display message -->                       
         <% } else { %>
         <div id="workArea" style="background-color:#F4F4F4;">
             <pre> <h3><%=msg%></h3> </pre> <br>
         </div>
-            <input type="button" class="button" onclick="popMessage('<%=processorName%>')" value = "Pop Message"> <br>     
-    
-        <table>
-            <%if (((null!=processorData)&& processorData.getParams() != null
-                            && !processorData.getParams().isEmpty()
-                            &&(processorData.getParams().get("message.processor.failMessagesStore")!=null))) { %>
-                        <tr>
-                            <td>
-                                <h3> Redirect Message to : </h3>
-                            </td>
-                            <td>
-                                <input name="FailMessagesStore" id="FailMessagesStore" type="hidden"
-                                       value="<%=processorData.getParams().get("message.processor.failMessagesStore")%>"/>
-                                <label id="FailMessagesStore_label" for="FailMessagesStore"><%=processorData.getParams()
-                                       .get("message.processor.failMessagesStore")%>
-                                </label>
-                                <br/>
-                            </td>
-                            <td>
-                                <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect">
-                            </td>
-                        </tr>
-                        <%} else {%>
-                        <tr>
-                            <td>
-                                <h3> Redirect Message to : </h3>
-                            </td>
-                            <td>
-                                <select id="FailMessagesStore" name="FailMessagesStore">
-                                    <%for (String msn : messageStores) {%>
-                                    <option selected="true" value="<%=msn%>"><%=msn%>
-                                    </option>
-                                    <%} %>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="button" class="button" onclick="redirectMessage('<%=processorName%>')" value = "Redirect">
-                            </td>
-                        </tr>
-                    <%}%>  
-        </table>
+        <br>
+        
+        <!-- Operations -->
+        <div>
+            <table width = "50%">
+                <!-- Pop Message -->
+                <tr>
+                    <td width ="50%" >
+                        <p> Pop the message from the Queue </p>
+                    </td>
+                    <td width ="25%">
+                        <p> </p>
+                    </td>
+                    <td width ="25%">
+                        <input type="button" class="button" onclick="popMessage('<%=processorName%>')" value = "Pop Message">
+                    </td>
+                </tr>
+                
+                <!-- Enqueue Message -->
+                <tr>
+                    <td width = "50%">
+                        <p>Enqueue message to the Queue </p>
                         
-        <input type="button" value="<fmt:message key="cancel"/>"
-                   onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
-                   class="button"/>
-        <% } %>
+                    </td>
+                    <td width = "25%">
+                        <select id="FailMessagesStore" name="FailMessagesStore">
+                            <%for (String msn : messageStores) {%>
+                                <option selected="true" value="<%=msn%>"><%=msn%></option>
+                            <%} %>
+                        </select>
+                    </td>
+                    <td width = "25%">
+                        <input type="button" class="button" value = "Enqueue" onclick="enqueueMessage('<%=processorName%>')" >
+                    </td>    
+                </tr>
+                
+                <!-- Cancel -->
+                <tr>
+                    <td>
+                        <input type="button" value="<fmt:message key="cancel"/>"
+                               onclick="javascript:document.location.href='../message_processor/index.jsp?region=region1&item=messageProcessor_menu&ordinal=0'"
+                               class="button"/>       
+                    </td>
+                </tr>
+            </table>
+        </div>
+            
+       <% } %>
     </div>
 
     <script type="text/javascript">
@@ -287,22 +298,23 @@
                     url: "popMessageFromQueue.jsp",
                     data: {"processorName": name},
                     success: function (result, status, xhr) {
-                        alert("Message has been sucessfully popped");
+                        if(status == "success")
+                        { CARBON.showInfoDialog("Message successfully popped from Queue"); }
                     }
                 });
             });
         }
         
-        function redirectMessage(name)
+        function enqueueMessage(name)
         {
             var store = document.getElementById('FailMessagesStore').value;
             CARBON.showConfirmationDialog("Do you want to redirect the message to Message Store "+store+"?", function () {
                 jQuery.ajax({
                     type: "POST",
-                    url: "redirectMessageToQueue.jsp",
+                    url: "enqueueMessageToQueue.jsp",
                     data: {"processorName": name, "storeName":store},
                     success: function (result, status, xhr) {
-                        alert("Message has been sucessfully redirected");
+                        CARBON.showInfoDialog("Message successfully enqueued to " + store);
                     }
                 });
             });

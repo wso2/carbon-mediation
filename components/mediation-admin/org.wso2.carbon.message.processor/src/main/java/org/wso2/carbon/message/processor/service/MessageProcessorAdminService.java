@@ -30,7 +30,6 @@ import org.apache.synapse.config.xml.MessageProcessorFactory;
 import org.apache.synapse.config.xml.MessageProcessorSerializer;
 import org.apache.synapse.message.MessageConsumer;
 import org.apache.synapse.message.MessageProducer;
-import org.apache.synapse.message.StoreForwardException;
 import org.apache.synapse.message.processor.MessageProcessor;
 import org.apache.synapse.message.processor.impl.ScheduledMessageProcessor;
 import org.apache.synapse.message.processor.impl.failover.FailoverMessageForwardingProcessorView;
@@ -39,7 +38,6 @@ import org.apache.synapse.message.processor.impl.forwarder.MessageForwardingProc
 import org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor;
 import org.apache.synapse.message.processor.impl.sampler.SamplingProcessor;
 import org.apache.synapse.message.processor.impl.sampler.SamplingProcessorView;
-import org.opensaml.xml.signature.P;
 import org.wso2.carbon.mediation.initializer.AbstractServiceBusAdmin;
 import org.wso2.carbon.mediation.initializer.ServiceBusConstants;
 import org.wso2.carbon.mediation.initializer.ServiceBusUtils;
@@ -763,29 +761,22 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
     }
 
 
-    /*
-     * Get the poisonMessage passed from the synapse
+    /**
+     * Gets the message from the associated queue.
+     *
+     * @param processorName message processor name.
+     * @return <code>msg</code> returns message received from the queue as a string.
      */
-
-    public String getMessage(String processorName) throws Exception {
+    public String getMessage(String processorName) {
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
-        String msg = null;
-
-        try {
-            msg = getMessageAsString(messageConsumer);
-        } catch (Exception e) {
-            log.error("MessageProcessorAdminService : Failed to get message" + e);
-        }
-
-        messageConsumer.cleanup(); //Removes the subscription after getting the message.
+        String msg = getMessageAsString(messageConsumer);
+        messageConsumer.cleanup();
         return msg;
     }
 
-    private String getMessageAsString(MessageConsumer consumer) throws StoreForwardException {
+    private String getMessageAsString(MessageConsumer messageConsumer) throws SynapseException {
         MessageContext messageContext;
-        MessageConsumer messageConsumer = consumer;
-
         String msg = null;
 
         if (messageConsumer.isAlive()) {
@@ -793,64 +784,51 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
                 messageContext = messageConsumer.receive();
                 msg = messageContext.getEnvelope().toString();
             } catch (SynapseException e) {
-                log.error("MessageProcessorAdminService : Failed to get message", e);
+                log.error("Failed to get message : ", e);
             }
         }
-
         return  msg;
     }
 
-    /*
-     * Send request to Synapse to pop the poisonMessage
+    /**
+     * Pops the message from the associated queue.
+     *
+     * @param processorName message processor name.
      */
     public void popMessage(String processorName) {
-
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
 
-        try {
-            popMessageFromQueue(messageConsumer);
-        } catch (Exception e) {
-           log.error("Failed to pop the message", e);
-        }
-
+        popMessageFromQueue(messageConsumer);
         messageConsumer.cleanup();
     }
 
-    private  void popMessageFromQueue(MessageConsumer consumer) {
-        MessageConsumer messageConsumer = consumer;
-        MessageContext messageContext;
-
-        try{
-            messageContext = messageConsumer.receive();
+    private  void popMessageFromQueue(MessageConsumer messageConsumer) throws SynapseException{
+        try {
+            messageConsumer.receive();
             messageConsumer.ack();
         } catch (SynapseException e) {
-            log.error("Cannot Pop message. SynapseConfig caught exception.",e);
+            log.error("Failed to pop message : ",e);
         }
     }
 
-    /*
-     * RedirectMessage to specified message store
+    /**
+     * Pops the message and enqueues it to a specified queue.
+     *
+     * @param processorName message processor name.
+     * @param storeName name of the store to enqueue the message.
      */
-
-    public void redirectMessage(String processorName, String storeName){
+    public void popAndEnqueueMessage(String processorName, String storeName){
         SynapseConfiguration configuration = getSynapseConfiguration();
         MessageConsumer messageConsumer = getMessageConsumer(configuration,processorName);
         MessageProducer messageProducer = configuration.getMessageStore(storeName).getProducer();
 
-        try {
-            redirectMessageToStore(messageProducer, messageConsumer);
-        } catch (Exception e) {
-            log.error("Failed to pop the message",e);
-        }
-
+        popAndEnqueueMessageToStore(messageProducer, messageConsumer);
         messageConsumer.cleanup();
     }
 
-    private void redirectMessageToStore(MessageProducer producer, MessageConsumer consumer)
+    private void popAndEnqueueMessageToStore(MessageProducer messageProducer, MessageConsumer messageConsumer) throws SynapseException
     {
-        MessageProducer messageProducer = producer;
-        MessageConsumer messageConsumer = consumer;
         MessageContext messageContext;
 
         try {
@@ -858,18 +836,22 @@ public class MessageProcessorAdminService extends AbstractServiceBusAdmin {
             messageProducer.storeMessage(messageContext);
             messageConsumer.ack();
         } catch (SynapseException e) {
-            log.error("Cannot Pop message. SynapseConfig caught exception.",e);
+            log.error("Failed to enqueue the message : ",e);
         }
 
     }
 
-
-
+    /**
+     * Gets the messageConsumer associated with the specified processor.
+     *
+     * @param configuration SynapseConfiguration.
+     * @param processorName message processor name.
+     * @return <code>messageConsumer</code> object associated with specified processor.
+     */
     private MessageConsumer getMessageConsumer(SynapseConfiguration configuration, String processorName) {
         MessageProcessor processor = configuration.getMessageProcessors().get(processorName);
         final String messageStoreName = processor.getMessageStoreName();
-        MessageConsumer messageConsumer = configuration.getMessageStore(messageStoreName).getConsumer();
-        return messageConsumer;
+        return configuration.getMessageStore(messageStoreName).getConsumer();
     }
 
 }
